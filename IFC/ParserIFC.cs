@@ -1,0 +1,709 @@
+// MIT License
+// Copyright (c) 2016 Geometry Gym Pty Ltd
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
+// and associated documentation files (the "Software"), to deal in the Software without restriction, 
+// including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
+// subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all copies or substantial 
+// portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Text;
+using System.Reflection;
+using System.IO;
+using System.ComponentModel;
+using System.Diagnostics;
+
+using GeometryGym.STEP;
+
+namespace GeometryGym.Ifc
+{
+	public static class ParserIfc 
+	{
+		public static string Encode(string str)
+		{
+			string result = "";
+			for (int icounter = 0; icounter < str.Length; icounter++)
+			{
+				char c = str[icounter];
+				int i = (int)c;
+				if(i < 32 || i > 126)
+					result +=  "\\X2\\" + string.Format("{0:x4}", i).ToUpper() + "\\X0\\";
+				else
+					result += c;
+			}
+			return result;
+		}
+		public static string Decode(string str) //http://www.buildingsmart-tech.org/implementation/get-started/string-encoding/string-encoding-decoding-summary
+		{
+			int ilast = str.Length - 4, icounter = 0;
+			string result = "";
+			while (icounter < ilast)
+			{
+				char c = str[icounter];
+				if (c == '\\')
+				{
+					if (str[icounter + 2] == '\\')
+					{
+						if (str[icounter + 1] == 'S')
+						{
+							char o = str[icounter + 3];
+							result += (char)((int)o + 128);
+							icounter += 3;
+						}
+						else if (str[icounter + 1] == 'X' && str.Length > icounter + 4)
+						{
+							string s = str.Substring(icounter + 3, 2);
+							c = System.Text.Encoding.ASCII.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+							//result += (char)();
+							result += c;
+							icounter += 4;
+						}
+						else
+							result += str[icounter];
+					}
+					else if (str[icounter + 3] == '\\' && str[icounter + 2] == '2' && str[icounter + 1] == 'X')
+					{
+						icounter += 4;
+						while (str[icounter] != '\\')
+						{
+							string s = str.Substring(icounter, 4);
+							c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+							//result += (char)();
+							result += c;
+							icounter += 4;
+						}
+						icounter += 3;
+					}
+					else
+						result += str[icounter];
+				}
+				else
+					result += str[icounter];
+				icounter++;
+			}
+			while (icounter < str.Length)
+				result += str[icounter++];
+			return result;
+		}
+
+		public static IfcLogicalEnum ParseIFCLogical(string str) 
+		{
+			string s = str.Trim();
+			if (str == "$")
+				return IfcLogicalEnum.UNKNOWN;
+			Char c = char.ToUpper(s.Replace(".", "")[0]);
+			if (c == 'T')
+				return IfcLogicalEnum.TRUE;
+			else if (c == 'F')
+				return IfcLogicalEnum.FALSE;
+
+			return IfcLogicalEnum.UNKNOWN;
+		}
+		public static IfcLogicalEnum StripLogical(string s, ref int pos)
+		{
+			IfcLogicalEnum result = IfcLogicalEnum.UNKNOWN;
+			int icounter = pos, len = s.Length;
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				pos = icounter;
+				return result;
+			}
+			if (s[icounter++] != '.')
+				throw new Exception("Unrecognized format!");
+			char c = char.ToUpper(s[icounter++]);
+			if (c == 'T')
+				result = IfcLogicalEnum.TRUE;
+			else if (c == 'F')
+				result = IfcLogicalEnum.TRUE;
+			pos = icounter + 2;
+			return result;
+		}
+		public static string LogicalToString(IfcLogicalEnum l)
+		{
+			if (l == IfcLogicalEnum.TRUE)
+				return ".T.";
+			else if (l == IfcLogicalEnum.FALSE)
+				return ".F.";
+			return ".U.";
+		}
+
+		internal static void GetKeyWord(string line, out int ifcID, out string keyword, out string def)
+		{
+			keyword = "";
+			def = "";
+			ifcID = 0;
+			if (string.IsNullOrEmpty(line))
+				return;
+			string strLine = line.Trim();
+			int jlast = strLine.Length, jcounter = (line[0] == '#' ? 1 : 0);
+			char c;
+			for (; jcounter < jlast; jcounter++)
+			{
+				c = strLine[jcounter];
+				if (char.IsDigit(c))
+					def += c;
+				else
+					break;
+			}
+			if (!string.IsNullOrEmpty(def))
+				ifcID = int.Parse(def);
+			c = strLine[jcounter];
+			while (c == ' ')
+				c = strLine[++jcounter];
+			if (strLine[jcounter] == '=')
+				jcounter++;
+			c = strLine[jcounter];
+			while (c == ' ')
+				c = strLine[++jcounter];
+			if (c != 'I')
+				return;
+			for (; jcounter < jlast; jcounter++)
+			{
+				c = strLine[jcounter];
+				if (c == '(')
+					break;
+				keyword += c;
+			}
+			keyword = keyword.Trim();
+			keyword = keyword.ToUpper();
+			int len = strLine.Length;
+			int ilast = 1;
+			while (strLine[len - ilast] != ')')
+				ilast++;
+			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
+		}
+		internal static BaseClassIfc ParseLine(string line, Schema schema)
+		{
+			string kw = "", str = "";
+			int ifcID = 0;
+			if (string.IsNullOrEmpty(line))
+				return null;
+			if (line.Length < 5 || line.StartsWith("ISO"))
+				return null;
+			GetKeyWord(line, out ifcID, out kw, out str);
+			if (string.IsNullOrEmpty(kw))
+				return null;
+			str = str.Trim();
+			BaseClassIfc result = LineParser(kw, str, schema);
+			if (result == null)
+				return null;
+			result.mIFCString = str;
+			result.mIndex = ifcID;
+			return result;
+		}
+		private static BaseClassIfc LineParser(string keyword, string str, Schema schema)
+		{
+			Type type = Type.GetType("GeometryGym.Ifc." + keyword,false,true);
+			if (type != null)
+			{
+				Type[] arguments = new Type[] { typeof(string), typeof(Schema) };
+				MethodInfo parser = type.GetMethod("Parse",BindingFlags.Static | BindingFlags.NonPublic,null,CallingConventions.Any, arguments,null);
+				if (parser != null)
+					return parser.Invoke(null, new object[] { str,schema }) as BaseClassIfc;
+				arguments = new Type[] { typeof(string) };
+				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, arguments, null);
+				if (parser != null)
+					return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
+			}
+			return null;
+		}
+
+		internal static IfcColour parseColour(string str)
+		{
+			string kw = "", def = "";
+			int id = 0;
+			ParserIfc.GetKeyWord(str, out id, out kw, out def);
+			if (string.IsNullOrEmpty(kw))
+				return null;
+			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
+				return IfcColourRgb.Parse(str);
+			if (string.Compare(kw, "IFCDRAUGHTINGPREDEFINEDCOLOUR", false) == 0)
+				return IfcDraughtingPreDefinedColour.Parse(str);
+			return null;
+		}
+		internal static IfcColourOrFactor parseColourOrFactor(string str)
+		{
+			if (str[0] == '#')
+				return null;
+			string kw = "", def = "";
+			int id = 0;
+			ParserIfc.GetKeyWord(str, out id, out kw, out def);
+			if (string.IsNullOrEmpty(kw))
+				return null;
+			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
+				return IfcColourRgb.Parse(str);
+			return new IfcNormalisedRatioMeasure(ParserSTEP.ParseDouble(def));
+		}
+		internal static IfcDerivedMeasureValue parseDerivedMeasureValue(string str)
+		{
+			int len = str.Length;
+			if (str.EndsWith(")"))
+				len--;
+			int icounter = 0;
+			char c = str[icounter];
+			while (!char.IsDigit(c) && icounter < str.Length)
+				c = str[icounter++];
+			if (icounter == str.Length)
+				return null;
+			icounter--;
+			if (icounter > 1)
+			{
+				string kw = str.Substring(0, icounter - 1);
+				double val = 0;
+				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+				{
+					if (string.Compare(kw, IfcVolumetricFlowRateMeasure.mKW, true) == 0)
+						return new IfcVolumetricFlowRateMeasure(val);
+					if (string.Compare(kw, IfcThermalTransmittanceMeasure.mKW, true) == 0)
+						return new IfcThermalTransmittanceMeasure(val);
+					//IfcThermalResistanceMeasure, 
+					//IfcThermalAdmittanceMeasure,  
+					if (string.Compare(kw, IfcPressureMeasure.mKW, true) == 0)
+						return new IfcPressureMeasure(val);
+					//IfcPowerMeasure, 
+					//IfcMassFlowRateMeasure, 
+					if (string.Compare(kw, IfcMassDensityMeasure.mKW, true) == 0)
+						return new IfcMassDensityMeasure(val);
+					/*IfcLinearVelocityMeasure, 
+					IfcKinematicViscosityMeasure, 
+					IfcIntegerCountRateMeasure, 
+					IfcHeatFluxDensityMeasure, 
+					IfcFrequencyMeasure, 
+					IfcEnergyMeasure, 
+					IfcElectricVoltageMeasure, 
+					, */
+					if (string.Compare(kw, IfcDynamicViscosityMeasure.mKW, true) == 0)
+						return new IfcDynamicViscosityMeasure(val);
+					//	if (string.Compare(kw, IfcCompoundPlaneAngleMeasure.mKW, true) == 0)
+					//		return new IfcCompoundPlaneAngleMeasure(val);
+
+					/*IfcAngularVelocityMeasure, 
+					IfcThermalConductivityMeasure, */
+					if (string.Compare(kw, IfcMolecularWeightMeasure.mKW, true) == 0)
+						return new IfcMolecularWeightMeasure(val);
+					/*IfcVaporPermeabilityMeasure, 
+					IfcMoistureDiffusivityMeasure, 
+					IfcIsothermalMoistureCapacityMeasure, 
+					IfcSpecificHeatCapacityMeasure, */
+					if (string.Compare(kw, IfcMonetaryMeasure.mKW, true) == 0)
+						return new IfcMonetaryMeasure(val);
+					/*IfcMagneticFluxDensityMeasure, 
+					IfcMagneticFluxMeasure, 
+					IfcLuminousFluxMeasure, */
+					if (string.Compare(kw, IfcForceMeasure.mKW, true) == 0)
+						return new IfcForceMeasure(val);
+					/*IfcInductanceMeasure, 
+					IfcIlluminanceMeasure, 
+					IfcElectricResistanceMeasure, 
+					IfcElectricConductanceMeasure, 
+					IfcElectricChargeMeasure, 
+					IfcDoseEquivalentMeasure, 
+					IfcElectricCapacitanceMeasure, 
+					IfcAbsorbedDoseMeasure, 
+					IfcRadioActivityMeasure, 
+					IfcRotationalFrequencyMeasure, 
+					IfcTorqueMeasure, 
+					IfcAccelerationMeasure, 
+					IfcLinearForceMeasure, */
+					if (string.Compare(kw, IfcLinearStiffnessMeasure.mKW, true) == 0)
+						return new IfcLinearStiffnessMeasure(val);
+					//IfcModulusOfSubgradeReactionMeasure, 
+					if (string.Compare(kw, IfcModulusOfElasticityMeasure.mKW, true) == 0)
+						return new IfcModulusOfElasticityMeasure(val);
+					/*IfcMomentOfInertiaMeasure, 
+					IfcPlanarForceMeasure,  */
+					if (string.Compare(kw, IfcRotationalStiffnessMeasure.mKW, true) == 0)
+						return new IfcRotationalStiffnessMeasure(val);
+					/*IfcShearModulusMeasure, 
+					IfcLinearMomentMeasure, 
+					IfcLuminousIntensityDistributionMeasure, 
+					IfcCurvatureMeasure, */
+					if (string.Compare(kw, IfcMassPerLengthMeasure.mKW, true) == 0)
+						return new IfcMassPerLengthMeasure(val);
+
+					/*IfcModulusOfLinearSubgradeReactionMeasure, 
+					IfcModulusOfRotationalSubgradeReactionMeasure, 
+					IfcRotationalMassMeasure, 
+					IfcSectionalAreaIntegralMeasure, 
+					IfcSectionModulusMeasure, 
+					IfcTemperatureGradientMeasure, 
+					, */
+					if (string.Compare(kw, IfcThermalExpansionCoefficientMeasure.mKW, true) == 0)
+						return new IfcThermalExpansionCoefficientMeasure(val);
+					if (string.Compare(kw, IfcWarpingConstantMeasure.mKW, true) == 0)
+						return new IfcWarpingConstantMeasure(val);
+					if (string.Compare(kw, IfcWarpingMomentMeasure.mKW, true) == 0)
+						return new IfcWarpingMomentMeasure(val);
+					/*IfcSoundPowerMeasure, 
+					IfcSoundPressureMeasure, 
+					IfcHeatingValueMeasure, 
+					IfcPHMeasure, 
+					IfcIonConcentrationMeasure, 
+					IfcTemperatureRateOfChangeMeasure, 
+					IfcAreaDensityMeasure, 
+					IfcSoundPowerLevelMeasure, 
+					IfcSoundPressureLevelMeasure);*/
+				}
+			}
+			return null;
+		}
+		internal static IfcMeasureValue parseMeasureValue(string str)
+		{
+			int len = str.Length;
+			if (str.EndsWith(")"))
+				len--;
+			int icounter = 0;
+			char c = str[icounter];
+			while (!char.IsDigit(c) && icounter < str.Length)
+				c = str[icounter++];
+			if (icounter == str.Length)
+				return null;
+			icounter--;
+			if (icounter > 1)
+			{
+				string kw = str.Substring(0, icounter - 1);
+				double val = 0;
+				int i = 0;
+				if (int.TryParse(str.Substring(icounter, len - icounter), out i))
+				{
+					if (string.Compare(kw, IfcCountMeasure.mKW, true) == 0)
+						return new IfcCountMeasure(i);
+				}
+				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+				{
+					if (string.Compare(kw, IfcVolumeMeasure.mKW, true) == 0)
+						return new IfcVolumeMeasure(val);
+					if (string.Compare(kw, IfcTimeMeasure.mKW, true) == 0)
+						return new IfcTimeMeasure(val);
+					if (string.Compare(kw, IfcThermodynamicTemperatureMeasure.mKW, true) == 0)
+						return new IfcThermodynamicTemperatureMeasure(val);
+					//IfcSolidAngleMeasure, */
+					if (string.Compare(kw, IfcPositiveRatioMeasure.mKW, true) == 0)
+						return new IfcPositiveRatioMeasure(val);
+					if (string.Compare(kw, IfcRatioMeasure.mKW, true) == 0)
+						return new IfcRatioMeasure(val);
+					//IfcPositivePlaneAngleMeasure,
+					if (string.Compare(kw, IfcPlaneAngleMeasure.mKW, true) == 0)
+						return new IfcPlaneAngleMeasure(val);
+					//if (string.Compare(kw, IfcParameterValue.mKW, true) == 0)
+					//	return new IfcParameterValue(val);
+					//	if (string.Compare(kw, IfcNumericMeasure.mKW, true) == 0)
+					//	return new IfcNumericMeasure(val); 
+					if (string.Compare(kw, IfcMassMeasure.mKW, true) == 0)
+						return new IfcMassMeasure(val);
+					if (string.Compare(kw, IfcPositiveLengthMeasure.mKW, true) == 0)
+						return new IfcPositiveLengthMeasure(val);
+					if (string.Compare(kw, IfcLengthMeasure.mKW, true) == 0)
+						return new IfcLengthMeasure(val);
+					//IfcElectricCurrentMeasure, 
+
+
+					//IfcContextDependentMeasure, 
+					if (string.Compare(kw, IfcAreaMeasure.mKW, true) == 0)
+						return new IfcAreaMeasure(val);
+					//IfcAmountOfSubstanceMeasure, 
+					//IfcLuminousIntensityMeasure, 
+					if (string.Compare(kw, IfcNormalisedRatioMeasure.mKW, true) == 0)
+						return new IfcNormalisedRatioMeasure(val);
+					//IfcComplexNumber, 
+					//IfcNonNegativeLengthMeasure);
+				}
+				if (string.Compare(kw, IfcDescriptiveMeasure.mKW, true) == 0)
+					return new IfcDescriptiveMeasure(str.Substring(icounter, len - icounter));
+			}
+			return null;
+		}
+		internal static IfcSimpleValue parseSimpleValue(string str)
+		{
+			if (str.StartsWith("IFCBOOLEAN("))
+				return new IfcBoolean(string.Compare(str.Substring(11, str.Length - 12), ".T.") == 0);
+			if (str.StartsWith("IFCIDENTIFIER("))
+				return new IfcIdentifier(str.Substring(15, str.Length - 17));
+			if (str.StartsWith("IFCINTEGER("))
+				return new IfcInteger(int.Parse(str.Substring(11, str.Length - 12)));
+			if (str.StartsWith("IFCLABEL("))
+			{
+				string s = str.Substring(9, str.Length - 10).Replace("'", "");
+				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
+			}
+			if (str.StartsWith("IFCLOGICAL("))
+			{
+				string s = str.Substring(11, str.Length - 12);
+				IfcLogicalEnum l = IfcLogicalEnum.UNKNOWN;
+				if (s == ".T.")
+					l = IfcLogicalEnum.TRUE;
+				else if (s == ".F.")
+					l = IfcLogicalEnum.FALSE;
+				return new IfcLogical(l);
+			}
+			if (str.StartsWith("IFCREAL("))
+				return new IfcReal(ParserSTEP.ParseDouble(str.Substring(8, str.Length - 9)));
+			if (str.StartsWith("IFCTEXT("))
+			{
+				string s = str.Substring(8, str.Length - 9).Replace("'", "");
+				return new IfcText((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
+			}
+			int i = 0;
+			if (int.TryParse(str, out i))
+				return new IfcInteger(i);
+			double d = 0;
+			if (double.TryParse(str, out d))
+				return new IfcReal(d);
+			if (str == ".T.")
+				return new IfcBoolean(true);
+			if (str == ".F.")
+				return new IfcBoolean(false);
+			if (str == ".U.")
+				return new IfcLogical(IfcLogicalEnum.UNKNOWN);
+			return null;
+		}
+		internal static IfcValue parseValue(string str)
+		{
+			IfcMeasureValue sv = parseMeasureValue(str);
+			if (sv != null)
+				return sv;
+			IfcDerivedMeasureValue mv = parseDerivedMeasureValue(str);
+			if (mv != null)
+				return mv;
+			return parseSimpleValue(str);
+		}
+		internal static bool TryGetDouble(IfcValue v, out double val)
+		{
+			IfcReal r = v as IfcReal;
+			if (r != null)
+			{
+				val = r.mValue;
+				return true;
+			}
+			IfcInteger i = v as IfcInteger;
+			if (i != null)
+			{
+				val = i.mValue;
+				return true;
+			}
+			IfcPositiveLengthMeasure plm = v as IfcPositiveLengthMeasure;
+			if (plm != null)
+			{
+				val = plm.mValue;
+				return true;
+			}
+			IfcDynamicViscosityMeasure dvm = v as IfcDynamicViscosityMeasure;
+			if (dvm != null)
+			{
+				val = dvm.mValue;
+				return true;
+			}
+			IfcMassDensityMeasure mdm = v as IfcMassDensityMeasure;
+			if (mdm != null)
+			{
+				val = mdm.mValue;
+				return true;
+			}
+			IfcModulusOfElasticityMeasure mem = v as IfcModulusOfElasticityMeasure;
+			if (mem != null)
+			{
+				val = mem.mValue;
+				return true;
+			}
+			IfcPositiveRatioMeasure prm = v as IfcPositiveRatioMeasure;
+			if (prm != null)
+			{
+				val = prm.mValue;
+				return true;
+			}
+			IfcThermalExpansionCoefficientMeasure tec = v as IfcThermalExpansionCoefficientMeasure;
+			if (tec != null)
+			{
+				val = tec.mValue;
+				return true;
+			}
+			val = 0;
+			return false;
+		}
+
+
+		//http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID.aspx
+		/// <summary>
+		/// Conversion methods between an IFC 
+		/// encoded GUID string and a .NET GUID.
+		/// This is a translation of the C code 
+		/// found here: 
+		/// http://www.iai-tech.org/ifc/IFC2x3/TC1/html/index.htm
+		/// </summary>
+		/// 
+		 
+		#region Private Members
+		/// <summary>
+		/// The replacement table
+		/// </summary>
+		private static readonly char[] base64Chars = new char[]
+    { '0','1','2','3','4','5','6','7','8','9'
+    , 'A','B','C','D','E','F','G','H','I','J'
+    , 'K','L','M','N','O','P','Q','R','S','T'
+    , 'U','V','W','X','Y','Z','a','b','c','d'
+    , 'e','f','g','h','i','j','k','l','m','n'
+    , 'o','p','q','r','s','t','u','v','w','x'
+    , 'y','z','_','$' };
+
+		/// <summary>
+		/// Conversion of an integer into characters 
+		/// with base 64 using the table base64Chars
+		/// </summary>
+		/// <param name="number">The number to convert</param>
+		/// <param name="result">The result char array to write to</param>
+		/// <param name="start">The position in the char array to start writing</param>
+		/// <param name="len">The length to write</param>
+		/// <returns></returns>
+		static void cv_to_64(uint number, ref char[] result, int start, int len)
+		{
+			uint act;
+			int iDigit, nDigits;
+
+			Debug.Assert(len <= 4);
+			act = number;
+			nDigits = len;
+
+			for (iDigit = 0; iDigit < nDigits; iDigit++)
+			{
+				result[start + len - iDigit - 1] = base64Chars[(int)(act % 64)];
+				act /= 64;
+			}
+			Debug.Assert(act == 0, "Logic failed, act was not null: " + act.ToString());
+			return;
+		}
+
+		/// <summary>
+		/// The reverse function to calculate 
+		/// the number from the characters
+		/// </summary>
+		/// <param name="str">The char array to convert from</param>
+		/// <param name="start">Position in array to start read</param>
+		/// <param name="len">The length to read</param>
+		/// <returns>The calculated nuber</returns>
+		static uint cv_from_64(char[] str, int start, int len)
+		{
+			int i, j, index;
+			uint res = 0;
+			Debug.Assert(len <= 4);
+
+			for (i = 0; i < len; i++)
+			{
+				index = -1;
+				for (j = 0; j < 64; j++)
+				{
+					if (base64Chars[j] == str[start + i])
+					{
+						index = j;
+						break;
+					}
+				}
+				Debug.Assert(index >= 0);
+				res = res * 64 + ((uint)index);
+			}
+			return res;
+		}
+		#endregion // Private Members
+
+		#region Conversion Methods
+		/// <summary>
+		/// Reconstruction of the GUID 
+		/// from an IFC GUID string (base64)
+		/// </summary>
+		/// <param name="guid">The GUID string to convert. Must be 22 characters int</param>
+		/// <returns>GUID correspondig to the string</returns>
+		public static Guid DecodeGlobalID(string guid)
+		{
+			try
+			{
+				if (guid.Length == 22)
+				{
+					uint[] num = new uint[6];
+					char[] str = guid.ToCharArray();
+					int n = 2, pos = 0, i;
+					for (i = 0; i < 6; i++)
+					{
+						num[i] = cv_from_64(str, pos, n);
+						pos += n; n = 4;
+					}
+					int a = (int)((num[0] * 16777216 + num[1]));
+					short b = (short)(num[2] / 256);
+					short c = (short)((num[2] % 256) * 256 + num[3] / 65536);
+					byte[] d = new byte[8];
+					d[0] = Convert.ToByte((num[3] / 256) % 256);
+					d[1] = Convert.ToByte(num[3] % 256);
+					d[2] = Convert.ToByte(num[4] / 65536);
+					d[3] = Convert.ToByte((num[4] / 256) % 256);
+					d[4] = Convert.ToByte(num[4] % 256);
+					d[5] = Convert.ToByte(num[5] / 65536);
+					d[6] = Convert.ToByte((num[5] / 256) % 256);
+					d[7] = Convert.ToByte(num[5] % 256);
+
+					return new Guid(a, b, c, d);
+				}
+			}
+			catch (Exception) { }
+			return Guid.Empty;
+		}
+
+		/// <summary>
+		/// Conversion of a GUID to a string 
+		/// representing the GUID 
+		/// </summary>
+		/// <param name="guid">The GUID to convert</param>
+		/// <returns>IFC (base64) encoded GUID string</returns>
+		public static string EncodeGuid(Guid guid)
+		{
+			uint[] num = new uint[6];
+			char[] str = new char[22];
+			int i, n;
+			byte[] b = guid.ToByteArray();
+
+			// Creation of six 32 Bit integers from the components of the GUID structure
+			num[0] = (uint)(BitConverter.ToUInt32(b, 0) / 16777216);
+			num[1] = (uint)(BitConverter.ToUInt32(b, 0) % 16777216);
+			num[2] = (uint)(BitConverter.ToUInt16(b, 4) * 256 + BitConverter.ToInt16(b, 6) / 256);
+			num[3] = (uint)((BitConverter.ToUInt16(b, 6) % 256) * 65536 + b[8] * 256 + b[9]);
+			num[4] = (uint)(b[10] * 65536 + b[11] * 256 + b[12]);
+			num[5] = (uint)(b[13] * 65536 + b[14] * 256 + b[15]);
+
+			// Conversion of the numbers into a system using a base of 64
+			n = 2;
+			int pos = 0;
+			for (i = 0; i < 6; i++)
+			{
+				cv_to_64(num[i], ref str, pos, n);
+				pos += n; n = 4;
+			}
+			return new String(str);
+		}
+		#endregion // Conversion Methods
+
+	 
+	}
+}

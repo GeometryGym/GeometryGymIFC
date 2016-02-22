@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GGYM.IFC</RootNamespace>
+    <AssemblyName>GeometryGymIFCRhinoCommonx64</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\x64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Rhino3dmIO, Version=5.1.30000.14, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\lib\net40\Rhino3dmIO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\ifc\BaseClassIFC.cs">
+      <Link>IFC\Core\BaseClassIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\DatabaseIFC.cs">
+      <Link>IFC\Core\DatabaseIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\Enumerations.cs">
+      <Link>IFC\Core\Enumerations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\ifc A.cs">
+      <Link>IFC\Core\ifc A.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC B.cs">
+      <Link>IFC\Core\IFC B.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC C.cs">
+      <Link>IFC\Core\IFC C.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC D.cs">
+      <Link>IFC\Core\IFC D.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC E.cs">
+      <Link>IFC\Core\IFC E.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC F.cs">
+      <Link>IFC\Core\IFC F.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC G.cs">
+      <Link>IFC\Core\IFC G.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC H.cs">
+      <Link>IFC\Core\IFC H.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC I.cs">
+      <Link>IFC\Core\IFC I.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC J.cs">
+      <Link>IFC\Core\IFC J.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC L.cs">
+      <Link>IFC\Core\IFC L.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC M.cs">
+      <Link>IFC\Core\IFC M.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC N.cs">
+      <Link>IFC\Core\IFC N.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC O.cs">
+      <Link>IFC\Core\IFC O.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC P.cs">
+      <Link>IFC\Core\IFC P.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC Q.cs">
+      <Link>IFC\Core\IFC Q.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC R.cs">
+      <Link>IFC\Core\IFC R.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC S.cs">
+      <Link>IFC\Core\IFC S.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC T.cs">
+      <Link>IFC\Core\IFC T.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC U.cs">
+      <Link>IFC\Core\IFC U.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC V.cs">
+      <Link>IFC\Core\IFC V.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC W.cs">
+      <Link>IFC\Core\IFC W.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\IFC Z.cs">
+      <Link>IFC\Core\IFC Z.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ifc\ParserIFC.cs">
+      <Link>IFC\Core\ParserIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC A RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC A RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC B RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC B RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC C RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC C RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC D RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC D RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC E RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC E RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC F RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC F RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC G RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC G RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC H RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC H RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC I RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC I RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC L RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC L RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC M RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC M RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC O RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC O RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC P RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC P RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC R RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC R RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC S RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC S RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC T RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC T RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RhinoCommon IFC\IFC V RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC V RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\step\BaseClassSTEP.cs">
+      <Link>STEP\BaseClassSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\step\ParserSTEP.cs">
+      <Link>STEP\ParserSTEP.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+xcopy /s /y "$(SolutionDir)packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\NativeBinaries\x86\*.*" "$(TargetDir)x86\"
+xcopy /s /y "$(SolutionDir)packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\NativeBinaries\x64\*.*" "$(TargetDir)x64\"
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
