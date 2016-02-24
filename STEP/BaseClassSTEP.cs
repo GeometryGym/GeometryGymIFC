@@ -28,7 +28,7 @@ namespace GeometryGym.STEP
 {
 	public class STEPEntity 
 	{
-		internal int mIndex = 0;
+		internal int mIndex = 0; 
 		internal List<string> mComments = new List<string>();
 
 		public int Index { get { return mIndex; } }

@@ -883,11 +883,12 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));
 	{
 		private string mName = "$";// : OPTIONAL IfcLabel;		
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-
 		//INVERSE
 		internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
+
+		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public List<IfcStyledItem> StyledItems { get { return mStyledItems; } }
+
 		protected IfcPresentationStyle() : base() { }
 		protected IfcPresentationStyle(IfcPresentationStyle i) : base() { mName = i.mName; }
 		protected IfcPresentationStyle(DatabaseIfc m, string name) : base(m) { Name = name; }
@@ -905,8 +906,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcPresentationStyleAssignment() : base() { }
 		internal IfcPresentationStyleAssignment(IfcPresentationStyleAssignment o) : base() { mStyles = new List<int>(o.mStyles.ToArray()); }
-		internal IfcPresentationStyleAssignment(DatabaseIfc m, IfcPresentationStyle style) : base(m) { mStyles.Add(style.Index); }
-		internal IfcPresentationStyleAssignment(DatabaseIfc m, List<IfcPresentationStyle> styles) : base(m) { mStyles = styles.ConvertAll(x => x.Index); }
+		internal IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
+		internal IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
 		internal static IfcPresentationStyleAssignment Parse(string strDef) { IfcPresentationStyleAssignment s = new IfcPresentationStyleAssignment(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		internal static void parseFields(IfcPresentationStyleAssignment s, List<string> arrFields, ref int ipos) { s.mStyles = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildString()

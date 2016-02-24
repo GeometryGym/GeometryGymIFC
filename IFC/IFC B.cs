@@ -787,7 +787,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcBuildingStorey() : base() { }
 		internal IfcBuildingStorey(IfcBuildingStorey p) : base(p) { mElevation = p.mElevation; }
-		internal IfcBuildingStorey(IfcBuilding host, string name, double elev) : base(host.mDatabase)
+		public IfcBuildingStorey(IfcBuilding host, string name, double elev) : base(host.mDatabase)
 		{
 			host.addStorey(this);
 			Name = name;

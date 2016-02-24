@@ -1876,8 +1876,21 @@ additional types	some additional representation types are given:
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		internal IfcStyledItem() : base() { }
-		internal IfcStyledItem(IfcStyledItem el) : base(el) { mItem = el.mItem; mStyles.AddRange(el.mStyles); }
-		public IfcStyledItem(IfcStyleAssignmentSelect style, string name) : base(style.Database) { Name = name; mStyles.Add(style.Index); }
+		internal IfcStyledItem(IfcStyledItem i) : base(i) { mItem = i.mItem; mStyles.AddRange(i.mStyles); }
+		public IfcStyledItem(IfcStyleAssignmentSelect style, string name) : base(style.Database)
+		{
+			Name = name;
+			if (mDatabase.mSchema == Schema.IFC2x3)
+			{
+				IfcPresentationStyle ps = style as IfcPresentationStyle;
+				if (ps != null)
+					mStyles.Add(new IfcPresentationStyleAssignment(ps).mIndex);
+				else
+					throw new Exception("XX Invalid style for schema " + mDatabase.mSchema.ToString());
+			}
+			else
+				mStyles.Add(style.Index);
+		}
 		
 		internal static IfcStyledItem Parse(string strDef) { IfcStyledItem i = new IfcStyledItem(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		internal static void parseFields(IfcStyledItem i, List<string> arrFields, ref int ipos)
