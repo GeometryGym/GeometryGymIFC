@@ -7,6 +7,9 @@ for IFC5, and are easily extended for experimental extensions.
 Documentation on these classes is available on Building Smart websites, such as
 http://www.buildingsmart-tech.org/ifc/IFC4/Add1/html/ (Browse Alphabetical Listings)
 
+For a list of software/applications supporting IFC interaction, refer to
+http://www.buildingsmart-tech.org/implementation/implementations/plominoview.allapplications
+
 Projects to demonstrate the classes include
 https://github.com/jmirtsch/GeometryGymIFCExamples
 https://github.com/BuildingSMART/IfcScript
