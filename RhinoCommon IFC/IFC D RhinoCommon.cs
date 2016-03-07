@@ -23,14 +23,28 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
 	public partial class IfcDirection
 	{
 		internal Vector3d Vector { get { return new Vector3d(mCoordinateX, mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
+		public IfcDirection(DatabaseIfc db, Vector3d v) : base(db)
+		{
+			Vector3d unit = v;
+			unit.Unitize();
+
+			mCoordinateX = unit.X;
+			mCoordinateY = unit.Y;
+			mCoordinateZ = unit.Z;
+		}
+		internal IfcDirection(DatabaseIfc db, Vector2d v) : base(db)
+		{
+			double len = v.Length;
+			mCoordinateX = v.X / len;
+			mCoordinateY = v.Y / len;
+			mCoordinateZ = double.NaN;
+		}
 	}
 }

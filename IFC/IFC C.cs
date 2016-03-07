@@ -555,6 +555,12 @@ namespace GeometryGym.Ifc
 		internal new static IfcCivilElementType Parse(string strDef) { IfcCivilElementType t = new IfcCivilElementType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		internal static void parseFields(IfcCivilElementType t, List<string> arrFields, ref int ipos) { IfcElementType.parseFields(t, arrFields, ref ipos); }
 	}
+	public abstract partial class IfcCivilStructureElement : IfcSpatialStructureElement //IFC5
+	{
+		protected IfcCivilStructureElement() : base() { }
+		protected IfcCivilStructureElement(IfcCivilStructureElement p) : base(p) { }
+		protected IfcCivilStructureElement(IfcSpatialStructureElement host, string name) : base(host, name) { }
+	}
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationSelect //	SUBTYPE OF IfcExternalInformation;
 	{
 		internal string mSource = "$";//  : OPTIONAL IfcLabel;
@@ -967,9 +973,9 @@ namespace GeometryGym.Ifc
 		private bool mSameSense;// : BOOLEAN;
 		private int mParentCurve;// : IfcCurve;  Really IfcBoundedCurve WR1
 
-		internal IfcTransitionCode Transition { get { return mTransition; } }
-		internal bool SameSense { get { return mSameSense; } }
-		internal IfcBoundedCurve ParentCurve { get { return mDatabase.mIfcObjects[mParentCurve] as IfcBoundedCurve; } }
+		public IfcTransitionCode Transition { get { return mTransition; } }
+		public bool SameSense { get { return mSameSense; } }
+		public IfcBoundedCurve ParentCurve { get { return mDatabase.mIfcObjects[mParentCurve] as IfcBoundedCurve; } }
 
 		internal IfcCompositeCurveSegment() : base() { }
 		internal IfcCompositeCurveSegment(IfcCompositeCurveSegment el) : base(el) { mTransition = el.mTransition; mSameSense = el.mSameSense; mParentCurve = el.mParentCurve; }
@@ -2143,7 +2149,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcCurtainWallType Parse(string strDef) { IfcCurtainWallType t = new IfcCurtainWallType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D))*/
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
 	{   //INVERSE GeomGym
 		internal IfcEdgeCurve mEdge = null;
 

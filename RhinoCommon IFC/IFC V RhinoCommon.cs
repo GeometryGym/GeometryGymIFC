@@ -23,11 +23,12 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcVector
+	{
+		public IfcVector(DatabaseIfc db, Vector3d v) : base(db) { Orientation = new IfcDirection(db, v); mMagnitude = v.Length; }
+	}
 }

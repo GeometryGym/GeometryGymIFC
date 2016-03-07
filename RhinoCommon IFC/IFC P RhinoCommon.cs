@@ -23,14 +23,38 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcPoint
 	{
 		internal virtual Point3d Coordinates { get { return Point3d.Unset; } }
+	}
+	public partial class IfcPolyline
+	{
+		internal IfcPolyline(DatabaseIfc db, Line l) : base(db) { Points = new List<IfcCartesianPoint>() { new IfcCartesianPoint(db, l.From), new IfcCartesianPoint(db, l.To) }; }
+		internal IfcPolyline(DatabaseIfc db, Polyline pl) : base(db)
+		{
+			List<IfcCartesianPoint> points = new List<IfcCartesianPoint>(pl.Count);
+			if (pl.IsClosed)
+			{
+				int ilast = pl.Count - 1;
+				for (int icounter = 0; icounter < ilast; icounter++)
+					points.Add(new IfcCartesianPoint(db, pl[icounter]));
+				points.Add(points[0]);
+			}
+			else
+			{
+				for (int icounter = 0; icounter < pl.Count; icounter++)
+					points.Add(new IfcCartesianPoint(db, pl[icounter]));
+			}
+			Points = points;
+		}
+	}
+	public partial class IfcPlacement
+	{
+		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
+
 	}
 }

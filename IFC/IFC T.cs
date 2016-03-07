@@ -1029,7 +1029,7 @@ namespace GeometryGym.Ifc
 		internal IfcTrimmingSelect mTrim2;//: SET [1:2] OF IfcTrimmingSelect;
 		private bool mSenseAgreement;// : BOOLEAN;
 
-		internal IfcCurve BasisCurve { get { return mDatabase.mIfcObjects[mBasisCurve] as IfcCurve; } }
+		internal IfcCurve BasisCurve { get { return mDatabase.mIfcObjects[mBasisCurve] as IfcCurve; } set { mBasisCurve = value.mIndex; } }
 		internal bool SenseAgreement { get { return mSenseAgreement; } }
 
 		internal IfcTrimmingPreference mMasterRepresentation = IfcTrimmingPreference.UNSPECIFIED;// : IfcTrimmingPreference; 

@@ -23,9 +23,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects;
 
 namespace GeometryGym.Ifc
 {
@@ -43,7 +41,7 @@ namespace GeometryGym.Ifc
 
 	public partial class IfcCartesianPointList2D
 	{
-		public IfcCartesianPointList2D(DatabaseIfc m, IEnumerable<Point2d> coordList) : base(m)
+		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Point2d> coordList) : base(db)
 		{
 			List<Tuple<double, double>> pts = new List<Tuple<double, double>>();
 			foreach (Point2d t in coordList)
@@ -51,13 +49,17 @@ namespace GeometryGym.Ifc
 			mCoordList = pts.ToArray();
 		}
 	}
-	public partial class IfcConnectionPointEccentricity
+	public partial class IfcCartesianPointList3D
 	{
-		internal Vector3d Eccentricity { get { return new Vector3d(mEccentricityInX, mEccentricityInY, mEccentricityInZ); } }
-
-		internal IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, Vector3d ecc) : base(v) { mEccentricityInX = ecc.X; mEccentricityInY = ecc.Y; mEccentricityInZ = ecc.Z; }
+		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Point3d> coordList) : base(db)
+		{
+			List<Tuple<double, double, double>> pts = new List<Tuple<double, double, double>>();
+			foreach (Point3d t in coordList)
+				pts.Add(new Tuple<double, double, double>(t.X, t.Y, t.Z));
+			mCoordList = pts.ToArray();
+		}
 	}
-	public abstract partial class IfcCartesianTransformationOperator
+		public abstract partial class IfcCartesianTransformationOperator
 	{
 		internal Transform Transform
 		{
@@ -110,5 +112,27 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianTransformationOperator3DnonUniform
 	{
 		internal override Transform getScaleTransform(Point3d location) { return Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
+	}
+	public partial class IfcCompositeCurve
+	{
+		public IfcCompositeCurve(DatabaseIfc db, PolyCurve pc) : this(db, pc, false) { }
+		internal IfcCompositeCurve(DatabaseIfc db, PolyCurve plc, bool twoD) : base(db)
+		{
+			mSegments = new List<int>(plc.SegmentCount);
+			IfcCartesianPoint curr = null;
+			for (int icounter = 0; icounter < plc.SegmentCount; icounter++)
+				mSegments.Add(new IfcCompositeCurveSegment(db, plc.SegmentCurve(icounter), true, IfcTransitionCode.CONTINUOUS, twoD, curr, out curr).mIndex);
+		}
+	}
+	public partial class IfcCompositeCurveSegment
+	{
+		internal IfcCompositeCurveSegment(DatabaseIfc db, Curve c, bool sense, IfcTransitionCode tc, bool twoD, IfcCartesianPoint optStrt, out IfcCartesianPoint end)
+			: this(tc,sense,IfcBoundedCurve.convCurve(db, c, optStrt, twoD, out end)) { }
+	}
+	public partial class IfcConnectionPointEccentricity
+	{
+		internal Vector3d Eccentricity { get { return new Vector3d(mEccentricityInX, mEccentricityInY, mEccentricityInZ); } }
+
+		internal IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, Vector3d ecc) : base(v) { mEccentricityInX = ecc.X; mEccentricityInY = ecc.Y; mEccentricityInZ = ecc.Z; }
 	}
 }

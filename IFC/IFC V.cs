@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 		internal int mOrientation; // : IfcDirection;
 		internal double mMagnitude;// : IfcLengthMeasure; 
 
-		internal IfcDirection Orientation { get { return mDatabase.mIfcObjects[mOrientation] as IfcDirection; } }
+		internal IfcDirection Orientation { get { return mDatabase.mIfcObjects[mOrientation] as IfcDirection; } set { mOrientation = value.mIndex; } }
 
 		internal IfcVector() : base() { }
 		internal IfcVector(IfcVector v) : base(v) { mOrientation = v.mOrientation; mMagnitude = v.mMagnitude; }

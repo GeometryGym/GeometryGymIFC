@@ -1042,7 +1042,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{ 
 		private int mRefDirection;// : OPTIONAL IfcDirection;
-		public IfcDirection RefDirection { get { return mDatabase.mIfcObjects[mRefDirection] as IfcDirection; } }
+		public IfcDirection RefDirection { get { return mDatabase.mIfcObjects[mRefDirection] as IfcDirection; } set { mRefDirection = value.mIndex; } }
 		
 		internal IfcAxis2Placement2D() : base() { }
 		internal IfcAxis2Placement2D(IfcAxis2Placement2D i) : base(i) { mRefDirection = i.mRefDirection; }

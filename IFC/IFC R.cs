@@ -514,9 +514,21 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcReinforcingBar : IfcReinforcingElement
 	{
-		internal double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
+		private double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
 		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
 		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
+
+		public double NominalDiameter
+		{
+			get
+			{
+				if (mNominalDiameter > mDatabase.Tolerance)
+					return mNominalDiameter;
+				IfcReinforcingBarType t = RelatingType as IfcReinforcingBarType;
+				return (t != null ? t.NominalDiameter : 0);
+			}
+			set { mNominalDiameter = value; }
+		}
 		internal IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarRoleEnum; IFC4 OPTIONAL
 		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NONE;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
 		public IfcReinforcingBarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -555,7 +567,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcReinforcingBarType : IfcReinforcingElementType  //IFC4
 	{
 		internal IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcFastenerTypeEnum; //IFC4
-		internal double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
+		private double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
 		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
 		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NONE;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
@@ -563,6 +575,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcBendingParameterSelect> mBendingParameters = new List<IfcBendingParameterSelect>();//	:	OPTIONAL LIST [1:?] OF IfcBendingParameterSelect;
 
 		public IfcReinforcingBarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public double NominalDiameter { get { return mNominalDiameter; } set { mNominalDiameter = value; } }
 
 		internal IfcReinforcingBarType() : base() { }
 		internal IfcReinforcingBarType(IfcReinforcingBarType t)
@@ -625,7 +638,9 @@ namespace GeometryGym.Ifc
 	public abstract class IfcReinforcingElement : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor))
 	{
 		internal new enum SubTypes { IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor }
-		internal string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 Depreceated 
+		private string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 Depreceated 
+
+		public string SteelGrade { get { return (mSteelGrade == "$" ? "" : ParserIfc.Decode(mSteelGrade)); } set { mSteelGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		protected IfcReinforcingElement() : base() { }
 		protected IfcReinforcingElement(IfcReinforcingElement e) : base(e) { mSteelGrade = e.mSteelGrade; }

@@ -23,9 +23,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {

@@ -454,6 +454,29 @@ namespace GeometryGym.Ifc
 			}
 			return element;
 		}
+		internal void addStructuralMember(IfcStructuralMember m)
+		{
+			if (m == null)
+				return;
+			if (mDatabase.mSchema == Schema.IFC2x3)
+			{
+				mHasStructuralMemberSS.Add(new IfcRelConnectsStructuralElement(this, m));
+			}
+			else
+			{
+				string s = "Analytic Elements";
+				foreach (IfcRelAssignsToProduct ra in mReferencedBy)
+				{
+					if (string.Compare(ra.Name, s, true) == 0)
+					{
+						if (!ra.mRelatedObjects.Contains(m.mIndex))
+							ra.mRelatedObjects.Add(m.mIndex);
+						return;
+					}
+				}
+				IfcRelAssignsToProduct rap = new IfcRelAssignsToProduct(m, this) { Name = s };
+			}
+		}
 	}
 	public abstract partial class IfcElementarySurface : IfcSurface //ABSTRACT SUPERTYPE OF (ONEOF(IfcPlane))
 	{

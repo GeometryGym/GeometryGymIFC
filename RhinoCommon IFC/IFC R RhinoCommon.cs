@@ -23,11 +23,18 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcRationalBSplineCurveWithKnots
+	{
+		internal IfcRationalBSplineCurveWithKnots(DatabaseIfc db, NurbsCurve nc, bool twoD)
+			: base(db, nc, twoD)
+		{
+			mWeightsData = new List<double>(nc.Points.Count);
+			for (int icounter = 0; icounter < nc.Points.Count; icounter++)
+				mWeightsData.Add(nc.Points[icounter].Weight);
+		}
+	}
 }

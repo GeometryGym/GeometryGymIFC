@@ -299,6 +299,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLine() : base() { }
 		internal IfcLine(IfcLine l) : base(l) { mPnt = l.mPnt; mDir = l.mDir; }
+		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 		internal static IfcLine Parse(string strDef) { IfcLine l = new IfcLine(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
 		internal static void parseFields(IfcLine l, List<string> arrFields, ref int ipos) { IfcCurve.parseFields(l, arrFields, ref ipos); l.mPnt = ParserSTEP.ParseLink(arrFields[ipos++]); l.mDir = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mPnt) + "," + ParserSTEP.LinkToString(mDir); }

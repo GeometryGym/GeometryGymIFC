@@ -359,38 +359,73 @@ namespace GeometryGym.Ifc
 		internal new static IfcBoxedHalfSpace Parse(string strDef) { IfcBoxedHalfSpace s = new IfcBoxedHalfSpace(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mEnclosure); }
 	}
+	public partial class IfcBridge : IfcBridgeStructureElement //IFC5
+	{
+		internal IfcBridgeStructureType mPredefinedType = IfcBridgeStructureType.ARCHED_BRIDGE;    //:	IfcBridgeStructureType;
+		public IfcBridgeStructureType PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		internal IfcBridge() : base() { }
+		internal IfcBridge(IfcBridge b) : base(b) { mPredefinedType = b.mPredefinedType; }
+		internal IfcBridge(IfcSpatialStructureElement host, string name,IfcBridgeStructureIndicator indicator, IfcBridgeStructureType type) : base(host, name,indicator) { mPredefinedType = type; } 
+		internal static void parseFields(IfcBridge b, List<string> arrFields, ref int ipos)
+		{
+			IfcBridgeStructureElement.parseFields(b, arrFields, ref ipos);
+			string s = arrFields[ipos++];
+			if (s[0] == '.')
+				b.mPredefinedType = (IfcBridgeStructureType)Enum.Parse(typeof(IfcBridgeStructureType), s.Replace(".", ""));
+		}
+		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }//mPredefinedType != .NOTDEFINED ? : ",$,")  }
+		internal static IfcBridge Parse(string strDef) { IfcBridge b = new IfcBridge(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
+	}
+	public abstract partial class IfcBridgeStructureElement : IfcCivilStructureElement //IFC5 ABSTRACT SUPERTYPE OF (ONEOF (IfcBridge, IfcBridgePart))
+	{
+		internal IfcBridgeStructureIndicator mStructureIndicator = IfcBridgeStructureIndicator.OTHER;    //: IfcBridgeStructureIndicator;
+
+		public IfcBridgeStructureIndicator StructureIndicator { get { return mStructureIndicator; } set { mStructureIndicator = value; } }
+
+		internal IfcBridgeStructureElement() : base() { }
+		internal IfcBridgeStructureElement(IfcBridgeStructureElement e) : base(e) { mStructureIndicator = e.mStructureIndicator; }
+		internal IfcBridgeStructureElement(IfcSpatialStructureElement host, string name, IfcBridgeStructureIndicator indicator) : base(host, name)
+		{
+			mStructureIndicator = indicator;
+		}
+
+		internal static void parseFields(IfcBridgeStructureElement e, List<string> arrFields, ref int ipos)
+		{
+			IfcCivilStructureElement.parseFields(e, arrFields, ref ipos);
+			string s = arrFields[ipos++];
+			if (s[0] == '.')
+				e.mStructureIndicator = (IfcBridgeStructureIndicator)Enum.Parse(typeof(IfcBridgeStructureIndicator), s.Replace(".", ""));
+		}
+		protected override string BuildString() { return base.BuildString() + ",." + mStructureIndicator.ToString() + "."; }
+	}
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
 	{
 		private int mDegree;// : INTEGER;
 		private List<int> mControlPointsList = new List<int>();// : LIST [2:?] OF IfcCartesianPoint;
 		private IfcBSplineCurveForm mCurveForm;// : IfcBSplineCurveForm;
-		private IfcLogicalEnum mClosedCurve;// : LOGICAL;
-		private IfcLogicalEnum mSelfIntersect;// : LOGICAL; 
+		private IfcLogicalEnum mClosedCurve = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
+		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL; 
 
-		internal int Degree { get { return mDegree; } }
-		internal List<IfcCartesianPoint> ControlPointsList { get { return mControlPointsList.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } }
-		internal IfcBSplineCurveForm CurveForm { get { return mCurveForm; } }
-		internal IfcLogicalEnum ClosedCurve { get { return mClosedCurve; } }
-		internal IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } }
+		public int Degree { get { return mDegree; } }
+		public List<IfcCartesianPoint> ControlPointsList { get { return mControlPointsList.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } }
+		public IfcBSplineCurveForm CurveForm { get { return mCurveForm; } }
+		public IfcLogicalEnum ClosedCurve { get { return mClosedCurve; } set { mClosedCurve = value; } }
+		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		protected IfcBSplineCurve() : base() { }
-		protected IfcBSplineCurve(IfcBSplineCurve pl)
-			: base(pl)
+		protected IfcBSplineCurve(IfcBSplineCurve c)
+			: base(c)
 		{
-			mDegree = pl.mDegree;
-			mControlPointsList = new List<int>(pl.mControlPointsList.ToArray());
-			mCurveForm = pl.mCurveForm;
-			mClosedCurve = pl.mClosedCurve;
-			mSelfIntersect = pl.mSelfIntersect;
+			mDegree = c.mDegree;
+			mControlPointsList = new List<int>(c.mControlPointsList.ToArray());
+			mCurveForm = c.mCurveForm;
+			mClosedCurve = c.mClosedCurve;
+			mSelfIntersect = c.mSelfIntersect;
 		}
-		private IfcBSplineCurve(DatabaseIfc m, int degree, IfcBSplineCurveForm form, IfcLogicalEnum closed, IfcLogicalEnum selfIntersect)
-			: base(m)
-		{
-			mDegree = degree;
-			mCurveForm = form;
-			mClosedCurve = closed;
-			mSelfIntersect = selfIntersect;
-		}
+		private IfcBSplineCurve(DatabaseIfc db, int degree, IfcBSplineCurveForm form) : base(db) { mDegree = degree; mCurveForm = form; }
+		protected IfcBSplineCurve(DatabaseIfc db, int degree, List<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form)
+			: this(db, degree, form) { mControlPointsList = controlPoints.ConvertAll(x => x.mIndex); }
 
 		protected static void parseFields(IfcBSplineCurve c, List<string> arrFields, ref int ipos)
 		{
@@ -422,12 +457,11 @@ namespace GeometryGym.Ifc
 		internal IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineCurveWithKnots() : base() { }
-		internal IfcBSplineCurveWithKnots(IfcBSplineCurveWithKnots pl)
-			: base(pl)
+		internal IfcBSplineCurveWithKnots(IfcBSplineCurveWithKnots c) : base(c)
 		{
-			mMultiplicities = new List<int>(pl.mMultiplicities.ToArray());
-			mKnots = new List<double>(pl.mKnots.ToArray());
-			mKnotSpec = pl.mKnotSpec;
+			mMultiplicities = new List<int>(c.mMultiplicities.ToArray());
+			mKnots = new List<double>(c.mKnots.ToArray());
+			mKnotSpec = c.mKnotSpec;
 		}
 
 		internal static void parseFields(IfcBSplineCurveWithKnots c, List<string> arrFields, ref int ipos)
@@ -465,39 +499,35 @@ namespace GeometryGym.Ifc
 		private IfcLogicalEnum mVClosed = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL; 
 
-		internal int UDegree { get { return mUDegree; } }
-		internal int VDegree { get { return mVDegree; } }
-		internal List<List<IfcCartesianPoint>> ControlPointsList { get { return mControlPointsList.ConvertAll(x => x.ConvertAll(y => mDatabase.mIfcObjects[y] as IfcCartesianPoint)); } }
-		internal IfcBSplineSurfaceForm SurfaceForm { get { return mSurfaceForm; } }
-		internal IfcLogicalEnum UClosed { get { return mUClosed; } }
-		internal IfcLogicalEnum VClosed { get { return mVClosed; } }
-		internal IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } }
+		public int UDegree { get { return mUDegree; } }
+		public int VDegree { get { return mVDegree; } }
+		public List<List<IfcCartesianPoint>> ControlPointsList { get { return mControlPointsList.ConvertAll(x => x.ConvertAll(y => mDatabase.mIfcObjects[y] as IfcCartesianPoint)); } }
+		public IfcBSplineSurfaceForm SurfaceForm { get { return mSurfaceForm; } }
+		public IfcLogicalEnum UClosed { get { return mUClosed; } set { mUClosed = value; } }
+		public IfcLogicalEnum VClosed { get { return mVClosed; } set { mVClosed = value; } }
+		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		protected IfcBSplineSurface() : base() { }
-		protected IfcBSplineSurface(IfcBSplineSurface pl)
-			: base(pl)
+		protected IfcBSplineSurface(IfcBSplineSurface s)
+			: base(s)
 		{
-			mUDegree = pl.mUDegree;
-			mVDegree = pl.mVDegree;
-			for (int icounter = 0; icounter < pl.mControlPointsList.Count; icounter++)
-				mControlPointsList.Add(new List<int>(pl.mControlPointsList[icounter].ToArray()));
-			mSurfaceForm = pl.mSurfaceForm;
-			mUClosed = pl.mUClosed;
-			mVClosed = pl.mVClosed;
-			mSelfIntersect = pl.mSelfIntersect;
+			mUDegree = s.mUDegree;
+			mVDegree = s.mVDegree;
+			for (int icounter = 0; icounter < s.mControlPointsList.Count; icounter++)
+				mControlPointsList.Add(new List<int>(s.mControlPointsList[icounter].ToArray()));
+			mSurfaceForm = s.mSurfaceForm;
+			mUClosed = s.mUClosed;
+			mVClosed = s.mVClosed;
+			mSelfIntersect = s.mSelfIntersect;
 		}
-		private IfcBSplineSurface(DatabaseIfc m, int uDegree, int vDegree, IfcBSplineSurfaceForm form, IfcLogicalEnum uClosed, IfcLogicalEnum vClosed, IfcLogicalEnum selfIntersect)
-			: base(m)
+		private IfcBSplineSurface(DatabaseIfc db, int uDegree, int vDegree, IfcBSplineSurfaceForm form) : base(db)
 		{
 			mUDegree = uDegree;
 			mVDegree = vDegree;
 			mSurfaceForm = form;
-			mUClosed = uClosed;
-			mVClosed = vClosed;
-			mSelfIntersect = selfIntersect;
 		}
-		protected IfcBSplineSurface(DatabaseIfc m, int uDegree, int vDegree, List<List<IfcCartesianPoint>> controlPoints, IfcBSplineSurfaceForm form, IfcLogicalEnum uClosed, IfcLogicalEnum vClosed, IfcLogicalEnum selfIntersect) :
-			this(m, uDegree, vDegree, form, uClosed, vClosed, selfIntersect)
+		protected IfcBSplineSurface(DatabaseIfc db, int uDegree, int vDegree, List<List<IfcCartesianPoint>> controlPoints, IfcBSplineSurfaceForm form) :
+			this(db, uDegree, vDegree, form)
 		{
 			foreach (List<IfcCartesianPoint> cps in controlPoints)
 				mControlPointsList.Add(cps.ConvertAll(x => x.mIndex));
@@ -552,9 +582,9 @@ namespace GeometryGym.Ifc
 		internal List<double> mUKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
 		internal List<double> mVKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
 		internal IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType; 
+
 		internal IfcBSplineSurfaceWithKnots() : base() { }
-		internal IfcBSplineSurfaceWithKnots(IfcBSplineSurfaceWithKnots s)
-			: base(s)
+		internal IfcBSplineSurfaceWithKnots(IfcBSplineSurfaceWithKnots s) : base(s)
 		{
 			mUMultiplicities = new List<int>(s.mUMultiplicities.ToArray());
 			mVMultiplicities = new List<int>(s.mVMultiplicities.ToArray());
@@ -563,7 +593,7 @@ namespace GeometryGym.Ifc
 			mKnotSpec = s.mKnotSpec;
 		}
 		internal IfcBSplineSurfaceWithKnots(DatabaseIfc m, int uDegree, int vDegree, IfcBSplineSurfaceForm form, List<List<IfcCartesianPoint>> controlPoints, IfcLogicalEnum uClosed, IfcLogicalEnum vClosed, IfcLogicalEnum selfIntersect, List<int> uMultiplicities, List<int> vMultiplicities, List<double> uKnots, List<double> vKnots, IfcKnotType type)
-			: base(m, uDegree, vDegree, controlPoints, form, uClosed, vClosed, selfIntersect)
+			: base(m, uDegree, vDegree, controlPoints, form)
 		{
 			mUMultiplicities.AddRange(uMultiplicities);
 			mVMultiplicities.AddRange(vMultiplicities);

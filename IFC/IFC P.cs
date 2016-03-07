@@ -533,13 +533,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcPolyline : IfcBoundedCurve
 	{
 		private List<int> mPoints = new List<int>();// : LIST [2:?] OF IfcCartesianPoint;
-
-		internal List<IfcCartesianPoint> Points { get { return mPoints.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } }
+		public List<IfcCartesianPoint> Points { get { return mPoints.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } set { mPoints = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcPolyline() : base() { }
 		internal IfcPolyline(IfcPolyline pl) : base(pl) { mPoints = new List<int>(pl.mPoints.ToArray()); }
 		public IfcPolyline(IfcCartesianPoint start, IfcCartesianPoint end) : base(start.mDatabase) { mPoints.Add(start.mIndex); mPoints.Add(end.mIndex); }
-		internal IfcPolyline(List<IfcCartesianPoint> pts) : base(pts[1].mDatabase) { mPoints = pts.ConvertAll(x => x.mIndex); }
+		internal IfcPolyline(List<IfcCartesianPoint> pts) : base(pts[1].mDatabase) { Points = pts; }
 		internal static void parseFields(IfcPolyline p, List<string> arrFields, ref int ipos) { IfcBoundedCurve.parseFields(p, arrFields, ref ipos); p.mPoints = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		internal static IfcPolyline Parse(string strDef) { IfcPolyline p = new IfcPolyline(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		protected override string BuildString()

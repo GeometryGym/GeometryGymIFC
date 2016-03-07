@@ -23,11 +23,58 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcTrimmedCurve
+	{
+		public IfcTrimmedCurve(IfcCartesianPoint s, IfcCartesianPoint e) : base(s.mDatabase)
+		{
+			IfcLine il = new IfcLine(s, new IfcVector(s.mDatabase,e.Coordinates - s.Coordinates));
+			mBasisCurve = il.mIndex;
+			mTrim1 = new IfcTrimmingSelect(s);
+			mTrim2 = new IfcTrimmingSelect(e);
+			mMasterRepresentation = IfcTrimmingPreference.CARTESIAN;
+			mSenseAgreement = true;
+		}
+		internal IfcTrimmedCurve(DatabaseIfc db, Arc a, bool twoD, IfcCartesianPoint optStrt, out IfcCartesianPoint end) : base(db)
+		{
+			Point3d o = a.Plane.Origin, s = a.StartPoint, e = a.EndPoint;
+			Vector3d x = s - o;
+			mSenseAgreement = true;
+			if (optStrt == null)
+				optStrt = twoD ? new IfcCartesianPoint(db, new Point2d(s.X, s.Y)) : new IfcCartesianPoint(db, s);
+			end = twoD ? new IfcCartesianPoint(db, new Point2d(e.X, e.Y)) : new IfcCartesianPoint(db,e);
+			if (twoD)
+			{
+				if (a.Plane.ZAxis.Z < 0)
+				{
+					mSenseAgreement = false;
+					x = e - o;
+					IfcAxis2Placement2D ap = new IfcAxis2Placement2D(db, new Point2d(o.X, o.Y), new Vector2d(x.X, x.Y));
+					BasisCurve = new IfcCircle(ap, a.Radius);
+					mTrim1 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, optStrt);
+					mTrim2 = new IfcTrimmingSelect(0, end);
+				}
+				else
+				{
+					IfcAxis2Placement2D ap = new IfcAxis2Placement2D(db, new Point2d(o.X, o.Y), new Vector2d(x.X, x.Y));
+					BasisCurve = new IfcCircle(ap, a.Radius);
+					mTrim1 = new IfcTrimmingSelect(0, optStrt);
+					mTrim2 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, end);
+				}
+			}
+			else
+			{
+				Vector3d y = Vector3d.CrossProduct(a.Plane.ZAxis, x);
+				Plane pl = new Plane(o, x, y);
+				IfcAxis2Placement3D ap = new IfcAxis2Placement3D(db, pl);
+				BasisCurve = new IfcCircle(ap, a.Radius);
+				mTrim1 = new IfcTrimmingSelect(0, optStrt);
+				mTrim2 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, end);
+			}
+			mMasterRepresentation = IfcTrimmingPreference.CARTESIAN;
+		}
+	}
 }

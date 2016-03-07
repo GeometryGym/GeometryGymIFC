@@ -23,9 +23,7 @@ using System.Text;
 using System.Reflection;
 using System.IO; 
 
-using Rhino.Collections;
 using Rhino.Geometry;
-using Rhino.DocObjects; 
 
 namespace GeometryGym.Ifc
 {
@@ -37,9 +35,28 @@ namespace GeometryGym.Ifc
 	public partial class IfcAxis2Placement2D
 	{
 		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? (mDatabase.mIfcObjects[mRefDirection] as IfcDirection).Vector : Vector3d.XAxis); } }
+
+		internal IfcAxis2Placement2D(DatabaseIfc db, Point2d position, Vector2d dir) : base(db, position)
+		{
+			if (dir.Length > 0 && new Vector3d(dir.X, dir.Y, 0).IsParallelTo(Vector3d.XAxis, Math.PI / 1800) != 1)
+				RefDirection = new IfcDirection(db, dir);
+		}
 	}
 	public partial class IfcAxis2Placement3D
 	{
-		
+		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db)
+		{
+			double angTol = Math.PI / 1800;
+			if (plane.ZAxis.IsParallelTo(Vector3d.ZAxis, angTol) != 1)
+			{
+				Axis = new IfcDirection(db, plane.ZAxis);
+				RefDirection = new IfcDirection(db, plane.XAxis);
+			}
+			else if (plane.XAxis.IsParallelTo(Vector3d.XAxis, angTol) != 1)
+			{
+				RefDirection = new IfcDirection(db, plane.XAxis);
+				Axis = (db.mZAxis == null ? new IfcDirection(db, Vector3d.ZAxis) : db.mZAxis);
+			}
+		}
 	}
 }

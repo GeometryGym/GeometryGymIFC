@@ -193,7 +193,7 @@ namespace GeometryGym.Ifc
 				m.Associates.addAssociation(this);
 		}
 	}
-	public interface IfcObjectDefinitionSelect : IfcInterface { List<IfcRelDefinesByProperties> IsDefinedBy { get; } } // IFC4 SELECT (IfcContext, IfcObject);
+	public interface IfcObjectDefinitionSelect : IfcInterface { List<IfcRelDefinesByProperties> IsDefinedBy { get; } } // IFC4 SELECT (IfcContext, IfcObject,IfcReferencePlacement);
 	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
 	{	//INVERSE 
 		internal List<IfcProduct> mPlacesObject = new List<IfcProduct>();// : SET [1:?] OF IfcProduct FOR ObjectPlacement;

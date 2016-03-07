@@ -793,13 +793,8 @@ additional types	some additional representation types are given:
 
 		internal IfcSpace() : base() { }
 		internal IfcSpace(IfcSpace p) : base(p) { mPredefinedType = p.mPredefinedType; mElevationWithFlooring = p.mElevationWithFlooring; }
-		internal IfcSpace(IfcSpatialStructureElement host, string name)
-			: base(host, name)
+		internal IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name)
 		{
-			//container.addSpace(this);
-			//if(mDatabase.mSchema == Schema.IFC2x3 && mPredefinedType != IfcSpaceTypeEnum.EXTERNAL && mPredefinedType != IfcSpaceTypeEnum.INTERNAL && mPredefinedType != IfcSpaceTypeEnum.NOTDEFINED )
-			//	mPredefinedType = IfcSpaceTypeEnum.NOTDEFINED;
-			//mElevationWithFlooring = elev;
 			IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null);
 		}
 
@@ -1193,7 +1188,7 @@ additional types	some additional representation types are given:
 		internal new static IfcStairType Parse(string strDef) { IfcStairType t = new IfcStairType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return (mDatabase.mSchema == Schema.IFC2x3 ? "" : base.BuildString() + ",." + mPredefinedType.ToString() + "."); }
 	}
-	public abstract partial class IfcStructuralAction : IfcStructuralActivity // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralLinearAction ,IfcStructuralPlanarAction,IfcStructuralPointAction))
+	public abstract partial class IfcStructuralAction : IfcStructuralActivity // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveAction, IfcStructuralPointAction, IfcStructuralSurfaceAction))
 	{
 		internal bool mDestabilizingLoad = true, mDestabSet = false;//: OPTIONAL BOOLEAN; IFC4 made optional
 		internal int mCausedBy;// : OPTIONAL IfcStructuralReaction; DELETED IFC4 
@@ -1335,7 +1330,7 @@ additional types	some additional representation types are given:
 		internal static IfcStructuralCurveAction Parse(string strDef,Schema schema) { IfcStructuralCurveAction a = new IfcStructuralCurveAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralCurveAction a, List<string> arrFields, ref int ipos,Schema schema)
 		{
-			IfcStructuralAction.parseFields(a, arrFields, ref ipos);
+			IfcStructuralAction.parseFields(a, arrFields, ref ipos,schema);
 			string s = arrFields[ipos++];
 			if (s.StartsWith("."))
 				a.mProjectedOrTrue = (IfcProjectedOrTrueLengthEnum)Enum.Parse(typeof(IfcProjectedOrTrueLengthEnum), s.Replace(".", ""));
@@ -1675,14 +1670,14 @@ additional types	some additional representation types are given:
 		internal IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleForce l, bool global) : base(lc, item, l, global) { }
 		internal IfcStructuralPointAction(IfcStructuralPointAction p) : base(p) { }
 		internal IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, item, l, global) { }
-		internal static IfcStructuralPointAction Parse(string strDef)
+		internal static IfcStructuralPointAction Parse(string strDef,Schema schema)
 		{
 			IfcStructuralPointAction a = new IfcStructuralPointAction();
 			int ipos = 0;
-			parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos);
+			parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema);
 			return a;
 		}
-		internal static void parseFields(IfcStructuralPointAction a, List<string> arrFields, ref int ipos) { IfcStructuralAction.parseFields(a, arrFields, ref ipos); }
+		internal static void parseFields(IfcStructuralPointAction a, List<string> arrFields, ref int ipos,Schema schema) { IfcStructuralAction.parseFields(a, arrFields, ref ipos,schema); }
 	}
 	public partial class IfcStructuralPointConnection : IfcStructuralConnection
 	{
@@ -1800,7 +1795,7 @@ additional types	some additional representation types are given:
 		internal static IfcStructuralSurfaceAction Parse(string strDef, Schema schema) { IfcStructuralSurfaceAction a = new IfcStructuralSurfaceAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralSurfaceAction a, List<string> arrFields, ref int ipos, Schema schema)
 		{
-			IfcStructuralAction.parseFields(a, arrFields, ref ipos);
+			IfcStructuralAction.parseFields(a, arrFields, ref ipos,schema);
 			string s = arrFields[ipos++];
 			if (s.StartsWith("."))
 				a.mProjectedOrTrue = (IfcProjectedOrTrueLengthEnum)Enum.Parse(typeof(IfcProjectedOrTrueLengthEnum), s.Replace(".", ""));
