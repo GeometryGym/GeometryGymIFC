@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 				mTrim1 = new IfcTrimmingSelect(0, optStrt);
 				mTrim2 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, end);
 			}
-			mMasterRepresentation = IfcTrimmingPreference.CARTESIAN;
+			mMasterRepresentation = IfcTrimmingPreference.PARAMETER;
 		}
 	}
 }

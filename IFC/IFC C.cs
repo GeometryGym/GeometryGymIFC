@@ -1456,7 +1456,7 @@ namespace GeometryGym.Ifc
 		private string mLongName = "$";// : OPTIONAL IfcLabel;
 		private string mPhase = "$";// : OPTIONAL IfcLabel;
 		internal List<int> mRepresentationContexts = new List<int>();// : 	OPTIONAL SET [1:?] OF IfcRepresentationContext;
-		private int mUnitsInContext;// : OPTIONAL IfcUnitAssignment; 
+		private int mUnitsInContext;// : OPTIONAL IfcUnitAssignment; IFC2x3 not Optional
 		//INVERSE
 		internal List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
 		internal List<IfcRelDeclares> mDeclares = new List<IfcRelDeclares>();
@@ -1482,7 +1482,7 @@ namespace GeometryGym.Ifc
 				mRepresentationContexts.Add(m.mGeomRepContxt.mIndex);
 			IfcUnitAssignment u = new IfcUnitAssignment(m);
 			u.SetUnits(length);
-			mUnitsInContext = u.mIndex;
+			UnitsInContext = u;
 			mIsDecomposedBy.Clear(); //??? Jon
 		}
 		protected IfcContext(DatabaseIfc m, string name) : base(m)

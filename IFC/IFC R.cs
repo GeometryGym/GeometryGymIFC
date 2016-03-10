@@ -2347,17 +2347,16 @@ namespace GeometryGym.Ifc
 		internal string mRepresentationIdentifier = "$";//  : OPTIONAL IfcLabel; //RepresentationIdentifier: Name of the representation, e.g. 'Body' for 3D shape, 'FootPrint' for 2D ground view, 'Axis' for reference axis, 		
 		internal string mRepresentationType = "$";//  : OPTIONAL IfcLabel;
 		internal List<int> mItems = new List<int>();//  : SET [1:?] OF IfcRepresentationItem; 
-
-		internal string RepresentationIdentifier { get { return mRepresentationIdentifier == "$" ? "" : mRepresentationIdentifier; } set { mRepresentationIdentifier = (string.IsNullOrEmpty(value) ? "$" : value); } }
-		internal string RepresentationType { get { return mRepresentationType == "$" ? "" : mRepresentationType; } set { mRepresentationType = string.IsNullOrEmpty(value) ? "$" : value; } }
 		//INVERSE 
 		internal IfcRepresentationMap mRepresentationMap = null;//	 : 	SET [0:1] OF IfcRepresentationMap FOR MappedRepresentation;
 		internal List<IfcPresentationLayerAssignment> mLayerAssignments = new List<IfcPresentationLayerAssignment>();// new List<>();//	IFC4 change : 	SET OF IfcPresentationLayerAssignment FOR AssignedItems;
 		private List<IfcProductRepresentation> mOfProductRepresentation = new List<IfcProductRepresentation>();/// IFC4 change	 : 	SET [0:n] OF IfcProductRepresentation FOR Representations;
 
-		internal IfcRepresentationContext ContextOfItems { get { return mDatabase.mIfcObjects[mContextOfItems] as IfcRepresentationContext; } }
-		internal List<IfcRepresentationItem> Items { get { return mItems.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcRepresentationItem); } }
-		internal List<IfcProductRepresentation> OfProductRepresentation { get { return mOfProductRepresentation; } }
+		public IfcRepresentationContext ContextOfItems { get { return mDatabase.mIfcObjects[mContextOfItems] as IfcRepresentationContext; } }
+		public string RepresentationIdentifier { get { return mRepresentationIdentifier == "$" ? "" : mRepresentationIdentifier; } set { mRepresentationIdentifier = (string.IsNullOrEmpty(value) ? "$" : value); } }
+		public string RepresentationType { get { return mRepresentationType == "$" ? "" : mRepresentationType; } set { mRepresentationType = string.IsNullOrEmpty(value) ? "$" : value; } }
+		public List<IfcRepresentationItem> Items { get { return mItems.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcRepresentationItem); } }
+		public List<IfcProductRepresentation> OfProductRepresentation { get { return mOfProductRepresentation; } }
 		public List<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
 
 		protected IfcRepresentation() : base() { }

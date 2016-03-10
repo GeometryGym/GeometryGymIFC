@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 		private int mMappingTarget;// : IfcCartesianTransformationOperator;
 
 		public IfcRepresentationMap MappingSource { get { return mDatabase.mIfcObjects[mMappingSource] as IfcRepresentationMap; } }
-		internal IfcCartesianTransformationOperator MappingTarget { get { return mDatabase.mIfcObjects[mMappingTarget] as IfcCartesianTransformationOperator; } }
+		public IfcCartesianTransformationOperator MappingTarget { get { return mDatabase.mIfcObjects[mMappingTarget] as IfcCartesianTransformationOperator; } }
 
 		internal IfcMappedItem() : base() { }
 		internal IfcMappedItem(IfcMappedItem i) : base(i) { mMappingSource = i.mMappingSource; mMappingTarget = i.mMappingTarget; }
