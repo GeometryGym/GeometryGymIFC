@@ -68,7 +68,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
 		internal IfcGeneralProfileProperties(string name, List<IfcProperty> props, IfcProfileDef p) : base(name, props, p) { }
 
-		internal static IfcGeneralProfileProperties Parse(string strDef) { IfcGeneralProfileProperties p = new IfcGeneralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal new static IfcGeneralProfileProperties Parse(string strDef,Schema schema) { IfcGeneralProfileProperties p = new IfcGeneralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		internal static void parseFields(IfcGeneralProfileProperties gp, List<string> arrFields, ref int ipos,Schema schema)
 		{
 			IfcProfileProperties.parseFields(gp, arrFields, ref ipos,schema);

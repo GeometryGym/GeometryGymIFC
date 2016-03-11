@@ -1047,7 +1047,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement2D() : base() { }
 		internal IfcAxis2Placement2D(IfcAxis2Placement2D i) : base(i) { mRefDirection = i.mRefDirection; }
 		public IfcAxis2Placement2D(DatabaseIfc db) : base(db) { }
-		public IfcAxis2Placement2D(IfcCartesianPoint point) : base(point) { }
+		public IfcAxis2Placement2D(IfcCartesianPoint point) : base(point) { } 
 	
 		protected override string BuildString() { return (mDatabase.mOutputEssential ? "" : base.BuildString() + "," + ParserSTEP.LinkToString(mRefDirection)); }
 		internal static IfcAxis2Placement2D Parse(string strDef) { IfcAxis2Placement2D p = new IfcAxis2Placement2D(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }

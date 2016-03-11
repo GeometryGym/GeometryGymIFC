@@ -1440,15 +1440,30 @@ namespace GeometryGym.Ifc
 
 		public IfcElement RelatingElement { get { return mDatabase.mIfcObjects[mRelatingElement] as IfcElement; } }
 		public IfcStructuralMember RelatedStructuralMember { get { return mDatabase.mIfcObjects[mRelatedStructuralMember] as IfcStructuralMember; } }
-
 		internal IfcRelConnectsStructuralElement() : base() { }
 		internal IfcRelConnectsStructuralElement(IfcRelConnectsStructuralElement c) : base(c) { mRelatingElement = c.mRelatingElement; mRelatedStructuralMember = c.mRelatedStructuralMember; }
 		internal IfcRelConnectsStructuralElement(IfcElement elem, IfcStructuralMember memb)
-			: base(elem.mDatabase) { if (elem.mDatabase.mSchema != Schema.IFC2x3) throw new Exception(KeyWord + " Deleted IFC4!"); mRelatingElement = elem.mIndex; mRelatedStructuralMember = memb.mIndex; }
+			: base(elem.mDatabase)
+		{
+			if (elem.mDatabase.mSchema != Schema.IFC2x3)
+				throw new Exception(KeyWord + " Deleted IFC4!");
+			mRelatingElement = elem.mIndex;
+			elem.mHasStructuralMemberSS.Add(this);
+			mRelatedStructuralMember = memb.mIndex;
+			memb.mStructuralMemberForGG = this;
+		}
 		internal static IfcRelConnectsStructuralElement Parse(string strDef) { IfcRelConnectsStructuralElement i = new IfcRelConnectsStructuralElement(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		internal static void parseFields(IfcRelConnectsStructuralElement i, List<string> arrFields, ref int ipos) { IfcRelConnects.parseFields(i, arrFields, ref ipos); i.mRelatingElement = ParserSTEP.ParseLink(arrFields[ipos++]); i.mRelatedStructuralMember = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedStructuralMember); }
-		internal override void relate() { IfcElement element = RelatingElement; if (element != null) element.mHasStructuralMemberSS.Add(this); (mDatabase.mIfcObjects[mRelatedStructuralMember] as IfcStructuralMember).mStructuralMemberForGG = this; }
+		internal override void relate()
+		{
+			IfcElement element = RelatingElement;
+			if (element != null)
+				element.mHasStructuralMemberSS.Add(this);
+			IfcStructuralMember member = RelatedStructuralMember;
+			if(member != null)
+				member.mStructuralMemberForGG = this;
+		}
 	}
 	public partial class IfcRelConnectsStructuralMember : IfcRelConnects
 	{

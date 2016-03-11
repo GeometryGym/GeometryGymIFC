@@ -1646,10 +1646,7 @@ additional types	some additional representation types are given:
 		protected IfcStructuralMember() : base() { }
 		protected IfcStructuralMember(IfcStructuralMember i) : base(i) { }
 		
-
 		protected static void parseFields(IfcStructuralMember m, List<string> arrFields, ref int ipos) { IfcStructuralItem.parseFields(m, arrFields, ref ipos); }
-
-		
 	}
 	public partial class IfcStructuralPlanarAction : IfcStructuralSurfaceAction // Ifc2x3 IfcStructuralAction
 	{
@@ -1725,9 +1722,9 @@ additional types	some additional representation types are given:
 			mTorsionalSectionModulus = p.mTorsionalSectionModulus;
 			mCentreOfGravityInX = p.mCentreOfGravityInX; mCentreOfGravityInY = p.mCentreOfGravityInY;
 		}
-		internal static void parseFields(IfcStructuralProfileProperties gp, List<string> arrFields, ref int ipos)
+		internal static void parseFields(IfcStructuralProfileProperties gp, List<string> arrFields, ref int ipos,Schema schema)
 		{
-			IfcGeneralProfileProperties.parseFields(gp, arrFields, ref ipos);
+			IfcGeneralProfileProperties.parseFields(gp, arrFields, ref ipos,schema);
 			gp.mTorsionalConstantX = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mMomentOfInertiaYZ = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			gp.mMomentOfInertiaY = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mMomentOfInertiaZ = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			gp.mWarpingConstant = ParserSTEP.ParseDouble(arrFields[ipos++]);
@@ -1738,7 +1735,7 @@ additional types	some additional representation types are given:
 			gp.mTorsionalSectionModulus = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			gp.mCentreOfGravityInX = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mCentreOfGravityInY = ParserSTEP.ParseDouble(arrFields[ipos++]);
 		}
-		internal new static IfcStructuralProfileProperties Parse(string strDef) { IfcStructuralProfileProperties p = new IfcStructuralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal new static IfcStructuralProfileProperties Parse(string strDef,Schema schema) { IfcStructuralProfileProperties p = new IfcStructuralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		protected override string BuildString()
 		{
 			return base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mTorsionalConstantX) + "," + ParserSTEP.DoubleOptionalToString(mMomentOfInertiaYZ) + "," + ParserSTEP.DoubleOptionalToString(mMomentOfInertiaY) + "," + ParserSTEP.DoubleOptionalToString(mMomentOfInertiaZ) + "," +
