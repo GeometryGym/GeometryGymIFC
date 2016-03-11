@@ -262,7 +262,7 @@ namespace GeometryGym.Ifc
 				mRotationalStiffnessZ = zz;
 			}
 		}
-		internal static IfcBoundaryNodeCondition Parse(string strDef) { IfcBoundaryNodeCondition b = new IfcBoundaryNodeCondition(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
+		internal static IfcBoundaryNodeCondition Parse(string strDef,Schema schema) { IfcBoundaryNodeCondition b = new IfcBoundaryNodeCondition(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return b; }
 		internal static void parseFields(IfcBoundaryNodeCondition b, List<string> arrFields, ref int ipos, Schema schema)
 		{
 			IfcBoundaryCondition.parseFields(b, arrFields, ref ipos);
