@@ -377,6 +377,134 @@ namespace GeometryGym.Ifc
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }//mPredefinedType != .NOTDEFINED ? : ",$,")  }
 		internal static IfcBridge Parse(string strDef) { IfcBridge b = new IfcBridge(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
 	}
+	public partial class IfcBridgeContactElement : IfcCivilElementPart //IFC5
+	{
+		internal IfcBridgeContactType mContactType = IfcBridgeContactType.CONNECTOR;//:	IfcBridgeContactType
+		public IfcBridgeContactType ContactType { get { return mContactType; } set { mContactType = value; } }
+
+		internal IfcBridgeContactElement() : base() { }
+		internal IfcBridgeContactElement(IfcBridgeContactElement b) : base(b) { mContactType = b.mContactType; }
+		internal IfcBridgeContactElement(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		internal static IfcBridgeContactElement Parse(string strDef) { IfcBridgeContactElement p = new IfcBridgeContactElement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal static void parseFields(IfcBridgeContactElement a, List<string> arrFields, ref int ipos)
+		{
+			IfcCivilElementPart.parseFields(a, arrFields, ref ipos);
+			a.mContactType = (IfcBridgeContactType)Enum.Parse(typeof(IfcBridgeContactType), arrFields[ipos++].Replace(".", ""));
+		}
+		protected override string BuildString()
+		{
+			return base.BuildString() + ",." + mContactType.ToString() + ".";
+		}
+	}
+	public abstract partial class IfcBridgeElement : IfcCivilElement //IFC5 ABSTRACT SUPERTYPE OF (ONEOF (IfcBridgeSegment, IfcBridgePrismaticElement))
+	{
+		protected IfcBridgeElement() : base() { }
+		protected IfcBridgeElement(IfcBridgeElement b) : base(b) {  }
+		protected IfcBridgeElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host,p,r) { }
+	}
+	public partial class IfcBridgePart : IfcBridgeStructureElement //IFC5
+	{
+		internal IfcBridgeStructureElementType mStructureElementType = IfcBridgeStructureElementType.ARCH;    //:	IfcBridgeStructureElementType;
+		internal IfcBridgeTechnologicalElementType mTechnoElementType = IfcBridgeTechnologicalElementType.BOW_STRING;    //:	IfcBridgeTechnologicalElementType
+		public IfcBridgeStructureElementType StructureElementType { get { return mStructureElementType; } set { mStructureElementType = value; } }
+		public IfcBridgeTechnologicalElementType TechnoElementType { get { return mTechnoElementType; } set { mTechnoElementType = value; } }
+
+		internal IfcBridgePart() : base() { }
+		internal IfcBridgePart(IfcBridgePart p) : base(p) { mStructureElementType = p.mStructureElementType; mTechnoElementType = p.mTechnoElementType; }
+		internal IfcBridgePart(IfcSpatialStructureElement host, string name, IfcBridgeStructureIndicator indicator, IfcBridgeStructureElementType type, IfcBridgeTechnologicalElementType techno) : base(host, name, indicator) { mStructureElementType = type; mTechnoElementType = techno; }
+		internal static void parseFields(IfcBridgePart b, List<string> arrFields, ref int ipos)
+		{
+			IfcBridgeStructureElement.parseFields(b, arrFields, ref ipos);
+			string s = arrFields[ipos++];
+			if (s[0] == '.')
+				b.mStructureElementType = (IfcBridgeStructureElementType)Enum.Parse(typeof(IfcBridgeStructureElementType), s.Replace(".", ""));
+			s = arrFields[ipos++];
+			if (s[0] == '.')
+				b.mTechnoElementType = (IfcBridgeTechnologicalElementType)Enum.Parse(typeof(IfcBridgeTechnologicalElementType), s.Replace(".", ""));
+		}
+		protected override string BuildString() { return base.BuildString() + ",." + mStructureElementType.ToString() + ".,." + mTechnoElementType.ToString() + "."; }
+		internal static IfcBridgePart Parse(string strDef) { IfcBridgePart b = new IfcBridgePart(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
+	}
+	public class IfcBridgePrismaticElement : IfcBridgeElement  //IFC5
+	{
+		internal IfcBridgePrismaticElementType mPredefinedType = IfcBridgePrismaticElementType.AUGET;// : OPTIONAL IfcBridgeSegmentType;
+		public IfcBridgePrismaticElementType PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		internal IfcBridgePrismaticElement() : base() { }
+		internal IfcBridgePrismaticElement(IfcBridgePrismaticElement s) : base(s) { mPredefinedType = s.mPredefinedType; }
+		public IfcBridgePrismaticElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcBridgePrismaticElementType type) : base(host, p, r)
+		{
+			if (mDatabase.mSchema == Schema.IFC2x3 || mDatabase.mSchema == Schema.IFC4 || mDatabase.mSchema == Schema.IFC4A1)
+				throw new Exception(KeyWord + " only supported in IFC5!");
+			mPredefinedType = type;
+		}
+		internal static IfcBridgePrismaticElement Parse(string strDef) { IfcBridgePrismaticElement e = new IfcBridgePrismaticElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
+		internal static void parseFields(IfcBridgePrismaticElement e, List<string> arrFields, ref int ipos)
+		{
+			IfcBridgeElement.parseFields(e, arrFields, ref ipos);
+			e.mPredefinedType = (IfcBridgePrismaticElementType)Enum.Parse(typeof(IfcBridgePrismaticElementType), arrFields[ipos++].Replace(".", ""));
+		}
+
+		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+	}
+	public class IfcBridgeSegment : IfcBridgeElement  //IFC5
+	{
+		internal IfcBridgeSegmentType mSegmentType = IfcBridgeSegmentType.CANTILEVER;//: IfcBridgeSegmentType;
+		internal List<int> mSegmentParts = new List<int>();// : SET[0:?] OF IfcCivilElementPart;
+
+		public IfcBridgeSegmentType SegmentType { get { return mSegmentType; } set { mSegmentType = value; } }
+
+		internal IfcBridgeSegment() : base() { }
+		internal IfcBridgeSegment(IfcBridgeSegment s) : base(s) { }
+		public IfcBridgeSegment(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcBridgeSegmentType type, List<IfcCivilElementPart> parts) : base(host, p, r)
+		{
+			if (mDatabase.mSchema == Schema.IFC2x3 || mDatabase.mSchema == Schema.IFC4 || mDatabase.mSchema == Schema.IFC4A1)
+				throw new Exception(KeyWord + " only supported in IFC5!");
+			mSegmentType = type;
+			mSegmentParts = parts.ConvertAll(x => x.mIndex);
+		}
+		internal static IfcBridgeSegment Parse(string strDef) { IfcBridgeSegment e = new IfcBridgeSegment(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
+		internal static void parseFields(IfcBridgeSegment e, List<string> arrFields, ref int ipos)
+		{
+			IfcBridgeElement.parseFields(e, arrFields, ref ipos);
+			e.mSegmentType = (IfcBridgeSegmentType)Enum.Parse(typeof(IfcBridgeSegmentType), arrFields[ipos++].Replace(".", ""));
+			e.mSegmentParts = ParserSTEP.SplitListLinks(arrFields[ipos++]);
+		}
+
+		protected override string BuildString()
+		{
+			string result = base.BuildString() + ",." + mSegmentType.ToString() + ".";
+			if (mSegmentParts.Count == 0)
+				return result + ",$";
+			result += ",(#" + mSegmentParts[0];
+			for (int icounter = 1; icounter < mSegmentParts.Count; icounter++)
+				result += ",#" + mSegmentParts[icounter];
+			return result + ")";	
+		}
+	}
+	public partial class IfcBridgeSegmentPart : IfcCivilElementPart //IFC5
+	{
+		internal IfcBridgeSubPartType mSubPartType = IfcBridgeSubPartType.BRANCH_WALL;//:	IfcBridgeSubPartType
+		internal IfcBridgeMechanicalRoleType mMechanicalRole = IfcBridgeMechanicalRoleType.COMPLETE;//:	IfcBridgeMechanicalRoleType
+
+		public IfcBridgeSubPartType SubPartType { get { return mSubPartType; } set { mSubPartType = value; } }
+		public IfcBridgeMechanicalRoleType MechanicalRole { get { return mMechanicalRole; } set { mMechanicalRole = value; } }
+
+		internal IfcBridgeSegmentPart() : base() { }
+		internal IfcBridgeSegmentPart(IfcBridgeSegmentPart b) : base(b) { mSubPartType = b.mSubPartType; mMechanicalRole = b.mMechanicalRole; }
+		internal IfcBridgeSegmentPart(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		internal static IfcBridgeSegmentPart Parse(string strDef) { IfcBridgeSegmentPart p = new IfcBridgeSegmentPart(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal static void parseFields(IfcBridgeSegmentPart a, List<string> arrFields, ref int ipos)
+		{
+			IfcCivilElementPart.parseFields(a, arrFields, ref ipos);
+			a.mSubPartType = (IfcBridgeSubPartType)Enum.Parse(typeof(IfcBridgeSubPartType), arrFields[ipos++].Replace(".", ""));
+			a.mMechanicalRole = (IfcBridgeMechanicalRoleType)Enum.Parse(typeof(IfcBridgeMechanicalRoleType), arrFields[ipos++].Replace(".", ""));
+		}
+		protected override string BuildString()
+		{
+			return base.BuildString() + ",." + mSubPartType.ToString() + ".,." + mMechanicalRole.ToString() + ".";
+		}
+	}
 	public abstract partial class IfcBridgeStructureElement : IfcCivilStructureElement //IFC5 ABSTRACT SUPERTYPE OF (ONEOF (IfcBridge, IfcBridgePart))
 	{
 		internal IfcBridgeStructureIndicator mStructureIndicator = IfcBridgeStructureIndicator.OTHER;    //: IfcBridgeStructureIndicator;
@@ -708,7 +836,6 @@ namespace GeometryGym.Ifc
 		{
 			return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcBuildingElementPartTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
-		//internal override void repair() { mObjectType = "$"; base.repair(); }
 	}
 	public partial class IfcBuildingElementPartType : IfcElementComponentType
 	{

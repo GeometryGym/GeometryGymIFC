@@ -498,7 +498,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircleHollowProfileDef : IfcCircleProfileDef
 	{
-		public override string KeyWord { get { return (mWallThickness > mDatabase.Tolerance ? "IFCCIRCLEPROFILEDEF" : base.KeyWord); } }
+		public override string KeyWord { get { return (mWallThickness < mDatabase.Tolerance ? "IFCCIRCLEPROFILEDEF" : base.KeyWord); } }
 		internal double mWallThickness;// : IfcPositiveLengthMeasure;
 		internal IfcCircleHollowProfileDef() : base() { }
 		internal IfcCircleHollowProfileDef(IfcCircleHollowProfileDef c) : base(c) { mWallThickness = c.mWallThickness; }
@@ -547,6 +547,18 @@ namespace GeometryGym.Ifc
 		internal static IfcCivilElement Parse(string strDef) { IfcCivilElement e = new IfcCivilElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcCivilElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
+	public abstract class IfcCivilElementPart : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBridgeSegmentPart , IfcBridgeContactElement , IfcCivilSheath , IfcCivilVoid))
+	{
+		// INVERSE
+		//ContainedInSegment : IfcBridgeSegment FOR SegmentParts;
+		protected IfcCivilElementPart() : base() { }
+		protected IfcCivilElementPart(IfcCivilElementPart e) : base(e) { }
+		internal IfcCivilElementPart(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected static void parseFields(IfcCivilElementPart e, List<string> arrFields, ref int ipos)
+		{
+			IfcElementComponent.parseFields(e, arrFields, ref ipos);
+		}
+	}
 	public partial class IfcCivilElementType : IfcElementType //IFC4
 	{
 		internal IfcCivilElementType() : base() { }
@@ -555,11 +567,33 @@ namespace GeometryGym.Ifc
 		internal new static IfcCivilElementType Parse(string strDef) { IfcCivilElementType t = new IfcCivilElementType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		internal static void parseFields(IfcCivilElementType t, List<string> arrFields, ref int ipos) { IfcElementType.parseFields(t, arrFields, ref ipos); }
 	}
+	public partial class IfcCivilSheath : IfcCivilElementPart //IFC5
+	{
+		internal IfcCivilSheath() : base() { }
+		internal IfcCivilSheath(IfcCivilSheath b) : base(b) { }
+		internal IfcCivilSheath(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		internal static IfcCivilSheath Parse(string strDef) { IfcCivilSheath p = new IfcCivilSheath(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal static void parseFields(IfcCivilSheath a, List<string> arrFields, ref int ipos)
+		{
+			IfcCivilElementPart.parseFields(a, arrFields, ref ipos);
+		}
+	}
 	public abstract partial class IfcCivilStructureElement : IfcSpatialStructureElement //IFC5
 	{
 		protected IfcCivilStructureElement() : base() { }
 		protected IfcCivilStructureElement(IfcCivilStructureElement p) : base(p) { }
 		protected IfcCivilStructureElement(IfcSpatialStructureElement host, string name) : base(host, name) { }
+	}
+	public partial class IfcCivilVoid : IfcCivilElementPart //IFC5
+	{
+		internal IfcCivilVoid() : base() { }
+		internal IfcCivilVoid(IfcCivilVoid b) : base(b) { }
+		internal IfcCivilVoid(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		internal static IfcCivilVoid Parse(string strDef) { IfcCivilVoid p = new IfcCivilVoid(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal static void parseFields(IfcCivilVoid a, List<string> arrFields, ref int ipos)
+		{
+			IfcCivilElementPart.parseFields(a, arrFields, ref ipos);
+		}
 	}
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationSelect //	SUBTYPE OF IfcExternalInformation;
 	{

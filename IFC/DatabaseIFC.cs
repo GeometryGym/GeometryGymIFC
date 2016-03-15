@@ -507,7 +507,7 @@ namespace GeometryGym.Ifc
 			ReadFile(stream, aggregate, 0);
 		}
 		public DatabaseIfc(ModelView view) : this(true, view) { }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination ? Schema.IFC2x3 : Schema.IFC4A1,view) { }
+		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.If2x3NotAssigned ? Schema.IFC2x3 : Schema.IFC4A1,view) { }
 		public DatabaseIfc(bool generate, Schema schema) : this(generate,schema,schema == Schema.IFC2x3 ? ModelView.If2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
 		private DatabaseIfc(bool generate,Schema schema, ModelView view)
 		{ 
