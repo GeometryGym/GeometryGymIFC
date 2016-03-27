@@ -125,7 +125,7 @@ namespace GeometryGym.Ifc
 	}
 	internal interface IfcDateTimeSelect : IfcInterface { DateTime DateTime { get; } } // IFC4 IfcCalenderDate, IfcDateAndTime, IfcLocalTime removed.  Date, IfcDateTime, IfcDescriptiveDate, IfcTime added
 	//ENTITY IfcDefinedSymbol  // DEPRECEATED IFC4
-	public interface IfcDefinitionSelect : IfcInterface { IfcRelDeclares HasContext { get; set; } List<IfcRelAssociates> HasAssociations { get; } DatabaseIfc Model { get; } } // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
+	public interface IfcDefinitionSelect : IfcInterface { IfcRelDeclares HasContext { get; set; } List<IfcRelAssociates> HasAssociations { get; }  } // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
 	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
 	{
 		private List<int> mElements = new List<int>();// : SET [1:?] OF IfcDerivedUnitElement;
@@ -871,8 +871,8 @@ namespace GeometryGym.Ifc
 		internal IfcDoorStandardCase() : base() { }
 		internal IfcDoorStandardCase(IfcDoorStandardCase o) : base(o) { }
 
-		internal static IfcDoorStandardCase Parse(string strDef) { IfcDoorStandardCase s = new IfcDoorStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		internal static void parseFields(IfcDoorStandardCase s, List<string> arrFields, ref int ipos) { IfcDoor.parseFields(s, arrFields, ref ipos); }
+		internal new static IfcDoorStandardCase Parse(string strDef, Schema schema) { IfcDoorStandardCase s = new IfcDoorStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
+		internal static void parseFields(IfcDoorStandardCase s, List<string> arrFields, ref int ipos, Schema schema) { IfcDoor.parseFields(s, arrFields, ref ipos,schema); }
 	}
 	public partial class IfcDoorStyle : IfcTypeProduct //IFC2x3 
 	{

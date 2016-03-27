@@ -1001,12 +1001,15 @@ namespace GeometryGym.Ifc
 			get { return mDatabase.mIfcObjects[mRepresentation] as IfcProductRepresentation; }
 			set
 			{
+				IfcProductDefinitionShape pds = Representation as IfcProductDefinitionShape;
+				if(pds != null)
+					pds.mShapeOfProduct.Remove(this);
 				if(value == null)
 					mRepresentation = 0;
 				else
 				{
 					mRepresentation = value.mIndex;
-					IfcProductDefinitionShape pds = value as IfcProductDefinitionShape;
+					pds = value as IfcProductDefinitionShape;
 					
 					if (pds != null && mPlacement == 0)
 					{
@@ -1514,8 +1517,6 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelAssociates> mHasAssociations = new List<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
 		public List<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
-
-		DatabaseIfc IfcDefinitionSelect.Model { get { return mDatabase; } }
 
 		protected IfcPropertyDefinition() : base() { }
 		protected IfcPropertyDefinition(IfcPropertyDefinition i) : base(i) { }

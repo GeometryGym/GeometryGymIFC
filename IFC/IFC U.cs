@@ -125,11 +125,14 @@ namespace GeometryGym.Ifc
 			else if (length == Length.Foot)
 			{
 				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(1 / 3.2808399), mDatabase.mSILength);
-				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Feet",mwu).mIndex);
+				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Feet", mwu).mIndex);
 				mDatabase.ScaleSI = 1 / 3.2808399;
 			}
 			else
+			{
 				mUnits.Add(mDatabase.mSILength.mIndex);
+				mDatabase.ScaleSI = 1;
+			}
 			SetUnits();
 		}
 		internal void SetUnits()

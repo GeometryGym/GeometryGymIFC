@@ -508,7 +508,6 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcBridgeStructureElement : IfcCivilStructureElement //IFC5 ABSTRACT SUPERTYPE OF (ONEOF (IfcBridge, IfcBridgePart))
 	{
 		internal IfcBridgeStructureIndicator mStructureIndicator = IfcBridgeStructureIndicator.OTHER;    //: IfcBridgeStructureIndicator;
-
 		public IfcBridgeStructureIndicator StructureIndicator { get { return mStructureIndicator; } set { mStructureIndicator = value; } }
 
 		internal IfcBridgeStructureElement() : base() { }

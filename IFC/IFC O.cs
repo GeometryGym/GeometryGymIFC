@@ -84,7 +84,6 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAggregates> IsDecomposedBy { get { return mIsDecomposedBy; } }
 		public List<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
 
-		DatabaseIfc IfcDefinitionSelect.Model { get { return mDatabase; } }
 		internal IfcRelAssociatesMaterial RelatedMaterialAssociation
 		{
 			get

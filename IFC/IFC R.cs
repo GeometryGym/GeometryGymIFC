@@ -1036,12 +1036,12 @@ namespace GeometryGym.Ifc
 		internal int mID = 0;
 		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcDefinitionSelect IFC2x3 IfcRoot; 
 
-		List<IfcDefinitionSelect> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcDefinitionSelect); } }
+		public List<IfcDefinitionSelect> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcDefinitionSelect); } }
 
 		protected IfcRelAssociates() : base() { }
 		protected IfcRelAssociates(IfcRelAssociates i) : base(i) { mRelatedObjects = new List<int>(i.mRelatedObjects.ToArray()); }
 		internal IfcRelAssociates(DatabaseIfc m) : base(m) { }
-		internal IfcRelAssociates(IfcDefinitionSelect related) : base(related.Model) { mRelatedObjects.Add(related.Index); }
+		internal IfcRelAssociates(IfcDefinitionSelect related) : base(related.Database) { mRelatedObjects.Add(related.Index); }
 		protected override string BuildString()
 		{
 			if (mRelatedObjects.Count == 0)

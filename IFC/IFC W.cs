@@ -290,12 +290,13 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildString() { return base.BuildString() + ",." + mOperationType.ToString() + ".,." + mPanelPosition.ToString() + ".," + ParserSTEP.DoubleOptionalToString(mFrameDepth) + "," + ParserSTEP.DoubleOptionalToString(mFrameThickness) + "," + ParserSTEP.LinkToString(mShapeAspectStyle); }
 	}
-	public class IfcWindowStandardCase : IfcWindow
+	public partial class IfcWindowStandardCase : IfcWindow
 	{
+		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IFCWINDOW" : base.KeyWord); } }
 		internal IfcWindowStandardCase() : base() { }
-		internal IfcWindowStandardCase(IfcWindowStandardCase o) : base(o) { }
-		internal static IfcWindowStandardCase Parse(string strDef) { IfcWindowStandardCase s = new IfcWindowStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		internal static void parseFields(IfcWindowStandardCase s, List<string> arrFields, ref int ipos) { IfcWindow.parseFields(s, arrFields, ref ipos); }
+		internal IfcWindowStandardCase(IfcWindowStandardCase w) : base(w) { }
+		internal new static IfcWindowStandardCase Parse(string strDef, Schema schema) { IfcWindowStandardCase s = new IfcWindowStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
+		internal static void parseFields(IfcWindowStandardCase s, List<string> arrFields, ref int ipos, Schema schema) { IfcWindow.parseFields(s, arrFields, ref ipos,schema); }
 	}
 	public partial class IfcWindowStyle : IfcTypeProduct // IFC2x3
 	{
@@ -351,7 +352,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcWindowType Parse(string strDef) { IfcWindowType s = new IfcWindowType(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		internal static void parseFields(IfcWindowType s, List<string> arrFields, ref int ipos)
 		{
-			IfcTypeProduct.parseFields(s, arrFields, ref ipos);
+			IfcBuildingElementType.parseFields(s, arrFields, ref ipos);
 			s.mPredefinedType = (IfcWindowTypeEnum)Enum.Parse(typeof(IfcWindowTypeEnum), arrFields[ipos++].Replace(".", ""));
 			s.mPartitioningType = (IfcWindowTypePartitioningEnum)Enum.Parse(typeof(IfcWindowTypePartitioningEnum), arrFields[ipos++].Replace(".", ""));
 			s.mParameterTakesPrecedence = ParserSTEP.ParseBool(arrFields[ipos++]);
