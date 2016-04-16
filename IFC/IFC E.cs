@@ -325,8 +325,6 @@ namespace GeometryGym.Ifc
 	public class IfcElectricalElement : IfcElement  /* DEPRECEATED IFC2x2*/ {  	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
-		public enum SubTypes { IfcBuildingElement, IfcCivilElement, IfcDistributionControlElement, IfcDistributionFlowElement, IfcElementAssembly, IfcElementComponent, IfcFeatureElement, IfcFurnishingElement, IfcGeographicElement, IfcTransportElement, IfcVirtualElement }
-
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
 		//INVERSE  ADD TO TREEVIEWER WHEN ACTIVATING
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMemberSS = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
@@ -481,7 +479,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcElementarySurface : IfcSurface //ABSTRACT SUPERTYPE OF (ONEOF(IfcPlane))
 	{
 		private int mPosition;// : IfcAxis2Placement3D; 
-		internal IfcAxis2Placement3D Position { get { return mDatabase.mIfcObjects[mPosition] as IfcAxis2Placement3D; } }
+		public IfcAxis2Placement3D Position { get { return mDatabase.mIfcObjects[mPosition] as IfcAxis2Placement3D; } }
 		protected IfcElementarySurface() : base() { }
 		protected IfcElementarySurface(IfcElementarySurface o) : base(o) { mPosition = o.mPosition; }
 		protected IfcElementarySurface(IfcAxis2Placement3D placement) : base(placement.mDatabase) { mPosition = placement.mIndex; }
@@ -550,7 +548,6 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
 	{
-		internal new enum SubTypes { IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator }
 		protected IfcElementComponent() : base() { }
 		protected IfcElementComponent(IfcElementComponent c) : base(c) { }
 		protected IfcElementComponent(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
@@ -646,13 +643,6 @@ namespace GeometryGym.Ifc
 	{  //	SUPERTYPE OF(ONEOF(IfcAirToAirHeatRecovery, IfcBoiler, IfcBurner, IfcChiller, IfcCoil, IfcCondenser, IfcCooledBeam, 
 		//IfcCoolingTower, IfcElectricGenerator, IfcElectricMotor, IfcEngine, IfcEvaporativeCooler, IfcEvaporator, IfcHeatExchanger,
 		//IfcHumidifier, IfcMotorConnection, IfcSolarDevice, IfcTransformer, IfcTubeBundle, IfcUnitaryEquipment))
-		internal new enum SubTypes
-		{
-			IfcAirToAirHeatRecovery, IfcBoiler, IfcBurner, IfcChiller, IfcCoil, IfcCondenser, IfcCooledBeam,
-			IfcCoolingTower, IfcElectricGenerator, IfcElectricMotor, IfcEngine, IfcEvaporativeCooler, IfcEvaporator, IfcHeatExchanger,
-			IfcHumidifier, IfcMotorConnection, IfcSolarDevice, IfcTransformer, IfcTubeBundle, IfcUnitaryEquipment
-		}
-
 		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCENERGYCONVERSIONDEVICE" : base.KeyWord; } }
 
 		internal IfcEnergyConversionDevice() : base() { }

@@ -349,7 +349,7 @@ namespace GeometryGym.Ifc
 		internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
 
 		protected IfcShapeModel() : base() { }
-		protected IfcShapeModel(IfcShapeModel i) : base(i) { }
+		protected IfcShapeModel(IfcShapeModel m) : base(m) { }
 		protected IfcShapeModel(IfcRepresentationItem ri, string identifier, string repType) : base(ri, identifier, repType) { }
 		protected IfcShapeModel(List<IfcRepresentationItem> reps, string identifier, string repType) : base(reps, identifier, repType) { }
 		protected static void parseString(IfcShapeModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos); }
@@ -1254,7 +1254,7 @@ additional types	some additional representation types are given:
 
 		internal IfcStructuralAnalysisModel() : base() { }
 		internal IfcStructuralAnalysisModel(IfcStructuralAnalysisModel i) : base(i) { mPredefinedType = i.mPredefinedType; mOrientationOf2DPlane = i.mOrientationOf2DPlane; mLoadedBy = new List<int>(i.mLoadedBy.ToArray()); mHasResults = new List<int>(i.mHasResults.ToArray()); }
-		internal IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name) { mPredefinedType = type; }
+		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name) { mPredefinedType = type; }
 		internal new static IfcStructuralAnalysisModel Parse(string strDef) { IfcStructuralAnalysisModel m = new IfcStructuralAnalysisModel(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcStructuralAnalysisModel c, List<string> arrFields, ref int ipos)
 		{
@@ -1305,7 +1305,7 @@ additional types	some additional representation types are given:
 
 		protected IfcStructuralConnection() : base() { }
 		protected IfcStructuralConnection(IfcStructuralConnection i) : base(i) { mAppliedCondition = i.mAppliedCondition; }
-		internal IfcStructuralConnection(IfcStructuralAnalysisModel sm, int id) : base(sm, id) {  }
+		protected IfcStructuralConnection(IfcStructuralAnalysisModel sm) : base(sm) {  }
 		protected static void parseFields(IfcStructuralConnection c, List<string> arrFields, ref int ipos) { IfcStructuralItem.parseFields(c, arrFields, ref ipos); c.mAppliedCondition = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mAppliedCondition); }
 	}
@@ -1325,7 +1325,7 @@ additional types	some additional representation types are given:
 		internal IfcStructuralCurveActivityTypeEnum mPredefinedType = IfcStructuralCurveActivityTypeEnum.NOTDEFINED;//IfcStructuralCurveActivityTypeEnum
 		internal IfcStructuralCurveAction() : base() { }
 		internal IfcStructuralCurveAction(IfcStructuralCurveAction p) : base(p) { mProjectedOrTrue = p.mProjectedOrTrue; mPredefinedType = p.mPredefinedType; }
-		internal IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralCurveActivityTypeEnum type)
+		public IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralCurveActivityTypeEnum type)
 			: base(lc, item, load, global) { mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		internal static IfcStructuralCurveAction Parse(string strDef,Schema schema) { IfcStructuralCurveAction a = new IfcStructuralCurveAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralCurveAction a, List<string> arrFields, ref int ipos,Schema schema)
@@ -1351,14 +1351,24 @@ additional types	some additional representation types are given:
 	}
 	public partial class IfcStructuralCurveMember : IfcStructuralMember
 	{
-		internal IfcStructuralCurveTypeEnum mPredefinedType;// : IfcStructuralCurveTypeEnum; 
+		internal IfcStructuralCurveTypeEnum mPredefinedType= IfcStructuralCurveTypeEnum.NOTDEFINED;// : IfcStructuralCurveTypeEnum; 
 		internal int mAxis; //: IfcDirection
 
-		public IfcStructuralCurveTypeEnum PredefinedType { get { return mPredefinedType; } }
-		public IfcDirection Axis { get { return mDatabase.mIfcObjects[mAxis] as IfcDirection; } }
+		public IfcStructuralCurveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcDirection Axis { get { return mDatabase.mIfcObjects[mAxis] as IfcDirection; } set { mAxis = value.mIndex; } }
 
 		public IfcStructuralCurveMember() : base() { }
-		internal IfcStructuralCurveMember(IfcStructuralCurveMember p) : base(p) { mPredefinedType = p.mPredefinedType; }
+		internal IfcStructuralCurveMember(IfcStructuralCurveMember m) : base(m) { mPredefinedType = m.mPredefinedType; }
+		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcStructuralPointConnection A, ExtremityAttributes start, IfcStructuralPointConnection B, ExtremityAttributes end, IfcMaterialProfile mp, IfcDirection dir, int id)
+			: this(sm, new IfcEdge(A.Vertex,B.Vertex),A,start,B,end, mp,dir, id) { }
+		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcEdge e, IfcStructuralPointConnection A, ExtremityAttributes start, IfcStructuralPointConnection B, ExtremityAttributes end, IfcMaterialProfile mp, IfcDirection dir,int id)
+			: base(sm, mp,id)
+		{
+			Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(e, "Reference"));
+			IfcRelConnectsStructuralMember csm = IfcRelConnectsStructuralMember.Create(this, A, true, start);
+			csm = IfcRelConnectsStructuralMember.Create(this, B, false, end);
+			Axis = dir;
+		}
 
 		internal static IfcStructuralCurveMember Parse(string strDef, Schema schema) { IfcStructuralCurveMember m = new IfcStructuralCurveMember(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return m; }
 		internal static void parseFields(IfcStructuralCurveMember m, List<string> arrFields, ref int ipos, Schema schema)
@@ -1370,6 +1380,27 @@ additional types	some additional representation types are given:
 				m.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + (mDatabase.mSchema == Schema.IFC2x3 ? "." : ".," + ParserSTEP.LinkToString(mAxis)); }
+
+		public class ExtremityAttributes
+		{
+			public IfcBoundaryNodeCondition BoundaryCondition { get; set; }
+			public IfcStructuralConnectionCondition StructuralConnectionCondition { get; set; }
+			public double SupportedLength { get; set; } = 0;
+			public Tuple<double, double, double> Eccentricity { get; set; } = null;
+			internal IfcAxis2Placement3D ConditionCoordinateSystem { get; set; } = null;
+			public ExtremityAttributes() { }
+			public ExtremityAttributes(ExtremityAttributes atts)
+			{
+				if(atts != null)
+				{
+					BoundaryCondition = atts.BoundaryCondition;
+					StructuralConnectionCondition = atts.StructuralConnectionCondition;
+					SupportedLength = atts.SupportedLength;
+					Eccentricity = atts.Eccentricity;
+					ConditionCoordinateSystem = atts.ConditionCoordinateSystem;
+				}
+			}
+		}
 	}
 	public class IfcStructuralCurveMemberVarying : IfcStructuralCurveMember
 	{
@@ -1393,15 +1424,16 @@ additional types	some additional representation types are given:
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 		protected IfcStructuralItem() : base() { }
 		protected IfcStructuralItem(IfcStructuralItem p) : base(p) { }
-		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) : base(sm.mDatabase)
+		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase)
 		{
 			sm.mIsGroupedBy[0].assign(this);
-			if (string.IsNullOrEmpty(Name))
-				Name = id.ToString();
-			else if (!string.IsNullOrEmpty(Description))
-				Description = id.ToString();
-			mID = id;
 			mDatabase.mContext.setStructuralUnits();
+		}
+		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
+		{
+			mID = id;
+			if (id >= 0)
+				Name = id.ToString();
 		}
 		protected static void parseFields(IfcStructuralItem i, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(i, arrFields, ref ipos); }
 	}
@@ -1409,8 +1441,8 @@ additional types	some additional representation types are given:
 	{
 		internal IfcStructuralLinearAction() : base() { }
 		internal IfcStructuralLinearAction(IfcStructuralLinearAction p) : base(p) { mProjectedOrTrue = p.mProjectedOrTrue; }
-		internal IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadLinearForce load, bool global, bool projected) : base(lc, item, load, global, projected, IfcStructuralCurveActivityTypeEnum.CONST) { }
-		internal IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadTemperature load, bool global, bool projected) : base(lc, item, load, global, projected, IfcStructuralCurveActivityTypeEnum.CONST) { }
+		public IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadLinearForce load, bool global, bool projected) : base(lc, item, load, global, projected, IfcStructuralCurveActivityTypeEnum.CONST) { }
+		public IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadTemperature load, bool global, bool projected) : base(lc, item, load, global, projected, IfcStructuralCurveActivityTypeEnum.CONST) { }
 		internal new static IfcStructuralLinearAction Parse(string strDef,Schema schema) { IfcStructuralLinearAction a = new IfcStructuralLinearAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralLinearAction a, List<string> arrFields, ref int ipos,Schema schema) { IfcStructuralCurveAction.parseFields(a, arrFields, ref ipos,schema); }
 	}
@@ -1418,6 +1450,10 @@ additional types	some additional representation types are given:
 	{
 		internal int mVaryingAppliedLoadLocation;// : IfcShapeAspect;
 		internal List<int> mSubsequentAppliedLoads = new List<int>();//: LIST [1:?] OF IfcStructuralLoad; 
+
+		public IfcShapeAspect VaryingAppliedLoadLocation { get { return mDatabase.mIfcObjects[mVaryingAppliedLoadLocation] as IfcShapeAspect; } set { mVaryingAppliedLoadLocation = value.mIndex; } }
+		public List<IfcStructuralLoad> SubsequentAppliedLoads { get { return mSubsequentAppliedLoads.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcStructuralLoad); } }
+
 		internal IfcStructuralLinearActionVarying() : base() { }
 		internal IfcStructuralLinearActionVarying(IfcStructuralLinearActionVarying p) : base(p) { mVaryingAppliedLoadLocation = p.mVaryingAppliedLoadLocation; mSubsequentAppliedLoads = new List<int>(p.mSubsequentAppliedLoads.ToArray()); }
 		internal new static IfcStructuralLinearActionVarying Parse(string strDef,Schema schema) { IfcStructuralLinearActionVarying a = new IfcStructuralLinearActionVarying(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
@@ -1501,6 +1537,8 @@ additional types	some additional representation types are given:
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCSTRUCTURALLOADGROUP" : base.KeyWord); } }
 
 		internal Tuple<double,double,double> mSelfWeightCoefficients = null;// : OPTIONAL LIST [3:3] OF IfcRatioMeasure; 
+		public Tuple<double,double,double> SelfWeightCoefficients { get { return mSelfWeightCoefficients; } set { mSelfWeightCoefficients = value; } }
+
 		internal IfcStructuralLoadCase() : base() { }
 		internal IfcStructuralLoadCase(IfcStructuralLoadCase p) : base(p) { mSelfWeightCoefficients = p.mSelfWeightCoefficients; }
 		public IfcStructuralLoadCase(IfcStructuralAnalysisModel sm, string name, IfcActionTypeEnum action, IfcActionSourceTypeEnum source, double coeff, string purpose)
@@ -1522,9 +1560,9 @@ additional types	some additional representation types are given:
 
 		internal IfcStructuralLoadGroup() : base() { }
 		internal IfcStructuralLoadGroup(IfcStructuralLoadGroup p) : base(p) { mPredefinedType = p.mPredefinedType; mActionType = p.mActionType; mActionSource = p.mActionSource; mCoefficient = p.mCoefficient; mPurpose = p.mPurpose; }
-		internal IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type, IfcActionTypeEnum action, IfcActionSourceTypeEnum source, double coeff, string purpose)
+		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type, IfcActionTypeEnum action, IfcActionSourceTypeEnum source, double coeff, string purpose)
 			: base(sm.mDatabase, name) { mLoadGroupFor.Add(sm); sm.addLoadGroup(this); mPredefinedType = type; mActionType = action; mActionSource = source; mCoefficient = coeff; if (!string.IsNullOrEmpty(purpose)) mPurpose = purpose; }
-		internal IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, List<double> factors, List<IfcStructuralLoadCase> cases, bool ULS)
+		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, List<double> factors, List<IfcStructuralLoadCase> cases, bool ULS)
 			: base(sm.mDatabase, name)
 		{
 			mPredefinedType = IfcLoadGroupTypeEnum.LOAD_COMBINATION;
@@ -1562,9 +1600,17 @@ additional types	some additional representation types are given:
 	{
 		internal double mLinearForceX = 0, mLinearForceY = 0, mLinearForceZ = 0; // : OPTIONAL IfcLinearForceMeasure
 		internal double mLinearMomentX = 0, mLinearMomentY = 0, mLinearMomentZ = 0;// : OPTIONAL IfcLinearMomentMeasure; 
+
+		public double LinearForceX { get { return mLinearForceX; } set { mLinearForceX = value; } }
+		public double LinearForceY { get { return mLinearForceY; } set { mLinearForceY = value; } }
+		public double LinearForceZ { get { return mLinearForceZ; } set { mLinearForceZ = value; } }
+		public double LinearMomentX { get { return mLinearMomentX; } set { mLinearMomentX = value; } }
+		public double LinearMomentY { get { return mLinearMomentY; } set { mLinearMomentY = value; } }
+		public double LinearMomentZ { get { return mLinearMomentZ; } set { mLinearMomentZ = value; } }
+
 		internal IfcStructuralLoadLinearForce() : base() { }
 		internal IfcStructuralLoadLinearForce(IfcStructuralLoadLinearForce f) : base(f) { mLinearForceX = f.mLinearForceX; mLinearForceY = f.mLinearForceY; mLinearForceZ = f.mLinearForceZ; mLinearMomentX = f.mLinearMomentX; mLinearMomentY = f.mLinearMomentY; mLinearMomentZ = f.mLinearMomentZ; }
-		internal IfcStructuralLoadLinearForce(DatabaseIfc m) : base(m) { }
+		public IfcStructuralLoadLinearForce(DatabaseIfc db) : base(db) { }
 		internal static IfcStructuralLoadLinearForce Parse(string strDef) { IfcStructuralLoadLinearForce l = new IfcStructuralLoadLinearForce(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
 		internal static void parseFields(IfcStructuralLoadLinearForce l, List<string> arrFields, ref int ipos)
 		{ IfcStructuralLoadStatic.parseFields(l, arrFields, ref ipos); l.mLinearForceX = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mLinearForceY= ParserSTEP.ParseDouble(arrFields[ipos++]); l.mLinearForceZ = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mLinearMomentX = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mLinearMomentY = ParserSTEP.ParseDouble(arrFields[ipos++]);  l.mLinearMomentZ = ParserSTEP.ParseDouble(arrFields[ipos++]); }
@@ -1605,9 +1651,18 @@ additional types	some additional representation types are given:
 	{
 		internal double mForceX = 0, mForceY = 0, mForceZ = 0;// : OPTIONAL IfcForceMeasure;
 		internal double mMomentX = 0, mMomentY = 0, mMomentZ = 0;// : OPTIONAL IfcTorqueMeasure; 
+
+		public double ForceX { get { return mForceX; } set { mForceX = value; } }
+		public double ForceY { get { return mForceY; } set { mForceY = value; } }
+		public double ForceZ { get { return mForceZ; } set { mForceZ = value; } }
+		public double MomentX { get { return mMomentX; } set { mMomentX = value; } }
+		public double MomentY { get { return mMomentY; } set { mMomentY = value; } }
+		public double MomentZ { get { return mMomentZ; } set { mMomentZ = value; } }
+
 		internal IfcStructuralLoadSingleForce() : base() { }
+		public IfcStructuralLoadSingleForce(DatabaseIfc db) : base(db) { }
 		internal IfcStructuralLoadSingleForce(IfcStructuralLoadSingleForce f) : base(f) { mForceX = f.mForceX; mForceY = f.mForceY; mForceZ = f.mForceZ; mMomentX = f.mMomentX; mMomentY = f.mMomentY; mMomentZ = f.mMomentZ; }
-		internal IfcStructuralLoadSingleForce(DatabaseIfc m) : base(m) { }
+		public IfcStructuralLoadSingleForce(DatabaseIfc db,double forceX, double forceY,double forceZ) : base(db) { mForceX = forceX; mForceY = forceY; mForceZ = forceZ; }
 		internal static IfcStructuralLoadSingleForce Parse(string strDef) { IfcStructuralLoadSingleForce l = new IfcStructuralLoadSingleForce(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
 		internal static void parseFields(IfcStructuralLoadSingleForce l, List<string> arrFields, ref int ipos) { IfcStructuralLoadStatic.parseFields(l, arrFields, ref ipos); l.mForceX = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mForceY = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mForceZ = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mMomentX = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mMomentY = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mMomentZ = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mForceX) + "," + ParserSTEP.DoubleOptionalToString(mForceY) + "," + ParserSTEP.DoubleOptionalToString(mForceZ) + "," + ParserSTEP.DoubleOptionalToString(mMomentX) + "," + ParserSTEP.DoubleOptionalToString(mMomentY) + "," + ParserSTEP.DoubleOptionalToString(mMomentZ); }
@@ -1643,10 +1698,18 @@ additional types	some additional representation types are given:
 		//INVERSE
 		internal List<IfcRelConnectsStructuralMember> mConnectedBy = new List<IfcRelConnectsStructuralMember>();// : SET [0:?] OF IfcRelConnectsStructuralMember FOR RelatingStructuralMember 
 		internal IfcRelConnectsStructuralElement mStructuralMemberForGG = null;
+
 		protected IfcStructuralMember() : base() { }
 		protected IfcStructuralMember(IfcStructuralMember i) : base(i) { }
+		protected IfcStructuralMember(IfcStructuralAnalysisModel sm, IfcMaterialSelect ms, int id) : base(sm,id) { MaterialSelect = ms;  }
 		
 		protected static void parseFields(IfcStructuralMember m, List<string> arrFields, ref int ipos) { IfcStructuralItem.parseFields(m, arrFields, ref ipos); }
+
+		public IfcMaterialSelect MaterialSelect
+		{
+			get { return GetMaterialSelect(); }
+			set { base.setMaterial(value); }
+		}
 	}
 	public partial class IfcStructuralPlanarAction : IfcStructuralSurfaceAction // Ifc2x3 IfcStructuralAction
 	{
@@ -1664,9 +1727,9 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralPointAction : IfcStructuralAction
 	{
 		internal IfcStructuralPointAction() : base() { }
-		internal IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleForce l, bool global) : base(lc, item, l, global) { }
 		internal IfcStructuralPointAction(IfcStructuralPointAction p) : base(p) { }
-		internal IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, item, l, global) { }
+		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleForce l, bool global) : base(lc, item, l, global) { }
+		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, item, l, global) { }
 		internal static IfcStructuralPointAction Parse(string strDef,Schema schema)
 		{
 			IfcStructuralPointAction a = new IfcStructuralPointAction();
@@ -1680,12 +1743,13 @@ additional types	some additional representation types are given:
 	{
 		private int mConditionCoordinateSystem = 0;//	:	OPTIONAL IfcAxis2Placement3D;
 
-		internal IfcAxis2Placement3D ConditionCoordinateSystem { get { return mDatabase.mIfcObjects[mConditionCoordinateSystem] as IfcAxis2Placement3D; } set { mConditionCoordinateSystem = (value == null ? 0 : value.mIndex); } }
+		public IfcAxis2Placement3D ConditionCoordinateSystem { get { return mDatabase.mIfcObjects[mConditionCoordinateSystem] as IfcAxis2Placement3D; } set { mConditionCoordinateSystem = (value == null ? 0 : value.mIndex); } }
 		public new IfcBoundaryNodeCondition AppliedCondition { get { return mDatabase.mIfcObjects[mAppliedCondition] as IfcBoundaryNodeCondition; } set { mAppliedCondition = (value == null ? 0 : value.mIndex); } }
 
 		public IfcStructuralPointConnection() : base() { }
 		internal IfcStructuralPointConnection(IfcStructuralPointConnection c) : base(c) { }
-		
+		public IfcStructuralPointConnection(IfcStructuralAnalysisModel sm, IfcVertexPoint point)
+			: base(sm) { Representation = new IfcProductDefinitionShape(IfcTopologyRepresentation.getRepresentation(point)); }
 		internal static IfcStructuralPointConnection Parse(string strDef) { IfcStructuralPointConnection c = new IfcStructuralPointConnection(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		internal static void parseFields(IfcStructuralPointConnection c, List<string> arrFields, ref int ipos)
 		{
@@ -1694,6 +1758,33 @@ additional types	some additional representation types are given:
 				c.mConditionCoordinateSystem = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
 		protected override string BuildString() { return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mConditionCoordinateSystem == 0 ? ",$" : ",#" + mConditionCoordinateSystem)); }
+
+		internal IfcVertexPoint Vertex
+		{
+			get
+			{
+				IfcProductDefinitionShape ps = Representation as IfcProductDefinitionShape;
+				if (ps != null)
+				{
+					List<IfcShapeModel> reps = ps.Representations;
+					foreach (IfcRepresentation r in reps)
+					{
+						IfcTopologyRepresentation tr = r as IfcTopologyRepresentation;
+						if (tr != null)
+						{
+							List<IfcRepresentationItem> items = tr.Items;
+							foreach (IfcRepresentationItem ri in items)
+							{
+								IfcVertexPoint vp = ri as IfcVertexPoint;
+								if (vp != null)
+									return vp;
+							}
+						}
+					}
+				}
+				return null;
+			}
+		}
 	}
 	public class IfcStructuralPointReaction : IfcStructuralReaction
 	{
@@ -1777,8 +1868,8 @@ additional types	some additional representation types are given:
 		internal double mPlasticShapeFactorZ;// : OPTIONAL IfcPositiveRatioMeasure; 
 		internal IfcStructuralSteelProfileProperties() : base() { }
 		internal IfcStructuralSteelProfileProperties(IfcStructuralSteelProfileProperties p) : base(p) { mShearAreaZ = p.mShearAreaZ; mShearAreaY = p.mShearAreaY; mPlasticShapeFactorY = p.mPlasticShapeFactorY; mPlasticShapeFactorZ = p.mPlasticShapeFactorZ; }
-		internal static void parseFields(IfcStructuralSteelProfileProperties gp, List<string> arrFields, ref int ipos) { IfcStructuralProfileProperties.parseFields(gp, arrFields, ref ipos); gp.mShearAreaZ = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mShearAreaY = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mPlasticShapeFactorY = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mPlasticShapeFactorZ = ParserSTEP.ParseDouble(arrFields[ipos++]); }
-		internal new static IfcStructuralSteelProfileProperties Parse(string strDef) { IfcStructuralSteelProfileProperties p = new IfcStructuralSteelProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+		internal static void parseFields(IfcStructuralSteelProfileProperties gp, List<string> arrFields, ref int ipos,Schema schema) { IfcStructuralProfileProperties.parseFields(gp, arrFields, ref ipos,schema); gp.mShearAreaZ = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mShearAreaY = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mPlasticShapeFactorY = ParserSTEP.ParseDouble(arrFields[ipos++]); gp.mPlasticShapeFactorZ = ParserSTEP.ParseDouble(arrFields[ipos++]); }
+		internal new static IfcStructuralSteelProfileProperties Parse(string strDef, Schema schema) { IfcStructuralSteelProfileProperties p = new IfcStructuralSteelProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mShearAreaZ) + "," + ParserSTEP.DoubleOptionalToString(mShearAreaY) + "," + ParserSTEP.DoubleOptionalToString(mPlasticShapeFactorY) + "," + ParserSTEP.DoubleOptionalToString(mPlasticShapeFactorZ); }
 	}
 	public partial class IfcStructuralSurfaceAction : IfcStructuralAction //IFC4 SUPERTYPE OF(IfcStructuralPlanarAction)
@@ -1818,6 +1909,13 @@ additional types	some additional representation types are given:
 
 		public IfcStructuralSurfaceMember() : base() { }
 		internal IfcStructuralSurfaceMember(IfcStructuralSurfaceMember p) : base(p) { mPredefinedType = p.mPredefinedType; mThickness = p.mThickness; }
+		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFace f, IfcMaterialLayerSetUsage m, int id)
+			: base(sm, m, id)
+		{
+			IfcTopologyRepresentation tr = new IfcTopologyRepresentation(f, "Reference");
+			Representation = new IfcProductRepresentation(tr);
+			mThickness = m.ForLayerSet.MaterialLayers.ConvertAll(x=>x.LayerThickness).Sum();
+		}
 
 		internal static IfcStructuralSurfaceMember Parse(string strDef) { IfcStructuralSurfaceMember m = new IfcStructuralSurfaceMember(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcStructuralSurfaceMember sm, List<string> arrFields, ref int ipos) { IfcStructuralMember.parseFields(sm, arrFields, ref ipos); sm.mPredefinedType = (IfcStructuralSurfaceTypeEnum)Enum.Parse(typeof(IfcStructuralSurfaceTypeEnum), arrFields[ipos++].Replace(".", "")); sm.mThickness = ParserSTEP.ParseDouble(arrFields[ipos++]); }

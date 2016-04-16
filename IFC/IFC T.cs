@@ -562,7 +562,7 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public abstract class IfcTessellatedItem : IfcGeometricRepresentationItem
+	public abstract class IfcTessellatedItem : IfcGeometricRepresentationItem //IFC4
 	{
 		protected IfcTessellatedItem() : base() { }
 		protected IfcTessellatedItem(IfcTessellatedItem o) : base(o) { }
@@ -1156,8 +1156,7 @@ namespace GeometryGym.Ifc
 		internal double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcTShapeProfileDef() : base() { }
-		internal IfcTShapeProfileDef(IfcTShapeProfileDef p)
-			: base(p)
+		internal IfcTShapeProfileDef(IfcTShapeProfileDef p) : base(p)
 		{
 			mDepth = p.mDepth;
 			mFlangeWidth = p.mFlangeWidth;
@@ -1169,7 +1168,21 @@ namespace GeometryGym.Ifc
 			mWebSlope = p.mWebSlope;
 			mFlangeSlope = p.mFlangeSlope;
 		}
-		
+		public IfcTShapeProfileDef(DatabaseIfc db, string name, double depth, double flangeWidth, double webThickness, double flangeThickness,double filletRadius, double flangeEdgeRadius,double webEdgeRadius, double flangeSlope)
+			: base(db)
+		{
+			Name = name;
+			mDepth = depth;
+			mFlangeWidth = flangeWidth;
+			mWebThickness = webThickness;
+			mFlangeThickness = flangeThickness;
+			mFilletRadius = filletRadius;
+			mFlangeEdgeRadius = flangeEdgeRadius;
+			mWebEdgeRadius = webEdgeRadius;
+			mFlangeSlope = flangeSlope;
+		}
+
+
 		internal static void parseFields(IfcTShapeProfileDef p, List<string> arrFields, ref int ipos,Schema schema)
 		{
 			IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos);

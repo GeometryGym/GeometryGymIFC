@@ -423,7 +423,18 @@ namespace GeometryGym.Ifc
 			mEdgeRadius = p.mEdgeRadius;
 			mLegSlope = p.mLegSlope;
 		}
-		
+		public IfcLShapeProfileDef(DatabaseIfc db, string name, double depth, double width, double thickness, double filletRadius, double edgeRadius, double legSlope)
+			: base(db)
+		{
+			Name = name;
+			mDepth = depth;
+			mWidth = width;
+			mThickness = thickness;
+			mFilletRadius = filletRadius;
+			mEdgeRadius = edgeRadius;
+			mLegSlope = legSlope;
+		}
+
 		internal static void parseFields(IfcLShapeProfileDef p, List<string> arrFields, ref int ipos, Schema schema)
 		{
 			IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos);

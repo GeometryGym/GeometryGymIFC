@@ -380,7 +380,7 @@ namespace GeometryGym.Ifc
 				len--;
 			int icounter = 0;
 			char c = str[icounter];
-			while (!char.IsDigit(c) && icounter < str.Length)
+			while (!char.IsDigit(c) && c != '-' && c != '.' && icounter < str.Length)
 				c = str[icounter++];
 			if (icounter == str.Length)
 				return null;

@@ -682,7 +682,8 @@ namespace GeometryGym.Ifc
 
 		internal static StreamReader getStreamReader(string fileName)
 		{
-			string ext = System.IO.Path.GetExtension(fileName); 
+			string ext = System.IO.Path.GetExtension(fileName);
+#if(!NOIFCZIP)
 			if (string.Compare(ext, ".IFCZIP", true) == 0)
 			{
 				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
@@ -691,7 +692,8 @@ namespace GeometryGym.Ifc
 					return null;
 				}
 				return new StreamReader(za.Entries[0].Open(), System.Text.Encoding.GetEncoding("windows-1252"));
-			} 
+			}
+#endif
 			return new StreamReader(fileName, System.Text.Encoding.GetEncoding("windows-1252"));
 		}
 
@@ -941,6 +943,7 @@ namespace GeometryGym.Ifc
 		public bool WriteFile(string filename)
 		{
 			StreamWriter sw = null;
+#if (!NOIFCZIP)
 			bool zip = filename.EndsWith(".ifczip");
 			System.IO.Compression.ZipArchive za = null;
 			if (zip)
@@ -952,6 +955,7 @@ namespace GeometryGym.Ifc
 				sw = new StreamWriter(zae.Open());
 			}
 			else
+#endif
 				sw = new StreamWriter(filename);
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
@@ -969,8 +973,10 @@ namespace GeometryGym.Ifc
 			sw.Write(getFooterString());
 			sw.Close();
 			Thread.CurrentThread.CurrentUICulture = current;
+#if(!NOIFCZIP)
 			if (zip)
 				za.Dispose();
+#endif
 			return true;
 		}
 	}

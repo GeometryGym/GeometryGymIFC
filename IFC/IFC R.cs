@@ -635,9 +635,8 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	public abstract class IfcReinforcingElement : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor))
+	public abstract partial class IfcReinforcingElement : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor))
 	{
-		internal new enum SubTypes { IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor }
 		private string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 Depreceated 
 
 		public string SteelGrade { get { return (mSteelGrade == "$" ? "" : ParserIfc.Decode(mSteelGrade)); } set { mSteelGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
@@ -1483,8 +1482,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcRelConnectsStructuralMember() : base() { }
 		internal IfcRelConnectsStructuralMember(IfcRelConnectsStructuralMember i) : base(i) { mRelatingStructuralMember = i.mRelatingStructuralMember; mRelatedStructuralConnection = i.mRelatedStructuralConnection; mAppliedCondition = i.mAppliedCondition; mAdditionalConditions = i.mAdditionalConditions; mSupportedLength = i.mSupportedLength; mConditionCoordinateSystem = i.mConditionCoordinateSystem; }
-		internal IfcRelConnectsStructuralMember(IfcStructuralMember member, IfcStructuralConnection connection)
-			: base(member.mDatabase)
+		internal IfcRelConnectsStructuralMember(IfcStructuralMember member, IfcStructuralConnection connection) : base(member.mDatabase)
 		{
 			mRelatingStructuralMember = member.mIndex;
 			member.mConnectedBy.Add(this);
@@ -1513,11 +1511,22 @@ namespace GeometryGym.Ifc
 			if (c != null)
 				c.mConnectsStructuralMembers.Add(this);
 		}
+
+		public static IfcRelConnectsStructuralMember Create(IfcStructuralCurveMember member,IfcStructuralPointConnection point, bool atStart, IfcStructuralCurveMember.ExtremityAttributes atts)
+		{
+			string desc = atStart ? "Start":"End";
+			if (atts == null)
+				return new IfcRelConnectsStructuralMember(member, point) { Description = desc };
+			double tol = member.mDatabase.Tolerance;
+			if (atts.Eccentricity != null && (Math.Abs( atts.Eccentricity.Item1) > tol || Math.Abs(atts.Eccentricity.Item2) > tol || Math.Abs(atts.Eccentricity.Item3) > tol))
+				return new IfcRelConnectsWithEccentricity(member, point, new IfcConnectionPointEccentricity(point.Vertex, atts.Eccentricity.Item1, atts.Eccentricity.Item2, atts.Eccentricity.Item3)) { Description = desc , AppliedCondition = atts.BoundaryCondition,AdditionalConditions = atts.StructuralConnectionCondition, SupportedLength = atts.SupportedLength, ConditionCoordinateSystem = atts.ConditionCoordinateSystem };
+			return new IfcRelConnectsStructuralMember(member, point) { Description = desc, AppliedCondition = atts.BoundaryCondition, AdditionalConditions = atts.StructuralConnectionCondition, SupportedLength = atts.SupportedLength, ConditionCoordinateSystem = atts.ConditionCoordinateSystem } ;
+		}
 	}
 	public class IfcRelConnectsWithEccentricity : IfcRelConnectsStructuralMember
 	{
 		internal int mConnectionConstraint;// : IfcConnectionGeometry
-		internal IfcConnectionGeometry ConnectionConstraint { get { return mDatabase.mIfcObjects[mConnectionConstraint] as IfcConnectionGeometry; } set { mConnectionConstraint = value.mIndex; } }
+		public IfcConnectionGeometry ConnectionConstraint { get { return mDatabase.mIfcObjects[mConnectionConstraint] as IfcConnectionGeometry; } set { mConnectionConstraint = value.mIndex; } }
 
 		internal IfcRelConnectsWithEccentricity() : base() { }
 		internal IfcRelConnectsWithEccentricity(IfcRelConnectsWithEccentricity c) : base(c) { mConnectionConstraint = c.mConnectionConstraint; }
@@ -2814,9 +2823,10 @@ namespace GeometryGym.Ifc
 	{
 		internal bool mRigid = false;
 		internal IfcRotationalStiffnessMeasure mStiffness = null;
-		public IfcRotationalStiffnessSelect(bool fix) { mRigid = fix; }
-		internal IfcRotationalStiffnessSelect(double stiff) { mStiffness = new IfcRotationalStiffnessMeasure(stiff); }
+
 		internal IfcRotationalStiffnessSelect(IfcRotationalStiffnessMeasure stiff) { mStiffness = stiff; }
+		public IfcRotationalStiffnessSelect(bool fix) { mRigid = fix; }
+		public IfcRotationalStiffnessSelect(double stiff) { mStiffness = new IfcRotationalStiffnessMeasure(stiff); }
 		internal static IfcRotationalStiffnessSelect Parse(string str, Schema schema)
 		{
 			if (str.StartsWith("IFCBOOL"))

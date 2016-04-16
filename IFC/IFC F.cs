@@ -124,9 +124,12 @@ namespace GeometryGym.Ifc
 	{
 		internal int mFaceSurface;// : IfcSurface;
 		internal bool mSameSense = true;// : BOOLEAN;
-		internal IfcSurface FaceSurface { get { return mDatabase.mIfcObjects[mFaceSurface] as IfcSurface; } }
+
+		public IfcSurface FaceSurface { get { return mDatabase.mIfcObjects[mFaceSurface] as IfcSurface; } }
+		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
+
 		internal IfcFaceSurface() : base() { }
-		internal IfcFaceSurface(IfcFaceSurface i) : base(i) { mFaceSurface = i.mFaceSurface; mSameSense = i.mSameSense; }
+		internal IfcFaceSurface(IfcFaceSurface s) : base(s) { mFaceSurface = s.mFaceSurface; mSameSense = s.mSameSense; }
 		internal IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		internal IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		internal IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense)
@@ -383,10 +386,8 @@ namespace GeometryGym.Ifc
 		internal static IfcFixedReferenceSweptAreaSolid Parse(string strDef) { IfcFixedReferenceSweptAreaSolid s = new IfcFixedReferenceSweptAreaSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mDirectrix) + "," + ParserSTEP.DoubleToString(mStartParam) + "," + ParserSTEP.DoubleToString(mEndParam) + "," + ParserSTEP.LinkToString(mFixedReference); }
 	}
-	public class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
+	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
 	{ //, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve))
-		internal new enum SubTypes { IfcAirTerminalBox, IfcDamper, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve }
-
 		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWCONTROLLER" : base.KeyWord; } }
 
 		internal IfcFlowController() : base() { }
@@ -405,8 +406,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowFitting : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcCableCarrierFitting, IfcCableFitting, IfcDuctFitting, IfcJunctionBox, IfcPipeFitting))
 	{
-		internal new enum SubTypes { IfcCableCarrierFitting, IfcCableFitting, IfcDuctFitting, IfcJunctionBox, IfcPipeFitting }
-
 		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWFITTING" : base.KeyWord; } }
 
 		internal IfcFlowFitting() : base() { }
@@ -487,10 +486,8 @@ namespace GeometryGym.Ifc
 		internal new static IfcFlowMeterType Parse(string strDef) { IfcFlowMeterType t = new IfcFlowMeterType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public class IfcFlowMovingDevice : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCompressor, IfcFan, IfcPump))
+	public partial class IfcFlowMovingDevice : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCompressor, IfcFan, IfcPump))
 	{
-		internal new enum SubTypes { IfcCompressor, IfcFan, IfcPump }
-
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWMOVINGDEVICE" : base.KeyWord); } }
 
 		internal IfcFlowMovingDevice() : base() { }
@@ -509,8 +506,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowSegment : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCableCarrierSegment, IfcCableSegment, IfcDuctSegment, IfcPipeSegment))
 	{
-		internal new enum SubTypes { IfcCableCarrierSegment, IfcCableSegment, IfcDuctSegment, IfcPipeSegment }
-
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWSEGMENT" : base.KeyWord); } }
 
 		internal IfcFlowSegment() : base() { }
@@ -527,10 +522,8 @@ namespace GeometryGym.Ifc
 		protected IfcFlowSegmentType(DatabaseIfc db) : base(db) { }
 		protected static void parseFields(IfcFlowSegmentType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }
 	}
-	public class IfcFlowStorageDevice : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcElectricFlowStorageDevice, IfcTank))
+	public partial class IfcFlowStorageDevice : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcElectricFlowStorageDevice, IfcTank))
 	{
-		internal new enum SubTypes { IfcElectricFlowStorageDevice, IfcTank }
-
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWSTORAGEDEVICE" : base.KeyWord); } }
 
 		internal IfcFlowStorageDevice() : base() { }
@@ -545,10 +538,8 @@ namespace GeometryGym.Ifc
 		protected IfcFlowStorageDeviceType(IfcFlowStorageDeviceType t) : base(t) { }
 		protected static void parseFields(IfcFlowStorageDeviceType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }
 	}
-	public class IfcFlowTerminal : IfcDistributionFlowElement 	//SUPERTYPE OF(ONEOF(IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal))
+	public partial class IfcFlowTerminal : IfcDistributionFlowElement 	//SUPERTYPE OF(ONEOF(IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal))
 	{
-		internal new enum SubTypes { IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal }
-
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWTERMINAL" : base.KeyWord); } }
 
 		internal IfcFlowTerminal() : base() { }
@@ -565,10 +556,8 @@ namespace GeometryGym.Ifc
 		protected IfcFlowTerminalType(DatabaseIfc db) : base(db) { }
 		protected static void parseFields(IfcFlowTerminalType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }
 	}
-	public class IfcFlowTreatmentDevice : IfcDistributionFlowElement // 	SUPERTYPE OF(ONEOF(IfcDuctSilencer, IfcFilter, IfcInterceptor))
+	public partial class IfcFlowTreatmentDevice : IfcDistributionFlowElement // 	SUPERTYPE OF(ONEOF(IfcDuctSilencer, IfcFilter, IfcInterceptor))
 	{
-		internal new enum SubTypes { IfcDuctSilencer, IfcFilter, IfcInterceptor } //"IFCFLOWTREATMENTDEVICE"
-
 		public override string KeyWord { get { return (mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWTREATMENTDEVICE" : base.KeyWord); } }
 
 		internal IfcFlowTreatmentDevice() : base() { }
@@ -681,8 +670,6 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcFuelProperties // DEPRECEATED IFC4
 	public partial class IfcFurnishingElement : IfcElement // DEPRECEATED IFC4 to make abstract SUPERTYPE OF(ONEOF(IfcFurniture, IfcSystemFurnitureElement))
 	{
-		internal new enum SubTypes { IfcFurniture, IfcSystemFurnitureElement }
-
 		internal IfcFurnishingElement() : base() { }
 		internal IfcFurnishingElement(IfcFurnishingElement f) : base(f) { }
 		internal IfcFurnishingElement(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }

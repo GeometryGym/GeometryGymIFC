@@ -289,9 +289,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcPile : IfcBuildingElement
 	{
 		internal IfcPileTypeEnum mPredefinedType = IfcPileTypeEnum.NOTDEFINED;// OPTIONAL : IfcPileTypeEnum;
-		internal IfcPileConstructionEnum mConstructionType = IfcPileConstructionEnum.NOTDEFINED;// : OPTIONAL IfcPileConstructionEnum; 
+		internal IfcPileConstructionEnum mConstructionType = IfcPileConstructionEnum.NOTDEFINED;// : OPTIONAL IfcPileConstructionEnum; IFC4 	Deprecated.
 
 		public IfcPileTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcPileConstructionEnum ConstructionType { get { return mConstructionType; } set { mConstructionType = value; } }
 
 		internal IfcPile() : base() { }
 		internal IfcPile(IfcPile p) : base(p) { mPredefinedType = p.mPredefinedType; mConstructionType = p.mConstructionType; }
@@ -519,7 +520,7 @@ namespace GeometryGym.Ifc
 		internal static IfcPointOnSurface Parse(string strDef) { IfcPointOnSurface p = new IfcPointOnSurface(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mBasisSurface) + "," + ParserSTEP.DoubleToString(mPointParameterU) + "," + ParserSTEP.DoubleToString(mPointParameterV); }
 	}
-	public interface IfcPointOrVertexPoint : IfcInterface { }
+	public interface IfcPointOrVertexPoint : IfcInterface { }  // = SELECT ( IfcPoint, IfcVertexPoint);
 	public partial class IfcPolygonalBoundedHalfSpace : IfcHalfSpaceSolid
 	{
 		internal int mPosition;// : IfcAxis2Placement3D;
@@ -557,8 +558,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcPolyloop : IfcLoop
 	{
 		internal List<int> mPolygon = new List<int>();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
-
-		internal List<IfcCartesianPoint> Polygon { get { return mPolygon.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } }
+		public List<IfcCartesianPoint> Polygon { get { return mPolygon.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcCartesianPoint); } }
 
 		internal IfcPolyloop() : base() { }
 		internal IfcPolyloop(IfcPolyloop o) : base(o) { mPolygon = new List<int>(o.mPolygon.ToArray()); }
@@ -1609,7 +1609,7 @@ namespace GeometryGym.Ifc
 	{
 		protected List<int> mHasProperties = new List<int>(1);// : SET [1:?] OF IfcProperty;
 
-		public List<IfcProperty> HasProperties { get { return mHasProperties.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcProperty); } }
+		public List<IfcProperty> HasProperties { get { return mHasProperties.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcProperty); } set { mHasProperties = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcPropertySet() : base() { }
 		internal IfcPropertySet(IfcPropertySet i) : base(i) { mHasProperties = new List<int>(i.mHasProperties.ToArray()); }
@@ -1673,9 +1673,9 @@ namespace GeometryGym.Ifc
 		private int mUnit;// : OPTIONAL IfcUnit; 
 
 		public IfcValue NominalValue { get { return mNominalValue; } set { mNominalValue = value; } }
-		internal IfcUnit Unit { get { return mDatabase.mIfcObjects[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
+		public IfcUnit Unit { get { return mDatabase.mIfcObjects[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
 
-		private string mVal;
+		internal string mVal;
 		internal IfcPropertySingleValue(IfcPropertySingleValue q) : base(q) { mNominalValue = q.mNominalValue; mUnit = q.mUnit; }
 		internal IfcPropertySingleValue() : base() { }
 		public IfcPropertySingleValue(DatabaseIfc m, string name, IfcValue value) : base(m, name,"") { mNominalValue = value; }

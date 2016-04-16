@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GGYM.IFC</RootNamespace>
     <AssemblyName>GeometryGymIFC</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -26,7 +26,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NOIFCZIP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -141,6 +141,9 @@
     </Compile>
     <Compile Include="..\..\IFC\ParserIFC.cs">
       <Link>IFC\ParserIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\IFC\Property Sets.cs">
+      <Link>IFC\Property Sets.cs</Link>
     </Compile>
     <Compile Include="..\..\STEP\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>

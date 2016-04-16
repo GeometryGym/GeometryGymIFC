@@ -1254,11 +1254,16 @@ namespace GeometryGym.Ifc
 		protected static void parseFields(IfcConnectionGeometry c, List<string> arrFields, ref int ipos) { }
 	}
 	public partial class IfcConnectionPointEccentricity : IfcConnectionPointGeometry
-	{
+	{ 
 		private double mEccentricityInX, mEccentricityInY, mEccentricityInZ;// : OPTIONAL IfcLengthMeasure;
+		public double EccentricityInX { get { return mEccentricityInX; } set { mEccentricityInX = value; } }
+		public double EccentricityInY { get { return mEccentricityInY; } set { mEccentricityInY = value; } }
+		public double EccentricityInZ { get { return mEccentricityInZ; } set { mEccentricityInZ = value; } }
 
 		internal IfcConnectionPointEccentricity() : base() { }
-		internal IfcConnectionPointEccentricity(IfcConnectionPointEccentricity el) : base(el) { mEccentricityInX = el.mEccentricityInX; mEccentricityInY = el.mEccentricityInY; mEccentricityInZ = el.mEccentricityInZ; }
+		internal IfcConnectionPointEccentricity(IfcConnectionPointEccentricity e) : base(e) { mEccentricityInX = e.mEccentricityInX; mEccentricityInY = e.mEccentricityInY; mEccentricityInZ = e.mEccentricityInZ; }
+		public IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, double x, double y, double z) : base(v) { mEccentricityInX = x; mEccentricityInY = y; mEccentricityInZ = z; }
+
 		internal new static IfcConnectionPointEccentricity Parse(string strDef) { IfcConnectionPointEccentricity c = new IfcConnectionPointEccentricity(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		internal static void parseFields(IfcConnectionPointEccentricity c, List<string> arrFields, ref int ipos) { IfcConnectionPointGeometry.parseFields(c, arrFields, ref ipos); c.mEccentricityInX = ParserSTEP.ParseDouble(arrFields[ipos++]); c.mEccentricityInY = ParserSTEP.ParseDouble(arrFields[ipos++]); c.mEccentricityInZ = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mEccentricityInX) + "," + ParserSTEP.DoubleOptionalToString(mEccentricityInY) + "," + ParserSTEP.DoubleOptionalToString(mEccentricityInZ); }
@@ -1268,8 +1273,8 @@ namespace GeometryGym.Ifc
 		private int mPointOnRelatingElement;// : IfcPointOrVertexPoint;
 		private int mPointOnRelatedElement;// : OPTIONAL IfcPointOrVertexPoint;
 
-		internal IfcPointOrVertexPoint PointOnRelatingElement { get { return mDatabase.mIfcObjects[mPointOnRelatingElement] as IfcPointOrVertexPoint; } }
-		internal IfcPointOrVertexPoint PointOnRelatedElement { get { return mDatabase.mIfcObjects[mPointOnRelatedElement] as IfcPointOrVertexPoint; } }
+		public IfcPointOrVertexPoint PointOnRelatingElement { get { return mDatabase.mIfcObjects[mPointOnRelatingElement] as IfcPointOrVertexPoint; } }
+		public IfcPointOrVertexPoint PointOnRelatedElement { get { return mDatabase.mIfcObjects[mPointOnRelatedElement] as IfcPointOrVertexPoint; } }
 
 		internal IfcConnectionPointGeometry() : base() { }
 		internal IfcConnectionPointGeometry(IfcConnectionPointGeometry g) : base(g) { mPointOnRelatingElement = g.mPointOnRelatingElement; mPointOnRelatedElement = g.mPointOnRelatedElement; }

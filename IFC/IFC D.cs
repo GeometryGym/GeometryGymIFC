@@ -416,7 +416,6 @@ namespace GeometryGym.Ifc
 	{ // IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement)) //"IFCDISTRIBUTIONCONTROLELEMENT"
 		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCDISTRIBUTIONCONTROLELEMENT" : base.KeyWord; } }
 
-		internal new enum SubTypes { IfcActuator, IfcAlarm, IfcController, IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement }
 		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
 		internal string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
@@ -436,8 +435,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDistributionElement : IfcElement //SUPERTYPE OF (ONEOF (IfcDistributionControlElement ,IfcDistributionFlowElement))
 	{
-		internal new enum SubTypes { IfcDistributionControlElement, IfcDistributionFlowElement }  
-
 		internal IfcDistributionElement() : base() { }
 		protected IfcDistributionElement(IfcDistributionElement be) : base(be) { }
 		internal IfcDistributionElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
@@ -470,8 +467,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDistributionFlowElement : IfcDistributionElement //SUPERTYPE OF (ONEOF (IfcDistributionChamberElement ,IfcEnergyConversionDevice ,
 	{ 	//IfcFlowController ,IfcFlowFitting ,IfcFlowMovingDevice,IfcFlowSegment ,IfcFlowStorageDevice ,IfcFlowTerminal ,IfcFlowTreatmentDevice))
-		internal new enum SubTypes { IfcDistributionChamberElement, IfcEnergyConversionDevice, IfcFlowController, IfcFlowFitting, IfcFlowMovingDevice, IfcFlowSegment, IfcFlowStorageDevice, IfcFlowTerminal, IfcFlowTreatmentDevice }
-		
 		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCDISTRIBUTIONFLOWELEMENT" : base.KeyWord; } }
 
 		//INVERSE 	HasControlElements : SET [0:1] OF IfcRelFlowControlElements FOR RelatingFlowElement;
@@ -524,33 +519,6 @@ namespace GeometryGym.Ifc
 		internal static IfcDistributionPort Parse(string strDef, Schema schema) { IfcDistributionPort p = new IfcDistributionPort(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return p; }
 		protected override string BuildString() { return base.BuildString() + ",." + mFlowDirection.ToString() + (mDatabase.mSchema == Schema.IFC2x3 ? "." : ".,." + mPredefinedType + ".,." + mSystemType + "."); }
 
-		public class Pset_DistributionPortTypeDuct : IfcPropertySet
-		{
-
-			public PEnum_DuctConnectionType ConnectionType { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ConnectionType", new IfcLabel(value.ToString())).mIndex); } }
-			public double NominalWidth { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NominalWidth", new IfcPositiveLengthMeasure(value)).mIndex); } }
-			public double NominalHeight { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NominalHeight", new IfcPositiveLengthMeasure(value)).mIndex); } }
-			//if (!string.IsNullOrEmpty(connectionSubType))
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mConnectionSubTypeLabel, "", new IfcLabel(connectionSubType)));
-			//if (nominalWidth > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mNominalWidthLabel, "", new IfcPositiveLengthMeasure(nominalWidth)));
-			//if (nominalHeight > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mNominalHeightLabel, "", new IfcPositiveLengthMeasure(nominalHeight)));
-			//if (Math.Abs(dryBulbTemperature) > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mDryBulbTemperatureLabel, "", new IfcThermodynamicTemperatureMeasure(dryBulbTemperature)));
-			//if (Math.Abs(wetBulbTemperature) > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mWetBulbTemperatureLabel, "", new IfcThermodynamicTemperatureMeasure(wetBulbTemperature)));
-			//if (volumetricFlowRate > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mVolumetricFlowRateLabel, "", new IfcVolumetricFlowRateMeasure(volumetricFlowRate)));
-			//if (velocity > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mVelocityLabel, "", new IfcLinearVelocityMeasure(velocity)));
-			//if (pressure > tol)
-			//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mPressureLabel, "", new IfcPressureMeasure(pressure)));
-
-
-			public Pset_DistributionPortTypeDuct(DatabaseIfc db) : base(db, "Pset_DistributionPortTypeDuct") { }
-
-		}
 	}
 	public partial class IfcDistributionSystem : IfcSystem //SUPERTYPE OF(IfcDistributionCircuit) IFC4
 	{

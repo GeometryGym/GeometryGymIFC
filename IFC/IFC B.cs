@@ -229,14 +229,20 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTranslationalStiffnessSelect mTranslationalStiffnessX, mTranslationalStiffnessY, mTranslationalStiffnessZ;// : OPTIONAL IfcTranslationalStiffnessSelect;
 		internal IfcRotationalStiffnessSelect mRotationalStiffnessX, mRotationalStiffnessY, mRotationalStiffnessZ;// : OPTIONAL IfcRotationalStiffnessSelect; 
+
+		public IfcTranslationalStiffnessSelect TranslationalStiffnessX { get { return mTranslationalStiffnessX; } set { mTranslationalStiffnessX = value; } }
+		public IfcTranslationalStiffnessSelect TranslationalStiffnessY { get { return mTranslationalStiffnessY; } set { mTranslationalStiffnessY = value; } }
+		public IfcTranslationalStiffnessSelect TranslationalStiffnessZ { get { return mTranslationalStiffnessZ; } set { mTranslationalStiffnessZ = value; } }
+		public IfcRotationalStiffnessSelect RotationalStiffnessX { get { return mRotationalStiffnessX; } set { mRotationalStiffnessX = value; } }
+		public IfcRotationalStiffnessSelect RotationalStiffnessY { get { return mRotationalStiffnessY; } set { mRotationalStiffnessY = value; } }
+		public IfcRotationalStiffnessSelect RotationalStiffnessZ { get { return mRotationalStiffnessZ; } set { mRotationalStiffnessZ = value; } }
+
 		internal IfcBoundaryNodeCondition() : base() { }
 		internal IfcBoundaryNodeCondition(IfcBoundaryNodeCondition i) : base(i) { mTranslationalStiffnessX = i.mTranslationalStiffnessX; mTranslationalStiffnessY = i.mTranslationalStiffnessY; mTranslationalStiffnessZ = i.mTranslationalStiffnessZ; mRotationalStiffnessX = i.mRotationalStiffnessX; mRotationalStiffnessY = i.mRotationalStiffnessY; mRotationalStiffnessZ = i.mRotationalStiffnessZ; }
 		public IfcBoundaryNodeCondition(DatabaseIfc m, string name, bool restrainX, bool restrainY, bool restrainZ, bool restrainXX, bool restrainYY, bool restrainZZ)
 			: this(m, name, new IfcTranslationalStiffnessSelect(restrainX), new IfcTranslationalStiffnessSelect(restrainY), new IfcTranslationalStiffnessSelect(restrainZ), new IfcRotationalStiffnessSelect(restrainXX), new IfcRotationalStiffnessSelect(restrainYY), new IfcRotationalStiffnessSelect(restrainZZ)) { }
-		internal IfcBoundaryNodeCondition(DatabaseIfc m, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz)
-			: base(m, name)
+		public IfcBoundaryNodeCondition(DatabaseIfc m, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz) : base(m, name)
 		{
-
 			if (m.mSchema == Schema.IFC2x3)
 			{
 				if (x != null && (x.mRigid || x.mStiffness == null))
@@ -290,7 +296,6 @@ namespace GeometryGym.Ifc
 				(mRotationalStiffnessZ == null ? "$" : mRotationalStiffnessZ.ToString());
 		}
 	}	
-
 	public class IfcBoundaryNodeConditionWarping : IfcBoundaryNodeCondition
 	{
 		internal IfcWarpingStiffnessSelect mWarpingStiffness;// : OPTIONAL IfcWarpingStiffnessSelect; 
@@ -298,8 +303,8 @@ namespace GeometryGym.Ifc
 		internal IfcBoundaryNodeConditionWarping(IfcBoundaryNodeConditionWarping i) : base(i) { mWarpingStiffness = i.mWarpingStiffness; }
 		internal IfcBoundaryNodeConditionWarping(DatabaseIfc m, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz, IfcWarpingStiffnessSelect w)
 			: base(m, name, x, y, z, xx, yy, zz) { mWarpingStiffness = w; }
-		internal new static IfcBoundaryNodeConditionWarping Parse(string strDef) { IfcBoundaryNodeConditionWarping b = new IfcBoundaryNodeConditionWarping(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
-		internal static void parseFields(IfcBoundaryNodeConditionWarping b, List<string> arrFields, ref int ipos) { IfcBoundaryNodeCondition.parseFields(b, arrFields, ref ipos); b.mWarpingStiffness = IfcWarpingStiffnessSelect.Parse(arrFields[ipos++]); }
+		internal new static IfcBoundaryNodeConditionWarping Parse(string strDef,Schema schema) { IfcBoundaryNodeConditionWarping b = new IfcBoundaryNodeConditionWarping(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return b; }
+		internal static void parseFields(IfcBoundaryNodeConditionWarping b, List<string> arrFields, ref int ipos, Schema schema) { IfcBoundaryNodeCondition.parseFields(b, arrFields, ref ipos,schema); b.mWarpingStiffness = IfcWarpingStiffnessSelect.Parse(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + mWarpingStiffness.ToString(); }
 	}
 	public abstract partial class IfcBoundedCurve : IfcCurve //ABSTRACT SUPERTYPE OF (ONEOF (IfcBSplineCurve ,IfcCompositeCurve ,IfcPolyline ,IfcTrimmedCurve)) IFC4 IfcIndexedPolyCurve IFC4x1 IfcCurveSegment2D
@@ -438,7 +443,7 @@ namespace GeometryGym.Ifc
 				throw new Exception(KeyWord + " only supported in IFC5!");
 			mPredefinedType = type;
 		}
-		internal static IfcBridgePrismaticElement Parse(string strDef) { IfcBridgePrismaticElement e = new IfcBridgePrismaticElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
+		internal new static IfcBridgePrismaticElement Parse(string strDef) { IfcBridgePrismaticElement e = new IfcBridgePrismaticElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcBridgePrismaticElement e, List<string> arrFields, ref int ipos)
 		{
 			IfcBridgeElement.parseFields(e, arrFields, ref ipos);
@@ -463,7 +468,7 @@ namespace GeometryGym.Ifc
 			mSegmentType = type;
 			mSegmentParts = parts.ConvertAll(x => x.mIndex);
 		}
-		internal static IfcBridgeSegment Parse(string strDef) { IfcBridgeSegment e = new IfcBridgeSegment(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
+		internal new static IfcBridgeSegment Parse(string strDef) { IfcBridgeSegment e = new IfcBridgeSegment(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcBridgeSegment e, List<string> arrFields, ref int ipos)
 		{
 			IfcBridgeElement.parseFields(e, arrFields, ref ipos);
@@ -798,7 +803,6 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcBuildingElement : IfcElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcBeam,IfcBuildingElementProxy,IfcColumn,IfcCovering,IfcCurtainWall,IfcDoor,IfcFooting
 	{ //,IfcMember,IfcPile,IfcPlate,IfcRailing,IfcRamp,IfcRampFlight,IfcRoof,IfcSlab,IfcStair,IfcStairFlight,IfcWall,IfcWindow) IFC2x3 IfcBuildingElementComponent IFC4  IfcShadingDevice
-		internal new enum SubTypes { IfcBeam, IfcBuildingElementProxy, IfcColumn, IfcCovering, IfcCurtainWall, IfcDoor, IfcFooting, IfcMember, IfcPile, IfcPlate, IfcRailing, IfcRamp, IfcRampFlight, IfcRoof, IfcShadingDevice, IfcSlab, IfcStair, IfcStairFlight, IfcWall, IfcWindow }
 		protected IfcBuildingElement() : base() { }
 		protected IfcBuildingElement(IfcBuildingElement e) : base(e) { }
 		protected IfcBuildingElement(DatabaseIfc m) : base(m) { }

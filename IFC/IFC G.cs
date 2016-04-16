@@ -44,8 +44,14 @@ namespace GeometryGym.Ifc
 		internal double mMolecularWeight; //: OPTIONAL IfcMolecularWeightMeasure;
 		internal double mPorosity; //: OPTIONAL IfcNormalisedRatioMeasure;
 		internal double mMassDensity;//OPTIONAL IfcMassDensityMeasure
+
+		public double MolecularWeight { get { return mMolecularWeight; } set { mMolecularWeight = value; } }
+		public double Porosity { get { return mPorosity; } set { mPorosity = value; } }
+		public double MassDensity { get { return mMassDensity; } set { mMassDensity = value; } } 
+
 		internal IfcGeneralMaterialProperties() : base() { }
-		internal IfcGeneralMaterialProperties(IfcGeneralMaterialProperties el) : base(el) { mMolecularWeight = el.mMolecularWeight; mPorosity = el.mPorosity; mMassDensity = el.mMassDensity; }
+		internal IfcGeneralMaterialProperties(IfcGeneralMaterialProperties p) : base(p) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
+		public IfcGeneralMaterialProperties(IfcMaterial material) : base(material) { }
 		internal IfcGeneralMaterialProperties(IfcMaterial mat, double molecularWeight, double porosity, double massDensity) : base(mat)
 		{
 			mMolecularWeight = molecularWeight;
@@ -190,9 +196,14 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcGeometricRepresentationContext Parse(string strDef) { IfcGeometricRepresentationContext c = new IfcGeometricRepresentationContext(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
-	public abstract partial class IfcGeometricRepresentationItem : IfcRepresentationItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotationFillArea ,IfcAnnotationSurface >,IfcBooleanResult >,IfcBoundingBox >,IfcCartesianTransformationOperator
-	{   // >,IfcCompositeCurveSegment >,IfcCsgPrimitive3D >,IfcCurve ,IfcDefinedSymbol >,IfcDirection >,IfcDraughtingCallout >,IfcFaceBasedSurfaceModel ,IfcFillAreaStyleHatching ,IfcFillAreaStyleTileSymbolWithStyle ,IfcFillAreaStyleTiles 
-		//>,IfcGeometricSet >,IfcHalfSpaceSolid ,IfcLightSource >,IfcOneDirectionRepeatFactor >,IfcPlacement >,IfcPlanarExtent >,IfcPoint >,IfcSectionedSpine >,IfcShellBasedSurfaceModel >,IfcSolidModel >,IfcSurface ,IfcTextLiteral >,IfcVector))*/
+	public abstract partial class IfcGeometricRepresentationItem : IfcRepresentationItem 
+	{
+		//ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotationFillArea, IfcBooleanResult, IfcBoundingBox, IfcCartesianTransformationOperator, 
+		//		IfcCompositeCurveSegment, IfcCsgPrimitive3D, IfcCurve, IfcDirection,IfcFaceBasedSurfaceModel, IfcFillAreaStyleHatching, 
+		//		IfcFillAreaStyleTiles, IfcGeometricSet, IfcHalfSpaceSolid, IfcLightSource, IfcPlacement, IfcPlanarExtent, IfcPoint,
+		//		IfcSectionedSpine, IfcShellBasedSurfaceModel, IfcSolidModel, IfcSurface, IfcTextLiteral, IfcVector))
+		// IFC2x3 IfcAnnotationSurface, IfcDefinedSymbol, IfcDraughtingCallout, IfcFillAreaStyleTileSymbolWithStyle, IfcOneDirectionRepeatFactor
+		// IFC4 IfcCartesianPointList, IfcTessellatedItem
 		protected IfcGeometricRepresentationItem() : base() { }
 		protected IfcGeometricRepresentationItem(IfcGeometricRepresentationItem p) : base(p) { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc m) : base(m) { }
