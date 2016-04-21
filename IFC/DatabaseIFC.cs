@@ -34,7 +34,6 @@ namespace GeometryGym.Ifc
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, If2x3NotAssigned };
 	public partial class DatabaseIfc
 	{
-			
 		internal partial class Aggregate
 		{
 			//internal List<IfcProfileDef> mProfiles = new List<IfcProfileDef>();
@@ -391,6 +390,9 @@ namespace GeometryGym.Ifc
 			get { return mContext as IfcProject; }
 		}
 		internal List<BaseClassIfc> mIfcObjects = new List<BaseClassIfc>(new BaseClassIfc[] { new BaseClassIfc() }); 
+
+		public int RecordCount { get { return mIfcObjects.Count; } }
+		public BaseClassIfc Item(int index) { return (index < mIfcObjects.Count ? mIfcObjects[index] : null);  }
 
 		private IfcCartesianPoint mOrigin = null, mWorldOrigin = null,mOrigin2d = null;
 		internal IfcDirection mXAxis, mYAxis, mZAxis;
