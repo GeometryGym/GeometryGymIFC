@@ -897,8 +897,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcArbitraryProfileDefWithVoids() : base() { }
 		internal IfcArbitraryProfileDefWithVoids(IfcArbitraryProfileDefWithVoids i) : base((IfcArbitraryClosedProfileDef)i) { mInnerCurves = new List<int>(i.mInnerCurves.ToArray()); }
-		internal IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner.mIndex); }
-		internal IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, List<IfcCurve> inner) : base(name, perim) { mInnerCurves = inner.ConvertAll(x => x.mIndex); }
+		public IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner.mIndex); }
+		public IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, List<IfcCurve> inner) : base(name, perim) { mInnerCurves = inner.ConvertAll(x => x.mIndex); }
 		internal new static IfcArbitraryProfileDefWithVoids Parse(string strDef) { IfcArbitraryProfileDefWithVoids p = new IfcArbitraryProfileDefWithVoids(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcArbitraryProfileDefWithVoids p, List<string> arrFields, ref int ipos) { IfcArbitraryClosedProfileDef.parseFields(p, arrFields, ref ipos); p.mInnerCurves = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildString()

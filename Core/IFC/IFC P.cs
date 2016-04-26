@@ -539,7 +539,9 @@ namespace GeometryGym.Ifc
 		internal IfcPolyline() : base() { }
 		internal IfcPolyline(IfcPolyline pl) : base(pl) { mPoints = new List<int>(pl.mPoints.ToArray()); }
 		public IfcPolyline(IfcCartesianPoint start, IfcCartesianPoint end) : base(start.mDatabase) { mPoints.Add(start.mIndex); mPoints.Add(end.mIndex); }
-		internal IfcPolyline(List<IfcCartesianPoint> pts) : base(pts[1].mDatabase) { Points = pts; }
+		public IfcPolyline(List<IfcCartesianPoint> pts) : base(pts[1].mDatabase) { Points = pts; }
+		public IfcPolyline(DatabaseIfc db, List<Tuple<double,double>> points) : base(db) { Points = points.ConvertAll(x => new IfcCartesianPoint(db, x.Item1, x.Item2)); }
+		public IfcPolyline(DatabaseIfc db, List<Tuple<double,double,double>> points) : base(db) { Points = points.ConvertAll(x => new IfcCartesianPoint(db, x.Item1, x.Item2,x.Item3)); }
 		internal static void parseFields(IfcPolyline p, List<string> arrFields, ref int ipos) { IfcBoundedCurve.parseFields(p, arrFields, ref ipos); p.mPoints = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		internal static IfcPolyline Parse(string strDef) { IfcPolyline p = new IfcPolyline(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		protected override string BuildString()
@@ -988,7 +990,15 @@ namespace GeometryGym.Ifc
 			set 
 			{
 				if (value == null)
+				{
+					if(mPlacement > 0)
+					{
+						IfcObjectPlacement pl = Placement;
+						if (pl != null)
+							pl.mPlacesObject.Remove(this);
+					}
 					mPlacement = 0;
+				}
 				else
 				{
 					mPlacement = value.mIndex;
@@ -1032,8 +1042,14 @@ namespace GeometryGym.Ifc
 		protected IfcProduct() : base() { }
 		protected IfcProduct(IfcProduct o) : base(o) { mPlacement = o.mPlacement; mRepresentation = o.mRepresentation; }
 		protected IfcProduct(IfcProductRepresentation rep) : base(rep.mDatabase) { mRepresentation = rep.mIndex; }
-		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { mPlacement = placement.mIndex; }
-		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(rep.mDatabase) { mPlacement = placement.mIndex; mRepresentation = rep.mIndex; }
+		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { Placement = placement; }
+		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)
+		{
+			if(placement != null) 
+				Placement = placement;
+			if(rep != null)
+				mRepresentation = rep.mIndex;
+		}
 		protected IfcProduct(DatabaseIfc db) : base(db) { }
 		protected IfcProduct(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host.mDatabase) 
 		{
@@ -1530,6 +1546,9 @@ namespace GeometryGym.Ifc
 		//internal List<string> mEnumerationValues = new List<string>();// : LIST [1:?] OF IfcValue;
 		internal string mEnumerationValues = "";// : LIST [1:?] OF IfcValue; 
 		internal int mEnumerationReference;// : OPTIONAL IfcPropertyEnumeration;   
+
+		//public List<IfcValue> EnumerationValues { get { return mEnumerationValues; } }
+		public IfcPropertyEnumeration EnumerationReference { get { return mDatabase.mIfcObjects[mEnumerationReference] as IfcPropertyEnumeration; } }
 
 		internal IfcPropertyEnumeratedValue(IfcPropertyEnumeratedValue q) : base(q) { mEnumerationValues = q.mEnumerationValues; /*mEnumerationValues = new List<string>( q.mEnumerationValues.ToArray());*/ mEnumerationReference = q.mEnumerationReference; }
 		internal IfcPropertyEnumeratedValue() : base() { }

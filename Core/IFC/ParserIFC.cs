@@ -286,11 +286,14 @@ namespace GeometryGym.Ifc
 					//IfcThermalAdmittanceMeasure,  
 					if (string.Compare(kw, IfcPressureMeasure.mKW, true) == 0)
 						return new IfcPressureMeasure(val);
-					//IfcPowerMeasure, 
+					if (string.Compare(kw, IfcPowerMeasure.mKW, true) == 0)
+						return new IfcPowerMeasure(val);
 					//IfcMassFlowRateMeasure, 
 					if (string.Compare(kw, IfcMassDensityMeasure.mKW, true) == 0)
 						return new IfcMassDensityMeasure(val);
-					/*IfcLinearVelocityMeasure, 
+					if (string.Compare(kw, IfcLinearVelocityMeasure.mKW, true) == 0)
+						return new IfcLinearVelocityMeasure(val);
+					/*, 
 					IfcKinematicViscosityMeasure, 
 					IfcIntegerCountRateMeasure, 
 					IfcHeatFluxDensityMeasure, 
@@ -390,11 +393,10 @@ namespace GeometryGym.Ifc
 				string kw = str.Substring(0, icounter - 1);
 				double val = 0;
 				int i = 0;
-				if (int.TryParse(str.Substring(icounter, len - icounter), out i))
-				{
-					if (string.Compare(kw, IfcCountMeasure.mKW, true) == 0)
-						return new IfcCountMeasure(i);
-				}
+				//if (int.TryParse(str.Substring(icounter, len - icounter), out i))
+				//{
+					
+				//}
 				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
 				{
 					if (string.Compare(kw, IfcVolumeMeasure.mKW, true) == 0)
@@ -422,8 +424,8 @@ namespace GeometryGym.Ifc
 					if (string.Compare(kw, IfcLengthMeasure.mKW, true) == 0)
 						return new IfcLengthMeasure(val);
 					//IfcElectricCurrentMeasure, 
-
-
+					if (string.Compare(kw, IfcCountMeasure.mKW, true) == 0)
+						return new IfcCountMeasure(val);
 					//IfcContextDependentMeasure, 
 					if (string.Compare(kw, IfcAreaMeasure.mKW, true) == 0)
 						return new IfcAreaMeasure(val);

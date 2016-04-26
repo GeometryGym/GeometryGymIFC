@@ -316,6 +316,16 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCMONETARYMEASURE";
 	}
+	public class IfcPowerMeasure : IfcDerivedMeasureValue
+	{
+		internal double mValue;
+		public object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } }
+		public IfcPowerMeasure(double value) { mValue = value; }
+		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public string getKW { get { return mKW; } }
+		internal static string mKW = "IFCPOWERMEASURE";
+	}
 	public class IfcPressureMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
@@ -412,11 +422,11 @@ namespace GeometryGym.Ifc
 	}
 	public class IfcCountMeasure : IfcMeasureValue
 	{
-		internal int mValue;
+		internal double mValue;
 		public object Value { get { return mValue; } }
 		public double Measure { get { return mValue; } }
-		internal IfcCountMeasure(int value) { mValue = value; }
-		public override string ToString() { return getKW + "(" + mValue + ")"; }
+		internal IfcCountMeasure(double value) { mValue = value; }
+		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCCOUNTMEASURE";
 	}

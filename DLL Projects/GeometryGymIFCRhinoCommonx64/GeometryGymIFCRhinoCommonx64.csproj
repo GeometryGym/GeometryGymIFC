@@ -46,143 +46,155 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\ifc\BaseClassIFC.cs">
+    <Compile Include="..\..\Core\IFC\BaseClassIFC.cs">
       <Link>IFC\Core\BaseClassIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\DatabaseIFC.cs">
+    <Compile Include="..\..\Core\IFC\DatabaseIFC.cs">
       <Link>IFC\Core\DatabaseIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\Enumerations.cs">
+    <Compile Include="..\..\Core\IFC\Enumerations.cs">
       <Link>IFC\Core\Enumerations.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\ifc A.cs">
-      <Link>IFC\Core\ifc A.cs</Link>
+    <Compile Include="..\..\Core\IFC\IFC A.cs">
+      <Link>IFC\Core\IFC A.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC B.cs">
+    <Compile Include="..\..\Core\IFC\IFC B.cs">
       <Link>IFC\Core\IFC B.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC C.cs">
+    <Compile Include="..\..\Core\IFC\IFC C.cs">
       <Link>IFC\Core\IFC C.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC D.cs">
+    <Compile Include="..\..\Core\IFC\IFC D.cs">
       <Link>IFC\Core\IFC D.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC E.cs">
+    <Compile Include="..\..\Core\IFC\IFC E.cs">
       <Link>IFC\Core\IFC E.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC F.cs">
+    <Compile Include="..\..\Core\IFC\IFC F.cs">
       <Link>IFC\Core\IFC F.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC G.cs">
+    <Compile Include="..\..\Core\IFC\IFC G.cs">
       <Link>IFC\Core\IFC G.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC H.cs">
+    <Compile Include="..\..\Core\IFC\IFC H.cs">
       <Link>IFC\Core\IFC H.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC I.cs">
+    <Compile Include="..\..\Core\IFC\IFC I.cs">
       <Link>IFC\Core\IFC I.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC J.cs">
+    <Compile Include="..\..\Core\IFC\IFC J.cs">
       <Link>IFC\Core\IFC J.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC L.cs">
+    <Compile Include="..\..\Core\IFC\IFC L.cs">
       <Link>IFC\Core\IFC L.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC M.cs">
+    <Compile Include="..\..\Core\IFC\IFC M.cs">
       <Link>IFC\Core\IFC M.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC N.cs">
+    <Compile Include="..\..\Core\IFC\IFC N.cs">
       <Link>IFC\Core\IFC N.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC O.cs">
+    <Compile Include="..\..\Core\IFC\IFC O.cs">
       <Link>IFC\Core\IFC O.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC P.cs">
+    <Compile Include="..\..\Core\IFC\IFC P.cs">
       <Link>IFC\Core\IFC P.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC Q.cs">
+    <Compile Include="..\..\Core\IFC\IFC Q.cs">
       <Link>IFC\Core\IFC Q.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC R.cs">
+    <Compile Include="..\..\Core\IFC\IFC R.cs">
       <Link>IFC\Core\IFC R.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC S.cs">
+    <Compile Include="..\..\Core\IFC\IFC S.cs">
       <Link>IFC\Core\IFC S.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC T.cs">
+    <Compile Include="..\..\Core\IFC\IFC T.cs">
       <Link>IFC\Core\IFC T.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC U.cs">
+    <Compile Include="..\..\Core\IFC\IFC U.cs">
       <Link>IFC\Core\IFC U.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC V.cs">
+    <Compile Include="..\..\Core\IFC\IFC V.cs">
       <Link>IFC\Core\IFC V.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC W.cs">
+    <Compile Include="..\..\Core\IFC\IFC W.cs">
       <Link>IFC\Core\IFC W.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\IFC Z.cs">
+    <Compile Include="..\..\Core\IFC\IFC Z.cs">
       <Link>IFC\Core\IFC Z.cs</Link>
     </Compile>
-    <Compile Include="..\..\ifc\ParserIFC.cs">
+    <Compile Include="..\..\Core\IFC\ParserIFC.cs">
       <Link>IFC\Core\ParserIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC A RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC A RhinoCommon.cs</Link>
+    <Compile Include="..\..\Core\IFC\Property Sets.cs">
+      <Link>IFC\Core\Property Sets.cs</Link>
     </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC B RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC B RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC C RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC C RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC D RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC D RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC E RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC E RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC F RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC F RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC G RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC G RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC H RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC H RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC I RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC I RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC L RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC L RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC M RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC M RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC O RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC O RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC P RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC P RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC R RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC R RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC S RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC S RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC T RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC T RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\RhinoCommon IFC\IFC V RhinoCommon.cs">
-      <Link>IFC\RhinoCommon\IFC V RhinoCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\step\BaseClassSTEP.cs">
+    <Compile Include="..\..\Core\STEP\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>
     </Compile>
-    <Compile Include="..\..\step\ParserSTEP.cs">
+    <Compile Include="..\..\Core\STEP\ParserSTEP.cs">
       <Link>STEP\ParserSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC A RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC A RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC B RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC B RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC C RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC C RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC D RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC D RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC E RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC E RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC F RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC F RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC G RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC G RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC H RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC H RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC I RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC I RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC L RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC L RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC M RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC M RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC O RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC O RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC P RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC P RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC R RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC R RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC S RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC S RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC T RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC T RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC U RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC U RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC V RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC V RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC W RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC W RhinoCommon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC Z RhinoCommon.cs">
+      <Link>IFC\RhinoCommon\IFC Z RhinoCommon.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

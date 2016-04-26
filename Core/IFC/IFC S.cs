@@ -597,15 +597,15 @@ additional types	some additional representation types are given:
 		internal string mLandTitleNumber = "$";// : OPTIONAL IfcLabel;
 		internal int mSiteAddress;// : OPTIONAL IfcPostalAddress; 
 
-		internal IfcCompoundPlaneAngleMeasure RefLatitude { set { mRefLatitude = (value == null ? "$" : value.ToString()); } }
-		internal IfcCompoundPlaneAngleMeasure RefLongitude { set { mRefLongitude = (value == null ? "$" : value.ToString()); } }
-		internal double RefElevation { get { return mRefElevation; } set { mRefElevation = value; } }
-		internal IfcPostalAddress SiteAddress { get { return mDatabase.mIfcObjects[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
+		public IfcCompoundPlaneAngleMeasure RefLatitude { set { mRefLatitude = (value == null ? "$" : value.ToString()); } }
+		public IfcCompoundPlaneAngleMeasure RefLongitude { set { mRefLongitude = (value == null ? "$" : value.ToString()); } }
+		public double RefElevation { get { return mRefElevation; } set { mRefElevation = value; } }
+		public IfcPostalAddress SiteAddress { get { return mDatabase.mIfcObjects[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSite() : base() { }
 		internal IfcSite(IfcSite p) : base(p) { mRefLatitude = p.mRefLatitude; mRefLongitude = p.mRefLongitude; mRefElevation = p.mRefElevation; mLandTitleNumber = p.mLandTitleNumber; mSiteAddress = p.mSiteAddress; }
-		internal IfcSite(DatabaseIfc db, string name) : base(db) { Name = name; }
-		internal IfcSite(IfcSite host, string name) : base(host, name) { }
+		public IfcSite(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.WorldCoordinatePlacement)) { Name = name; }
+		public IfcSite(IfcSite host, string name) : base(host, name) { }
 		internal static void parseFields(IfcSite s, List<string> arrFields, ref int ipos)
 		{
 			IfcSpatialStructureElement.parseFields(s, arrFields, ref ipos);
@@ -903,7 +903,7 @@ additional types	some additional representation types are given:
 
 		protected IfcSpatialElement() : base() { }
 		protected IfcSpatialElement(IfcSpatialElement e) : base(e) { mLongName = e.mLongName; }
-		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(host.mDatabase)
+		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, 0))))
 		{ 
 			Name = name;
 			IfcBuilding building = this as IfcBuilding;
@@ -925,13 +925,12 @@ additional types	some additional representation types are given:
 				}
 			}
 		}
-		protected IfcSpatialElement(DatabaseIfc m) : base(m)
+		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement)
 		{
 			IfcRelContainedInSpatialStructure rs = new IfcRelContainedInSpatialStructure(this);
 			if (mDatabase.mSchema != Schema.IFC2x3)
 			{
-				IfcObjectPlacement pl = Placement;
-				mContainerCommonPlacement = (pl == null ? new IfcLocalPlacement(new IfcAxis2Placement3D(mDatabase)) :new IfcLocalPlacement(pl,new IfcAxis2Placement3D(mDatabase)) );
+				mContainerCommonPlacement = new IfcLocalPlacement(placement,new IfcAxis2Placement3D(mDatabase));
 				mContainerCommonPlacement.mContainerHost = this;
 			}
 		}
@@ -1029,8 +1028,8 @@ additional types	some additional representation types are given:
 		public IfcElementCompositionEnum CompositionType { get { return mCompositionType; } set { mCompositionType = value; } }
 
 		protected IfcSpatialStructureElement() : base() { }
-		protected IfcSpatialStructureElement(IfcSpatialStructureElement p) : base(p) { mCompositionType = p.mCompositionType; }
-		protected IfcSpatialStructureElement(DatabaseIfc m) : base(m) { if (m.mSchema == Schema.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
+		protected IfcSpatialStructureElement(IfcSpatialStructureElement e) : base(e) { mCompositionType = e.mCompositionType; }
+		protected IfcSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { if (pl.mDatabase.mSchema == Schema.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host,string name) : base(host,name) { if (mDatabase.mSchema == Schema.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected static void parseFields(IfcSpatialStructureElement s, List<string> arrFields, ref int ipos)
 		{
@@ -1226,8 +1225,7 @@ additional types	some additional representation types are given:
 
 		protected IfcStructuralActivity() : base() { }
 		protected IfcStructuralActivity(IfcStructuralActivity p) : base(p) { mAppliedLoad = p.mAppliedLoad; mGlobalOrLocal = p.mGlobalOrLocal; }
-		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, IfcRelAssignsToGroup loadcase)
-			: base(db)
+		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, IfcRelAssignsToGroup loadcase) : base(db)
 		{
 			mAssignedToStructuralItem = new IfcRelConnectsStructuralActivity(item, this);
 			mAppliedLoad = load.mIndex;
@@ -1245,16 +1243,25 @@ additional types	some additional representation types are given:
 	public interface IfcStructuralActivityAssignmentSelect : IfcInterface { } //SELECT(IfcStructuralItem,IfcElement);
 	public partial class IfcStructuralAnalysisModel : IfcSystem
 	{
-		internal IfcAnalysisModelTypeEnum mPredefinedType;// : IfcAnalysisModelTypeEnum;
+		internal IfcAnalysisModelTypeEnum mPredefinedType = IfcAnalysisModelTypeEnum.NOTDEFINED;// : IfcAnalysisModelTypeEnum;
 		internal int mOrientationOf2DPlane;// : OPTIONAL IfcAxis2Placement3D;
 		internal List<int> mLoadedBy = new List<int>();//  : OPTIONAL SET [1:?] OF IfcStructuralLoadGroup;
 		internal List<int> mHasResults = new List<int>();//: OPTIONAL SET [1:?] OF IfcStructuralResultGroup  
+		internal int mSharedPlacement;//	:	OPTIONAL IfcObjectPlacement;
 
-		internal List<IfcStructuralLoadGroup> LoadedBy { get { return mLoadedBy.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcStructuralLoadGroup); } }
+		public IfcAnalysisModelTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public List<IfcStructuralLoadGroup> LoadedBy { get { return mLoadedBy.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcStructuralLoadGroup); } }
+		public List<IfcStructuralResultGroup> HasResults { get { return mHasResults.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcStructuralResultGroup); } } 
+		public IfcObjectPlacement SharedPlacement { get { return mDatabase.mIfcObjects[mSharedPlacement] as IfcObjectPlacement; } set { mSharedPlacement = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcStructuralAnalysisModel() : base() { }
-		internal IfcStructuralAnalysisModel(IfcStructuralAnalysisModel i) : base(i) { mPredefinedType = i.mPredefinedType; mOrientationOf2DPlane = i.mOrientationOf2DPlane; mLoadedBy = new List<int>(i.mLoadedBy.ToArray()); mHasResults = new List<int>(i.mHasResults.ToArray()); }
-		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name) { mPredefinedType = type; }
+		internal IfcStructuralAnalysisModel(IfcStructuralAnalysisModel m) : base(m) { mPredefinedType = m.mPredefinedType; mOrientationOf2DPlane = m.mOrientationOf2DPlane; mLoadedBy = new List<int>(m.mLoadedBy.ToArray()); mHasResults = new List<int>(m.mHasResults.ToArray()); mSharedPlacement = m.mSharedPlacement; }
+		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) 
+			: base(bldg, name)
+		{
+			mPredefinedType = type;
+			SharedPlacement = new IfcLocalPlacement(mDatabase.WorldCoordinatePlacement);
+		}
 		internal new static IfcStructuralAnalysisModel Parse(string strDef) { IfcStructuralAnalysisModel m = new IfcStructuralAnalysisModel(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcStructuralAnalysisModel c, List<string> arrFields, ref int ipos)
 		{
@@ -1267,7 +1274,8 @@ additional types	some additional representation types are given:
 			str = arrFields[ipos++];
 			if (str != "$")
 				c.mHasResults = ParserSTEP.SplitListLinks(str);
-
+			if (ipos < arrFields.Count) // IFC4 late change
+				c.mSharedPlacement = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
 		protected override string BuildString()
 		{
@@ -1290,6 +1298,8 @@ additional types	some additional representation types are given:
 					str += "," + ParserSTEP.LinkToString(mHasResults[icounter]);
 				str += ")";
 			}
+			if (mDatabase.mSchema != Schema.IFC2x3)
+				str += (mSharedPlacement == 0 ? ",$" : ",#" + mSharedPlacement);
 			return str;
 		}
 
@@ -1424,7 +1434,7 @@ additional types	some additional representation types are given:
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 		protected IfcStructuralItem() : base() { }
 		protected IfcStructuralItem(IfcStructuralItem p) : base(p) { }
-		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase)
+		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase.mSchema == Schema.IFC2x3 ? new IfcLocalPlacement(sm.SharedPlacement,new IfcAxis2Placement3D(sm.mDatabase)) : sm.SharedPlacement ,null)
 		{
 			sm.mIsGroupedBy[0].assign(this);
 			mDatabase.mContext.setStructuralUnits();
@@ -1906,15 +1916,16 @@ additional types	some additional representation types are given:
 		internal double mThickness;// : OPTIONAL IfcPositiveLengthMeasure; 
 
 		public IfcStructuralSurfaceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public double Thickness { get { return mThickness; } set { mThickness = value; } }
 
 		public IfcStructuralSurfaceMember() : base() { }
 		internal IfcStructuralSurfaceMember(IfcStructuralSurfaceMember p) : base(p) { mPredefinedType = p.mPredefinedType; mThickness = p.mThickness; }
-		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFace f, IfcMaterialLayerSetUsage m, int id)
-			: base(sm, m, id)
+		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFaceSurface f, IfcMaterial material, int id, double thickness)
+			: base(sm, material, id)
 		{
 			IfcTopologyRepresentation tr = new IfcTopologyRepresentation(f, "Reference");
 			Representation = new IfcProductRepresentation(tr);
-			mThickness = m.ForLayerSet.MaterialLayers.ConvertAll(x=>x.LayerThickness).Sum();
+			mThickness = thickness;
 		}
 
 		internal static IfcStructuralSurfaceMember Parse(string strDef) { IfcStructuralSurfaceMember m = new IfcStructuralSurfaceMember(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }

@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 
 			internal Aggregate() { }
 			partial void setCustomAggregate(BaseClassIfc obj);
-            internal void setAggregate(BaseClassIfc obj)
+			internal void setAggregate(BaseClassIfc obj)
 			{
 				IfcProduct product = obj as IfcProduct;
 				if (product != null)
@@ -102,7 +102,7 @@ namespace GeometryGym.Ifc
 				//if (application != null)
 				//	mApplications.Add(application);
 				IfcComplexProperty cp = obj as IfcComplexProperty;
-				if(cp != null)
+				if (cp != null)
 				{
 					mComplexProperties.Add(cp);
 					return;
@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 					mCoordinateOperations.Add(coordOp);
 					return;
 				}
-				
+
 				IfcEdgeCurve edgeCurve = obj as IfcEdgeCurve;
 				if (edgeCurve != null)
 				{
@@ -137,9 +137,9 @@ namespace GeometryGym.Ifc
 				if (geometricRepresentationContext != null)
 				{
 					mGeomContexts.Add(geometricRepresentationContext);
-					return ;
+					return;
 				}
-				
+
 
 				IfcGroup group = obj as IfcGroup;
 				if (group != null)
@@ -220,7 +220,7 @@ namespace GeometryGym.Ifc
 					return;
 				}
 				IfcPropertySet propSet = obj as IfcPropertySet;
-				if(propSet != null)
+				if (propSet != null)
 				{
 					mPropertySets.Add(propSet);
 					return;
@@ -277,12 +277,12 @@ namespace GeometryGym.Ifc
 				setCustomAggregate(obj);
 			}
 			partial void InitializeOthers(string folder);
-            internal void RelateObjects(string folder)
+			internal void RelateObjects(string folder)
 			{
 				try
 				{
 					int icounter;
-					for(icounter = 0; icounter < mComplexProperties.Count;icounter++)
+					for (icounter = 0; icounter < mComplexProperties.Count; icounter++)
 						mComplexProperties[icounter].relate();
 					for (icounter = 0; icounter < mCoordinateOperations.Count; icounter++)
 						mCoordinateOperations[icounter].Relate();
@@ -304,7 +304,7 @@ namespace GeometryGym.Ifc
 						itm.relate();
 					for (icounter = 0; icounter < mLocalPlacements.Count; icounter++)
 						mLocalPlacements[icounter].setReference();
-					for(icounter = 0; icounter < mMappedItems.Count; icounter++)
+					for (icounter = 0; icounter < mMappedItems.Count; icounter++)
 						mMappedItems[icounter].MappingSource.mMapUsage.Add(mMappedItems[icounter]);
 					for (icounter = 0; icounter < mMaterialProperties.Count; icounter++)
 						mMaterialProperties[icounter].relate();
@@ -336,7 +336,7 @@ namespace GeometryGym.Ifc
 						rc.relate();
 					foreach (IfcShapeAspect sa in mShapeAspects)
 						sa.relate();
-					for(icounter = 0; icounter < mTypeProducts.Count; icounter++)
+					for (icounter = 0; icounter < mTypeProducts.Count; icounter++)
 					{
 						List<IfcRepresentationMap> repMaps = mTypeProducts[icounter].RepresentationMaps;
 						for (int jcounter = 0; jcounter < repMaps.Count; jcounter++)
@@ -354,12 +354,13 @@ namespace GeometryGym.Ifc
 		}
 		internal Guid id = Guid.NewGuid();
 		internal int mNextBlank = 1;
-		
+
 		internal Schema mSchema = Schema.IFC2x3;
-		
+
 		internal ModelView mModelView = ModelView.If2x3NotAssigned;
 		internal bool mAccuratePreview = false;// mCoordinationView = false; 
-		internal string mFolder = "";
+		public string FolderPath { get; set; } = "";
+		public string FileName { get; set; } = "";
 		internal double mPlaneAngleToRadians = 1;
 		internal bool mTimeInDays = false;
 		public int NextObjectRecord { set { mNextBlank = value; } }
@@ -392,8 +393,11 @@ namespace GeometryGym.Ifc
 		internal List<BaseClassIfc> mIfcObjects = new List<BaseClassIfc>(new BaseClassIfc[] { new BaseClassIfc() }); 
 
 		public int RecordCount { get { return mIfcObjects.Count; } }
-		public BaseClassIfc Item(int index) { return (index < mIfcObjects.Count ? mIfcObjects[index] : null);  }
-
+		public BaseClassIfc this[int index]
+		{
+			get { return (index < mIfcObjects.Count ? mIfcObjects[index] : null); }
+			//set {  }
+		}
 		private IfcCartesianPoint mOrigin = null, mWorldOrigin = null,mOrigin2d = null;
 		internal IfcDirection mXAxis, mYAxis, mZAxis;
 		//internal int mTempWorldCoordinatePlacement = 0;
@@ -682,10 +686,10 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal static StreamReader getStreamReader(string fileName)
+		internal StreamReader getStreamReader(string fileName)
 		{
-			string ext = System.IO.Path.GetExtension(fileName);
-#if(!NOIFCZIP)
+			string ext = Path.GetExtension(fileName);
+#if (!NOIFCZIP)
 			if (string.Compare(ext, ".IFCZIP", true) == 0)
 			{
 				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
@@ -696,6 +700,8 @@ namespace GeometryGym.Ifc
 				return new StreamReader(za.Entries[0].Open(), System.Text.Encoding.GetEncoding("windows-1252"));
 			}
 #endif
+			FileName = fileName;
+			FolderPath = Path.GetDirectoryName(fileName);
 			return new StreamReader(fileName, System.Text.Encoding.GetEncoding("windows-1252"));
 		}
 
@@ -845,7 +851,7 @@ namespace GeometryGym.Ifc
 		private void postImport(Aggregate aggregate) 
 		{
 			mWorldCoordinatePlacement = null;
-			aggregate.RelateObjects(mFolder);
+			aggregate.RelateObjects(FolderPath);
 			if(mContext != null)
 			{
 				mContext.initializeUnitsAndScales();
@@ -945,6 +951,8 @@ namespace GeometryGym.Ifc
 		public bool WriteFile(string filename)
 		{
 			StreamWriter sw = null;
+			FolderPath = Path.GetDirectoryName(filename);
+			FileName = filename;
 #if (!NOIFCZIP)
 			bool zip = filename.EndsWith(".ifczip");
 			System.IO.Compression.ZipArchive za = null;
@@ -961,7 +969,7 @@ namespace GeometryGym.Ifc
 				sw = new StreamWriter(filename);
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-			sw.Write(getHeaderString("") + "\r\n");
+			sw.Write(getHeaderString(filename) + "\r\n");
 			for (int icounter = 1; icounter < mIfcObjects.Count; icounter++)
 			{
 				BaseClassIfc ie = mIfcObjects[icounter];

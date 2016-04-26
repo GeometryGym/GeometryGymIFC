@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NOIFCZIP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -61,94 +61,94 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\IFC\BaseClassIFC.cs">
+    <Compile Include="..\..\Core\IFC\BaseClassIFC.cs">
       <Link>IFC\BaseClassIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\DatabaseIFC.cs">
+    <Compile Include="..\..\Core\IFC\DatabaseIFC.cs">
       <Link>IFC\DatabaseIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\Enumerations.cs">
+    <Compile Include="..\..\Core\IFC\Enumerations.cs">
       <Link>IFC\Enumerations.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC A.cs">
+    <Compile Include="..\..\Core\IFC\IFC A.cs">
       <Link>IFC\IFC A.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC B.cs">
+    <Compile Include="..\..\Core\IFC\IFC B.cs">
       <Link>IFC\IFC B.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC C.cs">
+    <Compile Include="..\..\Core\IFC\IFC C.cs">
       <Link>IFC\IFC C.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC D.cs">
+    <Compile Include="..\..\Core\IFC\IFC D.cs">
       <Link>IFC\IFC D.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC E.cs">
+    <Compile Include="..\..\Core\IFC\IFC E.cs">
       <Link>IFC\IFC E.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC F.cs">
+    <Compile Include="..\..\Core\IFC\IFC F.cs">
       <Link>IFC\IFC F.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC G.cs">
+    <Compile Include="..\..\Core\IFC\IFC G.cs">
       <Link>IFC\IFC G.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC H.cs">
+    <Compile Include="..\..\Core\IFC\IFC H.cs">
       <Link>IFC\IFC H.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC I.cs">
+    <Compile Include="..\..\Core\IFC\IFC I.cs">
       <Link>IFC\IFC I.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC J.cs">
+    <Compile Include="..\..\Core\IFC\IFC J.cs">
       <Link>IFC\IFC J.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC L.cs">
+    <Compile Include="..\..\Core\IFC\IFC L.cs">
       <Link>IFC\IFC L.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC M.cs">
+    <Compile Include="..\..\Core\IFC\IFC M.cs">
       <Link>IFC\IFC M.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC N.cs">
+    <Compile Include="..\..\Core\IFC\IFC N.cs">
       <Link>IFC\IFC N.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC O.cs">
+    <Compile Include="..\..\Core\IFC\IFC O.cs">
       <Link>IFC\IFC O.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC P.cs">
+    <Compile Include="..\..\Core\IFC\IFC P.cs">
       <Link>IFC\IFC P.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC Q.cs">
+    <Compile Include="..\..\Core\IFC\IFC Q.cs">
       <Link>IFC\IFC Q.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC R.cs">
+    <Compile Include="..\..\Core\IFC\IFC R.cs">
       <Link>IFC\IFC R.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC S.cs">
+    <Compile Include="..\..\Core\IFC\IFC S.cs">
       <Link>IFC\IFC S.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC T.cs">
+    <Compile Include="..\..\Core\IFC\IFC T.cs">
       <Link>IFC\IFC T.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC U.cs">
+    <Compile Include="..\..\Core\IFC\IFC U.cs">
       <Link>IFC\IFC U.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC V.cs">
+    <Compile Include="..\..\Core\IFC\IFC V.cs">
       <Link>IFC\IFC V.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC W.cs">
+    <Compile Include="..\..\Core\IFC\IFC W.cs">
       <Link>IFC\IFC W.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\IFC Z.cs">
+    <Compile Include="..\..\Core\IFC\IFC Z.cs">
       <Link>IFC\IFC Z.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\ParserIFC.cs">
+    <Compile Include="..\..\Core\IFC\ParserIFC.cs">
       <Link>IFC\ParserIFC.cs</Link>
     </Compile>
-    <Compile Include="..\..\IFC\Property Sets.cs">
+    <Compile Include="..\..\Core\IFC\Property Sets.cs">
       <Link>IFC\Property Sets.cs</Link>
     </Compile>
-    <Compile Include="..\..\STEP\BaseClassSTEP.cs">
+    <Compile Include="..\..\Core\STEP\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>
     </Compile>
-    <Compile Include="..\..\STEP\ParserSTEP.cs">
+    <Compile Include="..\..\Core\STEP\ParserSTEP.cs">
       <Link>STEP\ParserSTEP.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

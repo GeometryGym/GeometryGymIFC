@@ -288,9 +288,9 @@ namespace GeometryGym.Ifc
 
 		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
-		internal List<IfcGridAxis> UAxes { get { return mUAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
-		internal List<IfcGridAxis> VAxes { get { return mVAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
-		internal List<IfcGridAxis> WAxes { get { return mWAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
+		public List<IfcGridAxis> UAxes { get { return mUAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
+		public List<IfcGridAxis> VAxes { get { return mVAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
+		public List<IfcGridAxis> WAxes { get { return mWAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
 
 		internal IfcGrid() : base() { }
 		internal IfcGrid(IfcGrid g) : base(g) { mUAxes = new List<int>(g.mUAxes.ToArray()); mVAxes = new List<int>(g.mVAxes.ToArray()); mWAxes = new List<int>(g.mWAxes.ToArray()); mPredefinedType = g.mPredefinedType; }
@@ -357,8 +357,9 @@ namespace GeometryGym.Ifc
 		internal IfcGrid mPartOfU = null;//	:	SET [0:1] OF IfcGrid FOR UAxes;
 		internal List<IfcVirtualGridIntersection> mHasIntersections = new List<IfcVirtualGridIntersection>();//:	SET OF IfcVirtualGridIntersection FOR IntersectingAxes;
 
-		internal string AxisTag { get { return mAxisTag == "$" ? "" : mAxisTag; } }
-		internal IfcCurve AxisCurve { get { return mDatabase.mIfcObjects[mAxisCurve] as IfcCurve; } }
+		public override string Name { get { return AxisTag; } set { AxisTag = value; } }
+		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public IfcCurve AxisCurve { get { return mDatabase.mIfcObjects[mAxisCurve] as IfcCurve; } }
 
 		internal IfcGridAxis() : base() { }
 		internal IfcGridAxis(IfcGridAxis p) : base() { mAxisTag = p.mAxisTag; mAxisCurve = p.mAxisCurve; mSameSense = p.mSameSense; }

@@ -784,7 +784,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuilding() : base() { }
 		internal IfcBuilding(IfcBuilding p) : base(p) { mElevationOfRefHeight = p.mElevationOfRefHeight; mElevationOfTerrain = p.mElevationOfTerrain; mBuildingAddress = p.mBuildingAddress; }
-		public IfcBuilding(DatabaseIfc db, string name) : base(db) { Name = name; }
+		public IfcBuilding(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.WorldCoordinatePlacement) ) { Name = name; }
 		public IfcBuilding(IfcBuilding host, string name) : base(host, name) {   }
 		public IfcBuilding(IfcSite host, string name) : base(host, name) {   }
 	 			
@@ -947,12 +947,11 @@ namespace GeometryGym.Ifc
 		}
 		public IfcBuildingStorey() : base() { }
 		internal IfcBuildingStorey(IfcBuildingStorey p) : base(p) { mElevation = p.mElevation; }
-		public IfcBuildingStorey(IfcBuilding host, string name, double elev) : base(host.mDatabase)
+		public IfcBuildingStorey(IfcBuilding host, string name, double elev) : base(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elev))))
 		{
 			host.addStorey(this);
 			Name = name;
 			Elevation = elev;
-			Placement = new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, 0, Elevation)));
 		}
 		internal static void parseFields(IfcBuildingStorey s, List<string> arrFields, ref int ipos) { IfcSpatialStructureElement.parseFields(s, arrFields, ref ipos); s.mElevation = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleToString(mElevation); }

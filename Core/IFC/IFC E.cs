@@ -1008,8 +1008,8 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcExternalSpatialStructureElement : IfcSpatialElement //	ABSTRACT SUPERTYPE OF(IfcExternalSpatialElement)
 	{
 		protected IfcExternalSpatialStructureElement() : base() { }
-		protected IfcExternalSpatialStructureElement(IfcExternalSpatialStructureElement p) : base(p) { }
-		protected IfcExternalSpatialStructureElement(DatabaseIfc m) : base(m) { }
+		protected IfcExternalSpatialStructureElement(IfcExternalSpatialStructureElement e) : base(e) { }
+		protected IfcExternalSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { }
 		protected IfcExternalSpatialStructureElement(IfcSite host, string name) : base(host, name) { }
 		protected static void parseFields(IfcExternalSpatialStructureElement s, List<string> arrFields, ref int ipos) { IfcSpatialElement.parseFields(s, arrFields, ref ipos); }
 	}

@@ -1654,21 +1654,21 @@ namespace GeometryGym.Ifc
 		}
 		internal override void relate()
 		{
-			BaseClassIfc ent = mDatabase.mIfcObjects[mRelatingStructure];
-			IfcSpatialElement se = ent as IfcSpatialElement;
+			IfcSpatialElement se = RelatingStructure;
 			if (se != null)
-				se.mContainsElements.Add(this);//.relateStructure(contains);
-			for (int icounter = 0; icounter < mRelatedElements.Count; icounter++)
+				se.mContainsElements.Add(this);
+			List<IfcProduct> products = RelatedElements;
+			for (int icounter = 0; icounter < products.Count; icounter++)
 			{
-				IfcProduct p = mDatabase.mIfcObjects[mRelatedElements[icounter]] as IfcProduct;
-				IfcElement e = p as IfcElement;
-				if (e != null)
-					e.mContainedInStructure = this;
+				IfcProduct product = products[icounter] as IfcProduct;
+				IfcElement element = product as IfcElement;
+				if (element != null)
+					element.mContainedInStructure = this;
 				else
 				{
-					IfcGrid g = ent as IfcGrid;
-					if (g != null)
-						g.mContainedInStructure = this;
+					IfcGrid grid = product as IfcGrid;
+					if (grid != null)
+						grid.mContainedInStructure = this;
 				}
 			}
 		}

@@ -90,8 +90,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcIndexedPolyCurve() : base() { }
 		internal IfcIndexedPolyCurve(IfcIndexedPolyCurve p) : base(p) { mPoints = p.mPoints; mSegments.AddRange(p.mSegments); mSelfIntersect = p.mSelfIntersect; }
-		internal IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
-		internal IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { Segments = segs; }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { Segments = segs; }
 		internal static void parseFields(IfcIndexedPolyCurve c, List<string> arrFields, ref int ipos)
 		{
 			IfcBoundedCurve.parseFields(c, arrFields, ref ipos);
