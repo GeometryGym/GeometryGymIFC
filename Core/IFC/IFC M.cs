@@ -231,6 +231,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		private List<IfcMaterialProperties> mHasProperties = new List<IfcMaterialProperties>();
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+
 		public IfcRelAssociatesMaterial Associates
 		{
 			get
@@ -244,7 +245,7 @@ namespace GeometryGym.Ifc
 			set { mAssociatedTo.Add(value); }
 		}
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
-		internal List<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
+		public List<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		public virtual IfcMaterial PrimaryMaterial { get { return null; } }
@@ -552,7 +553,9 @@ namespace GeometryGym.Ifc
 		public List<IfcMaterialProfile> MaterialProfiles { get { return mMaterialProfiles.ConvertAll(x=>mDatabase.mIfcObjects[x] as IfcMaterialProfile); } }
 
 		public override IfcMaterial PrimaryMaterial { get { return (mMaterialProfiles.Count != 1 ? null : MaterialProfiles[0].Material); } }
-		
+
+		//GeomGym
+		internal IfcMaterialProfileSet mTaperEnd = null;
 
 		internal IfcMaterialProfileSet() : base() { }
 		internal IfcMaterialProfileSet(IfcMaterialProfileSet m) : base(m) { mName = m.mName; mDescription = m.mDescription; mMaterialProfiles = new List<int>(m.mMaterialProfiles.ToArray()); mCompositeProfile = m.mCompositeProfile; }
@@ -568,8 +571,7 @@ namespace GeometryGym.Ifc
 				throw new Exception("Material Profile can be assigned to only a single profile set");
 			mMaterialProfiles.Add(profile.mIndex);
 		}
-		internal IfcMaterialProfileSet(string name, List<IfcMaterialProfile> profiles)
-			: base(profiles[0].mDatabase)
+		internal IfcMaterialProfileSet(string name, List<IfcMaterialProfile> profiles) : base(profiles[0].mDatabase)
 		{
 			List<IfcProfileDef> defs = new List<IfcProfileDef>(profiles.Count);
 			for (int icounter = 0; icounter < profiles.Count; icounter++)
@@ -584,7 +586,7 @@ namespace GeometryGym.Ifc
 					defs.Add(mDatabase.mIfcObjects[mp.mProfile] as IfcProfileDef);
 			}
 			if (defs.Count > 0)
-				mCompositeProfile = new IfcCompositeProfileDef(name, defs, "").mIndex;
+				mCompositeProfile = new IfcCompositeProfileDef(name, defs).mIndex;
 		}
 		internal static IfcMaterialProfileSet Parse(string strDef) { IfcMaterialProfileSet m = new IfcMaterialProfileSet(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcMaterialProfileSet m, List<string> arrFields, ref int ipos) { IfcMaterialDefinition.parseFields(m, arrFields, ref ipos); m.mName = arrFields[ipos++].Replace("'", ""); m.mDescription = arrFields[ipos++].Replace("'", ""); m.mMaterialProfiles = ParserSTEP.SplitListLinks(arrFields[ipos++]); m.mCompositeProfile = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -1027,7 +1029,15 @@ namespace GeometryGym.Ifc
 		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcMemberType() : base() { }
 		internal IfcMemberType(IfcMemberType t) : base(t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = ps; }
+		internal IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase)
+		{
+			Name = name;
+			mPredefinedType = type;
+			if (ps.mTaperEnd != null)
+				mTapering = ps;
+			else
+				MaterialSelect = ps;
+		}
 		public IfcMemberType(DatabaseIfc m, string name, IfcMemberTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcMemberType(string name, IfcMaterialProfile mp, IfcMemberTypeEnum type) : base(mp.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mp; }
 

@@ -182,6 +182,11 @@ namespace GeometryGym.Ifc
 	{
 		private double mCoordinateX = 0, mCoordinateY = 0, mCoordinateZ = 0;
 
+		public Tuple<double,double,double> Coordinates
+		{
+			get { return new Tuple<double, double, double>(mCoordinateX, mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); }
+			set { mCoordinateX = value.Item1; mCoordinateY = value.Item2; mCoordinateZ = value.Item3; }
+		}
 		internal IfcCartesianPoint() : base() { }
 		internal IfcCartesianPoint(IfcCartesianPoint p) : base()
 		{
@@ -424,7 +429,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcChiller() : base() { }
 		internal IfcChiller(IfcChiller c) : base(c) { mPredefinedType = c.mPredefinedType; }
-		internal IfcChiller(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcChiller(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcChiller s, List<string> arrFields, ref int ipos)
 		{
@@ -443,9 +448,11 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcChillerTypeEnum mPredefinedType = IfcChillerTypeEnum.NOTDEFINED;// : IfcChillerTypeEnum
 		public IfcChillerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcChillerType() : base() { }
 		internal IfcChillerType(IfcChillerType t) : base(t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcChillerType(DatabaseIfc m, string name, IfcChillerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcChillerType(DatabaseIfc db, string name, IfcChillerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
+
 		internal static void parseFields(IfcChillerType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcChillerTypeEnum)Enum.Parse(typeof(IfcChillerTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcChillerType Parse(string strDef) { IfcChillerType t = new IfcChillerType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
@@ -929,7 +936,15 @@ namespace GeometryGym.Ifc
 		internal IfcColumnType(IfcColumnType t) : base(t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcColumnType(DatabaseIfc m, string name, IfcColumnTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcColumnType(string name, IfcMaterialProfile ps, IfcColumnTypeEnum type) : this(name,new IfcMaterialProfileSet(ps.Name, ps), type) { }
-		internal IfcColumnType(string name, IfcMaterialProfileSet ps, IfcColumnTypeEnum type) : base(ps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = ps; }
+		internal IfcColumnType(string name, IfcMaterialProfileSet ps, IfcColumnTypeEnum type) : base(ps.mDatabase)
+		{
+			Name = name;
+			mPredefinedType = type;
+			if (ps.mTaperEnd != null)
+				mTapering = ps;
+			else
+				MaterialSelect = ps;
+		}
 		internal static void parseFields(IfcColumnType t, List<string> arrFields, ref int ipos) { IfcBuildingElementType.parseFields(t,arrFields, ref ipos); t.mPredefinedType = (IfcColumnTypeEnum)Enum.Parse(typeof(IfcColumnTypeEnum), arrFields[ipos++].Replace(".", ""));  }
 		internal new static IfcColumnType Parse(string strDef) { IfcColumnType t = new IfcColumnType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
@@ -1029,16 +1044,14 @@ namespace GeometryGym.Ifc
 
 		internal IfcCompositeProfileDef() : base() { }
 		internal IfcCompositeProfileDef(IfcCompositeProfileDef i) : base(i) { mProfiles = new List<int>(i.mProfiles.ToArray()); mLabel = i.mLabel; }
-		private IfcCompositeProfileDef(DatabaseIfc m, string name, string label)
-			: base(m)
+		private IfcCompositeProfileDef(DatabaseIfc m, string name) : base(m)
 		{
 			Name = name;
-			Label = label;
 			if (mDatabase.mModelView == ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcCompositeProfileDef : " + m.ModelView.ToString());
 		}
-		internal IfcCompositeProfileDef(string name, List<IfcProfileDef> defs, string label) : this(defs[0].mDatabase, name, label) { mProfiles = defs.ConvertAll(x => x.mIndex); }
-		internal IfcCompositeProfileDef(string name, IfcProfileDef p1, IfcProfileDef p2, string label) : this(p1.mDatabase, name, label) { mProfiles.Add(p1.mIndex); mProfiles.Add(p2.mIndex); }
+		public IfcCompositeProfileDef(string name, List<IfcProfileDef> defs) : this(defs[0].mDatabase, name) { mProfiles = defs.ConvertAll(x => x.mIndex); }
+		public IfcCompositeProfileDef(string name, IfcProfileDef p1, IfcProfileDef p2) : this(p1.mDatabase, name) { mProfiles.Add(p1.mIndex); mProfiles.Add(p2.mIndex); }
 		internal new static IfcCompositeProfileDef Parse(string strDef) { IfcCompositeProfileDef p = new IfcCompositeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcCompositeProfileDef p, List<string> arrFields, ref int ipos) { IfcProfileDef.parseFields(p, arrFields, ref ipos); p.mProfiles = ParserSTEP.SplitListLinks(arrFields[ipos++]); p.mLabel = arrFields[ipos++].Replace("'", ""); }
 		protected override string BuildString()

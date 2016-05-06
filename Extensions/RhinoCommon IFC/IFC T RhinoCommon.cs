@@ -31,7 +31,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcTrimmedCurve(IfcCartesianPoint s, IfcCartesianPoint e) : base(s.mDatabase)
 		{
-			IfcLine il = new IfcLine(s, new IfcVector(s.mDatabase,e.Coordinates - s.Coordinates));
+			IfcLine il = new IfcLine(s, new IfcVector(s.mDatabase,e.Location- s.Location));
 			mBasisCurve = il.mIndex;
 			mTrim1 = new IfcTrimmingSelect(s);
 			mTrim2 = new IfcTrimmingSelect(e);

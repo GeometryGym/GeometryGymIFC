@@ -239,12 +239,27 @@ namespace GeometryGym.Ifc
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
+		public IfcPerson ThePerson { get { return mDatabase.mIfcObjects[mThePerson] as IfcPerson; } set { mThePerson = value.mIndex; } }
+		public IfcOrganization TheOrganization { get { return mDatabase.mIfcObjects[mTheOrganization] as IfcOrganization; } set { mTheOrganization = value.mIndex; } }
+
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		internal IfcPersonAndOrganization() : base() { }
 		internal IfcPersonAndOrganization(IfcPersonAndOrganization i) : base() { mThePerson = i.mThePerson; mTheOrganization = i.mTheOrganization; mRoles = i.mRoles; }
-		internal IfcPersonAndOrganization(DatabaseIfc m) : base(m) { mThePerson = new IfcPerson(m).mIndex; mTheOrganization = new IfcOrganization(m).mIndex; }
+		internal IfcPersonAndOrganization(DatabaseIfc m) : base(m)
+		{
+			mThePerson = new IfcPerson(m).mIndex;
+			string name = "UNKNOWN";
+			try
+			{
+				name = ((string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion", "RegisteredOrganization", "")).Replace("'", "");
+				if (string.IsNullOrEmpty(name) || string.Compare(name, "Microsoft", true) == 0)
+					name = "UNKNOWN";
+			}
+			catch (Exception) { }
+			mTheOrganization = new IfcOrganization(m,name).mIndex;
+		}
 		internal static void parseFields(IfcPersonAndOrganization c, List<string> arrFields, ref int ipos) { c.mThePerson = ParserSTEP.ParseLink(arrFields[ipos++]); c.mTheOrganization = ParserSTEP.ParseLink(arrFields[ipos++]); c.mRoles = arrFields[ipos++]; }
 		internal static IfcPersonAndOrganization Parse(string strDef) { IfcPersonAndOrganization c = new IfcPersonAndOrganization(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mThePerson) + "," + ParserSTEP.LinkToString(mTheOrganization) + "," + mRoles; }

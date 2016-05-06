@@ -338,7 +338,7 @@ namespace GeometryGym.Ifc
 		private int mPlacementRelTo;// : OPTIONAL IfcObjectPlacement;
 		private int mRelativePlacement;// : IfcAxis2Placement;
 
-		private bool mSet = false;
+		private bool mCalculated = false;
 
 		internal IfcObjectPlacement PlacementRelTo
 		{
@@ -348,13 +348,23 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement RelativePlacement
 		{
 			get { return mDatabase.mIfcObjects[mRelativePlacement] as IfcAxis2Placement; }
-			set { mRelativePlacement = value.Index; mSet = false; }
+			set { mRelativePlacement = value.Index; mCalculated = false; }
 		}
 
 		internal IfcLocalPlacement() : base() { }
 		internal IfcLocalPlacement(IfcLocalPlacement p) : base(p) { mPlacementRelTo = p.mPlacementRelTo; mRelativePlacement = p.mRelativePlacement; }
-		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database, null) { mRelativePlacement = placement.Index; }
-		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement) { if(relativeTo != null) mPlacementRelTo = relativeTo.mIndex; }
+		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database, null)
+		{
+			mRelativePlacement = placement.Index;
+		}
+		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)
+		{
+			if (relativeTo != null)
+			{
+				mPlacementRelTo = relativeTo.mIndex;
+				relativeTo.mReferencedByPlacements.Add(this);
+			}
+		}
 		
 		internal static IfcLocalPlacement Parse(string strDef) { IfcLocalPlacement p = new IfcLocalPlacement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcLocalPlacement p, List<string> arrFields, ref int ipos) { IfcObjectPlacement.parseFields(p, arrFields, ref ipos); p.mPlacementRelTo = ParserSTEP.ParseLink(arrFields[ipos++]); p.mRelativePlacement = ParserSTEP.ParseLink(arrFields[ipos++]); }

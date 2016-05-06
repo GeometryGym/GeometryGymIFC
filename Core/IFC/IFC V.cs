@@ -115,7 +115,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
 		internal int mVertexGeometry;// : IfcPoint; 
-		internal IfcPoint VertexGeometry { get { return mDatabase.mIfcObjects[mVertexGeometry] as IfcPoint; } }
+		public IfcPoint VertexGeometry { get { return mDatabase.mIfcObjects[mVertexGeometry] as IfcPoint; } }
+
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(IfcVertexPoint v) : base(v) { mVertexGeometry = v.mVertexGeometry; }
 		public IfcVertexPoint(IfcPoint cp) : base(cp.mDatabase) { mVertexGeometry = cp.mIndex; }

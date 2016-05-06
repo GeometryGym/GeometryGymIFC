@@ -27,7 +27,7 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcDirection
+	public partial class IfcDirection : IfcGeometricRepresentationItem
 	{
 		internal Vector3d Vector { get { return new Vector3d(mCoordinateX, mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
 		public IfcDirection(DatabaseIfc db, Vector3d v) : base(db)
@@ -39,7 +39,7 @@ namespace GeometryGym.Ifc
 			mCoordinateY = unit.Y;
 			mCoordinateZ = unit.Z;
 		}
-		internal IfcDirection(DatabaseIfc db, Vector2d v) : base(db)
+		public IfcDirection(DatabaseIfc db, Vector2d v) : base(db)
 		{
 			double len = v.Length;
 			mCoordinateX = v.X / len;

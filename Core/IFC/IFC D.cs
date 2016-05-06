@@ -125,7 +125,11 @@ namespace GeometryGym.Ifc
 	}
 	internal interface IfcDateTimeSelect : IfcInterface { DateTime DateTime { get; } } // IFC4 IfcCalenderDate, IfcDateAndTime, IfcLocalTime removed.  Date, IfcDateTime, IfcDescriptiveDate, IfcTime added
 	//ENTITY IfcDefinedSymbol  // DEPRECEATED IFC4
-	public interface IfcDefinitionSelect : IfcInterface { IfcRelDeclares HasContext { get; set; } List<IfcRelAssociates> HasAssociations { get; }  } // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
+	public interface IfcDefinitionSelect : IfcInterface // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
+	{
+		IfcRelDeclares HasContext { get; set; }
+		List<IfcRelAssociates> HasAssociations { get; }
+	}
 	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
 	{
 		private List<int> mElements = new List<int>();// : SET [1:?] OF IfcDerivedUnitElement;

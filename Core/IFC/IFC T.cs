@@ -895,6 +895,10 @@ namespace GeometryGym.Ifc
 	{
 		internal bool mRigid = false;
 		internal IfcLinearStiffnessMeasure mStiffness = null;
+
+		public bool Rigid { get { return mRigid; } }
+		public IfcLinearStiffnessMeasure Stiffness { get { return mStiffness; } }
+
 		internal IfcTranslationalStiffnessSelect(bool fix) { mRigid = fix; }
 		internal IfcTranslationalStiffnessSelect(double stiff) { mStiffness = new IfcLinearStiffnessMeasure(stiff); }
 		internal IfcTranslationalStiffnessSelect(IfcLinearStiffnessMeasure stiff) { mStiffness = stiff; }

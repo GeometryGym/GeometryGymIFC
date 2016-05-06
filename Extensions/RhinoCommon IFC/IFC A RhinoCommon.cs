@@ -29,12 +29,12 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
-		internal Vector3d AxisVector { get { return (mAxis > 0 ? (mDatabase.mIfcObjects[mAxis] as IfcDirection).Vector : Vector3d.XAxis); } }
+		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector : Vector3d.XAxis); } }
 	}
 	
-	public partial class IfcAxis2Placement2D
+	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
-		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? (mDatabase.mIfcObjects[mRefDirection] as IfcDirection).Vector : Vector3d.XAxis); } }
+		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? RefDirection.Vector : Vector3d.XAxis); } }
 
 		internal IfcAxis2Placement2D(DatabaseIfc db, Point2d position, Vector2d dir) : base(db, position)
 		{

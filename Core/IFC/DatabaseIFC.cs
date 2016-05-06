@@ -458,26 +458,58 @@ namespace GeometryGym.Ifc
 
 		partial void printError(string str);
 		internal void logError(string str) { printError(str); }
-		partial void getApplicationString(ref string app);
-		internal string applicationString
+		partial void getApplicationFullName(ref string app);
+		partial void getApplicationIdentifier(ref string app);
+		partial void getApplicationDeveloper(ref string app);
+
+		private string mApplicationFullName = "", mApplicationIdentifier = "", mApplicationDeveloper = "";
+		public string ApplicationFullName
 		{
 			get
 			{
-				string str = "";
-				getApplicationString(ref str);
-				if(string.IsNullOrEmpty(str))
+				if (string.IsNullOrEmpty(mApplicationFullName))
 				{
-					try
+					getApplicationFullName(ref mApplicationFullName);
+					if (string.IsNullOrEmpty(mApplicationFullName))
 					{
-						Assembly assembly = Assembly.GetExecutingAssembly();
-						AssemblyName name = assembly.GetName();
-						return name.Name + " v" + name.Version;
+						try
+						{
+							Assembly assembly = Assembly.GetExecutingAssembly();
+							AssemblyName name = assembly.GetName();
+							return name.Name;
+						}
+						catch (Exception) { return "Unknown Application"; }
 					}
-					catch(Exception) { }
 				}
-				return "Unknown Application";
+				return mApplicationFullName;
 			}
+			set { mApplicationFullName = value; }
 		}
+		public string ApplicationIdentifier
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(mApplicationIdentifier))
+				{
+					getApplicationIdentifier(ref mApplicationIdentifier);
+					if (string.IsNullOrEmpty(mApplicationIdentifier))
+						return ApplicationFullName;
+				}
+				return mApplicationIdentifier;
+			}
+			set { mApplicationIdentifier = value; }
+		}
+		public string ApplicationDeveloper
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(mApplicationDeveloper))
+					getApplicationDeveloper(ref mApplicationDeveloper);
+				return (string.IsNullOrEmpty(mApplicationDeveloper) ? "Unknown" : mApplicationDeveloper);
+			}
+			set { mApplicationDeveloper = value; }
+		}
+
 		internal string getHeaderString(string fileName)
 		{
 			string vd = (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" :
@@ -491,7 +523,7 @@ namespace GeometryGym.Ifc
 			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
 			hdr += "/* organization */ ('Unknown'),\r\n";
 			hdr += "/* preprocessor_version */ 'GeomGymIFC by Geometry Gym Pty Ltd',\r\n";
-			hdr += "/* originating_system */ '" + applicationString + "',\r\n";
+			hdr += "/* originating_system */ '" + ApplicationFullName + "',\r\n";
 
 			hdr += "/* authorization */ 'None');\r\n\r\n";
 			hdr += "FILE_SCHEMA (('" + (mSchema == Schema.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";

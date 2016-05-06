@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelDefinesByType IsTypedBy { get { return mIsTypedBy; } set { mIsTypedBy = value; } }
 		public List<IfcRelDefinesByProperties> IsDefinedBy { get { return mIsDefinedBy; } }
 
-		internal IfcTypeObject RelatingType 
+		public IfcTypeObject RelatingType 
 		{ 
 			get { return (mIsTypedBy == null ? null : mIsTypedBy.RelatingType); }
 			set
@@ -55,7 +55,7 @@ namespace GeometryGym.Ifc
 					if (value.mObjectTypeOf == null)
 						value.mObjectTypeOf = new IfcRelDefinesByType(this,value);
 					else
-						value.mObjectTypeOf.assignObj(this);
+						value.mObjectTypeOf.AssignObj(this);
 				}
 			}
 		}
@@ -331,7 +331,7 @@ namespace GeometryGym.Ifc
 	public class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
 	{
 		internal string mIdentification = "$";// : OPTIONAL IfcIdentifier;
-		private string mName;// : IfcLabel;
+		private string mName = "";// : IfcLabel;
 		private string mDescription = "$";// : OPTIONAL IfcText;
 		private List<int> mRoles = new List<int>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
 		private List<int> mAddresses = new List<int>();// : OPTIONAL LIST [1:?] OF IfcAddress; 
@@ -351,18 +351,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcOrganization() : base() { }
 		internal IfcOrganization(IfcOrganization i) : base() { mIdentification = i.mIdentification; mName = i.mName; mDescription = i.mDescription; mRoles = i.mRoles; mAddresses = i.mAddresses; }
-		internal IfcOrganization(DatabaseIfc db) : base(db)
-		{
-			mName = "UNKNOWN";
-			try
-			{
-				mName = ((string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion", "RegisteredOrganization", "")).Replace("'", "");
-				if (string.IsNullOrEmpty(mName) || mName == "Microsoft")
-					mName = "UNKNOWN";
-			}
-			catch (Exception) { }
-		}
-		internal IfcOrganization(DatabaseIfc m, string name) : base(m) { Name = name; }
+		internal IfcOrganization(DatabaseIfc db) : base(db) { } //Used only for developer
+		public IfcOrganization(DatabaseIfc m, string name) : base(m) { Name = name; }
 		internal static void parseFields(IfcOrganization o, List<string> arrFields, ref int ipos)
 		{
 			o.mIdentification = arrFields[ipos++];
@@ -374,7 +364,10 @@ namespace GeometryGym.Ifc
 		internal static IfcOrganization Parse(string strDef) { IfcOrganization o = new IfcOrganization(); int ipos = 0; parseFields(o, ParserSTEP.SplitLineFields(strDef), ref ipos); return o; }
 		protected override string BuildString()
 		{
-			string str = base.BuildString() + "," + mIdentification + ",'" + mName + "'," + mDescription + (mRoles.Count == 0 ? ",$" : ",(#" + mRoles[0]);
+			string name = mName;
+			if(string.IsNullOrEmpty(name))
+				name = mDatabase.ApplicationDeveloper;
+			string str = base.BuildString() + "," + mIdentification + ",'" + name + "'," + mDescription + (mRoles.Count == 0 ? ",$" : ",(#" + mRoles[0]);
 
 			for (int icounter = 1; icounter < mRoles.Count; icounter++)
 				str += ",#" + mRoles;

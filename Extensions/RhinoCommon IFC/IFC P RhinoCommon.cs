@@ -27,9 +27,9 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcPoint
+	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
 	{
-		internal virtual Point3d Coordinates { get { return Point3d.Unset; } }
+		internal virtual Point3d Location { get { return Point3d.Unset; } }
 	}
 	public partial class IfcPolyline
 	{
@@ -52,9 +52,8 @@ namespace GeometryGym.Ifc
 			Points = points;
 		}
 	}
-	public partial class IfcPlacement
+	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
 	{
 		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
-
 	}
 }

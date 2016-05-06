@@ -206,7 +206,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminal() : base() { }
 		internal IfcAirTerminal(IfcAirTerminal t) : base(t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcAirTerminal(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminal(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcAirTerminal s, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowTerminal.parseFields(s, arrFields, ref ipos); 
@@ -225,7 +225,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminalBox() : base() { }
 		internal IfcAirTerminalBox(IfcAirTerminalBox b) : base(b) { mPredefinedType = b.mPredefinedType; }
-		internal IfcAirTerminalBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminalBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcAirTerminalBox s, List<string> arrFields, ref int ipos)
 		{
@@ -260,6 +260,7 @@ namespace GeometryGym.Ifc
 		internal IfcAirTerminalType(IfcAirTerminalType t) : base(t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcAirTerminalType() : base() { }
 		public IfcAirTerminalType(DatabaseIfc m, string name, IfcAirTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+
 		internal static void parseFields(IfcAirTerminalType t,List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t,arrFields, ref ipos); t.mPredefinedType = (IfcAirTerminalTypeEnum)Enum.Parse(typeof(IfcAirTerminalTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcAirTerminalType Parse(string strDef) { IfcAirTerminalType t = new IfcAirTerminalType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
@@ -652,28 +653,29 @@ namespace GeometryGym.Ifc
 
 		internal IfcApplication() : base() { }
 		internal IfcApplication(IfcApplication o) : base() { mApplicationDeveloper = o.mApplicationDeveloper; mVersion = o.mVersion; mApplicationFullName = o.mApplicationFullName; mApplicationIdentifier = o.mApplicationIdentifier; }
-		internal IfcApplication(DatabaseIfc m) : base(m)
+		internal IfcApplication(DatabaseIfc db) : base(db)
 		{
-			IfcOrganization o = new IfcOrganization(m, "Geometry Gym Pty Ltd");
+			IfcOrganization o = new IfcOrganization(db, "Geometry Gym Pty Ltd");
 			mApplicationDeveloper = o.mIndex;
 			try
 			{
-				mVersion = "'" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "'";
+				mVersion =  System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 			}
-			catch (Exception) { }
-#if(GH)
-			mApplicationFullName = "'ggGrasshopperIFC - Geometry Gym Plug-in for Grasshopper3d'";
-			mApplicationIdentifier = "'ggGrasshopperIFC'";
-#elif(CONVERTER)
-			mApplicationFullName = "'ggIFCConverter - Geometry Gym Pty Ltd'";
-			mApplicationIdentifier = "'ggIFCConverter'";
-#else
-			mApplicationFullName = "'ggRhinoIFC - Geometry Gym Plug-in for Rhino3d'";
-			mApplicationIdentifier = "'ggRhinoIFC'";
-#endif
+			catch (Exception) { mVersion = "Unknown"; }
 		}
-		internal static void parseFields(IfcApplication a, List<string> arrFields, ref int ipos) { a.mApplicationDeveloper = ParserSTEP.ParseLink(arrFields[ipos++]); a.mVersion = arrFields[ipos++]; a.mApplicationFullName = arrFields[ipos++]; a.mApplicationIdentifier = arrFields[ipos++]; }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mApplicationDeveloper) + "," + mVersion + "," + mApplicationFullName + "," + mApplicationIdentifier; }
+		internal static void parseFields(IfcApplication a, List<string> arrFields, ref int ipos)
+		{
+			a.mApplicationDeveloper = ParserSTEP.ParseLink(arrFields[ipos++]);
+			a.mVersion = arrFields[ipos++].Replace("'", "");
+			a.mApplicationFullName = arrFields[ipos++].Replace("'", "");
+			a.mApplicationIdentifier = arrFields[ipos++].Replace("'", "");
+		}
+		protected override string BuildString()
+		{
+			return base.BuildString() + "," + ParserSTEP.LinkToString(mApplicationDeveloper) + ",'" + mVersion + "','" + 
+				(string.IsNullOrEmpty(mApplicationFullName) ? mDatabase.ApplicationFullName : mApplicationFullName) + "','" + 
+				(string.IsNullOrEmpty(mApplicationIdentifier) ? mDatabase.ApplicationIdentifier : mApplicationIdentifier) + "'";
+		}
 		internal static IfcApplication Parse(string strDef) { IfcApplication a = new IfcApplication(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 	}
 	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect, IfcResourceObjectSelect //SUPERTYPE OF(IfcCostValue);

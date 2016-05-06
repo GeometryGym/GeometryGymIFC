@@ -50,7 +50,10 @@ namespace GeometryGym.Ifc
 	{
 		internal int mEdgeGeometry;// IfcCurve;
 		internal bool mSameSense;// : BOOL;
-		internal IfcCurve EdgeGeometry { get { return mDatabase.mIfcObjects[mEdgeGeometry] as IfcCurve; } }
+
+		public IfcCurve EdgeGeometry { get { return mDatabase.mIfcObjects[mEdgeGeometry] as IfcCurve; } }
+		public bool SameSense { get { return mSameSense; } }
+		
 		internal IfcEdgeCurve() : base() { }
 		internal IfcEdgeCurve(IfcEdgeCurve el) : base(el) { mEdgeGeometry = el.mEdgeGeometry; mSameSense = el.mSameSense; }
 		public IfcEdgeCurve(IfcVertexPoint start, IfcVertexPoint end, IfcCurve edge, bool sense) : base(start, end) { mEdgeGeometry = edge.mIndex; mSameSense = sense; }
@@ -167,8 +170,14 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricDistributionPointFunctionEnum mDistributionPointFunction;// : IfcElectricDistributionPointFunctionEnum;
 		internal string mUserDefinedFunction = "$";// : OPTIONAL IfcLabel;
+
+		public IfcElectricDistributionPointFunctionEnum DistributionPointFunction { get { return mDistributionPointFunction; } set { mDistributionPointFunction = value; } }
+		public string UserDefinedFunction { get { return mUserDefinedFunction == "$" ? "" : mUserDefinedFunction; } set { mUserDefinedFunction = string.IsNullOrEmpty(value) ? "$" : value.Replace("'", ""); } }
+
 		internal IfcElectricDistributionPoint() : base() { }
-		internal IfcElectricDistributionPoint(IfcElectricDistributionPoint be) : base(be) { mDistributionPointFunction = be.mDistributionPointFunction; mUserDefinedFunction = be.mUserDefinedFunction; }
+		internal IfcElectricDistributionPoint(IfcElectricDistributionPoint p) : base(p) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
+		public IfcElectricDistributionPoint(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+
 		internal static void parseFields(IfcElectricDistributionPoint dp, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowController.parseFields(dp, arrFields, ref ipos);
@@ -176,7 +185,7 @@ namespace GeometryGym.Ifc
 			dp.mUserDefinedFunction = arrFields[ipos++];
 		}
 		internal new static IfcElectricDistributionPoint Parse(string strDef) { IfcElectricDistributionPoint p = new IfcElectricDistributionPoint(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
-		protected override string BuildString() { return base.BuildString() + ",." + mDistributionPointFunction.ToString() + ".," + mUserDefinedFunction; }
+		protected override string BuildString() { return base.BuildString() + ",." + mDistributionPointFunction.ToString() + (mUserDefinedFunction == "$" ? ".,$" : ".,'" + mUserDefinedFunction + "'"); }
 	}
 	public class IfcElectricFlowStorageDevice : IfcFlowStorageDevice //IFC4
 	{
@@ -326,7 +335,8 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
-		//INVERSE  ADD TO TREEVIEWER WHEN ACTIVATING
+		
+		//INVERSE  
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMemberSS = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal List<IfcRelConnectsElements> mConnectedTo = new List<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
@@ -850,7 +860,7 @@ namespace GeometryGym.Ifc
 
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		internal List<IfcProperty> ExtendedProperties { get { return mExtendedProperties.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcProperty); } }
+		public List<IfcProperty> ExtendedProperties { get { return mExtendedProperties.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcProperty); } }
 
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(IfcExtendedProperties p) : base(p) { mExtendedProperties = new List<int>(p.mExtendedProperties.ToArray()); mDescription = p.mDescription; mName = p.mName; }

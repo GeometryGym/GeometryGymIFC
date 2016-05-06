@@ -2018,7 +2018,8 @@ namespace GeometryGym.Ifc
 					o.IsTypedBy = this;
 			}
 		}
-		internal void assignObj(IfcObject obj)
+
+		public void AssignObj(IfcObject obj) //TODO CHECK CLASS NAME MATCHES INSTANCE
 		{
 			mRelatedObjects.Add(obj.mIndex);
 			if (obj.IsTypedBy != null)
@@ -2444,9 +2445,9 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		private List<IfcRepresentation> mRepresentationsInContext = new List<IfcRepresentation>();// :	SET OF IfcRepresentation FOR ContextOfItems;
 
-		internal string ContextIdentifier { get { return (mContextIdentifier == "$" ? "" : ParserIfc.Decode(mContextIdentifier)); } set { mContextIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		internal string ContextType { get { return (mContextType == "$" ? "" : ParserIfc.Decode(mContextType)); } set { mContextType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		internal List<IfcRepresentation> RepresentationsInContext { get { return mRepresentationsInContext; } }
+		public string ContextIdentifier { get { return (mContextIdentifier == "$" ? "" : ParserIfc.Decode(mContextIdentifier)); } set { mContextIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string ContextType { get { return (mContextType == "$" ? "" : ParserIfc.Decode(mContextType)); } set { mContextType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public List<IfcRepresentation> RepresentationsInContext { get { return mRepresentationsInContext; } }
 
 		protected bool mActive = true;
 		internal bool Active { get { return mActive; } set { mActive = value; } }
@@ -2823,6 +2824,9 @@ namespace GeometryGym.Ifc
 	{
 		internal bool mRigid = false;
 		internal IfcRotationalStiffnessMeasure mStiffness = null;
+
+		public bool Rigid { get { return mRigid; } }
+		public IfcRotationalStiffnessMeasure Stiffness { get { return mStiffness; } }
 
 		internal IfcRotationalStiffnessSelect(IfcRotationalStiffnessMeasure stiff) { mStiffness = stiff; }
 		public IfcRotationalStiffnessSelect(bool fix) { mRigid = fix; }

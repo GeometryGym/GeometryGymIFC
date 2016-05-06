@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GeometryGym.Ifc</RootNamespace>
+    <AssemblyName>GeometryGymIFC Math.NET</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.0.2\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MathNet.Spatial, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\core\ifc\BaseClassIFC.cs">
+      <Link>IFC\Core\BaseClassIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\DatabaseIFC.cs">
+      <Link>IFC\Core\DatabaseIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\Enumerations.cs">
+      <Link>IFC\Core\Enumerations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC A.cs">
+      <Link>IFC\Core\IFC A.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC B.cs">
+      <Link>IFC\Core\IFC B.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC C.cs">
+      <Link>IFC\Core\IFC C.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC D.cs">
+      <Link>IFC\Core\IFC D.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC E.cs">
+      <Link>IFC\Core\IFC E.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC F.cs">
+      <Link>IFC\Core\IFC F.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC G.cs">
+      <Link>IFC\Core\IFC G.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC H.cs">
+      <Link>IFC\Core\IFC H.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC I.cs">
+      <Link>IFC\Core\IFC I.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC J.cs">
+      <Link>IFC\Core\IFC J.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC L.cs">
+      <Link>IFC\Core\IFC L.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC M.cs">
+      <Link>IFC\Core\IFC M.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC N.cs">
+      <Link>IFC\Core\IFC N.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC O.cs">
+      <Link>IFC\Core\IFC O.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC P.cs">
+      <Link>IFC\Core\IFC P.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC Q.cs">
+      <Link>IFC\Core\IFC Q.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC R.cs">
+      <Link>IFC\Core\IFC R.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC S.cs">
+      <Link>IFC\Core\IFC S.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC T.cs">
+      <Link>IFC\Core\IFC T.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC U.cs">
+      <Link>IFC\Core\IFC U.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC V.cs">
+      <Link>IFC\Core\IFC V.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC W.cs">
+      <Link>IFC\Core\IFC W.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\IFC Z.cs">
+      <Link>IFC\Core\IFC Z.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\ParserIFC.cs">
+      <Link>IFC\Core\ParserIFC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\ifc\Property Sets.cs">
+      <Link>IFC\Core\Property Sets.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\step\BaseClassSTEP.cs">
+      <Link>STEP\BaseClassSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\core\step\ParserSTEP.cs">
+      <Link>STEP\ParserSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC A Math.NET.cs">
+      <Link>IFC\Math.NET\IFC A Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC C Math.NET.cs">
+      <Link>IFC\Math.NET\IFC C Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC D Math.NET.cs">
+      <Link>IFC\Math.NET\IFC D Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC G Math.NET.cs">
+      <Link>IFC\Math.NET\IFC G Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC L Math.NET.cs">
+      <Link>IFC\Math.NET\IFC L Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC O Math.NET.cs">
+      <Link>IFC\Math.NET\IFC O Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Extensions\Math.NET IFC\IFC P Math.NET.cs">
+      <Link>IFC\Math.NET\IFC P Math.NET.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -388,11 +388,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
 	{ //, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve))
-		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 ? "IFCFLOWCONTROLLER" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mSchema == Schema.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IFCFLOWCONTROLLER" : base.KeyWord; } }
 
 		internal IfcFlowController() : base() { }
 		internal IfcFlowController(IfcFlowController c) : base(c) { }
-		internal IfcFlowController(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		protected IfcFlowController(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcFlowController c, List<string> arrFields, ref int ipos) { IfcDistributionFlowElement.parseFields(c, arrFields, ref ipos); }
 		internal new static IfcFlowController Parse(string strDef) { IfcFlowController c = new IfcFlowController(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }

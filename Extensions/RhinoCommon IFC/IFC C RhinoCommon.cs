@@ -27,9 +27,9 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcCartesianPoint
+	public partial class IfcCartesianPoint : IfcPoint
 	{
-		internal override Point3d Coordinates
+		internal override Point3d Location
 		{
 			get { return new Point3d(mCoordinateX, mCoordinateY, Double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); }
 		}
@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 			get
 			{
 				IfcCartesianPoint cp = LocalOrigin;
-				Point3d p = cp.Coordinates;
+				Point3d p = cp.Location;
 				return Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
 			}
 		}
