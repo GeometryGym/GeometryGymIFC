@@ -20,7 +20,7 @@ namespace GeometryGym.Ifc
 					CoordinateSystem coordinateSystem = new CoordinateSystem();
 					Point3D o = new Point3D(0,0,0), x = new Point3D(1, 0, 0), y = new Point3D(0, 1, 0);
 					IfcObjectPlacement pl = PlacementRelTo;
-					CoordinateSystem RelativeTo = pl == null ? mDatabase.WorldCoordinatePlacement.CoordinateSystem : pl.CoordinateSystem;
+					CoordinateSystem RelativeTo = pl == null ? new CoordinateSystem() : pl.CoordinateSystem;
 					o = RelativeTo.Transform(o);
 					x = RelativeTo.Transform(x);
 					y = RelativeTo.Transform(y);

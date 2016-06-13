@@ -30,7 +30,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum Schema {  IFC2x3, IFC4, IFC4A1 };
+	public enum ReleaseVersion {  IFC2x3, IFC4, IFC4A1, IFC4A2 };
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, If2x3NotAssigned };
 	public partial class DatabaseIfc
 	{
@@ -41,6 +41,7 @@ namespace GeometryGym.Ifc
 			//internal List<IfcRepresentationMap> mRepMaps = new List<IfcRepresentationMap>();
 			//internal List<IfcApplication> mApplications = new List<IfcApplication>();
 			internal List<IfcBuildingStorey> mBuildingStories = new List<IfcBuildingStorey>();
+			internal List<IfcClassificationReference> mClassifications = new List<IfcClassificationReference>(); 
 			internal List<IfcComplexProperty> mComplexProperties = new List<IfcComplexProperty>();
 			internal List<IfcCoordinateOperation> mCoordinateOperations = new List<IfcCoordinateOperation>();
 			internal List<IfcEdgeCurve> mEdgeCurves = new List<IfcEdgeCurve>();
@@ -61,6 +62,7 @@ namespace GeometryGym.Ifc
 			internal List<IfcPresentationLayerAssignment> mPresentationLayerAssignments = new List<IfcPresentationLayerAssignment>();
 			internal List<IfcProduct> mProducts = new List<IfcProduct>();
 			internal List<IfcProductRepresentation> mProductReps = new List<IfcProductRepresentation>();
+			internal List<IfcProfileProperties> mProfileProperties = new List<IfcProfileProperties>();
 			internal List<IfcPropertySet> mPropertySets = new List<IfcPropertySet>();
 			internal List<IfcRelationship> mRelationships = new List<IfcRelationship>();
 			internal List<IfcRepresentation> mRepresentations = new List<IfcRepresentation>();
@@ -69,7 +71,7 @@ namespace GeometryGym.Ifc
 			internal List<IfcSlab> mSlabs = new List<IfcSlab>();
 			internal List<IfcStructuralItem> mStructItems = new List<IfcStructuralItem>();
 			internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
-			internal List<IfcTypeProduct> mTypeProducts = new List<IfcTypeProduct>();
+			internal List<IfcTypeObject> mTypeObjects = new List<IfcTypeObject>();
 			internal List<IfcWall> mWalls = new List<IfcWall>();
 			internal List<IfcZone> mZones = new List<IfcZone>();
 
@@ -101,6 +103,12 @@ namespace GeometryGym.Ifc
 				//IfcApplication application = obj as IfcApplication;
 				//if (application != null)
 				//	mApplications.Add(application);
+				IfcClassificationReference classification = obj as IfcClassificationReference;
+				if(classification != null)
+				{
+					mClassifications.Add(classification);
+					return;
+				}
 				IfcComplexProperty cp = obj as IfcComplexProperty;
 				if (cp != null)
 				{
@@ -139,7 +147,6 @@ namespace GeometryGym.Ifc
 					mGeomContexts.Add(geometricRepresentationContext);
 					return;
 				}
-
 
 				IfcGroup group = obj as IfcGroup;
 				if (group != null)
@@ -219,6 +226,12 @@ namespace GeometryGym.Ifc
 					mProductReps.Add(productRepresentation);
 					return;
 				}
+				IfcProfileProperties profileProperties = obj as IfcProfileProperties;
+				if (profileProperties != null)
+				{
+					mProfileProperties.Add(profileProperties);
+					return;
+				}
 				IfcPropertySet propSet = obj as IfcPropertySet;
 				if (propSet != null)
 				{
@@ -268,10 +281,10 @@ namespace GeometryGym.Ifc
 					return;
 				}
 
-				IfcTypeProduct typeProduct = obj as IfcTypeProduct;
-				if (typeProduct != null)
+				IfcTypeObject typeObject = obj as IfcTypeObject;
+				if (typeObject != null)
 				{
-					mTypeProducts.Add(typeProduct);
+					mTypeObjects.Add(typeObject);
 					return;
 				}
 				setCustomAggregate(obj);
@@ -282,6 +295,8 @@ namespace GeometryGym.Ifc
 				try
 				{
 					int icounter;
+					for (icounter = 0; icounter < mClassifications.Count; icounter++)
+						mClassifications[icounter].relate();
 					for (icounter = 0; icounter < mComplexProperties.Count; icounter++)
 						mComplexProperties[icounter].relate();
 					for (icounter = 0; icounter < mCoordinateOperations.Count; icounter++)
@@ -296,6 +311,8 @@ namespace GeometryGym.Ifc
 						}
 						catch (Exception) { }
 					}
+					for (icounter = 0; icounter < mGeomContexts.Count; icounter++)
+						mGeomContexts[icounter].relate();
 					for (icounter = 0; icounter < mProducts.Count; icounter++)
 						mProducts[icounter].relate();
 					foreach (IfcIndexedColourMap icm in mIndexedColourMap)
@@ -320,6 +337,8 @@ namespace GeometryGym.Ifc
 						}
 						catch (Exception) { }
 					}
+					foreach(IfcProfileProperties prop in mProfileProperties)
+						prop.ProfileDefinition.mHasProperties.Add(prop);
 					for (icounter = 0; icounter < mPropertySets.Count; icounter++)
 						mPropertySets[icounter].relate();
 					for (icounter = 0; icounter < mRelationships.Count; icounter++)
@@ -336,11 +355,21 @@ namespace GeometryGym.Ifc
 						rc.relate();
 					foreach (IfcShapeAspect sa in mShapeAspects)
 						sa.relate();
-					for (icounter = 0; icounter < mTypeProducts.Count; icounter++)
+					for (icounter = 0; icounter < mTypeObjects.Count; icounter++)
 					{
-						List<IfcRepresentationMap> repMaps = mTypeProducts[icounter].RepresentationMaps;
-						for (int jcounter = 0; jcounter < repMaps.Count; jcounter++)
-							repMaps[jcounter].mTypeProducts.Add(mTypeProducts[icounter]);
+						IfcTypeObject typeObject = mTypeObjects[icounter];
+						List<IfcPropertySetDefinition> psets = typeObject.HasPropertySets;
+						for(int jcounter = 0; jcounter< psets.Count; jcounter++)
+						{
+							psets[jcounter].mDefinesType.Add(typeObject);
+						}
+						IfcTypeProduct typeProduct = typeObject as IfcTypeProduct;
+						if (typeProduct != null)
+						{
+							List<IfcRepresentationMap> repMaps = typeProduct.RepresentationMaps;
+							for (int jcounter = 0; jcounter < repMaps.Count; jcounter++)
+								repMaps[jcounter].mTypeProducts.Add(typeProduct);
+						}
 					}
 					for (icounter = 0; icounter < mStyledItems.Count; icounter++)
 						mStyledItems[icounter].associateItem();
@@ -353,21 +382,38 @@ namespace GeometryGym.Ifc
 			}
 		}
 		internal Guid id = Guid.NewGuid();
-		internal int mNextBlank = 1;
-
-		internal Schema mSchema = Schema.IFC2x3;
+		private int mNextBlank = 1;
+		internal int NextBlank
+		{
+			get
+			{
+				if (this[mNextBlank] == null)
+					return mNextBlank;
+				for(int icounter = mNextBlank; icounter < RecordCount; icounter++)
+				{
+					if(this[icounter] == null)
+					{
+						mNextBlank = icounter;
+						return mNextBlank;
+					}
+				}
+				mNextBlank = RecordCount;
+				return mNextBlank;
+			}
+		}
+		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
 
 		internal ModelView mModelView = ModelView.If2x3NotAssigned;
-		internal bool mAccuratePreview = false;// mCoordinationView = false; 
+		internal bool mAccuratePreview = false; 
 		public string FolderPath { get; set; } = "";
 		public string FileName { get; set; } = "";
 		internal double mPlaneAngleToRadians = 1;
 		internal bool mTimeInDays = false;
 		public int NextObjectRecord { set { mNextBlank = value; } }
-		public Schema IFCSchema
+		public ReleaseVersion Release
 		{ 
-			get { return mSchema; }  
-			set { mSchema = value; } 
+			get { return mRelease; }  
+			set { mRelease = value; } 
 		}
 		public ModelView ModelView
 		{
@@ -377,31 +423,53 @@ namespace GeometryGym.Ifc
 		public double Tolerance
 		{
 			get { return mModelTolerance; }
-			set { mModelTolerance = Math.Min(0.0005 / mModelSIScale, value); }
+			set
+			{
+				mModelTolerance = Math.Min(0.0005 / mModelSIScale, value);
+				mLengthDigits = Math.Max(2, -1*(int)(Math.Log10(mModelTolerance)-1));
+			}
 		}
 		public double ScaleSI
 		{
 			get { return mModelSIScale; }
 			set { mModelSIScale = value; }
 		}
-		
+		internal int mLengthDigits = 6;
 		private double mModelTolerance = 0.0001,mModelSIScale = 1;
-		public IfcProject Project
-		{
-			get { return mContext as IfcProject; }
-		}
-		internal List<BaseClassIfc> mIfcObjects = new List<BaseClassIfc>(new BaseClassIfc[] { new BaseClassIfc() }); 
+		public IfcContext Context { get { return mContext; } }
+		public IfcProject Project { get { return mContext as IfcProject; } }
+		private List<BaseClassIfc> mIfcObjects = new List<BaseClassIfc>() { new BaseClassIfc() }; 
 
 		public int RecordCount { get { return mIfcObjects.Count; } }
 		public BaseClassIfc this[int index]
 		{
 			get { return (index < mIfcObjects.Count ? mIfcObjects[index] : null); }
-			//set {  }
+			set
+			{
+				if(value == null)
+				{
+					if (mIfcObjects.Count > index)
+						mIfcObjects[index] = null;
+					if (index < mNextBlank)
+						mNextBlank = index;
+					return;
+				}
+				if (mIfcObjects.Count <= index)
+				{
+					for (int ncounter = mIfcObjects.Count; ncounter <= index; ncounter++)
+						mIfcObjects.Add(new BaseClassIfc());
+				}
+				mIfcObjects[index] = value;
+				if (index == mNextBlank)
+					mNextBlank = mNextBlank + 1;	
+				value.mDatabase = this;
+				value.mIndex = index;
+			}
 		}
 		private IfcCartesianPoint mOrigin = null, mWorldOrigin = null,mOrigin2d = null;
 		internal IfcDirection mXAxis, mYAxis, mZAxis;
 		//internal int mTempWorldCoordinatePlacement = 0;
-		private IfcAxis2Placement3D mWorldCoordinatePlacement;
+		//private IfcAxis2Placement3D mWorldCoordinatePlacement;
 		internal IfcAxis2Placement3D mPlacementPlaneXY;
 		internal IfcAxis2Placement2D m2DPlaceOrigin;
 		internal IfcSIUnit mSILength, mSIArea, mSIVolume;
@@ -510,30 +578,28 @@ namespace GeometryGym.Ifc
 			set { mApplicationDeveloper = value; }
 		}
 
+		private string viewDefinition { get { return (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" : (mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned"))); } }
 		internal string getHeaderString(string fileName)
 		{
-			string vd = (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" :
-				(mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned")));
-			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + vd + "]'),'2;1');\r\n";
+			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + viewDefinition + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
 			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
 			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
-			hdr += "/* organization */ ('Unknown'),\r\n";
+			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
 			hdr += "/* preprocessor_version */ 'GeomGymIFC by Geometry Gym Pty Ltd',\r\n";
 			hdr += "/* originating_system */ '" + ApplicationFullName + "',\r\n";
 
 			hdr += "/* authorization */ 'None');\r\n\r\n";
-			hdr += "FILE_SCHEMA (('" + (mSchema == Schema.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
+			hdr += "FILE_SCHEMA (('" + (mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";
 			return hdr;
 		}
 		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; } 
-		internal bool mDrawBuildElemProx = true, mDrawSpaceReps = false,mDrawFurnishing = true,mDrawFasteners = false,mDrawPlates = true,mDrawRailings = true, mOutputEssential = false, mCFSasMesh = false;
-		
+		internal DatabaseIfc() :base() { }
 		public DatabaseIfc(string fileName) : base() 
 		{
 			Aggregate aggregate = new Aggregate();
@@ -545,17 +611,17 @@ namespace GeometryGym.Ifc
 			ReadFile(stream, aggregate, 0);
 		}
 		public DatabaseIfc(ModelView view) : this(true, view) { }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.If2x3NotAssigned ? Schema.IFC2x3 : Schema.IFC4A1,view) { }
-		public DatabaseIfc(bool generate, Schema schema) : this(generate,schema,schema == Schema.IFC2x3 ? ModelView.If2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
-		private DatabaseIfc(bool generate,Schema schema, ModelView view)
+		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.If2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4A1,view) { }
+		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate,schema,schema == ReleaseVersion.IFC2x3 ? ModelView.If2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
+		private DatabaseIfc(bool generate,ReleaseVersion schema, ModelView view)
 		{ 
-			mSchema = schema;
+			mRelease = schema;
 			mModelView = view;
 #if(RHINO)
 			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
 			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
 #endif 
-			if (mSchema == Schema.IFC2x3 || mSchema == Schema.IFC4)
+			if (mRelease == ReleaseVersion.IFC2x3 || mRelease == ReleaseVersion.IFC4)
 			{
 				OwnerHistory(IfcChangeActionEnum.ADDED);
 			}
@@ -566,9 +632,6 @@ namespace GeometryGym.Ifc
 			if (generate)
 				initData();
 		} 
-		
-		
-			
 		
 		internal void initData()
 		{ 
@@ -583,7 +646,8 @@ namespace GeometryGym.Ifc
 			IfcDirection direction = XAxis;
 			direction = YAxis;
 			direction = ZAxis;
-			IfcAxis2Placement pl = this.WorldCoordinatePlacement;
+			IfcAxis2Placement3D pl = this.PlaneXYPlacement;
+			//IfcAxis2Placement pl = this.WorldCoordinatePlacement;
 			IfcAxis2Placement2D placement = Origin2dPlace; 
 		}
 		public override string ToString()
@@ -611,15 +675,15 @@ namespace GeometryGym.Ifc
 				return m2DPlaceOrigin;
 			}
 		}
-		internal IfcCartesianPoint WorldOrigin
-		{
-			get
-			{
-				if(mWorldOrigin == null)
-					mWorldOrigin = WorldCoordinatePlacement.Location;
-				return mWorldOrigin;
-			}
-		}
+		//internal IfcCartesianPoint WorldOrigin
+		//{
+		//	get
+		//	{
+		//		if(mWorldOrigin == null)
+		//			mWorldOrigin = WorldCoordinatePlacement.Location;
+		//		return mWorldOrigin;
+		//	}
+		//}
 		internal IfcCartesianPoint Origin2d
 		{
 			get
@@ -629,55 +693,55 @@ namespace GeometryGym.Ifc
 				return mOrigin2d;
 			}
 		} 
-		internal IfcAxis2Placement3D WorldCoordinatePlacement
-		{
-			get
-			{
-				if (mWorldCoordinatePlacement == null)
-				{
-					if (mContext != null)
-					{
-						List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
-						foreach (IfcRepresentationContext context in contexts)
-						{
-							IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
-							if (grc == null)
-								continue;
-							IfcAxis2Placement3D pl = grc.WorldCoordinateSystem as IfcAxis2Placement3D;
-							if (pl != null)
-							{
-								mWorldCoordinatePlacement = pl;
-								break;
-							}
-						}
-					}
-					if (mWorldCoordinatePlacement == null)
-					{
-						mWorldCoordinatePlacement = new IfcAxis2Placement3D(new IfcCartesianPoint(this, 0, 0, 0), mZAxis, mXAxis);
-						if (mContext != null)
-						{
-							List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
-							foreach (IfcRepresentationContext context in contexts)
-							{
-								IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
-								if (grc != null)
-								{
-									grc.WorldCoordinateSystem = mWorldCoordinatePlacement;
-									return mWorldCoordinatePlacement;
-								}
-							}
-						}
-					}
-				}
-				return mWorldCoordinatePlacement;
-			}
-		}
+		//internal IfcAxis2Placement3D WorldCoordinatePlacement
+		//{
+		//	get
+		//	{
+		//		if (mWorldCoordinatePlacement == null)
+		//		{
+		//			if (mContext != null)
+		//			{
+		//				List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
+		//				foreach (IfcRepresentationContext context in contexts)
+		//				{
+		//					IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
+		//					if (grc == null)
+		//						continue;
+		//					IfcAxis2Placement3D pl = grc.WorldCoordinateSystem as IfcAxis2Placement3D;
+		//					if (pl != null)
+		//					{
+		//						mWorldCoordinatePlacement = pl;
+		//						break;
+		//					}
+		//				}
+		//			}
+		//			if (mWorldCoordinatePlacement == null)
+		//			{
+		//				mWorldCoordinatePlacement = new IfcAxis2Placement3D(new IfcCartesianPoint(this, 0, 0, 0), mZAxis, mXAxis);
+		//				if (mContext != null)
+		//				{
+		//					List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
+		//					foreach (IfcRepresentationContext context in contexts)
+		//					{
+		//						IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
+		//						if (grc != null)
+		//						{
+		//							grc.WorldCoordinateSystem = mWorldCoordinatePlacement;
+		//							return mWorldCoordinatePlacement;
+		//						}
+		//					}
+		//				}
+		//			}
+		//		}
+		//		return mWorldCoordinatePlacement;
+		//	}
+		//}
 		internal IfcAxis2Placement3D PlaneXYPlacement
 		{
 			get
 			{
 				if (mPlacementPlaneXY == null)
-					mPlacementPlaneXY = new IfcAxis2Placement3D(this);
+					mPlacementPlaneXY = new IfcAxis2Placement3D(Origin);
 				return mPlacementPlaneXY;
 			}
 		}
@@ -718,6 +782,27 @@ namespace GeometryGym.Ifc
 			}
 		}
 
+		internal Dictionary<int, int> mDuplicateMapping = new Dictionary<int, int>();
+		internal BaseClassIfc Duplicate(BaseClassIfc entity)
+		{
+			if (mDuplicateMapping.ContainsKey(entity.mIndex))
+				return this[mDuplicateMapping[entity.mIndex]];
+			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
+			if (type != null)
+			{
+				Type[] types = new Type[] { typeof(DatabaseIfc), type };
+				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+null, types, null);
+				if (constructor != null)
+				{
+					BaseClassIfc result = constructor.Invoke(new object[] { this, entity }) as BaseClassIfc;
+					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
+					return result;
+				}
+			}
+			return null;
+		}
+
 		internal StreamReader getStreamReader(string fileName)
 		{
 			string ext = Path.GetExtension(fileName);
@@ -739,7 +824,7 @@ namespace GeometryGym.Ifc
 
 		private IfcContext ReadFile(TextReader sr, Aggregate aggregate, int offset)
 		{
-			mSchema = Schema.IFC2x3;
+			mRelease = ReleaseVersion.IFC2x3;
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			string strLine = sr.ReadLine(), str = "";
@@ -882,7 +967,7 @@ namespace GeometryGym.Ifc
 		partial void customPostImport(Aggregate aggregate);
 		private void postImport(Aggregate aggregate) 
 		{
-			mWorldCoordinatePlacement = null;
+			//mWorldCoordinatePlacement = null;
 			aggregate.RelateObjects(FolderPath);
 			if(mContext != null)
 			{
@@ -892,7 +977,7 @@ namespace GeometryGym.Ifc
 					mGeomRepContxt = mIfcObjects[mContext.mRepresentationContexts[0]] as IfcGeometricRepresentationContext;
 				if (mContext.mDeclares.Count == 0)
 				{
-					List<IfcDefinitionSelect> lds = aggregate.mTypeProducts.ConvertAll(x => (IfcDefinitionSelect)x);
+					List<IfcDefinitionSelect> lds = aggregate.mTypeObjects.ConvertAll(x => (IfcDefinitionSelect)x);
 					IfcRelDeclares rd = new IfcRelDeclares(mContext, lds) { Name = "DeclaredTypes" };
 				}
 			}
@@ -907,10 +992,10 @@ namespace GeometryGym.Ifc
 			if (ts.StartsWith("FILE_SCHEMA(('IFC2X4", true, System.Globalization.CultureInfo.CurrentCulture) ||
 					ts.StartsWith("FILE_SCHEMA(('IFC4", true, System.Globalization.CultureInfo.CurrentCulture))
 			{ 
-				mSchema = Schema.IFC4;
+				mRelease = ReleaseVersion.IFC4;
 				return null;
 			}
-			BaseClassIfc result = ParserIfc.ParseLine(line, mSchema);
+			BaseClassIfc result = ParserIfc.ParseLine(line, mRelease);
 			if (result == null)
 			{
 				int ifcID = 0;
@@ -965,11 +1050,7 @@ namespace GeometryGym.Ifc
 					mSIVolume = unit;
 			}
 			aggregate.setAggregate(result);
-			if (mIfcObjects.Count <= result.mIndex)
-				for (int ncounter = mIfcObjects.Count; ncounter <= result.mIndex; ncounter++)
-					mIfcObjects.Add(new BaseClassIfc());
-			mIfcObjects[result.mIndex] = result;
-			result.mDatabase = this;
+			this[result.mIndex] = result;	
 			
 			//IfcWorkPlan workPlan = result as IfcWorkPlan;
 			//if(workPlan != null)

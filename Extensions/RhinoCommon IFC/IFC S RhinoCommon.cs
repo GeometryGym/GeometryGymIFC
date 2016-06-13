@@ -27,5 +27,122 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcStructuralLoadLinearForce
+	{
+		public Vector3d LinearForce
+		{
+			get { return new Vector3d(mLinearForceX, mLinearForceY, mLinearForceZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mLinearForceX = value.X;
+					mLinearForceY = value.Y;
+					mLinearForceZ = value.Z;
+				}
+				else
+					mLinearForceX = mLinearForceY = mLinearForceZ = 0;
+			}
+		}
+		public Vector3d LinearMoment
+		{
+			get { return new Vector3d(mLinearMomentX, mLinearMomentY, mLinearMomentZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mLinearMomentX = value.X;
+					mLinearMomentY = value.Y;
+					mLinearMomentZ = value.Z;
+				}
+				else
+					mLinearMomentX = mLinearMomentY = mLinearMomentZ = 0;
+			}
+		}
+	}
+
+	public partial class IfcStructuralLoadPlanarForce
+	{
+		public Vector3d PlanarForce
+		{
+			get { return new Vector3d(mPlanarForceX, mPlanarForceY, mPlanarForceZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mPlanarForceX = value.X;
+					mPlanarForceY = value.Y;
+					mPlanarForceZ = value.Z;
+				}
+				else
+					mPlanarForceX = mPlanarForceY = mPlanarForceZ = 0;
+			}
+		}
+	}
+	public partial class IfcStructuralLoadSingleDisplacement
+	{
+		public Vector3d Displacement
+		{
+			get { return new Vector3d(mDisplacementX, mDisplacementY, mDisplacementZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mDisplacementX = value.X;
+					mDisplacementY = value.Y;
+					mDisplacementZ = value.Z;
+				}
+				else
+					mDisplacementX = mDisplacementY = mDisplacementZ = 0;
+			}
+		}
+		public Vector3d RotationalDisplacement
+		{
+			get { return new Vector3d(mRotationalDisplacementRX, mRotationalDisplacementRY, mRotationalDisplacementRZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mRotationalDisplacementRX = value.X;
+					mRotationalDisplacementRY = value.Y;
+					mRotationalDisplacementRZ = value.Z;
+				}
+				else
+					mRotationalDisplacementRX = mRotationalDisplacementRY = mRotationalDisplacementRZ = 0;
+			}
+		}
+	}
+	public partial class IfcStructuralLoadSingleForce
+	{
+		public Vector3d Force
+		{
+			get { return new Vector3d(mForceX, mForceY, mForceZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mForceX = value.X;
+					mForceY = value.Y;
+					mForceZ = value.Z;
+				}
+				else
+					mForceX = mForceY = mForceZ = 0;
+			}
+		}
+		public Vector3d Moment
+		{
+			get { return new Vector3d(mMomentX, mMomentY, mMomentZ); }
+			set
+			{
+				if (value.IsValid)
+				{
+					mMomentX = value.X;
+					mMomentY = value.Y;
+					mMomentZ = value.Z;
+				}
+				else
+					mMomentX = mMomentY = mMomentZ = 0;
+			}
+		}
+	}
 }

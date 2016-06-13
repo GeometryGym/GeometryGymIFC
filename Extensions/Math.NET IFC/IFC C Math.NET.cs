@@ -9,7 +9,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcCartesianPoint : IfcPoint
 	{
-		public override Point3D Coordinates
+		public override Point3D Location 
 		{
 			get { return new Point3D(mCoordinateX, mCoordinateY, Double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); }
 		}

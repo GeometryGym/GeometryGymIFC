@@ -37,39 +37,15 @@ namespace GeometryGym.Ifc
 		DatabaseIfc IfcInterface.Database { get { return mDatabase; } }
 
 		internal BaseClassIfc() : base() { }
-		protected BaseClassIfc(BaseClassIfc e) { mIndex = e.mIndex; mDatabase = e.mDatabase; mDatabase.mIfcObjects[e.mIndex] = this; }
+		protected BaseClassIfc(BaseClassIfc e) { mIndex = e.mIndex; }
 		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
 		protected BaseClassIfc(DatabaseIfc m) { attachModel(m); }
 		
-		
+		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
+
 		private void attachModel(DatabaseIfc m)
 		{
-
-			bool added = false;
-			for (int icounter = m.mNextBlank; icounter < m.mIfcObjects.Count; icounter++)
-			{
-				if (m.mIfcObjects[icounter] == null)
-				{
-					added = true;
-					mIndex = icounter;
-					m.mNextBlank = icounter + 1;
-					m.mIfcObjects[icounter] = this;
-					break;
-				}
-			}
-			if (!added)
-			{
-				if (m.mNextBlank > m.mIfcObjects.Count)
-				{
-					int count = m.mNextBlank - m.mIfcObjects.Count;
-					for (int pcounter = 0; pcounter < count; pcounter++)
-						m.mIfcObjects.Add(null);
-				}
-				mIndex = m.mIfcObjects.Count;
-				m.mIfcObjects.Add(this);
-				m.mNextBlank = mIndex + 1;
-			}
-			mDatabase = m;
+			m[m.NextBlank] = this;
 		}
 	}
 	public interface IfcInterface { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }

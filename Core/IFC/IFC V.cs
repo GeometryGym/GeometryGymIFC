@@ -29,13 +29,13 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	public interface IfcValue { string getKW { get; } object Value { get; } }  //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
-	public class IfcValve : IfcFlowController //IFC4
+	public partial class IfcValve : IfcFlowController //IFC4
 	{
 		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// OPTIONAL : IfcValveTypeEnum;
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcValve() : base() { }
-		internal IfcValve(IfcValve b) : base(b) { mPredefinedType = b.mPredefinedType; }
+		internal IfcValve(DatabaseIfc db, IfcValve v) : base(db, v) { mPredefinedType = v.mPredefinedType; }
 		internal IfcValve(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcValve s, List<string> arrFields, ref int ipos)
@@ -46,45 +46,47 @@ namespace GeometryGym.Ifc
 				s.mPredefinedType = (IfcValveTypeEnum)Enum.Parse(typeof(IfcValveTypeEnum), str);
 		}
 		internal new static IfcValve Parse(string strDef) { IfcValve s = new IfcValve(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcValveTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcValveTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
 	}
-	public class IfcValveType : IfcFlowControllerType
+	public partial class IfcValveType : IfcFlowControllerType
 	{
 		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// : IfcValveTypeEnum; 
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcValveType() : base() { }
-		internal IfcValveType(IfcValveType t) : base(t) { mPredefinedType = t.mPredefinedType; }
+		internal IfcValveType(DatabaseIfc db, IfcValveType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcValveType t, List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcValveTypeEnum)Enum.Parse(typeof(IfcValveTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcValveType Parse(string strDef) { IfcValveType t = new IfcValveType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
 	public partial class IfcVector : IfcGeometricRepresentationItem
 	{
 		internal int mOrientation; // : IfcDirection;
 		internal double mMagnitude;// : IfcLengthMeasure; 
 
-		internal IfcDirection Orientation { get { return mDatabase.mIfcObjects[mOrientation] as IfcDirection; } set { mOrientation = value.mIndex; } }
+		public IfcDirection Orientation { get { return mDatabase[mOrientation] as IfcDirection; } set { mOrientation = value.mIndex; } }
+		public double Magnitude { get { return mMagnitude; } set { mMagnitude = value; } }
 
 		internal IfcVector() : base() { }
-		internal IfcVector(IfcVector v) : base(v) { mOrientation = v.mOrientation; mMagnitude = v.mMagnitude; }
+		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
+		public IfcVector(IfcDirection orientation, double magnitude) { Orientation = orientation; Magnitude = magnitude; }
 	
 		internal static void parseFields(IfcVector v, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(v, arrFields, ref ipos); v.mOrientation = ParserSTEP.ParseLink(arrFields[ipos++]); v.mMagnitude = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		internal static IfcVector Parse(string strDef) { IfcVector v = new IfcVector(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
 	}
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
 		internal IfcVertex() : base() { }
-		internal IfcVertex(IfcVertex v) : base(v) { }
-		internal IfcVertex(DatabaseIfc m) : base(m) { }
+		internal IfcVertex(DatabaseIfc db) : base(db) { }
+		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
 		internal static IfcVertex Parse(string strDef) { IfcVertex v = new IfcVertex(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
 		internal static void parseFields(IfcVertex v, List<string> arrFields, ref int ipos) { IfcTopologicalRepresentationItem.parseFields(v, arrFields, ref ipos); }
 	}
-	public class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
+	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
 	{
 		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
 		internal List<int> mTexturePoints = new List<int>();// LIST [3:?] OF IfcCartesianPoint; 
@@ -92,9 +94,9 @@ namespace GeometryGym.Ifc
 		internal IfcVertexBasedTextureMap(IfcVertexBasedTextureMap m) : base() { mTextureVertices = new List<int>(m.mTextureVertices.ToArray()); mTexturePoints = new List<int>(m.mTexturePoints.ToArray()); }
 		internal static IfcVertexBasedTextureMap Parse(string strDef) { IfcVertexBasedTextureMap m = new IfcVertexBasedTextureMap(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcVertexBasedTextureMap m, List<string> arrFields, ref int ipos) { m.mTextureVertices = ParserSTEP.SplitListLinks(arrFields[ipos++]); m.mTexturePoints = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildString() + ",(" + ParserSTEP.LinkToString(mTextureVertices[0]);
+			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mTextureVertices[0]);
 			for (int icounter = 1; icounter < mTextureVertices.Count; icounter++)
 				str += "," + ParserSTEP.LinkToString(mTextureVertices[icounter]);
 			str += "),(" + ParserSTEP.LinkToString(mTexturePoints[0]);
@@ -103,26 +105,27 @@ namespace GeometryGym.Ifc
 			return str;
 		}
 	}
-	public class IfcVertexloop : IfcLoop
+	public partial class IfcVertexloop : IfcLoop
 	{
 		internal int mLoopVertex;// : IfcVertex; 
+		public IfcVertex LoopVertex { get { return mDatabase[mLoopVertex] as IfcVertex; } set { mLoopVertex = value.mIndex; } }
 		internal IfcVertexloop() : base() { }
-		internal IfcVertexloop(IfcVertexloop o) : base(o) { mLoopVertex = o.mLoopVertex; }
+		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Duplicate(l.LoopVertex) as IfcVertex; }
 		internal new static IfcVertexloop Parse(string strDef) { IfcVertexloop l = new IfcVertexloop(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
 		internal static void parseFields(IfcVertexloop l, List<string> arrFields, ref int ipos) { IfcLoop.parseFields(l, arrFields, ref ipos); l.mLoopVertex = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mLoopVertex); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mLoopVertex); }
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
 		internal int mVertexGeometry;// : IfcPoint; 
-		public IfcPoint VertexGeometry { get { return mDatabase.mIfcObjects[mVertexGeometry] as IfcPoint; } }
+		public IfcPoint VertexGeometry { get { return mDatabase[mVertexGeometry] as IfcPoint; } set { mVertexGeometry = value.mIndex; } }
 
 		internal IfcVertexPoint() : base() { }
-		internal IfcVertexPoint(IfcVertexPoint v) : base(v) { mVertexGeometry = v.mVertexGeometry; }
-		public IfcVertexPoint(IfcPoint cp) : base(cp.mDatabase) { mVertexGeometry = cp.mIndex; }
+		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
+		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Duplicate(v.VertexGeometry) as IfcPoint; }
 		internal new static IfcVertexPoint Parse(string strDef) { IfcVertexPoint v = new IfcVertexPoint(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
 		internal static void parseFields(IfcVertexPoint v, List<string> arrFields, ref int ipos) { IfcVertex.parseFields(v, arrFields, ref ipos); v.mVertexGeometry = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
 	}
 	public partial class IfcVibrationIsolator : IfcElementComponent
 	{
@@ -130,7 +133,7 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcVibrationIsolator() : base() { }
-		internal IfcVibrationIsolator(IfcVibrationIsolator a) : base(a) { mPredefinedType = a.mPredefinedType; }
+		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i) : base(db, i) { mPredefinedType = i.mPredefinedType; }
 		public IfcVibrationIsolator(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 
 		internal static IfcVibrationIsolator Parse(string strDef) { int ipos = 0; IfcVibrationIsolator a = new IfcVibrationIsolator(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
@@ -141,22 +144,22 @@ namespace GeometryGym.Ifc
 			if (s.StartsWith("."))
 				a.mPredefinedType = (IfcVibrationIsolatorTypeEnum)Enum.Parse(typeof(IfcVibrationIsolatorTypeEnum), s.Replace(".", ""));
 		}
-		protected override string BuildString() { return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcVibrationIsolatorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcVibrationIsolatorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 	}
-	public class IfcVibrationIsolatorType : IfcElementComponentType
+	public partial class IfcVibrationIsolatorType : IfcElementComponentType
 	{
 		internal IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : IfcVibrationIsolatorTypeEnum
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcVibrationIsolatorType() : base() { }
-		internal IfcVibrationIsolatorType(IfcVibrationIsolatorType be) : base(be) { mPredefinedType = be.mPredefinedType; }
+		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcVibrationIsolatorType t, List<string> arrFields, ref int ipos) { IfcDiscreteAccessoryType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcVibrationIsolatorTypeEnum)Enum.Parse(typeof(IfcVibrationIsolatorTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcVibrationIsolatorType Parse(string strDef) { IfcVibrationIsolatorType t = new IfcVibrationIsolatorType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public class IfcVirtualElement : IfcElement
+	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }
-		internal IfcVirtualElement(IfcVirtualElement el) : base(el) { }
+		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e) : base(db, e) { }
 		internal static IfcProduct Parse(string strDef) { IfcVirtualElement e = new IfcVirtualElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcVirtualElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -173,9 +176,9 @@ namespace GeometryGym.Ifc
 			List<string> lst = ParserSTEP.SplitLineFields(arrFields[ipos++]);
 			i.mOffsetDistances = new Tuple<double,double,double>(ParserSTEP.ParseDouble(lst[0]), ParserSTEP.ParseDouble(lst[1]),(lst.Count > 2 ? ParserSTEP.ParseDouble(lst[2]) : double.NaN));
 		}
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildString() + ",(" + ParserSTEP.LinkToString(mIntersectingAxes[0]) + "," +
+			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mIntersectingAxes[0]) + "," +
 				ParserSTEP.LinkToString(mIntersectingAxes[1]) + "),(";
 			str += ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2);
 			if (!double.IsNaN(mOffsetDistances.Item3))
@@ -190,17 +193,16 @@ namespace GeometryGym.Ifc
 		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcVoidingFeature() : base() { }
-		internal IfcVoidingFeature(IfcVoidingFeature od) : base(od) { mPredefinedType = od.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
 		
-		internal static IfcVoidingFeature Parse(string strDef, Schema schema) { IfcVoidingFeature e = new IfcVoidingFeature(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return e; }
-		internal static void parseFields(IfcVoidingFeature e, List<string> arrFields, ref int ipos, Schema schema)
+		internal static IfcVoidingFeature Parse(string strDef, ReleaseVersion schema) { IfcVoidingFeature e = new IfcVoidingFeature(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return e; }
+		internal static void parseFields(IfcVoidingFeature e, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			IfcFeatureElementSubtraction.parseFields(e, arrFields, ref ipos);
-			if (schema != Schema.IFC2x3)
+			if (schema != ReleaseVersion.IFC2x3)
 				e.mPredefinedType = (IfcVoidingFeatureTypeEnum)Enum.Parse(typeof(IfcVoidingFeatureTypeEnum), arrFields[ipos++].Replace(".", ""));
 		}
-		protected override string BuildString() { return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : ",." + mPredefinedType + "."); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType + "."); }
 	}
 
 	public interface IfcDerivedMeasureValue : IfcValue { double Measure { get; } } //(IfcVolumetricFlowRateMeasure,IfcTimeStamp ,IfcThermalTransmittanceMeasure ,IfcThermalResistanceMeasure
@@ -217,7 +219,7 @@ namespace GeometryGym.Ifc
 	//,IfcSectionalAreaIntegralMeasure ,IfcSectionModulusMeasure ,IfcTemperatureGradientMeasure ,IfcThermalExpansionCoefficientMeasure ,IfcWarpingConstantMeasure
 	//,IfcWarpingMomentMeasure ,IfcSoundPowerMeasure ,IfcSoundPressureMeasure ,IfcHeatingValueMeasure,IfcPHMeasure,IfcIonConcentrationMeasure);
 
-	public class IfcDynamicViscosityMeasure : IfcDerivedMeasureValue
+	public partial class IfcDynamicViscosityMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -227,7 +229,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCDYNAMICVISCOSITYMEASURE";
 	}
-	public class IfcForceMeasure : IfcDerivedMeasureValue
+	public partial class IfcForceMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -237,7 +239,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCFORCEMEASURE";
 	}
-	public class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue
+	public partial class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -247,7 +249,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCLINEARSTIFFNESSMEASURE";
 	}
-	public class IfcLinearVelocityMeasure : IfcDerivedMeasureValue
+	public partial class IfcLinearVelocityMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -257,7 +259,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCLINEARVELOCITYMEASURE";
 	}
-	public class IfcMassDensityMeasure : IfcDerivedMeasureValue
+	public partial class IfcMassDensityMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -277,7 +279,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCMASSPERLENGTHMEASURE";
 	}
-	public class IfcModulusOfElasticityMeasure : IfcDerivedMeasureValue
+	public partial class IfcModulusOfElasticityMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -305,7 +307,7 @@ namespace GeometryGym.Ifc
 		internal IfcMomentOfInertiaMeasure(double value) { mValue = value; }
 		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public string getKW { get { return mKW; } }
-		internal static string mKW = "IFCMOMOENTOFINERTIAMEASURE";
+		internal static string mKW = "IFCMOMENTOFINERTIAMEASURE";
 	}
 	public struct IfcMonetaryMeasure : IfcDerivedMeasureValue//, IfcAppliedValueSelect
 	{
@@ -317,7 +319,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCMONETARYMEASURE";
 	}
-	public class IfcPowerMeasure : IfcDerivedMeasureValue
+	public partial class IfcPowerMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -327,7 +329,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCPOWERMEASURE";
 	}
-	public class IfcPressureMeasure : IfcDerivedMeasureValue
+	public partial class IfcPressureMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -337,7 +339,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCPRESSUREMEASURE";
 	}
-	public class IfcRotationalStiffnessMeasure : IfcDerivedMeasureValue
+	public partial class IfcRotationalStiffnessMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -347,7 +349,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCROTATIONALSTIFFNESSMEASURE";
 	}
-	public class IfcSectionModulusMeasure : IfcDerivedMeasureValue
+	public partial class IfcSectionModulusMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -357,7 +359,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCSECTIONMODULUSMEASURE";
 	}
-	public class IfcThermalExpansionCoefficientMeasure : IfcDerivedMeasureValue
+	public partial class IfcThermalExpansionCoefficientMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -367,7 +369,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCTHERMALEXPANSIONCOEFFICIENTMEASURE";
 	}
-	public class IfcThermalTransmittanceMeasure : IfcDerivedMeasureValue
+	public partial class IfcThermalTransmittanceMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -377,7 +379,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCTHERMALTRANSMITTANCEMEASURE";
 	}
-	public class IfcVolumetricFlowRateMeasure : IfcDerivedMeasureValue// IfcMeasureValue
+	public partial class IfcVolumetricFlowRateMeasure : IfcDerivedMeasureValue// IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -387,7 +389,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCVOLUMETRICFLOWRATEMEASURE";
 	}
-	public class IfcWarpingConstantMeasure : IfcDerivedMeasureValue
+	public partial class IfcWarpingConstantMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -397,7 +399,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCWARPINGCONSTANTMEASURE";
 	}
-	public class IfcWarpingMomentMeasure : IfcDerivedMeasureValue
+	public partial class IfcWarpingMomentMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -411,7 +413,7 @@ namespace GeometryGym.Ifc
 	public interface IfcMeasureValue : IfcValue { double Measure { get; } } //TYPE IfcMeasureValue = SELECT (IfcVolumeMeasure,IfcTimeMeasure ,IfcThermodynamicTemperatureMeasure ,IfcSolidAngleMeasure ,IfcPositiveRatioMeasure
 	//,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
 	//IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
-	public class IfcAreaMeasure : IfcMeasureValue
+	public partial class IfcAreaMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -421,7 +423,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCAREAMEASURE";
 	}
-	public class IfcCountMeasure : IfcMeasureValue
+	public partial class IfcCountMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -431,7 +433,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCCOUNTMEASURE";
 	}
-	public class IfcDescriptiveMeasure : IfcMeasureValue, IfcSizeSelect
+	public partial class IfcDescriptiveMeasure : IfcMeasureValue, IfcSizeSelect
 	{
 		internal string mValue;
 		public object Value { get { return mValue; } }
@@ -441,7 +443,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCDESCRIPTIVEMEASURE";
 	}
-	public class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect
+	public partial class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -451,7 +453,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCLENGTHMEASURE";
 	}
-	public class IfcMassMeasure : IfcMeasureValue
+	public partial class IfcMassMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -461,7 +463,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCMASSMEASURE";
 	}
-	public class IfcNormalisedRatioMeasure : IfcMeasureValue, IfcColourOrFactor
+	public partial class IfcNormalisedRatioMeasure : IfcMeasureValue, IfcColourOrFactor
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -472,7 +474,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCNORMALISEDRATIOMEASURE";
 	}
-	public class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect
+	public partial class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -482,7 +484,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCPLANEANGLEMEASURE";
 	}
-	public class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect
+	public partial class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -506,7 +508,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCPOSITIVELENGTHMEASURE";
 	}
-	public class IfcPositiveRatioMeasure : IfcMeasureValue
+	public partial class IfcPositiveRatioMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -530,7 +532,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCPOSITIVERATIOMEASURE";
 	}
-	public class IfcRatioMeasure : IfcMeasureValue, IfcTimeOrRatioSelect//, IfcAppliedValueSelect
+	public partial class IfcRatioMeasure : IfcMeasureValue, IfcTimeOrRatioSelect//, IfcAppliedValueSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -541,7 +543,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCRATIOMEASURE";
 	}
-	public class IfcThermodynamicTemperatureMeasure : IfcMeasureValue
+	public partial class IfcThermodynamicTemperatureMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -551,7 +553,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCTHERMODYNAMICTEMPERATRUEMEASURE";
 	}
-	public class IfcTimeMeasure : IfcMeasureValue
+	public partial class IfcTimeMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -561,7 +563,7 @@ namespace GeometryGym.Ifc
 		public string getKW { get { return mKW; } }
 		internal static string mKW = "IFCTIMEMEASURE";
 	}
-	public class IfcVolumeMeasure : IfcMeasureValue
+	public partial class IfcVolumeMeasure : IfcMeasureValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -573,7 +575,7 @@ namespace GeometryGym.Ifc
 	}
 
 	public interface IfcSimpleValue : IfcValue { }// = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical);
-	public class IfcBoolean : IfcSimpleValue
+	public partial class IfcBoolean : IfcSimpleValue
 	{
 		internal bool mValue;
 		public object Value { get { return mValue; } }
@@ -581,7 +583,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + ParserSTEP.BoolToString(mValue) + ")"; }
 		public string getKW { get { return "IFCBOOLEAN"; } }
 	}
-	public class IfcIdentifier : IfcSimpleValue
+	public partial class IfcIdentifier : IfcSimpleValue
 	{
 		internal string mValue;
 		public object Value { get { return mValue; } }
@@ -589,7 +591,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "('" + mValue + "')"; }
 		public string getKW { get { return "IFCIDENTIFIER"; } }
 	}
-	public class IfcInteger : IfcSimpleValue
+	public partial class IfcInteger : IfcSimpleValue
 	{
 		internal int mValue;
 		public object Value { get { return mValue; } }
@@ -597,7 +599,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + mValue.ToString() + ")"; }
 		public string getKW { get { return "IFCINTEGER"; } }
 	}
-	public class IfcLabel : IfcSimpleValue
+	public partial class IfcLabel : IfcSimpleValue
 	{
 		internal string mValue;
 		public object Value { get { return ParserIfc.Decode(mValue); } }
@@ -605,7 +607,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "('" + mValue + "')"; }
 		public string getKW { get { return "IFCLABEL"; } }
 	}
-	public class IfcLogical : IfcSimpleValue
+	public partial class IfcLogical : IfcSimpleValue
 	{
 		internal IfcLogicalEnum mValue;
 		public object Value { get { return mValue.ToString(); } }
@@ -613,7 +615,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + ParserIfc.LogicalToString(mValue) + ")"; }
 		public string getKW { get { return "IFCLOGICAL"; } }
 	}
-	public class IfcReal : IfcSimpleValue
+	public partial class IfcReal : IfcSimpleValue
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -621,7 +623,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public string getKW { get { return "IFCREAL"; } }
 	}
-	public class IfcSpecularExponent : IfcSimpleValue, IfcSpecularHighlightSelect
+	public partial class IfcSpecularExponent : IfcSimpleValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -629,7 +631,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public string getKW { get { return "IFCSPECULAREXPONENT"; } }
 	}
-	public class IfcSpecularRoughness : IfcSimpleValue, IfcSpecularHighlightSelect
+	public partial class IfcSpecularRoughness : IfcSimpleValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
 		public object Value { get { return mValue; } }
@@ -637,7 +639,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return getKW + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public string getKW { get { return "IFCSPECULARROUGHNESS"; } }
 	}
-	public class IfcText : IfcSimpleValue
+	public partial class IfcText : IfcSimpleValue
 	{
 		internal string mValue;
 		public object Value { get { return ParserIfc.Decode(mValue); } }

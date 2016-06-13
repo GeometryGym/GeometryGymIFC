@@ -9,11 +9,11 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
 	{
-		public virtual Point3D Coordinates { get { return Point3D.NaN; } }
+		public virtual Point3D Location { get { return Point3D.NaN; } }
 	}
 	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
 	{
-		internal Point3D LocationPoint { get { return Location.Coordinates; } }
+		internal Point3D LocationPoint { get { return Location.Location; } }
 
 		public abstract CoordinateSystem CoordinateSystem { get; }
 

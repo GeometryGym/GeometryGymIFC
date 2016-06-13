@@ -121,6 +121,9 @@
     <Compile Include="..\..\Core\IFC\IFC R.cs">
       <Link>IFC\IFC R.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\IFC Relationship.cs">
+      <Link>IFC\IFC Relationship.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\IFC\IFC S.cs">
       <Link>IFC\IFC S.cs</Link>
     </Compile>

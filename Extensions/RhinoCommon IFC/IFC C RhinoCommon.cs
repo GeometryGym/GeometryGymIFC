@@ -59,14 +59,14 @@ namespace GeometryGym.Ifc
 			mCoordList = pts.ToArray();
 		}
 	}
-		public abstract partial class IfcCartesianTransformationOperator
+	public abstract partial class IfcCartesianTransformationOperator
 	{
 		internal Transform Transform
 		{
 			get
 			{
 				IfcCartesianPoint cp = LocalOrigin;
-				Point3d p = cp.Location;
+				Point3d p = (cp == null ? Point3d.Origin : cp.Location);
 				return Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
 			}
 		}

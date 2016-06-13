@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 			Polyline pl = new Polyline();
 			if (c.TryGetPolyline(out pl))
 			{
-				if (db.mSchema != Schema.IFC2x3 && db.mSchema != Schema.IFC4)
+				if (db.mRelease != ReleaseVersion.IFC2x3 && db.mRelease != ReleaseVersion.IFC4)
 				{
 					if (twoD)
 						return new IfcIndexedPolyCurve(new IfcCartesianPointList2D(db, pl.ConvertAll(x => new Point2d(x.X, x.Y))));
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 			PolyCurve plc = c as PolyCurve;
 			if (plc != null)
 			{
-				if (db.mSchema != Schema.IFC2x3 && db.mSchema != Schema.IFC4)
+				if (db.mRelease != ReleaseVersion.IFC2x3 && db.mRelease != ReleaseVersion.IFC4)
 				{
 					IfcIndexedPolyCurve ipc = IfcIndexedPolyCurve.Convert(db, plc, twoD);
 					if (ipc != null)
@@ -130,7 +130,7 @@ namespace GeometryGym.Ifc
 				}
 				return new IfcCompositeCurve(db, plc, twoD);
 			}
-			if (db.mSchema != Schema.IFC2x3)
+			if (db.mRelease != ReleaseVersion.IFC2x3)
 			{
 				NurbsCurve nc = c as NurbsCurve;
 				if (nc != null)

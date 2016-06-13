@@ -26,7 +26,7 @@ using System.ComponentModel;
 
 namespace GeometryGym.STEP
 {
-	public class STEPEntity 
+	public partial class STEPEntity 
 	{
 		internal int mIndex = 0; 
 		internal List<string> mComments = new List<string>();
@@ -38,7 +38,7 @@ namespace GeometryGym.STEP
 
 		public override string ToString()
 		{
-			string str = BuildString();
+			string str = BuildStringSTEP();
 			if (string.IsNullOrEmpty(str))
 				return "";
 			string comment = "";
@@ -49,6 +49,6 @@ namespace GeometryGym.STEP
 			}
 			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord + "(" + str.Substring(1) + ");";
 		}
-		protected virtual string BuildString() { return ""; } 
+		protected virtual string BuildStringSTEP() { return ""; } 
 	}
 }

@@ -47,7 +47,7 @@ namespace GeometryGym.STEP
 		{
 			string s = str.Trim();
 			if (s == "$")
-				return 0;
+				return double.NaN;
 			if (s == "*")
 				return 0;
 			return double.Parse(s, NumberFormat);
@@ -72,8 +72,8 @@ namespace GeometryGym.STEP
 		}
 
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
-		public static string DoubleToString(double i) { return String.Format("{0:0.0################}", i); }
-		public static string DoubleOptionalToString(double i) { return (i == 0 ? "$" : String.Format("{0:0.0################}", i)); }
+		public static string DoubleToString(double d) { return String.Format("{0:0.0################}", d); }
+		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) ? "$" : String.Format("{0:0.0################}", i)); }
 		public static string IntToString(int i)
 		{
 			if (i == 0)
@@ -675,6 +675,7 @@ namespace GeometryGym.STEP
 			pos = icounter + 2;
 			return c == 'T';
 		}
+		
 		public static double StripDouble(string s, ref int pos)
 		{
 			int icounter = pos, len = s.Length;

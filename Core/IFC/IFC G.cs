@@ -33,13 +33,13 @@ namespace GeometryGym.Ifc
 		internal IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
 		internal IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcGasTerminalType() : base() { }
-		internal IfcGasTerminalType(IfcGasTerminalType t) : base(t) { mPredefinedType = t.mPredefinedType; }
+		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcGasTerminalType t, List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcGasTerminalTypeEnum)Enum.Parse(typeof(IfcGasTerminalTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcGasTerminalType Parse(string strDef) { IfcGasTerminalType t = new IfcGasTerminalType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
+	public partial class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
 		internal double mMolecularWeight; //: OPTIONAL IfcMolecularWeightMeasure;
 		internal double mPorosity; //: OPTIONAL IfcNormalisedRatioMeasure;
@@ -60,22 +60,29 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcGeneralMaterialProperties Parse(string strDef) { IfcGeneralMaterialProperties p = new IfcGeneralMaterialProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcGeneralMaterialProperties p, List<string> arrFields, ref int ipos) { IfcMaterialPropertiesSuperSeded.parseFields(p, arrFields, ref ipos); p.mMolecularWeight = ParserSTEP.ParseDouble(arrFields[ipos++]); p.mPorosity = ParserSTEP.ParseDouble(arrFields[ipos++]); p.mMassDensity = ParserSTEP.ParseDouble(arrFields[ipos++]); }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mMolecularWeight) + "," + ParserSTEP.DoubleOptionalToString(mPorosity) + "," + ParserSTEP.DoubleOptionalToString(mMassDensity); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mMolecularWeight) + "," + ParserSTEP.DoubleOptionalToString(mPorosity) + "," + ParserSTEP.DoubleOptionalToString(mMassDensity); }
 	}
-	public class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
+	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
 	{ 
-		internal double mPhysicalWeight;// : OPTIONAL IfcMassPerLengthMeasure;
-		internal double mPerimeter;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mMinimumPlateThickness;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mMaximumPlateThickness;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mCrossSectionArea;// : OPTIONAL IfcAreaMeasure;
+		internal double mPhysicalWeight = double.NaN;// : OPTIONAL IfcMassPerLengthMeasure;
+		internal double mPerimeter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mMinimumPlateThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mMaximumPlateThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mCrossSectionArea = double.NaN;// : OPTIONAL IfcAreaMeasure;
+
+		public double PhysicalWeight { get { return mPhysicalWeight; } set { mPhysicalWeight = value; } }
+		public double Perimeter { get { return mPerimeter; } set { mPerimeter = value; } }
+		public double MinimumPlateThickness { get { return mMinimumPlateThickness; } set { mMinimumPlateThickness = value; } }
+		public double MaximumPlateThickness { get { return mMaximumPlateThickness; } set { mMaximumPlateThickness = value; } }
+		public double CrossSectionArea { get { return mCrossSectionArea; } set { mCrossSectionArea = value; } }
+
 		internal IfcGeneralProfileProperties() : base() { }
-		internal IfcGeneralProfileProperties(IfcGeneralProfileProperties p) : base(p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
-		internal IfcGeneralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
+		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p) : base(db, p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
+		public IfcGeneralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
 		internal IfcGeneralProfileProperties(string name, List<IfcProperty> props, IfcProfileDef p) : base(name, props, p) { }
 
-		internal new static IfcGeneralProfileProperties Parse(string strDef,Schema schema) { IfcGeneralProfileProperties p = new IfcGeneralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
-		internal static void parseFields(IfcGeneralProfileProperties gp, List<string> arrFields, ref int ipos,Schema schema)
+		internal new static IfcGeneralProfileProperties Parse(string strDef,ReleaseVersion schema) { IfcGeneralProfileProperties p = new IfcGeneralProfileProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
+		internal static void parseFields(IfcGeneralProfileProperties gp, List<string> arrFields, ref int ipos,ReleaseVersion schema)
 		{
 			IfcProfileProperties.parseFields(gp, arrFields, ref ipos,schema);
 			gp.mPhysicalWeight = ParserSTEP.ParseDouble(arrFields[ipos++]);
@@ -84,15 +91,15 @@ namespace GeometryGym.Ifc
 			gp.mMaximumPlateThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			gp.mCrossSectionArea = ParserSTEP.ParseDouble(arrFields[ipos++]);
 		}
-		protected override string BuildString() { return (mDatabase.mSchema != Schema.IFC2x3 ? "" : base.BuildString() + "," + ParserSTEP.DoubleOptionalToString(mPhysicalWeight) + "," + ParserSTEP.DoubleOptionalToString(mPerimeter) + "," + ParserSTEP.DoubleOptionalToString(mMinimumPlateThickness) + "," + ParserSTEP.DoubleOptionalToString(mMaximumPlateThickness) + "," + ParserSTEP.DoubleOptionalToString(mCrossSectionArea)); }
+		protected override string BuildStringSTEP() { return (mDatabase.mRelease != ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mPhysicalWeight) + "," + ParserSTEP.DoubleOptionalToString(mPerimeter) + "," + ParserSTEP.DoubleOptionalToString(mMinimumPlateThickness) + "," + ParserSTEP.DoubleOptionalToString(mMaximumPlateThickness) + "," + ParserSTEP.DoubleOptionalToString(mCrossSectionArea)); }
 	}
 	public partial class IfcGeographicElement : IfcElement  //IFC4
 	{
 		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// OPTIONAL IfcGeographicElementTypeEnum; 
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcGeographicElement() : base() { }
-		internal IfcGeographicElement(IfcGeographicElement e) : base(e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcGeographicElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { if (mDatabase.mSchema == Schema.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
+		internal IfcGeographicElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
 		
 		internal static IfcGeographicElement Parse(string strDef) { IfcGeographicElement e = new IfcGeographicElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcGeographicElement e, List<string> arrFields, ref int ipos)
@@ -102,14 +109,14 @@ namespace GeometryGym.Ifc
 			if (s.StartsWith("."))
 				e.mPredefinedType = (IfcGeographicElementTypeEnum)Enum.Parse(typeof(IfcGeographicElementTypeEnum), s.Replace(".", ""));
 		}
-		protected override string BuildString() { return (mDatabase.mSchema == Schema.IFC2x3 ? "" : base.BuildString() + ",." + mPredefinedType + "."); }
+		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP() + ",." + mPredefinedType + "."); }
 	}
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
 	{
 		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// IfcGeographicElementTypeEnum; 
 		internal IfcGeographicElementType() : base() { }
-		internal IfcGeographicElementType(IfcGeographicElementType o) : base(o) { mPredefinedType = o.mPredefinedType; }
-		internal IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mSchema == Schema.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
+		internal IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
 		internal new static IfcGeographicElementType Parse(string strDef) { IfcGeographicElementType t = new IfcGeographicElementType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		internal static void parseFields(IfcGeographicElementType t, List<string> arrFields, ref int ipos)
 		{
@@ -118,12 +125,12 @@ namespace GeometryGym.Ifc
 			if (s.StartsWith("."))
 				t.mPredefinedType = (IfcGeographicElementTypeEnum)Enum.Parse(typeof(IfcGeographicElementTypeEnum), s.Replace(".", ""));
 		}
-		protected override string BuildString() { return (mDatabase.mSchema == Schema.IFC2x3 ? "" : base.BuildString() + ",." + mPredefinedType.ToString() + "."); }
+		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."); }
 	}
-	public class IfcGeometricCurveSet : IfcGeometricSet
+	public partial class IfcGeometricCurveSet : IfcGeometricSet
 	{
 		internal IfcGeometricCurveSet() : base() { }
-		internal IfcGeometricCurveSet(IfcGeometricCurveSet p) : base(p) { }
+		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s) : base(db,s) { }
 		internal IfcGeometricCurveSet(List<IfcGeometricSetSelect> set) : base(set)
 		{
 			for (int icounter = 0; icounter < set.Count; icounter++)
@@ -143,22 +150,22 @@ namespace GeometryGym.Ifc
 		internal int mWorldCoordinateSystem;// : IfcAxis2Placement;
 		internal int mTrueNorth;// : OPTIONAL IfcDirection; 
 		//INVERSE
-		private List<IfcGeometricRepresentationSubContext> mHasSubContexts = new List<IfcGeometricRepresentationSubContext>();//	 :	SET OF IfcGeometricRepresentationSubContext FOR ParentContext;
+		internal List<IfcGeometricRepresentationSubContext> mHasSubContexts = new List<IfcGeometricRepresentationSubContext>();//	 :	SET OF IfcGeometricRepresentationSubContext FOR ParentContext;
 		private IfcCoordinateOperation mHasCoordinateOperation = null; //IFC4
 
 		public int CoordinateSpaceDimension { get { return mCoordinateSpaceDimension; } set { mCoordinateSpaceDimension = value; } }
 		public double Precision { get { return mPrecision; } set { mPrecision = value; } }
-		public IfcAxis2Placement WorldCoordinateSystem { get { return mDatabase.mIfcObjects[mWorldCoordinateSystem] as IfcAxis2Placement; } set { mWorldCoordinateSystem = (value == null ? 0 : value.Index); } }
+		public IfcAxis2Placement WorldCoordinateSystem { get { return mDatabase[mWorldCoordinateSystem] as IfcAxis2Placement; } set { mWorldCoordinateSystem = (value == null ? 0 : value.Index); } }
 		public IfcDirection TrueNorth 
 		{ 
-			get { return mDatabase.mIfcObjects[mTrueNorth] as IfcDirection; }  
+			get { return mDatabase[mTrueNorth] as IfcDirection; }  
 			set 
 			{
 				if (value == null)
 					mTrueNorth = 0;
 				else
 				{
-					if (Math.Abs(value.CoordinateZ) > mDatabase.Tolerance)
+					if (Math.Abs(value.DirectionRatioZ) > mDatabase.Tolerance)
 						throw new Exception("True North direction must be 2 dimensional direction");
 					mTrueNorth = value.mIndex; 
 				}
@@ -167,17 +174,27 @@ namespace GeometryGym.Ifc
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
 		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; } }
 		
-
 		internal IfcGeometricRepresentationContext() : base() { }
-		internal IfcGeometricRepresentationContext(IfcGeometricRepresentationContext p) : base(p) { mCoordinateSpaceDimension = p.mCoordinateSpaceDimension; mPrecision = p.mPrecision; mTrueNorth = p.mTrueNorth; }
-		protected IfcGeometricRepresentationContext(DatabaseIfc m) : base(m) { }
-		internal IfcGeometricRepresentationContext(DatabaseIfc m, int SpaceDimension, double precision)
-			: base(m)
+		protected IfcGeometricRepresentationContext(DatabaseIfc db) : base(db) { }
+		internal IfcGeometricRepresentationContext(DatabaseIfc db, IfcGeometricRepresentationContext c) : base(db, c)
+		{
+			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
+			mPrecision = c.mPrecision;
+			WorldCoordinateSystem = db.Duplicate(c.mDatabase[ c.mWorldCoordinateSystem]) as IfcAxis2Placement;
+			if (c.mTrueNorth > 0)
+				TrueNorth = db.Duplicate(c.TrueNorth) as IfcDirection;
+
+			foreach (IfcGeometricRepresentationSubContext sc in mHasSubContexts)
+				db.Duplicate(sc);
+		}
+		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
 			mCoordinateSpaceDimension = SpaceDimension;
 			mPrecision = Math.Max(1e-8, precision);
-			WorldCoordinateSystem = mDatabase.WorldCoordinatePlacement;
+			WorldCoordinateSystem = new IfcAxis2Placement3D(new IfcCartesianPoint(db,0,0,0));
+			TrueNorth = new IfcDirection(mDatabase, 0, 1);
 		}
+		public IfcGeometricRepresentationContext(int coordinateSpaceDimension, IfcAxis2Placement worldCoordinateSystem) : base(worldCoordinateSystem.Database) { mCoordinateSpaceDimension = coordinateSpaceDimension; WorldCoordinateSystem = worldCoordinateSystem; }
 
 		internal static void parseFields(IfcGeometricRepresentationContext c, List<string> arrFields, ref int ipos)
 		{
@@ -187,12 +204,12 @@ namespace GeometryGym.Ifc
 			c.mWorldCoordinateSystem = ParserSTEP.ParseLink(arrFields[ipos++]);
 			c.mTrueNorth = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
 			if (this as IfcGeometricRepresentationSubContext != null)
-				return base.BuildString() + ",*,*,*,*";
+				return base.BuildStringSTEP() + ",*,*,*,*";
 			
-			return base.BuildString() + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleToString(mPrecision)) + "," + ParserSTEP.LinkToString(mWorldCoordinateSystem) + "," + ParserSTEP.LinkToString(mTrueNorth);
+			return base.BuildStringSTEP() + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleToString(mPrecision)) + "," + ParserSTEP.LinkToString(mWorldCoordinateSystem) + "," + ParserSTEP.LinkToString(mTrueNorth);
 		}
 		internal static IfcGeometricRepresentationContext Parse(string strDef) { IfcGeometricRepresentationContext c = new IfcGeometricRepresentationContext(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
@@ -205,29 +222,31 @@ namespace GeometryGym.Ifc
 		// IFC2x3 IfcAnnotationSurface, IfcDefinedSymbol, IfcDraughtingCallout, IfcFillAreaStyleTileSymbolWithStyle, IfcOneDirectionRepeatFactor
 		// IFC4 IfcCartesianPointList, IfcTessellatedItem
 		protected IfcGeometricRepresentationItem() : base() { }
-		protected IfcGeometricRepresentationItem(IfcGeometricRepresentationItem p) : base(p) { }
-		protected IfcGeometricRepresentationItem(DatabaseIfc m) : base(m) { }
+		protected IfcGeometricRepresentationItem(DatabaseIfc db) : base(db) { }
+		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i) : base(db,i) { }
 		protected static void parseFields(IfcGeometricRepresentationItem i, List<string> arrFields, ref int ipos) { IfcRepresentationItem.parseFields(i, arrFields, ref ipos); }
 		protected override void Parse(string str, ref int ipos) { base.Parse(str, ref ipos); }
 	}
-	public class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
+	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
 		internal int mContainerContext;// : IfcGeometricRepresentationContext;
-		internal double mTargetScale;// : OPTIONAL IfcPositiveRatioMeasure;
+		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
 		private IfcGeometricProjectionEnum mTargetView;// : IfcGeometricProjectionEnum;
 		internal string mUserDefinedTargetView = "$";// : OPTIONAL IfcLabel;
 
-		internal IfcGeometricProjectionEnum TargetView { get { return mTargetView; } }
+		public IfcGeometricRepresentationContext ContainerContext { get { return mDatabase[mContainerContext] as IfcGeometricRepresentationContext; } set { mContainerContext = value.mIndex; value.mHasSubContexts.Add(this); } }
+		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
+		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
 		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		internal IfcGeometricRepresentationSubContext() : base() { }
-		internal IfcGeometricRepresentationSubContext(IfcGeometricRepresentationSubContext p)
-			: base(p)
+		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s) : base(db, s)
 		{
-			mContainerContext = p.mContainerContext;
-			mTargetScale = p.mTargetScale;
-			mTargetView = p.mTargetView;
-			mUserDefinedTargetView = p.mUserDefinedTargetView;
+			ContainerContext = db.Duplicate(s.ContainerContext) as IfcGeometricRepresentationContext;
+
+			mTargetScale = s.mTargetScale;
+			mTargetView = s.mTargetView;
+			mUserDefinedTargetView = s.mUserDefinedTargetView;
 		}
 		internal IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, double scale, IfcGeometricProjectionEnum view)
 			: base(container.mDatabase)
@@ -245,11 +264,11 @@ namespace GeometryGym.Ifc
 			c.mTargetView = (IfcGeometricProjectionEnum)Enum.Parse(typeof(IfcGeometricProjectionEnum), arrFields[ipos++].Replace(".", ""));
 			c.mUserDefinedTargetView = arrFields[ipos++];
 		}
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.LinkToString(mContainerContext) + "," + ParserSTEP.DoubleOptionalToString(mTargetScale) + ",." + mTargetView.ToString() + (mUserDefinedTargetView == "$" ?  ".,$" : ".,'" + mUserDefinedTargetView + "'"); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mContainerContext) + (double.IsNaN(mTargetScale) || mTargetScale <=0 ? ",$,." : "," + ParserSTEP.DoubleOptionalToString(mTargetScale) + ",.") + mTargetView.ToString() + (mUserDefinedTargetView == "$" ?  ".,$" : ".,'" + mUserDefinedTargetView + "'"); }
 		internal new static IfcGeometricRepresentationSubContext Parse(string strDef) { IfcGeometricRepresentationSubContext c = new IfcGeometricRepresentationSubContext(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		internal void relate()
 		{
-			IfcGeometricRepresentationContext gc = mDatabase.mIfcObjects[mContainerContext] as IfcGeometricRepresentationContext;
+			IfcGeometricRepresentationContext gc = ContainerContext;
 			if (gc != null)
 			{
 				mActive = gc.Active;
@@ -260,15 +279,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
 	{
 		private List<int> mElements = new List<int>(); //SET [1:?] OF IfcGeometricSetSelect; 
-		internal List<IfcGeometricSetSelect> Elements { get { return mElements.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGeometricSetSelect); } }
+		internal List<IfcGeometricSetSelect> Elements { get { return mElements.ConvertAll(x => mDatabase[x] as IfcGeometricSetSelect); } set { mElements = value.ConvertAll(x => x.Index); } }
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(IfcGeometricSet p) : base(p) { mElements = new List<int>(p.mElements.ToArray()); }
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { Elements = s.mElements.ConvertAll(x=>db.Duplicate(s.mDatabase[x]) as IfcGeometricSetSelect); }
 		internal IfcGeometricSet(List<IfcGeometricSetSelect> set) : base(set[0].Database) { mElements = set.ConvertAll(x => x.Index); }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
 			if (mElements.Count == 0)
 				return "";
-			string str = base.BuildString() + ",(" + ParserSTEP.LinkToString(mElements[0]);
+			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mElements[0]);
 			for (int icounter = 1; icounter < mElements.Count; icounter++)
 				str += "," + ParserSTEP.LinkToString(mElements[icounter]);
 			return str + ")";
@@ -288,15 +307,21 @@ namespace GeometryGym.Ifc
 
 		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
-		public List<IfcGridAxis> UAxes { get { return mUAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
-		public List<IfcGridAxis> VAxes { get { return mVAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
-		public List<IfcGridAxis> WAxes { get { return mWAxes.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcGridAxis); } }
+		public List<IfcGridAxis> UAxes { get { return mUAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mUAxes = value.ConvertAll(x => x.mIndex); } }
+		public List<IfcGridAxis> VAxes { get { return mVAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mVAxes = value.ConvertAll(x => x.mIndex); } }
+		public List<IfcGridAxis> WAxes { get { return mWAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mWAxes = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcGrid() : base() { }
-		internal IfcGrid(IfcGrid g) : base(g) { mUAxes = new List<int>(g.mUAxes.ToArray()); mVAxes = new List<int>(g.mVAxes.ToArray()); mWAxes = new List<int>(g.mWAxes.ToArray()); mPredefinedType = g.mPredefinedType; }
+		internal IfcGrid(DatabaseIfc db, IfcGrid g) : base(db, g)
+		{
+			UAxes = g.UAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
+			VAxes = g.VAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
+			WAxes = g.WAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
+			mPredefinedType = g.mPredefinedType;
+		}
 
-		internal static IfcGrid Parse(string strDef, Schema schema) { IfcGrid g = new IfcGrid(); int ipos = 0; parseFields(g, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return g; }
-		internal static void parseFields(IfcGrid g, List<string> arrFields, ref int ipos, Schema schema)
+		internal static IfcGrid Parse(string strDef, ReleaseVersion schema) { IfcGrid g = new IfcGrid(); int ipos = 0; parseFields(g, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return g; }
+		internal static void parseFields(IfcGrid g, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			IfcProduct.parseFields(g, arrFields, ref ipos);
 			g.mUAxes = ParserSTEP.SplitListLinks(arrFields[ipos++]);
@@ -304,16 +329,16 @@ namespace GeometryGym.Ifc
 			string s = arrFields[ipos++];
 			if (s != "$")
 				g.mWAxes = ParserSTEP.SplitListLinks(s);
-			if (schema != Schema.IFC2x3)
+			if (schema != ReleaseVersion.IFC2x3)
 			{
 				s = arrFields[ipos++];
 				if (s[0] == '.')
 					g.mPredefinedType = (IfcGridTypeEnum)Enum.Parse(typeof(IfcGridTypeEnum), s.Replace(".", ""));
 			}
 		}
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildString() + ",(";
+			string str = base.BuildStringSTEP() + ",(";
 			if (mUAxes.Count > 0)
 			{
 				str += ParserSTEP.LinkToString(mUAxes[0]);
@@ -335,7 +360,7 @@ namespace GeometryGym.Ifc
 					str += "," + ParserSTEP.LinkToString(mWAxes[icounter]);
 				return str + ")";
 			}
-			return str + "$" + (mDatabase.mSchema == Schema.IFC2x3 ? "" : ",." + mPredefinedType.ToString() + ".");
+			return str + "$" + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType.ToString() + ".");
 		}
 
 		internal void AddUAxis(IfcGridAxis a) { mUAxes.Add(a.mIndex); a.mPartOfU = this; }
@@ -359,24 +384,27 @@ namespace GeometryGym.Ifc
 
 		public override string Name { get { return AxisTag; } set { AxisTag = value; } }
 		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public IfcCurve AxisCurve { get { return mDatabase.mIfcObjects[mAxisCurve] as IfcCurve; } }
+		public IfcCurve AxisCurve { get { return mDatabase[mAxisCurve] as IfcCurve; } }
 
 		internal IfcGridAxis() : base() { }
 		internal IfcGridAxis(IfcGridAxis p) : base() { mAxisTag = p.mAxisTag; mAxisCurve = p.mAxisCurve; mSameSense = p.mSameSense; }
 		internal IfcGridAxis(DatabaseIfc m, string tag, IfcCurve axis, bool sameSense) : base(m) { if (!string.IsNullOrEmpty(tag)) mAxisTag = tag.Replace("'", ""); mAxisCurve = axis.mIndex; mSameSense = sameSense; }
 		internal static IfcGridAxis Parse(string strDef) { IfcGridAxis a = new IfcGridAxis(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcGridAxis a, List<string> arrFields, ref int ipos) { a.mAxisTag = arrFields[ipos++].Replace("'", ""); a.mAxisCurve = ParserSTEP.ParseLink(arrFields[ipos++]); a.mSameSense = ParserSTEP.ParseBool(arrFields[ipos++]); }
-		protected override string BuildString() { return base.BuildString() + (mAxisTag == "$" ? ",$," : ",'" + mAxisTag + "',") + ParserSTEP.LinkToString(mAxisCurve) + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mAxisTag == "$" ? ",$," : ",'" + mAxisTag + "',") + ParserSTEP.LinkToString(mAxisCurve) + "," + ParserSTEP.BoolToString(mSameSense); }
 	}
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
 		internal int mPlacementLocation;// : IfcVirtualGridIntersection ;
 		internal int mPlacementRefDirection;// : OPTIONAL IfcVirtualGridIntersection;
+
+		public IfcVirtualGridIntersection PlacementLocation { get { return mDatabase[mPlacementLocation] as IfcVirtualGridIntersection; } set { mPlacementLocation = value.mIndex; } }
+		public IfcVirtualGridIntersection PlacementRefDirection { get { return mDatabase[mPlacementRefDirection] as IfcVirtualGridIntersection; } set { mPlacementRefDirection = (value == null ? 0 : value.mIndex); } }
+
 		internal IfcGridPlacement() : base() { }
-		internal IfcGridPlacement(IfcGridPlacement p) : base(p) { mPlacementLocation = p.mPlacementLocation; mPlacementRefDirection = p.mPlacementRefDirection; }
 		internal static IfcGridPlacement Parse(string strDef) { IfcGridPlacement p = new IfcGridPlacement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcGridPlacement p, List<string> arrFields, ref int ipos) { IfcObjectPlacement.parseFields(p, arrFields, ref ipos); p.mPlacementLocation = ParserSTEP.ParseLink(arrFields[ipos++]); p.mPlacementRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		protected override string BuildString() { return (mDatabase.mOutputEssential || mPlacesObject.Count == 0 ? "" : base.BuildString() + "," + ParserSTEP.LinkToString(mPlacementLocation) + "," + ParserSTEP.LinkToString(mPlacementRefDirection)); }
+		protected override string BuildStringSTEP() { return (mPlacesObject.Count == 0 ? "" : base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementLocation) + "," + ParserSTEP.LinkToString(mPlacementRefDirection)); }
 	}
 	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{
@@ -385,13 +413,16 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAssignsToGroup> IsGroupedBy { get { return mIsGroupedBy; } }
 
 		internal IfcGroup() : base() { }
-		internal IfcGroup(IfcGroup p) : base(p) { }
+		internal IfcGroup(DatabaseIfc db, IfcGroup g) : base(db,g)
+		{
+			
+		}
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; mIsGroupedBy.Add(new IfcRelAssignsToGroup(this)); }
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(this, ods)); }
 
 		internal static IfcGroup Parse(string strDef) { IfcGroup g = new IfcGroup(); int ipos = 0; parseFields(g, ParserSTEP.SplitLineFields(strDef), ref ipos); return g; }
 		internal static void parseFields(IfcGroup g, List<string> arrFields, ref int ipos) { IfcObject.parseFields(g, arrFields, ref ipos); }
-		protected override string BuildString() { return (mDatabase.ModelView == ModelView.Ifc2x3Coordination ? "" : base.BuildString()); }
+		protected override string BuildStringSTEP() { return (mDatabase.ModelView == ModelView.Ifc2x3Coordination ? "" : base.BuildStringSTEP()); }
 		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].assign(o); }
 	}
 }

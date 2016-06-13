@@ -29,12 +29,12 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	public partial interface IfcUnit : IfcInterface { } // = SELECT(IfcDerivedUnit, IfcNamedUnit, IfcMonetaryUnit);
-	public class IfcUnitaryControlElement : IfcDistributionControlElement //IFC4  
+	public partial class IfcUnitaryControlElement : IfcDistributionControlElement //IFC4  
 	{
 		internal IfcUnitaryControlElementTypeEnum mPredefinedType = IfcUnitaryControlElementTypeEnum.NOTDEFINED;
 		public IfcUnitaryControlElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		internal IfcUnitaryControlElement(IfcUnitaryControlElement a) : base(a) { mPredefinedType = a.mPredefinedType; }
 		internal IfcUnitaryControlElement() : base() { }
+		internal IfcUnitaryControlElement(DatabaseIfc db, IfcUnitaryControlElement e) : base(db,e) { mPredefinedType = e.mPredefinedType; }
 		internal IfcUnitaryControlElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
 		internal static void parseFields(IfcUnitaryControlElement a, List<string> arrFields, ref int ipos)
 		{
@@ -44,28 +44,28 @@ namespace GeometryGym.Ifc
 				a.mPredefinedType = (IfcUnitaryControlElementTypeEnum)Enum.Parse(typeof(IfcUnitaryControlElementTypeEnum), s.Replace(".", ""));
 		}
 		internal new static IfcUnitaryControlElement Parse(string strDef) { IfcUnitaryControlElement d = new IfcUnitaryControlElement(); int ipos = 0; parseFields(d, ParserSTEP.SplitLineFields(strDef), ref ipos); return d; }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcUnitaryControlElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcUnitaryControlElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
 	}
-	public class IfcUnitaryControlElementType : IfcDistributionControlElementType
+	public partial class IfcUnitaryControlElementType : IfcDistributionControlElementType
 	{
 		internal IfcUnitaryControlElementTypeEnum mPredefinedType = IfcUnitaryControlElementTypeEnum.NOTDEFINED;// : IfcUnitaryControlElementTypeEnum; 
 		public IfcUnitaryControlElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		internal IfcUnitaryControlElementType(IfcUnitaryControlElementType be) : base(be) { mPredefinedType = be.mPredefinedType; }
 		internal IfcUnitaryControlElementType() : base() { }
+		internal IfcUnitaryControlElementType(DatabaseIfc db, IfcUnitaryControlElementType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcUnitaryControlElementType(DatabaseIfc m, string name, IfcUnitaryControlElementTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 		internal static void parseFields(IfcUnitaryControlElementType t, List<string> arrFields, ref int ipos) { IfcDistributionControlElementType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcUnitaryControlElementTypeEnum)Enum.Parse(typeof(IfcUnitaryControlElementTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcUnitaryControlElementType Parse(string strDef) { IfcUnitaryControlElementType t = new IfcUnitaryControlElementType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public class IfcUnitaryEquipment : IfcEnergyConversionDevice //IFC4
+	public partial class IfcUnitaryEquipment : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcUnitaryEquipmentTypeEnum mPredefinedType = IfcUnitaryEquipmentTypeEnum.NOTDEFINED;// OPTIONAL : IfcUnitaryEquipmentTypeEnum;
 		public IfcUnitaryEquipmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcUnitaryEquipment() : base() { }
-		internal IfcUnitaryEquipment(IfcUnitaryEquipment b) : base(b) { mPredefinedType = b.mPredefinedType; }
+		internal IfcUnitaryEquipment(DatabaseIfc db, IfcUnitaryEquipment e) : base(db,e) { mPredefinedType = e.mPredefinedType; }
 		internal IfcUnitaryEquipment(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcUnitaryEquipment s, List<string> arrFields, ref int ipos)
@@ -76,32 +76,31 @@ namespace GeometryGym.Ifc
 				s.mPredefinedType = (IfcUnitaryEquipmentTypeEnum)Enum.Parse(typeof(IfcUnitaryEquipmentTypeEnum), str);
 		}
 		internal new static IfcUnitaryEquipment Parse(string strDef) { IfcUnitaryEquipment s = new IfcUnitaryEquipment(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcUnitaryEquipmentTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcUnitaryEquipmentTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
 	}
-	public class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType
+	public partial class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType
 	{
 		internal IfcUnitaryEquipmentTypeEnum mPredefinedType = IfcUnitaryEquipmentTypeEnum.NOTDEFINED;// : IfcUnitaryEquipmentTypeEnum; 
 		public IfcUnitaryEquipmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcUnitaryEquipmentType() : base() { }
-		internal IfcUnitaryEquipmentType(IfcUnitaryEquipmentType be) : base((IfcEnergyConversionDeviceType)be) { mPredefinedType = be.mPredefinedType; }
+		internal IfcUnitaryEquipmentType(DatabaseIfc db, IfcUnitaryEquipmentType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcUnitaryEquipmentType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcUnitaryEquipmentTypeEnum)Enum.Parse(typeof(IfcUnitaryEquipmentTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcUnitaryEquipmentType Parse(string strDef) { IfcUnitaryEquipmentType t = new IfcUnitaryEquipmentType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
 	public partial class IfcUnitAssignment : BaseClassIfc
 	{
 		public enum Length { Metre, Centimetre, Millimetre, Foot, Inch };
 
 		private List<int> mUnits = new List<int>();// : SET [1:?] OF IfcUnit; 
-
-		internal List<IfcUnit> Units { get { return mUnits.ConvertAll(x => mDatabase.mIfcObjects[x] as IfcUnit); } }
+		public List<IfcUnit> Units { get { return mUnits.ConvertAll(x => mDatabase[x] as IfcUnit); } set { mUnits = value.ConvertAll(x => x.Index); } }
 
 		internal IfcUnitAssignment() : base() { }
-		internal IfcUnitAssignment(IfcUnitAssignment v) : base() { mUnits = new List<int>(v.mUnits.ToArray()); }
-		internal IfcUnitAssignment(DatabaseIfc m) : base(m) { }
+		internal IfcUnitAssignment(DatabaseIfc db) : base(db) { }
+		public IfcUnitAssignment(List<IfcUnit> units) : base(units[0].Database) { Units = units; }
 
 		internal void SetUnits(Length length)
 		{
@@ -184,10 +183,14 @@ namespace GeometryGym.Ifc
 			IfcNamedUnit time = Find(IfcUnitEnum.TIMEUNIT);
 			if (time == null || Math.Abs(time.getSIFactor() - 1) < mDatabase.Tolerance)
 				time = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND);
-			mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT).mIndex);
-			mUnits.Add(new IfcSIUnit(m, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL).mIndex);
-			mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 3), IfcDerivedUnitEnum.SECTIONMODULUSUNIT).mIndex);
-			mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 4), IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT).mIndex);
+			if(Find(IfcDerivedUnitEnum.ACCELERATIONUNIT) == null)
+				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT).mIndex);
+			if(Find(IfcUnitEnum.PRESSUREUNIT) == null)
+				mUnits.Add(new IfcSIUnit(m, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL).mIndex);
+			if (Find(IfcDerivedUnitEnum.SECTIONMODULUSUNIT) == null)
+				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 3), IfcDerivedUnitEnum.SECTIONMODULUSUNIT).mIndex);
+			if(Find(IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT) == null)
+				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(m.mSILength, 4), IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT).mIndex);
 			IfcSIUnit massu = Find(IfcUnitEnum.MASSUNIT) as IfcSIUnit;
 			if (massu == null)
 			{
@@ -204,17 +207,20 @@ namespace GeometryGym.Ifc
 			}
 			if (Find(IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT) == null)
 				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(kelvin, -1), IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT).mIndex);
-			mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(m.mSILength, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT).mIndex);
+			if(Find(IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT) == null)
+				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(m.mSILength, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT).mIndex);
+
 			IfcNamedUnit radians = Find(IfcUnitEnum.PLANEANGLEUNIT);
 			if (radians == null || Math.Abs(radians.getSIFactor() - 1) < mDatabase.Tolerance)
 				radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
-			mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(m.mSILength, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT).mIndex);
+			if(Find(IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT) == null)
+				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(m.mSILength, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT).mIndex);
 		}
 		internal void AddUnit(IfcUnit u) { mUnits.Add(u.Index); }
 		internal static void parseFields(IfcUnitAssignment a, List<string> arrFields, ref int ipos) { a.mUnits = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildString() + ",(";
+			string str = base.BuildStringSTEP() + ",(";
 			if (mUnits.Count > 0)
 			{
 				str += ParserSTEP.LinkToString(mUnits[0]);
@@ -250,7 +256,7 @@ namespace GeometryGym.Ifc
 		{
 			for (int icounter = 0; icounter < mUnits.Count; icounter++)
 			{
-				IfcNamedUnit u = mDatabase.mIfcObjects[mUnits[icounter]] as IfcNamedUnit;
+				IfcNamedUnit u = mDatabase[mUnits[icounter]] as IfcNamedUnit;
 				if (u != null && u.UnitType == cbu.UnitType)
 				{
 					mUnits[icounter] = cbu.mIndex;
@@ -346,23 +352,20 @@ namespace GeometryGym.Ifc
 	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef
 	{
 		internal double mDepth, mFlangeWidth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
-		internal double mFilletRadius, mEdgeRadius, mFlangeSlope;// : OPTIONAL IfcPlaneAngleMeasure;
-		//internal double mCentreOfGravityInX;// : : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
+		internal double mFilletRadius = double.NaN, mEdgeRadius = double.NaN, mFlangeSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
+																										//internal double mCentreOfGravityInX;// : : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
+		public double Depth { get { return mDepth; } set { mDepth = value; } }
+		public double FlangeWidth { get { return mFlangeWidth; } set { mFlangeWidth = value; } }
+		public double WebThickness { get { return mWebThickness; } set { mWebThickness = value; } }
+		public double FlangeThickness { get { return mFlangeThickness; } set { mFlangeThickness = value; } }
+		public double FilletRadius { get { return mFilletRadius; } set { mFilletRadius = value; } }
+		public double EdgeRadius { get { return mEdgeRadius; } set { mEdgeRadius = value; } }
+		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
+
 		internal IfcUShapeProfileDef() : base() { }
-		internal IfcUShapeProfileDef(IfcUShapeProfileDef p)
-			: base(p)
-		{
-			mDepth = p.mDepth;
-			mFlangeWidth = p.mFlangeWidth;
-			mWebThickness = p.mWebThickness;
-			mFlangeThickness = p.mFlangeThickness;
-			mFilletRadius = p.mFilletRadius;
-			mEdgeRadius = p.mEdgeRadius;
-			mFlangeSlope = p.mFlangeSlope;
-		}
-		public IfcUShapeProfileDef(DatabaseIfc m, string name, double depth, double flangeWidth, double webThickness, double flangeThickness, double filletRadius, double edgeRadius, double flangeSlope)
-			: base(m) { Name = name; mDepth = depth; mFlangeWidth = flangeWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; mFilletRadius = filletRadius; mEdgeRadius = edgeRadius; mFlangeSlope = flangeSlope; }
-		internal static void parseFields(IfcUShapeProfileDef p, List<string> arrFields, ref int ipos,Schema schema)
+		public IfcUShapeProfileDef(DatabaseIfc m, string name, double depth, double flangeWidth, double webThickness, double flangeThickness)
+			: base(m,name) { mDepth = depth; mFlangeWidth = flangeWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness;  }
+		internal static void parseFields(IfcUShapeProfileDef p, List<string> arrFields, ref int ipos,ReleaseVersion schema)
 		{
 			IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos);
 			p.mDepth = ParserSTEP.ParseDouble(arrFields[ipos++]);
@@ -372,10 +375,10 @@ namespace GeometryGym.Ifc
 			p.mFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mFlangeSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			if (schema == Schema.IFC2x3)
+			if (schema == ReleaseVersion.IFC2x3)
 				ipos++;
 		}
-		internal static IfcUShapeProfileDef Parse(string strDef, Schema schema) { IfcUShapeProfileDef p = new IfcUShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
-		protected override string BuildString() { return base.BuildString() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mSchema == Schema.IFC2x3 ? ",$" : ""); }
+		internal static IfcUShapeProfileDef Parse(string strDef, ReleaseVersion schema) { IfcUShapeProfileDef p = new IfcUShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ",$" : ""); }
 	}
 }

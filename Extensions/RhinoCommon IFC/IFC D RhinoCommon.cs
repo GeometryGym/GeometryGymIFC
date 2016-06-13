@@ -29,22 +29,22 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcDirection : IfcGeometricRepresentationItem
 	{
-		internal Vector3d Vector { get { return new Vector3d(mCoordinateX, mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
+		internal Vector3d Vector { get { return new Vector3d(mDirectionRatioX, mDirectionRatioY, double.IsNaN(mDirectionRatioZ) ? 0 : mDirectionRatioZ); } }
 		public IfcDirection(DatabaseIfc db, Vector3d v) : base(db)
 		{
 			Vector3d unit = v;
 			unit.Unitize();
 
-			mCoordinateX = unit.X;
-			mCoordinateY = unit.Y;
-			mCoordinateZ = unit.Z;
+			mDirectionRatioX = unit.X;
+			mDirectionRatioY = unit.Y;
+			mDirectionRatioZ = unit.Z;
 		}
 		public IfcDirection(DatabaseIfc db, Vector2d v) : base(db)
 		{
 			double len = v.Length;
-			mCoordinateX = v.X / len;
-			mCoordinateY = v.Y / len;
-			mCoordinateZ = double.NaN;
+			mDirectionRatioX = v.X / len;
+			mDirectionRatioY = v.Y / len;
+			mDirectionRatioZ = double.NaN;
 		}
 	}
 }

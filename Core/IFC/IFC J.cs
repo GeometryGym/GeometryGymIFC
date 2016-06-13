@@ -28,12 +28,12 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public class IfcJunctionBox : IfcFlowFitting //IFC4
+	public partial class IfcJunctionBox : IfcFlowFitting //IFC4
 	{
 		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// OPTIONAL : IfcJunctionBoxTypeEnum;
 		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcJunctionBox() : base() { }
-		internal IfcJunctionBox(IfcJunctionBox b) : base(b) { mPredefinedType = b.mPredefinedType; }
+		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
 		internal IfcJunctionBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcJunctionBox s, List<string> arrFields, ref int ipos)
@@ -44,9 +44,9 @@ namespace GeometryGym.Ifc
 				s.mPredefinedType = (IfcJunctionBoxTypeEnum)Enum.Parse(typeof(IfcJunctionBoxTypeEnum), str);
 		}
 		internal new static IfcJunctionBox Parse(string strDef) { IfcJunctionBox s = new IfcJunctionBox(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		protected override string BuildString()
+		protected override string BuildStringSTEP()
 		{
-			return base.BuildString() + (mDatabase.mSchema == Schema.IFC2x3 ? "" : (mPredefinedType == IfcJunctionBoxTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcJunctionBoxTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
 	}
 	internal class IfcJunctionBoxType : IfcFlowFittingType
@@ -54,10 +54,10 @@ namespace GeometryGym.Ifc
 		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// : IfcJunctionBoxTypeEnum;
 		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcJunctionBoxType() : base() { }
-		internal IfcJunctionBoxType(IfcJunctionBoxType t) : base(t) { mPredefinedType = t.mPredefinedType; }
+		internal IfcJunctionBoxType(DatabaseIfc db, IfcJunctionBoxType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcJunctionBoxType(DatabaseIfc m, string name, IfcJunctionBoxTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcJunctionBoxType t, List<string> arrFields, ref int ipos) { IfcFlowFittingType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcJunctionBoxTypeEnum)Enum.Parse(typeof(IfcJunctionBoxTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcJunctionBoxType Parse(string strDef) { IfcJunctionBoxType t = new IfcJunctionBoxType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildString() { return base.BuildString() + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
 }

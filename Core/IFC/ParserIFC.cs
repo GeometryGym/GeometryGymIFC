@@ -198,7 +198,7 @@ namespace GeometryGym.Ifc
 				ilast++;
 			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
 		}
-		internal static BaseClassIfc ParseLine(string line, Schema schema)
+		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema)
 		{
 			string kw = "", str = "";
 			int ifcID = 0;
@@ -217,12 +217,12 @@ namespace GeometryGym.Ifc
 			result.mIndex = ifcID;
 			return result;
 		}
-		private static BaseClassIfc LineParser(string keyword, string str, Schema schema)
+		private static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion schema)
 		{
 			Type type = Type.GetType("GeometryGym.Ifc." + keyword,false,true);
 			if (type != null)
 			{
-				Type[] arguments = new Type[] { typeof(string), typeof(Schema) };
+				Type[] arguments = new Type[] { typeof(string), typeof(ReleaseVersion) };
 				MethodInfo parser = type.GetMethod("Parse",BindingFlags.Static | BindingFlags.NonPublic,null,CallingConventions.Any, arguments,null);
 				if (parser != null)
 					return parser.Invoke(null, new object[] { str,schema }) as BaseClassIfc;

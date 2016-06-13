@@ -28,7 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public class Pset_DistributionPortTypeDuct : IfcPropertySet
+	public partial class Pset_DistributionPortTypeDuct : IfcPropertySet
 	{
 		public PEnum_DuctConnectionType ConnectionType { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ConnectionType", new IfcLabel(value.ToString())).mIndex); } }
 		public double NominalWidth { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NominalWidth", new IfcPositiveLengthMeasure(value)).mIndex); } }
@@ -51,23 +51,23 @@ namespace GeometryGym.Ifc
 		//	props.Add(new IfcPropertySingleValue(mDatabase, Pset_DistributionPortTypeDuct.mPressureLabel, "", new IfcPressureMeasure(pressure)));
 		public Pset_DistributionPortTypeDuct(DatabaseIfc db) : base(db, "Pset_DistributionPortTypeDuct") { }
 	}
-	public class Pset_MaterialCommon : IfcMaterialProperties
+	public partial class Pset_MaterialCommon : IfcMaterialProperties
 	{
 		public double MolecularWeight { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MolecularWeight", new IfcMolecularWeightMeasure(value)).mIndex); } }
 		public double Porosity { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "Porosity", new IfcNormalisedRatioMeasure(value)).mIndex); } }
 		public double MassDensity { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MassDensity", new IfcMassDensityMeasure(value)).mIndex); } }
-		public Pset_MaterialCommon(IfcMaterialDefinition material) : base( "Pset_MaterialCommon",material) { }
+		public Pset_MaterialCommon(IfcMaterialDefinition material) : base( "Pset_MaterialCommon",material) { Description = material.Name; }
 	}
-	public class Pset_MaterialMechanical : IfcMaterialProperties
+	public partial class Pset_MaterialMechanical : IfcMaterialProperties
 	{
 		public double DynamicViscosity { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "DynamicViscosity", new IfcDynamicViscosityMeasure(value)).mIndex); } }
 		public double YoungModulus { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "YoungModulus", new IfcModulusOfElasticityMeasure(value)).mIndex); } }
 		public double ShearModulus { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearModulus", new IfcModulusOfElasticityMeasure(value)).mIndex); } }
 		public double PoissonRatio { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "PoissonRatio", new IfcPositiveRatioMeasure(value)).mIndex); } }
 		public double ThermalExpansionCoefficient { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ThermalExpansionCoefficient", new IfcThermalExpansionCoefficientMeasure(value)).mIndex); } }
-		public Pset_MaterialMechanical(IfcMaterialDefinition material) : base("Pset_MaterialMechanical",material) { }
+		public Pset_MaterialMechanical(IfcMaterialDefinition material) : base("Pset_MaterialMechanical",material) { Description = material.Name; }
 	}
-	public class Pset_MaterialSteel : IfcMaterialProperties
+	public partial class Pset_MaterialSteel : IfcMaterialProperties
 	{
 		public double YieldStress { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "YieldStress", new IfcPressureMeasure(value)).mIndex); } }
 		public double UltimateStress { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "UltimateStress", new IfcPressureMeasure(value)).mIndex); } }
@@ -76,6 +76,36 @@ namespace GeometryGym.Ifc
 		public double ProportionalStress { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ProportionalStress", new IfcPressureMeasure(value)).mIndex); } }
 		public double PlasticStrain { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "PlasticStrain", new IfcPositiveRatioMeasure(value)).mIndex); } }
 		//public double Relaxations { set { if (value > 0) mExtendedProperties.Add(new ifctableValue IfcPropertySingleValue(mDatabase, "Relaxations", new IfcPositiveRatioMeasure(value)).mIndex); } }
-		public Pset_MaterialSteel(IfcMaterialDefinition material) : base("Pset_MaterialSteel", material) { }
+		public Pset_MaterialSteel(IfcMaterialDefinition material) : base("Pset_MaterialSteel", material) { Description = material.Name; }
+	}
+
+	public partial class Pset_ProfileMechanical : IfcProfileProperties
+	{
+		public double MassPerLength { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MassPerLength", "", new IfcMassPerLengthMeasure(value)).mIndex); } }
+		public double CrossSectionArea { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "CrossSectionArea", "", new IfcAreaMeasure(value)).mIndex); } }
+		public double Perimeter { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "Perimeter", "", new IfcPositiveLengthMeasure(value)).mIndex); } }
+		public double MinimumPlateThickness { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MinimumPlateThickness", "", new IfcPositiveLengthMeasure(value)).mIndex); } }
+		public double MaximumPlateThickness { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MaximumPlateThickness", "", new IfcPositiveLengthMeasure(value)).mIndex); } }
+		public double CentreOfGravityInX { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "CentreOfGravityInX", "", new IfcLengthMeasure(value)).mIndex); } }
+		public double CentreOfGravityInY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "CentreOfGravityInY", "", new IfcLengthMeasure(value)).mIndex); } }
+		public double ShearCentreZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearCentreZ", "", new IfcLengthMeasure(value)).mIndex); } }
+		public double ShearCentreY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearCentreY", "", new IfcLengthMeasure(value)).mIndex); } }
+		public double MomentOfInertiaY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MomentOfInertiaY", "", new IfcMomentOfInertiaMeasure(value)).mIndex); } }
+		public double MomentOfInertiaZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MomentOfInertiaZ", "", new IfcMomentOfInertiaMeasure(value)).mIndex); } }
+		public double MomentOfInertiaYZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MomentOfInertiaYZ", "", new IfcMomentOfInertiaMeasure(value)).mIndex); } }
+		public double TorsionalConstantX { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "TorsionalConstantX", "", new IfcMomentOfInertiaMeasure(value)).mIndex); } }
+		public double WarpingConstant { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "WarpingConstant", "", new IfcWarpingConstantMeasure(value)).mIndex); } }
+		public double ShearDeformationAreaZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearDeformationAreaZ", "", new IfcAreaMeasure(value)).mIndex); } }
+		public double ShearDeformationAreaY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearDeformationAreaY", "", new IfcAreaMeasure(value)).mIndex); } }
+		public double MaximumSectionModulusY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MaximumSectionModulusY", "", new IfcSectionModulusMeasure(value)).mIndex); } }
+		public double MinimumSectionModulusY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MinimumSectionModulusY", "", new IfcSectionModulusMeasure(value)).mIndex); } }
+		public double MaximumSectionModulusZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MaximumSectionModulusZ", "", new IfcSectionModulusMeasure(value)).mIndex); } }
+		public double MinimumSectionModulusZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "MinimumSectionModulusZ", "", new IfcSectionModulusMeasure(value)).mIndex); } }
+		public double TorsionalSectionModulus { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "TorsionalSectionModulus", "", new IfcSectionModulusMeasure(value)).mIndex); } }
+		public double ShearAreaZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearAreaZ", "", new IfcAreaMeasure(value)).mIndex); } }
+		public double ShearAreaY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "ShearAreaY", "", new IfcAreaMeasure(value)).mIndex); } }
+		public double PlasticShapeFactorY { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "PlasticShapeFactorY", "", new IfcPositiveRatioMeasure(value)).mIndex); } }
+		public double PlasticShapeFactorZ { set { mExtendedProperties.Add(new IfcPropertySingleValue(mDatabase, "PlasticShapeFactorZ", "", new IfcPositiveRatioMeasure(value)).mIndex); } }
+		public Pset_ProfileMechanical(IfcProfileDef profileDef) : base("Pset_ProfileMechanical", profileDef) { Description = profileDef.Name; }
 	}
 }
