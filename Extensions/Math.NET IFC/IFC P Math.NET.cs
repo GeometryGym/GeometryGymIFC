@@ -19,4 +19,5 @@ namespace GeometryGym.Ifc
 
 		protected IfcPlacement(DatabaseIfc db, Point2D position) : base(db) { Location = new IfcCartesianPoint(db, position); }
 	}
+	
 }	

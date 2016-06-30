@@ -31,8 +31,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcImageTexture : IfcSurfaceTexture
 	{
 		internal string mUrlReference;// : IfcIdentifier; 
+		public string UrlReference { get { return  ParserIfc.Decode(mUrlReference); } set { mUrlReference = ParserIfc.Encode(value); } }
 		internal IfcImageTexture() : base() { }
-		internal IfcImageTexture(IfcImageTexture i) : base((IfcSurfaceTexture)i) { mUrlReference = i.mUrlReference; }
+		internal IfcImageTexture(IfcImageTexture i) : base(i) { mUrlReference = i.mUrlReference; }
+		public IfcImageTexture(DatabaseIfc db,bool repeatS, bool repeatT, string urlReference) : base(db,repeatS,repeatT) { UrlReference = urlReference; }
 		internal static IfcImageTexture Parse(string strDef, ReleaseVersion schema) { IfcImageTexture t = new IfcImageTexture(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return t; }
 		internal static void parseFields(IfcImageTexture t, List<string> arrFields, ref int ipos,ReleaseVersion schema)
 		{
@@ -242,7 +244,7 @@ namespace GeometryGym.Ifc
 	}
 	//ENTITY IfcIrregularTimeSeries
 	//ENTITY IfcIrregularTimeSeriesValue;ductFittingTypeEnum;
-	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef 
+	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{
 		internal double mOverallWidth, mOverallDepth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;

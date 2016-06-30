@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		private IfcUnitEnum mUnitType;// : IfcUnitEnum 
 
 		public IfcDimensionalExponents Dimensions { get { return mDatabase[mDimensions] as IfcDimensionalExponents;  } set { mDimensions = value.Index; } }
-		public IfcUnitEnum UnitType { get { return mUnitType; } }
+		public IfcUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
 
 		protected IfcNamedUnit() : base() { }
 		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit p) : base(db) { if(p.mDimensions > 0) Dimensions = db.Duplicate(p.Dimensions) as IfcDimensionalExponents; mUnitType = p.mUnitType; }

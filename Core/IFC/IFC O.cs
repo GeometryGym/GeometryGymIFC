@@ -78,6 +78,7 @@ namespace GeometryGym.Ifc
 		protected static void parseFields(IfcObject obj, List<string> arrFields, ref int ipos) { IfcObjectDefinition.parseFields(obj, arrFields, ref ipos); obj.mObjectType = arrFields[ipos++].Replace("'", ""); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mObjectType == "$" ? ",$" : ",'" + mObjectType + "'"); }
 
+		
 	}
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
 	{	//INVERSE  
@@ -221,12 +222,39 @@ namespace GeometryGym.Ifc
 			if (m != null)
 				m.Associates.addAssociation(this);
 		}
+
+		public virtual List<T> Extract<T>() where T : IBaseClassIfc
+		{
+			// Early implementation, should search for typed objects such as products and type products.  Contact Jon
+			// for expanding for more ifc classes
+			List<T> result = new List<T>();
+			foreach(IfcRelNests rns in mIsNestedBy)
+			{
+				foreach(IfcObjectDefinition od in rns.RelatedObjects)
+				{
+					if(od is T)
+						result.Add((T)(IBaseClassIfc) od);
+					result.AddRange(od.Extract<T>());
+				}
+			}
+			foreach(IfcRelAggregates rags in mIsDecomposedBy)
+			{
+				foreach (IfcObjectDefinition od in rags.RelatedObjects)
+				{
+					if(od is T)
+						result.Add((T)(IBaseClassIfc) od);
+					result.AddRange(od.Extract<T>());
+				}
+			}
+			return result;
+		}
 	}
 	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
 	{	//INVERSE 
-		internal List<IfcProduct> mPlacesObject = new List<IfcProduct>();// : SET [1:?] OF IfcProduct FOR ObjectPlacement;
+		internal List<IfcProduct> mPlacesObject = new List<IfcProduct>();// : SET [0:?] OF IfcProduct FOR ObjectPlacement; ifc2x3 [1:?] 
 		internal List<IfcLocalPlacement> mReferencedByPlacements = new List<IfcLocalPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
 		internal IfcProduct mContainerHost = null;
+
 		protected IfcObjectPlacement() : base() { }
 		protected IfcObjectPlacement(DatabaseIfc db) : base(db) { }
 		protected IfcObjectPlacement(DatabaseIfc db, IfcProduct p) : base(db)
@@ -248,7 +276,8 @@ namespace GeometryGym.Ifc
 		internal IfcObjectiveEnum mObjectiveQualifier = IfcObjectiveEnum.NOTDEFINED;// : 	IfcObjectiveEnum
 		internal string mUserDefinedQualifier = "$";
 
-		internal List<IfcConstraint> BenchMarks { get { return mBenchmarkValues.ConvertAll(x => mDatabase[x] as IfcConstraint); } }
+		public List<IfcConstraint> BenchmarkValues { get { return mBenchmarkValues.ConvertAll(x => mDatabase[x] as IfcConstraint); } set { mBenchmarkValues = value.ConvertAll(x => x.mIndex); } }
+		public string UserDefinedQualifier { get { return (mUserDefinedQualifier == "$" ? "" : ParserIfc.Decode(mUserDefinedQualifier)); } set { mUserDefinedQualifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcObjective() : base() { }
 		internal IfcObjective(IfcObjective m) : base(m) { mBenchmarkValues = new List<int>(m.mBenchmarkValues.ToArray()); mLogicalAggregator = m.mLogicalAggregator;  mObjectiveQualifier = m.mObjectiveQualifier; mUserDefinedQualifier = m.mUserDefinedQualifier; }
@@ -335,7 +364,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOpeningStandardCase : IfcOpeningElement //IFC4
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCOPENINGELEMENT" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcOpeningElement" : base.KeyWord); } }
 		internal IfcOpeningStandardCase() : base() { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }
 		public IfcOpeningStandardCase(DatabaseIfc db, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(db) { Placement = placement; Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(eas)); }
@@ -395,7 +424,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcOrganization() : base() { }
-		internal IfcOrganization(DatabaseIfc db) : base(db) { } //Used only for developer
+		internal IfcOrganization(DatabaseIfc db) : base(db) { } 
 		internal IfcOrganization(DatabaseIfc db, IfcOrganization o) : base(db)
 		{
 			mIdentification = o.mIdentification;
@@ -500,10 +529,10 @@ namespace GeometryGym.Ifc
 		public IfcApplication OwningApplication { get { return mDatabase[mOwningApplication] as IfcApplication; } set { mOwningApplication = value.mIndex; } }
 		public IfcStateEnum State { get { return mState; } set { mState = value; } }
 		public IfcChangeActionEnum ChangeAction { get { return mChangeAction; } set { mChangeAction = value; } }
-		public int LastModifiedDate { get { return mLastModifiedDate; } }
-		public IfcPersonAndOrganization LastModifyingUser { get { return mDatabase[mLastModifyingUser] as IfcPersonAndOrganization; } set { mOwningUser = value.mIndex; } }
-		public IfcApplication LastModifyingApplication { get { return mDatabase[mLastModifyingApplication] as IfcApplication; } }
-		public int CreationDate { get { return mCreationDate; } }
+		public int LastModifiedDate { get { return mLastModifiedDate; } set { mLastModifiedDate = value; } }
+		public IfcPersonAndOrganization LastModifyingUser { get { return mDatabase[mLastModifyingUser] as IfcPersonAndOrganization; } set { mOwningUser = (value == null ? 0 : value.mIndex); } }
+		public IfcApplication LastModifyingApplication { get { return mDatabase[mLastModifyingApplication] as IfcApplication; } set { mLastModifyingApplication = (value == null ? 0 : value.mIndex); } }
+		public int CreationDate { get { return mCreationDate; } set { mCreationDate = value; } }
 
 		internal IfcOwnerHistory() : base() { }
 		public IfcOwnerHistory(IfcPersonAndOrganization po, IfcApplication app, IfcChangeActionEnum ca) : base(po.mDatabase)

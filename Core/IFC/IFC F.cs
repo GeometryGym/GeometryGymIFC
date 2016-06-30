@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { Bounds = f.Bounds.ConvertAll(x=>db.Duplicate(x) as IfcFaceBound); }
 		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer.mIndex); }
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner.mIndex); }
-		internal IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds = bounds.ConvertAll(x => x.mIndex); }
+		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds = bounds.ConvertAll(x => x.mIndex); }
 		internal static IfcFace Parse(string str)
 		{
 			IfcFace f = new IfcFace();
@@ -55,7 +55,7 @@ namespace GeometryGym.Ifc
 			return str + ")";
 		}
 	}
-	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem
+	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
 		private List<int> mFbsmFaces = new List<int>();// : SET [1:?] OF IfcConnectedFaceSet;
 		public List<IfcConnectedFaceSet> FbsmFaces { get { return mFbsmFaces.ConvertAll(x =>mDatabase[x] as IfcConnectedFaceSet); } set { mFbsmFaces = value.ConvertAll(x => x.mIndex); } }
@@ -116,7 +116,7 @@ namespace GeometryGym.Ifc
 			return b;
 		}
 	}
-	public partial class IfcFaceSurface : IfcFace //SUPERTYPE OF(IfcAdvancedFace)
+	public partial class IfcFaceSurface : IfcFace, IfcSurfaceOrFaceSurface //SUPERTYPE OF(IfcAdvancedFace)
 	{
 		internal int mFaceSurface;// : IfcSurface;
 		internal bool mSameSense = true;// : BOOLEAN;
@@ -124,12 +124,11 @@ namespace GeometryGym.Ifc
 		public IfcSurface FaceSurface { get { return mDatabase[mFaceSurface] as IfcSurface; } set { mFaceSurface = value.mIndex; } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 
-		internal IfcFaceSurface() : base() { }
+		internal IfcFaceSurface() : base() { } 
 		internal IfcFaceSurface(DatabaseIfc db, IfcFaceSurface s) : base(db,s) { FaceSurface = db.Duplicate( s.FaceSurface) as IfcSurface; mSameSense = s.mSameSense; }
-		internal IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
-		internal IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
-		internal IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense)
-			: base(bounds) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
+		public IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
+		public IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
+		public IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense) : base(bounds) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		internal new static IfcFaceSurface Parse(string strDef) { IfcFaceSurface s = new IfcFaceSurface(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		internal static void parseFields(IfcFaceSurface s, List<string> arrFields, ref int ipos) { IfcFace.parseFields(s, arrFields, ref ipos); s.mFaceSurface = ParserSTEP.ParseLink(arrFields[ipos++]); s.mSameSense = ParserSTEP.ParseBool(arrFields[ipos]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mFaceSurface) + "," + ParserSTEP.BoolToString(mSameSense); }
@@ -226,6 +225,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcFeatureElement() : base() { }
 		protected IfcFeatureElement(DatabaseIfc db) : base(db) {  }
+		protected IfcFeatureElement(DatabaseIfc db, IfcFeatureElement e) : base(db, e) { }
 		protected IfcFeatureElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		protected static void parseFields(IfcFeatureElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -235,6 +235,7 @@ namespace GeometryGym.Ifc
 		public List<IfcRelProjectsElement> ProjectsElements { get { return mProjectsElements; } }
 
 		protected IfcFeatureElementAddition() : base() { }
+		protected IfcFeatureElementAddition(DatabaseIfc db, IfcFeatureElementAddition e) : base(db,e) { }
 		protected static void parseFields(IfcFeatureElementAddition e, List<string> arrFields, ref int ipos) { IfcFeatureElement.parseFields(e, arrFields, ref ipos); }
 	}
 	public abstract partial class IfcFeatureElementSubtraction : IfcFeatureElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcOpeningElement ,IfcVoidingFeature)) 
@@ -308,6 +309,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcFilterType : IfcFlowTreatmentDeviceType
 	{
 		internal IfcFilterTypeEnum mPredefinedType = IfcFilterTypeEnum.NOTDEFINED;// : IfcFilterTypeEnum;
+		public IfcFilterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcFilterType() : base() { }
 		internal IfcFilterType(DatabaseIfc db, IfcFilterType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcFilterType t, List<string> arrFields, ref int ipos) { IfcFlowTreatmentDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcFilterTypeEnum)Enum.Parse(typeof(IfcFilterTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -379,7 +381,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
 	{ //, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve))
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IFCFLOWCONTROLLER" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IfcFlowController" : base.KeyWord; } }
 
 		internal IfcFlowController() : base() { }
 		internal IfcFlowController(DatabaseIfc db, IfcFlowController c) : base(db,c) { }
@@ -397,7 +399,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowFitting : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcCableCarrierFitting, IfcCableFitting, IfcDuctFitting, IfcJunctionBox, IfcPipeFitting))
 	{
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWFITTING" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowFitting" : base.KeyWord; } }
 
 		internal IfcFlowFitting() : base() { }
 		internal IfcFlowFitting(DatabaseIfc db, IfcFlowFitting f) : base(db,f) { }
@@ -479,7 +481,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowMovingDevice : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCompressor, IfcFan, IfcPump))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWMOVINGDEVICE" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowMovingDevice" : base.KeyWord); } }
 
 		internal IfcFlowMovingDevice() : base() { }
 		internal IfcFlowMovingDevice(DatabaseIfc db, IfcFlowMovingDevice d) : base(db, d) { }
@@ -497,7 +499,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowSegment : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCableCarrierSegment, IfcCableSegment, IfcDuctSegment, IfcPipeSegment))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWSEGMENT" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowSegment" : base.KeyWord); } }
 
 		internal IfcFlowSegment() : base() { }
 		internal IfcFlowSegment(DatabaseIfc db, IfcFlowSegment s) : base(db, s) { }
@@ -515,7 +517,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowStorageDevice : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcElectricFlowStorageDevice, IfcTank))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWSTORAGEDEVICE" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowStorageDevice" : base.KeyWord); } }
 
 		internal IfcFlowStorageDevice() : base() { }
 		internal IfcFlowStorageDevice(DatabaseIfc db, IfcFlowStorageDevice d) : base(db,d) { }
@@ -531,7 +533,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowTerminal : IfcDistributionFlowElement 	//SUPERTYPE OF(ONEOF(IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWTERMINAL" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTerminal" : base.KeyWord); } }
 
 		internal IfcFlowTerminal() : base() { }
 		internal IfcFlowTerminal(DatabaseIfc db, IfcFlowTerminal t) : base(db, t) { }
@@ -549,7 +551,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFlowTreatmentDevice : IfcDistributionFlowElement // 	SUPERTYPE OF(ONEOF(IfcDuctSilencer, IfcFilter, IfcInterceptor))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFLOWTREATMENTDEVICE" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTreatmentDevice" : base.KeyWord); } }
 
 		internal IfcFlowTreatmentDevice() : base() { }
 		internal IfcFlowTreatmentDevice(DatabaseIfc db, IfcFlowTreatmentDevice d) : base(db, d) { }
@@ -661,7 +663,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFurniture : IfcFurnishingElement
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCFURNISHINGELEMENT" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFurnishingElement" : base.KeyWord); } }
 		internal IfcFurnitureTypeEnum mPredefinedType = IfcFurnitureTypeEnum.NOTDEFINED;//: OPTIONAL IfcFurnitureTypeEnum;
 		internal IfcFurniture() : base() { }
 		internal IfcFurniture(DatabaseIfc db, IfcFurniture f) : base(db, f) { mPredefinedType = f.mPredefinedType; }

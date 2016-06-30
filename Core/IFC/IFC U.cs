@@ -28,7 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial interface IfcUnit : IfcInterface { } // = SELECT(IfcDerivedUnit, IfcNamedUnit, IfcMonetaryUnit);
+	public partial interface IfcUnit : IBaseClassIfc { } // = SELECT(IfcDerivedUnit, IfcNamedUnit, IfcMonetaryUnit);
 	public partial class IfcUnitaryControlElement : IfcDistributionControlElement //IFC4  
 	{
 		internal IfcUnitaryControlElementTypeEnum mPredefinedType = IfcUnitaryControlElementTypeEnum.NOTDEFINED;
@@ -123,12 +123,14 @@ namespace GeometryGym.Ifc
 			}
 			else if (length == Length.Foot)
 			{
-				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(1 / 3.2808399), mDatabase.mSILength);
+				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(0.3048), mDatabase.mSILength);
 				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Feet", mwu).mIndex);
-				mDatabase.ScaleSI = 1 / 3.2808399;
+				mDatabase.ScaleSI = 0.3048;
 			}
 			else
 			{
+				if (mDatabase.mSILength == null)
+					mDatabase.mSILength = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE);
 				mUnits.Add(mDatabase.mSILength.mIndex);
 				mDatabase.ScaleSI = 1;
 			}
@@ -353,7 +355,8 @@ namespace GeometryGym.Ifc
 	{
 		internal double mDepth, mFlangeWidth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN, mEdgeRadius = double.NaN, mFlangeSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
-																										//internal double mCentreOfGravityInX;// : : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
+		internal double mCentreOfGravityInX = double.NaN;// : : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
+
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 		public double FlangeWidth { get { return mFlangeWidth; } set { mFlangeWidth = value; } }
 		public double WebThickness { get { return mWebThickness; } set { mWebThickness = value; } }
@@ -363,6 +366,17 @@ namespace GeometryGym.Ifc
 		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcUShapeProfileDef() : base() { }
+		internal IfcUShapeProfileDef(DatabaseIfc db, IfcUShapeProfileDef p) : base(db, p)
+		{
+			mDepth = p.mDepth;
+			mFlangeWidth = p.mFlangeWidth;
+			mWebThickness = p.mWebThickness;
+			mFlangeThickness = p.mFlangeThickness;
+			mFilletRadius = p.mFilletRadius;
+			mEdgeRadius = p.mEdgeRadius;
+			mFlangeSlope = p.mFlangeSlope;
+			mCentreOfGravityInX = p.mCentreOfGravityInX;
+		}
 		public IfcUShapeProfileDef(DatabaseIfc m, string name, double depth, double flangeWidth, double webThickness, double flangeThickness)
 			: base(m,name) { mDepth = depth; mFlangeWidth = flangeWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness;  }
 		internal static void parseFields(IfcUShapeProfileDef p, List<string> arrFields, ref int ipos,ReleaseVersion schema)
@@ -375,10 +389,10 @@ namespace GeometryGym.Ifc
 			p.mFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mFlangeSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			if (schema == ReleaseVersion.IFC2x3)
-				ipos++;
+			if(schema == ReleaseVersion.IFC2x3)
+				p.mCentreOfGravityInX = ParserSTEP.ParseDouble(arrFields[ipos++]);
 		}
 		internal static IfcUShapeProfileDef Parse(string strDef, ReleaseVersion schema) { IfcUShapeProfileDef p = new IfcUShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ",$" : ""); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInX) : ""); }
 	}
 }

@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		internal IfcZone() : base() { }
 		internal IfcZone(DatabaseIfc db, IfcZone z) : base(db, z) { mLongName = z.mLongName; }
 		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
-		internal IfcZone(IfcSpatialElement e, string name, string longname, List<IfcSpace> spaces) : base(e, name)
+		public IfcZone(IfcSpatialElement e, string name, string longname, List<IfcSpace> spaces) : base(e, name)
 		{
 			if (spaces != null)
 				mIsGroupedBy[0].mRelatedObjects.AddRange(spaces.ConvertAll(x => x.mIndex));
@@ -53,8 +53,10 @@ namespace GeometryGym.Ifc
 		internal double mFlangeThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
+
 		internal IfcZShapeProfileDef() : base() { }
-		
+		internal IfcZShapeProfileDef(DatabaseIfc db, IfcZShapeProfileDef p) : base(db, p) { mDepth = p.mDepth; mFlangeWidth = p.mFlangeWidth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mEdgeRadius = p.mEdgeRadius; }
+
 		internal new static IfcZShapeProfileDef Parse(string strDef) { IfcZShapeProfileDef p = new IfcZShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcZShapeProfileDef p, List<string> arrFields, ref int ipos)
 		{

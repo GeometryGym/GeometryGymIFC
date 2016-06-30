@@ -123,12 +123,13 @@ namespace GeometryGym.Ifc
 			return new IfcDateAndTime(cd, new IfcLocalTime(m, date.Hour, date.Minute, date.Second));
 		}
 	}
-	public interface IfcDateTimeSelect : IfcInterface { DateTime DateTime { get; } } // IFC2x3 IfcCalenderDate, IfcDateAndTime, IfcLocalTime 
+	public interface IfcDateTimeSelect : IBaseClassIfc { DateTime DateTime { get; } } // IFC2x3 IfcCalenderDate, IfcDateAndTime, IfcLocalTime 
 	//ENTITY IfcDefinedSymbol  // DEPRECEATED IFC4
-	public interface IfcDefinitionSelect : IfcInterface // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
+	public interface IfcDefinitionSelect : IBaseClassIfc // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
 	{
 		IfcRelDeclares HasContext { get; set; }
 		List<IfcRelAssociates> HasAssociations { get; }
+		List<T> Extract<T>() where T : IBaseClassIfc;
 	}
 	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
 	{
@@ -206,13 +207,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDimensionalExponents : BaseClassIfc
 	{
-		internal int mLengthExponent;// : INTEGER;
-		internal int mMassExponent;// : INTEGER;
-		internal int mTimeExponent;// : INTEGER;
-		internal int mElectricCurrentExponent;// : INTEGER;
-		internal int mThermodynamicTemperatureExponent;// : INTEGER;
-		internal int mAmountOfSubstanceExponent;// : INTEGER;
-		internal int mLuminousIntensityExponent;// : INTEGER;
+		internal int mLengthExponent, mMassExponent,mTimeExponent, mElectricCurrentExponent, mThermodynamicTemperatureExponent, mAmountOfSubstanceExponent, mLuminousIntensityExponent;// : INTEGER;
 		internal IfcDimensionalExponents() : base() { }
 		internal IfcDimensionalExponents(DatabaseIfc m, int len, int mass, int time, int elecCurr, int themrmo, int amountSubs, int luminous) : base(m)
 		{
@@ -408,7 +403,7 @@ namespace GeometryGym.Ifc
 	} 
 	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
 	{ // IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement)) //"IFCDISTRIBUTIONCONTROLELEMENT"
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCDISTRIBUTIONCONTROLELEMENT" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDistributionControlElement" : base.KeyWord; } }
 
 		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
 		internal string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
@@ -434,7 +429,7 @@ namespace GeometryGym.Ifc
 		internal IfcDistributionElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		internal IfcDistributionElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
 		
-		internal static void parseFields(IfcDiscreteAccessoryType e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
+		internal static void parseFields(IfcDistributionElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 		internal static IfcDistributionElement Parse(string strDef) { IfcDistributionElement e = new IfcDistributionElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal IfcDistributionSystem getSystem()
 		{
@@ -461,7 +456,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDistributionFlowElement : IfcDistributionElement //SUPERTYPE OF (ONEOF (IfcDistributionChamberElement ,IfcEnergyConversionDevice ,
 	{ 	//IfcFlowController ,IfcFlowFitting ,IfcFlowMovingDevice,IfcFlowSegment ,IfcFlowStorageDevice ,IfcFlowTerminal ,IfcFlowTreatmentDevice))
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCDISTRIBUTIONFLOWELEMENT" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDistributionFlowElement" : base.KeyWord; } }
 
 		//INVERSE 	HasControlElements : SET [0:1] OF IfcRelFlowControlElements FOR RelatingFlowElement;
 		//GG
@@ -492,10 +487,10 @@ namespace GeometryGym.Ifc
 		public IfcDistributionSystemEnum SystemType { get { return mSystemType; } set { mSystemType = value; } }
 
 		internal IfcDistributionPort() : base() { }
-		internal IfcDistributionPort(IfcDistributionPort p) : base(p) { mFlowDirection = p.mFlowDirection; mPredefinedType = p.mPredefinedType; mSystemType = p.mSystemType; }
 		public IfcDistributionPort(IfcElement host) : base(host) { }
 		public IfcDistributionPort(IfcElementType host) : base(host) { }
 		public IfcDistributionPort(DatabaseIfc db) : base(db) { }
+		internal IfcDistributionPort(DatabaseIfc db, IfcDistributionPort p) : base(db,p) { mFlowDirection = p.mFlowDirection; mPredefinedType = p.mPredefinedType; mSystemType = p.mSystemType; }
 		internal static void parseFields(IfcDistributionPort p, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			IfcPort.parseFields(p, arrFields, ref ipos);
@@ -711,7 +706,7 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mDescription == "$" ? ",$," : ",'" + mDescription + "',") + ParserSTEP.LinkToString(mReferencedDocument)); }
 	}
-	public interface IfcDocumentSelect : IfcInterface //IFC4 SELECT (	IfcDocumentReference, IfcDocumentInformation);
+	public interface IfcDocumentSelect : IBaseClassIfc //IFC4 SELECT (	IfcDocumentReference, IfcDocumentInformation);
 	{
 		List<IfcRelAssociatesDocument> Associates { get; set; }
 	}
@@ -818,7 +813,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDoorStandardCase : IfcDoor
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IFCDOOR" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcDoor" : base.KeyWord); } }
 		internal IfcDoorStandardCase() : base() { }
 
 		internal new static IfcDoorStandardCase Parse(string strDef, ReleaseVersion schema) { IfcDoorStandardCase s = new IfcDoorStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
@@ -846,7 +841,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCDOORSTYLE" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDoorStyle" : base.KeyWord); } }
 
 		internal IfcDoorTypeEnum mPredefinedType = IfcDoorTypeEnum.NOTDEFINED;
 		internal IfcDoorTypeOperationEnum mOperationType;// : IfcDoorStyleOperationEnum; 
@@ -910,7 +905,7 @@ namespace GeometryGym.Ifc
 			return str + ")";
 		}
 	}
-	public interface IfcDraughtingCalloutElement : IfcInterface { } //SELECT (IfcAnnotationCurveOccurrence ,IfcAnnotationTextOccurrence ,IfcAnnotationSymbolOccurrence);
+	public interface IfcDraughtingCalloutElement : IBaseClassIfc { } //SELECT (IfcAnnotationCurveOccurrence ,IfcAnnotationTextOccurrence ,IfcAnnotationSymbolOccurrence);
 	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECEATED IFC4
 	{
 		internal string mName = "$";// : OPTIONAL IfcLabel;

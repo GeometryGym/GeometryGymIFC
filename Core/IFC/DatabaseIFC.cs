@@ -403,6 +403,11 @@ namespace GeometryGym.Ifc
 		}
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
 
+		internal class GenerateOptions
+		{
+			internal bool mGenerateOwnerHistory = true;
+		}
+		internal GenerateOptions mOptions = new GenerateOptions();
 		internal ModelView mModelView = ModelView.If2x3NotAssigned;
 		internal bool mAccuratePreview = false; 
 		public string FolderPath { get; set; } = "";
@@ -457,7 +462,7 @@ namespace GeometryGym.Ifc
 				if (mIfcObjects.Count <= index)
 				{
 					for (int ncounter = mIfcObjects.Count; ncounter <= index; ncounter++)
-						mIfcObjects.Add(new BaseClassIfc());
+						mIfcObjects.Add(null);
 				}
 				mIfcObjects[index] = value;
 				if (index == mNextBlank)
@@ -474,7 +479,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement2D m2DPlaceOrigin;
 		internal IfcSIUnit mSILength, mSIArea, mSIVolume;
 		internal IfcGeometricRepresentationContext mGeomRepContxt;
-		internal IfcGeometricRepresentationSubContext mGeoRepSubContxtBody = null, mGeoRepSubContxtAxis=null, mGeoRepSubContxtAnalysisSurface = null;
+		
 		private IfcApplication mApplication = null;
 		internal IfcApplication Application
 		{
@@ -491,9 +496,47 @@ namespace GeometryGym.Ifc
 			get
 			{
 				if (mPersonOrganization == null)
-					mPersonOrganization = new IfcPersonAndOrganization(this);
+					mPersonOrganization = new IfcPersonAndOrganization(Person, Organization);
 				return mPersonOrganization;
 			}
+		}
+		private IfcPerson mPerson = null;
+		internal IfcPerson Person
+		{
+			get
+			{
+				if (mPerson == null)
+				{
+					mPerson = new IfcPerson(this, System.Environment.UserName.Replace("'", ""),"","");
+#if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
+			string str = GGYM.ggAssembly.mOptions.OwnerRole;
+			if (!string.IsNullOrEmpty(str))
+			{
+				IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcRoleEnum>(str, out role))
+				{
+					if (role != IfcRoleEnum.NOTDEFINED)
+						mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(this, role, "", "", new List<int>()) };
+				}
+				else
+					mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(this, IfcRoleEnum.USERDEFINED, str, "", new List<int>()) };
+			}
+#endif
+				}
+				return mPerson;
+			}
+
+		}
+		private IfcOrganization mOrganization = null;
+		internal IfcOrganization Organization
+		{
+			get
+			{
+				if (mOrganization == null)
+					mOrganization = new IfcOrganization(this,IfcOrganization.Organization);
+				return mOrganization;
+			}
+
 		}
 		private IfcOwnerHistory mOwnerHistoryCreate,mOwnerHistoryModify,mOwnerHistoryDelete;
 		internal IfcOwnerHistory OwnerHistory(IfcChangeActionEnum changeAction)
@@ -519,7 +562,21 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 
-		
+		internal enum SubContextIdentifier { Axis, Body, Surface };
+		internal IfcGeometricRepresentationSubContext SubContext(SubContextIdentifier nature)
+		{
+			if(nature == SubContextIdentifier.Axis)
+			{
+				if(mSubContxtAxis == null)
+					mSubContxtAxis = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
+				return mSubContxtAxis;
+			}
+			if(mSubContxtBody == null)
+				mSubContxtBody = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
+			return mSubContxtBody; 
+		}
+		private IfcGeometricRepresentationSubContext mSubContxtBody = null, mSubContxtAxis=null, mSubContxtAnalysisSurface = null;
+
 		internal IfcContext mContext = null;
 		
 		internal HashSet<string> mGlobalIDs = new HashSet<string>();
@@ -621,14 +678,7 @@ namespace GeometryGym.Ifc
 			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
 			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
 #endif 
-			if (mRelease == ReleaseVersion.IFC2x3 || mRelease == ReleaseVersion.IFC4)
-			{
-				OwnerHistory(IfcChangeActionEnum.ADDED);
-			}
 			mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
-			mGeoRepSubContxtAxis = new IfcGeometricRepresentationSubContext(mGeomRepContxt, 0, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
-			mGeoRepSubContxtBody = new IfcGeometricRepresentationSubContext(mGeomRepContxt, 0, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
-
 			if (generate)
 				initData();
 		} 
@@ -825,6 +875,8 @@ null, types, null);
 		private IfcContext ReadFile(TextReader sr, Aggregate aggregate, int offset)
 		{
 			mRelease = ReleaseVersion.IFC2x3;
+			bool ownerHistory = mOptions.mGenerateOwnerHistory;
+			mOptions.mGenerateOwnerHistory = false;
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			string strLine = sr.ReadLine(), str = "";
@@ -960,7 +1012,7 @@ null, types, null);
 			sr.Close();
 			Thread.CurrentThread.CurrentCulture = current; 
 			postImport(aggregate);
-
+			mOptions.mGenerateOwnerHistory = ownerHistory;
 			return mContext;
 		}
 

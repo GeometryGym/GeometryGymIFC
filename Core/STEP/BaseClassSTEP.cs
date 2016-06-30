@@ -34,7 +34,7 @@ namespace GeometryGym.STEP
 		public int Index { get { return mIndex; } }
 		public List<string> Comments { get { return mComments; } set { mComments = value; } }
 
-		public virtual string KeyWord {get { return this.GetType().Name.ToUpper();}}
+		public virtual string KeyWord {get { return this.GetType().Name;}}
 
 		public override string ToString()
 		{
@@ -47,7 +47,7 @@ namespace GeometryGym.STEP
 				foreach (string c in mComments)
 					comment = "/* " + c + " */\r\n";
 			}
-			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord + "(" + str.Substring(1) + ");";
+			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord.ToUpper() + "(" + str.Substring(1) + ");";
 		}
 		protected virtual string BuildStringSTEP() { return ""; } 
 	}

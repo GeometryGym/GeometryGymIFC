@@ -122,32 +122,35 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWaterProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
-		internal double mIsPotable;// : OPTIONAL IfcDynamicViscosityMeasure;
-		internal double mHardness;// : OPTIONAL IfcModulusOfElasticityMeasure;
-		internal double mAlkalinityConcentration;// : OPTIONAL IfcModulusOfElasticityMeasure;
-		internal double mPoissonRatio;// : OPTIONAL IfcPositiveRatioMeasure;
-		internal double mThermalExpansionCoefficient;// : OPTIONAL IfcThermalExpansionCoefficientMeasure; 
+		internal bool mIsPotable = false;// : 	OPTIONAL BOOLEAN;
+		internal double mHardness = double.NaN, mAlkalinityConcentration = double.NaN, mAcidityConcentration = double.NaN;// : : 	OPTIONAL IfcIonConcentrationMeasure
+		internal double mImpuritiesContent = double.NaN;//: 	OPTIONAL IfcNormalisedRatioMeasure
+		internal double mPHLevel = double.NaN;  //: 	OPTIONAL IfcPHMeasure;
+		internal double mDissolvedSolidsContent = double.NaN;//: 	OPTIONAL IfcNormalisedRatioMeasure
 		internal IfcWaterProperties() : base() { }
-		internal IfcWaterProperties(IfcWaterProperties be)
-			: base(be)
+		internal IfcWaterProperties(DatabaseIfc db, IfcWaterProperties p) : base(db,p)
 		{
-			mIsPotable = be.mIsPotable;
-			mHardness = be.mHardness;
-			mAlkalinityConcentration = be.mAlkalinityConcentration;
-			mPoissonRatio = be.mPoissonRatio;
-			mThermalExpansionCoefficient = be.mThermalExpansionCoefficient;
+			mIsPotable = p.mIsPotable;
+			mHardness = p.mHardness;
+			mAlkalinityConcentration = p.mAlkalinityConcentration;
+			mAcidityConcentration = p.mAcidityConcentration;
+			mImpuritiesContent = p.mImpuritiesContent;
+			mPHLevel = p.mPHLevel;
+			mDissolvedSolidsContent = p.mDissolvedSolidsContent;
 		}
 		internal static IfcWaterProperties Parse(string strDef) { IfcWaterProperties p = new IfcWaterProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcWaterProperties p, List<string> arrFields, ref int ipos)
 		{
 			IfcMaterialPropertiesSuperSeded.parseFields(p, arrFields, ref ipos);
-			p.mIsPotable = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			p.mIsPotable = ParserSTEP.ParseBool(arrFields[ipos++]);
 			p.mHardness = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mAlkalinityConcentration = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mPoissonRatio = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mThermalExpansionCoefficient = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			p.mAcidityConcentration = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			p.mImpuritiesContent = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			p.mPHLevel = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			p.mDissolvedSolidsContent = ParserSTEP.ParseDouble(arrFields[ipos++]);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mIsPotable) + "," + ParserSTEP.DoubleOptionalToString(mHardness) + "," + ParserSTEP.DoubleOptionalToString(mAlkalinityConcentration) + "," + ParserSTEP.DoubleOptionalToString(mPoissonRatio) + "," + ParserSTEP.DoubleOptionalToString(mThermalExpansionCoefficient); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.BoolToString(mIsPotable) + "," + ParserSTEP.DoubleOptionalToString(mHardness) + "," + ParserSTEP.DoubleOptionalToString(mAlkalinityConcentration) + "," + ParserSTEP.DoubleOptionalToString(mAcidityConcentration) + "," + ParserSTEP.DoubleOptionalToString(mImpuritiesContent) + "," + ParserSTEP.DoubleOptionalToString(mPHLevel) + "," + ParserSTEP.DoubleOptionalToString(mDissolvedSolidsContent); }
 	}
 	public partial class IfcWindow : IfcBuildingElement
 	{
@@ -270,7 +273,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWindowStandardCase : IfcWindow
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IFCWINDOW" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcWindow" : base.KeyWord); } }
 		internal IfcWindowStandardCase() : base() { }
 		internal new static IfcWindowStandardCase Parse(string strDef, ReleaseVersion schema) { IfcWindowStandardCase s = new IfcWindowStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
 		internal static void parseFields(IfcWindowStandardCase s, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcWindow.parseFields(s, arrFields, ref ipos,schema); }
@@ -300,7 +303,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCWINDOWSTYLE" : base.KeyWord); } }
+		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcWindowStyle" : base.KeyWord); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
 		internal bool mParameterTakesPrecedence;// : BOOLEAN; 

@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + (oe == null ? "," + ParserSTEP.LinkToString(mEdgeStart) + "," + ParserSTEP.LinkToString(mEdgeEnd) : ",*,*");
 		}
 	}
-	public partial class IfcEdgeCurve : IfcEdge
+	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
 	{
 		internal int mEdgeGeometry;// IfcCurve;
 		internal bool mSameSense;// : BOOL;
@@ -399,6 +399,11 @@ namespace GeometryGym.Ifc
 					rce.RelatedElement = db[db.mDuplicateMapping[element.mIndex]] as IfcElement;
 				}
 			}
+			foreach(IfcRelVoidsElement ve in e.mHasOpenings)
+			{
+				IfcRelVoidsElement rv = db.Duplicate(ve) as IfcRelVoidsElement;
+				rv.RelatingBuildingElement = this;
+			}
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
 			{
 				IfcRelConnectsStructuralActivity rc = db.Duplicate(rcss) as IfcRelConnectsStructuralActivity;
@@ -699,7 +704,7 @@ namespace GeometryGym.Ifc
 	{  //	SUPERTYPE OF(ONEOF(IfcAirToAirHeatRecovery, IfcBoiler, IfcBurner, IfcChiller, IfcCoil, IfcCondenser, IfcCooledBeam, 
 		//IfcCoolingTower, IfcElectricGenerator, IfcElectricMotor, IfcEngine, IfcEvaporativeCooler, IfcEvaporator, IfcHeatExchanger,
 		//IfcHumidifier, IfcMotorConnection, IfcSolarDevice, IfcTransformer, IfcTubeBundle, IfcUnitaryEquipment))
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IFCENERGYCONVERSIONDEVICE" : base.KeyWord; } }
+		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcEnergyConversionDevice " : base.KeyWord; } }
 
 		internal IfcEnergyConversionDevice() : base() { }
 		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d) : base(db, d) { }
@@ -887,7 +892,7 @@ namespace GeometryGym.Ifc
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } } 
 
 		internal IfcExtendedMaterialProperties() : base() { }
-		internal IfcExtendedMaterialProperties(IfcExtendedMaterialProperties el) : base(el) { mExtendedProperties = new List<int>(el.mExtendedProperties.ToArray()); mDescription = el.mDescription; mName = el.mName; }
+		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p) : base(db,p) { ExtendedProperties = p.ExtendedProperties.ConvertAll(x=>db.Duplicate(x) as IfcProperty); mDescription = p.mDescription; mName = p.mName; }
 		internal static IfcExtendedMaterialProperties Parse(string strDef) { IfcExtendedMaterialProperties p = new IfcExtendedMaterialProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcExtendedMaterialProperties p, List<string> arrFields, ref int ipos) { IfcMaterialPropertiesSuperSeded.parseFields(p, arrFields, ref ipos); p.mExtendedProperties = ParserSTEP.SplitListLinks(arrFields[ipos++]); p.mDescription = arrFields[ipos++]; p.mName = arrFields[ipos++]; }
 		protected override string BuildStringSTEP()
@@ -1076,6 +1081,7 @@ namespace GeometryGym.Ifc
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }
+		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D placement, IfcDirection dir, double depth) : base(prof, placement) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + ParserSTEP.DoubleToString(Math.Round(mDepth, mDatabase.mLengthDigits)); }

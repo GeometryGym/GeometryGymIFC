@@ -28,13 +28,13 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class BaseClassIfc : STEPEntity, IfcInterface
+	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
 		internal string mIFCString = "";
 		public virtual string Name { get { return ""; } set { } }
 		internal DatabaseIfc mDatabase = null;
 
-		DatabaseIfc IfcInterface.Database { get { return mDatabase; } }
+		DatabaseIfc IBaseClassIfc.Database { get { return mDatabase; } }
 
 		internal BaseClassIfc() : base() { }
 		protected BaseClassIfc(BaseClassIfc e) { mIndex = e.mIndex; }
@@ -48,6 +48,6 @@ namespace GeometryGym.Ifc
 			m[m.NextBlank] = this;
 		}
 	}
-	public interface IfcInterface { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
+	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
 
 }

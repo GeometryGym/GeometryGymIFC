@@ -101,7 +101,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcLampType Parse(string strDef) { IfcLampType t = new IfcLampType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public interface IfcLayeredItem : IfcInterface { List<IfcPresentationLayerAssignment> LayerAssignments { get; } }// = SELECT(IfcRepresentationItem, IfcRepresentation);
+	public interface IfcLayeredItem : IBaseClassIfc { List<IfcPresentationLayerAssignment> LayerAssignments { get; } }// = SELECT(IfcRepresentationItem, IfcRepresentation);
 	public partial class IfcLibraryInformation : IfcExternalInformation
 	{
 		internal string mName;// :	IfcLabel;
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 		//string Name { get; }
 	}
 	//ENTITY IfcLightDistributionData;
-	public interface IfcLightDistributionDataSourceSelect : IfcInterface { } //SELECT(IfcExternalReference,IfcLightIntensityDistribution);
+	public interface IfcLightDistributionDataSourceSelect : IBaseClassIfc { } //SELECT(IfcExternalReference,IfcLightIntensityDistribution);
 	public partial class IfcLightFixture : IfcFlowTerminal
 	{
 		internal IfcLightFixtureTypeEnum mPredefinedType = IfcLightFixtureTypeEnum.NOTDEFINED;// : OPTIONAL IfcLightFixtureTypeEnum; 
@@ -441,8 +441,19 @@ namespace GeometryGym.Ifc
 		internal double mDepth, mWidth, mThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN, mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mLegSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
-		//internal double mCentreOfGravityInX, mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure 
+		internal double mCentreOfGravityInX = double.NaN, mCentreOfGravityInY = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure 
 		internal IfcLShapeProfileDef() : base() { }
+		internal IfcLShapeProfileDef(DatabaseIfc db, IfcLShapeProfileDef p) : base(db, p)
+		{
+			mDepth = p.mDepth;
+			mWidth = p.mWidth;
+			mThickness = p.mThickness;
+			mFilletRadius = p.mFilletRadius;
+			mEdgeRadius = p.mEdgeRadius;
+			mLegSlope = p.mLegSlope;
+			mCentreOfGravityInX = p.mCentreOfGravityInX;
+			mCentreOfGravityInY = p.mCentreOfGravityInY;
+		}
 		public IfcLShapeProfileDef(DatabaseIfc db, string name, double depth, double width, double thickness, double filletRadius, double edgeRadius, double legSlope)
 			: base(db,name)
 		{
@@ -452,6 +463,7 @@ namespace GeometryGym.Ifc
 			mFilletRadius = filletRadius;
 			mEdgeRadius = edgeRadius;
 			mLegSlope = legSlope;
+			
 		}
 
 		internal static void parseFields(IfcLShapeProfileDef p, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -464,9 +476,12 @@ namespace GeometryGym.Ifc
 			p.mEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mLegSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			if (schema == ReleaseVersion.IFC2x3)
-				ipos += 2;
+			{
+				p.mCentreOfGravityInX = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mCentreOfGravityInY = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			}
 		}
 		internal static IfcLShapeProfileDef Parse(string strDef, ReleaseVersion schema) { IfcLShapeProfileDef p = new IfcLShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mWidth) + "," + ParserSTEP.DoubleToString(mThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mLegSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ",$,$" : ""); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mWidth) + "," + ParserSTEP.DoubleToString(mThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mLegSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInX) + "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInY) : ""); }
 	}
 }

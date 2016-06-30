@@ -41,16 +41,16 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
-		internal double mMolecularWeight; //: OPTIONAL IfcMolecularWeightMeasure;
-		internal double mPorosity; //: OPTIONAL IfcNormalisedRatioMeasure;
-		internal double mMassDensity;//OPTIONAL IfcMassDensityMeasure
+		internal double mMolecularWeight = double.NaN; //: OPTIONAL IfcMolecularWeightMeasure;
+		internal double mPorosity = double.NaN; //: OPTIONAL IfcNormalisedRatioMeasure;
+		internal double mMassDensity = double.NaN;//OPTIONAL IfcMassDensityMeasure
 
 		public double MolecularWeight { get { return mMolecularWeight; } set { mMolecularWeight = value; } }
 		public double Porosity { get { return mPorosity; } set { mPorosity = value; } }
 		public double MassDensity { get { return mMassDensity; } set { mMassDensity = value; } } 
 
 		internal IfcGeneralMaterialProperties() : base() { }
-		internal IfcGeneralMaterialProperties(IfcGeneralMaterialProperties p) : base(p) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
+		internal IfcGeneralMaterialProperties(DatabaseIfc db, IfcGeneralMaterialProperties p) : base(db,p) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
 		public IfcGeneralMaterialProperties(IfcMaterial material) : base(material) { }
 		internal IfcGeneralMaterialProperties(IfcMaterial mat, double molecularWeight, double porosity, double massDensity) : base(mat)
 		{
@@ -172,7 +172,7 @@ namespace GeometryGym.Ifc
 			} 
 		}
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
-		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; } }
+		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != mIndex) value.SourceCRS = this; } }
 		
 		internal IfcGeometricRepresentationContext() : base() { }
 		protected IfcGeometricRepresentationContext(DatabaseIfc db) : base(db) { }
@@ -248,12 +248,11 @@ namespace GeometryGym.Ifc
 			mTargetView = s.mTargetView;
 			mUserDefinedTargetView = s.mUserDefinedTargetView;
 		}
-		internal IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, double scale, IfcGeometricProjectionEnum view)
+		internal IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, IfcGeometricProjectionEnum view)
 			: base(container.mDatabase)
 		{
-			mContainerContext = container.mIndex;
+			ContainerContext = container;
 			mContextType = container.mContextType;
-			mTargetScale = scale;
 			mTargetView = view;
 		}
 		internal static void parseFields(IfcGeometricRepresentationSubContext c, List<string> arrFields, ref int ipos)
@@ -295,7 +294,7 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcGeometricSet s, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(s, arrFields, ref ipos); s.mElements = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		internal static IfcGeometricSet Parse(string strDef) { IfcGeometricSet s = new IfcGeometricSet(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 	}
-	public partial interface IfcGeometricSetSelect : IfcInterface { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
+	public partial interface IfcGeometricSetSelect : IBaseClassIfc { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
 	public partial class IfcGrid : IfcProduct
 	{
 		private List<int> mUAxes = new List<int>();// : LIST [1:?] OF UNIQUE IfcGridAxis;

@@ -89,7 +89,11 @@ namespace GeometryGym.Ifc
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
-		public IfcReference ReferencePath { get { return mDatabase[mReferencePath] as IfcReference; } set { mReferencePath = (value == null ? 0 : value.mIndex); } }
+		public IfcReference ReferencePath
+		{
+			get { return mDatabase[mReferencePath] as IfcReference; }
+			set { mReferencePath = (value == null ? 0 : value.mIndex); }
+		}
 
 		internal IfcTableColumn() : base() { }
 		internal IfcTableColumn(IfcTableColumn c) : base() { mIdentifier = c.mIdentifier; mName = c.mName; mDescription = c.mDescription; mUnit = c.mUnit; mReferencePath = c.mReferencePath; }
@@ -685,12 +689,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcThermalMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
-		internal double mSpecificHeatCapacity;// : OPTIONAL IfcSpecificHeatCapacityMeasure;
-		internal double mBoilingPoint;// : OPTIONAL IfcThermodynamicTemperatureMeasure;
-		internal double mFreezingPoint;// : OPTIONAL IfcThermodynamicTemperatureMeasure;
-		internal double mThermalConductivity;// : OPTIONAL IfcThermalConductivityMeasure; 
+		internal double mSpecificHeatCapacity = double.NaN;// : OPTIONAL IfcSpecificHeatCapacityMeasure;
+		internal double mBoilingPoint = double.NaN;// : OPTIONAL IfcThermodynamicTemperatureMeasure;
+		internal double mFreezingPoint = double.NaN;// : OPTIONAL IfcThermodynamicTemperatureMeasure;
+		internal double mThermalConductivity = double.NaN;// : OPTIONAL IfcThermalConductivityMeasure; 
 		internal IfcThermalMaterialProperties() : base() { }
-		internal IfcThermalMaterialProperties(IfcThermalMaterialProperties el) : base(el) { mSpecificHeatCapacity = el.mSpecificHeatCapacity; mBoilingPoint = el.mBoilingPoint; mFreezingPoint = el.mFreezingPoint; mThermalConductivity = el.mThermalConductivity; }
+		internal IfcThermalMaterialProperties(DatabaseIfc db, IfcThermalMaterialProperties p) : base(db,p) { mSpecificHeatCapacity = p.mSpecificHeatCapacity; mBoilingPoint = p.mBoilingPoint; mFreezingPoint = p.mFreezingPoint; mThermalConductivity = p.mThermalConductivity; }
 		internal static IfcThermalMaterialProperties Parse(string strDef) { IfcThermalMaterialProperties p = new IfcThermalMaterialProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcThermalMaterialProperties p, List<string> arrFields, ref int ipos)
 		{
@@ -1040,7 +1044,7 @@ namespace GeometryGym.Ifc
 		internal static IfcTrimmedCurve Parse(string strDef) { IfcTrimmedCurve c = new IfcTrimmedCurve(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mBasisCurve) + "," + mTrim1.ToString() + "," + mTrim2.ToString() + "," + ParserSTEP.BoolToString(mSenseAgreement) + ",." + mMasterRepresentation.ToString() + "."; }
 	}
-	public struct IfcTrimmingSelect
+	public partial struct IfcTrimmingSelect
 	{
 		internal IfcTrimmingSelect(double param, IfcCartesianPoint cp)
 		{
@@ -1134,7 +1138,7 @@ namespace GeometryGym.Ifc
 		internal double mDepth, mFlangeWidth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN, mFlangeEdgeRadius = double.NaN, mWebEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mWebSlope = double.NaN, mFlangeSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
-		//internal double mCentreOfGravityInX;// : OPTIONAL IfcPositiveLengthMeasure 
+		internal double mCentreOfGravityInX = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure 
 
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 		public double FlangeWidth { get { return mFlangeWidth; } set { mFlangeWidth = value; } }
@@ -1170,7 +1174,7 @@ namespace GeometryGym.Ifc
 			p.mWebSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			p.mFlangeSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
 			if (schema == ReleaseVersion.IFC2x3)
-				ipos++;
+				p.mCentreOfGravityInX = ParserSTEP.ParseDouble(arrFields[ipos++]);	
 		}
 		internal static IfcTShapeProfileDef Parse(string strDef,ReleaseVersion schema) { IfcTShapeProfileDef p = new IfcTShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		protected override string BuildStringSTEP()
@@ -1179,7 +1183,7 @@ namespace GeometryGym.Ifc
 				ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," +
 				ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeEdgeRadius) + "," +
 				ParserSTEP.DoubleOptionalToString(mWebEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mWebSlope) + "," +
-				ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ",$" : "");
+				ParserSTEP.DoubleOptionalToString(mFlangeSlope) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInX) : "");
 		}
 	}
 	public partial class IfcTubeBundle : IfcEnergyConversionDevice //IFC4
@@ -1231,7 +1235,7 @@ namespace GeometryGym.Ifc
 		//INVERSE 
 		internal IfcRelDefinesByType mObjectTypeOf = null;
 
-		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } }
+		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } set { mApplicableOccurrence = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public List<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets.ConvertAll(x => mDatabase[x] as IfcPropertySetDefinition); } set { mHasPropertySets = value.ConvertAll(x => x.mIndex); } }
 		public IfcRelDefinesByType ObjectTypeOf { get { return mObjectTypeOf; } }
 		//GeomGym

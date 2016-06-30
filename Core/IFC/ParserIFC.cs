@@ -24,6 +24,7 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 using GeometryGym.STEP;
 
@@ -278,100 +279,15 @@ namespace GeometryGym.Ifc
 				double val = 0;
 				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
 				{
-					if (string.Compare(kw, IfcVolumetricFlowRateMeasure.mKW, true) == 0)
-						return new IfcVolumetricFlowRateMeasure(val);
-					if (string.Compare(kw, IfcThermalTransmittanceMeasure.mKW, true) == 0)
-						return new IfcThermalTransmittanceMeasure(val);
-					//IfcThermalResistanceMeasure, 
-					//IfcThermalAdmittanceMeasure,  
-					if (string.Compare(kw, IfcPressureMeasure.mKW, true) == 0)
-						return new IfcPressureMeasure(val);
-					if (string.Compare(kw, IfcPowerMeasure.mKW, true) == 0)
-						return new IfcPowerMeasure(val);
-					//IfcMassFlowRateMeasure, 
-					if (string.Compare(kw, IfcMassDensityMeasure.mKW, true) == 0)
-						return new IfcMassDensityMeasure(val);
-					if (string.Compare(kw, IfcLinearVelocityMeasure.mKW, true) == 0)
-						return new IfcLinearVelocityMeasure(val);
-					/*, 
-					IfcKinematicViscosityMeasure, 
-					IfcIntegerCountRateMeasure, 
-					IfcHeatFluxDensityMeasure, 
-					IfcFrequencyMeasure, 
-					IfcEnergyMeasure, 
-					IfcElectricVoltageMeasure, 
-					, */
-					if (string.Compare(kw, IfcDynamicViscosityMeasure.mKW, true) == 0)
-						return new IfcDynamicViscosityMeasure(val);
-					//	if (string.Compare(kw, IfcCompoundPlaneAngleMeasure.mKW, true) == 0)
-					//		return new IfcCompoundPlaneAngleMeasure(val);
-
-					/*IfcAngularVelocityMeasure, 
-					IfcThermalConductivityMeasure, */
-					if (string.Compare(kw, IfcMolecularWeightMeasure.mKW, true) == 0)
-						return new IfcMolecularWeightMeasure(val);
-					/*IfcVaporPermeabilityMeasure, 
-					IfcMoistureDiffusivityMeasure, 
-					IfcIsothermalMoistureCapacityMeasure, 
-					IfcSpecificHeatCapacityMeasure, */
-					if (string.Compare(kw, IfcMonetaryMeasure.mKW, true) == 0)
-						return new IfcMonetaryMeasure(val);
-					/*IfcMagneticFluxDensityMeasure, 
-					IfcMagneticFluxMeasure, 
-					IfcLuminousFluxMeasure, */
-					if (string.Compare(kw, IfcForceMeasure.mKW, true) == 0)
-						return new IfcForceMeasure(val);
-					/*IfcInductanceMeasure, 
-					IfcIlluminanceMeasure, 
-					IfcElectricResistanceMeasure, 
-					IfcElectricConductanceMeasure, 
-					IfcElectricChargeMeasure, 
-					IfcDoseEquivalentMeasure, 
-					IfcElectricCapacitanceMeasure, 
-					IfcAbsorbedDoseMeasure, 
-					IfcRadioActivityMeasure, 
-					IfcRotationalFrequencyMeasure, 
-					IfcTorqueMeasure, 
-					IfcAccelerationMeasure, 
-					IfcLinearForceMeasure, */
-					if (string.Compare(kw, IfcLinearStiffnessMeasure.mKW, true) == 0)
-						return new IfcLinearStiffnessMeasure(val);
-					//IfcModulusOfSubgradeReactionMeasure, 
-					if (string.Compare(kw, IfcModulusOfElasticityMeasure.mKW, true) == 0)
-						return new IfcModulusOfElasticityMeasure(val);
-					/*IfcMomentOfInertiaMeasure, 
-					IfcPlanarForceMeasure,  */
-					if (string.Compare(kw, IfcRotationalStiffnessMeasure.mKW, true) == 0)
-						return new IfcRotationalStiffnessMeasure(val);
-					/*IfcShearModulusMeasure, 
-					IfcLinearMomentMeasure, 
-					IfcLuminousIntensityDistributionMeasure, 
-					IfcCurvatureMeasure, */
-					if (string.Compare(kw, IfcMassPerLengthMeasure.mKW, true) == 0)
-						return new IfcMassPerLengthMeasure(val);
-
-					/*IfcModulusOfLinearSubgradeReactionMeasure, 
-					IfcModulusOfRotationalSubgradeReactionMeasure, 
-					IfcRotationalMassMeasure, 
-					IfcSectionalAreaIntegralMeasure, 
-					IfcSectionModulusMeasure, 
-					IfcTemperatureGradientMeasure, 
-					, */
-					if (string.Compare(kw, IfcThermalExpansionCoefficientMeasure.mKW, true) == 0)
-						return new IfcThermalExpansionCoefficientMeasure(val);
-					if (string.Compare(kw, IfcWarpingConstantMeasure.mKW, true) == 0)
-						return new IfcWarpingConstantMeasure(val);
-					if (string.Compare(kw, IfcWarpingMomentMeasure.mKW, true) == 0)
-						return new IfcWarpingMomentMeasure(val);
-					/*IfcSoundPowerMeasure, 
-					IfcSoundPressureMeasure, 
-					IfcHeatingValueMeasure, 
-					IfcPHMeasure, 
-					IfcIonConcentrationMeasure, 
-					IfcTemperatureRateOfChangeMeasure, 
-					IfcAreaDensityMeasure, 
-					IfcSoundPowerLevelMeasure, 
-					IfcSoundPressureLevelMeasure);*/
+					Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
+					if (type != null)
+					{
+						Type[] types = new Type[] { typeof(double) };
+						ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+		null, types, null);
+						if (constructor != null)
+							return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
+					}
 				}
 			}
 			return null;
@@ -391,53 +307,46 @@ namespace GeometryGym.Ifc
 			if (icounter > 1)
 			{
 				string kw = str.Substring(0, icounter - 1);
-				double val = 0;
-				int i = 0;
-				//if (int.TryParse(str.Substring(icounter, len - icounter), out i))
-				//{
-					
-				//}
-				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+				Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
+				if (type != null)
 				{
-					if (string.Compare(kw, IfcVolumeMeasure.mKW, true) == 0)
-						return new IfcVolumeMeasure(val);
-					if (string.Compare(kw, IfcTimeMeasure.mKW, true) == 0)
-						return new IfcTimeMeasure(val);
-					if (string.Compare(kw, IfcThermodynamicTemperatureMeasure.mKW, true) == 0)
-						return new IfcThermodynamicTemperatureMeasure(val);
-					//IfcSolidAngleMeasure, */
-					if (string.Compare(kw, IfcPositiveRatioMeasure.mKW, true) == 0)
-						return new IfcPositiveRatioMeasure(val);
-					if (string.Compare(kw, IfcRatioMeasure.mKW, true) == 0)
-						return new IfcRatioMeasure(val);
-					//IfcPositivePlaneAngleMeasure,
-					if (string.Compare(kw, IfcPlaneAngleMeasure.mKW, true) == 0)
-						return new IfcPlaneAngleMeasure(val);
-					//if (string.Compare(kw, IfcParameterValue.mKW, true) == 0)
-					//	return new IfcParameterValue(val);
-					//	if (string.Compare(kw, IfcNumericMeasure.mKW, true) == 0)
-					//	return new IfcNumericMeasure(val); 
-					if (string.Compare(kw, IfcMassMeasure.mKW, true) == 0)
-						return new IfcMassMeasure(val);
-					if (string.Compare(kw, IfcPositiveLengthMeasure.mKW, true) == 0)
-						return new IfcPositiveLengthMeasure(val);
-					if (string.Compare(kw, IfcLengthMeasure.mKW, true) == 0)
-						return new IfcLengthMeasure(val);
-					//IfcElectricCurrentMeasure, 
-					if (string.Compare(kw, IfcCountMeasure.mKW, true) == 0)
-						return new IfcCountMeasure(val);
-					//IfcContextDependentMeasure, 
-					if (string.Compare(kw, IfcAreaMeasure.mKW, true) == 0)
-						return new IfcAreaMeasure(val);
-					//IfcAmountOfSubstanceMeasure, 
-					//IfcLuminousIntensityMeasure, 
-					if (string.Compare(kw, IfcNormalisedRatioMeasure.mKW, true) == 0)
-						return new IfcNormalisedRatioMeasure(val);
-					//IfcComplexNumber, 
-					//IfcNonNegativeLengthMeasure);
+					if(type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+						return extractMeasureValue(type, str.Substring(icounter, len - icounter));
 				}
-				if (string.Compare(kw, IfcDescriptiveMeasure.mKW, true) == 0)
-					return new IfcDescriptiveMeasure(str.Substring(icounter, len - icounter));
+			}
+			return null;
+		}
+		internal static IfcMeasureValue extractMeasureValue(Type type, string value)
+		{
+			if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+			{
+				if (string.Compare(type.Name,"IfcDescriptiveMeasure",true) == 0)
+					return new IfcDescriptiveMeasure(value);
+				double val = 0;
+				if(double.TryParse(value,out val))
+				{
+					Type[] types = new Type[] { typeof(double) };
+					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+	null, types, null);
+					if (constructor != null)
+						return constructor.Invoke(new object[] { val }) as IfcMeasureValue;
+				}
+			}
+			return null;
+		}
+		internal static IfcDerivedMeasureValue extractDerivedMeasureValue(Type type, string value)
+		{
+			if (type.GetInterfaces().Contains(typeof(IfcDerivedMeasureValue)))
+			{
+				double val = 0;
+				if (double.TryParse(value, out val))
+				{
+					Type[] types = new Type[] { typeof(double) };
+					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+	null, types, null);
+					if (constructor != null)
+						return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
+				}
 			}
 			return null;
 		}
@@ -485,6 +394,38 @@ namespace GeometryGym.Ifc
 				return new IfcLogical(IfcLogicalEnum.UNKNOWN);
 			return null;
 		}
+		internal static IfcSimpleValue extractSimpleValue(Type type, string value)
+		{
+			if(type.GetInterfaces().Contains(typeof(IfcSimpleValue)))
+			{
+				string name = type.Name.ToUpper();
+				if(string.Compare(name,"IFCBOOLEAN") == 0)
+				{
+					bool result = false;
+					if (bool.TryParse(value, out result))
+						return new IfcBoolean(result);
+					return new IfcBoolean( value.Contains("T"));
+				}
+				if (string.Compare(name, "IFCIDENTIFIER") == 0)
+					return new IfcIdentifier(value);
+				if (string.Compare(name, "IFCINTEGER") == 0)
+					return new IfcInteger(int.Parse(value));
+				if (string.Compare(name, "IFCLABEL") == 0)
+					return new IfcLabel(value);
+				if(string.Compare(name, "IFCLOGICAL") == 0)
+				{
+					bool result = false;
+					if (bool.TryParse(value, out result))
+						return new IfcLogical(result);
+					return new IfcLogical(IfcLogicalEnum.UNKNOWN);
+				}
+				if (string.Compare(name, "IFCREAL") == 0)
+					return new IfcReal(double.Parse(value));
+				if (string.Compare(name, "IFCTEXT") == 0)
+					return new IfcText(value);
+			}
+			return null;
+		}
 		internal static IfcValue parseValue(string str)
 		{
 			IfcMeasureValue sv = parseMeasureValue(str);
@@ -494,6 +435,21 @@ namespace GeometryGym.Ifc
 			if (mv != null)
 				return mv;
 			return parseSimpleValue(str);
+		}
+		internal static IfcValue extractValue(string keyword, string value)
+		{
+			Type type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+			if (type != null)
+			{
+				Type[] interfaces = type.GetInterfaces();
+				if (interfaces.Contains(typeof(IfcSimpleValue)))
+					return extractSimpleValue(type, value);
+				if (interfaces.Contains(typeof(IfcMeasureValue)))
+					return extractMeasureValue(type, value);
+				if (interfaces.Contains(typeof(IfcDerivedMeasureValue)))
+					return extractDerivedMeasureValue(type, value);
+			}
+			return null;
 		}
 		internal static bool TryGetDouble(IfcValue v, out double val)
 		{

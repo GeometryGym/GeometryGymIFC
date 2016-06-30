@@ -110,19 +110,18 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcHygroscopicMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
-		internal double mUpperVaporResistanceFactor, mLowerVaporResistanceFactor; //: OPTIONAL IfcPositiveRatioMeasure;
-		internal double mIsothermalMoistureCapacity; //: : OPTIONAL IfcIsothermalMoistureCapacityMeasure;
-		internal double mVaporPermeability;//: OPTIONAL IfcVaporPermeabilityMeasure;
-		internal double mMoistureDiffusivity;// : OPTIONAL IfcMoistureDiffusivityMeasure;*/
+		internal double mUpperVaporResistanceFactor = double.NaN, mLowerVaporResistanceFactor = double.NaN; //: OPTIONAL IfcPositiveRatioMeasure;
+		internal double mIsothermalMoistureCapacity = double.NaN; //: : OPTIONAL IfcIsothermalMoistureCapacityMeasure;
+		internal double mVaporPermeability = double.NaN;//: OPTIONAL IfcVaporPermeabilityMeasure;
+		internal double mMoistureDiffusivity = double.NaN;// : OPTIONAL IfcMoistureDiffusivityMeasure;*/
 		internal IfcHygroscopicMaterialProperties() : base() { }
-		internal IfcHygroscopicMaterialProperties(IfcHygroscopicMaterialProperties el)
-			: base(el)
+		internal IfcHygroscopicMaterialProperties(DatabaseIfc db, IfcHygroscopicMaterialProperties p) : base(db,p)
 		{
-			mUpperVaporResistanceFactor = el.mUpperVaporResistanceFactor;
-			mLowerVaporResistanceFactor = el.mLowerVaporResistanceFactor;
-			mIsothermalMoistureCapacity = el.mIsothermalMoistureCapacity;
-			mVaporPermeability = el.mVaporPermeability;
-			mMoistureDiffusivity = el.mMoistureDiffusivity;
+			mUpperVaporResistanceFactor = p.mUpperVaporResistanceFactor;
+			mLowerVaporResistanceFactor = p.mLowerVaporResistanceFactor;
+			mIsothermalMoistureCapacity = p.mIsothermalMoistureCapacity;
+			mVaporPermeability = p.mVaporPermeability;
+			mMoistureDiffusivity = p.mMoistureDiffusivity;
 		}
 		internal static IfcHygroscopicMaterialProperties Parse(string strDef) { IfcHygroscopicMaterialProperties p = new IfcHygroscopicMaterialProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcHygroscopicMaterialProperties p, List<string> arrFields, ref int ipos)

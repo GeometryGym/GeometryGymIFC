@@ -93,11 +93,9 @@ namespace GeometryGym.Ifc
 		internal static IfcActorRole Parse(string strDef) { IfcActorRole a = new IfcActorRole(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + (mDatabase.mRelease == ReleaseVersion.IFC2x3 && mRole == IfcRoleEnum.COMMISSIONINGENGINEER ? "COMISSIONINGENGINEER" : mRole.ToString()) + (mUserDefinedRole == "$" ? ".,$," : ".,'" + mUserDefinedRole + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'") ; }
 	}
-	public interface IfcActorSelect : IfcInterface {  }// IfcOrganization,  IfcPerson,  IfcPersonAndOrganization);
+	public interface IfcActorSelect : IBaseClassIfc {  }// IfcOrganization,  IfcPerson,  IfcPersonAndOrganization);
 	public partial class IfcActuator : IfcDistributionControlElement //IFC4  
 	{   
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? base.KeyWord : "IFCACTUATOR"; } }
-
 		internal IfcActuatorTypeEnum mPredefinedType = IfcActuatorTypeEnum.NOTDEFINED;
 		public IfcActuatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
@@ -620,7 +618,7 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcAppliedValueRelationship Parse(string strDef) { IfcAppliedValueRelationship a = new IfcAppliedValueRelationship(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 	}
-	public interface IfcAppliedValueSelect : IfcInterface { }; //	IfcMeasureWithUnit, IfcValue, IfcReference); IFC2x3 //IfcRatioMeasure, IfcMeasureWithUnit, IfcMonetaryMeasure); 
+	public interface IfcAppliedValueSelect : IBaseClassIfc { }; //	IfcMeasureWithUnit, IfcValue, IfcReference); IFC2x3 //IfcRatioMeasure, IfcMeasureWithUnit, IfcMonetaryMeasure); 
 	public partial class IfcApproval : BaseClassIfc, IfcResourceObjectSelect
 	{
 		internal string mDescription = "$";// : OPTIONAL IfcText;
@@ -721,7 +719,7 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcArbitraryClosedProfileDef p, List<string> arrFields, ref int ipos) { IfcProfileDef.parseFields(p, arrFields, ref ipos); p.mOuterCurve = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOuterCurve); }
 	}
-	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef
+	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef //	SUPERTYPE OF(IfcCenterLineProfileDef)
 	{
 		private int mCurve;// : IfcBoundedCurve
 		public IfcBoundedCurve Curve { get { return mDatabase[mCurve] as IfcBoundedCurve; } set { mCurve = value.mIndex; } }
@@ -808,28 +806,83 @@ namespace GeometryGym.Ifc
 				ParserSTEP.LinkToString(mIncorporationDate) + "," +ParserSTEP.LinkToString(mDepreciatedValue);
 		}
 	}
-	public partial class IfcAsymmetricIShapeProfileDef : IfcIShapeProfileDef //IFC4 IfcParameterizedProfileDef
+	public partial class IfcAsymmetricIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 IfcIShapeProfileDef 
 	{
+		internal double mBottomFlangeWidth, mOverallDepth, mWebThickness, mBottomFlangeThickness;//	:	IfcPositiveLengthMeasure;
+		internal double mBottomFlangeFilletRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
 		internal double mTopFlangeWidth;// : IfcPositiveLengthMeasure;
-		internal double mTopFlangeThickness;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mTopFlangeFilletRadius;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure 
+		internal double mTopFlangeThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mTopFlangeFilletRadius = double.NaN;// 	:	OPTIONAL IfcNonNegativeLengthMeasure;
+		internal double mBottomFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
+		internal double mBottomFlangeSlope = double.NaN;//	:	OPTIONAL IfcPlaneAngleMeasure;
+		internal double mTopFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
+		internal double mTopFlangeSlope = double.NaN;//:	OPTIONAL IfcPlaneAngleMeasure;
+		internal double mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure IFC4 deleted
 		internal IfcAsymmetricIShapeProfileDef() : base() { }
+		internal IfcAsymmetricIShapeProfileDef(DatabaseIfc db, IfcAsymmetricIShapeProfileDef p) : base(db, p)
+		{
+			mBottomFlangeWidth = p.mBottomFlangeWidth;
+			mOverallDepth = p.mOverallDepth;
+			mWebThickness = p.mWebThickness;
+			mBottomFlangeThickness = p.mBottomFlangeThickness;
+			mBottomFlangeFilletRadius = p.mBottomFlangeFilletRadius;
+			mTopFlangeWidth = p.mTopFlangeWidth;
+			mTopFlangeThickness = p.mTopFlangeThickness;
+			mTopFlangeFilletRadius = p.mTopFlangeFilletRadius;
+			mBottomFlangeEdgeRadius = p.mBottomFlangeEdgeRadius;
+			mBottomFlangeSlope = p.mBottomFlangeSlope;
+			mTopFlangeEdgeRadius = p.mTopFlangeEdgeRadius;
+			mTopFlangeSlope = p.mTopFlangeSlope;
+			mCentreOfGravityInY = p.mCentreOfGravityInY;
+		}
 		internal static void parseFields(IfcAsymmetricIShapeProfileDef p, List<string> arrFields, ref int ipos,ReleaseVersion schema)
 		{
-			IfcIShapeProfileDef.parseFields(p, arrFields, ref ipos,schema);
-			p.mTopFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mTopFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mTopFlangeFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos);
 			if (schema == ReleaseVersion.IFC2x3)
+			{
+				p.mBottomFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mOverallDepth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mWebThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
 				p.mCentreOfGravityInY = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			}
+			else
+			{
+				p.mBottomFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mOverallDepth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mWebThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mBottomFlangeSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
+				p.mTopFlangeSlope = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			}
 		}
-		internal new static IfcAsymmetricIShapeProfileDef Parse(string strDef,ReleaseVersion schema) { IfcAsymmetricIShapeProfileDef p = new IfcAsymmetricIShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
-
+		internal static IfcAsymmetricIShapeProfileDef Parse(string strDef,ReleaseVersion schema) { IfcAsymmetricIShapeProfileDef p = new IfcAsymmetricIShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
+		
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mTopFlangeWidth) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeThickness) + "," +
-				ParserSTEP.DoubleOptionalToString(mTopFlangeFilletRadius) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInY) : "");
+			if (mDatabase.Release == ReleaseVersion.IFC2x3)
+			{
+				return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mBottomFlangeWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," + 
+					ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mBottomFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeFilletRadius) + "," +
+					ParserSTEP.DoubleToString(mTopFlangeWidth) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeThickness) + "," +
+					ParserSTEP.DoubleOptionalToString(mTopFlangeFilletRadius) +  "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInY);
+			}
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mBottomFlangeWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," +
+					ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mBottomFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeFilletRadius) + "," +
+				ParserSTEP.DoubleToString(mTopFlangeWidth) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeThickness) + "," +
+				ParserSTEP.DoubleOptionalToString(mTopFlangeFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeEdgeRadius) + "," +
+				ParserSTEP.DoubleOptionalToString(mBottomFlangeSlope) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeEdgeRadius) + "," +
+				ParserSTEP.DoubleOptionalToString(mTopFlangeSlope);
 		}
 	}
 	public partial class IfcAudioVisualAppliance : IfcFlowTerminal //IFC4
@@ -872,7 +925,7 @@ namespace GeometryGym.Ifc
 		internal static IfcAxis1Placement Parse(string strDef) { IfcAxis1Placement p = new IfcAxis1Placement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcAxis1Placement p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]); }
 	}
-	public partial interface IfcAxis2Placement : IfcInterface { } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
+	public partial interface IfcAxis2Placement : IBaseClassIfc { } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{ 
 		private int mRefDirection;// : OPTIONAL IfcDirection;

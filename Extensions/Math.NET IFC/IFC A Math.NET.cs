@@ -21,7 +21,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial interface IfcAxis2Placement : IfcInterface //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
+	public partial interface IfcAxis2Placement : IBaseClassIfc //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	{
 		CoordinateSystem CoordinateSystem { get; }
 	}
