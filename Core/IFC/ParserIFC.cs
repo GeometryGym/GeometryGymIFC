@@ -220,6 +220,7 @@ namespace GeometryGym.Ifc
 		}
 		private static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion schema)
 		{
+		
 			Type type = Type.GetType("GeometryGym.Ifc." + keyword,false,true);
 			if (type != null)
 			{
@@ -232,6 +233,8 @@ namespace GeometryGym.Ifc
 				if (parser != null)
 					return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
 			}
+			if (string.Compare(keyword, "IfcParameterizedProfileDef", true) == 0)
+				return LineParser("IfcProfileDef", str, schema);
 			return null;
 		}
 

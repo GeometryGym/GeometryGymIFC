@@ -32,6 +32,7 @@ namespace GeometryGym.Ifc
 	{
 		internal string mUrlReference;// : IfcIdentifier; 
 		public string UrlReference { get { return  ParserIfc.Decode(mUrlReference); } set { mUrlReference = ParserIfc.Encode(value); } }
+
 		internal IfcImageTexture() : base() { }
 		internal IfcImageTexture(IfcImageTexture i) : base(i) { mUrlReference = i.mUrlReference; }
 		public IfcImageTexture(DatabaseIfc db,bool repeatS, bool repeatT, string urlReference) : base(db,repeatS,repeatT) { UrlReference = urlReference; }
@@ -184,6 +185,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcInterceptorTypeEnum mPredefinedType = IfcInterceptorTypeEnum.NOTDEFINED;
 		public IfcInterceptorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcInterceptor() : base() { }
 		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i) : base(db, i) { mPredefinedType = i.mPredefinedType; }
 		internal IfcInterceptor(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -204,6 +206,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcInterceptorTypeEnum mPredefinedType = IfcInterceptorTypeEnum.NOTDEFINED;// : IfcInterceptorTypeEnum;
 		public IfcInterceptorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcInterceptorType() : base() { }
 		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcInterceptorType t, List<string> arrFields, ref int ipos) { IfcFlowTreatmentDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcInterceptorTypeEnum)Enum.Parse(typeof(IfcInterceptorTypeEnum), arrFields[ipos++].Replace(".", "")); }

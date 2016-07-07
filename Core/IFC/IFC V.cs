@@ -55,6 +55,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// : IfcValveTypeEnum; 
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcValveType() : base() { }
 		internal IfcValveType(DatabaseIfc db, IfcValveType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -90,6 +91,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
 		internal List<int> mTexturePoints = new List<int>();// LIST [3:?] OF IfcCartesianPoint; 
+
 		internal IfcVertexBasedTextureMap() : base() { }
 		internal IfcVertexBasedTextureMap(IfcVertexBasedTextureMap m) : base() { mTextureVertices = new List<int>(m.mTextureVertices.ToArray()); mTexturePoints = new List<int>(m.mTexturePoints.ToArray()); }
 		internal static IfcVertexBasedTextureMap Parse(string strDef) { IfcVertexBasedTextureMap m = new IfcVertexBasedTextureMap(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
@@ -109,6 +111,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mLoopVertex;// : IfcVertex; 
 		public IfcVertex LoopVertex { get { return mDatabase[mLoopVertex] as IfcVertex; } set { mLoopVertex = value.mIndex; } }
+
 		internal IfcVertexloop() : base() { }
 		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Duplicate(l.LoopVertex) as IfcVertex; }
 		internal new static IfcVertexloop Parse(string strDef) { IfcVertexloop l = new IfcVertexloop(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
@@ -150,6 +153,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : IfcVibrationIsolatorTypeEnum
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcVibrationIsolatorType() : base() { }
 		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcVibrationIsolatorType t, List<string> arrFields, ref int ipos) { IfcDiscreteAccessoryType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcVibrationIsolatorTypeEnum)Enum.Parse(typeof(IfcVibrationIsolatorTypeEnum), arrFields[ipos++].Replace(".", "")); }

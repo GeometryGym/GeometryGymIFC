@@ -111,14 +111,7 @@ namespace GeometryGym.Ifc
 			//RelatedObjects = a.RelatedObjects.ConvertAll(x => db.Duplicate(x) as IfcObjectDefinition);
 		}
 		protected IfcRelAssigns(IfcObjectDefinition related) : this(new List<IfcObjectDefinition>() { related }) { }
-		protected IfcRelAssigns(List<IfcObjectDefinition> relObjects) : base(relObjects[0].mDatabase)
-		{
-			for (int icounter = 0; icounter < relObjects.Count; icounter++)
-			{
-				mRelatedObjects.Add(relObjects[icounter].mIndex);
-				relObjects[icounter].mHasAssignments.Add(this);
-			}
-		}
+		protected IfcRelAssigns(List<IfcObjectDefinition> relObjects) : base(relObjects[0].mDatabase) { RelatedObjects = relObjects; }
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mRelatedObjects[0]);
@@ -222,7 +215,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelAssignsToControl : IfcRelAssigns
 	{
 		internal int mRelatingControl;// : IfcControl; 
-		internal IfcControl RelatingControl { get { return mDatabase[mRelatingControl] as IfcControl; } }
+		public IfcControl RelatingControl { get { return mDatabase[mRelatingControl] as IfcControl; } }
 
 		internal IfcRelAssignsToControl() : base() { }
 		internal IfcRelAssignsToControl(IfcRelAssignsToControl a) : base(a) { mRelatingControl = a.mRelatingControl; }
@@ -352,18 +345,31 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcRelAssociates : IfcRelationship   //ABSTRACT SUPERTYPE OF (ONEOF(IfcRelAssociatesApproval,IfcRelAssociatesclassification,IfcRelAssociatesConstraint,IfcRelAssociatesDocument,IfcRelAssociatesLibrary,IfcRelAssociatesMaterial))
 	{
-		internal int mID = 0;
+		//internal int mID = 0;
 		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcDefinitionSelect IFC2x3 IfcRoot; 
-		public List<IfcDefinitionSelect> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcDefinitionSelect); } }
+		public List<IfcDefinitionSelect> RelatedObjects
+		{
+			get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcDefinitionSelect); }
+			set
+			{
+				for (int icounter = 0; icounter < value.Count; icounter++)
+				{
+					IfcDefinitionSelect ds = value[icounter];
+					mRelatedObjects.Add(ds.Index);
+					ds.HasAssociations.Add(this);
+				}
+			}
+		}
 
 		protected IfcRelAssociates() : base() { }
 		protected IfcRelAssociates(IfcRelAssociates i) : base(i) { mRelatedObjects = new List<int>(i.mRelatedObjects.ToArray()); }
 		protected IfcRelAssociates(DatabaseIfc db) : base(db) { }
 		protected IfcRelAssociates(DatabaseIfc db, IfcRelAssociates r) : base(db, r)
 		{
-			//	mRelatedObjects = new List<int>(i.mRelatedObjects.ToArray());
+			
+			//RelatedObjects = r.mRelatedObjects.ConvertAll(x => db.Duplicate(r.mDatabase[x]) as IfcDefinitionSelect);
 		}
-		protected IfcRelAssociates(IfcDefinitionSelect related) : base(related.Database) { mRelatedObjects.Add(related.Index); }
+		protected IfcRelAssociates(IfcDefinitionSelect related) : base(related.Database) { mRelatedObjects.Add(related.Index); related.HasAssociations.Add(this); }
 		protected override string BuildStringSTEP()
 		{
 			if (mRelatedObjects.Count == 0)
@@ -448,13 +454,12 @@ namespace GeometryGym.Ifc
 		private int mRelatingConstraint;// : IfcConstraint
 
 		public string Intent { get { return (mIntent == "$" ? "" : ParserIfc.Decode(mIntent)); } set { mIntent = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		internal IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; value.mConstraintForObjects.Add(this); } }
+		public IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; value.mConstraintForObjects.Add(this); } }
+
 		internal IfcRelAssociatesConstraint() : base() { }
-		internal IfcRelAssociatesConstraint(IfcRelAssociatesConstraint a) : base(a) { mRelatingConstraint = a.mRelatingConstraint; }
-		internal IfcRelAssociatesConstraint(string intent, IfcConstraint c)
-			: base(c.mDatabase) { if (!string.IsNullOrEmpty(intent)) mIntent = intent.Replace("'", ""); mRelatingConstraint = c.Index; }
-		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, string intent, IfcConstraint c)
-			: base(related) { if (!string.IsNullOrEmpty(intent)) mIntent = intent.Replace("'", ""); mRelatingConstraint = c.Index; }
+		internal IfcRelAssociatesConstraint(IfcConstraint c) : base(c.mDatabase) { RelatingConstraint = c; }
+		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c) : base(db,c) { RelatingConstraint = db.Duplicate(c.RelatingConstraint) as IfcConstraint; }
+		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, IfcConstraint constraint) : base(related) { RelatingConstraint = constraint; }
 
 		internal static IfcRelAssociatesConstraint Parse(string strDef) { IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcRelAssociatesConstraint a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mIntent = arrFields[ipos++].Replace("'", ""); a.mRelatingConstraint = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -605,9 +610,9 @@ namespace GeometryGym.Ifc
 		internal int mRelatingElement;// : IfcElement;
 		internal int mRelatedElement;// : IfcElement; 
 
-		internal IfcConnectionGeometry ConnectionGeometry { get { return mDatabase[mConnectionGeometry] as IfcConnectionGeometry; } set { mConnectionGeometry = (value == null ? 0 : value.mIndex); } }
-		internal IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } set { mRelatingElement = value.mIndex;  } }
-		internal IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
+		public IfcConnectionGeometry ConnectionGeometry { get { return mDatabase[mConnectionGeometry] as IfcConnectionGeometry; } set { mConnectionGeometry = (value == null ? 0 : value.mIndex); } }
+		public IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } set { mRelatingElement = value.mIndex;  } }
+		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
 
 		internal IfcRelConnectsElements() : base() { }
 		internal IfcRelConnectsElements(DatabaseIfc db, IfcRelConnectsElements r) : base(db,r)
@@ -644,8 +649,10 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mRelatingPriorities = new List<int>();// : LIST [0:?] OF INTEGER;
 		internal List<int> mRelatedPriorities = new List<int>();// : LIST [0:?] OF INTEGER;
-		internal IfcConnectionTypeEnum mRelatedConnectionType = IfcConnectionTypeEnum.NOTDEFINED;// : IfcConnectionTypeEnum;
-		internal IfcConnectionTypeEnum mRelatingConnectionType = IfcConnectionTypeEnum.NOTDEFINED;// : IfcConnectionTypeEnum; 
+
+		public IfcConnectionTypeEnum mRelatedConnectionType = IfcConnectionTypeEnum.NOTDEFINED;// : IfcConnectionTypeEnum;
+		public IfcConnectionTypeEnum mRelatingConnectionType = IfcConnectionTypeEnum.NOTDEFINED;// : IfcConnectionTypeEnum; 
+
 		internal IfcRelConnectsPathElements() : base() { }
 		internal IfcRelConnectsPathElements(DatabaseIfc db, IfcRelConnectsPathElements r) : base(db,r)
 		{
@@ -690,9 +697,9 @@ namespace GeometryGym.Ifc
 		internal int mRelatedPort;// : IfcPort;
 		internal int mRealizingElement;// : OPTIONAL IfcElement; 
 
-		internal IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } }
-		internal IfcPort RelatedPort { get { return mDatabase[mRelatedPort] as IfcPort; } }
-		internal IfcElement RealizingElement { get { return mDatabase[mRealizingElement] as IfcElement; } }
+		public IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } }
+		public IfcPort RelatedPort { get { return mDatabase[mRelatedPort] as IfcPort; } }
+		public IfcElement RealizingElement { get { return mDatabase[mRealizingElement] as IfcElement; } }
 
 		internal IfcRelConnectsPorts() : base() { }
 		internal IfcRelConnectsPorts(IfcRelConnectsPorts c) : base(c) { mRelatingPort = c.mRelatingPort; mRelatedPort = c.mRelatedPort; mRealizingElement = c.mRealizingElement; }
@@ -720,8 +727,8 @@ namespace GeometryGym.Ifc
 		internal int mRelatingPort;// : IfcPort;
 		internal int mRelatedElement;// : IfcElement; 
 
-		internal IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } }
-		internal IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } }
+		public IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } }
+		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } }
 
 		internal IfcRelConnectsPortToElement() : base() { }
 		internal IfcRelConnectsPortToElement(IfcRelConnectsPortToElement c) : base(c) { mRelatingPort = c.mRelatingPort; mRelatedElement = c.mRelatedElement; }
@@ -742,8 +749,8 @@ namespace GeometryGym.Ifc
 		private int mRelatingElement;// : IfcStructuralActivityAssignmentSelect; SELECT(IfcStructuralItem,IfcElement);
 		private int mRelatedStructuralActivity;// : IfcStructuralActivity; 
 
-		internal IfcStructuralActivityAssignmentSelect RelatingElement { get { return mDatabase[mRelatingElement] as IfcStructuralActivityAssignmentSelect; } set { mRelatingElement = value.Index; value.AssignedStructuralActivity.Add(this); } }
-		internal IfcStructuralActivity RelatedStructuralActivity { get { return mDatabase[mRelatedStructuralActivity] as IfcStructuralActivity; } set { mRelatedStructuralActivity = value.Index; } }
+		public IfcStructuralActivityAssignmentSelect RelatingElement { get { return mDatabase[mRelatingElement] as IfcStructuralActivityAssignmentSelect; } set { mRelatingElement = value.Index; value.AssignedStructuralActivity.Add(this); } }
+		public IfcStructuralActivity RelatedStructuralActivity { get { return mDatabase[mRelatedStructuralActivity] as IfcStructuralActivity; } set { mRelatedStructuralActivity = value.Index; } }
 
 		internal IfcRelConnectsStructuralActivity() : base() { }
 		internal IfcRelConnectsStructuralActivity(DatabaseIfc db, IfcRelConnectsStructuralActivity c) : base(db,c)
@@ -779,6 +786,7 @@ namespace GeometryGym.Ifc
 
 		public IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } set { mRelatingElement = value.mIndex; value.mHasStructuralMember.Add(this); } }
 		public IfcStructuralMember RelatedStructuralMember { get { return mDatabase[mRelatedStructuralMember] as IfcStructuralMember; } set { mRelatedStructuralMember = value.mIndex; value.mStructuralMemberForGG = this; } }
+
 		internal IfcRelConnectsStructuralElement() : base() { }
 		internal IfcRelConnectsStructuralElement(DatabaseIfc db, IfcRelConnectsStructuralElement c) : base(c)
 		{
@@ -890,6 +898,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mRealizingElements = new List<int>();// :	SET [1:?] OF IfcElement;
 		internal string mConnectionType = "$";// : :	OPTIONAL IfcLabel; 
+
 		public List<IfcElement> RealizingElements { get { return mRealizingElements.ConvertAll(x => mDatabase[x] as IfcElement); } set { mRealizingElements = value.ConvertAll(x => x.mIndex); }  }
 		
 		internal IfcRelConnectsWithRealizingElements() : base() { }
@@ -1108,8 +1117,8 @@ namespace GeometryGym.Ifc
 		internal int mRelatedSpace;// : IfcSpace;
 		internal List<int> mRelatedCoverings = new List<int>();// SET [1:?] OF IfcCovering; 
 
-		internal IfcSpace RelatedSpace { get { return mDatabase[mRelatedSpace] as IfcSpace; } }
-		internal List<IfcCovering> RelatedCoverings { get { return mRelatedCoverings.ConvertAll(x => mDatabase[x] as IfcCovering); } }
+		public IfcSpace RelatedSpace { get { return mDatabase[mRelatedSpace] as IfcSpace; } }
+		public List<IfcCovering> RelatedCoverings { get { return mRelatedCoverings.ConvertAll(x => mDatabase[x] as IfcCovering); } }
 
 		internal IfcRelCoversSpaces() : base() { }
 		internal IfcRelCoversSpaces(IfcRelCoversSpaces c) : base(c) { mRelatedSpace = c.mRelatedSpace; mRelatedCoverings = new List<int>(c.mRelatedCoverings.ToArray()); }
@@ -1153,7 +1162,7 @@ namespace GeometryGym.Ifc
 		private int mRelatingContext;// : 	IfcContext;
 		private List<int> mRelatedDefinitions = new List<int>();// :	SET [1:?] OF IfcDefinitionSelect; 
 
-		internal IfcContext RelatingContext { get { return mDatabase[mRelatingContext] as IfcContext; } set { mRelatingContext = value.mIndex; if (!value.mDeclares.Contains(this)) value.mDeclares.Add(this); } }
+		public IfcContext RelatingContext { get { return mDatabase[mRelatingContext] as IfcContext; } set { mRelatingContext = value.mIndex; if (!value.mDeclares.Contains(this)) value.mDeclares.Add(this); } }
 		public List<IfcDefinitionSelect> RelatedDefinitions { get { return mRelatedDefinitions.ConvertAll(x => mDatabase[x] as IfcDefinitionSelect); } set { mRelatedDefinitions = value.ConvertAll(x => x.Index); } }
 
 		internal IfcRelDeclares() : base() { }
@@ -1214,8 +1223,8 @@ namespace GeometryGym.Ifc
 		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcObject;
 		internal int mRelatingObject;// : IfcObject  
 
-		internal List<IfcObject> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject); } }
-		internal IfcObject RelatingObject { get { return mDatabase[mRelatingObject] as IfcObject; } }
+		public List<IfcObject> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject); } }
+		public IfcObject RelatingObject { get { return mDatabase[mRelatingObject] as IfcObject; } }
 
 		internal IfcRelDefinesByObject() : base() { }
 		internal IfcRelDefinesByObject(IfcRelDefinesByObject d) : base(d) { mRelatedObjects = new List<int>(d.mRelatedObjects.ToArray()); mRelatingObject = d.mRelatingObject; }
@@ -1350,8 +1359,8 @@ namespace GeometryGym.Ifc
 		internal List<int> mRelatedPropertySets = new List<int>();// : SET [1:?] OF IfcPropertySetDefinition;
 		internal int mRelatingTemplate;// :	IfcPropertySetTemplate;
 
-		internal List<IfcPropertySetDefinition> RelatedPropertySets { get { return mRelatedPropertySets.ConvertAll(x => mDatabase[x] as IfcPropertySetDefinition); } }
-		internal IfcPropertySetTemplate RelatingTemplate { get { return mDatabase[mRelatingTemplate] as IfcPropertySetTemplate; } }
+		public List<IfcPropertySetDefinition> RelatedPropertySets { get { return mRelatedPropertySets.ConvertAll(x => mDatabase[x] as IfcPropertySetDefinition); } }
+		public IfcPropertySetTemplate RelatingTemplate { get { return mDatabase[mRelatingTemplate] as IfcPropertySetTemplate; } }
 
 		internal IfcRelDefinesByTemplate() : base() { }
 		internal IfcRelDefinesByTemplate(IfcRelDefinesByTemplate d) : base(d) { mRelatedPropertySets = new List<int>(d.mRelatedPropertySets.ToArray()); mRelatingTemplate = d.mRelatingTemplate; }
@@ -1444,8 +1453,8 @@ namespace GeometryGym.Ifc
 		private int mRelatingOpeningElement;// : IfcOpeningElement;
 		private int mRelatedBuildingElement;// :OPTIONAL IfcElement; 
 
-		internal IfcOpeningElement RelatingOpeningElement { get { return mDatabase[mRelatingOpeningElement] as IfcOpeningElement; } }
-		internal IfcElement RelatedBuildingElement { get { return mDatabase[mRelatedBuildingElement] as IfcElement; } }
+		public IfcOpeningElement RelatingOpeningElement { get { return mDatabase[mRelatingOpeningElement] as IfcOpeningElement; } }
+		public IfcElement RelatedBuildingElement { get { return mDatabase[mRelatedBuildingElement] as IfcElement; } }
 
 		internal IfcRelFillsElement() : base() { }
 		internal IfcRelFillsElement(IfcRelFillsElement f) : base(f) { mRelatingOpeningElement = f.mRelatingOpeningElement; mRelatedBuildingElement = f.mRelatedBuildingElement; }
@@ -1471,8 +1480,8 @@ namespace GeometryGym.Ifc
 		internal int mRelatingObject;// : IfcObjectDefinition 
 		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcObjectDefinition; 
 
-		internal IfcObjectDefinition RelatingObject { get { return mDatabase[mRelatingObject] as IfcObjectDefinition; } set { mRelatingObject = value.mIndex; if (!value.mIsNestedBy.Contains(this)) value.mIsNestedBy.Add(this); } }
-		internal List<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObjectDefinition); } set { mRelatedObjects = value.ConvertAll(x => x.mIndex); } }
+		public IfcObjectDefinition RelatingObject { get { return mDatabase[mRelatingObject] as IfcObjectDefinition; } set { mRelatingObject = value.mIndex; if (!value.mIsNestedBy.Contains(this)) value.mIsNestedBy.Add(this); } }
+		public List<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObjectDefinition); } set { mRelatedObjects = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcRelNests() : base() { }
 		internal IfcRelNests(IfcRelNests n) : base(n) { mRelatingObject = n.mRelatingObject; mRelatedObjects = new List<int>(n.mRelatedObjects.ToArray()); }
@@ -1552,8 +1561,8 @@ namespace GeometryGym.Ifc
 		internal int mRelatingElement;// : IfcElement; 
 		internal int mRelatedFeatureElement;// : IfcFeatureElementAddition
 
-		internal IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } }
-		internal IfcFeatureElementAddition RelatedFeatureElement { get { return mDatabase[mRelatedFeatureElement] as IfcFeatureElementAddition; } }
+		public IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } }
+		public IfcFeatureElementAddition RelatedFeatureElement { get { return mDatabase[mRelatedFeatureElement] as IfcFeatureElementAddition; } }
 
 		protected IfcRelProjectsElement() : base() { }
 		protected IfcRelProjectsElement(IfcRelProjectsElement p) : base(p) { mRelatingElement = p.mRelatingElement; mRelatedFeatureElement = p.mRelatedFeatureElement; }
@@ -1680,7 +1689,8 @@ namespace GeometryGym.Ifc
 		internal IfcPhysicalOrVirtualEnum mPhysicalOrVirtualBoundary = IfcPhysicalOrVirtualEnum.NOTDEFINED;// : IfcPhysicalOrVirtualEnum;
 		internal IfcInternalOrExternalEnum mInternalOrExternalBoundary = IfcInternalOrExternalEnum.NOTDEFINED;// : IfcInternalOrExternalEnum; 
 
-		internal IfcSpaceBoundarySelect RelatingSpace { get { return mDatabase[mRelatingSpace] as IfcSpaceBoundarySelect; } }
+		public IfcSpaceBoundarySelect RelatingSpace { get { return mDatabase[mRelatingSpace] as IfcSpaceBoundarySelect; } }
+
 		internal IfcRelSpaceBoundary() : base() { }
 		internal IfcRelSpaceBoundary(IfcRelSpaceBoundary p) : base(p) { mRelatingSpace = p.mRelatingSpace; mRelatedBuildingElement = p.mRelatedBuildingElement; mConnectionGeometry = p.mConnectionGeometry; mPhysicalOrVirtualBoundary = p.mPhysicalOrVirtualBoundary; mInternalOrExternalBoundary = p.mInternalOrExternalBoundary; }
 		internal IfcRelSpaceBoundary(IfcSpaceBoundarySelect s, IfcElement e, IfcConnectionGeometry g, IfcPhysicalOrVirtualEnum virt, IfcInternalOrExternalEnum intern) : base(s.Database)

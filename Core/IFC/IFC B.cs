@@ -162,9 +162,9 @@ namespace GeometryGym.Ifc
 		private int mFirstOperand;// : IfcBooleanOperand;
 		private int mSecondOperand;// : IfcBooleanOperand;
 
-		internal IfcBooleanOperator Operator { get { return mOperator; } }
-		internal IfcBooleanOperand FirstOperand { get { return mDatabase[mFirstOperand] as IfcBooleanOperand; } set { mFirstOperand = value.Index; } }
-		internal IfcBooleanOperand SecondOperand { get { return mDatabase[mSecondOperand] as IfcBooleanOperand; } set { mSecondOperand = value.Index; } }
+		public IfcBooleanOperator Operator { get { return mOperator; } }
+		public IfcBooleanOperand FirstOperand { get { return mDatabase[mFirstOperand] as IfcBooleanOperand; } set { mFirstOperand = value.Index; } }
+		public IfcBooleanOperand SecondOperand { get { return mDatabase[mSecondOperand] as IfcBooleanOperand; } set { mSecondOperand = value.Index; } }
 
 		internal IfcBooleanResult() : base() { }
 		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b) : base(db,b) { mOperator = b.mOperator; FirstOperand = db.Duplicate(b.mDatabase[ b.mFirstOperand]) as IfcBooleanOperand; SecondOperand = db.Duplicate(b.mDatabase[b.mSecondOperand]) as IfcBooleanOperand; }
@@ -334,9 +334,9 @@ namespace GeometryGym.Ifc
 		private double mXDim, mYDim, mZDim;// : IfcPositiveLengthMeasure
 
 		public IfcCartesianPoint Corner { get { return mDatabase[mCorner] as IfcCartesianPoint; } set { mCorner = value.mIndex; } }
-		internal double XDim { get { return mXDim; } }
-		internal double YDim { get { return mYDim; } }
-		internal double ZDim { get { return mZDim; } }
+		public double XDim { get { return mXDim; } set { mXDim = value; } }
+		public double YDim { get { return mYDim; } set { mYDim = value; } }
+		public double ZDim { get { return mZDim; } set { mZDim = value; } }
 
 		internal IfcBoundingBox() : base() { }
 		internal IfcBoundingBox(DatabaseIfc db, IfcBoundingBox b) : base(db,b) { Corner = db.Duplicate(b.Corner) as IfcCartesianPoint; mXDim = b.mXDim; mYDim = b.mYDim; mZDim = b.mZDim; }
@@ -363,7 +363,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcBoxedHalfSpace : IfcHalfSpaceSolid
 	{
 		private int mEnclosure;// : IfcBoundingBox; 
-		internal IfcBoundingBox Enclosure { get { return mDatabase[mEnclosure] as IfcBoundingBox; } set { mEnclosure = value.mIndex; } }
+		public IfcBoundingBox Enclosure { get { return mDatabase[mEnclosure] as IfcBoundingBox; } set { mEnclosure = value.mIndex; } }
 
 		internal IfcBoxedHalfSpace() : base() { }
 		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Duplicate(s.Enclosure) as IfcBoundingBox; }
@@ -423,9 +423,9 @@ namespace GeometryGym.Ifc
 		private List<double> mKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
 		private IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType;
 
-		internal List<int> Multiplicities { get { return mMultiplicities; } }
-		internal List<double> Knots { get { return mKnots; } }
-		internal IfcKnotType KnotSpec { get { return mKnotSpec; } }
+		public List<int> Multiplicities { get { return mMultiplicities; } }
+		public List<double> Knots { get { return mKnots; } }
+		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineCurveWithKnots() : base() { }
 		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c) : base(db, c)
@@ -616,9 +616,9 @@ namespace GeometryGym.Ifc
 		internal double mElevationOfTerrain = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal int mBuildingAddress;// : OPTIONAL IfcPostalAddress; 
 
-		internal double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set {mElevationOfRefHeight = value; } }
-		internal double ElevationOfTerrain { get { return mElevationOfTerrain; } set {mElevationOfTerrain = value; } }
-		internal IfcPostalAddress BuildingAddress {get {return mDatabase[mBuildingAddress] as IfcPostalAddress;} set { mBuildingAddress = (value == null ? 0 : value.mIndex); }}
+		public double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set {mElevationOfRefHeight = value; } }
+		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set {mElevationOfTerrain = value; } }
+		public IfcPostalAddress BuildingAddress {get {return mDatabase[mBuildingAddress] as IfcPostalAddress;} set { mBuildingAddress = (value == null ? 0 : value.mIndex); }}
 
 		internal IfcBuilding() : base() { }
 		public IfcBuilding(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.PlaneXYPlacement) ) { Name = name; setDefaultAddress();  }
@@ -686,6 +686,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcBuildingElementPartTypeEnum mPredefinedType = IfcBuildingElementPartTypeEnum.NOTDEFINED;// : IfcBuildingElementPartTypeEnum;
 		public IfcBuildingElementPartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcBuildingElementPartType() : base() { }
 		internal IfcBuildingElementPartType(DatabaseIfc db, IfcBuildingElementPartType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcBuildingElementPartType(DatabaseIfc m, string name, IfcBuildingElementPartTypeEnum type) : base(m) { Name = name; if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception("XXX Only valid in IFC4 or newer!"); mPredefinedType = type; }
@@ -824,6 +825,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcBurner : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcBurnerTypeEnum mPredefinedType = IfcBurnerTypeEnum.NOTDEFINED;// OPTIONAL : IfcBurnerTypeEnum;
+		public IfcBurnerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcBurner() : base() { }
 		internal IfcBurner(DatabaseIfc db, IfcBurner b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
 		internal IfcBurner(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }

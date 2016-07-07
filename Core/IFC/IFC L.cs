@@ -32,6 +32,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLaborResourceTypeEnum mPredefinedType = IfcLaborResourceTypeEnum.NOTDEFINED;// OPTIONAL : IfcRoofTypeEnum; 
 		public IfcLaborResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLaborResource() : base() { }
 		internal IfcLaborResource(IfcLaborResource o) : base(o) { mPredefinedType = o.mPredefinedType; }
 		internal IfcLaborResource(DatabaseIfc db) : base(db) { }
@@ -51,7 +52,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcLaborResourceType : IfcConstructionResourceType //IFC4
 	{
 		internal IfcLaborResourceTypeEnum mPredefinedType = IfcLaborResourceTypeEnum.NOTDEFINED;
-		internal IfcLaborResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcLaborResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLaborResourceType() : base() { }
 		internal IfcLaborResourceType(DatabaseIfc db, IfcLaborResourceType t) : base(db ,t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcLaborResourceType(DatabaseIfc m, string name, IfcLaborResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -76,6 +78,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLampTypeEnum mPredefinedType = IfcLampTypeEnum.NOTDEFINED;// OPTIONAL : IfcLampTypeEnum;
 		public IfcLampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLamp() : base() { }
 		internal IfcLamp(DatabaseIfc db, IfcLamp l) : base(db, l) { mPredefinedType = l.mPredefinedType; }
 		internal IfcLamp(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -94,6 +97,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLampTypeEnum mPredefinedType = IfcLampTypeEnum.NOTDEFINED;// : IfcLampTypeEnum; 
 		public IfcLampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLampType() : base() { }
 		internal IfcLampType(DatabaseIfc db, IfcLampType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcLampType(DatabaseIfc m, string name, IfcLampTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -156,6 +160,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLightFixtureTypeEnum mPredefinedType = IfcLightFixtureTypeEnum.NOTDEFINED;// : OPTIONAL IfcLightFixtureTypeEnum; 
 		public IfcLightFixtureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLightFixture() : base() { }
 		internal IfcLightFixture(DatabaseIfc db, IfcLightFixture f) : base(db, f) { mPredefinedType = f.mPredefinedType; }
 		internal IfcLightFixture(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -167,6 +172,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLightFixtureTypeEnum mPredefinedType = IfcLightFixtureTypeEnum.NOTDEFINED;// : IfcLightFixtureTypeEnum; 
 		public IfcLightFixtureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcLightFixtureType() : base() { }
 		internal IfcLightFixtureType(DatabaseIfc db, IfcLightFixtureType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcLightFixtureType(DatabaseIfc m, string name, IfcLightFixtureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -335,7 +341,7 @@ namespace GeometryGym.Ifc
 
 		private bool mCalculated = false;
 
-		internal IfcObjectPlacement PlacementRelTo
+		public IfcObjectPlacement PlacementRelTo
 		{
 			get { return mDatabase[mPlacementRelTo] as IfcObjectPlacement; }
 			set
@@ -352,7 +358,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal IfcAxis2Placement RelativePlacement
+		public IfcAxis2Placement RelativePlacement
 		{
 			get { return mDatabase[mRelativePlacement] as IfcAxis2Placement; }
 			set { mRelativePlacement = value.Index; mCalculated = false; }

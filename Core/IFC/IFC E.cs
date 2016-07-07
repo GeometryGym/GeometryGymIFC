@@ -114,6 +114,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricApplianceTypeEnum mPredefinedType = IfcElectricApplianceTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricApplianceTypeEnum;
 		public IfcElectricApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricAppliance() : base() { }
 		internal IfcElectricAppliance(DatabaseIfc db, IfcElectricAppliance a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
 		internal IfcElectricAppliance(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -131,6 +132,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricApplianceTypeEnum mPredefinedType = IfcElectricApplianceTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum;
 		public IfcElectricApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricApplianceType() : base() { }
 		internal IfcElectricApplianceType(DatabaseIfc db, IfcElectricApplianceType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcElectricApplianceType(DatabaseIfc m, string name, IfcElectricApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -142,6 +144,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricDistributionBoardTypeEnum mPredefinedType = IfcElectricDistributionBoardTypeEnum.NOTDEFINED;// OPTIONAL : IfcDamperTypeEnum;
 		public IfcElectricDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricDistributionBoard() : base() { }
 		internal IfcElectricDistributionBoard(DatabaseIfc db, IfcElectricDistributionBoard b) : base(db,b) { mPredefinedType = b.mPredefinedType; }
 		internal IfcElectricDistributionBoard(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -196,6 +199,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricFlowStorageDeviceTypeEnum mPredefinedType = IfcElectricFlowStorageDeviceTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricFlowStorageDeviceTypeEnum;
 		public IfcElectricFlowStorageDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricFlowStorageDevice() : base() { }
 		internal IfcElectricFlowStorageDevice(DatabaseIfc db, IfcElectricFlowStorageDevice d) : base(db,d) { mPredefinedType = d.mPredefinedType; }
 		internal IfcElectricFlowStorageDevice(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -215,10 +219,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcElectricFlowStorageDeviceType : IfcFlowStorageDeviceType
 	{
-		internal IfcElectricApplianceTypeEnum mPredefinedType = IfcElectricApplianceTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum;
+		internal IfcElectricFlowStorageDeviceTypeEnum mPredefinedType = IfcElectricFlowStorageDeviceTypeEnum.NOTDEFINED;// : IfcElectricFlowStorageDeviceTypeEnum;
+		public IfcElectricFlowStorageDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricFlowStorageDeviceType() : base() { }
 		internal IfcElectricFlowStorageDeviceType(DatabaseIfc db, IfcElectricFlowStorageDeviceType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal static void parseFields(IfcElectricFlowStorageDeviceType t, List<string> arrFields, ref int ipos) { IfcFlowStorageDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcElectricApplianceTypeEnum)Enum.Parse(typeof(IfcElectricApplianceTypeEnum), arrFields[ipos++].Replace(".", "")); }
+		internal static void parseFields(IfcElectricFlowStorageDeviceType t, List<string> arrFields, ref int ipos) { IfcFlowStorageDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcElectricFlowStorageDeviceTypeEnum)Enum.Parse(typeof(IfcElectricFlowStorageDeviceTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcElectricFlowStorageDeviceType Parse(string strDef) { IfcElectricFlowStorageDeviceType t = new IfcElectricFlowStorageDeviceType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
@@ -248,6 +254,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricGeneratorTypeEnum mPredefinedType = IfcElectricGeneratorTypeEnum.NOTDEFINED;// : IfcElectricGeneratorTypeEnum;
 		public IfcElectricGeneratorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricGeneratorType() : base() { }
 		internal IfcElectricGeneratorType(DatabaseIfc db, IfcElectricGeneratorType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcElectricGeneratorType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcElectricGeneratorTypeEnum)Enum.Parse(typeof(IfcElectricGeneratorTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -258,6 +265,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricHeaterTypeEnum mPredefinedType = IfcElectricHeaterTypeEnum.NOTDEFINED;// : IfcElectricHeaterTypeEnum
 		public IfcElectricHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricHeaterType() : base() { }
 		internal IfcElectricHeaterType(DatabaseIfc db, IfcElectricHeaterType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcElectricHeaterType t, List<string> arrFields, ref int ipos) { IfcFlowTerminalType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcElectricHeaterTypeEnum)Enum.Parse(typeof(IfcElectricHeaterTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -268,6 +276,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricMotorTypeEnum mPredefinedType = IfcElectricMotorTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricMotorTypeEnum;
 		public IfcElectricMotorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricMotor() : base() { }
 		internal IfcElectricMotor(DatabaseIfc db, IfcElectricMotor m) : base(db, m) { mPredefinedType = m.mPredefinedType; }
 		internal IfcElectricMotor(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -289,6 +298,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricMotorTypeEnum mPredefinedType = IfcElectricMotorTypeEnum.NOTDEFINED;// : IfcElectricMotorTypeEnum;
 		public IfcElectricMotorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricMotorType() : base() { }
 		internal IfcElectricMotorType(DatabaseIfc db, IfcElectricMotorType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcElectricMotorType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcElectricMotorTypeEnum)Enum.Parse(typeof(IfcElectricMotorTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -321,6 +331,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElectricTimeControlTypeEnum mPredefinedType = IfcElectricTimeControlTypeEnum.NOTDEFINED;// : IfcElectricTimeControlTypeEnum;
 		public IfcElectricTimeControlTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElectricTimeControlType() : base() { }
 		internal IfcElectricTimeControlType(DatabaseIfc db, IfcElectricTimeControlType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcElectricTimeControlType(DatabaseIfc m, string name, IfcElectricTimeControlTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -543,6 +554,7 @@ namespace GeometryGym.Ifc
 	{
 		private int mPosition;// : IfcAxis2Placement3D; 
 		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mPosition = value.mIndex; } }
+
 		protected IfcElementarySurface() : base() { }
 		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s) : base(db,s) { Position = db.Duplicate(s.Position) as IfcAxis2Placement3D; }
 		protected IfcElementarySurface(IfcAxis2Placement3D placement) : base(placement.mDatabase) { mPosition = placement.mIndex; }
@@ -596,6 +608,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcElementAssemblyTypeEnum mPredefinedType = IfcElementAssemblyTypeEnum.NOTDEFINED;// IfcElementAssemblyTypeEnum; 
 		public IfcElementAssemblyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcElementAssemblyType() : base() { }
 		internal IfcElementAssemblyType(DatabaseIfc db, IfcElementAssemblyType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
@@ -749,6 +762,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcEngineTypeEnum mPredefinedType = IfcEngineTypeEnum.NOTDEFINED;// : IfcEngineTypeEnum;
 		public IfcEngineTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcEngineType() : base() { }
 		internal IfcEngineType(DatabaseIfc db, IfcEngineType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcEngineType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcEngineTypeEnum)Enum.Parse(typeof(IfcEngineTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -766,8 +780,7 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcEnvironmentalImpactValue v, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcAppliedValue.parseFields(v, arrFields, ref ipos, schema); v.mImpactType = arrFields[ipos++]; v.mEnvCategory = (IfcEnvironmentalImpactCategoryEnum)Enum.Parse(typeof(IfcEnvironmentalImpactCategoryEnum), arrFields[ipos++].Replace(".", "")); v.mUserDefinedCategory = arrFields[ipos++]; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mImpactType + ",." + mEnvCategory.ToString() + ".," + mUserDefinedCategory; }
 	}
-	public partial class IfcEquipmentElement : IfcElement //IFC2x2 Depreceated 
-	{ }
+	public partial class IfcEquipmentElement : IfcElement { }//IFC2x2 Depreceated 
 	public partial class IfcEquipmentStandard : IfcControl // DEPRECEATED IFC4
 	{
 		internal IfcEquipmentStandard() : base() { }
@@ -800,6 +813,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcEvaporativeCoolerTypeEnum mPredefinedType = IfcEvaporativeCoolerTypeEnum.NOTDEFINED;// : IfcEvaporativeCoolerTypeEnum;
 		public IfcEvaporativeCoolerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcEvaporativeCoolerType() : base() { }
 		internal IfcEvaporativeCoolerType(DatabaseIfc db, IfcEvaporativeCoolerType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcEvaporativeCoolerType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcEvaporativeCoolerTypeEnum)Enum.Parse(typeof(IfcEvaporativeCoolerTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -832,6 +846,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcEvaporatorTypeEnum mPredefinedType = IfcEvaporatorTypeEnum.NOTDEFINED;// : IfcEvaporatorTypeEnum;
 		public IfcEvaporatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcEvaporatorType() : base() { }
 		internal IfcEvaporatorType(DatabaseIfc db, IfcEvaporatorType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcEvaporatorType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcEvaporatorTypeEnum)Enum.Parse(typeof(IfcEvaporatorTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -966,8 +981,10 @@ namespace GeometryGym.Ifc
 	{ //INVERSE
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
+
 		protected IfcExternalInformation() : base() { }
 		protected IfcExternalInformation(DatabaseIfc db) : base(db) { }
 		protected IfcExternalInformation(DatabaseIfc db, IfcExternalInformation i) : base(db) { }
@@ -978,7 +995,6 @@ namespace GeometryGym.Ifc
 		private string mLocation = "$";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
 		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
 		private string mName = "$";//  : IfcLabel;
-		
 		//INVERSE  
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
@@ -1006,16 +1022,16 @@ namespace GeometryGym.Ifc
 		private int mRelatingReference;// :	IfcExternalReference;
 		private List<int> mRelatedResourceObjects = new List<int>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
-		internal IfcExternalReference RelatingReference { get { return mDatabase[mRelatingReference] as IfcExternalReference; } }
-		internal List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } }
+		public IfcExternalReference RelatingReference { get { return mDatabase[mRelatingReference] as IfcExternalReference; } }
+		public List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } }
 
 		//INVERSE
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
 		internal IfcExternalReferenceRelationship(IfcExternalReferenceRelationship i) : base(i) { mRelatingReference = i.mRelatingReference; mRelatedResourceObjects.AddRange(i.mRelatedResourceObjects); }
-		internal IfcExternalReferenceRelationship(DatabaseIfc m, string name, string description, IfcExternalReference reference, List<IfcResourceObjectSelect> related)
-			: base(m, name, description) { mRelatingReference = reference.mIndex; mRelatedResourceObjects = related.ConvertAll(x => x.Index); }
+		internal IfcExternalReferenceRelationship(IfcExternalReference reference, List<IfcResourceObjectSelect> related)
+			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; mRelatedResourceObjects = related.ConvertAll(x => x.Index); }
 		internal static IfcExternalReferenceRelationship Parse(string strDef, ReleaseVersion schema) { IfcExternalReferenceRelationship m = new IfcExternalReferenceRelationship(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return m; }
 		internal static void parseFields(IfcExternalReferenceRelationship m, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -1084,15 +1100,14 @@ namespace GeometryGym.Ifc
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D placement, IfcDirection dir, double depth) : base(prof, placement) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + ParserSTEP.DoubleToString(Math.Round(mDepth, mDatabase.mLengthDigits)); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + ParserSTEP.DoubleToString(Math.Round(mDepth, mDatabase.mOptions.mLengthDigits)); }
 		internal static void parseFields(IfcExtrudedAreaSolid e, List<string> arrFields, ref int ipos) { IfcSweptAreaSolid.parseFields(e, arrFields, ref ipos); e.mExtrudedDirection = ParserSTEP.ParseLink(arrFields[ipos++]); e.mDepth = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		internal static IfcExtrudedAreaSolid Parse(string strDef) { IfcExtrudedAreaSolid e = new IfcExtrudedAreaSolid(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 	}
 	public partial class IfcExtrudedAreaSolidTapered : IfcExtrudedAreaSolid
 	{
 		private int mEndSweptArea;//: IfcProfileDef 
-
-		internal IfcProfileDef EndSweptArea { get { return mDatabase[mEndSweptArea] as IfcProfileDef; } set { mEndSweptArea = value.mIndex; } }
+		public IfcProfileDef EndSweptArea { get { return mDatabase[mEndSweptArea] as IfcProfileDef; } set { mEndSweptArea = value.mIndex; } }
 
 		internal IfcExtrudedAreaSolidTapered() : base() { }
 		public IfcExtrudedAreaSolidTapered(IfcParameterizedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcParameterizedProfileDef end) : base(start, placement, new IfcDirection(start.mDatabase,0,0,1), depth) { EndSweptArea = end; }

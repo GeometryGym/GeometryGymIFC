@@ -32,6 +32,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// OPTIONAL : IfcJunctionBoxTypeEnum;
 		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcJunctionBox() : base() { }
 		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
 		internal IfcJunctionBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -53,6 +54,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// : IfcJunctionBoxTypeEnum;
 		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcJunctionBoxType() : base() { }
 		internal IfcJunctionBoxType(DatabaseIfc db, IfcJunctionBoxType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcJunctionBoxType(DatabaseIfc m, string name, IfcJunctionBoxTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }

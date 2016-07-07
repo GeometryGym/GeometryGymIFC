@@ -33,8 +33,8 @@ namespace GeometryGym.Ifc
 		private int mBaseSurface;// : IfcSurface;
 		private bool mAgreementFlag;// : BOOLEAN;
 
-		internal IfcSurface BaseSurface { get { return mDatabase[mBaseSurface] as IfcSurface; } set { mBaseSurface = value.mIndex; } }
-		internal bool AgreementFlag { get { return mAgreementFlag; } }
+		public IfcSurface BaseSurface { get { return mDatabase[mBaseSurface] as IfcSurface; } set { mBaseSurface = value.mIndex; } }
+		public bool AgreementFlag { get { return mAgreementFlag; } }
 
 		internal IfcHalfSpaceSolid() : base() { }
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
@@ -47,6 +47,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcHeatExchangerTypeEnum mPredefinedType = IfcHeatExchangerTypeEnum.NOTDEFINED;// OPTIONAL : IfcHeatExchangerTypeEnum;
 		public IfcHeatExchangerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcHeatExchanger() : base() { }
 		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
 		internal IfcHeatExchanger(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -68,6 +69,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcHeatExchangerTypeEnum mPredefinedType = IfcHeatExchangerTypeEnum.NOTDEFINED;// : IfcHeatExchangerTypeEnum;
 		public IfcHeatExchangerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcHeatExchangerType() : base() { }
 		internal IfcHeatExchangerType(DatabaseIfc db, IfcHeatExchangerType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }

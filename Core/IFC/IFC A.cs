@@ -170,8 +170,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcAdvancedBrepWithVoids : IfcAdvancedBrep
 	{
 		private List<int> mVoids = new List<int>();// : SET [1:?] OF IfcClosedShell
+		public List<IfcClosedShell> Voids { get { return mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell); } set { mVoids = value.ConvertAll(x => x.mIndex); } }
 
-		internal List<IfcClosedShell> Voids { get { return mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell); } set { mVoids = value.ConvertAll(x => x.mIndex); } }
 		internal IfcAdvancedBrepWithVoids() : base() { }
 		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=> db.Duplicate(x) as IfcClosedShell); }
 
@@ -302,7 +302,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlarm : IfcDistributionControlElement //IFC4  
 	{
 		internal IfcAlarmTypeEnum mPredefinedType = IfcAlarmTypeEnum.NOTDEFINED;
-		internal IfcAlarmTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcAlarmTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcAlarm() : base() { }
 		internal IfcAlarm(DatabaseIfc db, IfcAlarm a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
@@ -352,22 +352,6 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcAnnotation Parse(string strDef) { int ipos = 0; IfcAnnotation a = new IfcAnnotation(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcAnnotation a, List<string> arrFields, ref int ipos)  { IfcProduct.parseFields(a,arrFields, ref ipos); }
-#if(rRHINO)
-		internal override bool drawRhino(Transform tr, int layerIndex, List<GeometryBase> voids, string building, string storey)
-		{
-			List<GeometryBase> vs = voids;
-			if (vs == null)
-				vs = new List<GeometryBase>();
-
-			for (int icounter = 0; icounter < mHasOpenings.Count; icounter++)
-			{
-				List<GeometryBase> v = ((IfcRelVoidsElement)mModel.mIFCobjs[mHasOpenings[icounter]]).getGeom();
-				if (v != null)
-					vs.AddRange(v);
-			}
-			return base.drawRhino(tr, layerIndex, vs, building, storey);
-		}
-#endif
 	}
 	public abstract partial class IfcAnnotationCurveOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
 	{
@@ -379,8 +363,10 @@ namespace GeometryGym.Ifc
 	{
 		internal int mOuterBoundary;// : IfcCurve;
 		internal List<int> mInnerBoundaries = new List<int>();// OPTIONAL SET [1:?] OF IfcCurve; 
+
 		public IfcCurve OuterBoundary { get { return mDatabase[mOuterBoundary] as IfcCurve; } set { mOuterBoundary = value.mIndex; } }
-		List<IfcCurve> InnerBoundaries { get { return mInnerBoundaries.ConvertAll(x => mDatabase[x] as IfcCurve); } set { mInnerBoundaries = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public List<IfcCurve> InnerBoundaries { get { return mInnerBoundaries.ConvertAll(x => mDatabase[x] as IfcCurve); } set { mInnerBoundaries = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+
 		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Duplicate(a.OuterBoundary) as IfcCurve; InnerBoundaries = a.InnerBoundaries.ConvertAll(x=>db.Duplicate(x) as IfcCurve); }
 		internal IfcAnnotationFillArea() : base() { }
 		internal static void parseFields(IfcAnnotationFillArea a, List<string> arrFields, ref int ipos)
@@ -433,8 +419,10 @@ namespace GeometryGym.Ifc
 	{
 		internal int mItem;// : IfcGeometricRepresentationItem;
 		internal int mTextureCoordinates;// OPTIONAL IfcTextureCoordinate;
+
 		public IfcGeometricRepresentationItem Item { get { return mDatabase[mItem] as IfcGeometricRepresentationItem; } set { mItem = value.mIndex; } }
-		public IfcTextureCoordinate TextureCoordinates { get { return mDatabase[mTextureCoordinates] as IfcTextureCoordinate; } set { mTextureCoordinates = value.mIndex; } } 
+		public IfcTextureCoordinate TextureCoordinates { get { return mDatabase[mTextureCoordinates] as IfcTextureCoordinate; } set { mTextureCoordinates = value.mIndex; } }
+
 		internal IfcAnnotationSurface() : base() { } 
 		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates > 0) TextureCoordinates = db.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
 		internal static void parseFields(IfcAnnotationSurface s,List<string> arrFields, ref int ipos)
@@ -518,11 +506,11 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcApplication Parse(string strDef) { IfcApplication a = new IfcApplication(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 	}
-	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect, IfcResourceObjectSelect //SUPERTYPE OF(IfcCostValue);
+	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcResourceObjectSelect// SUPERTYPE OF(IfcCostValue);
 	{
 		internal string mName = "$";// : OPTIONAL IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
-		internal int mAppliedValue = 0;// : OPTIONAL IfcAppliedValueSelect
+		internal int mAppliedValueIndex = 0;// : OPTIONAL IfcAppliedValueSelect
 		internal IfcValue mAppliedValueValue = null;
 		internal int mUnitBasis;// : OPTIONAL IfcMeasureWithUnit;
 		internal string mApplicableDate = "$";// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
@@ -537,17 +525,28 @@ namespace GeometryGym.Ifc
 
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } } 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		
+		public IfcAppliedValueSelect AppliedValue { get { return mDatabase[mAppliedValueIndex] as IfcAppliedValueSelect; } set { mAppliedValueIndex = (value == null ? 0 : value.Index); } }
+		public IfcValue Value { get { return mAppliedValueValue; } set { mAppliedValueValue = value; } }
+		public IfcMeasureWithUnit UnitBasis { get { return mDatabase[mUnitBasis] as IfcMeasureWithUnit; } set { mUnitBasis = (value == null ? 0 : value.mIndex); } }
+		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string Condition { get { return (mCondition == "$" ? "" : ParserIfc.Decode(mCondition)); } set { mCondition = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
+		public List<IfcAppliedValue> Components { get { return mComponents.ConvertAll(x => mDatabase[x] as IfcAppliedValue); } set { mComponents = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		internal IfcAppliedValue() : base() { }
-		internal IfcAppliedValue(IfcAppliedValue v) : base()
+		public IfcAppliedValue(DatabaseIfc db) : base(db) { }
+		public IfcAppliedValue(IfcAppliedValueSelect appliedValue) : base(appliedValue.Database) { AppliedValue = appliedValue; }
+		public IfcAppliedValue(DatabaseIfc db, IfcValue value) : base(db) { Value = value; }
+		internal IfcAppliedValue(IfcAppliedValue v) : base() { } //todo remove
+		internal IfcAppliedValue(DatabaseIfc db, IfcAppliedValue v) : base(db)
 		{
-			mName = v.mName; mDescription = v.mDescription; mAppliedValue = v.mAppliedValue; mAppliedValueValue = v.mAppliedValueValue; mUnitBasis = v.mUnitBasis; mApplicableDate = v.mApplicableDate;
-			mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator; mComponents.AddRange(v.mComponents);
+			mName = v.mName; mDescription = v.mDescription; mAppliedValueIndex = v.mAppliedValueIndex; mAppliedValueValue = v.mAppliedValueValue;
+			UnitBasis = db.Duplicate(v.UnitBasis) as IfcMeasureWithUnit;
+			mApplicableDate = v.mApplicableDate; mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator;
+			Components = v.Components.ConvertAll(x=>db.Duplicate(x) as IfcAppliedValue);
 		}
-
 		internal static IfcAppliedValue Parse(string strDef, ReleaseVersion schema) { IfcAppliedValue v = new IfcAppliedValue(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return v; }
 		internal static void parseFields(IfcAppliedValue a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -556,7 +555,7 @@ namespace GeometryGym.Ifc
 			string str = arrFields[ipos++];
 			a.mAppliedValueValue = ParserIfc.parseValue(str);
 			if (a.mAppliedValueValue == null)
-				a.mAppliedValue = ParserSTEP.ParseLink(str);
+				a.mAppliedValueIndex = ParserSTEP.ParseLink(str);
 			a.mUnitBasis = ParserSTEP.ParseLink(arrFields[ipos++]);
 			a.mApplicableDate = arrFields[ipos++];
 			a.mFixedUntilDate = arrFields[ipos++];
@@ -580,7 +579,7 @@ namespace GeometryGym.Ifc
 					str += "," + ParserSTEP.LinkToString(mComponents[icounter]);
 				str += ")";
 			}
-			return base.BuildStringSTEP() + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',") + (mAppliedValueValue != null ? mAppliedValueValue.ToString() : ParserSTEP.LinkToString(mAppliedValue)) + "," + ParserSTEP.LinkToString(mUnitBasis) + "," + mApplicableDate + "," + mFixedUntilDate +
+			return base.BuildStringSTEP() + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',") + (mAppliedValueValue != null ? mAppliedValueValue.ToString() : ParserSTEP.LinkToString(mAppliedValueIndex)) + "," + ParserSTEP.LinkToString(mUnitBasis) + "," + mApplicableDate + "," + mFixedUntilDate +
 				(mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mCategory == "$" ? ",$," : ",'" + mCategory + "',") + (mCondition == "$" ? "$," : "'" + mCondition + "',") + (mArithmeticOperator == IfcArithmeticOperatorEnum.NONE ? "$," : "." + mArithmeticOperator.ToString() + ".,") + str);
 		}
 	}
@@ -618,7 +617,10 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcAppliedValueRelationship Parse(string strDef) { IfcAppliedValueRelationship a = new IfcAppliedValueRelationship(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 	}
-	public interface IfcAppliedValueSelect : IBaseClassIfc { }; //	IfcMeasureWithUnit, IfcValue, IfcReference); IFC2x3 //IfcRatioMeasure, IfcMeasureWithUnit, IfcMonetaryMeasure); 
+	public interface IfcAppliedValueSelect : IBaseClassIfc  //	IfcMeasureWithUnit, IfcValue, IfcReference); IFC2x3 //IfcRatioMeasure, IfcMeasureWithUnit, IfcMonetaryMeasure); 
+	{
+		//List<IfcAppliedValue> AppliedValueFor { get; }
+	}
 	public partial class IfcApproval : BaseClassIfc, IfcResourceObjectSelect
 	{
 		internal string mDescription = "$";// : OPTIONAL IfcText;
@@ -631,10 +633,10 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
-		[Browsable(false)]
+
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
-		[Browsable(false)]
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
+
 		internal IfcApproval() : base() { }
 		internal IfcApproval(IfcApproval o) : base()
 		{
@@ -707,7 +709,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatedApproval) + "," + ParserSTEP.LinkToString(mRelatingApproval) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? (mDescription == "$" ? ",$,'" : ",'" + mDescription + "','") +  mName  + "'": ""); }
 		internal static IfcApprovalRelationship Parse(string strDef,ReleaseVersion schema) { IfcApprovalRelationship a = new IfcApprovalRelationship(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 	}
-	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef
+	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef //SUPERTYPE OF(IfcArbitraryProfileDefWithVoids)
 	{
 		private int mOuterCurve;// : IfcBoundedCurve
 		public IfcBoundedCurve OuterCurve { get { return mDatabase[mOuterCurve] as IfcBoundedCurve; } set { mOuterCurve = value.mIndex; } }
@@ -758,7 +760,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return "IFCARCINDEX((" + mA + "," + mB + "," + mC + "))"; }
 	}
 	public partial class IfcAsset : IfcGroup
-	{	
+	{
 		internal string mAssetID;// : IfcIdentifier;
 		internal int mOriginalValue;// : IfcCostValue;
 		internal int mCurrentValue;// : IfcCostValue;
@@ -766,26 +768,40 @@ namespace GeometryGym.Ifc
 		internal int mOwner;// : IfcActorSelect;
 		internal int mUser;// : IfcActorSelect;
 		internal int mResponsiblePerson;// : IfcPerson;
-		internal int mIncorporationDate;// : IfcCalendarDate;
+		internal string mIncorporationDate = ""; // : IfcDate 
+		internal int mIncorporationDateSS;// : IfcDate Ifc2x3 IfcCalendarDate;
 		internal int mDepreciatedValue;// : IfcCostValue; 
+
+		public string AssetID { get { return (mAssetID == "$" ? "" : ParserIfc.Decode(mAssetID)); } set { mAssetID = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public IfcCostValue OriginalValue { get { return mDatabase[mOriginalValue] as IfcCostValue; } set { mOriginalValue = value.mIndex; } } 
+		public IfcCostValue CurrentValue { get { return mDatabase[mCurrentValue] as IfcCostValue; } set { mCurrentValue = value.mIndex; } } 
+		public IfcCostValue TotalReplacementCost { get { return mDatabase[mTotalReplacementCost] as IfcCostValue; } set { mTotalReplacementCost = value.mIndex; } } 
+		public IfcActorSelect Owner { get { return mDatabase[mOwner] as IfcActorSelect; } set { mOwner = value.Index; } }
+		public IfcActorSelect User { get { return mDatabase[mUser] as IfcActorSelect; } set { mUser = value.Index; } }
+		public IfcPerson ResponsiblePerson { get { return mDatabase[mResponsiblePerson] as IfcPerson; } set { mResponsiblePerson = value.mIndex; } }
+		//public  IncorporationDate
+		public IfcCostValue DepreciatedValue { get { return mDatabase[mDepreciatedValue] as IfcCostValue; } set { mDepreciatedValue = value.mIndex; } } 
+
 		
 		internal IfcAsset() : base() { }
 		internal IfcAsset(DatabaseIfc db, IfcAsset a) : base(db,a)
 		{
-			//mAssetID = a.mAssetID;
-			//mOriginalValue = a.mOriginalValue;
-			//mCurrentValue = a.mCurrentValue;
-			//mTotalReplacementCost = a.mTotalReplacementCost;
-			//mOwner = a.mOwner;
-			//mUser = a.mUser;
-			//mResponsiblePerson = a.mResponsiblePerson;
-			//mIncorporationDate = a.mIncorporationDate;
-			//mDepreciatedValue = a.mDepreciatedValue;
-#warning todo
+			mAssetID = a.mAssetID;
+			OriginalValue = db.Duplicate(a.OriginalValue) as IfcCostValue;
+			CurrentValue = db.Duplicate(a.CurrentValue) as IfcCostValue;
+			TotalReplacementCost = db.Duplicate(a.TotalReplacementCost) as IfcCostValue;
+			Owner = db.Duplicate(a.mDatabase[a.mOwner]) as IfcActorSelect;
+			User = db.Duplicate(a.mDatabase[a.mUser]) as IfcActorSelect;
+			ResponsiblePerson = db.Duplicate(a.ResponsiblePerson) as IfcPerson;
+			mIncorporationDate = a.mIncorporationDate;
+			if(a.mIncorporationDateSS > 0)
+				mIncorporationDateSS = db.Duplicate(a.mDatabase[ a.mIncorporationDateSS]).mIndex;
+
+			DepreciatedValue =  db.Duplicate(a.DepreciatedValue) as IfcCostValue;
 		}
 		internal IfcAsset(DatabaseIfc m, string name) : base(m,name) { }
-		internal new static IfcAsset Parse(string strDef) { IfcAsset a = new IfcAsset(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcAsset a,List<string> arrFields, ref int ipos)
+		internal new static IfcAsset Parse(string strDef, ReleaseVersion release) { IfcAsset a = new IfcAsset(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
+		internal static void parseFields(IfcAsset a,List<string> arrFields, ref int ipos, ReleaseVersion release)
 		{ 
 			IfcGroup.parseFields(a,arrFields, ref ipos);
 			a.mAssetID = arrFields[ipos++].Replace("'","");
@@ -795,7 +811,10 @@ namespace GeometryGym.Ifc
 			a.mOwner = ParserSTEP.ParseLink(arrFields[ipos++]);
 			a.mUser = ParserSTEP.ParseLink(arrFields[ipos++]);
 			a.mResponsiblePerson = ParserSTEP.ParseLink(arrFields[ipos++]);
-			a.mIncorporationDate = ParserSTEP.ParseLink(arrFields[ipos++]);
+			if (release == ReleaseVersion.IFC2x3)
+				a.mIncorporationDateSS = ParserSTEP.ParseLink(arrFields[ipos++]);
+			else
+				a.mIncorporationDate = arrFields[ipos++];
 			a.mDepreciatedValue = ParserSTEP.ParseLink(arrFields[ipos++]); 
 		}
 		protected override string BuildStringSTEP()
@@ -803,7 +822,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() +",'" + mAssetID + "'," + ParserSTEP.LinkToString(mOriginalValue) + "," +ParserSTEP.LinkToString(mCurrentValue) + "," + 
 				ParserSTEP.LinkToString(mTotalReplacementCost) + "," +ParserSTEP.LinkToString(mOwner) + "," +
 				ParserSTEP.LinkToString(mUser) + "," +ParserSTEP.LinkToString(mResponsiblePerson) + "," +
-				ParserSTEP.LinkToString(mIncorporationDate) + "," +ParserSTEP.LinkToString(mDepreciatedValue);
+				(mDatabase.Release == ReleaseVersion.IFC2x3 ? ParserSTEP.LinkToString(mIncorporationDateSS) : mIncorporationDate ) + "," +ParserSTEP.LinkToString(mDepreciatedValue);
 		}
 	}
 	public partial class IfcAsymmetricIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 IfcIShapeProfileDef 
@@ -889,6 +908,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcAudioVisualApplianceTypeEnum mPredefinedType = IfcAudioVisualApplianceTypeEnum.NOTDEFINED;// OPTIONAL : IfcAudioVisualApplianceTypeEnum;
 		public IfcAudioVisualApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcAudioVisualAppliance() : base() { }
 		internal IfcAudioVisualAppliance(DatabaseIfc db, IfcAudioVisualAppliance a) : base(db,a) { mPredefinedType = a.mPredefinedType; }
 		internal static void parseFields(IfcAudioVisualAppliance s, List<string> arrFields, ref int ipos)
@@ -906,6 +926,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcAudioVisualApplianceTypeEnum mPredefinedType = IfcAudioVisualApplianceTypeEnum.NOTDEFINED;// : IfcAudioVisualApplianceBoxTypeEnum; 
 		public IfcAudioVisualApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcAudioVisualApplianceType() : base() { }
 		internal IfcAudioVisualApplianceType(DatabaseIfc db, IfcAudioVisualApplianceType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcAudioVisualApplianceType(DatabaseIfc m, string name, IfcAudioVisualApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -944,8 +965,26 @@ namespace GeometryGym.Ifc
 		private int mAxis;// : OPTIONAL IfcDirection;
 		private int mRefDirection;// : OPTIONAL IfcDirection; 
 
-		public IfcDirection Axis { get { return mDatabase[mAxis] as IfcDirection; } set { mAxis = (value == null ? 0 : value.mIndex); } }
-		public IfcDirection RefDirection { get { return mDatabase[mRefDirection] as IfcDirection; } set { mRefDirection = (value == null ? 0 : value.mIndex); } }
+		public IfcDirection Axis
+		{
+			get { return mDatabase[mAxis] as IfcDirection; }
+			set
+			{
+				mAxis = value.mIndex;
+				if (mRefDirection == 0)
+					RefDirection = (Math.Abs(value.DirectionRatioX - 1) < 1e-3 ? mDatabase.YAxis : mDatabase.XAxis);
+			}
+		}
+		public IfcDirection RefDirection
+		{
+			get { return mDatabase[mRefDirection] as IfcDirection; }
+			set
+			{
+				mRefDirection = value.mIndex;
+				if (mAxis == 0)
+					Axis = (Math.Abs(value.DirectionRatioZ - 1) < 1e-3 ? mDatabase.XAxis : mDatabase.ZAxis);
+			}
+		}
 
 		internal IfcAxis2Placement3D() : base() { }
 		public IfcAxis2Placement3D(IfcCartesianPoint p) : base(p) { }

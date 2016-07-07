@@ -406,6 +406,7 @@ namespace GeometryGym.Ifc
 		internal class GenerateOptions
 		{
 			internal bool mGenerateOwnerHistory = true;
+			internal int mLengthDigits = 6;
 		}
 		internal GenerateOptions mOptions = new GenerateOptions();
 		internal ModelView mModelView = ModelView.If2x3NotAssigned;
@@ -431,7 +432,7 @@ namespace GeometryGym.Ifc
 			set
 			{
 				mModelTolerance = Math.Min(0.0005 / mModelSIScale, value);
-				mLengthDigits = Math.Max(2, -1*(int)(Math.Log10(mModelTolerance)-1));
+				mOptions.mLengthDigits = Math.Max(2, -1*(int)(Math.Log10(mModelTolerance)-1));
 			}
 		}
 		public double ScaleSI
@@ -439,7 +440,6 @@ namespace GeometryGym.Ifc
 			get { return mModelSIScale; }
 			set { mModelSIScale = value; }
 		}
-		internal int mLengthDigits = 6;
 		private double mModelTolerance = 0.0001,mModelSIScale = 1;
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }

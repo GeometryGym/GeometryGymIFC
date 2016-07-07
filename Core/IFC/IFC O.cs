@@ -274,22 +274,15 @@ namespace GeometryGym.Ifc
 		internal List<int> mBenchmarkValues = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcConstraint;
 		internal IfcLogicalOperatorEnum mLogicalAggregator = IfcLogicalOperatorEnum.NONE;// : OPTIONAL IfcLogicalOperatorEnum;
 		internal IfcObjectiveEnum mObjectiveQualifier = IfcObjectiveEnum.NOTDEFINED;// : 	IfcObjectiveEnum
-		internal string mUserDefinedQualifier = "$";
+		internal string mUserDefinedQualifier = "$"; //	:	OPTIONAL IfcLabel;
 
 		public List<IfcConstraint> BenchmarkValues { get { return mBenchmarkValues.ConvertAll(x => mDatabase[x] as IfcConstraint); } set { mBenchmarkValues = value.ConvertAll(x => x.mIndex); } }
 		public string UserDefinedQualifier { get { return (mUserDefinedQualifier == "$" ? "" : ParserIfc.Decode(mUserDefinedQualifier)); } set { mUserDefinedQualifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcObjective() : base() { }
-		internal IfcObjective(IfcObjective m) : base(m) { mBenchmarkValues = new List<int>(m.mBenchmarkValues.ToArray()); mLogicalAggregator = m.mLogicalAggregator;  mObjectiveQualifier = m.mObjectiveQualifier; mUserDefinedQualifier = m.mUserDefinedQualifier; }
-		public IfcObjective(DatabaseIfc db, string name, IfcConstraintEnum constraint, List<IfcConstraint> benchmarks, IfcObjectiveEnum qualifier, string userQualifier)
-		 	: base(db, name, constraint)
-		{
-			if (benchmarks != null && benchmarks.Count > 0)
-				mBenchmarkValues = benchmarks.ConvertAll(x => x.mIndex);
-			mObjectiveQualifier = qualifier;
-			if (!string.IsNullOrEmpty(userQualifier))
-				mUserDefinedQualifier = userQualifier.Replace("'", "");
-		}
+		internal IfcObjective(DatabaseIfc db, IfcObjective o) : base(db,o) { BenchmarkValues = o.BenchmarkValues.ConvertAll(x=>db.Duplicate(x) as IfcConstraint); mLogicalAggregator = o.mLogicalAggregator;  mObjectiveQualifier = o.mObjectiveQualifier; mUserDefinedQualifier = o.mUserDefinedQualifier; }
+		public IfcObjective(DatabaseIfc db, string name, IfcConstraintEnum constraint, IfcObjectiveEnum qualifier)
+		 	: base(db, name, constraint) { mObjectiveQualifier = qualifier; }
 
 		internal static IfcObjective Parse(string strDef, ReleaseVersion schema) { IfcObjective m = new IfcObjective(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return m; }
 		internal static void parseFields(IfcObjective m, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -335,6 +328,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mRepeatFactor;//  : IfcVector 
 		public IfcVector RepeatFactor { get { return mDatabase[mRepeatFactor] as IfcVector; } set { mRepeatFactor = value.mIndex; } }
+
 		internal IfcOneDirectionRepeatFactor() : base() { }
 		internal IfcOneDirectionRepeatFactor(DatabaseIfc db, IfcOneDirectionRepeatFactor f) : base(db, f) { RepeatFactor = db.Duplicate(f.RepeatFactor) as IfcVector; }
 		internal static void parseFields(IfcOneDirectionRepeatFactor f, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(f, arrFields, ref ipos); f.mRepeatFactor = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -403,8 +397,8 @@ namespace GeometryGym.Ifc
 			set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value.Replace("'", ""))); }
 		}
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		internal List<IfcActorRole> Roles { get { return mRoles.ConvertAll(x => mDatabase[x] as IfcActorRole); } set { mRoles = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
-		internal List<IfcAddress> Addresses { get { return mAddresses.ConvertAll(x => mDatabase[x] as IfcAddress); } set { mAddresses = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public List<IfcActorRole> Roles { get { return mRoles.ConvertAll(x => mDatabase[x] as IfcActorRole); } set { mRoles = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public List<IfcAddress> Addresses { get { return mAddresses.ConvertAll(x => mDatabase[x] as IfcAddress); } set { mAddresses = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
@@ -463,7 +457,9 @@ namespace GeometryGym.Ifc
 	{
 		internal int mEdgeElement;// IfcEdge;
 		internal bool mOrientation = true;// : BOOL;
+
 		public IfcEdge EdgeElement { get { return mDatabase[mEdgeElement] as IfcEdge; } set { mEdgeElement = value.mIndex; } }
+
 		internal IfcOrientedEdge() : base() { }
 		internal IfcOrientedEdge(DatabaseIfc db, IfcOrientedEdge e) : base(db,e) { EdgeElement = db.Duplicate( e.EdgeElement) as IfcEdge; mOrientation = e.mOrientation; }
 		public IfcOrientedEdge(IfcEdge e, bool sense) : base(e.mDatabase) { mEdgeElement = e.mIndex; mOrientation = sense; }
@@ -490,6 +486,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// OPTIONAL : IfcOutletTypeEnum;
 		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcOutlet() : base() { }
 		internal IfcOutlet(DatabaseIfc db, IfcOutlet o) : base(db,o) { mPredefinedType = o.mPredefinedType; }
 		internal IfcOutlet(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -507,6 +504,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// : IfcOutletTypeEnum; 
 		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcOutletType() : base() { }
 		internal IfcOutletType(DatabaseIfc db, IfcOutletType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcOutletType(DatabaseIfc m, string name, IfcOutletTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }

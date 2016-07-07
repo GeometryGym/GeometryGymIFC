@@ -57,6 +57,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcRailingTypeEnum mPredefinedType = IfcRailingTypeEnum.NOTDEFINED;
 		public IfcRailingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcRailingType() : base() { }
 		internal IfcRailingType(DatabaseIfc db, IfcRailingType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		public IfcRailingType(DatabaseIfc m, string name, IfcRailingTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -109,6 +110,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcRampFlightTypeEnum mPredefinedType = IfcRampFlightTypeEnum.NOTDEFINED;
 		public IfcRampFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcRampFlightType() : base() { }
 		internal IfcRampFlightType(DatabaseIfc db, IfcRampFlightType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		public IfcRampFlightType(DatabaseIfc m, string name, IfcRampFlightTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -120,6 +122,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcRampTypeEnum mPredefinedType = IfcRampTypeEnum.NOTDEFINED;
 		public IfcRampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcRampType() : base() { }
 		internal IfcRampType(DatabaseIfc db, IfcRampType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		public IfcRampType(DatabaseIfc m, string name, IfcRampTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -255,7 +258,9 @@ namespace GeometryGym.Ifc
 		internal int mBasisSurface;// : IfcPlane;
 		internal double mU1, mV1, mU2, mV2;// : IfcParameterValue;
 		internal bool mUsense, mVsense;// : BOOLEAN; 
+
 		public IfcPlane BasisSurface { get { return mDatabase[mBasisSurface] as IfcPlane; } set { mBasisSurface = value.mIndex; } }
+
 		internal IfcRectangularTrimmedSurface() : base() { }
 		internal IfcRectangularTrimmedSurface(DatabaseIfc db, IfcRectangularTrimmedSurface s) : base(db,s)
 		{
@@ -386,10 +391,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcReference : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect // IFC4
 	{
-		internal string mTypeIdentifier = "$", mAttributeIdentifier = "$"; //:		OPTIONAL IfcIdentifier;
-		internal string mInstanceName = "$"; //:		OPTIONAL IfcLabel;
+		internal string mTypeIdentifier = "$", mAttributeIdentifier = "$"; //:	OPTIONAL IfcIdentifier;
+		internal string mInstanceName = "$"; //:OPTIONAL IfcLabel;
 		internal List<int> mListPositions = new List<int>();//	 :	OPTIONAL LIST [1:?] OF INTEGER;
 		private int mInnerReference = 0;//	 :	OPTIONAL IfcReference;
+
 
 		public string TypeIdentifier { get { return (mTypeIdentifier == "$" ? "" : ParserIfc.Decode(mTypeIdentifier)); } set { mTypeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string AttributeIdentifier { get { return (mAttributeIdentifier == "$" ? "" : ParserIfc.Decode(mAttributeIdentifier)); } set { mAttributeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
@@ -413,7 +419,7 @@ namespace GeometryGym.Ifc
 			InstanceName = instanceName;
 		}
 		public IfcReference(string typeId, string attributeId, string instanceName, IfcReference inner)
-			: this(inner.mDatabase,typeId,attributeId,instanceName) { InnerReference = inner; }
+			: this(inner.mDatabase,typeId,attributeId,instanceName) { InnerReference = inner;  }
 		public IfcReference(string typeId, string attributeId, string instanceName, int position, IfcReference inner)
 			: this(typeId, attributeId, instanceName, inner) { mListPositions.Add(position); }
 		public IfcReference(string typeId, string attributeId, string instanceName, List<int> positions, IfcReference inner)
@@ -487,7 +493,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcReinforcementDefinitionProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
 	{
 		internal string mDefinitionType = "$";// 	:	OPTIONAL IfcLabel; 
-		List<int> mReinforcementSectionDefinitions = new List<int>();// :	LIST [1:?] OF IfcSectionReinforcementProperties;
+		internal List<int> mReinforcementSectionDefinitions = new List<int>();// :	LIST [1:?] OF IfcSectionReinforcementProperties;
+
 		public List<IfcSectionReinforcementProperties> ReinforcementSectionDefinitions { get { return mReinforcementSectionDefinitions.ConvertAll(x=>mDatabase[x] as IfcSectionReinforcementProperties) ; } set { mReinforcementSectionDefinitions = value.ConvertAll(x => x.mIndex); } }
 		internal IfcReinforcementDefinitionProperties() : base() { }
 		internal IfcReinforcementDefinitionProperties(DatabaseIfc db, IfcReinforcementDefinitionProperties p) : base(db, p)
@@ -517,6 +524,8 @@ namespace GeometryGym.Ifc
 		private double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
 		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
 		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarRoleEnum; IFC4 OPTIONAL
+		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NONE;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
 
 		public double NominalDiameter
 		{
@@ -529,9 +538,8 @@ namespace GeometryGym.Ifc
 			}
 			set { mNominalDiameter = value; }
 		}
-		internal IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarRoleEnum; IFC4 OPTIONAL
-		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NONE;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
 		public IfcReinforcingBarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcReinforcingBar() : base() { }
 		internal IfcReinforcingBar(DatabaseIfc db, IfcReinforcingBar b) : base(db, b)
 		{
@@ -663,6 +671,7 @@ namespace GeometryGym.Ifc
 		internal double mTransverseBarCrossSectionArea;// : IfcAreaMeasure;
 		internal double mLongitudinalBarSpacing, mTransverseBarSpacing;// : IfcPositiveLengthMeasure;
 		internal IfcReinforcingMeshTypeEnum mPredefinedType = IfcReinforcingMeshTypeEnum.NOTDEFINED; //	:	OPTIONAL IfcReinforcingMeshTypeEnum;
+
 		public IfcReinforcingMeshTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcReinforcingMesh() : base() { }
 		internal IfcReinforcingMesh(DatabaseIfc db, IfcReinforcingMesh m) : base(db, m)
@@ -738,8 +747,8 @@ namespace GeometryGym.Ifc
 		public string RepresentationIdentifier { get { return mRepresentationIdentifier == "$" ? "" : mRepresentationIdentifier; } set { mRepresentationIdentifier = (string.IsNullOrEmpty(value) ? "$" : value); } }
 		public string RepresentationType { get { return mRepresentationType == "$" ? "" : mRepresentationType; } set { mRepresentationType = string.IsNullOrEmpty(value) ? "$" : value; } }
 		public List<IfcRepresentationItem> Items { get { return mItems.ConvertAll(x => mDatabase[x] as IfcRepresentationItem); } set { mItems = value.ConvertAll(x => x.mIndex); } }
-		public List<IfcProductRepresentation> OfProductRepresentation { get { return mOfProductRepresentation; } }
 		public List<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
+		public List<IfcProductRepresentation> OfProductRepresentation { get { return mOfProductRepresentation; } }
 
 		protected IfcRepresentation() : base() { }
 		
@@ -885,12 +894,17 @@ namespace GeometryGym.Ifc
 		internal int mRelatingConstraint;// :	IfcConstraint;
 		internal List<int> mRelatedResourceObjects = new List<int>();// :	SET [1:?] OF IfcResourceObjectSelect;
 
-		internal IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } }
-		internal List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } }
+		public IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; if (!value.mPropertiesForConstraint.Contains(this)) value.mPropertiesForConstraint.Add(this); } }
+		public List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } set { mRelatedResourceObjects = value.ConvertAll(x => x.Index); } }
+
 		internal IfcResourceConstraintRelationship() : base() { }
 		internal IfcResourceConstraintRelationship(IfcResourceConstraintRelationship o) : base(o) { mRelatingConstraint = o.mRelatingConstraint; }
-		public IfcResourceConstraintRelationship(string name, string description, IfcConstraint constraint, IfcResourceObjectSelect related) : this(name, description, constraint, new List<IfcResourceObjectSelect>() { related }) { }
-		public IfcResourceConstraintRelationship(string name, string description, IfcConstraint constraint, List<IfcResourceObjectSelect> related) : base(constraint.mDatabase, name, description) { mRelatingConstraint = constraint.mIndex; mRelatedResourceObjects = related.ConvertAll(x => x.Index); }
+		public IfcResourceConstraintRelationship(IfcConstraint constraint, IfcResourceObjectSelect related) : this( constraint, new List<IfcResourceObjectSelect>() { related }) { }
+		public IfcResourceConstraintRelationship(IfcConstraint constraint, List<IfcResourceObjectSelect> related) : base(constraint.mDatabase)
+		{
+			RelatingConstraint = constraint;
+			RelatedResourceObjects = related;
+		}
 		internal static IfcResourceConstraintRelationship Parse(string strDef, ReleaseVersion schema) { IfcResourceConstraintRelationship a = new IfcResourceConstraintRelationship(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcResourceConstraintRelationship a, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcResourceLevelRelationship.parseFields(a, arrFields, ref ipos,schema); a.mRelatingConstraint = ParserSTEP.ParseLink(arrFields[ipos++]); a.mRelatedResourceObjects = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -919,8 +933,8 @@ namespace GeometryGym.Ifc
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		protected IfcResourceLevelRelationship() : base() { }
+		protected IfcResourceLevelRelationship(DatabaseIfc db) : base(db) { }
 		protected IfcResourceLevelRelationship(IfcResourceLevelRelationship r) : base() { mDescription = r.mDescription; mName = r.mName; }
-		protected IfcResourceLevelRelationship(DatabaseIfc m, string name, string description) : base(m) { Name = name; Description = description; }
 		internal static void parseFields(IfcResourceLevelRelationship a, List<string> arrFields, ref int ipos,ReleaseVersion schema)
 		{
 			if (schema != ReleaseVersion.IFC2x3)
@@ -1096,6 +1110,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcRoofTypeEnum mPredefinedType = IfcRoofTypeEnum.NOTDEFINED;
 		public IfcRoofTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcRoofType() : base() { }
 		internal IfcRoofType(DatabaseIfc db, IfcRoofType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		public IfcRoofType(DatabaseIfc m, string name, IfcRoofTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }

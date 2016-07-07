@@ -31,7 +31,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcGasTerminalType : IfcFlowTerminalType // DEPRECEATED IFC4
 	{
 		internal IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
-		internal IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcGasTerminalType() : base() { }
 		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -97,6 +98,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// OPTIONAL IfcGeographicElementTypeEnum; 
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcGeographicElement() : base() { }
 		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
 		internal IfcGeographicElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
@@ -114,6 +116,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
 	{
 		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// IfcGeographicElementTypeEnum; 
+		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcGeographicElementType() : base() { }
 		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
@@ -278,7 +282,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
 	{
 		private List<int> mElements = new List<int>(); //SET [1:?] OF IfcGeometricSetSelect; 
-		internal List<IfcGeometricSetSelect> Elements { get { return mElements.ConvertAll(x => mDatabase[x] as IfcGeometricSetSelect); } set { mElements = value.ConvertAll(x => x.Index); } }
+		public List<IfcGeometricSetSelect> Elements { get { return mElements.ConvertAll(x => mDatabase[x] as IfcGeometricSetSelect); } set { mElements = value.ConvertAll(x => x.Index); } }
+
 		internal IfcGeometricSet() : base() { }
 		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { Elements = s.mElements.ConvertAll(x=>db.Duplicate(s.mDatabase[x]) as IfcGeometricSetSelect); }
 		internal IfcGeometricSet(List<IfcGeometricSetSelect> set) : base(set[0].Database) { mElements = set.ConvertAll(x => x.Index); }

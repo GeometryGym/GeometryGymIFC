@@ -32,6 +32,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;//: OPTIONAL IfcWallTypeEnum; 
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWall() : base() { }
 		public IfcWall(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 
@@ -65,6 +66,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWallType() : base() { }
 		internal IfcWallType(DatabaseIfc db, IfcWallType t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		public IfcWallType(DatabaseIfc m, string name, IfcWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -96,6 +98,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWasteTerminalTypeEnum mPredefinedType = IfcWasteTerminalTypeEnum.NOTDEFINED;// OPTIONAL : IfcWasteTerminalTypeEnum;
 		public IfcWasteTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWasteTerminal() : base() { }
 		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcWasteTerminal(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -113,6 +116,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWasteTerminalTypeEnum mPredefinedType = IfcWasteTerminalTypeEnum.NOTDEFINED;// : IfcWasteTerminalTypeEnum; 
 		public IfcWasteTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWasteTerminalType() : base() { }
 		internal IfcWasteTerminalType(DatabaseIfc db, IfcWasteTerminalType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -308,7 +312,9 @@ namespace GeometryGym.Ifc
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
 		internal bool mParameterTakesPrecedence;// : BOOLEAN; 
 		internal string mUserDefinedPartitioningType = "$"; // 	 :	OPTIONAL IfcLabel;
+
 		public IfcWindowTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWindowType() : base() { }
 		internal IfcWindowType(DatabaseIfc db, IfcWindowType t) : base(db,t) { mPredefinedType = t.mPredefinedType; mPartitioningType = t.mPartitioningType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedPartitioningType = t.mUserDefinedPartitioningType; }
 		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -412,7 +418,6 @@ namespace GeometryGym.Ifc
 		internal string mUserDefinedControlType = "$";//	 : 	OPTIONAL IfcLabel;
 
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-
 
 		protected IfcWorkControl() : base() { }
 		protected IfcWorkControl(IfcWorkControl i)

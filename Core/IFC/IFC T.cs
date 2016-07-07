@@ -34,19 +34,18 @@ namespace GeometryGym.Ifc
 		private List<int> mRows = new List<int>();// OPTIONAL LIST [1:?] OF IfcTableRow;
 		private List<int> mColumns = new List<int>();// :	OPTIONAL LIST [1:?] OF IfcTableColumn;
 
-		internal List<IfcTableRow> Rows { get { return mRows.ConvertAll(x => mDatabase[x] as IfcTableRow); } }
-		internal List<IfcTableColumn> Columns { get { return mColumns.ConvertAll(x => mDatabase[x] as IfcTableColumn); } }
+		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
+		public List<IfcTableRow> Rows { get { return mRows.ConvertAll(x => mDatabase[x] as IfcTableRow); } set { mRows = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public List<IfcTableColumn> Columns { get { return mColumns.ConvertAll(x => mDatabase[x] as IfcTableColumn); } set { mColumns = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 
 		internal IfcTable() : base() { }
-		internal IfcTable(IfcTable o) : base() { mName = o.mName; mRows.AddRange(o.mRows); mColumns.AddRange(o.mColumns); }
-		public IfcTable(DatabaseIfc m, string name, List<IfcTableRow> rows, List<IfcTableColumn> cols) : base(m)
+		public IfcTable(DatabaseIfc db) : base(db) { }
+		internal IfcTable(DatabaseIfc db, IfcTable t) : base(db) { mName = t.mName; Rows = t.Rows.ConvertAll(x=>db.Duplicate(t) as IfcTableRow); Columns = t.Columns.ConvertAll(x=>db.Duplicate(x) as IfcTableColumn); }
+		public IfcTable(string name, List<IfcTableRow> rows, List<IfcTableColumn> cols) : base(rows == null || rows.Count == 0 ? cols[0].mDatabase : rows[0].mDatabase)
 		{
-			if (!string.IsNullOrEmpty(name))
-				mName = name.Replace("'", "");
-			if (rows != null && rows.Count > 0)
-				mRows = rows.ConvertAll(x => x.mIndex);
-			if (cols != null && cols.Count > 0)
-				mColumns = cols.ConvertAll(x => x.mIndex);
+			Name = name.Replace("'", "");
+			Rows = rows;
+			Columns = cols;
 		}
 		internal static void parseFields(IfcTable t, List<string> arrFields, ref int ipos) { t.mName = arrFields[ipos++]; t.mRows = ParserSTEP.SplitListLinks(arrFields[ipos++]); t.mColumns = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -89,15 +88,11 @@ namespace GeometryGym.Ifc
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
-		public IfcReference ReferencePath
-		{
-			get { return mDatabase[mReferencePath] as IfcReference; }
-			set { mReferencePath = (value == null ? 0 : value.mIndex); }
-		}
+		public IfcReference ReferencePath { get { return mDatabase[mReferencePath] as IfcReference; } set { mReferencePath = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcTableColumn() : base() { }
-		internal IfcTableColumn(IfcTableColumn c) : base() { mIdentifier = c.mIdentifier; mName = c.mName; mDescription = c.mDescription; mUnit = c.mUnit; mReferencePath = c.mReferencePath; }
 		public IfcTableColumn(DatabaseIfc db) : base(db) { }
+		internal IfcTableColumn(DatabaseIfc db, IfcTableColumn c) : base(db) { mIdentifier = c.mIdentifier; mName = c.mName; mDescription = c.mDescription; if(c.mUnit >0) Unit = db.Duplicate(c.mDatabase[ c.mUnit]) as IfcUnit; if(c.mReferencePath > 0) ReferencePath = db.Duplicate(c.ReferencePath) as IfcReference; }
 		 
 		internal static void parseFields(IfcTableColumn t, List<string> arrFields, ref int ipos)
 		{
@@ -115,12 +110,13 @@ namespace GeometryGym.Ifc
 		internal List<IfcValue> mRowCells = new List<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
 		internal bool mIsHeading = false; //:	:	OPTIONAL BOOLEAN;
 
-		public List<IfcValue> RowCells { get { return mRowCells; } }
+		public List<IfcValue> RowCells { get { return mRowCells; } set { mRowCells = value; } }
+		public bool IsHeading { get { return mIsHeading; } set { mIsHeading = value; } }
 
 		internal IfcTableRow() : base() { }
 		internal IfcTableRow(IfcTableRow o) : base() { mRowCells.AddRange(o.mRowCells); mIsHeading = o.mIsHeading; }
-		public IfcTableRow(DatabaseIfc m, IfcValue val) : this(m, new List<IfcValue>() { val }, false) { }
-		public IfcTableRow(DatabaseIfc m, List<IfcValue> vals, bool isHeading) : base(m)
+		public IfcTableRow(DatabaseIfc db, IfcValue val) : this(db, new List<IfcValue>() { val }, false) { }
+		public IfcTableRow(DatabaseIfc db, List<IfcValue> vals, bool isHeading) : base(db)
 		{
 			mRowCells.AddRange(vals);
 			mIsHeading = isHeading;
@@ -160,6 +156,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTankTypeEnum mPredefinedType = IfcTankTypeEnum.NOTDEFINED;// OPTIONAL : IfcTankTypeEnum;
 		public IfcTankTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTank() : base() { }
 		internal IfcTank(DatabaseIfc db, IfcTank t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcTank(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -180,6 +177,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcTankType : IfcFlowStorageDeviceType
 	{
 		internal IfcTankTypeEnum mPredefinedType = IfcTankTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum; 
+		public IfcTankTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTankType() : base() { }
 		internal IfcTankType(DatabaseIfc db, IfcTankType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcTankType t, List<string> arrFields, ref int ipos) { IfcFlowStorageDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcTankTypeEnum)Enum.Parse(typeof(IfcTankTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -301,8 +300,8 @@ namespace GeometryGym.Ifc
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : IfcTaskTypeEnum; 
 		private string mWorkMethod = "$";// : OPTIONAL IfcLabel;
 
-		internal IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		internal string WorkMethod { get { return (mWorkMethod == "$" ? "" : ParserIfc.Decode(mWorkMethod)); } set { mWorkMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public string WorkMethod { get { return (mWorkMethod == "$" ? "" : ParserIfc.Decode(mWorkMethod)); } set { mWorkMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		internal IfcTaskType() : base() { }
 		internal IfcTaskType(DatabaseIfc db, IfcTaskType t) : base(db, t) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
@@ -467,6 +466,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTendonAnchorTypeEnum mPredefinedType = IfcTendonAnchorTypeEnum.NOTDEFINED;// :	OPTIONAL IfcTendonAnchorTypeEnum;
 		public IfcTendonAnchorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTendonAnchor() : base() { }
 		internal IfcTendonAnchor(DatabaseIfc db, IfcTendonAnchor a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
 		internal IfcTendonAnchor(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
@@ -527,7 +527,9 @@ namespace GeometryGym.Ifc
 		internal string mLiteral;// : IfcPresentableText;
 		internal int mPlacement;// : IfcAxis2Placement;
 		internal IfcTextPath mPath;// : IfcTextPath;
-		internal IfcAxis2Placement Placement { get { return mDatabase[mPlacement] as IfcAxis2Placement; } }
+		 
+		public IfcAxis2Placement Placement { get { return mDatabase[mPlacement] as IfcAxis2Placement; } }
+
 		internal IfcTextLiteral() : base() { }
 		//internal IfcTextLiteral(DatabaseIfc db, IfcTextLiteral l) : base(db,l) { mLiteral = o.mLiteral; mPlacement = o.mPlacement; mPath = o.mPath; }
 		internal static IfcTextLiteral Parse(string strDef) { IfcTextLiteral l = new IfcTextLiteral(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
@@ -815,6 +817,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTransformerTypeEnum mPredefinedType = IfcTransformerTypeEnum.NOTDEFINED;// OPTIONAL : IfcTransformerTypeEnum;
 		public IfcTransformerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTransformer() : base() { }
 		internal IfcTransformer(DatabaseIfc db, IfcTransformer t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcTransformer(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -836,6 +839,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTransformerTypeEnum mPredefinedType = IfcTransformerTypeEnum.NOTDEFINED;// : IfcTransformerEnum; 
 		public IfcTransformerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTransformerType() : base() { }
 		internal IfcTransformerType(DatabaseIfc db, IfcTransformerType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -888,6 +892,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTransportElementTypeEnum mPredefinedType;// IfcTransportElementTypeEnum; 
 		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTransportElementType() : base() { }
 		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -1190,6 +1195,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTubeBundleTypeEnum mPredefinedType = IfcTubeBundleTypeEnum.NOTDEFINED;// OPTIONAL : IfcTubeBundleTypeEnum;
 		public IfcTubeBundleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTubeBundle() : base() { }
 		internal IfcTubeBundle(DatabaseIfc db, IfcTubeBundle b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
 		internal IfcTubeBundle(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -1211,6 +1217,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTubeBundleTypeEnum mPredefinedType = IfcTubeBundleTypeEnum.NOTDEFINED;// : IfcTubeBundleEnum; 
 		public IfcTubeBundleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcTubeBundleType() : base() { }
 		internal IfcTubeBundleType(DatabaseIfc db, IfcTubeBundleType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcTubeBundleType(DatabaseIfc m, string name, IfcTubeBundleTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
@@ -1222,6 +1229,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mSecondRepeatFactor;//  : IfcVector 
 		public IfcVector SecondRepeatFactor { get { return mDatabase[mSecondRepeatFactor] as IfcVector; } set { mSecondRepeatFactor = value.mIndex; } }
+
 		internal IfcTwoDirectionRepeatFactor() : base() { }
 		internal IfcTwoDirectionRepeatFactor(DatabaseIfc db, IfcTwoDirectionRepeatFactor f) : base(db,f) { SecondRepeatFactor = db.Duplicate(f.SecondRepeatFactor) as IfcVector; }
 		internal static void parseFields(IfcTwoDirectionRepeatFactor f, List<string> arrFields, ref int ipos) { IfcOneDirectionRepeatFactor.parseFields(f, arrFields, ref ipos); f.mSecondRepeatFactor = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -1290,15 +1298,15 @@ namespace GeometryGym.Ifc
 	{ 
 		internal List<int> mRepresentationMaps = new List<int>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcRepresentationMap;
 		private string mTag = "$";// : OPTIONAL IfcLabel 
-
-		public List<IfcRepresentationMap> RepresentationMaps { get { return mRepresentationMaps.ConvertAll(x => mDatabase[x] as IfcRepresentationMap); } set { mRepresentationMaps = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
-		public string Tag { get { return (mTag == "$" ? "" : mTag); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : value); } }
 		//INVERSE
 		internal List<IfcRelAssignsToProduct> mReferencedBy = new List<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
+		
+		public List<IfcRepresentationMap> RepresentationMaps { get { return mRepresentationMaps.ConvertAll(x => mDatabase[x] as IfcRepresentationMap); } set { mRepresentationMaps = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public string Tag { get { return (mTag == "$" ? "" : mTag); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : value); } }
 		public List<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
 
 		protected IfcTypeProduct() : base() { }
-		protected IfcTypeProduct(DatabaseIfc db) : base(db) { if (mDatabase.mContext != null) mDatabase.mContext.AddDeclared(this); }
+		protected IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t) : base(db,t) { RepresentationMaps = t.RepresentationMaps.ConvertAll(x=>db.Duplicate(x) as IfcRepresentationMap); mTag = t.mTag; }
 
 		internal new static IfcTypeProduct Parse(string strDef) { IfcTypeProduct p = new IfcTypeProduct(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }

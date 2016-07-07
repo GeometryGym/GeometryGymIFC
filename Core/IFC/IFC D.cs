@@ -54,6 +54,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDamperTypeEnum mPredefinedType = IfcDamperTypeEnum.NOTDEFINED;// : IfcDamperTypeEnum;
 		public IfcDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDamperType() : base() { }
 		internal IfcDamperType(DatabaseIfc db, IfcDamperType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcDamperType(DatabaseIfc m, string name, IfcDamperTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -189,7 +190,6 @@ namespace GeometryGym.Ifc
 		public IfcCartesianTransformationOperator2D Operator { get { return mDatabase[mOperator] as IfcCartesianTransformationOperator2D; } set { mOperator = value.mIndex; } }
 		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
-
 		internal IfcDerivedProfileDef() : base() { }
 		public IfcDerivedProfileDef(IfcProfileDef container, IfcCartesianTransformationOperator2D op,string name) : base(container.mDatabase,name) { ContainerProfile = container; Operator = op; }
 		
@@ -321,6 +321,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDiscreteAccessoryTypeEnum mPredefinedType = IfcDiscreteAccessoryTypeEnum.NOTDEFINED;// : OPTIONAL IfcDiscreteAccessoryTypeEnum;
 		public IfcDiscreteAccessoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDiscreteAccessory() : base() { }
 		internal IfcDiscreteAccessory(DatabaseIfc db, IfcDiscreteAccessory a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
 		internal IfcDiscreteAccessory(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
@@ -342,6 +343,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDiscreteAccessoryTypeEnum mPredefinedType = IfcDiscreteAccessoryTypeEnum.NOTDEFINED;//:	OPTIONAL IfcDiscreteAccessoryTypeEnum; IFC4	
 		public IfcDiscreteAccessoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDiscreteAccessoryType() : base() { }
 		internal IfcDiscreteAccessoryType(DatabaseIfc db, IfcDiscreteAccessoryType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcDiscreteAccessoryType(DatabaseIfc m, string name, IfcDiscreteAccessoryTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
@@ -387,6 +389,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDistributionChamberElementTypeEnum mPredefinedType;
 		public IfcDistributionChamberElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDistributionChamberElementType() : base() { }
 		internal IfcDistributionChamberElementType(DatabaseIfc db, IfcDistributionChamberElementType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcDistributionChamberElementType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcDistributionChamberElementTypeEnum)Enum.Parse(typeof(IfcDistributionChamberElementTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -406,7 +409,7 @@ namespace GeometryGym.Ifc
 		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDistributionControlElement" : base.KeyWord; } }
 
 		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
-		internal string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		internal IfcDistributionControlElement() : base() { }
 		internal IfcDistributionControlElement(DatabaseIfc db, IfcDistributionControlElement e) : base(db,e) { }
@@ -943,6 +946,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDuctFittingTypeEnum mPredefinedType = IfcDuctFittingTypeEnum.NOTDEFINED;// OPTIONAL : IfcDuctFittingTypeEnum;
 		public IfcDuctFittingTypeEnum Predefined { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDuctFitting() : base() { }
 		internal IfcDuctFitting(DatabaseIfc db, IfcDuctFitting f) : base(db, f) { mPredefinedType = f.mPredefinedType; }
 		internal IfcDuctFitting(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -964,6 +968,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDuctFittingTypeEnum mPredefinedType = IfcDuctFittingTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum;
 		public IfcDuctFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDuctFittingType() : base() { }
 		internal IfcDuctFittingType(DatabaseIfc db, IfcDuctFittingType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcDuctFittingType(DatabaseIfc m, string name, IfcDuctFittingTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
@@ -995,6 +1000,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDuctSegmentTypeEnum mPredefinedType = IfcDuctSegmentTypeEnum.NOTDEFINED;// : IfcDuctSegmentTypeEnum;
 		public IfcDuctSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDuctSegmentType() : base() { }
 		internal IfcDuctSegmentType(DatabaseIfc db, IfcDuctSegmentType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal IfcDuctSegmentType(DatabaseIfc m, string name, IfcDuctSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
@@ -1007,6 +1013,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDuctSilencerTypeEnum mPredefinedType = IfcDuctSilencerTypeEnum.NOTDEFINED;
 		public IfcDuctSilencerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcDuctSilencer() : base() { }
 		internal IfcDuctSilencer(DatabaseIfc db, IfcDuctSilencer s) : base(db, s) { mPredefinedType = s.mPredefinedType; }
 		internal IfcDuctSilencer(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -1026,6 +1033,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcDuctSilencerType : IfcFlowTreatmentDeviceType
 	{
 		internal IfcDuctSilencerTypeEnum mPredefinedType = IfcDuctSilencerTypeEnum.NOTDEFINED;// : IfcDuctSilencerTypeEnum;
+		public IfcDuctSilencerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		
 		internal IfcDuctSilencerType() : base() { }
 		internal IfcDuctSilencerType(DatabaseIfc db, IfcDuctSilencerType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		internal static void parseFields(IfcDuctSilencerType t, List<string> arrFields, ref int ipos) { IfcFlowTreatmentDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcDuctSilencerTypeEnum)Enum.Parse(typeof(IfcDuctSilencerTypeEnum), arrFields[ipos++].Replace(".", "")); }
