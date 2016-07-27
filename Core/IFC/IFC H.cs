@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 		public bool AgreementFlag { get { return mAgreementFlag; } }
 
 		internal IfcHalfSpaceSolid() : base() { }
-		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
+		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 
 		internal static void parseFields(IfcHalfSpaceSolid s, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(s, arrFields, ref ipos); s.mBaseSurface = ParserSTEP.ParseLink(arrFields[ipos++]); s.mAgreementFlag = ParserSTEP.ParseBool(arrFields[ipos++]); }
 		internal static IfcHalfSpaceSolid Parse(string strDef) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }

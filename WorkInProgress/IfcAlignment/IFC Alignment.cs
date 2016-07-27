@@ -294,7 +294,7 @@ namespace GeometryGym.Ifc
 		internal IfcCartesianPoint StartPoint { get { return mDatabase[mStartPoint] as IfcCartesianPoint; } set { mStartPoint = value.mIndex; } }
 
 		protected IfcCurveSegment2D() : base() { }
-		protected IfcCurveSegment2D(DatabaseIfc db, IfcCurveSegment2D p) : base(db,p) { StartPoint = db.Duplicate( p.StartPoint) as IfcCartesianPoint; mStartDirection = p.mStartDirection; mSegmentLength = p.mSegmentLength; }
+		protected IfcCurveSegment2D(DatabaseIfc db, IfcCurveSegment2D p) : base(db,p) { StartPoint = db.Factory.Duplicate( p.StartPoint) as IfcCartesianPoint; mStartDirection = p.mStartDirection; mSegmentLength = p.mSegmentLength; }
 		protected IfcCurveSegment2D(IfcCartesianPoint start, double startDirection, double length)
 			: base(start.mDatabase)
 		{
@@ -312,7 +312,6 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + ParserSTEP.DoubleToString(mSegmentLength); }
 	}
 	
-	
 	public partial class IfcLineSegment2D : IfcCurveSegment2D  //IFC4x1
 	{
 		internal IfcLineSegment2D() : base() { }
@@ -322,7 +321,6 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcLineSegment2D c, List<string> arrFields, ref int ipos) { IfcCurveSegment2D.parseFields(c, arrFields, ref ipos); }
 		internal static IfcLineSegment2D Parse(string strDef) { IfcLineSegment2D c = new IfcLineSegment2D(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
-	
 	
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{

@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		public List<IfcFaceBound> Bounds { get { return mBounds.ConvertAll(x =>mDatabase[x] as IfcFaceBound); } set { mBounds = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcFace() : base() { }
-		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { Bounds = f.Bounds.ConvertAll(x=>db.Duplicate(x) as IfcFaceBound); }
+		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { Bounds = f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound); }
 		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer.mIndex); }
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner.mIndex); }
 		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds = bounds.ConvertAll(x => x.mIndex); }
@@ -62,7 +62,7 @@ namespace GeometryGym.Ifc
 		public List<IfcConnectedFaceSet> FbsmFaces { get { return mFbsmFaces.ConvertAll(x =>mDatabase[x] as IfcConnectedFaceSet); } set { mFbsmFaces = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcFaceBasedSurfaceModel() : base() { }
-		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { FbsmFaces = s.FbsmFaces.ConvertAll(x => db.Duplicate(x) as IfcConnectedFaceSet); }
+		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { FbsmFaces = s.FbsmFaces.ConvertAll(x => db.Factory.Duplicate(x) as IfcConnectedFaceSet); }
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mFbsmFaces[0]);
@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 		public IfcLoop Bound { get { return mDatabase[mBound] as IfcLoop; } set { mBound = value.mIndex; } }
 
 		internal IfcFaceBound() : base() { }
-		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b) : base(db,b) { Bound = db.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
+		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b) : base(db,b) { Bound = db.Factory.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
 		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { mBound = l.mIndex; mOrientation = orientation; }
 		internal static IfcFaceBound Parse(string str)
 		{
@@ -128,7 +128,7 @@ namespace GeometryGym.Ifc
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 
 		internal IfcFaceSurface() : base() { } 
-		internal IfcFaceSurface(DatabaseIfc db, IfcFaceSurface s) : base(db,s) { FaceSurface = db.Duplicate( s.FaceSurface) as IfcSurface; mSameSense = s.mSameSense; }
+		internal IfcFaceSurface(DatabaseIfc db, IfcFaceSurface s) : base(db,s) { FaceSurface = db.Factory.Duplicate( s.FaceSurface) as IfcSurface; mSameSense = s.mSameSense; }
 		public IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		public IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		public IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense) : base(bounds) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
@@ -150,7 +150,7 @@ namespace GeometryGym.Ifc
 		public List<IfcClosedShell> Voids { get { return mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell); } set { mVoids = value.ConvertAll(x => x.mIndex);  } }
 
 		internal IfcFacetedBrepWithVoids() : base() { }
-		internal IfcFacetedBrepWithVoids(DatabaseIfc db, IfcFacetedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=>db.Duplicate(x) as IfcClosedShell); }
+		internal IfcFacetedBrepWithVoids(DatabaseIfc db, IfcFacetedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=>db.Factory.Duplicate(x) as IfcClosedShell); }
 		internal new static IfcFacetedBrepWithVoids Parse(string strDef) { IfcFacetedBrepWithVoids b = new IfcFacetedBrepWithVoids(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
 		internal static void parseFields(IfcFacetedBrepWithVoids b, List<string> arrFields, ref int ipos) { IfcManifoldSolidBrep.parseFields(b, arrFields, ref ipos); b.mVoids = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 		{
 			new IfcRelVoidsElement(host, this);
 			Representation = rep;
-			Placement = new IfcLocalPlacement(host.Placement, mDatabase.PlaneXYPlacement);	
+			Placement = new IfcLocalPlacement(host.Placement, mDatabase.Factory.PlaneXYPlacement);	
 		}
 		
 		protected static void parseFields(IfcFeatureElementSubtraction e, List<string> arrFields, ref int ipos) { IfcFeatureElement.parseFields(e, arrFields, ref ipos); }

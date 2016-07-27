@@ -239,7 +239,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcRectangleProfileDef() : base() { }
 		internal IfcRectangleProfileDef(DatabaseIfc db, IfcRectangleProfileDef p) : base(db, p) { mXDim = p.mXDim; mYDim = p.mYDim; }
-		public IfcRectangleProfileDef(DatabaseIfc m, string name, double depth, double width) : base(m,name) { mXDim = width; mYDim = depth; }
+		public IfcRectangleProfileDef(DatabaseIfc db, string name, double xDim, double yDim) : base(db,name) { mXDim = xDim; mYDim = yDim; }
 		internal static void parseFields(IfcRectangleProfileDef p, List<string> arrFields, ref int ipos) { IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos); p.mXDim = ParserSTEP.ParseDouble(arrFields[ipos++]); p.mYDim = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mXDim) + "," + ParserSTEP.DoubleToString(mYDim); }
 		internal new static IfcRectangleProfileDef Parse(string strDef) { IfcRectangleProfileDef p = new IfcRectangleProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
@@ -264,7 +264,7 @@ namespace GeometryGym.Ifc
 		internal IfcRectangularTrimmedSurface() : base() { }
 		internal IfcRectangularTrimmedSurface(DatabaseIfc db, IfcRectangularTrimmedSurface s) : base(db,s)
 		{
-			BasisSurface = db.Duplicate(s.BasisSurface) as IfcPlane;
+			BasisSurface = db.Factory.Duplicate(s.BasisSurface) as IfcPlane;
 			mU1 = s.mU1;
 			mU2 = s.mU2;
 			mV1 = s.mV1;
@@ -412,6 +412,7 @@ namespace GeometryGym.Ifc
 			mListPositions.AddRange(r.mListPositions);
 			mInnerReference = r.mInnerReference;
 		}
+		public IfcReference(DatabaseIfc db) : base(db) { }	
 		public IfcReference(DatabaseIfc db, string typeId, string attributeId, string instanceName) : base(db)
 		{
 			TypeIdentifier = typeId;
@@ -450,6 +451,59 @@ namespace GeometryGym.Ifc
 				str += "),";
 			}
 			return str + ParserSTEP.LinkToString(mInnerReference);
+		}
+
+		public static IfcReference ParseDescription(DatabaseIfc db, string referenceDescription)
+		{
+			// Example description 
+			//RepresentationMaps.MappedRepresentation['Body'].Items[*].StyledByItem.Styles\IfcSurfaceStyle.Styles\IfcSurfaceStyleWithTextures.Textures\IfcImageTexture.UrlReference
+			int i = referenceDescription.IndexOf('.');
+			IfcReference innerReference = null;
+			if (i > 0)
+				innerReference = ParseDescription(db, referenceDescription.Substring(i + 1));
+			string str = i > 0 ? referenceDescription.Substring(0, i) : referenceDescription;
+			i =   str.IndexOf('\\');
+			string attributeId = "",instanceName = "";
+			if(i > 0)	
+			{
+				if(innerReference != null)
+					innerReference.TypeIdentifier = str.Substring(i + 1, str.Length - i - 1);
+				str = str.Substring(0, i);
+			}
+			List<int> positions = new List<int>();
+			if (str[str.Length-1] == ']')
+			{
+				i = str.IndexOf('[');
+				attributeId = str.Substring(0, i);
+				str = str.Substring(i+1, str.Length - i - 2);
+				if (str != "*")
+				{
+					if (str.Contains(' '))
+					{
+						string[] fields = str.Split(" ".ToCharArray());
+						foreach (string s in fields)
+						{
+							if (int.TryParse(s, out i))
+								positions.Add(i);
+						}
+					}
+					else
+					{
+						if (int.TryParse(str, out i))
+							positions.Add(i);
+						else
+							instanceName = str.Replace("'", "");
+					}
+				}
+			}
+			else
+				attributeId = str;
+			IfcReference result = new IfcReference(db);
+			result.AttributeIdentifier = attributeId;
+			result.InstanceName = instanceName;
+			result.ListPositions = positions;
+			result.InnerReference = innerReference;
+			return result;
 		}
 	}
 	//ENTITY IfcReferencesValueDocument; // DEPRECEATED IFC4
@@ -500,7 +554,7 @@ namespace GeometryGym.Ifc
 		internal IfcReinforcementDefinitionProperties(DatabaseIfc db, IfcReinforcementDefinitionProperties p) : base(db, p)
 		{
 			mDefinitionType = p.mDefinitionType;
-			ReinforcementSectionDefinitions = p.ReinforcementSectionDefinitions.ConvertAll(x => db.Duplicate(x) as IfcSectionReinforcementProperties);
+			ReinforcementSectionDefinitions = p.ReinforcementSectionDefinitions.ConvertAll(x => db.Factory.Duplicate(x) as IfcSectionReinforcementProperties);
 		}
 		internal IfcReinforcementDefinitionProperties(string name, string type, List<IfcSectionReinforcementProperties> sectProps)
 			: base(sectProps[0].mDatabase, name) { if (!string.IsNullOrEmpty(type)) mDefinitionType = type; mReinforcementSectionDefinitions = sectProps.ConvertAll(x => x.mIndex); }
@@ -756,16 +810,16 @@ namespace GeometryGym.Ifc
 		{
 			RepresentationIdentifier = identifier.Replace("'", "");
 			RepresentationType = repType.Replace("'", "");
-			ContextOfItems = db.SubContext(string.Compare(identifier, "Axis", true) == 0 ? DatabaseIfc.SubContextIdentifier.Axis : DatabaseIfc.SubContextIdentifier.Body);
+			ContextOfItems = db.Factory.SubContext(string.Compare(identifier, "Axis", true) == 0 ? FactoryIfc.SubContextIdentifier.Axis : FactoryIfc.SubContextIdentifier.Body);
 		}
 		protected IfcRepresentation(IfcRepresentationItem ri) : this(ri.mDatabase,"","") { mItems.Add(ri.mIndex); }
 		protected IfcRepresentation(DatabaseIfc db, IfcRepresentation r) : base(db)
 		{
-			ContextOfItems = db.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
+			ContextOfItems = db.Factory.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
 
 			mRepresentationIdentifier = r.mRepresentationIdentifier;
 			mRepresentationType = r.mRepresentationType;
-			Items = r.Items.ConvertAll(x => db.Duplicate(x) as IfcRepresentationItem);
+			Items = r.Items.ConvertAll(x => db.Factory.Duplicate(x) as IfcRepresentationItem);
 		}
 		protected IfcRepresentation(IfcRepresentationItem ri, string identifier, string repType)
 			: this(ri.mDatabase, identifier, repType) { mItems.Add(ri.mIndex); }
@@ -791,8 +845,9 @@ namespace GeometryGym.Ifc
 			}
 			return str + ")";
 		}
-		internal void relate()
+		internal override void postParseRelate()
 		{
+			base.postParseRelate();
 			IfcRepresentationContext rc = ContextOfItems;
 			if (rc != null)
 				rc.RepresentationsInContext.Add(this);
@@ -849,7 +904,7 @@ namespace GeometryGym.Ifc
 		{
 			if (p.mStyledByItem != null)
 			{
-				IfcStyledItem si = db.Duplicate(p.mStyledByItem) as IfcStyledItem;
+				IfcStyledItem si = db.Factory.Duplicate(p.mStyledByItem) as IfcStyledItem;
 				si.Item = this;
 			}
 		}
@@ -872,8 +927,8 @@ namespace GeometryGym.Ifc
 		internal List<IfcTypeProduct> mTypeProducts = new List<IfcTypeProduct>();// GG
 
 		internal IfcRepresentationMap() : base() { }
-		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m) : base(db) { MappingOrigin = db.Duplicate(m.mDatabase[m.mMappingOrigin]) as IfcAxis2Placement; MappedRepresentation = db.Duplicate(m.MappedRepresentation) as IfcRepresentation; }
-		public IfcRepresentationMap(IfcRepresentationItem item) : base(item.mDatabase) { MappingOrigin = item.mDatabase.PlaneXYPlacement; MappedRepresentation = new IfcShapeRepresentation(new List<IfcRepresentationItem>() { item }); }
+		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m) : base(db) { MappingOrigin = db.Factory.Duplicate(m.mDatabase[m.mMappingOrigin]) as IfcAxis2Placement; MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation) as IfcRepresentation; }
+		public IfcRepresentationMap(IfcRepresentationItem item) : base(item.mDatabase) { MappingOrigin = item.mDatabase.Factory.PlaneXYPlacement; MappedRepresentation = new IfcShapeRepresentation(new List<IfcRepresentationItem>() { item }); }
 		public IfcRepresentationMap(IfcAxis2Placement placement, IfcRepresentation representation) : base(representation.mDatabase) { mMappingOrigin = placement.Index; mMappedRepresentation = representation.mIndex; }
 
 		internal static IfcRepresentationMap Parse(string strDef) { IfcRepresentationMap m = new IfcRepresentationMap(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
@@ -895,7 +950,7 @@ namespace GeometryGym.Ifc
 		internal List<int> mRelatedResourceObjects = new List<int>();// :	SET [1:?] OF IfcResourceObjectSelect;
 
 		public IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; if (!value.mPropertiesForConstraint.Contains(this)) value.mPropertiesForConstraint.Add(this); } }
-		public List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } set { mRelatedResourceObjects = value.ConvertAll(x => x.Index); } }
+		public List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } set { mRelatedResourceObjects = value.ConvertAll(x => x.Index); foreach (IfcResourceObjectSelect ro in value) ro.HasConstraintRelationships.Add(this); } }
 
 		internal IfcResourceConstraintRelationship() : base() { }
 		internal IfcResourceConstraintRelationship(IfcResourceConstraintRelationship o) : base(o) { mRelatingConstraint = o.mRelatingConstraint; }
@@ -914,8 +969,14 @@ namespace GeometryGym.Ifc
 				result += ",#" + mRelatedResourceObjects[icounter];
 			return result + ")";
 		}
-		internal void relate()
+		internal void addRelated(IfcResourceObjectSelect r)
 		{
+			r.HasConstraintRelationships.Add(this);
+			mRelatedResourceObjects.Add(r.Index);
+		}
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
 			RelatingConstraint.mPropertiesForConstraint.Add(this);
 			List<IfcResourceObjectSelect> related = RelatedResourceObjects;
 			for (int icounter = 0; icounter < related.Count; icounter++)
@@ -1027,9 +1088,8 @@ namespace GeometryGym.Ifc
 		public double Angle { get { return mAngle; } set { mAngle = value; } }
 
 		internal IfcRevolvedAreaSolid() : base() { }
-		internal IfcRevolvedAreaSolid(DatabaseIfc db, IfcRevolvedAreaSolid s) : base(db,s) { Axis = db.Duplicate(s.Axis) as IfcAxis1Placement; mAngle = s.mAngle; }
-		public IfcRevolvedAreaSolid(IfcProfileDef profile, IfcAxis2Placement3D pl, IfcAxis1Placement axis, double angle) : base(profile, pl) { Axis = axis; mAngle = angle; }
-
+		internal IfcRevolvedAreaSolid(DatabaseIfc db, IfcRevolvedAreaSolid s) : base(db,s) { Axis = db.Factory.Duplicate(s.Axis) as IfcAxis1Placement; mAngle = s.mAngle; }
+		public IfcRevolvedAreaSolid(IfcProfileDef profile, IfcAxis2Placement3D position, IfcAxis1Placement axis, double angle) : base(profile, position) { Axis = axis; mAngle = angle; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mAxis) + "," + ParserSTEP.DoubleToString(mAngle); }
 		internal static void parseFields(IfcRevolvedAreaSolid r, List<string> arrFields, ref int ipos)
 		{
@@ -1163,14 +1223,14 @@ namespace GeometryGym.Ifc
 		{
 			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 			//m.mGlobalIDs.Add(mGlobalId);
-			if (db.Release == ReleaseVersion.IFC2x3 || (db.mModelView != ModelView.Ifc4Reference && db.mOptions.mGenerateOwnerHistory))
-				OwnerHistory = db.OwnerHistory(IfcChangeActionEnum.ADDED);
+			if (db.Release == ReleaseVersion.IFC2x3 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
+				OwnerHistory = db.Factory.OwnerHistory(IfcChangeActionEnum.ADDED);
 		}
 		protected IfcRoot(DatabaseIfc db, IfcRoot r) : base(db)
 		{
 			GlobalId = r.GlobalId;
 			if (r.mOwnerHistory > 0)
-				OwnerHistory = db.Duplicate(r.OwnerHistory) as IfcOwnerHistory;
+				OwnerHistory = db.Factory.Duplicate(r.OwnerHistory) as IfcOwnerHistory;
 			mName = r.mName;
 			mDescription = r.mDescription;
 		}

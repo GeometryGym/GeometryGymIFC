@@ -30,6 +30,17 @@ namespace GeometryGym.Ifc
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector : Vector3d.XAxis); } }
+
+		public override Plane Plane
+		{
+			get
+			{
+				Point3d p = LocationPoint;
+				Vector3d xaxis = AxisVector;
+				Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, xaxis);
+				return new Plane(p, xaxis, yAxis);
+			}
+		}
 	}
 	
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
@@ -41,10 +52,20 @@ namespace GeometryGym.Ifc
 			if (dir.Length > 0 && new Vector3d(dir.X, dir.Y, 0).IsParallelTo(Vector3d.XAxis, Math.PI / 1800) != 1)
 				RefDirection = new IfcDirection(db, dir);
 		}
+		public override Plane Plane
+		{
+			get
+			{
+				Point3d o = LocationPoint;
+				Vector3d xaxis = DirectionVector;
+				Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, xaxis);
+				return new Plane(o, xaxis, yAxis);
+			}
+		}
 	}
 	public partial class IfcAxis2Placement3D
 	{
-		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db)
+		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db,plane.Origin)
 		{
 			double angTol = Math.PI / 1800;
 			if (plane.ZAxis.IsParallelTo(Vector3d.ZAxis, angTol) != 1)
@@ -55,7 +76,24 @@ namespace GeometryGym.Ifc
 			else if (plane.XAxis.IsParallelTo(Vector3d.XAxis, angTol) != 1)
 			{
 				RefDirection = new IfcDirection(db, plane.XAxis);
-				Axis = (db.mZAxis == null ? new IfcDirection(db, Vector3d.ZAxis) : db.mZAxis);
+				Axis = db.Factory.ZAxis;
+			}
+		}
+
+		public override Plane Plane
+		{
+			get
+			{
+				if (!mPlane.IsValid)
+				{
+					Point3d orig = LocationPoint;
+					IfcDirection axis = Axis, refDirection = RefDirection;
+					Vector3d norm = axis == null ? Vector3d.ZAxis : axis.Vector;
+					Vector3d xaxis = refDirection == null ? Vector3d.XAxis : refDirection.Vector;
+					Vector3d yAxis = Vector3d.CrossProduct(norm, xaxis);
+					mPlane = new Plane(orig, xaxis, yAxis);
+				}
+				return mPlane;
 			}
 		}
 	}

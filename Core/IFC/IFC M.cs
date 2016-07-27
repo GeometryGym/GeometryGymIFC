@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcManifoldSolidBrep() : base() { }
 		protected IfcManifoldSolidBrep(IfcClosedShell s) : base(s.mDatabase) { Outer = s; }
-		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b) : base(db,b) { Outer = db.Duplicate( b.Outer) as IfcClosedShell; }
+		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b) : base(db,b) { Outer = db.Factory.Duplicate( b.Outer) as IfcClosedShell; }
 
 		internal static void parseFields(IfcManifoldSolidBrep b, List<string> arrFields, ref int ipos) { IfcSolidModel.parseFields(b, arrFields, ref ipos); b.mOuter = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOuter); }
@@ -82,12 +82,18 @@ namespace GeometryGym.Ifc
 		public IfcCartesianTransformationOperator MappingTarget { get { return mDatabase[mMappingTarget] as IfcCartesianTransformationOperator; } set { mMappingTarget = value.mIndex; } }
 
 		internal IfcMappedItem() : base() { }
-		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i) : base(db,i) { MappingSource = db.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
+		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i) : base(db,i) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
 		internal IfcMappedItem(IfcRepresentationMap rm, IfcCartesianTransformationOperator co) : base(rm.mDatabase) { mMappingSource = rm.mIndex; mMappingTarget = co.mIndex; }
 		
 		internal static void parseFields(IfcMappedItem i, List<string> arrFields, ref int ipos) { IfcRepresentationItem.parseFields(i, arrFields, ref ipos); i.mMappingSource = ParserSTEP.ParseLink(arrFields[ipos++]); i.mMappingTarget = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal static IfcMappedItem Parse(string strDef) { IfcMappedItem i = new IfcMappedItem(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mMappingSource) + "," + ParserSTEP.LinkToString(mMappingTarget); }
+
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			MappingSource.mMapUsage.Add(this);
+		}
 	}
 	public partial class IfcMaterial : IfcMaterialDefinition
 	{
@@ -269,20 +275,18 @@ namespace GeometryGym.Ifc
 		internal new static IfcMaterialDefinitionRepresentation Parse(string strDef) { IfcMaterialDefinitionRepresentation m = new IfcMaterialDefinitionRepresentation(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcMaterialDefinitionRepresentation m, List<string> arrFields, ref int ipos) { IfcProductRepresentation.parseFields(m, arrFields, ref ipos); m.mRepresentedMaterial = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRepresentedMaterial); }
-	
-		internal override void relate()
+
+		internal override void postParseRelate()
 		{
-			base.relate();
-			IfcMaterial m = RepresentedMaterial;
-			if (m != null)
-				m.mHasRepresentation = this;
+			base.postParseRelate();
+			RepresentedMaterial.mHasRepresentation = this;
 		}
 	}
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
 	{
 		internal int mMaterial;// : OPTIONAL IfcMaterial;
 		internal double mLayerThickness;// ::	IfcNonNegativeLengthMeasure IFC4Chagne IfcPositiveLengthMeasure;
-		internal IfcLogicalEnum mIsVentilated = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcLogical; 
+		internal IfcLogicalEnum mIsVentilated = IfcLogicalEnum.FALSE; // : OPTIONAL IfcLogical; 
 		internal string mName = "$";// : OPTIONAL IfcLabel; IFC4
 		internal string mDescription = "$";// : OPTIONAL IfcText; IFC4
 		internal string mCategory = "$";// : OPTIONAL IfcLabel; IFC4
@@ -460,7 +464,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mMaterials = new List<int>();// LIST [1:?] OF IfcMaterial; 
 
-		public List<IfcMaterial> Materials { get { return mMaterials.ConvertAll(x =>mDatabase[x] as IfcMaterial); } }
+		public List<IfcMaterial> Materials { get { return mMaterials.ConvertAll(x =>mDatabase[x] as IfcMaterial); } set { mMaterials = value.ConvertAll(x => x.mIndex); } }
 
 		internal List<IfcRelAssociatesMaterial> mAssociatedTo = new List<IfcRelAssociatesMaterial>();
 		public IfcRelAssociatesMaterial Associates
@@ -479,7 +483,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterial PrimaryMaterial { get { return mDatabase[mMaterials[0]] as IfcMaterial; } }
 
 		internal IfcMaterialList() : base() { }
-		internal IfcMaterialList(IfcMaterialList m) : base() { mMaterials = new List<int>(m.mMaterials.ToArray()); }
+		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) { Materials = m.Materials.ConvertAll(x=>db.Factory.Duplicate(x) as IfcMaterial); }
 		internal static IfcMaterialList Parse(string strDef) { IfcMaterialList m = new IfcMaterialList(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcMaterialList m, List<string> arrFields, ref int ipos) { m.mMaterials = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -603,7 +607,7 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial { get { return ForProfileSet.PrimaryMaterial; } }
 
 		internal IfcMaterialProfileSetUsage() : base() { }
-		internal IfcMaterialProfileSetUsage(DatabaseIfc db, IfcMaterialProfileSetUsage m) : base(db,m) { ForProfileSet = db.Duplicate( m.ForProfileSet) as IfcMaterialProfileSet; mCardinalPoint = m.mCardinalPoint; mReferenceExtent = m.mReferenceExtent; }
+		internal IfcMaterialProfileSetUsage(DatabaseIfc db, IfcMaterialProfileSetUsage m) : base(db,m) { ForProfileSet = db.Factory.Duplicate( m.ForProfileSet) as IfcMaterialProfileSet; mCardinalPoint = m.mCardinalPoint; mReferenceExtent = m.mReferenceExtent; }
 		public IfcMaterialProfileSetUsage(IfcMaterialProfileSet ps)
 			: base(ps.mDatabase) { ForProfileSet = ps; }
 		public IfcMaterialProfileSetUsage(IfcMaterialProfileSet ps, IfcCardinalPointReference ip)
@@ -653,14 +657,13 @@ namespace GeometryGym.Ifc
 
 		protected IfcMaterialPropertiesSuperSeded() : base() { }
 		protected IfcMaterialPropertiesSuperSeded(IfcMaterial mat) : base(mat.mDatabase) { if (mat.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " Depreceated IFC4!"); mMaterial = mat.mIndex; }
-		protected IfcMaterialPropertiesSuperSeded(DatabaseIfc db, IfcMaterialPropertiesSuperSeded m) : base(db) { Material = db.Duplicate(m.Material) as IfcMaterial; }
+		protected IfcMaterialPropertiesSuperSeded(DatabaseIfc db, IfcMaterialPropertiesSuperSeded m) : base(db) { Material = db.Factory.Duplicate(m.Material) as IfcMaterial; }
 		protected static void parseFields(IfcMaterialPropertiesSuperSeded p, List<string> arrFields, ref int ipos) { p.mMaterial = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mMaterial); }
-		internal void relate()
+		internal override void postParseRelate()
 		{
-			IfcMaterial m =mDatabase[mMaterial] as IfcMaterial;
-			if (m != null)
-				m.mHasPropertiesSS.Add(this);
+			base.postParseRelate();
+			Material.mHasPropertiesSS.Add(this);
 		}
 	}
 	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4
@@ -670,7 +673,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterialDefinition Material { get { return mDatabase[mMaterial] as IfcMaterialDefinition; } set { mMaterial = value.mIndex; value.AddProperties(this); } }
 
 		internal IfcMaterialProperties() : base() { }
-		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p) : base(db, p) { Material = db.Duplicate(p.Material) as IfcMaterialDefinition; }
+		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p) : base(db, p) { Material = db.Factory.Duplicate(p.Material) as IfcMaterialDefinition; }
 		public IfcMaterialProperties(string name, IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = name; mMaterial = mat.mIndex; mat.AddProperties(this); }
 		internal IfcMaterialProperties(string name, List<IfcProperty> props, IfcMaterialDefinition mat) : base(name, props) { mMaterial = mat.mIndex; mat.AddProperties(this); }
 
@@ -682,11 +685,10 @@ namespace GeometryGym.Ifc
 				return "";
 			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mMaterial);
 		}
-		internal void relate()
+		internal override void postParseRelate()
 		{
-			IfcMaterialDefinition md = Material;
-			if (md != null)
-				md.AddProperties(this);
+			base.postParseRelate();
+			Material.AddProperties(this);
 		}
 	}
 	public partial class IfcMaterialRelationship : IfcResourceLevelRelationship //IFC4
@@ -924,7 +926,7 @@ namespace GeometryGym.Ifc
 			mHardeningModule = p.mHardeningModule;
 			mProportionalStress = p.mProportionalStress;
 			mPlasticStrain = p.mPlasticStrain;
-			Relaxations = p.Relaxations.ConvertAll(x=> db.Duplicate(x) as IfcRelaxation);
+			Relaxations = p.Relaxations.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRelaxation);
 		}
 		public IfcMechanicalSteelMaterialProperties(IfcMaterial mat) : base(mat) { }
 		public IfcMechanicalSteelMaterialProperties(IfcMaterial mat, double dynVisc, double youngs, double shear, double poisson, double thermalExp, double yieldStress, double ultimateStress, double ultimateStrain, double hardeningModule, double proportionalStress, double plasticStrain)
@@ -1046,9 +1048,9 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 
 	}
-	public partial class IfcMetric : IfcConstraint//, IfcAppliedValueSelect
+	public partial class IfcMetric : IfcConstraint
 	{
-		internal IfcBenchmarkEnum mBenchMark = IfcBenchmarkEnum.EQUALTO;// : OPTIONAL IfcLogicalOperatorEnum;
+		internal IfcBenchmarkEnum mBenchMark = IfcBenchmarkEnum.EQUALTO;// : IfcBenchmarkEnum
 		internal string mValueSource = "$"; //	 :	OPTIONAL IfcLabel;
 		private int mDataValue;// : OPTIONAL IfcMetricValueSelect;
 		internal IfcValue mDataValueValue = null;
@@ -1066,10 +1068,10 @@ namespace GeometryGym.Ifc
 			mBenchMark = m.mBenchMark;
 			mValueSource = m.mValueSource;
 			if(mDataValue > 0)
-				DataValue = db.Duplicate(m.mDatabase[ m.mDataValue]) as IfcMetricValueSelect;
+				DataValue = db.Factory.Duplicate(m.mDatabase[ m.mDataValue]) as IfcMetricValueSelect;
 			mDataValueValue = m.mDataValueValue;
 			if(mReferencePath > 0)
-				ReferencePath = db.Duplicate( m.ReferencePath) as IfcReference;
+				ReferencePath = db.Factory.Duplicate( m.ReferencePath) as IfcReference;
 		}
 		public IfcMetric(DatabaseIfc db, string name, IfcConstraintEnum constraint) : base(db, name, constraint) { }
 		

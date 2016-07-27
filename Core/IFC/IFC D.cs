@@ -174,7 +174,7 @@ namespace GeometryGym.Ifc
 		public int Exponent { get { return mExponent; } } 
 
 		internal IfcDerivedUnitElement() : base() { }
-		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
+		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Factory.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
 		public IfcDerivedUnitElement(IfcNamedUnit u, int exponent) : base(u.mDatabase) { mUnit = u.mIndex; mExponent = exponent; }
 		internal static void parseFields(IfcDerivedUnitElement e, List<string> arrFields, ref int ipos) { e.mUnit = ParserSTEP.ParseLink(arrFields[ipos++]); e.mExponent = ParserSTEP.ParseInt(arrFields[ipos++]); }
 		internal static IfcDerivedUnitElement Parse(string strDef) { IfcDerivedUnitElement e = new IfcDerivedUnitElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
@@ -580,22 +580,22 @@ namespace GeometryGym.Ifc
 			mIdentification = i.mIdentification;
 			mName = i.mName;
 			mDescription = i.mDescription;
-			DocumentReferences = i.DocumentReferences.ConvertAll(x => db.Duplicate(x) as IfcDocumentReference);
+			DocumentReferences = i.DocumentReferences.ConvertAll(x => db.Factory.Duplicate(x) as IfcDocumentReference);
 			mPurpose = i.mPurpose;
 			mIntendedUse = i.mIntendedUse;
 			mScope = i.mScope;
 			mRevision = i.mRevision;
 			mDocumentOwner = i.mDocumentOwner;
-			Editors = i.mEditors.ConvertAll(x=>db.Duplicate(i.mDatabase[x]) as IfcActorSelect);
+			Editors = i.mEditors.ConvertAll(x=>db.Factory.Duplicate(i.mDatabase[x]) as IfcActorSelect);
 			mCreationTime = i.mCreationTime;
 			mLastRevisionTime = i.mLastRevisionTime;
 			mElectronicFormat = i.mElectronicFormat;
 			if(i.mSSElectronicFormat > 0)
-				mSSElectronicFormat = db.Duplicate(i.mDatabase[i.mSSElectronicFormat]).mIndex;
+				mSSElectronicFormat = db.Factory.Duplicate(i.mDatabase[i.mSSElectronicFormat]).mIndex;
 			//if(i.mValidFrom > 0)
-			//	ValidFrom = db.Duplicate( i.ValidFrom) as IfcCalendarDate;
+			//	ValidFrom = db.Factory.Duplicate( i.ValidFrom) as IfcCalendarDate;
 			//if(i.mValidUntil > 0)
-			//	ValidUntil = db.Duplicate( i.ValidUntil) as IfcCalendarDate;
+			//	ValidUntil = db.Factory.Duplicate( i.ValidUntil) as IfcCalendarDate;
 #warning todo
 			mConfidentiality = i.mConfidentiality;
 			mStatus = i.mStatus;
@@ -691,11 +691,11 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelAssociatesDocument> mDocumentRefForObjects = new List<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public IfcDocumentInformation ReferencedDocumen { get { return mDatabase[mReferencedDocument] as IfcDocumentInformation; } set { mReferencedDocument = (value == null ? 0 : value.mIndex); } }
+		public IfcDocumentInformation ReferencedDocument { get { return mDatabase[mReferencedDocument] as IfcDocumentInformation; } set { mReferencedDocument = (value == null ? 0 : value.mIndex); } }
 		public List<IfcRelAssociatesDocument> Associates { get { return mDocumentRefForObjects; } set { mDocumentRefForObjects = value; } }
 
 		internal IfcDocumentReference() : base() { }
-		internal IfcDocumentReference(IfcDocumentReference i) : base(i) { }
+		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 		internal static IfcDocumentReference Parse(string strDef, ReleaseVersion schema) { IfcDocumentReference r = new IfcDocumentReference(); int ipos = 0; parseFields(r, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return r; }
 		internal static void parseFields(IfcDocumentReference r, List<string> arrFields, ref int ipos, ReleaseVersion schema)

@@ -112,41 +112,100 @@ namespace GeometryGym.Ifc
 		internal string mVersion = "$";//:	OPTIONAL IfcLabel;
 		internal int mPublisher;//	 :	OPTIONAL IfcActorSelect;
 		internal string mVersionDate = "$"; // :	OPTIONAL IfcDateTime;
-		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference;
-		internal string mDescription = "$";//	 :	OPTIONAL IfcText;
+		internal int mVersionDateSS = 0; // 
+		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
+		internal string mDescription = "$";//	 :	OPTIONAL IfcText; //IFC4 Added
+		internal List<int> mLibraryReference = new List<int>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
 		//INVERSE
 		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
+		internal List<IfcLibraryReference> mHasLibraryReferences = new List<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
 
+		public override string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } } 
+		public string Version { get { return (mVersion == "$" ? "" : ParserIfc.Decode(mVersion)); } set { mVersion = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcActorSelect Publisher { get { return mDatabase[mPublisher] as IfcActorSelect; } set { mPublisher = (value == null ? 0 : value.Index); } }
+		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcLibraryInformation() : base() { }
-		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db,i) { mName = i.mName; mVersion = i.mVersion; if(i.mPublisher > 0) Publisher = db.Duplicate(i.mDatabase[ i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
-		internal static IfcLibraryInformation Parse(string strDef) { IfcLibraryInformation f = new IfcLibraryInformation(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
-		internal static void parseFields(IfcLibraryInformation f, List<string> arrFields, ref int ipos) { IfcExternalInformation.parseFields(f, arrFields, ref ipos); }
+		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db,i) { mName = i.mName; mVersion = i.mVersion; if(i.mPublisher > 0) Publisher = db.Factory.Duplicate(i.mDatabase[ i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
+		public IfcLibraryInformation(DatabaseIfc db, string name) : base(db) { Name = name; }
+		internal static IfcLibraryInformation Parse(string strDef, ReleaseVersion schema) { IfcLibraryInformation f = new IfcLibraryInformation(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return f; }
+		internal static void parseFields(IfcLibraryInformation f, List<string> arrFields, ref int ipos, ReleaseVersion schema)
+		{
+			IfcExternalInformation.parseFields(f, arrFields, ref ipos);
+			f.mName = arrFields[ipos++].Replace("'", "");
+			f.mVersion = arrFields[ipos++].Replace("'", "");
+			f.mPublisher = ParserSTEP.ParseLink(arrFields[ipos++]);
+			if (schema == ReleaseVersion.IFC2x3)
+			{
+				ipos++;
+				string str = arrFields[ipos++];
+				f.mLibraryReference = ParserSTEP.SplitListLinks(str.Substring(1,str.Length-2));	
+			}
+			else
+			{
+				f.mVersionDate = arrFields[ipos++].Replace("'", "");
+				f.mLocation = arrFields[ipos++];
+				f.mDescription = arrFields[ipos++];
+			}
+		}
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + ".'" + mName + (mVersion == "$" ? "',$," : "','" + mVersion + "',") + ParserSTEP.LinkToString(mPublisher) + (mVersionDate == "$" ? ",$," : ",'" + mVersionDate + "',") +
-				(mLocation == "$" ? "$," : "'" + mLocation + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'");
+			string result = base.BuildStringSTEP() + ",'" + mName + (mVersion == "$" ? "',$," : "','" + mVersion + "',") + ParserSTEP.LinkToString(mPublisher);
+			if (mDatabase.Release == ReleaseVersion.IFC2x3)
+			{
+				string refs =  mHasLibraryReferences.Count > 0 ? "#" + mHasLibraryReferences[0].mIndex : "";
+				for (int icounter = 1; icounter < mHasLibraryReferences.Count; icounter++)
+					refs += ",#" + mHasLibraryReferences[icounter].mIndex;
+				return result + ",$,(" + refs + ")"; //TODO date
+			}
+			return result + (mVersionDate == "$" ? ",$," : ",'" + mVersionDate + "',") + (mLocation == "$" ? "$," : "'" + mLocation + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'");
 		}
-
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			if (mDatabase.Release == ReleaseVersion.IFC2x3)
+			{
+				foreach (int i in mLibraryReference)
+					(mDatabase[i] as IfcLibraryReference).ReferencedLibrary = this;
+			}
+			
+		}
 	}
 	public partial class IfcLibraryReference : IfcExternalReference, IfcLibrarySelect
 	{
 		internal string mDescription = "$";//IFC4	 :	OPTIONAL IfcText;
-		internal string mLanguage = "$";//IFC4	 :	OPTIONAL IfcLanguageId;
-		internal int mReferencedLibrary;//	 :	OPTIONAL IfcLibraryInformation;
+		internal string mLanguage = "$"; //IFC4	 :	OPTIONAL IfcLanguageId;
+		internal int mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
 		//INVERSE
 		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public IfcLibraryInformation ReferencedLibrary { get { return mDatabase[mReferencedLibrary] as IfcLibraryInformation; } set { mReferencedLibrary = (value == null ? 0 : value.mIndex); if (!value.mHasLibraryReferences.Contains(this)) value.mHasLibraryReferences.Add(this); } }
 
 		internal IfcLibraryReference() : base() { }
-		internal IfcLibraryReference(IfcLibraryReference i) : base(i) { mDescription = i.mDescription; mLanguage = i.mLanguage; mReferencedLibrary = i.mReferencedLibrary; }
-		internal IfcLibraryReference(DatabaseIfc db) : base(db) { }
-		internal static IfcLibraryReference Parse(string strDef) { IfcLibraryReference f = new IfcLibraryReference(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
-		internal static void parseFields(IfcLibraryReference f, List<string> arrFields, ref int ipos) { IfcExternalReference.parseFields(f, arrFields, ref ipos); }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," : (mDescription == "$" ? ",$," : ",'" + mDescription + "',") + (mLanguage == "$" ? "$," : "'" + mLanguage + "',")) + ParserSTEP.LinkToString(mReferencedLibrary); }
+		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db,r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
+		public IfcLibraryReference(DatabaseIfc db) : base(db) { }
+		public IfcLibraryReference(IfcLibraryInformation referenced) : base(referenced.mDatabase) { ReferencedLibrary = referenced; }
+		internal static IfcLibraryReference Parse(string strDef, ReleaseVersion schema) { IfcLibraryReference f = new IfcLibraryReference(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return f; }
+		internal static void parseFields(IfcLibraryReference f, List<string> arrFields, ref int ipos, ReleaseVersion schema)
+		{
+			IfcExternalReference.parseFields(f, arrFields, ref ipos);
+			if(schema != ReleaseVersion.IFC2x3)
+			{
+				f.mDescription = arrFields[ipos++].Replace("'", "");
+				f.mLanguage = arrFields[ipos++].Replace("'", "");
+				f.mReferencedLibrary = ParserSTEP.ParseLink(arrFields[ipos++]);
+			}
+		}
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ((mDescription == "$" ? ",$," : ",'" + mDescription + "',") + (mLanguage == "$" ? "$," : "'" + mLanguage + "',") + ParserSTEP.LinkToString(mReferencedLibrary))); }
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			if (mDatabase.Release != ReleaseVersion.IFC2x3 && mReferencedLibrary > 0)
+				ReferencedLibrary.mHasLibraryReferences.Add(this);
+		}
 	}
 	public interface IfcLibrarySelect //SELECT ( IfcLibraryReference,  IfcLibraryInformation);
 	{
@@ -307,7 +366,7 @@ namespace GeometryGym.Ifc
 		public IfcVector Dir { get { return mDatabase[mDir] as IfcVector; } set { mDir = value.mIndex; } }
 
 		internal IfcLine() : base() { }
-		internal IfcLine(DatabaseIfc db, IfcLine l) : base(db,l) { Pnt = db.Duplicate( l.Pnt) as IfcCartesianPoint; Dir = db.Duplicate( l.Dir) as IfcVector; }
+		internal IfcLine(DatabaseIfc db, IfcLine l) : base(db,l) { Pnt = db.Factory.Duplicate( l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate( l.Dir) as IfcVector; }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 		internal static IfcLine Parse(string strDef) { IfcLine l = new IfcLine(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
 		internal static void parseFields(IfcLine l, List<string> arrFields, ref int ipos) { IfcCurve.parseFields(l, arrFields, ref ipos); l.mPnt = ParserSTEP.ParseLink(arrFields[ipos++]); l.mDir = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -377,8 +436,8 @@ namespace GeometryGym.Ifc
 		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
 		{
 			if (p.mPlacementRelTo > 0)
-				PlacementRelTo = db.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
-			RelativePlacement = db.Duplicate(p.mDatabase[p.mRelativePlacement]) as IfcAxis2Placement;
+				PlacementRelTo = db.Factory.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
+			RelativePlacement = db.Factory.Duplicate(p.mDatabase[p.mRelativePlacement]) as IfcAxis2Placement;
 		}
 		internal static IfcLocalPlacement Parse(string strDef) { IfcLocalPlacement p = new IfcLocalPlacement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcLocalPlacement p, List<string> arrFields, ref int ipos) { IfcObjectPlacement.parseFields(p, arrFields, ref ipos); p.mPlacementRelTo = ParserSTEP.ParseLink(arrFields[ipos++]); p.mRelativePlacement = ParserSTEP.ParseLink(arrFields[ipos++]); }
@@ -386,14 +445,14 @@ namespace GeometryGym.Ifc
 		{
 			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0)
 				return "";
-			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementRelTo) + "," + ParserSTEP.LinkToString(mRelativePlacement == 0 ? mDatabase.PlaneXYPlacement.mIndex : mRelativePlacement);
+			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementRelTo) + "," + ParserSTEP.LinkToString(mRelativePlacement == 0 ? mDatabase.Factory.PlaneXYPlacement.mIndex : mRelativePlacement);
 		}
 
-		internal void setReference()
+		internal override void postParseRelate()
 		{
-			IfcObjectPlacement placement = PlacementRelTo;
-			if (placement != null)
-				placement.mReferencedByPlacements.Add(this);
+			base.postParseRelate();
+			if (mPlacementRelTo > 0)
+				PlacementRelTo.mReferencedByPlacements.Add(this);
 		}
 	}
 	public partial class IfcLocalTime : BaseClassIfc, IfcDateTimeSelect // DEPRECEATED IFC4

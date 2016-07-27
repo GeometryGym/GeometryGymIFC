@@ -119,6 +119,8 @@ namespace GeometryGym.STEP
 			//string s = str.Trim(); 
 			string field = "";
 			List<string> fields = new List<string>();
+			if (string.IsNullOrEmpty(s))
+				return fields;
 			int ilast = s.Length;
 			int icounter = 0;
 			char c = s[icounter];

@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 		public IfcActorSelect TheActor { get { return mDatabase[mTheActor] as IfcActorSelect; } set { mTheActor = value.Index; } }
 
 		internal IfcActor() : base() { }
-		internal IfcActor(DatabaseIfc db, IfcActor a) : base(db,a) { TheActor = db.Duplicate(a.mDatabase[ a.mTheActor]) as IfcActorSelect; }
+		internal IfcActor(DatabaseIfc db, IfcActor a) : base(db,a) { TheActor = db.Factory.Duplicate(a.mDatabase[ a.mTheActor]) as IfcActorSelect; }
 		internal IfcActor(IfcActorSelect a) : base(a.Database)
 		{
  			if(mDatabase.mModelView != ModelView.If2x3NotAssigned && mDatabase.mModelView != ModelView.Ifc4NotAssigned )
@@ -173,7 +173,7 @@ namespace GeometryGym.Ifc
 		public List<IfcClosedShell> Voids { get { return mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell); } set { mVoids = value.ConvertAll(x => x.mIndex); } }
 
 		internal IfcAdvancedBrepWithVoids() : base() { }
-		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=> db.Duplicate(x) as IfcClosedShell); }
+		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=> db.Factory.Duplicate(x) as IfcClosedShell); }
 
 		internal new static IfcAdvancedBrepWithVoids Parse(string strDef) { IfcAdvancedBrepWithVoids b = new IfcAdvancedBrepWithVoids(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
 		internal static void parseFields(IfcAdvancedBrepWithVoids b, List<string> arrFields, ref int ipos) { IfcAdvancedBrep.parseFields(b, arrFields, ref ipos); b.mVoids = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
@@ -342,14 +342,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAnnotation : IfcProduct
 	{	 //INVERSE
-		//internal List<IfcRelContainedInSpatialStructure> mContainedInStructure = new List<IfcRelContainedInSpatialStructure>(); //: SET [0:1] OF IfcRelContainedInSpatialStructure FOR RelatedElements;
-		internal IfcAnnotation(IfcAnnotation el) : base(el) { }
+		internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		internal IfcAnnotation() : base() { }
-		internal IfcAnnotation(IfcProduct host) : base(host)
-		{
-			if (mDatabase.mModelView != ModelView.If2x3NotAssigned && mDatabase.mModelView != ModelView.Ifc4NotAssigned)
-				throw new Exception("Invalid Model View for " + KeyWord + " : " + mDatabase.ModelView.ToString());
-		}
+		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a) : base(db,a) { }
+		public IfcAnnotation(DatabaseIfc db) : base(db) { }
 		internal static IfcAnnotation Parse(string strDef) { int ipos = 0; IfcAnnotation a = new IfcAnnotation(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcAnnotation a, List<string> arrFields, ref int ipos)  { IfcProduct.parseFields(a,arrFields, ref ipos); }
 	}
@@ -367,7 +363,7 @@ namespace GeometryGym.Ifc
 		public IfcCurve OuterBoundary { get { return mDatabase[mOuterBoundary] as IfcCurve; } set { mOuterBoundary = value.mIndex; } }
 		public List<IfcCurve> InnerBoundaries { get { return mInnerBoundaries.ConvertAll(x => mDatabase[x] as IfcCurve); } set { mInnerBoundaries = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 
-		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Duplicate(a.OuterBoundary) as IfcCurve; InnerBoundaries = a.InnerBoundaries.ConvertAll(x=>db.Duplicate(x) as IfcCurve); }
+		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Factory.Duplicate(a.OuterBoundary) as IfcCurve; InnerBoundaries = a.InnerBoundaries.ConvertAll(x=>db.Factory.Duplicate(x) as IfcCurve); }
 		internal IfcAnnotationFillArea() : base() { }
 		internal static void parseFields(IfcAnnotationFillArea a, List<string> arrFields, ref int ipos)
 		{
@@ -424,7 +420,7 @@ namespace GeometryGym.Ifc
 		public IfcTextureCoordinate TextureCoordinates { get { return mDatabase[mTextureCoordinates] as IfcTextureCoordinate; } set { mTextureCoordinates = value.mIndex; } }
 
 		internal IfcAnnotationSurface() : base() { } 
-		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates > 0) TextureCoordinates = db.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
+		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Factory.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates > 0) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
 		internal static void parseFields(IfcAnnotationSurface s,List<string> arrFields, ref int ipos)
 		{  
 			IfcGeometricRepresentationItem.parseFields(s,arrFields, ref ipos);
@@ -479,13 +475,13 @@ namespace GeometryGym.Ifc
 				mVersion =  System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 			}
 			catch (Exception) { mVersion = "Unknown"; }
-			mApplicationFullName = db.ApplicationFullName;
-			mApplicationIdentifier = db.ApplicationIdentifier;
+			mApplicationFullName = db.Factory.ApplicationFullName;
+			mApplicationIdentifier = db.Factory.ApplicationIdentifier;
 
 		}
 		internal IfcApplication(DatabaseIfc db, IfcApplication a) : base(db)
 		{
-			ApplicationDeveloper = db.Duplicate(a.ApplicationDeveloper) as IfcOrganization;
+			ApplicationDeveloper = db.Factory.Duplicate(a.ApplicationDeveloper) as IfcOrganization;
 			mVersion = a.mVersion;
 			mApplicationFullName = a.mApplicationFullName;
 			mApplicationIdentifier = a.mApplicationIdentifier;
@@ -501,8 +497,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mApplicationDeveloper) + ",'" + mVersion + "','" + 
-				(string.IsNullOrEmpty(mApplicationFullName) ? mDatabase.ApplicationFullName : mApplicationFullName) + "','" + 
-				(string.IsNullOrEmpty(mApplicationIdentifier) ? mDatabase.ApplicationIdentifier : mApplicationIdentifier) + "'";
+				(string.IsNullOrEmpty(mApplicationFullName) ? mDatabase.Factory.ApplicationFullName : mApplicationFullName) + "','" + 
+				(string.IsNullOrEmpty(mApplicationIdentifier) ? mDatabase.Factory.ApplicationIdentifier : mApplicationIdentifier) + "'";
 		}
 		internal static IfcApplication Parse(string strDef) { IfcApplication a = new IfcApplication(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 	}
@@ -539,13 +535,13 @@ namespace GeometryGym.Ifc
 		public IfcAppliedValue(DatabaseIfc db) : base(db) { }
 		public IfcAppliedValue(IfcAppliedValueSelect appliedValue) : base(appliedValue.Database) { AppliedValue = appliedValue; }
 		public IfcAppliedValue(DatabaseIfc db, IfcValue value) : base(db) { Value = value; }
-		internal IfcAppliedValue(IfcAppliedValue v) : base() { } //todo remove
+		public IfcAppliedValue(IfcAppliedValue component1, IfcArithmeticOperatorEnum op,IfcAppliedValue component2) : base(component1.mDatabase) { Components = new List<IfcAppliedValue>() { component1, component2 }; mArithmeticOperator = op; } 
 		internal IfcAppliedValue(DatabaseIfc db, IfcAppliedValue v) : base(db)
 		{
 			mName = v.mName; mDescription = v.mDescription; mAppliedValueIndex = v.mAppliedValueIndex; mAppliedValueValue = v.mAppliedValueValue;
-			UnitBasis = db.Duplicate(v.UnitBasis) as IfcMeasureWithUnit;
+			UnitBasis = db.Factory.Duplicate(v.UnitBasis) as IfcMeasureWithUnit;
 			mApplicableDate = v.mApplicableDate; mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator;
-			Components = v.Components.ConvertAll(x=>db.Duplicate(x) as IfcAppliedValue);
+			Components = v.Components.ConvertAll(x=>db.Factory.Duplicate(x) as IfcAppliedValue);
 		}
 		internal static IfcAppliedValue Parse(string strDef, ReleaseVersion schema) { IfcAppliedValue v = new IfcAppliedValue(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return v; }
 		internal static void parseFields(IfcAppliedValue a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -787,17 +783,17 @@ namespace GeometryGym.Ifc
 		internal IfcAsset(DatabaseIfc db, IfcAsset a) : base(db,a)
 		{
 			mAssetID = a.mAssetID;
-			OriginalValue = db.Duplicate(a.OriginalValue) as IfcCostValue;
-			CurrentValue = db.Duplicate(a.CurrentValue) as IfcCostValue;
-			TotalReplacementCost = db.Duplicate(a.TotalReplacementCost) as IfcCostValue;
-			Owner = db.Duplicate(a.mDatabase[a.mOwner]) as IfcActorSelect;
-			User = db.Duplicate(a.mDatabase[a.mUser]) as IfcActorSelect;
-			ResponsiblePerson = db.Duplicate(a.ResponsiblePerson) as IfcPerson;
+			OriginalValue = db.Factory.Duplicate(a.OriginalValue) as IfcCostValue;
+			CurrentValue = db.Factory.Duplicate(a.CurrentValue) as IfcCostValue;
+			TotalReplacementCost = db.Factory.Duplicate(a.TotalReplacementCost) as IfcCostValue;
+			Owner = db.Factory.Duplicate(a.mDatabase[a.mOwner]) as IfcActorSelect;
+			User = db.Factory.Duplicate(a.mDatabase[a.mUser]) as IfcActorSelect;
+			ResponsiblePerson = db.Factory.Duplicate(a.ResponsiblePerson) as IfcPerson;
 			mIncorporationDate = a.mIncorporationDate;
 			if(a.mIncorporationDateSS > 0)
-				mIncorporationDateSS = db.Duplicate(a.mDatabase[ a.mIncorporationDateSS]).mIndex;
+				mIncorporationDateSS = db.Factory.Duplicate(a.mDatabase[ a.mIncorporationDateSS]).mIndex;
 
-			DepreciatedValue =  db.Duplicate(a.DepreciatedValue) as IfcCostValue;
+			DepreciatedValue =  db.Factory.Duplicate(a.DepreciatedValue) as IfcCostValue;
 		}
 		internal IfcAsset(DatabaseIfc m, string name) : base(m,name) { }
 		internal new static IfcAsset Parse(string strDef, ReleaseVersion release) { IfcAsset a = new IfcAsset(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
@@ -970,9 +966,14 @@ namespace GeometryGym.Ifc
 			get { return mDatabase[mAxis] as IfcDirection; }
 			set
 			{
-				mAxis = value.mIndex;
-				if (mRefDirection == 0)
-					RefDirection = (Math.Abs(value.DirectionRatioX - 1) < 1e-3 ? mDatabase.YAxis : mDatabase.XAxis);
+				if (value == null)
+					mAxis = 0;
+				else
+				{
+					mAxis = value.mIndex;
+					if (mRefDirection == 0)
+						RefDirection = (Math.Abs(value.DirectionRatioX - 1) < 1e-3 ? mDatabase.Factory.YAxis : mDatabase.Factory.XAxis);
+				}
 			}
 		}
 		public IfcDirection RefDirection
@@ -980,21 +981,26 @@ namespace GeometryGym.Ifc
 			get { return mDatabase[mRefDirection] as IfcDirection; }
 			set
 			{
-				mRefDirection = value.mIndex;
-				if (mAxis == 0)
-					Axis = (Math.Abs(value.DirectionRatioZ - 1) < 1e-3 ? mDatabase.XAxis : mDatabase.ZAxis);
+				if (value == null)
+					mRefDirection = 0;
+				else
+				{
+					mRefDirection = value.mIndex;
+					if (mAxis == 0)
+						Axis = (Math.Abs(value.DirectionRatioZ - 1) < 1e-3 ? mDatabase.Factory.XAxis : mDatabase.Factory.ZAxis);
+				}
 			}
 		}
 
 		internal IfcAxis2Placement3D() : base() { }
-		public IfcAxis2Placement3D(IfcCartesianPoint p) : base(p) { }
-		public IfcAxis2Placement3D(IfcCartesianPoint p, IfcDirection axis, IfcDirection refDirection) : base(p) { mAxis = (axis == null ? 0 : axis.mIndex); mRefDirection = (refDirection == null ? 0 : refDirection.mIndex); }
+		public IfcAxis2Placement3D(IfcCartesianPoint location) : base(location) { }
+		public IfcAxis2Placement3D(IfcCartesianPoint location, IfcDirection axis, IfcDirection refDirection) : base(location) { mAxis = (axis == null ? 0 : axis.mIndex); mRefDirection = (refDirection == null ? 0 : refDirection.mIndex); }
 		internal IfcAxis2Placement3D(DatabaseIfc db, IfcAxis2Placement3D p) : base(db, p)
 		{
 			if (p.mAxis > 0)
-				Axis = db.Duplicate(p.Axis) as IfcDirection;
+				Axis = db.Factory.Duplicate(p.Axis) as IfcDirection;
 			if (p.mRefDirection > 0)
-				RefDirection = db.Duplicate(p.RefDirection) as IfcDirection;
+				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
 		}
 
 		internal static IfcAxis2Placement3D Parse(string strDef) { IfcAxis2Placement3D p = new IfcAxis2Placement3D(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }

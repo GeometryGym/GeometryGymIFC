@@ -27,6 +27,22 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
+	public abstract partial class IfcParameterizedProfileDef
+	{
+		internal override Transform Transform
+		{
+			get { IfcAxis2Placement2D pos = Position; return (pos == null ? Transform.Identity : pos.Transform); }
+		}
+
+	}
+	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
+	{
+		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
+		protected IfcPlacement(DatabaseIfc db, Point3d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
+
+		public Transform Transform { get { return Transform.ChangeBasis(Plane, Plane.WorldXY); } }
+		public abstract Plane Plane { get; }
+	}
 	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
 	{
 		internal virtual Point3d Location { get { return Point3d.Unset; } }
@@ -52,8 +68,19 @@ namespace GeometryGym.Ifc
 			Points = points;
 		}
 	}
-	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
+	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
-		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
+		internal Transform PlacementTransform
+		{
+			get
+			{
+				IfcObjectPlacement p = Placement;
+				return (p == null ? Transform.Identity : p.Transform);
+			}
+		}
+	}
+	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef
+	{  //,IfcCompositeProfileDef ,IfcDerivedProfileDef ,IfcParameterizedProfileDef));  IFC2x3 abstract 
+		internal virtual Transform Transform { get { return Transform.Identity; } }
 	}
 }

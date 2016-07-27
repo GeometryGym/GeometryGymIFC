@@ -45,7 +45,7 @@ namespace GeometryGym.STEP
 			if (mComments.Count > 0)
 			{
 				foreach (string c in mComments)
-					comment = "/* " + c + " */\r\n";
+					comment += "/* " + c + " */\r\n";
 			}
 			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord.ToUpper() + "(" + str.Substring(1) + ");";
 		}

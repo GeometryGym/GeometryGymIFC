@@ -141,7 +141,7 @@ namespace GeometryGym.Ifc
 		public IfcBoilerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcBoilerType() : base() { }
 		internal IfcBoilerType(DatabaseIfc db, IfcBoilerType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcBoilerType(DatabaseIfc m, string name, IfcBoilerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcBoilerType(DatabaseIfc m, string name, IfcBoilerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcBoilerType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcBoilerTypeEnum)Enum.Parse(typeof(IfcBoilerTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcBoilerType Parse(string strDef) { IfcBoilerType t = new IfcBoilerType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
@@ -167,7 +167,7 @@ namespace GeometryGym.Ifc
 		public IfcBooleanOperand SecondOperand { get { return mDatabase[mSecondOperand] as IfcBooleanOperand; } set { mSecondOperand = value.Index; } }
 
 		internal IfcBooleanResult() : base() { }
-		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b) : base(db,b) { mOperator = b.mOperator; FirstOperand = db.Duplicate(b.mDatabase[ b.mFirstOperand]) as IfcBooleanOperand; SecondOperand = db.Duplicate(b.mDatabase[b.mSecondOperand]) as IfcBooleanOperand; }
+		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b) : base(db,b) { mOperator = b.mOperator; FirstOperand = db.Factory.Duplicate(b.mDatabase[ b.mFirstOperand]) as IfcBooleanOperand; SecondOperand = db.Factory.Duplicate(b.mDatabase[b.mSecondOperand]) as IfcBooleanOperand; }
 		public IfcBooleanResult(IfcBooleanOperator op, IfcBooleanOperand first, IfcBooleanOperand second) : base(first.Database)
 		{
 			mOperator = op;
@@ -339,7 +339,7 @@ namespace GeometryGym.Ifc
 		public double ZDim { get { return mZDim; } set { mZDim = value; } }
 
 		internal IfcBoundingBox() : base() { }
-		internal IfcBoundingBox(DatabaseIfc db, IfcBoundingBox b) : base(db,b) { Corner = db.Duplicate(b.Corner) as IfcCartesianPoint; mXDim = b.mXDim; mYDim = b.mYDim; mZDim = b.mZDim; }
+		internal IfcBoundingBox(DatabaseIfc db, IfcBoundingBox b) : base(db,b) { Corner = db.Factory.Duplicate(b.Corner) as IfcCartesianPoint; mXDim = b.mXDim; mYDim = b.mYDim; mZDim = b.mZDim; }
 		internal IfcBoundingBox(IfcCartesianPoint pt, double xdim, double ydim, double zdim) : base(pt.mDatabase)
 		{
 			//if (mModel.mModelView != ModelView.NotAssigned && mModel.mModelView != ModelView.IFC2x3Coordination)
@@ -366,7 +366,7 @@ namespace GeometryGym.Ifc
 		public IfcBoundingBox Enclosure { get { return mDatabase[mEnclosure] as IfcBoundingBox; } set { mEnclosure = value.mIndex; } }
 
 		internal IfcBoxedHalfSpace() : base() { }
-		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Duplicate(s.Enclosure) as IfcBoundingBox; }
+		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
 		internal static void parseFields(IfcBoxedHalfSpace s, List<string> arrFields, ref int ipos) { IfcHalfSpaceSolid.parseFields(s, arrFields, ref ipos); s.mEnclosure = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal new static IfcBoxedHalfSpace Parse(string strDef) { IfcBoxedHalfSpace s = new IfcBoxedHalfSpace(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mEnclosure); }
@@ -389,7 +389,7 @@ namespace GeometryGym.Ifc
 		protected IfcBSplineCurve(DatabaseIfc db, IfcBSplineCurve c) : base(db, c)
 		{
 			mDegree = c.mDegree;
-			ControlPointsList = c.ControlPointsList.ConvertAll(x => db.Duplicate(x) as IfcCartesianPoint);
+			ControlPointsList = c.ControlPointsList.ConvertAll(x => db.Factory.Duplicate(x) as IfcCartesianPoint);
 			mCurveForm = c.mCurveForm;
 			mClosedCurve = c.mClosedCurve;
 			mSelfIntersect = c.mSelfIntersect;
@@ -484,7 +484,7 @@ namespace GeometryGym.Ifc
 			mVDegree = s.mVDegree;
 			List<List<IfcCartesianPoint>> points = ControlPointsList;
 			foreach(List<IfcCartesianPoint> ps in points)
-				mControlPointsList.Add(ps.ConvertAll(x=>db.Duplicate(x).mIndex));
+				mControlPointsList.Add(ps.ConvertAll(x=>db.Factory.Duplicate(x).mIndex));
 			mSurfaceForm = s.mSurfaceForm;
 			mUClosed = s.mUClosed;
 			mVClosed = s.mVClosed;
@@ -621,10 +621,17 @@ namespace GeometryGym.Ifc
 		public IfcPostalAddress BuildingAddress {get {return mDatabase[mBuildingAddress] as IfcPostalAddress;} set { mBuildingAddress = (value == null ? 0 : value.mIndex); }}
 
 		internal IfcBuilding() : base() { }
-		public IfcBuilding(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.PlaneXYPlacement) ) { Name = name; setDefaultAddress();  }
+		public IfcBuilding(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.Factory.PlaneXYPlacement) ) { Name = name; setDefaultAddress();  }
 		public IfcBuilding(IfcBuilding host, string name) : base(host, name) { setDefaultAddress(); }
 		public IfcBuilding(IfcSite host, string name) : base(host, name) { setDefaultAddress(); }
 		public IfcBuilding(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { setDefaultAddress(); }
+		internal IfcBuilding(DatabaseIfc db, IfcBuilding b, bool downStream) : base(db, b, downStream)
+		{
+			mElevationOfRefHeight = b.mElevationOfRefHeight;
+			mElevationOfTerrain = b.mElevationOfTerrain;
+			if (b.mBuildingAddress > 0)
+				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress) as IfcPostalAddress;
+		}
 
 		private void setDefaultAddress()  //Implementers Agreement requires address
 		{
@@ -665,7 +672,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingElementPart() : base() { }
 		internal IfcBuildingElementPart(DatabaseIfc db, IfcBuildingElementPart p) : base(db, p) { mPredefinedType = p.mPredefinedType; }
-		internal IfcBuildingElementPart(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcBuildingElementPart(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		internal static IfcBuildingElementPart Parse(string strDef, ReleaseVersion schema) { IfcBuildingElementPart p = new IfcBuildingElementPart(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		internal static void parseFields(IfcBuildingElementPart a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -786,7 +793,7 @@ namespace GeometryGym.Ifc
 		}
 
 		public IfcBuildingStorey() : base() { }
-		
+		internal IfcBuildingStorey(DatabaseIfc db, IfcBuildingStorey s, bool downStream) : base(db,s,downStream) { mElevation = s.mElevation; }
 		public IfcBuildingStorey(IfcBuilding host, string name, double elev) : base(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elev))))
 		{
 			host.addStorey(this);

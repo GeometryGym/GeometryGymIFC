@@ -145,4 +145,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
+	{
+		internal Transform PositionTransform { get { return (mPosition == 0 ? Transform.Identity : Position.Transform); } }
+	}
 }

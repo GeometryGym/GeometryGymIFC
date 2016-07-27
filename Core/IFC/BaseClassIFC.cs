@@ -34,19 +34,30 @@ namespace GeometryGym.Ifc
 		public virtual string Name { get { return ""; } set { } }
 		internal DatabaseIfc mDatabase = null;
 
-		DatabaseIfc IBaseClassIfc.Database { get { return mDatabase; } }
+		public DatabaseIfc Database { get { return mDatabase; } }
 
 		internal BaseClassIfc() : base() { }
 		protected BaseClassIfc(BaseClassIfc e) { mIndex = e.mIndex; }
 		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
 		protected BaseClassIfc(DatabaseIfc m) { attachModel(m); }
-		
+
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
 
 		private void attachModel(DatabaseIfc m)
 		{
 			m[m.NextBlank] = this;
 		}
+
+		internal virtual void postParseRelate() { }
+		public virtual List<T> Extract<T>() where T : IBaseClassIfc
+		{
+			List<T> result = new List<T>();
+			if (this is T)
+				result.Add((T)(IBaseClassIfc)this);
+			return result;
+		}
+
+		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 	}
 	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
 

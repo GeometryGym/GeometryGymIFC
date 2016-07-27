@@ -56,8 +56,8 @@ namespace GeometryGym.Ifc
 		public double NeckArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NeckArea", new IfcAreaMeasure(value)).mIndex); } }
 		public double EffectiveArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "EffectiveArea", new IfcAreaMeasure(value)).mIndex); } }
 		public IfcPropertyTableValue<IfcVolumetricFlowRateMeasure, IfcPositiveRatioMeasure> AirFlowrateVersusFlowControlElement { set { value.Name = "AirFlowrateVersusFlowControlElement"; mHasProperties.Add(value.mIndex); } }
-		public Pset_AirTerminalTypeCommon(IfcAirTerminal valve) : base(valve.mDatabase, "Pset_AirTerminalTypeCommon") { Description = valve.Name; DefinesOccurrence.assign(valve); }
-		public Pset_AirTerminalTypeCommon(IfcAirTerminalType valveType) : base(valveType.mDatabase, "Pset_AirTerminalTypeCommon") { Description = valveType.Name; valveType.AddPropertySet(this); }
+		public Pset_AirTerminalTypeCommon(IfcAirTerminal airTerminal) : base(airTerminal.mDatabase, "Pset_AirTerminalTypeCommon") { Description = airTerminal.Name; DefinesOccurrence.assign(airTerminal); }
+		public Pset_AirTerminalTypeCommon(IfcAirTerminalType airTerminalType) : base(airTerminalType.mDatabase, "Pset_AirTerminalTypeCommon") { Description = airTerminalType.Name; airTerminalType.AddPropertySet(this); }
 	}
 	public partial class Pset_AirTerminalOccurrence : IfcPropertySet
 	{
@@ -232,6 +232,22 @@ namespace GeometryGym.Ifc
 		public Pset_PumpTypeCommon(IfcPump pump) : base(pump.mDatabase, "Pset_PumpTypeCommon") { Description = pump.Name; DefinesOccurrence.assign(pump); }
 		public Pset_PumpTypeCommon(IfcPumpType pumpType) : base(pumpType.mDatabase, "Pset_PumpTypeCommon") { Description = pumpType.Name; pumpType.AddPropertySet(this); }
 	}
+	public partial class Pset_SlabCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public PEnum_ElementStatus Status { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString())).mIndex); } }
+		public string AcousticRating { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "AcousticRating", new IfcLabel(value)).mIndex); } }
+		public string FireRating { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "FireRating", new IfcLabel(value)).mIndex); } }
+		public bool Combustible { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Combustible", new IfcBoolean(value)).mIndex); } }
+		public string SurfaceSpreadOfFlame { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "SurfaceSpreadOfFlame", new IfcLabel(value)).mIndex); } }
+		public double ThermalTransmittance { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ThermalTransmittance", new IfcThermalTransmittanceMeasure(value)).mIndex); } }
+		public bool IsExternal { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value)).mIndex); } }
+		public bool LoadBearing { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value)).mIndex); } }
+		public bool Compartmentation { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Compartmentation", new IfcBoolean(value)).mIndex); } }
+		public double PitchAngle { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "PitchAngle", new IfcPlaneAngleMeasure(value)).mIndex); } }
+		public Pset_SlabCommon(IfcSlab slab) : base(slab.mDatabase, "Pset_SlabCommon") { DefinesOccurrence.assign(slab); }
+		public Pset_SlabCommon(IfcSlabType slabType) : base(slabType.mDatabase, "Pset_SlabCommon") { Description = slabType.Name; slabType.AddPropertySet(this); }
+	}
 	public partial class Pset_SpaceHeaterTypeConvector : IfcPropertySet
 	{
 		public PEnum_SpaceHeaterConvectorType ConvectorType { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "ConvectorType", new IfcLabel(value.ToString())).mIndex); } }
@@ -264,6 +280,21 @@ namespace GeometryGym.Ifc
 		public Pset_SpaceHeaterTypeRadiator(IfcSpaceHeater spaceHeater) : base(spaceHeater.mDatabase, "Pset_SpaceHeaterTypeRadiator") { Description = spaceHeater.Name; DefinesOccurrence.assign(spaceHeater); }
 		public Pset_SpaceHeaterTypeRadiator(IfcSpaceHeaterType spaceHeaterType) : base(spaceHeaterType.mDatabase, "Pset_SpaceHeaterTypeRadiator") { Description = spaceHeaterType.Name; spaceHeaterType.AddPropertySet(this); }
 	}
+	public partial class Pset_UnitaryEquipmentTypeAirHandler : IfcPropertySet
+	{
+		public PEnum_AirHandlerConstruction AirHandlerConstruction { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "AirHandlerConstruction", new IfcLabel(value.ToString())).mIndex); } }
+		public PEnum_AirHandlerFanCoilArrangement AirHandlerFanCoilArrangement { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "AirHandlerFanCoilArrangement", new IfcLabel(value.ToString())).mIndex); } }
+		public bool DualDeck { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "DualDeck", new IfcBoolean(value)).mIndex); } }
+		public Pset_UnitaryEquipmentTypeAirHandler(IfcUnitaryEquipment unitaryEquipment) : base(unitaryEquipment.mDatabase, "Pset_UnitaryEquipmentTypeAirHandler") { Description = unitaryEquipment.Name; DefinesOccurrence.assign(unitaryEquipment); }
+		public Pset_UnitaryEquipmentTypeAirHandler(IfcUnitaryEquipmentType unitaryEquipmentType) : base(unitaryEquipmentType.mDatabase, "Pset_UnitaryEquipmentTypeAirHandler") { Description = unitaryEquipmentType.Name; unitaryEquipmentType.AddPropertySet(this); }
+	}
+	public partial class Pset_UnitaryEquipmentTypeCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public PEnum_ElementStatus Status { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString())).mIndex); } }
+		public Pset_UnitaryEquipmentTypeCommon(IfcUnitaryEquipment unitaryEquipment) : base(unitaryEquipment.mDatabase, "Pset_UnitaryEquipmentTypeCommonr") { Description = unitaryEquipment.Name; DefinesOccurrence.assign(unitaryEquipment); }
+		public Pset_UnitaryEquipmentTypeCommon(IfcUnitaryEquipmentType unitaryEquipmentType) : base(unitaryEquipmentType.mDatabase, "Pset_UnitaryEquipmentTypeCommon") { Description = unitaryEquipmentType.Name; unitaryEquipmentType.AddPropertySet(this); }
+	}
 	public partial class Pset_ValveTypeCommon : IfcPropertySet
 	{
 		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
@@ -278,4 +309,21 @@ namespace GeometryGym.Ifc
 		public Pset_ValveTypeCommon(IfcValve valve) : base(valve.mDatabase, "Pset_ValveTypeCommon") { Description = valve.Name; DefinesOccurrence.assign(valve); }
 		public Pset_ValveTypeCommon(IfcValveType valveType) : base(valveType.mDatabase, "Pset_ValveTypeCommon") { Description = valveType.Name; valveType.AddPropertySet(this); }
 	}
+	public partial class Pset_WallCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public PEnum_ElementStatus Status { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString())).mIndex); } }
+		public string AcousticRating { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "AcousticRating", new IfcLabel(value)).mIndex); } }
+		public string FireRating { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "FireRating", new IfcLabel(value)).mIndex); } }
+		public bool Combustible { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Combustible", new IfcBoolean(value)).mIndex); } }
+		public string SurfaceSpreadOfFlame { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "SurfaceSpreadOfFlame", new IfcLabel(value)).mIndex); } }
+		public double ThermalTransmittance { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ThermalTransmittance", new IfcThermalTransmittanceMeasure(value)).mIndex); } }
+		public bool IsExternal { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value)).mIndex); } }
+		public bool ExtendToStructure { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ExtendToStructure", new IfcBoolean(value)).mIndex); } }
+		public bool LoadBearing { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value)).mIndex); } }
+		public bool Compartmentation { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Compartmentation", new IfcBoolean(value)).mIndex); } }
+		public Pset_WallCommon(IfcWall wall) : base(wall.mDatabase, "Pset_WallCommon") {  DefinesOccurrence.assign(wall); }
+		public Pset_WallCommon(IfcWallType wallType) : base(wallType.mDatabase, "Pset_WallCommon") { Description = wallType.Name;  wallType.AddPropertySet(this); }
+	}
+
 }

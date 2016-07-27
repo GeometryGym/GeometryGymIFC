@@ -34,353 +34,6 @@ namespace GeometryGym.Ifc
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, If2x3NotAssigned };
 	public partial class DatabaseIfc
 	{
-		internal partial class Aggregate
-		{
-			//internal List<IfcProfileDef> mProfiles = new List<IfcProfileDef>();
-			//internal List<IfcWorkPlan> mWorkPlans = new List<IfcWorkPlan>();
-			//internal List<IfcRepresentationMap> mRepMaps = new List<IfcRepresentationMap>();
-			//internal List<IfcApplication> mApplications = new List<IfcApplication>();
-			internal List<IfcBuildingStorey> mBuildingStories = new List<IfcBuildingStorey>();
-			internal List<IfcClassificationReference> mClassifications = new List<IfcClassificationReference>(); 
-			internal List<IfcComplexProperty> mComplexProperties = new List<IfcComplexProperty>();
-			internal List<IfcCoordinateOperation> mCoordinateOperations = new List<IfcCoordinateOperation>();
-			internal List<IfcEdgeCurve> mEdgeCurves = new List<IfcEdgeCurve>();
-			internal List<IfcExternalReferenceRelationship> mExternalRelationships = new List<IfcExternalReferenceRelationship>();
-			//internal List<IfcExtrudedAreaSolid> mExtrusions = new List<IfcExtrudedAreaSolid>();
-			internal List<IfcGeometricRepresentationSubContext> mGeomContexts = new List<IfcGeometricRepresentationSubContext>();
-			internal List<IfcGrid> mGrids = new List<IfcGrid>();
-			internal List<IfcGroup> mGroups = new List<IfcGroup>();
-			internal List<IfcIndexedColourMap> mIndexedColourMap = new List<IfcIndexedColourMap>();
-			internal List<IfcIndexedTextureMap> mIndexedTextureMap = new List<IfcIndexedTextureMap>();
-			internal List<IfcLocalPlacement> mLocalPlacements = new List<IfcLocalPlacement>();
-			internal List<IfcMappedItem> mMappedItems = new List<IfcMappedItem>();
-			internal List<IfcMaterial> mMaterials = new List<IfcMaterial>();
-			internal List<IfcMaterialProperties> mMaterialProperties = new List<IfcMaterialProperties>();
-			internal List<IfcMaterialPropertiesSuperSeded> mMaterialPropertiesSS = new List<IfcMaterialPropertiesSuperSeded>();
-			//internal List<IfcMechanicalFastener> mFasteners = new List<IfcMechanicalFastener>();
-			internal List<IfcOwnerHistory> mOwnHistories = new List<IfcOwnerHistory>();
-			internal List<IfcPresentationLayerAssignment> mPresentationLayerAssignments = new List<IfcPresentationLayerAssignment>();
-			internal List<IfcProduct> mProducts = new List<IfcProduct>();
-			internal List<IfcProductRepresentation> mProductReps = new List<IfcProductRepresentation>();
-			internal List<IfcProfileProperties> mProfileProperties = new List<IfcProfileProperties>();
-			internal List<IfcPropertySet> mPropertySets = new List<IfcPropertySet>();
-			internal List<IfcRelationship> mRelationships = new List<IfcRelationship>();
-			internal List<IfcRepresentation> mRepresentations = new List<IfcRepresentation>();
-			internal List<IfcResourceConstraintRelationship> mConstraintRelationships = new List<IfcResourceConstraintRelationship>();
-			internal List<IfcShapeAspect> mShapeAspects = new List<IfcShapeAspect>();
-			internal List<IfcSlab> mSlabs = new List<IfcSlab>();
-			internal List<IfcStructuralItem> mStructItems = new List<IfcStructuralItem>();
-			internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
-			internal List<IfcTypeObject> mTypeObjects = new List<IfcTypeObject>();
-			internal List<IfcWall> mWalls = new List<IfcWall>();
-			internal List<IfcZone> mZones = new List<IfcZone>();
-
-			internal Aggregate() { }
-			partial void setCustomAggregate(BaseClassIfc obj);
-			internal void setAggregate(BaseClassIfc obj)
-			{
-				IfcProduct product = obj as IfcProduct;
-				if (product != null)
-				{
-					mProducts.Add(product);
-					IfcBuildingStorey buildingStorey = obj as IfcBuildingStorey;
-					if (buildingStorey != null)
-						mBuildingStories.Add(buildingStorey);
-					IfcGrid grid = obj as IfcGrid;
-					if (grid != null)
-						mGrids.Add(grid);
-					IfcSlab slab = product as IfcSlab;
-					if (slab != null)
-						mSlabs.Add(slab);
-					IfcStructuralItem structuralItem = obj as IfcStructuralItem;
-					if (structuralItem != null)
-						mStructItems.Add(structuralItem);
-					IfcWall wall = product as IfcWall;
-					if (wall != null)
-						mWalls.Add(wall);
-					return;
-				}
-				//IfcApplication application = obj as IfcApplication;
-				//if (application != null)
-				//	mApplications.Add(application);
-				IfcClassificationReference classification = obj as IfcClassificationReference;
-				if(classification != null)
-				{
-					mClassifications.Add(classification);
-					return;
-				}
-				IfcComplexProperty cp = obj as IfcComplexProperty;
-				if (cp != null)
-				{
-					mComplexProperties.Add(cp);
-					return;
-				}
-				IfcCoordinateOperation coordOp = obj as IfcCoordinateOperation;
-				if (coordOp != null)
-				{
-					mCoordinateOperations.Add(coordOp);
-					return;
-				}
-
-				IfcEdgeCurve edgeCurve = obj as IfcEdgeCurve;
-				if (edgeCurve != null)
-				{
-					mEdgeCurves.Add(edgeCurve);
-					return;
-				}
-				IfcExternalReferenceRelationship externalReferenceRelationship = obj as IfcExternalReferenceRelationship;
-				if (externalReferenceRelationship != null)
-				{
-					mExternalRelationships.Add(externalReferenceRelationship);
-					return;
-				}
-				//IfcExtrudedAreaSolid extrudedAreaSolid = result as IfcExtrudedAreaSolid;
-				//if(extrudedAreaSolid != null)
-				//{
-				//	if(result as IfcExtrudedAreaSolidTapered == null)
-				//		aggregate.mExtrusions.Add(extrudedAreaSolid);
-				//	return extrudedAreaSolid;
-				//}
-				IfcGeometricRepresentationSubContext geometricRepresentationContext = obj as IfcGeometricRepresentationSubContext;
-				if (geometricRepresentationContext != null)
-				{
-					mGeomContexts.Add(geometricRepresentationContext);
-					return;
-				}
-
-				IfcGroup group = obj as IfcGroup;
-				if (group != null)
-				{
-					IfcZone zone = group as IfcZone;
-					if (zone != null)
-					{
-						mZones.Add(zone);
-						return;
-					}
-					mGroups.Add(group);
-					return;
-				}
-				IfcIndexedColourMap indexedColourMap = obj as IfcIndexedColourMap;
-				if (indexedColourMap != null)
-				{
-					mIndexedColourMap.Add(indexedColourMap);
-					return;
-				}
-				IfcIndexedTextureMap indexedTextureMap = obj as IfcIndexedTextureMap;
-				if (indexedTextureMap != null)
-				{
-					mIndexedTextureMap.Add(indexedTextureMap);
-					return;
-				}
-				IfcLocalPlacement localPlacement = obj as IfcLocalPlacement;
-				if (localPlacement != null)
-				{
-					mLocalPlacements.Add(localPlacement);
-					return;
-				}
-				IfcMappedItem mi = obj as IfcMappedItem;
-				if (mi != null)
-				{
-					mMappedItems.Add(mi);
-					return;
-				}
-				IfcMaterial material = obj as IfcMaterial;
-				if (material != null)
-				{
-					mMaterials.Add(material);
-					return;
-				}
-				IfcMaterialProperties materialProperties = obj as IfcMaterialProperties;
-				if (materialProperties != null)
-				{
-					mMaterialProperties.Add(materialProperties);
-					return;
-				}
-				IfcMaterialPropertiesSuperSeded materialPropertiesSS = obj as IfcMaterialPropertiesSuperSeded;
-				if (materialPropertiesSS != null)
-				{
-					mMaterialPropertiesSS.Add(materialPropertiesSS);
-					return;
-				}
-				//	IfcMechanicalFastener mechanicalFastener = result as IfcMechanicalFastener;
-				//if(mechanicalFastener != null)
-				//{
-				//	mFasteners.Add(mechanicalFastener);
-				//	return mechanicalFastener;
-				//}
-				//IfcOwnerHistory ownerHistory = result as IfcOwnerHistory;
-				//if(ownerHistory != null)
-				//{
-				//	mOwnHistories.Add(ownerHistory);
-				//	return ownerHistory;
-				//} 
-				IfcPresentationLayerAssignment presentationLayerAssignment = obj as IfcPresentationLayerAssignment;
-				if (presentationLayerAssignment != null)
-				{
-					mPresentationLayerAssignments.Add(presentationLayerAssignment);
-					return;
-				}
-				IfcProductRepresentation productRepresentation = obj as IfcProductRepresentation;
-				if (productRepresentation != null)
-				{
-					mProductReps.Add(productRepresentation);
-					return;
-				}
-				IfcProfileProperties profileProperties = obj as IfcProfileProperties;
-				if (profileProperties != null)
-				{
-					mProfileProperties.Add(profileProperties);
-					return;
-				}
-				IfcPropertySet propSet = obj as IfcPropertySet;
-				if (propSet != null)
-				{
-					mPropertySets.Add(propSet);
-					return;
-				}
-				//IfcProfileDef profileDef = obj as IfcProfileDef;
-				//if (profileDef != null)
-				//{
-				//	mProfiles.Add(profileDef);
-				//	return profileDef;
-				//}
-				IfcRelationship relationship = obj as IfcRelationship;
-				if (relationship != null)
-				{
-					mRelationships.Add(relationship);
-					return;
-				}
-				IfcRepresentation representation = obj as IfcRepresentation;
-				if (representation != null)
-				{
-					mRepresentations.Add(representation);
-					return;
-				}
-				//IfcRepresentationMap representationMap = obj as IfcRepresentationMap;
-				//if (representationMap != null)
-				//{
-				//	mRepMaps.Add(representationMap);
-				//	return representationMap;
-				//}
-				IfcResourceConstraintRelationship rcr = obj as IfcResourceConstraintRelationship;
-				if (rcr != null)
-				{
-					mConstraintRelationships.Add(rcr);
-					return;
-				}
-				IfcShapeAspect shapeAspect = obj as IfcShapeAspect;
-				if (shapeAspect != null)
-				{
-					mShapeAspects.Add(shapeAspect);
-					return;
-				}
-				IfcStyledItem styledItem = obj as IfcStyledItem;
-				if (styledItem != null)
-				{
-					mStyledItems.Add(styledItem);
-					return;
-				}
-
-				IfcTypeObject typeObject = obj as IfcTypeObject;
-				if (typeObject != null)
-				{
-					mTypeObjects.Add(typeObject);
-					return;
-				}
-				setCustomAggregate(obj);
-			}
-			partial void InitializeOthers(string folder);
-			internal void RelateObjects(string folder)
-			{
-				try
-				{
-					int icounter;
-					for (icounter = 0; icounter < mClassifications.Count; icounter++)
-						mClassifications[icounter].relate();
-					for (icounter = 0; icounter < mComplexProperties.Count; icounter++)
-						mComplexProperties[icounter].relate();
-					for (icounter = 0; icounter < mCoordinateOperations.Count; icounter++)
-						mCoordinateOperations[icounter].Relate();
-					for (icounter = 0; icounter < mEdgeCurves.Count; icounter++)
-						mEdgeCurves[icounter].associate();
-					foreach (IfcExternalReferenceRelationship er in mExternalRelationships)
-					{
-						try
-						{
-							er.relate();
-						}
-						catch (Exception) { }
-					}
-					for (icounter = 0; icounter < mGeomContexts.Count; icounter++)
-						mGeomContexts[icounter].relate();
-					for (icounter = 0; icounter < mProducts.Count; icounter++)
-						mProducts[icounter].relate();
-					foreach (IfcIndexedColourMap icm in mIndexedColourMap)
-						icm.relate();
-					foreach (IfcIndexedTextureMap itm in mIndexedTextureMap)
-						itm.relate();
-					for (icounter = 0; icounter < mLocalPlacements.Count; icounter++)
-						mLocalPlacements[icounter].setReference();
-					for (icounter = 0; icounter < mMappedItems.Count; icounter++)
-						mMappedItems[icounter].MappingSource.mMapUsage.Add(mMappedItems[icounter]);
-					for (icounter = 0; icounter < mMaterialProperties.Count; icounter++)
-						mMaterialProperties[icounter].relate();
-					for (icounter = 0; icounter < mMaterialPropertiesSS.Count; icounter++)
-						mMaterialPropertiesSS[icounter].relate();
-					for (icounter = 0; icounter < mPresentationLayerAssignments.Count; icounter++)
-						mPresentationLayerAssignments[icounter].relate();
-					for (icounter = 0; icounter < mProductReps.Count; icounter++)
-					{
-						try
-						{
-							mProductReps[icounter].relate();
-						}
-						catch (Exception) { }
-					}
-					foreach(IfcProfileProperties prop in mProfileProperties)
-						prop.ProfileDefinition.mHasProperties.Add(prop);
-					for (icounter = 0; icounter < mPropertySets.Count; icounter++)
-						mPropertySets[icounter].relate();
-					for (icounter = 0; icounter < mRelationships.Count; icounter++)
-					{
-						try
-						{
-							mRelationships[icounter].relate();
-						}
-						catch (Exception) { }
-					}
-					foreach (IfcRepresentation r in mRepresentations)
-						r.relate();
-					foreach (IfcResourceConstraintRelationship rc in mConstraintRelationships)
-						rc.relate();
-					foreach (IfcShapeAspect sa in mShapeAspects)
-						sa.relate();
-					for (icounter = 0; icounter < mTypeObjects.Count; icounter++)
-					{
-						IfcTypeObject typeObject = mTypeObjects[icounter];
-						List<IfcPropertySetDefinition> psets = typeObject.HasPropertySets;
-						for(int jcounter = 0; jcounter< psets.Count; jcounter++)
-						{
-							psets[jcounter].mDefinesType.Add(typeObject);
-						}
-						IfcTypeProduct typeProduct = typeObject as IfcTypeProduct;
-						if (typeProduct != null)
-						{
-							List<IfcRepresentationMap> repMaps = typeProduct.RepresentationMaps;
-							for (int jcounter = 0; jcounter < repMaps.Count; jcounter++)
-								repMaps[jcounter].mTypeProducts.Add(typeProduct);
-						}
-					}
-					for (icounter = 0; icounter < mStyledItems.Count; icounter++)
-						mStyledItems[icounter].associateItem();
-					InitializeOthers(folder);
-				}
-				catch (Exception)
-				{
-					//logError.printMessage("XXX " + x.ToString());
-				}
-			}
-		}
 		internal Guid id = Guid.NewGuid();
 		private int mNextBlank = 1;
 		internal int NextBlank
@@ -403,12 +56,29 @@ namespace GeometryGym.Ifc
 		}
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
 
-		internal class GenerateOptions
+		private FactoryIfc mFactory = null;
+		public FactoryIfc Factory { get { return mFactory; } }
+
+		internal DatabaseIfc() : base() { mFactory = new FactoryIfc(this); }
+		public DatabaseIfc(string fileName) : this() { ReadFile(fileName); }
+		public DatabaseIfc(TextReader stream) : this() { ReadFile(stream, 0); }
+		public DatabaseIfc(ModelView view) : this(true, view) { }
+		public DatabaseIfc(DatabaseIfc db) : this() { mRelease = db.mRelease; mModelView = db.mModelView; Tolerance = db.Tolerance; }
+		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.If2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4A1, view) { }
+		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate, schema, schema == ReleaseVersion.IFC2x3 ? ModelView.If2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
+		private DatabaseIfc(bool generate, ReleaseVersion schema, ModelView view) : this()
 		{
-			internal bool mGenerateOwnerHistory = true;
-			internal int mLengthDigits = 6;
+			mRelease = schema;
+			mModelView = view;
+#if (RHINO)
+			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
+			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+#endif
+			mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
+			if (generate)
+				mFactory.initData();
 		}
-		internal GenerateOptions mOptions = new GenerateOptions();
+
 		internal ModelView mModelView = ModelView.If2x3NotAssigned;
 		internal bool mAccuratePreview = false; 
 		public string FolderPath { get; set; } = "";
@@ -431,8 +101,11 @@ namespace GeometryGym.Ifc
 			get { return mModelTolerance; }
 			set
 			{
-				mModelTolerance = Math.Min(0.0005 / mModelSIScale, value);
-				mOptions.mLengthDigits = Math.Max(2, -1*(int)(Math.Log10(mModelTolerance)-1));
+				if (!double.IsNaN(value))
+				{
+					mModelTolerance = Math.Min(0.0005 / mModelSIScale, value);
+					mLengthDigits = Math.Max(2, -1 * (int)(Math.Log10(mModelTolerance) - 1));
+				}
 			}
 		}
 		public double ScaleSI
@@ -441,6 +114,7 @@ namespace GeometryGym.Ifc
 			set { mModelSIScale = value; }
 		}
 		private double mModelTolerance = 0.0001,mModelSIScale = 1;
+		internal int mLengthDigits = 5;
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }
 		private List<BaseClassIfc> mIfcObjects = new List<BaseClassIfc>() { new BaseClassIfc() }; 
@@ -471,170 +145,14 @@ namespace GeometryGym.Ifc
 				value.mIndex = index;
 			}
 		}
-		private IfcCartesianPoint mOrigin = null, mWorldOrigin = null,mOrigin2d = null;
-		internal IfcDirection mXAxis, mYAxis, mZAxis;
-		//internal int mTempWorldCoordinatePlacement = 0;
-		//private IfcAxis2Placement3D mWorldCoordinatePlacement;
-		internal IfcAxis2Placement3D mPlacementPlaneXY;
-		internal IfcAxis2Placement2D m2DPlaceOrigin;
-		internal IfcSIUnit mSILength, mSIArea, mSIVolume;
-		internal IfcGeometricRepresentationContext mGeomRepContxt;
-		
-		private IfcApplication mApplication = null;
-		internal IfcApplication Application
-		{
-			get
-			{
-				if (mApplication == null)
-					mApplication = new IfcApplication(this);
-				return mApplication;
-			}
-		}
-		private IfcPersonAndOrganization mPersonOrganization = null;
-		internal IfcPersonAndOrganization PersonOrganization
-		{
-			get
-			{
-				if (mPersonOrganization == null)
-					mPersonOrganization = new IfcPersonAndOrganization(Person, Organization);
-				return mPersonOrganization;
-			}
-		}
-		private IfcPerson mPerson = null;
-		internal IfcPerson Person
-		{
-			get
-			{
-				if (mPerson == null)
-				{
-					mPerson = new IfcPerson(this, System.Environment.UserName.Replace("'", ""),"","");
-#if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
-			string str = GGYM.ggAssembly.mOptions.OwnerRole;
-			if (!string.IsNullOrEmpty(str))
-			{
-				IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcRoleEnum>(str, out role))
-				{
-					if (role != IfcRoleEnum.NOTDEFINED)
-						mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(this, role, "", "", new List<int>()) };
-				}
-				else
-					mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(this, IfcRoleEnum.USERDEFINED, str, "", new List<int>()) };
-			}
-#endif
-				}
-				return mPerson;
-			}
-
-		}
-		private IfcOrganization mOrganization = null;
-		internal IfcOrganization Organization
-		{
-			get
-			{
-				if (mOrganization == null)
-					mOrganization = new IfcOrganization(this,IfcOrganization.Organization);
-				return mOrganization;
-			}
-
-		}
-		private IfcOwnerHistory mOwnerHistoryCreate,mOwnerHistoryModify,mOwnerHistoryDelete;
-		internal IfcOwnerHistory OwnerHistory(IfcChangeActionEnum changeAction)
-		{
-			if(changeAction == IfcChangeActionEnum.ADDED)
-			{
-				if (mOwnerHistoryCreate == null)
-					mOwnerHistoryCreate = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);
-				return mOwnerHistoryCreate;
-			}
-			if(changeAction == IfcChangeActionEnum.DELETED)
-			{
-				if (mOwnerHistoryDelete == null)
-					mOwnerHistoryDelete = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.DELETED);
-				return mOwnerHistoryDelete;
-			}
-			if(changeAction == IfcChangeActionEnum.MODIFIED)
-			{
-				if (mOwnerHistoryModify == null)
-					mOwnerHistoryModify = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.MODIFIED);
-				return mOwnerHistoryModify;
-			}
-			return null;
-		}
-
-		internal enum SubContextIdentifier { Axis, Body, Surface };
-		internal IfcGeometricRepresentationSubContext SubContext(SubContextIdentifier nature)
-		{
-			if(nature == SubContextIdentifier.Axis)
-			{
-				if(mSubContxtAxis == null)
-					mSubContxtAxis = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
-				return mSubContxtAxis;
-			}
-			if(mSubContxtBody == null)
-				mSubContxtBody = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
-			return mSubContxtBody; 
-		}
-		private IfcGeometricRepresentationSubContext mSubContxtBody = null, mSubContxtAxis=null, mSubContxtAnalysisSurface = null;
-
+	
 		internal IfcContext mContext = null;
 		
 		internal HashSet<string> mGlobalIDs = new HashSet<string>();
 
 		partial void printError(string str);
 		internal void logError(string str) { printError(str); }
-		partial void getApplicationFullName(ref string app);
-		partial void getApplicationIdentifier(ref string app);
-		partial void getApplicationDeveloper(ref string app);
-
-		private string mApplicationFullName = "", mApplicationIdentifier = "", mApplicationDeveloper = "";
-		public string ApplicationFullName
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(mApplicationFullName))
-				{
-					getApplicationFullName(ref mApplicationFullName);
-					if (string.IsNullOrEmpty(mApplicationFullName))
-					{
-						try
-						{
-							Assembly assembly = Assembly.GetExecutingAssembly();
-							AssemblyName name = assembly.GetName();
-							return name.Name;
-						}
-						catch (Exception) { return "Unknown Application"; }
-					}
-				}
-				return mApplicationFullName;
-			}
-			set { mApplicationFullName = value; }
-		}
-		public string ApplicationIdentifier
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(mApplicationIdentifier))
-				{
-					getApplicationIdentifier(ref mApplicationIdentifier);
-					if (string.IsNullOrEmpty(mApplicationIdentifier))
-						return ApplicationFullName;
-				}
-				return mApplicationIdentifier;
-			}
-			set { mApplicationIdentifier = value; }
-		}
-		public string ApplicationDeveloper
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(mApplicationDeveloper))
-					getApplicationDeveloper(ref mApplicationDeveloper);
-				return (string.IsNullOrEmpty(mApplicationDeveloper) ? "Unknown" : mApplicationDeveloper);
-			}
-			set { mApplicationDeveloper = value; }
-		}
-
+		
 		private string viewDefinition { get { return (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" : (mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned"))); } }
 		internal string getHeaderString(string fileName)
 		{
@@ -647,7 +165,7 @@ namespace GeometryGym.Ifc
 			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
 			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
 			hdr += "/* preprocessor_version */ 'GeomGymIFC by Geometry Gym Pty Ltd',\r\n";
-			hdr += "/* originating_system */ '" + ApplicationFullName + "',\r\n";
+			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
 
 			hdr += "/* authorization */ 'None');\r\n\r\n";
 			hdr += "FILE_SCHEMA (('" + (mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
@@ -656,50 +174,6 @@ namespace GeometryGym.Ifc
 			return hdr;
 		}
 		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; } 
-		internal DatabaseIfc() :base() { }
-		public DatabaseIfc(string fileName) : base() 
-		{
-			Aggregate aggregate = new Aggregate();
-			ReadFile(getStreamReader(fileName),aggregate,0);
-		}
-		public DatabaseIfc(TextReader stream) : base()
-		{
-			Aggregate aggregate = new Aggregate();
-			ReadFile(stream, aggregate, 0);
-		}
-		public DatabaseIfc(ModelView view) : this(true, view) { }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.If2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4A1,view) { }
-		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate,schema,schema == ReleaseVersion.IFC2x3 ? ModelView.If2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
-		private DatabaseIfc(bool generate,ReleaseVersion schema, ModelView view)
-		{ 
-			mRelease = schema;
-			mModelView = view;
-#if(RHINO)
-			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
-			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
-#endif 
-			mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
-			if (generate)
-				initData();
-		} 
-		
-		internal void initData()
-		{ 
-			initGeom();
-			mSILength = new IfcSIUnit(this, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE);
-			mSIArea = new IfcSIUnit(this, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SQUARE_METRE);
-			mSIVolume = new IfcSIUnit(this, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE);
-		}
-		internal void initGeom()
-		{
-			IfcCartesianPoint point = Origin;
-			IfcDirection direction = XAxis;
-			direction = YAxis;
-			direction = ZAxis;
-			IfcAxis2Placement3D pl = this.PlaneXYPlacement;
-			//IfcAxis2Placement pl = this.WorldCoordinatePlacement;
-			IfcAxis2Placement2D placement = Origin2dPlace; 
-		}
 		public override string ToString()
 		{  
 			//IFCModel im = new IFCModel(mIFC2x3,true); 
@@ -716,167 +190,84 @@ namespace GeometryGym.Ifc
 			}
 			return result + getFooterString();
 		}
-		internal IfcAxis2Placement2D Origin2dPlace
+	
+		internal enum FormatIfc { JSON, STEP, XML }
+		internal class FileStreamIfc
 		{
-			get
+			internal FormatIfc mFormat;
+			internal StreamReader mStreamReader;
+			internal FileStreamIfc(FormatIfc format, StreamReader sr)
 			{
-				if (m2DPlaceOrigin == null)
-					m2DPlaceOrigin = new IfcAxis2Placement2D(new IfcCartesianPoint(this, 0, 0));
-				return m2DPlaceOrigin;
-			}
+				mFormat = format;
+				mStreamReader = sr;
+			} 
 		}
-		//internal IfcCartesianPoint WorldOrigin
-		//{
-		//	get
-		//	{
-		//		if(mWorldOrigin == null)
-		//			mWorldOrigin = WorldCoordinatePlacement.Location;
-		//		return mWorldOrigin;
-		//	}
-		//}
-		internal IfcCartesianPoint Origin2d
-		{
-			get
-			{
-				if (mOrigin2d == null)
-					mOrigin2d = new IfcCartesianPoint(this,0, 0);
-				return mOrigin2d;
-			}
-		} 
-		//internal IfcAxis2Placement3D WorldCoordinatePlacement
-		//{
-		//	get
-		//	{
-		//		if (mWorldCoordinatePlacement == null)
-		//		{
-		//			if (mContext != null)
-		//			{
-		//				List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
-		//				foreach (IfcRepresentationContext context in contexts)
-		//				{
-		//					IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
-		//					if (grc == null)
-		//						continue;
-		//					IfcAxis2Placement3D pl = grc.WorldCoordinateSystem as IfcAxis2Placement3D;
-		//					if (pl != null)
-		//					{
-		//						mWorldCoordinatePlacement = pl;
-		//						break;
-		//					}
-		//				}
-		//			}
-		//			if (mWorldCoordinatePlacement == null)
-		//			{
-		//				mWorldCoordinatePlacement = new IfcAxis2Placement3D(new IfcCartesianPoint(this, 0, 0, 0), mZAxis, mXAxis);
-		//				if (mContext != null)
-		//				{
-		//					List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
-		//					foreach (IfcRepresentationContext context in contexts)
-		//					{
-		//						IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
-		//						if (grc != null)
-		//						{
-		//							grc.WorldCoordinateSystem = mWorldCoordinatePlacement;
-		//							return mWorldCoordinatePlacement;
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//		return mWorldCoordinatePlacement;
-		//	}
-		//}
-		internal IfcAxis2Placement3D PlaneXYPlacement
-		{
-			get
-			{
-				if (mPlacementPlaneXY == null)
-					mPlacementPlaneXY = new IfcAxis2Placement3D(Origin);
-				return mPlacementPlaneXY;
-			}
-		}
-		internal IfcCartesianPoint Origin
-		{
-			get
-			{
-				if (mOrigin == null)
-					mOrigin = new IfcCartesianPoint(this, 0, 0, 0);
-				return mOrigin;
-			}
-		}
-		internal IfcDirection XAxis
-		{
-			get
-			{
-				if (mXAxis == null)
-					mXAxis = new IfcDirection(this, 1, 0, 0);
-				return mXAxis;
-			}
-		}
-		internal IfcDirection YAxis
-		{
-			get
-			{
-				if (mYAxis == null)
-					mYAxis = new IfcDirection(this, 0, 1, 0);
-				return mYAxis;
-			}
-		}
-		internal IfcDirection ZAxis
-		{
-			get
-			{
-				if (mZAxis == null)
-					mZAxis = new IfcDirection(this, 0, 0, 1);
-				return mZAxis;
-			}
-		}
-
-		internal Dictionary<int, int> mDuplicateMapping = new Dictionary<int, int>();
-		internal BaseClassIfc Duplicate(BaseClassIfc entity)
-		{
-			if (mDuplicateMapping.ContainsKey(entity.mIndex))
-				return this[mDuplicateMapping[entity.mIndex]];
-			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
-			if (type != null)
-			{
-				Type[] types = new Type[] { typeof(DatabaseIfc), type };
-				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, types, null);
-				if (constructor != null)
-				{
-					BaseClassIfc result = constructor.Invoke(new object[] { this, entity }) as BaseClassIfc;
-					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
-					return result;
-				}
-			}
-			return null;
-		}
-
-		internal StreamReader getStreamReader(string fileName)
+		internal FileStreamIfc getStreamReader(string fileName)
 		{
 			string ext = Path.GetExtension(fileName);
+			FileName = fileName;
+			FolderPath = Path.GetDirectoryName(fileName);
+			FormatIfc format = fileName.EndsWith("xml") ? FormatIfc.XML : FormatIfc.STEP;
+			if (fileName.EndsWith("json"))
+				format = FormatIfc.JSON;
 #if (!NOIFCZIP)
-			if (string.Compare(ext, ".IFCZIP", true) == 0)
+			if (fileName.ToLower().EndsWith("zip"))
 			{
 				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
 				if (za.Entries.Count != 1)
 				{
 					return null;
 				}
-				return new StreamReader(za.Entries[0].Open(), System.Text.Encoding.GetEncoding("windows-1252"));
+				string filename = za.Entries[0].Name.ToLower();
+				format = filename.EndsWith("xml") ? FormatIfc.XML : FormatIfc.STEP;
+				if (filename.EndsWith("json"))
+					format = FormatIfc.JSON;
+				StreamReader str = (format == FormatIfc.STEP ? new StreamReader(za.Entries[0].Open(), System.Text.Encoding.GetEncoding("windows-1252")) :
+					new StreamReader(za.Entries[0].Open()));
+				return new FileStreamIfc(format,str);
 			}
 #endif
-			FileName = fileName;
-			FolderPath = Path.GetDirectoryName(fileName);
-			return new StreamReader(fileName, System.Text.Encoding.GetEncoding("windows-1252"));
+			StreamReader sr = format == FormatIfc.STEP ? new StreamReader(fileName, System.Text.Encoding.GetEncoding("windows-1252")) :
+				new StreamReader(fileName);
+			return new FileStreamIfc(format, sr);
 		}
 
-		private IfcContext ReadFile(TextReader sr, Aggregate aggregate, int offset)
+		internal void ReadFile(string filename) { ReadFile(getStreamReader(filename)); }
+		internal void ReadFile(FileStreamIfc fs)
+		{
+			if (fs == null)
+				return;
+			switch (fs.mFormat)
+			{
+				case FormatIfc.XML:
+					ReadXMLStream(fs.mStreamReader);
+					break;
+				case FormatIfc.JSON:
+#if (IFCJSON)
+					ReadJSONFile(fs.mStreamReader);
+					break;
+#else
+					logError("IfcJSON not enabled!");
+					return;
+#endif
+				default:
+					ReadFile(fs.mStreamReader, 0);
+					break;
+			}
+			if (mContext != null)
+			{
+				mContext.initializeUnitsAndScales();
+
+				if (mContext.mRepresentationContexts.Count > 0)
+					mFactory.mGeomRepContxt = mIfcObjects[mContext.mRepresentationContexts[0]] as IfcGeometricRepresentationContext;
+				
+			}
+		}
+		private IfcContext ReadFile(TextReader sr, int offset)
 		{
 			mRelease = ReleaseVersion.IFC2x3;
-			bool ownerHistory = mOptions.mGenerateOwnerHistory;
-			mOptions.mGenerateOwnerHistory = false;
+			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
+			mFactory.Options.GenerateOwnerHistory = false;
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			string strLine = sr.ReadLine(), str = "";
@@ -939,7 +330,7 @@ null, types, null);
 					strLine = ParserSTEP.offsetSTEPRecords(strLine, offset);
 					try
 					{
-						InterpretLine(strLine, aggregate);
+						InterpretLine(strLine);
 					}
 					catch (Exception ex) { logError("XXX Error in line " + strLine + " " + ex.Message); }
 					strLine = sr.ReadLine();
@@ -1003,40 +394,36 @@ null, types, null);
 					}
 					try
 					{
-						InterpretLine(strLine, aggregate);
+						InterpretLine(strLine);
 					}
 					catch (Exception ex) { logError("XXX Error in line " + strLine + " " + ex.Message); }
 					strLine = sr.ReadLine();
 				}
 			}
 			sr.Close();
-			Thread.CurrentThread.CurrentCulture = current; 
-			postImport(aggregate);
-			mOptions.mGenerateOwnerHistory = ownerHistory;
+			Thread.CurrentThread.CurrentCulture = current;
+			postImport();	
+			Factory.Options.GenerateOwnerHistory = ownerHistory;
 			return mContext;
 		}
 
-		partial void customPostImport(Aggregate aggregate);
-		private void postImport(Aggregate aggregate) 
+		//partial void customPostImport();
+		private void postImport() 
 		{
 			//mWorldCoordinatePlacement = null;
-			aggregate.RelateObjects(FolderPath);
-			if(mContext != null)
+			for(int icounter = 1; icounter < RecordCount; icounter++)
 			{
-				mContext.initializeUnitsAndScales();
+				BaseClassIfc obj = this[icounter];
+				if (obj == null)
+					continue;
+					obj.postParseRelate();
 				
-				if (mContext.mRepresentationContexts.Count > 0)
-					mGeomRepContxt = mIfcObjects[mContext.mRepresentationContexts[0]] as IfcGeometricRepresentationContext;
-				if (mContext.mDeclares.Count == 0)
-				{
-					List<IfcDefinitionSelect> lds = aggregate.mTypeObjects.ConvertAll(x => (IfcDefinitionSelect)x);
-					IfcRelDeclares rd = new IfcRelDeclares(mContext, lds) { Name = "DeclaredTypes" };
-				}
 			}
-			customPostImport(aggregate);
 			
+			//	customPostImport();
+
 		}
-		internal BaseClassIfc InterpretLine(string line,Aggregate aggregate)
+		internal BaseClassIfc InterpretLine(string line)
 		{
 			if (line.StartsWith("ISO"))
 				return null;
@@ -1063,7 +450,7 @@ null, types, null);
 			IfcApplication application = result as IfcApplication;
 			if (application != null)
 			{
-				IfcApplication ea = mApplication;
+				IfcApplication ea = mFactory.mApplication;
 				if (ea != null && ea.mVersion == application.mVersion)
 				{
 					if (string.Compare(ea.ApplicationFullName, application.ApplicationFullName, true) == 0)
@@ -1071,10 +458,10 @@ null, types, null);
 						if (string.Compare(ea.mApplicationIdentifier, application.mApplicationIdentifier) == 0)
 						{
 							mIfcObjects[ea.mIndex] = null;
-							mApplication = application;
-							OwnerHistory(IfcChangeActionEnum.ADDED).mLastModifyingApplication = application.mIndex;
-							if (mOwnerHistoryModify != null)
-								mOwnerHistoryModify.mLastModifyingApplication = application.mIndex;
+							mFactory.mApplication = application;
+							mFactory.OwnerHistory(IfcChangeActionEnum.ADDED).mLastModifyingApplication = application.mIndex;
+							if (mFactory.mOwnerHistoryModify != null)
+								mFactory.mOwnerHistoryModify.mLastModifyingApplication = application.mIndex;
 						}
 					}
 				}
@@ -1086,7 +473,7 @@ null, types, null);
 			if (geometricRepresentationContext != null)
 			{
 				if (string.Compare(geometricRepresentationContext.mContextType, "Plan", true) != 0)
-					mGeomRepContxt = geometricRepresentationContext;
+					mFactory.mGeomRepContxt = geometricRepresentationContext;
 				if (geometricRepresentationContext.mPrecision > 1e-6)
 					Tolerance = geometricRepresentationContext.mPrecision;
 
@@ -1095,13 +482,12 @@ null, types, null);
 			if(unit != null)
 			{
 				if (unit.Name == IfcSIUnitName.METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mSILength = unit;
+					mFactory.mSILength = unit;
 				else if (unit.Name == IfcSIUnitName.SQUARE_METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mSIArea = unit;
+					mFactory.mSIArea = unit;
 				else if (unit.Name == IfcSIUnitName.CUBIC_METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mSIVolume = unit;
+					mFactory.mSIVolume = unit;
 			}
-			aggregate.setAggregate(result);
 			this[result.mIndex] = result;	
 			
 			//IfcWorkPlan workPlan = result as IfcWorkPlan;
@@ -1118,6 +504,19 @@ null, types, null);
 			StreamWriter sw = null;
 			FolderPath = Path.GetDirectoryName(filename);
 			FileName = filename;
+			if(filename.EndsWith("xml"))
+			{
+				WriteXMLFile(filename);
+				return true;
+			}
+#if (IFCJSON)
+			else if(filename.EndsWith("json"))
+			{
+				WriteJSONFile(filename);
+				return true;
+			}
+
+#endif
 #if (!NOIFCZIP)
 			bool zip = filename.EndsWith(".ifczip");
 			System.IO.Compression.ZipArchive za = null;
@@ -1131,7 +530,7 @@ null, types, null);
 			}
 			else
 #endif
-				sw = new StreamWriter(filename);
+			sw = new StreamWriter(filename);
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			sw.Write(getHeaderString(filename) + "\r\n");
@@ -1148,12 +547,341 @@ null, types, null);
 			sw.Write(getFooterString());
 			sw.Close();
 			Thread.CurrentThread.CurrentUICulture = current;
-#if(!NOIFCZIP)
+#if (!NOIFCZIP)
 			if (zip)
 				za.Dispose();
 #endif
 			return true;
 		}
+	}
+
+	public partial class FactoryIfc
+	{
+		private DatabaseIfc mDatabase = null;
+		internal FactoryIfc(DatabaseIfc db) { mDatabase = db; }
+
+		public partial class GenerateOptions
+		{
+			public bool GenerateOwnerHistory { get; set; } = true;
+			
+		}
+		internal GenerateOptions mOptions = new GenerateOptions();
+		public GenerateOptions Options { get { return mOptions; } }
+
+		internal Dictionary<int, int> mDuplicateMapping = new Dictionary<int, int>();
+		internal BaseClassIfc Duplicate(BaseClassIfc entity) { return Duplicate(entity, true); }
+		internal BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
+		{
+			if (mDuplicateMapping.ContainsKey(entity.mIndex))
+				return mDatabase[mDuplicateMapping[entity.mIndex]];
+			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
+			if (type != null)
+			{
+				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };
+				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+null, types, null);
+				if (constructor != null)
+				{
+					BaseClassIfc result = constructor.Invoke(new object[] { this, entity, downStream }) as BaseClassIfc;
+					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
+					return result;
+				}
+				types = new Type[] { typeof(DatabaseIfc), type };
+				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+null, types, null);
+				if (constructor != null)
+				{
+					BaseClassIfc result = constructor.Invoke(new object[] { this, entity }) as BaseClassIfc;
+					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
+					return result;
+				}
+			}
+			return null;
+		}
+
+		internal void initData()
+		{
+			initGeom();
+			mSILength = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE);
+			mSIArea = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SQUARE_METRE);
+			mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE);
+		}
+		internal void initGeom()
+		{
+			IfcCartesianPoint point = Origin;
+			IfcDirection direction = XAxis;
+			direction = YAxis;
+			direction = ZAxis;
+			IfcAxis2Placement3D pl = this.PlaneXYPlacement;
+			//IfcAxis2Placement pl = this.WorldCoordinatePlacement;
+			IfcAxis2Placement2D placement = Origin2dPlace;
+		}
+
+		private IfcCartesianPoint mOrigin = null, mWorldOrigin = null, mOrigin2d = null;
+		//internal int mTempWorldCoordinatePlacement = 0;
+		//private IfcAxis2Placement3D mWorldCoordinatePlacement;
+		internal IfcAxis2Placement3D mPlacementPlaneXY;
+		internal IfcAxis2Placement2D m2DPlaceOrigin;
+		internal IfcSIUnit mSILength, mSIArea, mSIVolume;
+		public IfcSIUnit SILength { get { if(mSILength == null) mSILength = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE); return mSILength; } }
+		public IfcSIUnit SIArea { get { if(mSIArea == null) mSIArea = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SQUARE_METRE); return mSIArea; } }
+		public IfcSIUnit SIVolume { get { if(mSIVolume == null) mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE); return mSIVolume; } }
+
+		internal IfcDirection mXAxis, mYAxis, mZAxis;
+
+		public IfcDirection XAxis { get { if (mXAxis == null) mXAxis = new IfcDirection(mDatabase, 1, 0, 0); return mXAxis; } }
+		public IfcDirection YAxis { get { if (mYAxis == null) mYAxis = new IfcDirection(mDatabase, 0, 1, 0); return mYAxis; } }
+		public IfcDirection ZAxis { get { if (mZAxis == null) mZAxis = new IfcDirection(mDatabase, 0, 0, 1); return mZAxis; } }
+
+		internal IfcGeometricRepresentationContext mGeomRepContxt;
+
+		partial void getApplicationFullName(ref string app);
+		partial void getApplicationIdentifier(ref string app);
+		partial void getApplicationDeveloper(ref string app);
+
+		private string mApplicationFullName = "", mApplicationIdentifier = "", mApplicationDeveloper = "";
+		public string ApplicationFullName
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(mApplicationFullName))
+				{
+					getApplicationFullName(ref mApplicationFullName);
+					if (string.IsNullOrEmpty(mApplicationFullName))
+					{
+						try
+						{
+							Assembly assembly = Assembly.GetExecutingAssembly();
+							AssemblyName name = assembly.GetName();
+							return name.Name;
+						}
+						catch (Exception) { return "Unknown Application"; }
+					}
+				}
+				return mApplicationFullName;
+			}
+			set { mApplicationFullName = value; }
+		}
+		public string ApplicationIdentifier
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(mApplicationIdentifier))
+				{
+					getApplicationIdentifier(ref mApplicationIdentifier);
+					if (string.IsNullOrEmpty(mApplicationIdentifier))
+						return ApplicationFullName;
+				}
+				return mApplicationIdentifier;
+			}
+			set { mApplicationIdentifier = value; }
+		}
+		public string ApplicationDeveloper
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(mApplicationDeveloper))
+					getApplicationDeveloper(ref mApplicationDeveloper);
+				return (string.IsNullOrEmpty(mApplicationDeveloper) ? "Unknown" : mApplicationDeveloper);
+			}
+			set { mApplicationDeveloper = value; }
+		}
+
+
+		internal IfcApplication mApplication = null;
+		internal IfcApplication Application
+		{
+			get
+			{
+				if (mApplication == null)
+					mApplication = new IfcApplication(mDatabase);
+				return mApplication;
+			}
+		}
+		private IfcPersonAndOrganization mPersonOrganization = null;
+		internal IfcPersonAndOrganization PersonOrganization
+		{
+			get
+			{
+				if (mPersonOrganization == null)
+					mPersonOrganization = new IfcPersonAndOrganization(Person, Organization);
+				return mPersonOrganization;
+			}
+		}
+		private IfcPerson mPerson = null;
+		internal IfcPerson Person
+		{
+			get
+			{
+				if (mPerson == null)
+				{
+					mPerson = new IfcPerson(mDatabase, System.Environment.UserName.Replace("'", ""), "", "");
+#if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
+			string str = GGYM.ggAssembly.mOptions.OwnerRole;
+			if (!string.IsNullOrEmpty(str))
+			{
+				IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcRoleEnum>(str, out role))
+				{
+					if (role != IfcRoleEnum.NOTDEFINED)
+						mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(mDatabase, role, "", "", new List<int>()) };
+				}
+				else
+					mPerson.Roles = new List<IfcActorRole>() { new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()) };
+			}
+#endif
+				}
+				return mPerson;
+			}
+
+		}
+		private IfcOrganization mOrganization = null;
+		internal IfcOrganization Organization
+		{
+			get
+			{
+				if (mOrganization == null)
+					mOrganization = new IfcOrganization(mDatabase, IfcOrganization.Organization);
+				return mOrganization;
+			}
+
+		}
+		internal IfcOwnerHistory mOwnerHistoryCreate, mOwnerHistoryModify, mOwnerHistoryDelete;
+		internal IfcOwnerHistory OwnerHistory(IfcChangeActionEnum changeAction)
+		{
+			if (changeAction == IfcChangeActionEnum.ADDED)
+			{
+				if (mOwnerHistoryCreate == null)
+					mOwnerHistoryCreate = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);
+				return mOwnerHistoryCreate;
+			}
+			if (changeAction == IfcChangeActionEnum.DELETED)
+			{
+				if (mOwnerHistoryDelete == null)
+					mOwnerHistoryDelete = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.DELETED);
+				return mOwnerHistoryDelete;
+			}
+			if (changeAction == IfcChangeActionEnum.MODIFIED)
+			{
+				if (mOwnerHistoryModify == null)
+					mOwnerHistoryModify = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.MODIFIED);
+				return mOwnerHistoryModify;
+			}
+			return null;
+		}
+
+		public enum SubContextIdentifier { Axis, Body, Surface, PlanSymbol };
+		public IfcGeometricRepresentationSubContext SubContext(SubContextIdentifier nature)
+		{
+			if (nature == SubContextIdentifier.Axis)
+			{
+				if (mSubContxtAxis == null)
+					mSubContxtAxis = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
+				return mSubContxtAxis;
+			}
+			else if (nature == SubContextIdentifier.PlanSymbol)
+			{
+				if (mSubContxtPlanSymbol == null)
+					mSubContxtPlanSymbol = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.PLAN_VIEW) { ContextIdentifier = "Annotation" };
+				return mSubContxtPlanSymbol;
+			}
+			if (mSubContxtBody == null)
+				mSubContxtBody = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
+			return mSubContxtBody;
+
+		}
+		private IfcGeometricRepresentationSubContext mSubContxtBody = null, mSubContxtAxis = null, mSubContxtPlanSymbol = null;
+
+		internal IfcAxis2Placement2D Origin2dPlace
+		{
+			get
+			{
+				if (m2DPlaceOrigin == null)
+					m2DPlaceOrigin = new IfcAxis2Placement2D(new IfcCartesianPoint(mDatabase, 0, 0));
+				return m2DPlaceOrigin;
+			}
+		}
+		//internal IfcCartesianPoint WorldOrigin
+		//{
+		//	get
+		//	{
+		//		if(mWorldOrigin == null)
+		//			mWorldOrigin = WorldCoordinatePlacement.Location;
+		//		return mWorldOrigin;
+		//	}
+		//}
+		internal IfcCartesianPoint Origin2d
+		{
+			get
+			{
+				if (mOrigin2d == null)
+					mOrigin2d = new IfcCartesianPoint(mDatabase, 0, 0);
+				return mOrigin2d;
+			}
+		}
+		//internal IfcAxis2Placement3D WorldCoordinatePlacement
+		//{
+		//	get
+		//	{
+		//		if (mWorldCoordinatePlacement == null)
+		//		{
+		//			if (mContext != null)
+		//			{
+		//				List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
+		//				foreach (IfcRepresentationContext context in contexts)
+		//				{
+		//					IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
+		//					if (grc == null)
+		//						continue;
+		//					IfcAxis2Placement3D pl = grc.WorldCoordinateSystem as IfcAxis2Placement3D;
+		//					if (pl != null)
+		//					{
+		//						mWorldCoordinatePlacement = pl;
+		//						break;
+		//					}
+		//				}
+		//			}
+		//			if (mWorldCoordinatePlacement == null)
+		//			{
+		//				mWorldCoordinatePlacement = new IfcAxis2Placement3D(new IfcCartesianPoint(this, 0, 0, 0), mZAxis, mXAxis);
+		//				if (mContext != null)
+		//				{
+		//					List<IfcRepresentationContext> contexts = mContext.RepresentationContexts;
+		//					foreach (IfcRepresentationContext context in contexts)
+		//					{
+		//						IfcGeometricRepresentationContext grc = context as IfcGeometricRepresentationContext;
+		//						if (grc != null)
+		//						{
+		//							grc.WorldCoordinateSystem = mWorldCoordinatePlacement;
+		//							return mWorldCoordinatePlacement;
+		//						}
+		//					}
+		//				}
+		//			}
+		//		}
+		//		return mWorldCoordinatePlacement;
+		//	}
+		//}
+		internal IfcAxis2Placement3D PlaneXYPlacement
+		{
+			get
+			{
+				if (mPlacementPlaneXY == null)
+					mPlacementPlaneXY = new IfcAxis2Placement3D(Origin);
+				return mPlacementPlaneXY;
+			}
+		}
+		internal IfcCartesianPoint Origin
+		{
+			get
+			{
+				if (mOrigin == null)
+					mOrigin = new IfcCartesianPoint(mDatabase, 0, 0, 0);
+				return mOrigin;
+			}
+		}
+		
+
 	}
 }
 

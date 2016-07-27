@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcGeometricCurveSet() : base() { }
 		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s) : base(db,s) { }
-		internal IfcGeometricCurveSet(List<IfcGeometricSetSelect> set) : base(set)
+		public IfcGeometricCurveSet(List<IfcGeometricSetSelect> set) : base(set)
 		{
 			for (int icounter = 0; icounter < set.Count; icounter++)
 			{
@@ -184,12 +184,12 @@ namespace GeometryGym.Ifc
 		{
 			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
 			mPrecision = c.mPrecision;
-			WorldCoordinateSystem = db.Duplicate(c.mDatabase[ c.mWorldCoordinateSystem]) as IfcAxis2Placement;
+			WorldCoordinateSystem = db.Factory.Duplicate(c.mDatabase[ c.mWorldCoordinateSystem]) as IfcAxis2Placement;
 			if (c.mTrueNorth > 0)
-				TrueNorth = db.Duplicate(c.TrueNorth) as IfcDirection;
+				TrueNorth = db.Factory.Duplicate(c.TrueNorth) as IfcDirection;
 
 			foreach (IfcGeometricRepresentationSubContext sc in mHasSubContexts)
-				db.Duplicate(sc);
+				db.Factory.Duplicate(sc);
 		}
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
@@ -213,7 +213,7 @@ namespace GeometryGym.Ifc
 			if (this as IfcGeometricRepresentationSubContext != null)
 				return base.BuildStringSTEP() + ",*,*,*,*";
 			
-			return base.BuildStringSTEP() + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleToString(mPrecision)) + "," + ParserSTEP.LinkToString(mWorldCoordinateSystem) + "," + ParserSTEP.LinkToString(mTrueNorth);
+			return base.BuildStringSTEP() + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleOptionalToString(mPrecision)) + "," + ParserSTEP.LinkToString(mWorldCoordinateSystem) + "," + ParserSTEP.LinkToString(mTrueNorth);
 		}
 		internal static IfcGeometricRepresentationContext Parse(string strDef) { IfcGeometricRepresentationContext c = new IfcGeometricRepresentationContext(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
@@ -246,7 +246,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeometricRepresentationSubContext() : base() { }
 		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s) : base(db, s)
 		{
-			ContainerContext = db.Duplicate(s.ContainerContext) as IfcGeometricRepresentationContext;
+			ContainerContext = db.Factory.Duplicate(s.ContainerContext) as IfcGeometricRepresentationContext;
 
 			mTargetScale = s.mTargetScale;
 			mTargetView = s.mTargetView;
@@ -269,14 +269,10 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mContainerContext) + (double.IsNaN(mTargetScale) || mTargetScale <=0 ? ",$,." : "," + ParserSTEP.DoubleOptionalToString(mTargetScale) + ",.") + mTargetView.ToString() + (mUserDefinedTargetView == "$" ?  ".,$" : ".,'" + mUserDefinedTargetView + "'"); }
 		internal new static IfcGeometricRepresentationSubContext Parse(string strDef) { IfcGeometricRepresentationSubContext c = new IfcGeometricRepresentationSubContext(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
-		internal void relate()
+		internal override void postParseRelate()
 		{
-			IfcGeometricRepresentationContext gc = ContainerContext;
-			if (gc != null)
-			{
-				mActive = gc.Active;
-				gc.HasSubContexts.Add(this);
-			}
+			base.postParseRelate();
+			ContainerContext.HasSubContexts.Add(this);
 		}
 	}
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
@@ -285,8 +281,8 @@ namespace GeometryGym.Ifc
 		public List<IfcGeometricSetSelect> Elements { get { return mElements.ConvertAll(x => mDatabase[x] as IfcGeometricSetSelect); } set { mElements = value.ConvertAll(x => x.Index); } }
 
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { Elements = s.mElements.ConvertAll(x=>db.Duplicate(s.mDatabase[x]) as IfcGeometricSetSelect); }
-		internal IfcGeometricSet(List<IfcGeometricSetSelect> set) : base(set[0].Database) { mElements = set.ConvertAll(x => x.Index); }
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { Elements = s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x]) as IfcGeometricSetSelect); }
+		public IfcGeometricSet(List<IfcGeometricSetSelect> set) : base(set[0].Database) { mElements = set.ConvertAll(x => x.Index); }
 		protected override string BuildStringSTEP()
 		{
 			if (mElements.Count == 0)
@@ -318,9 +314,9 @@ namespace GeometryGym.Ifc
 		internal IfcGrid() : base() { }
 		internal IfcGrid(DatabaseIfc db, IfcGrid g) : base(db, g)
 		{
-			UAxes = g.UAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
-			VAxes = g.VAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
-			WAxes = g.WAxes.ConvertAll(x => db.Duplicate(x) as IfcGridAxis);
+			UAxes = g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
+			VAxes = g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
+			WAxes = g.WAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
 			mPredefinedType = g.mPredefinedType;
 		}
 
@@ -373,6 +369,20 @@ namespace GeometryGym.Ifc
 		internal void RemoveUAxis(IfcGridAxis a) { mUAxes.Remove(a.mIndex); a.mPartOfU = null; }
 		internal void RemoveVAxis(IfcGridAxis a) { mVAxes.Remove(a.mIndex); a.mPartOfV = null; }
 		internal void RemoveWAxis(IfcGridAxis a) { mWAxes.Remove(a.mIndex); a.mPartOfW = null; }
+
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			List<IfcGridAxis> axes = UAxes;
+			for (int icounter = 0; icounter < axes.Count; icounter++)
+				axes[icounter].mPartOfU = this;
+			axes = VAxes;
+			for (int icounter = 0; icounter < axes.Count; icounter++)
+				axes[icounter].mPartOfV = this;
+			axes = WAxes;
+			for (int icounter = 0; icounter < axes.Count; icounter++)
+				axes[icounter].mPartOfW = this;
+		}
 	}
 	public partial class IfcGridAxis : BaseClassIfc
 	{
@@ -388,10 +398,10 @@ namespace GeometryGym.Ifc
 
 		public override string Name { get { return AxisTag; } set { AxisTag = value; } }
 		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public IfcCurve AxisCurve { get { return mDatabase[mAxisCurve] as IfcCurve; } }
+		public IfcCurve AxisCurve { get { return mDatabase[mAxisCurve] as IfcCurve; } set { mAxisCurve = value.mIndex; } }
 
 		internal IfcGridAxis() : base() { }
-		internal IfcGridAxis(IfcGridAxis p) : base() { mAxisTag = p.mAxisTag; mAxisCurve = p.mAxisCurve; mSameSense = p.mSameSense; }
+		internal IfcGridAxis(DatabaseIfc db, IfcGridAxis a) : base(db) { mAxisTag = a.mAxisTag; AxisCurve = db.Factory.Duplicate(a.AxisCurve) as IfcCurve; mSameSense = a.mSameSense; }
 		internal IfcGridAxis(DatabaseIfc m, string tag, IfcCurve axis, bool sameSense) : base(m) { if (!string.IsNullOrEmpty(tag)) mAxisTag = tag.Replace("'", ""); mAxisCurve = axis.mIndex; mSameSense = sameSense; }
 		internal static IfcGridAxis Parse(string strDef) { IfcGridAxis a = new IfcGridAxis(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcGridAxis a, List<string> arrFields, ref int ipos) { a.mAxisTag = arrFields[ipos++].Replace("'", ""); a.mAxisCurve = ParserSTEP.ParseLink(arrFields[ipos++]); a.mSameSense = ParserSTEP.ParseBool(arrFields[ipos++]); }

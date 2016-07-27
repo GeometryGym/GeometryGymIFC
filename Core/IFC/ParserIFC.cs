@@ -266,57 +266,65 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcDerivedMeasureValue parseDerivedMeasureValue(string str)
 		{
-			int len = str.Length;
-			if (str.EndsWith(")"))
-				len--;
-			int icounter = 0;
-			char c = str[icounter];
-			while (!char.IsDigit(c) && icounter < str.Length)
-				c = str[icounter++];
-			if (icounter == str.Length)
-				return null;
-			icounter--;
-			if (icounter > 1)
+			try
 			{
-				string kw = str.Substring(0, icounter - 1);
-				double val = 0;
-				if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+				int len = str.Length;
+				if (str.EndsWith(")"))
+					len--;
+				int icounter = 0;
+				char c = str[icounter];
+				while (!char.IsDigit(c) && icounter < str.Length)
+					c = str[icounter++];
+				if (icounter == str.Length)
+					return null;
+				icounter--;
+				if (icounter > 1)
 				{
-					Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
-					if (type != null)
+					string kw = str.Substring(0, icounter - 1);
+					double val = 0;
+					if (double.TryParse(str.Substring(icounter, len - icounter), out val))
 					{
-						Type[] types = new Type[] { typeof(double) };
-						ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-		null, types, null);
-						if (constructor != null)
-							return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
+						Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
+						if (type != null)
+						{
+							Type[] types = new Type[] { typeof(double) };
+							ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+			null, types, null);
+							if (constructor != null)
+								return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
+						}
 					}
 				}
 			}
+			catch(Exception) { }
 			return null;
 		}
 		internal static IfcMeasureValue parseMeasureValue(string str)
 		{
-			int len = str.Length;
-			if (str.EndsWith(")"))
-				len--;
-			int icounter = 0;
-			char c = str[icounter];
-			while (!char.IsDigit(c) && c != '-' && c != '.' && icounter < str.Length)
-				c = str[icounter++];
-			if (icounter == str.Length)
-				return null;
-			icounter--;
-			if (icounter > 1)
+			try
 			{
-				string kw = str.Substring(0, icounter - 1);
-				Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
-				if (type != null)
+				int len = str.Length;
+				if (str.EndsWith(")"))
+					len--;
+				int icounter = 0;
+				char c = str[icounter];
+				while (!char.IsDigit(c) && c != '-' && c != '.' && icounter < str.Length)
+					c = str[icounter++];
+				if (icounter == str.Length)
+					return null;
+				icounter--;
+				if (icounter > 1)
 				{
-					if(type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
-						return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+					string kw = str.Substring(0, icounter - 1);
+					Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
+					if (type != null)
+					{
+						if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+							return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+					}
 				}
 			}
+			catch(Exception) { }
 			return null;
 		}
 		internal static IfcMeasureValue extractMeasureValue(Type type, string value)
