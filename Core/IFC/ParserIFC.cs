@@ -35,14 +35,34 @@ namespace GeometryGym.Ifc
 		public static string Encode(string str)
 		{
 			string result = "";
-			for (int icounter = 0; icounter < str.Length; icounter++)
+			int length = str.Length;
+			for (int icounter = 0; icounter < length; icounter++)
 			{
 				char c = str[icounter];
-				int i = (int)c;
-				if(i < 32 || i > 126)
-					result +=  "\\X2\\" + string.Format("{0:x4}", i).ToUpper() + "\\X0\\";
+				if (c == '\r')
+				{
+					if(icounter + 1 < length)
+					{
+						if (str[icounter + 1] == '\n' && icounter + 2 == length)
+							return result;
+					}
+					continue;
+				}
+				if(c == '\n')
+				{
+					if (icounter + 1 == length)
+						return result;
+				}
+				if (c == '\'')
+					result += "''";
 				else
-					result += c;
+				{
+					int i = (int)c;
+					if (i < 32 || i > 126)
+						result += "\\X2\\" + string.Format("{0:x4}", i).ToUpper() + "\\X0\\";
+					else
+						result += c;
+				}
 			}
 			return result;
 		}
@@ -53,9 +73,14 @@ namespace GeometryGym.Ifc
 			while (icounter < ilast)
 			{
 				char c = str[icounter];
+				if(c == '\'')
+				{
+					if (icounter + 1 < ilast && str[icounter] == '\'')
+						icounter++;
+				}
 				if (c == '\\')
 				{
-					if (str[icounter + 2] == '\\')
+					if (icounter + 3 < ilast && str[icounter + 2] == '\\')
 					{
 						if (str[icounter + 1] == 'S')
 						{
@@ -96,7 +121,7 @@ namespace GeometryGym.Ifc
 			}
 			while (icounter < str.Length)
 				result += str[icounter++];
-			return result;
+			return result;	
 		}
 
 		public static IfcLogicalEnum ParseIFCLogical(string str) 

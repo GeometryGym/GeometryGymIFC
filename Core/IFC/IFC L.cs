@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		public IfcLaborResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcLaborResource() : base() { }
-		internal IfcLaborResource(IfcLaborResource o) : base(o) { mPredefinedType = o.mPredefinedType; }
+		internal IfcLaborResource(DatabaseIfc db, IfcLaborResource r) : base(db,r) { mPredefinedType = r.mPredefinedType; }
 		internal IfcLaborResource(DatabaseIfc db) : base(db) { }
 		internal static IfcLaborResource Parse(string strDef, ReleaseVersion schema) { IfcLaborResource r = new IfcLaborResource(); int ipos = 0; parseFields(r, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return r; }
 		internal static void parseFields(IfcLaborResource r, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 		internal IfcTimeOrRatioSelect mLagValue;//	IfcTimeOrRatioSelect
 		internal IfcTaskDurationEnum mDurationType = IfcTaskDurationEnum.NOTDEFINED;//	IfcTaskDurationEnum; 
 		internal IfcLagTime() : base() { }
-		internal IfcLagTime(IfcLagTime i) : base(i) { mLagValue = i.mLagValue; mDurationType = i.mDurationType; }
+		//internal IfcLagTime(IfcLagTime i) : base(i) { mLagValue = i.mLagValue; mDurationType = i.mDurationType; }
 		internal IfcLagTime(DatabaseIfc db,  IfcTimeOrRatioSelect lag, IfcTaskDurationEnum nature) : base(db) { mLagValue = lag; mDurationType = nature; }
 		internal static IfcLagTime Parse(string strDef) { IfcLagTime f = new IfcLagTime(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
 		internal static void parseFields(IfcLagTime f, List<string> arrFields, ref int ipos) { IfcSchedulingTime.parseFields(f, arrFields, ref ipos); }
@@ -424,6 +424,12 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcLocalPlacement() : base() { }
+		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
+		{
+			if (p.mPlacementRelTo > 0)
+				PlacementRelTo = db.Factory.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
+			RelativePlacement = db.Factory.Duplicate(p.mDatabase[p.mRelativePlacement]) as IfcAxis2Placement;
+		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)
 		{
@@ -433,12 +439,7 @@ namespace GeometryGym.Ifc
 				relativeTo.mReferencedByPlacements.Add(this);
 			}
 		}
-		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
-		{
-			if (p.mPlacementRelTo > 0)
-				PlacementRelTo = db.Factory.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
-			RelativePlacement = db.Factory.Duplicate(p.mDatabase[p.mRelativePlacement]) as IfcAxis2Placement;
-		}
+		
 		internal static IfcLocalPlacement Parse(string strDef) { IfcLocalPlacement p = new IfcLocalPlacement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcLocalPlacement p, List<string> arrFields, ref int ipos) { IfcObjectPlacement.parseFields(p, arrFields, ref ipos); p.mPlacementRelTo = ParserSTEP.ParseLink(arrFields[ipos++]); p.mRelativePlacement = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -466,7 +467,7 @@ namespace GeometryGym.Ifc
 		public IfcCoordinatedUniversalTimeOffset Zone { get { return mDatabase[mZone] as IfcCoordinatedUniversalTimeOffset; } set { mZone = (value == null ? 0 : value.mIndex); } }
 		public int DaylightSavingOffset { get { return mDaylightSavingOffset; } set { mDaylightSavingOffset = value; } }
 		internal IfcLocalTime() : base() { }
-		internal IfcLocalTime(IfcLocalTime t) : base()
+		internal IfcLocalTime(DatabaseIfc db, IfcLocalTime t) : base(db,t)
 		{
 			mHourComponent = t.mHourComponent;
 			mMinuteComponent = t.mMinuteComponent;

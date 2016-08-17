@@ -29,6 +29,13 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcBoundedCurve
 	{
+		public override Curve Curve
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+		}
 		public static IfcBoundedCurve ConvertRhinoCommonCurve(DatabaseIfc db, Curve crv)
 		{
 			double tol = db.Tolerance, angTol = Math.PI / 1800;
@@ -178,10 +185,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcBSplineCurveWithKnots
 	{
 		public IfcBSplineCurveWithKnots(DatabaseIfc db, int degree, List<Point3d> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
-			base(db, degree, controlPoints.ConvertAll(x=>new IfcCartesianPoint(db, x)), form)
+			base(degree, controlPoints.ConvertAll(x=>new IfcCartesianPoint(db, x)), form)
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
-				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
 			mMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
@@ -194,7 +199,7 @@ namespace GeometryGym.Ifc
 			adoptKnotsAndMultiplicities(nc);
 		}
 		public IfcBSplineCurveWithKnots(DatabaseIfc m, int degree, List<Point2d> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
-			base(m, degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)), form)
+			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)), form)
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
 				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());

@@ -416,6 +416,12 @@ namespace GeometryGym.Ifc
 		public IfcVirtualGridIntersection PlacementRefDirection { get { return mDatabase[mPlacementRefDirection] as IfcVirtualGridIntersection; } set { mPlacementRefDirection = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcGridPlacement() : base() { }
+		internal IfcGridPlacement(DatabaseIfc db, IfcGridPlacement p) : base(db, p)
+		{
+			PlacementLocation = db.Factory.Duplicate(p.PlacementLocation) as IfcVirtualGridIntersection;
+			if (p.mPlacementRefDirection > 0)
+				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcVirtualGridIntersection;
+		}
 		internal static IfcGridPlacement Parse(string strDef) { IfcGridPlacement p = new IfcGridPlacement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcGridPlacement p, List<string> arrFields, ref int ipos) { IfcObjectPlacement.parseFields(p, arrFields, ref ipos); p.mPlacementLocation = ParserSTEP.ParseLink(arrFields[ipos++]); p.mPlacementRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return (mPlacesObject.Count == 0 ? "" : base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementLocation) + "," + ParserSTEP.LinkToString(mPlacementRefDirection)); }
@@ -427,16 +433,13 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAssignsToGroup> IsGroupedBy { get { return mIsGroupedBy; } }
 
 		internal IfcGroup() : base() { }
-		internal IfcGroup(DatabaseIfc db, IfcGroup g) : base(db,g)
-		{
-			
-		}
+		internal IfcGroup(DatabaseIfc db, IfcGroup g) : base(db,g) { }
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; mIsGroupedBy.Add(new IfcRelAssignsToGroup(this)); }
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(this, ods)); }
 
 		internal static IfcGroup Parse(string strDef) { IfcGroup g = new IfcGroup(); int ipos = 0; parseFields(g, ParserSTEP.SplitLineFields(strDef), ref ipos); return g; }
 		internal static void parseFields(IfcGroup g, List<string> arrFields, ref int ipos) { IfcObject.parseFields(g, arrFields, ref ipos); }
 		protected override string BuildStringSTEP() { return (mDatabase.ModelView == ModelView.Ifc2x3Coordination ? "" : base.BuildStringSTEP()); }
-		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].assign(o); }
+		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].AddRelated(o); }
 	}
 }

@@ -252,6 +252,7 @@ namespace GeometryGym.Ifc
 		public IfcRelVoidsElement VoidsElement { get { return mVoidsElement; } }
 
 		protected IfcFeatureElementSubtraction() : base() { }
+		protected IfcFeatureElementSubtraction(DatabaseIfc db, IfcFeatureElementSubtraction s) : base(db,s) { }
 		protected IfcFeatureElementSubtraction(DatabaseIfc db) : base(db) {  }
 		protected IfcFeatureElementSubtraction(IfcElement host, IfcProductRepresentation rep) : base(host.mDatabase)
 		{
@@ -329,7 +330,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mFillStyles = new List<int>();// : SET [1:?] OF IfcFillStyleSelect;
 		internal IfcFillAreaStyle() : base() { }
-		internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
+		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
 		internal IfcFillAreaStyle(DatabaseIfc m, string name) : base(m, name) { }
 		internal static void parseFields(IfcFillAreaStyle s, List<string> arrFields, ref int ipos) { IfcPresentationStyle.parseFields(s, arrFields, ref ipos); s.mFillStyles = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		internal static IfcFillAreaStyle Parse(string strDef) { IfcFillAreaStyle s = new IfcFillAreaStyle(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
@@ -384,6 +385,13 @@ namespace GeometryGym.Ifc
 		public IfcDirection FixedReference { get { return mDatabase[mFixedReference] as IfcDirection; } set { mFixedReference = value.mIndex; } }
 
 		internal IfcFixedReferenceSweptAreaSolid() : base() { }
+		internal IfcFixedReferenceSweptAreaSolid(DatabaseIfc db, IfcFixedReferenceSweptAreaSolid s) : base(db, s)
+		{
+			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
+			mStartParam = s.mStartParam;
+			mEndParam = s.mEndParam;
+			FixedReference = db.Factory.Duplicate(s.FixedReference) as IfcDirection;
+		}
 
 		internal static void parseFields(IfcFixedReferenceSweptAreaSolid s, List<string> arrFields, ref int ipos) { IfcSweptAreaSolid.parseFields(s, arrFields, ref ipos); s.mDirectrix = ParserSTEP.ParseLink(arrFields[ipos++]); s.mStartParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mEndParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mFixedReference = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal static IfcFixedReferenceSweptAreaSolid Parse(string strDef) { IfcFixedReferenceSweptAreaSolid s = new IfcFixedReferenceSweptAreaSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
@@ -594,6 +602,26 @@ namespace GeometryGym.Ifc
 		internal double mPressureSingleValue = double.NaN;// : OPTIONAL IfcPressureMeasure;
 
 		internal IfcFluidFlowProperties() : base() { }
+		internal IfcFluidFlowProperties(DatabaseIfc db, IfcFluidFlowProperties p) : base(db, p)
+		{
+			mPropertySource = p.mPropertySource;
+			//if(p.mFlowConditionTimeSeries > 0)
+			//	mFlowConditionTimeSeries = p.mFlowConditionTimeSeries;
+
+			//mVelocityTimeSeries = p.mVelocityTimeSeries;
+			//mFlowrateTimeSeries = p.mFlowrateTimeSeries;
+			//mFluid = p.mFluid;
+			//mPressureTimeSeries = p.mPressureTimeSeries;
+			mUserDefinedPropertySource = p.mUserDefinedPropertySource;
+			mTemperatureSingleValue = p.mTemperatureSingleValue;
+			mWetBulbTemperatureSingleValue = p.mWetBulbTemperatureSingleValue;
+			//mWetBulbTemperatureTimeSeries = p.mWetBulbTemperatureTimeSeries;
+			//mTemperatureTimeSeries = p.mTemperatureTimeSeries;
+			mFlowrateSingleValue = p.mFlowrateSingleValue;
+			mFlowConditionSingleValue = p.mFlowConditionSingleValue;
+			mVelocitySingleValue = p.mVelocitySingleValue;
+			mPressureSingleValue = p.mPressureSingleValue;
+		}
 		internal IfcFluidFlowProperties(DatabaseIfc db, string name) : base(db, name) { }
 		internal static IfcFluidFlowProperties Parse(string strDef) { IfcFluidFlowProperties p = new IfcFluidFlowProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcFluidFlowProperties p, List<string> arrFields, ref int ipos)
@@ -631,6 +659,7 @@ namespace GeometryGym.Ifc
 		public IfcFootingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcFooting() : base() { }
+		internal IfcFooting(DatabaseIfc db, IfcFooting f) : base(db,f) { mPredefinedType = f.mPredefinedType; }
 		public IfcFooting(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcFooting Parse(string strDef) { IfcFooting f = new IfcFooting(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
@@ -696,7 +725,7 @@ namespace GeometryGym.Ifc
 	internal class IfcFurnitureStandard : IfcControl // DEPRECEATED IFC4
 	{
 		internal IfcFurnitureStandard() : base() { }
-		internal IfcFurnitureStandard(IfcFurnitureStandard i) : base((IfcControl)i) { }
+		internal IfcFurnitureStandard(DatabaseIfc db, IfcFurnitureStandard s) : base(db,s) { }
 		internal static IfcFurnitureStandard Parse(string strDef, ReleaseVersion schema) { IfcFurnitureStandard s = new IfcFurnitureStandard(); int ipos = 0; IfcControl.parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
 	}
 	public partial class IfcFurnitureType : IfcFurnishingElementType

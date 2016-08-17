@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		public string UrlReference { get { return  ParserIfc.Decode(mUrlReference); } set { mUrlReference = ParserIfc.Encode(value); } }
 
 		internal IfcImageTexture() : base() { }
-		internal IfcImageTexture(IfcImageTexture i) : base(i) { mUrlReference = i.mUrlReference; }
+		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t) : base(db,t) { mUrlReference = t.mUrlReference; }
 		public IfcImageTexture(DatabaseIfc db,bool repeatS, bool repeatT, string urlReference) : base(db,repeatS,repeatT) { UrlReference = urlReference; }
 		internal static IfcImageTexture Parse(string strDef, ReleaseVersion schema) { IfcImageTexture t = new IfcImageTexture(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return t; }
 		internal static void parseFields(IfcImageTexture t, List<string> arrFields, ref int ipos,ReleaseVersion schema)
@@ -56,10 +56,10 @@ namespace GeometryGym.Ifc
 		internal List<int> mColourIndex = new List<int>();// : LIST [1:?] OF IfcPositiveInteger;
 
 		public IfcTessellatedFaceSet MappedTo { get { return mDatabase[mMappedTo] as IfcTessellatedFaceSet; } set { mMappedTo = value.mIndex; } }
-		public IfcColourRgbList Colours { get { return mDatabase[mColours] as IfcColourRgbList; } }
+		public IfcColourRgbList Colours { get { return mDatabase[mColours] as IfcColourRgbList; } set { mColours = value.mIndex; } }
 
 		internal IfcIndexedColourMap() : base() { }
-		internal IfcIndexedColourMap(IfcIndexedColourMap v) : base(v) { mMappedTo = v.mMappedTo; mColours = v.mColours; }
+		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db,m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
 			: base(fs.mDatabase) { mMappedTo = fs.mIndex; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
@@ -203,10 +203,11 @@ namespace GeometryGym.Ifc
 		internal int mMappedTo = 0;// : IfcTessellatedFaceSet;
 		internal int mTexCoords = 0;// : IfcTextureVertexList;
 
-		public IfcTessellatedFaceSet MappedTo { get { return mDatabase[mMappedTo] as IfcTessellatedFaceSet; } }
+		public IfcTessellatedFaceSet MappedTo { get { return mDatabase[mMappedTo] as IfcTessellatedFaceSet; } set { mMappedTo = value.mIndex; } }
+		public IfcTextureVertexList TexCoords { get { return mDatabase[mTexCoords] as IfcTextureVertexList; } set { mTexCoords = value.mIndex; } }
 
 		protected IfcIndexedTextureMap() : base() { }
-		protected IfcIndexedTextureMap(IfcIndexedTextureMap m) : base(m) { mMappedTo = m.mMappedTo; mTexCoords = m.mTexCoords; }
+		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; } 
 		//internal IfcIndexedTextureMap(IfcTessellatedFaceSet mappedTo, ifctext) : this(pl, nll, selfIntersect, new List<int>()) { }
 		//internal IfcIndexedTextureMap(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs, IfcLogicalEnum selfIntersect) : this(pl, segs, selfIntersect, new List<int>()) { }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
@@ -228,7 +229,7 @@ namespace GeometryGym.Ifc
 		internal Tuple<int, int, int>[] mTexCoordList = new Tuple<int, int, int>[0];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
 
 		internal IfcIndexedTriangleTextureMap() : base() { }
-		internal IfcIndexedTriangleTextureMap(IfcIndexedTriangleTextureMap c) : base() { mTexCoordList = c.mTexCoordList; }
+		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db,m) { mTexCoordList = m.mTexCoordList; }
 		//public IfcIndexedTriangleTextureMap(DatabaseIfc m, IEnumerable<Tuple<int, int,int>> coords) : base(m) { mTexCoordList = coords.ToArray(); }
 
 		internal static IfcIndexedTriangleTextureMap Parse(string str) { IfcIndexedTriangleTextureMap m = new IfcIndexedTriangleTextureMap(); int pos = 0; m.parseFields(ParserSTEP.SplitLineFields(str), ref pos); return m; }
@@ -330,6 +331,7 @@ namespace GeometryGym.Ifc
 		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcIShapeProfileDef() : base() { }
+		internal IfcIShapeProfileDef(DatabaseIfc db, IfcIShapeProfileDef p) : base(db,p) { mOverallWidth = p.mOverallWidth; mOverallDepth = p.mOverallDepth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mFlangeEdgeRadius = p.mFlangeEdgeRadius; mFlangeSlope = p.mFlangeSlope; }
 		public IfcIShapeProfileDef(DatabaseIfc m, string name, double overallDepth, double overalWidth, double webThickness, double flangeThickness, double filletRadius)
 			: base(m,name) { mOverallDepth = overallDepth; mOverallWidth = overalWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; mFilletRadius = filletRadius; }
 

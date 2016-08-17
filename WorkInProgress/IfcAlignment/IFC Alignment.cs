@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public string LinearRefMethod { get { return (mLinearRefMethod == "$" ? "" : ParserIfc.Decode(mLinearRefMethod)); } set { mLinearRefMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		internal IfcAlignment() : base() { }
-		internal IfcAlignment(IfcAlignment a) : base(a) { mPredefinedType = a.mPredefinedType; mLinearRefMethod = a.mLinearRefMethod; }
+		internal IfcAlignment(DatabaseIfc db, IfcAlignment a) : base(db, a) { mPredefinedType = a.mPredefinedType; mLinearRefMethod = a.mLinearRefMethod; }
 		internal static void parseFields(IfcAlignment a, List<string> arrFields, ref int ipos) 
 		{ 
 			IfcPositioningElement.parseFields(a, arrFields, ref ipos);
@@ -325,7 +325,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{
 		protected IfcPositioningElement() : base() { }
-		protected IfcPositioningElement(IfcPositioningElement q) : base(q) { }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e) : base(db,e) { }
 		protected static void parseFields(IfcPositioningElement p, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(p, arrFields, ref ipos); }
 	}
 }

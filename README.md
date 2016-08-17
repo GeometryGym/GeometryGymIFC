@@ -10,6 +10,8 @@ http://www.buildingsmart-tech.org/ifc/IFC4/Add1/html/ (Browse Alphabetical Listi
 For a list of software/applications supporting IFC interaction, refer to
 http://www.buildingsmart-tech.org/implementation/implementations/plominoview.allapplications
 
+Implementataion of ifcxml is in early stage of development.
+
 Projects to demonstrate the classes include
 https://github.com/jmirtsch/GeometryGymIFCExamples
 https://github.com/BuildingSMART/IfcScript

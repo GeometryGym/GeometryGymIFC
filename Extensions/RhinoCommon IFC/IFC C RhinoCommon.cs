@@ -124,15 +124,29 @@ namespace GeometryGym.Ifc
 				mSegments.Add(new IfcCompositeCurveSegment(db, plc.SegmentCurve(icounter), true, IfcTransitionCode.CONTINUOUS, twoD, curr, out curr).mIndex);
 		}
 	}
+	public partial class IfcCircle : IfcConic
+	{
+		public override Curve Curve { get { return new ArcCurve(Circle); } }
+		public Circle Circle { get { return new Circle(Plane, mRadius); } }
+	}
 	public partial class IfcCompositeCurveSegment
 	{
 		internal IfcCompositeCurveSegment(DatabaseIfc db, Curve c, bool sense, IfcTransitionCode tc, bool twoD, IfcCartesianPoint optStrt, out IfcCartesianPoint end)
-			: this(tc,sense,IfcBoundedCurve.convCurve(db, c, optStrt, twoD, out end)) { }
+			: this(tc, sense, IfcBoundedCurve.convCurve(db, c, optStrt, twoD, out end)) { }
+	}
+	public abstract partial class IfcConic : IfcCurve /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCircle ,IfcEllipse))*/
+	{
+		public Transform Transform { get { return (mPosition > 0 ? Position.Transform : Transform.Translation(0, 0, 0)); } }
+		public Plane Plane { get { return (mPosition > 0 ? Position.Plane : Plane.WorldXY); } }
 	}
 	public partial class IfcConnectionPointEccentricity
 	{
 		internal Vector3d Eccentricity { get { return new Vector3d(mEccentricityInX, mEccentricityInY, mEccentricityInZ); } }
 
 		internal IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, Vector3d ecc) : base(v) { mEccentricityInX = ecc.X; mEccentricityInY = ecc.Y; mEccentricityInZ = ecc.Z; }
+	}
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
+	{
+		public abstract Curve Curve { get; }
 	}
 }

@@ -27,5 +27,43 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcLine : IfcCurve
+	{
+		public override Curve Curve
+		{
+			get
+			{
+				Point3d pt = Pnt.Location;
+				return new LineCurve(pt, pt + Dir.Vector);
+			}
+		}
+	}
+	public partial class IfcLocalPlacement : IfcObjectPlacement
+	{
+		private Transform mtransform = Transform.Unset;
+		public override Transform Transform
+		{
+			get
+			{
+				if (!mCalculated)
+				{
+					mCalculated = true;
+					Plane rel = Plane.WorldXY;
+					Point3d o = new Point3d(), x = new Point3d(1, 0, 0), y = new Point3d(0, 1, 0);
+					IfcObjectPlacement pl = PlacementRelTo;
+					Transform tr = pl == null ? Transform.Identity : pl.Transform;
+					o.Transform(tr);
+					x.Transform(tr);
+					y.Transform(tr);
+					rel = new Plane(o, x - o, y - o);
+
+					IfcAxis2Placement apl = RelativePlacement;
+					Plane pln = (apl == null ? Plane.WorldXY : apl.Plane);
+					mtransform = (rel.IsValid ? Transform.ChangeBasis(rel, Plane.WorldXY) * Transform.ChangeBasis(pln, Plane.WorldXY) :
+						 Transform.ChangeBasis(pln, Plane.WorldXY));
+				}
+				return mtransform;
+			}
+		}
+	} 
 }

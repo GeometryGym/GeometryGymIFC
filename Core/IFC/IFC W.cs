@@ -34,6 +34,7 @@ namespace GeometryGym.Ifc
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWall() : base() { }
+		internal IfcWall(DatabaseIfc db, IfcWall w) : base(db, w) { mPredefinedType = w.mPredefinedType; }
 		public IfcWall(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 
 		internal static IfcWall Parse(string strDef, ReleaseVersion schema) { IfcWall w = new IfcWall(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
@@ -58,6 +59,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcWallStandardCase : IfcWall
 	{
 		internal IfcWallStandardCase() : base() { }
+		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w) : base(db, w) { }
 
 		internal new static IfcWallStandardCase Parse(string strDef, ReleaseVersion schema) { IfcWallStandardCase w = new IfcWallStandardCase(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
 		internal static void parseFields(IfcWallStandardCase w, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcWall.parseFields(w, arrFields, ref ipos,schema); }
@@ -167,6 +169,7 @@ namespace GeometryGym.Ifc
 		public IfcWindowTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWindow() : base() { }
+		internal IfcWindow(DatabaseIfc db, IfcWindow w) : base(db, w) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
 		public IfcWindow(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 
 		internal static IfcWindow Parse(string strDef, ReleaseVersion schema) { IfcWindow w = new IfcWindow(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
@@ -200,7 +203,22 @@ namespace GeometryGym.Ifc
 
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 		internal IfcWindowLiningProperties() : base() { }
-		
+		internal IfcWindowLiningProperties(DatabaseIfc db, IfcWindowLiningProperties p) : base(db, p)
+		{
+			mLiningDepth = p.mLiningDepth;
+			mLiningThickness = p.mLiningThickness;
+			mTransomThickness = p.mTransomThickness;
+			mMullionThickness = p.mMullionThickness;
+			mFirstTransomOffset = p.mFirstTransomOffset;
+			mSecondTransomOffset = p.mSecondTransomOffset;
+			mFirstMullionOffset = p.mFirstMullionOffset;
+			mSecondMullionOffset = p.mSecondMullionOffset;
+			if (p.mShapeAspectStyle > 0)
+				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle) as IfcShapeAspect;
+			mLiningOffset = p.mLiningOffset;
+			mLiningToPanelOffsetX = p.mLiningToPanelOffsetX;
+			mLiningToPanelOffsetY = p.mLiningToPanelOffsetY;
+		}
 		internal IfcWindowLiningProperties(DatabaseIfc m, string name, double lngDpth, double lngThck, double trnsmThck, double mllnThck,
 			double trnsmOffst1, double trnsmOffst2, double mllnOffst1, double mllnOffst2, double lngOffset, double lngToPnlOffstX, double lngToPnlOffstY)
 			: base(m, name)
@@ -255,6 +273,15 @@ namespace GeometryGym.Ifc
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcWindowPanelProperties() : base() { }
+		internal IfcWindowPanelProperties(DatabaseIfc db, IfcWindowPanelProperties p) : base(db, p)
+		{
+			mOperationType = p.mOperationType;
+			mPanelPosition = p.mPanelPosition;
+			mFrameDepth = p.mFrameDepth;
+			mFrameThickness = p.mFrameThickness;
+			if (p.mShapeAspectStyle > 0)
+				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle) as IfcShapeAspect;
+		}
 		internal IfcWindowPanelProperties(DatabaseIfc m, string name, IfcWindowPanelOperationEnum op, IfcWindowPanelPositionEnum panel, double frameDepth, double frameThick)
 			: base(m, name)
 		{
@@ -279,6 +306,7 @@ namespace GeometryGym.Ifc
 	{
 		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcWindow" : base.KeyWord); } }
 		internal IfcWindowStandardCase() : base() { }
+		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w) : base(db,w) { }
 		internal new static IfcWindowStandardCase Parse(string strDef, ReleaseVersion schema) { IfcWindowStandardCase s = new IfcWindowStandardCase(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
 		internal static void parseFields(IfcWindowStandardCase s, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcWindow.parseFields(s, arrFields, ref ipos,schema); }
 	}
@@ -355,8 +383,10 @@ namespace GeometryGym.Ifc
 		internal List<int> mWorkingTimes = new List<int>();// :	OPTIONAL SET [1:?] OF IfcWorkTime;
 		internal List<int> mExceptionTimes = new List<int>();//	 :	OPTIONAL SET [1:?] OF IfcWorkTime;
 		internal IfcWorkCalendarTypeEnum mPredefinedType = IfcWorkCalendarTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkCalendarTypeEnum 
+		public List<IfcWorkTime> WorkingTimes { get { return mWorkingTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime); } set { mWorkingTimes = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public List<IfcWorkTime> ExceptionTimes { get { return mExceptionTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime); } set { mExceptionTimes = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 		internal IfcWorkCalendar() : base() { }
-		internal IfcWorkCalendar(IfcWorkCalendar i) : base(i) { mWorkingTimes.AddRange(i.mWorkingTimes); mExceptionTimes.AddRange(i.mExceptionTimes); mPredefinedType = i.mPredefinedType; }
+		internal IfcWorkCalendar(DatabaseIfc db, IfcWorkCalendar c) : base(db,c) { WorkingTimes = c.WorkingTimes.ConvertAll(x => db.Factory.Duplicate(x) as IfcWorkTime); ExceptionTimes = c.ExceptionTimes.ConvertAll(x=>db.Factory.Duplicate(x) as IfcWorkTime); mPredefinedType = c.mPredefinedType; }
 		internal IfcWorkCalendar(DatabaseIfc m, List<IfcWorkTime> working, List<IfcWorkTime> exception, IfcWorkCalendarTypeEnum type, IfcProject prj)
 			: base(m)
 		{
@@ -420,15 +450,15 @@ namespace GeometryGym.Ifc
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 
 		protected IfcWorkControl() : base() { }
-		protected IfcWorkControl(IfcWorkControl i)
-			: base(i)
+		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c) : base(db,c)
 		{
-			mCreationDate = i.mCreationDate;
-			mCreators.AddRange(i.mCreators);
-			mDuration = i.mDuration;
-			mTotalFloat = i.mTotalFloat;
-			mStartTime = i.mStartTime;
-			mFinishTime = i.mFinishTime;
+			mCreationDate = c.mCreationDate;
+			if(c.mCreators.Count > 0)
+				mCreators = c.mCreators.ConvertAll(x=>db.Factory.Duplicate(c.mDatabase[x]).mIndex);
+			mDuration = c.mDuration;
+			mTotalFloat = c.mTotalFloat;
+			mStartTime = c.mStartTime;
+			mFinishTime = c.mFinishTime;
 		}
 		
 		protected static void parseFields(IfcWorkControl c, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -484,7 +514,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWorkPlanTypeEnum mPredefinedType = IfcWorkPlanTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkPlanTypeEnum; IFC4
 		internal IfcWorkPlan() : base() { }
-		internal IfcWorkPlan(IfcWorkPlan p) : base(p) { mPredefinedType = p.mPredefinedType; }
+		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p) : base(db,p) { mPredefinedType = p.mPredefinedType; }
 		internal static IfcWorkPlan Parse(string strDef) { IfcWorkPlan p = new IfcWorkPlan(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcWorkPlan p, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -502,7 +532,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWorkScheduleTypeEnum mPredefinedType = IfcWorkScheduleTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkScheduleTypeEnum; IFC4
 		internal IfcWorkSchedule() : base() { }
-		internal IfcWorkSchedule(IfcWorkSchedule p) : base(p) { mPredefinedType = p.mPredefinedType; }
+		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s) : base(db,s) { mPredefinedType = s.mPredefinedType; }
 		internal static IfcWorkSchedule Parse(string strDef, ReleaseVersion schema) { IfcWorkSchedule s = new IfcWorkSchedule(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
 		internal static void parseFields(IfcWorkSchedule s, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -522,7 +552,7 @@ namespace GeometryGym.Ifc
 		internal string mStart = "$";//	 :	OPTIONAL IfcDate;
 		internal string mFinish = "$";//	 :	OPTIONAL IfcDate; 
 		internal IfcWorkTime() : base() { }
-		internal IfcWorkTime(IfcWorkTime i) : base(i) { mRecurrencePattern = i.mRecurrencePattern; mStart = i.mStart; mFinish = i.mFinish; }
+		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t) : base(db,t) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
 		internal IfcWorkTime(DatabaseIfc db, IfcRecurrencePattern recur, DateTime start, DateTime finish)
 			: base(db) { if (recur != null) mRecurrencePattern = recur.mIndex; if (start != DateTime.MinValue) mStart = IfcDate.convert(start); if (finish != DateTime.MinValue) mFinish = IfcDate.convert(finish); }
 		internal static IfcWorkTime Parse(string strDef) { IfcWorkTime f = new IfcWorkTime(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }

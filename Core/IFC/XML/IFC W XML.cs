@@ -18,41 +18,45 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Text;
 using System.Reflection;
 using System.IO;
 using System.ComponentModel;
+using System.Linq;
+using System.Xml;
+//using System.Xml.Linq;
 
-using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
+	public partial class IfcWall : IfcBuildingElement
 	{
-		internal string mIFCString = "";
-		public virtual string Name { get { return ""; } set { } }
-		internal DatabaseIfc mDatabase = null;
-
-		public DatabaseIfc Database { get { return mDatabase; } }
-
-		internal BaseClassIfc() : base() { }
-		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) { db.appendObject(this); db.Factory.mDuplicateMapping.Add(e.mIndex, mIndex); }
-		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
-		protected BaseClassIfc(DatabaseIfc db) { db.appendObject(this); }
-
-		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
-		internal virtual void postParseRelate() { }
-		public virtual List<T> Extract<T>() where T : IBaseClassIfc
+		internal override void ParseXml(XmlElement xml)
 		{
-			List<T> result = new List<T>();
-			if (this is T)
-				result.Add((T)(IBaseClassIfc)this);
-			return result;
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcWallTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
 		}
-
-		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
 	}
-	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
-
+	public partial class IfcWallType : IfcBuildingElementType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcWallTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
 }

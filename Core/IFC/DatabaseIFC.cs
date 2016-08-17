@@ -145,7 +145,7 @@ namespace GeometryGym.Ifc
 				value.mIndex = index;
 			}
 		}
-	
+		internal void appendObject(BaseClassIfc o) { this[NextBlank] = o; }	
 		internal IfcContext mContext = null;
 		
 		internal HashSet<string> mGlobalIDs = new HashSet<string>();
@@ -416,12 +416,13 @@ namespace GeometryGym.Ifc
 				BaseClassIfc obj = this[icounter];
 				if (obj == null)
 					continue;
+				try
+				{
 					obj.postParseRelate();
-				
+				}
+				catch(Exception) { }
 			}
-			
 			//	customPostImport();
-
 		}
 		internal BaseClassIfc InterpretLine(string line)
 		{
@@ -578,23 +579,13 @@ namespace GeometryGym.Ifc
 			if (type != null)
 			{
 				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };
-				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, types, null);
+				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
-				{
-					BaseClassIfc result = constructor.Invoke(new object[] { this, entity, downStream }) as BaseClassIfc;
-					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
-					return result;
-				}
+					return constructor.Invoke(new object[] { this.mDatabase, entity, downStream }) as BaseClassIfc;
 				types = new Type[] { typeof(DatabaseIfc), type };
-				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, types, null);
+				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
-				{
-					BaseClassIfc result = constructor.Invoke(new object[] { this, entity }) as BaseClassIfc;
-					mDuplicateMapping.Add(entity.mIndex, result.mIndex);
-					return result;
-				}
+					return constructor.Invoke(new object[] { this.mDatabase, entity }) as BaseClassIfc;
 			}
 			return null;
 		}

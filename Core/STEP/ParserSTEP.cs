@@ -35,7 +35,10 @@ namespace GeometryGym.STEP
 			CultureInfo ci = new CultureInfo("en-us");
 			NumberFormat = (NumberFormatInfo) ci.NumberFormat.Clone();
 		}
-		
+		public static string ParseString(string str)
+		{
+			return (str.Length > 2 ? str.Substring(1, str.Length - 2) : str);
+		}	
 		public static bool ParseBool(string str)
 		{
 			string s = str.Trim();
@@ -815,6 +818,62 @@ namespace GeometryGym.STEP
 						icounter++;
 					if (s[icounter++] != '#')
 						throw new Exception("Unrecognized format!");
+				}
+			}
+			pos = icounter + 2;
+			return result;
+		}
+		public static List<int> StripListInt(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			if (string.IsNullOrEmpty(s) || pos == len)
+				return new List<int>();
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				return new List<int>();
+			}
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			
+			List<int> result = new List<int>();
+			while (s[icounter] != ')')
+			{
+				string str = "";
+				while (char.IsDigit(s[icounter]))
+				{
+					str += s[icounter++];
+					if (icounter == len)
+						break;
+				}
+				result.Add(int.Parse(str));
+				if (icounter == len)
+					break;
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter] != ')')
+				{
+					if (s[icounter++] != ',')
+						throw new Exception("Unrecognized format!");
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
 				}
 			}
 			pos = icounter + 2;

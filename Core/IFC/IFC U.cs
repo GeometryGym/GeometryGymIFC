@@ -104,6 +104,7 @@ namespace GeometryGym.Ifc
 		public List<IfcUnit> Units { get { return mUnits.ConvertAll(x => mDatabase[x] as IfcUnit); } set { mUnits = value.ConvertAll(x => x.Index); } }
 
 		internal IfcUnitAssignment() : base() { }
+		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { Units = u.mUnits.ConvertAll(x => db.Factory.Duplicate(u.mDatabase[x]) as IfcUnit); }
 		internal IfcUnitAssignment(DatabaseIfc db) : base(db) { }
 		public IfcUnitAssignment(List<IfcUnit> units) : base(units[0].Database) { Units = units; }
 
@@ -128,9 +129,9 @@ namespace GeometryGym.Ifc
 			}
 			else if (length == Length.Foot)
 			{
-				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(0.3048), mDatabase.Factory.SILength);
+				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(FeetToMetre), mDatabase.Factory.SILength);
 				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Feet", mwu).mIndex);
-				mDatabase.ScaleSI = 0.3048;
+				mDatabase.ScaleSI = FeetToMetre;
 			}
 			else
 			{
@@ -139,6 +140,7 @@ namespace GeometryGym.Ifc
 			}
 			SetUnits();
 		}
+		internal static double FeetToMetre = 0.3048;
 		internal void SetUnits()
 		{
 			if (Find(IfcUnitEnum.AREAUNIT) == null)
@@ -295,9 +297,6 @@ namespace GeometryGym.Ifc
 								double docScale = Rhino.RhinoMath.UnitScale(Rhino.UnitSystem.Meters, Rhino.RhinoDoc.ActiveDoc.ModelUnitSystem);
 								mDatabase.Tolerance = docScale * Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance * d;
 							}
-#endif
-#if(REVIT)
-						d = mDatabase.mRevitScale = GGYM.Units.MetreToFeet * d; 
 #endif
 							result = d;
 						}

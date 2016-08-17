@@ -42,7 +42,11 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	
+	public partial interface IfcAxis2Placement : IBaseClassIfc //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
+	{
+		Transform Transform { get; }
+		Plane Plane { get; }
+	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
 		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? RefDirection.Vector : Vector3d.XAxis); } }
@@ -65,6 +69,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAxis2Placement3D
 	{
+		internal Plane mPlane = Plane.Unset; 
 		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db,plane.Origin)
 		{
 			double angTol = Math.PI / 1800;

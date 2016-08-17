@@ -18,41 +18,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Text;
 using System.Reflection;
 using System.IO;
 using System.ComponentModel;
+using System.Linq;
+using System.Xml;
+//using System.Xml.Linq;
 
-using GeometryGym.STEP;
+
 
 namespace GeometryGym.Ifc
 {
-	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
+	public partial class IfcHalfSpaceSolid : IfcGeometricRepresentationItem, IfcBooleanOperand /* SUPERTYPE OF (ONEOF (IfcBoxedHalfSpace ,IfcPolygonalBoundedHalfSpace)) */
 	{
-		internal string mIFCString = "";
-		public virtual string Name { get { return ""; } set { } }
-		internal DatabaseIfc mDatabase = null;
-
-		public DatabaseIfc Database { get { return mDatabase; } }
-
-		internal BaseClassIfc() : base() { }
-		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) { db.appendObject(this); db.Factory.mDuplicateMapping.Add(e.mIndex, mIndex); }
-		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
-		protected BaseClassIfc(DatabaseIfc db) { db.appendObject(this); }
-
-		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
-		internal virtual void postParseRelate() { }
-		public virtual List<T> Extract<T>() where T : IBaseClassIfc
+		internal override void ParseXml(XmlElement xml)
 		{
-			List<T> result = new List<T>();
-			if (this is T)
-				result.Add((T)(IBaseClassIfc)this);
-			return result;
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "BaseSurface") == 0)
+					BaseSurface = mDatabase.ParseXml<IfcSurface>(child as XmlElement);
+			}
+			if (xml.HasAttribute("AgreementFlag"))
+				mAgreementFlag = bool.Parse(xml.Attributes["AgreementFlag"].Value);
 		}
-
-		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(BaseSurface.GetXML(xml.OwnerDocument, "BaseSurface", this, processed));
+			xml.SetAttribute("AgreementFlag", mAgreementFlag.ToString().ToLower());
+		}
 	}
-	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
-
 }

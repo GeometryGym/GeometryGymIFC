@@ -78,6 +78,7 @@ namespace GeometryGym.Ifc
 	{
 		internal double mFeatureLength;// OPTIONAL IfcPositiveLengthMeasure; 
 		protected IfcEdgeFeature() : base() { }
+		protected IfcEdgeFeature(DatabaseIfc db, IfcEdgeFeature f) : base(db, f) { mFeatureLength = f.mFeatureLength; }
 		protected static void parseFields(IfcEdgeFeature f, List<string> arrFields, ref int ipos) { IfcFeatureElementSubtraction.parseFields(f, arrFields, ref ipos); f.mFeatureLength = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mFeatureLength); }
 	}
@@ -600,7 +601,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 				}
 			return (empty ? "" : base.BuildStringSTEP() + ",." + mAssemblyPlace.ToString() + ".,." + mPredefinedType.ToString() + ".");
 		}
-		public override bool AddElement(IfcElement s)
+		public override bool AddElement(IfcProduct s)
 		{
 			if (mIsDecomposedBy.Count == 0 || mIsDecomposedBy[0].mRelatedObjects.Count == 0)
 				mHost.AddElement(this);
@@ -649,6 +650,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		public List<IfcPhysicalQuantity> Quantities { get { return mQuantities.ConvertAll(x => mDatabase[x] as IfcPhysicalQuantity); } set { mQuantities = value.ConvertAll(x => x.mIndex); } }
 		
 		internal IfcElementQuantity() : base() { }
+		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q) : base(db, q) { mMethodOfMeasurement = q.mMethodOfMeasurement; Quantities = q.Quantities.ConvertAll(x => db.Factory.Duplicate(x) as IfcPhysicalQuantity); }
 		internal IfcElementQuantity(string name, string methodOfMeasurement, List<IfcPhysicalQuantity> quantities)
 			: base(quantities[0].mDatabase, name)
 		{
@@ -711,7 +713,9 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 	{
 		internal double mSemiAxis1;// : IfcPositiveLengthMeasure;
 		internal double mSemiAxis2;// : IfcPositiveLengthMeasure;
+
 		internal IfcEllipseProfileDef() : base() { }
+		internal IfcEllipseProfileDef(DatabaseIfc db, IfcEllipseProfileDef p) : base(db, p) { mSemiAxis1 = p.mSemiAxis1; mSemiAxis2 = p.mSemiAxis2; }
 	
 		internal static void parseFields(IfcEllipseProfileDef p, List<string> arrFields, ref int ipos) { IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos); p.mSemiAxis1 = ParserSTEP.ParseDouble(arrFields[ipos++]); p.mSemiAxis2 = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		internal new static IfcEllipseProfileDef Parse(string strDef) { IfcEllipseProfileDef p = new IfcEllipseProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
@@ -778,7 +782,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		internal IfcEnvironmentalImpactCategoryEnum mEnvCategory = IfcEnvironmentalImpactCategoryEnum.NOTDEFINED;// IfcEnvironmentalImpactCategoryEnum
 		internal string mUserDefinedCategory = "$";//  : OPTIONAL IfcLabel;
 		internal IfcEnvironmentalImpactValue() : base() { }
-		internal IfcEnvironmentalImpactValue(DatabaseIfc db, IfcEnvironmentalImpactValue v) : base(v) { mImpactType = v.mImpactType; mEnvCategory = v.mEnvCategory; mUserDefinedCategory = v.mUserDefinedCategory; }
+		internal IfcEnvironmentalImpactValue(DatabaseIfc db, IfcEnvironmentalImpactValue v) : base(db,v) { mImpactType = v.mImpactType; mEnvCategory = v.mEnvCategory; mUserDefinedCategory = v.mUserDefinedCategory; }
 		internal new static IfcEnvironmentalImpactValue Parse(string strDef, ReleaseVersion schema) { IfcEnvironmentalImpactValue v = new IfcEnvironmentalImpactValue(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return v; }
 		internal static void parseFields(IfcEnvironmentalImpactValue v, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcAppliedValue.parseFields(v, arrFields, ref ipos, schema); v.mImpactType = arrFields[ipos++]; v.mEnvCategory = (IfcEnvironmentalImpactCategoryEnum)Enum.Parse(typeof(IfcEnvironmentalImpactCategoryEnum), arrFields[ipos++].Replace(".", "")); v.mUserDefinedCategory = arrFields[ipos++]; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mImpactType + ",." + mEnvCategory.ToString() + ".," + mUserDefinedCategory; }
@@ -787,7 +791,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 	public partial class IfcEquipmentStandard : IfcControl // DEPRECEATED IFC4
 	{
 		internal IfcEquipmentStandard() : base() { }
-		internal IfcEquipmentStandard(IfcEquipmentStandard i) : base(i) { }
+		internal IfcEquipmentStandard(DatabaseIfc db, IfcEquipmentStandard s) : base(db,s) { }
 		internal static IfcEquipmentStandard Parse(string strDef, ReleaseVersion schema) { IfcEquipmentStandard s = new IfcEquipmentStandard(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return s; }
 	}
 	public partial class IfcEvaporativeCooler : IfcEnergyConversionDevice //IFC4
@@ -863,7 +867,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
 		internal int mEventOccurenceTime;//	:	OPTIONAL IfcEventTime;
 		internal IfcEvent() : base() { }
-		internal IfcEvent(IfcEvent t) : base(t) { mPredefinedType = t.mPredefinedType; mEventTriggerType = t.mEventTriggerType; mUserDefinedEventTriggerType = t.mUserDefinedEventTriggerType; }
+		internal IfcEvent(DatabaseIfc db, IfcEvent e) : base(db,e) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
 		internal static void parseFields(IfcEvent e, List<string> arrFields, ref int ipos)
 		{
 			IfcProcess.parseFields(e, arrFields, ref ipos);
@@ -990,7 +994,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 
 		protected IfcExternalInformation() : base() { }
 		protected IfcExternalInformation(DatabaseIfc db) : base(db) { }
-		protected IfcExternalInformation(DatabaseIfc db, IfcExternalInformation i) : base(db) { }
+		protected IfcExternalInformation(DatabaseIfc db, IfcExternalInformation i) : base(db,i) { }
 		protected static void parseFields(IfcExternalInformation r, List<string> arrFields, ref int ipos) { }
 	}
 	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcResourceObjectSelect//ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle
@@ -1011,7 +1015,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		public List<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return mExternalReferenceForResources; } }
 
 		protected IfcExternalReference() : base() { }
-		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) : base(db) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
+		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) : base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
 		protected IfcExternalReference(DatabaseIfc db) : base(db) { }
 		protected static void parseFields(IfcExternalReference r, List<string> arrFields, ref int ipos)
 		{
@@ -1033,7 +1037,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
-		internal IfcExternalReferenceRelationship(IfcExternalReferenceRelationship i) : base(i) { mRelatingReference = i.mRelatingReference; mRelatedResourceObjects.AddRange(i.mRelatedResourceObjects); }
+		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects = r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(r.mDatabase[x]) as IfcResourceObjectSelect); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, List<IfcResourceObjectSelect> related)
 			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; RelatedResourceObjects = related; }
@@ -1107,6 +1111,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }
+		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e) : base(db, e) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection) as IfcDirection; mDepth = e.mDepth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 
@@ -1120,6 +1125,7 @@ null, new[] { typeof(IfcProduct), typeof(IfcObjectPlacement), typeof(IfcProductR
 		public IfcProfileDef EndSweptArea { get { return mDatabase[mEndSweptArea] as IfcProfileDef; } set { mEndSweptArea = value.mIndex; } }
 
 		internal IfcExtrudedAreaSolidTapered() : base() { }
+		internal IfcExtrudedAreaSolidTapered(DatabaseIfc db, IfcExtrudedAreaSolidTapered e) : base(db,e) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea) as IfcProfileDef; }
 		public IfcExtrudedAreaSolidTapered(IfcParameterizedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcParameterizedProfileDef end) : base(start, placement, new IfcDirection(start.mDatabase,0,0,1), depth) { EndSweptArea = end; }
 		public IfcExtrudedAreaSolidTapered(IfcDerivedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcDerivedProfileDef end) : base(start, placement,new IfcDirection(start.mDatabase,0,0,1), depth ) { EndSweptArea = end; }
 

@@ -27,5 +27,9 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	 
+	public partial class IfcEllipse : IfcConic
+	{
+		public override Curve Curve { get { return Ellipse.ToNurbsCurve(); } }
+		public Ellipse Ellipse { get { return new Ellipse(base.Plane, mSemiAxis1, mSemiAxis2); } }
+	} 
 }

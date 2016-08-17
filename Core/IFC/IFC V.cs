@@ -124,8 +124,8 @@ namespace GeometryGym.Ifc
 		public IfcPoint VertexGeometry { get { return mDatabase[mVertexGeometry] as IfcPoint; } set { mVertexGeometry = value.mIndex; } }
 
 		internal IfcVertexPoint() : base() { }
-		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
+		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
 		internal new static IfcVertexPoint Parse(string strDef) { IfcVertexPoint v = new IfcVertexPoint(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
 		internal static void parseFields(IfcVertexPoint v, List<string> arrFields, ref int ipos) { IfcVertex.parseFields(v, arrFields, ref ipos); v.mVertexGeometry = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
@@ -169,21 +169,22 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVirtualGridIntersection : BaseClassIfc
 	{
-		internal List<int> mIntersectingAxes = new List<int>(2);// : LIST [2:2] OF UNIQUE IfcGridAxis;
-		internal Tuple<double,double,double> mOffsetDistances = null;// : LIST [2:3] OF IfcLengthMeasure; 
+		private Tuple<int,int> mIntersectingAxes = new Tuple<int,int>(0,0);// : LIST [2:2] OF UNIQUE IfcGridAxis;
+		private Tuple<double,double,double> mOffsetDistances = null;// : LIST [2:3] OF IfcLengthMeasure; 
+		public Tuple<IfcGridAxis,IfcGridAxis> IntersectingAxes { get { return new Tuple<IfcGridAxis, IfcGridAxis>(mDatabase[mIntersectingAxes.Item1] as IfcGridAxis, mDatabase[mIntersectingAxes.Item2] as IfcGridAxis); } set { mIntersectingAxes = new Tuple<int, int>(value.Item1.mIndex, value.Item2.mIndex); } }
 		internal IfcVirtualGridIntersection() : base() { }
-		internal IfcVirtualGridIntersection(IfcVirtualGridIntersection p) : base() { mIntersectingAxes = new List<int>(p.mIntersectingAxes.ToArray()); mOffsetDistances = p.mOffsetDistances; }
+		internal IfcVirtualGridIntersection(DatabaseIfc db, IfcVirtualGridIntersection i) : base(db, i) { Tuple<IfcGridAxis, IfcGridAxis> axes = i.IntersectingAxes; IntersectingAxes = new Tuple<IfcGridAxis,IfcGridAxis>(db.Factory.Duplicate(axes.Item1) as IfcGridAxis, db.Factory.Duplicate(axes.Item2) as IfcGridAxis); mOffsetDistances = i.mOffsetDistances; }
 		internal static IfcVirtualGridIntersection Parse(string strDef) { IfcVirtualGridIntersection i = new IfcVirtualGridIntersection(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		internal static void parseFields(IfcVirtualGridIntersection i, List<string> arrFields, ref int ipos)
 		{
-			i.mIntersectingAxes = ParserSTEP.SplitListLinks(arrFields[ipos++]);
+			List<int> links = ParserSTEP.SplitListLinks(arrFields[ipos++]);
+			i.mIntersectingAxes = new Tuple<int, int>(links[0], links[1]);
 			List<string> lst = ParserSTEP.SplitLineFields(arrFields[ipos++]);
 			i.mOffsetDistances = new Tuple<double,double,double>(ParserSTEP.ParseDouble(lst[0]), ParserSTEP.ParseDouble(lst[1]),(lst.Count > 2 ? ParserSTEP.ParseDouble(lst[2]) : double.NaN));
 		}
 		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mIntersectingAxes[0]) + "," +
-				ParserSTEP.LinkToString(mIntersectingAxes[1]) + "),(";
+			string str = base.BuildStringSTEP() + ",(#" + mIntersectingAxes.Item1 + ",#" + mIntersectingAxes.Item2 + "),(";
 			str += ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2);
 			if (!double.IsNaN(mOffsetDistances.Item3))
 				str += "," + ParserSTEP.DoubleToString(mOffsetDistances.Item3);
@@ -197,6 +198,7 @@ namespace GeometryGym.Ifc
 		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcVoidingFeature() : base() { }
+		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v) : base(db,v) { mPredefinedType = v.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
 		
 		internal static IfcVoidingFeature Parse(string strDef, ReleaseVersion schema) { IfcVoidingFeature e = new IfcVoidingFeature(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return e; }

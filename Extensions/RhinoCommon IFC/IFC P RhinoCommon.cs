@@ -35,8 +35,20 @@ namespace GeometryGym.Ifc
 		}
 
 	}
+	public partial class IfcPCurve : IfcCurve
+	{
+		public override Curve Curve
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+		}
+	}
 	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
 	{
+		internal Point3d LocationPoint { get { return Location.Location; } }
+
 		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
 		protected IfcPlacement(DatabaseIfc db, Point3d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
 

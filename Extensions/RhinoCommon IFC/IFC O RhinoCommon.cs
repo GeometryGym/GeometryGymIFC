@@ -27,5 +27,8 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	 
+	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
+	{
+		public abstract Transform Transform { get; }
+	} 
 }
