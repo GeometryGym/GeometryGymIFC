@@ -101,7 +101,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcActuator() : base() { }
 		internal IfcActuator(DatabaseIfc db, IfcActuator a) : base(db,a) { mPredefinedType = a.mPredefinedType; }
-		internal IfcActuator(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement,representation, system) { }
+		public IfcActuator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement,representation, system) { }
 
 		internal static void parseFields(IfcActuator a, List<string> arrFields, ref int ipos)
 		{ 
@@ -207,7 +207,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminal() : base() { }
 		internal IfcAirTerminal(DatabaseIfc db, IfcAirTerminal t) : base(db,t) { mPredefinedType = t.mPredefinedType; }
-		public IfcAirTerminal(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcAirTerminal s, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowTerminal.parseFields(s, arrFields, ref ipos); 
@@ -226,7 +226,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminalBox() : base() { }
 		internal IfcAirTerminalBox(DatabaseIfc db, IfcAirTerminalBox b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
-		public IfcAirTerminalBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminalBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcAirTerminalBox s, List<string> arrFields, ref int ipos)
 		{
@@ -273,7 +273,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirToAirHeatRecovery() : base() { }
 		internal IfcAirToAirHeatRecovery(DatabaseIfc db, IfcAirToAirHeatRecovery a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
-		internal IfcAirToAirHeatRecovery(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirToAirHeatRecovery(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcAirToAirHeatRecovery a, List<string> arrFields, ref int ipos)
 		{
 			IfcDistributionControlElement.parseFields(a, arrFields, ref ipos);
@@ -306,7 +306,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlarm() : base() { }
 		internal IfcAlarm(DatabaseIfc db, IfcAlarm a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
-		internal IfcAlarm(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAlarm(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcAlarm a, List<string> arrFields, ref int ipos) 
 		{ 
@@ -587,6 +587,22 @@ namespace GeometryGym.Ifc
 			foreach (IfcAppliedValue v in Components)
 				v.mComponentFor.Add(this);
 		}
+
+		public override bool Destruct(bool children)
+		{
+			if (children)
+			{
+				if (mAppliedValueIndex > 0)
+					mDatabase[mAppliedValueIndex].Destruct(children);
+				for (int icounter = 0; icounter < mComponents.Count; icounter++)
+				{
+					BaseClassIfc bc = mDatabase[mComponents[icounter]];
+					if (bc != null)
+						bc.Destruct(true);
+				}
+			}
+			return base.Destruct(children);
+		}
 	}
 	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECEATED IFC4
 	{
@@ -726,6 +742,12 @@ namespace GeometryGym.Ifc
 		internal new static IfcArbitraryClosedProfileDef Parse(string strDef) { IfcArbitraryClosedProfileDef p = new IfcArbitraryClosedProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcArbitraryClosedProfileDef p, List<string> arrFields, ref int ipos) { IfcProfileDef.parseFields(p, arrFields, ref ipos); p.mOuterCurve = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOuterCurve); }
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			OuterCurve.changeSchema(schema);
+		}
 	}
 	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef //	SUPERTYPE OF(IfcCenterLineProfileDef)
 	{
@@ -948,7 +970,10 @@ namespace GeometryGym.Ifc
 		public IfcDirection Axis { get { return (mAxis > 0 ? mDatabase[mAxis] as IfcDirection : null); } set { mAxis = (value == null ? 0 : value.mIndex); } }
 		
 		internal IfcAxis1Placement() : base() { }
-		internal IfcAxis1Placement(DatabaseIfc db) : base(db) { }
+		public IfcAxis1Placement(DatabaseIfc db) : base(db) { }
+		public IfcAxis1Placement(IfcCartesianPoint location) : base(location) { }
+		public IfcAxis1Placement(IfcDirection axis) : base(axis.mDatabase) { Axis = axis; }
+		public IfcAxis1Placement(IfcCartesianPoint location, IfcDirection axis) : base(location) { Axis = axis; }
 		internal IfcAxis1Placement(DatabaseIfc db, IfcAxis1Placement p) : base(db,p) { if(p.mAxis > 0) Axis = db.Factory.Duplicate( p.Axis) as IfcDirection; }
  
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mAxis); }
@@ -968,12 +993,14 @@ namespace GeometryGym.Ifc
 				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
 		}
 		public IfcAxis2Placement2D(DatabaseIfc db) : base(db.Factory.Origin2d) { }
-		public IfcAxis2Placement2D(IfcCartesianPoint point) : base(point) { }
+		public IfcAxis2Placement2D(IfcCartesianPoint location) : base(location) { }
 		
 
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRefDirection); }
 		internal static IfcAxis2Placement2D Parse(string strDef) { IfcAxis2Placement2D p = new IfcAxis2Placement2D(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcAxis2Placement2D p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
+
+		internal override bool isWorldXY { get { return base.isWorldXY && (mRefDirection == 0 || RefDirection.isXAxis); } }
 	}
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement
 	{
@@ -1025,5 +1052,17 @@ namespace GeometryGym.Ifc
 		internal static IfcAxis2Placement3D Parse(string strDef) { IfcAxis2Placement3D p = new IfcAxis2Placement3D(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcAxis2Placement3D p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]); p.mRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mAxis > 0 ? "," + ParserSTEP.LinkToString(mAxis) : ",$") + (mRefDirection > 0 ? "," + ParserSTEP.LinkToString(mRefDirection) : ",$"); }
+
+		internal override bool isWorldXY
+		{
+			get
+			{
+				if (mAxis > 0 && !Axis.isZAxis)
+					return false;
+				if (mRefDirection > 0 && !RefDirection.isXAxis)
+					return false;
+				return base.isWorldXY;
+			}
+		}
 	}
 }

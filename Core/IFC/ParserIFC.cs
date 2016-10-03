@@ -341,11 +341,14 @@ namespace GeometryGym.Ifc
 				if (icounter > 1)
 				{
 					string kw = str.Substring(0, icounter - 1);
-					Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
-					if (type != null)
+					if (kw.All(Char.IsLetter))
 					{
-						if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
-							return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+						Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
+						if (type != null)
+						{
+							if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+								return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+						}
 					}
 				}
 			}

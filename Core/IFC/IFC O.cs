@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
 			{
 				IfcRelDefinesByProperties drdp = db.Factory.Duplicate(rdp) as IfcRelDefinesByProperties;
-				drdp.assign(this);
+				drdp.Assign(this);
 			}
 			if(o.mIsTypedBy != null)
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy,false) as IfcRelDefinesByType;
@@ -86,10 +86,18 @@ namespace GeometryGym.Ifc
 		}
 		internal void IsolateObject(string filename)
 		{
-			
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
 			db.Factory.Duplicate(this);
 			db.WriteFile(filename);
+		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			for (int icounter = 0; icounter < mIsDefinedBy.Count; icounter++)
+				mIsDefinedBy[icounter].changeSchema(schema);
+			if(mIsTypedBy != null)
+				mIsTypedBy.changeSchema(schema);
+			base.changeSchema(schema);
 		}
 	}
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
@@ -238,6 +246,17 @@ namespace GeometryGym.Ifc
 				m.Associates.addAssociation(this);
 		}
 
+		internal virtual IfcProperty findProperty(string name)
+		{
+			List<IfcPropertySet> psets = Extract<IfcPropertySet>();
+			foreach (IfcPropertySet pset in psets)
+			{
+				IfcProperty p = pset.FindProperty(name);
+				if (p != null)
+					return p;
+			}
+			return null;
+		}
 		public override List<T> Extract<T>()
 		{
 			// Early implementation, should search for typed objects such as products and type products.  Contact Jon
@@ -254,6 +273,23 @@ namespace GeometryGym.Ifc
 					result.AddRange(od.Extract<T>());
 			}
 			return result;
+		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			for (int icounter = 0; icounter < mHasAssignments.Count; icounter++)
+			{
+				IfcRelAssigns assigns = mDatabase[mHasAssignments[icounter].Index] as IfcRelAssigns;
+				if(assigns != null)
+					assigns.changeSchema(schema);
+			}
+			for (int icounter = 0; icounter < mIsNestedBy.Count; icounter++)
+				mIsNestedBy[icounter].changeSchema(schema);
+			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
+				mHasAssociations[icounter].changeSchema(schema);
+			for (int icounter = 0; icounter < mIsDecomposedBy.Count; icounter++)
+				mIsDecomposedBy[icounter].changeSchema(schema);
+			base.changeSchema(schema);
 		}
 	}
 	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
@@ -317,6 +353,19 @@ namespace GeometryGym.Ifc
 			else
 				str += ",$,";
 			return str + (mLogicalAggregator != IfcLogicalOperatorEnum.NONE ? "." + mLogicalAggregator.ToString() + ".,." : "$,.") + mObjectiveQualifier + (mUserDefinedQualifier == "$" ? ".,$" : ".,'" + mUserDefinedQualifier + "'");
+		}
+		public override bool Destruct(bool children)
+		{
+			if (children)
+			{
+				for (int icounter = 0; icounter < mBenchmarkValues.Count; icounter++)
+				{
+					BaseClassIfc bc = mDatabase[mBenchmarkValues[icounter]];
+					if (bc != null)
+						bc.Destruct(true);
+				}
+			}
+			return base.Destruct(children);
 		}
 	}
 	public partial class IfcOccupant : IfcActor
@@ -470,6 +519,7 @@ namespace GeometryGym.Ifc
 		internal bool mOrientation = true;// : BOOL;
 
 		public IfcEdge EdgeElement { get { return mDatabase[mEdgeElement] as IfcEdge; } set { mEdgeElement = value.mIndex; } }
+		public bool Orientation { get { return mOrientation; } set { mOrientation = value; } }
 
 		internal IfcOrientedEdge() : base() { }
 		internal IfcOrientedEdge(DatabaseIfc db, IfcOrientedEdge e) : base(db,e) { EdgeElement = db.Factory.Duplicate( e.EdgeElement) as IfcEdge; mOrientation = e.mOrientation; }
@@ -500,7 +550,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcOutlet() : base() { }
 		internal IfcOutlet(DatabaseIfc db, IfcOutlet o) : base(db,o) { mPredefinedType = o.mPredefinedType; }
-		internal IfcOutlet(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcOutlet(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcOutlet s, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowTerminal.parseFields(s, arrFields, ref ipos);
@@ -561,7 +611,7 @@ namespace GeometryGym.Ifc
 			mOwningApplication = app.mIndex;
 			mState = IfcStateEnum.NA;
 			mChangeAction = ca;
-			TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0);
+			TimeSpan ts = DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0);
 			mCreationDate = (int)ts.TotalSeconds;
 			mLastModifiedDate = (int)ts.TotalSeconds;
 		}

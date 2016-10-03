@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelDefinesByProperties rd = mDatabase.ParseXml<IfcRelDefinesByProperties>(node as XmlElement);
 						if (rd != null)
-							rd.assign(this);
+							rd.Assign(this);
 					}
 				}
 			}
@@ -274,10 +274,10 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "LastModifyingApplication") == 0)
 					LastModifyingApplication = mDatabase.ParseXml<IfcApplication>(child as XmlElement);
 			}
-			if (xml.HasAttribute("State"))
+			if (xml.HasAttribute("State")) 
 				Enum.TryParse<IfcStateEnum>(xml.Attributes["State"].Value, true, out mState);
 			if (xml.HasAttribute("ChangeAction"))
-				Enum.TryParse<IfcChangeActionEnum>(xml.Attributes["ChangeAction"].Value, out mChangeAction);
+				Enum.TryParse<IfcChangeActionEnum>(xml.Attributes["ChangeAction"].Value,true, out mChangeAction);
 			if (xml.HasAttribute("LastModifiedDate"))
 				LastModifiedDate = int.Parse(xml.Attributes["LastModifiedDate"].Value);
 			if (xml.HasAttribute("CreationDate"))

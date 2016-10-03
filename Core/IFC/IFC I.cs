@@ -31,17 +31,17 @@ namespace GeometryGym.Ifc
 	public partial class IfcImageTexture : IfcSurfaceTexture
 	{
 		internal string mUrlReference;// : IfcIdentifier; 
-		public string UrlReference { get { return  ParserIfc.Decode(mUrlReference); } set { mUrlReference = ParserIfc.Encode(value); } }
+		public string UrlReference { get { return ParserIfc.Decode(mUrlReference); } set { mUrlReference = ParserIfc.Encode(value); } }
 
 		internal IfcImageTexture() : base() { }
-		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t) : base(db,t) { mUrlReference = t.mUrlReference; }
-		public IfcImageTexture(DatabaseIfc db,bool repeatS, bool repeatT, string urlReference) : base(db,repeatS,repeatT) { UrlReference = urlReference; }
-		internal static IfcImageTexture Parse(string strDef, ReleaseVersion schema) { IfcImageTexture t = new IfcImageTexture(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return t; }
-		internal static void parseFields(IfcImageTexture t, List<string> arrFields, ref int ipos,ReleaseVersion schema)
+		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t) : base(db, t) { mUrlReference = t.mUrlReference; }
+		public IfcImageTexture(DatabaseIfc db, bool repeatS, bool repeatT, string urlReference) : base(db, repeatS, repeatT) { UrlReference = urlReference; }
+		internal static IfcImageTexture Parse(string strDef, ReleaseVersion schema) { IfcImageTexture t = new IfcImageTexture(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return t; }
+		internal static void parseFields(IfcImageTexture t, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			try
 			{
-				IfcSurfaceTexture.parseFields(t, arrFields, ref ipos,schema);
+				IfcSurfaceTexture.parseFields(t, arrFields, ref ipos, schema);
 				t.mUrlReference = arrFields[ipos++].Replace("'", "");
 			}
 			catch (Exception) { }
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		internal int mMappedTo;// : IfcTessellatedFaceSet; 
-		// Overrides : OPTIONAL IfcStrippedOptional; 
+							   // Overrides : OPTIONAL IfcStrippedOptional; 
 		internal int mColours;// : IfcColourRgbList; 
 		internal List<int> mColourIndex = new List<int>();// : LIST [1:?] OF IfcPositiveInteger;
 
@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 		public IfcColourRgbList Colours { get { return mDatabase[mColours] as IfcColourRgbList; } set { mColours = value.mIndex; } }
 
 		internal IfcIndexedColourMap() : base() { }
-		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db,m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
+		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
 			: base(fs.mDatabase) { mMappedTo = fs.mIndex; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
@@ -92,10 +92,10 @@ namespace GeometryGym.Ifc
 
 		public IfcCartesianPointList Points { get { return mDatabase[mPoints] as IfcCartesianPointList; } set { mPoints = value.mIndex; } }
 		public List<IfcSegmentIndexSelect> Segments { get { return mSegments; } set { mSegments = new List<IfcSegmentIndexSelect>() { }; mSegments.AddRange(value); } }
-		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); }}
+		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
 		internal IfcIndexedPolyCurve() : base() { }
-		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db,c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
+		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { Segments = segs; }
 		internal static void parseFields(IfcIndexedPolyCurve c, List<string> arrFields, ref int ipos)
@@ -139,11 +139,33 @@ namespace GeometryGym.Ifc
 			str += (mSelfIntersect == IfcLogicalEnum.UNKNOWN ? "$" : (mSelfIntersect == IfcLogicalEnum.TRUE ? ".T." : ".F."));
 			return base.BuildStringSTEP() + str;
 		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			if (schema == ReleaseVersion.IFC2x3)
+			{
+				IfcCartesianPointList cpl = Points;
+				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;
+				if (cpl2d != null)
+				{
+					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.ToList(), Segments);
+					int index = bc.mIndex;
+					mDatabase[mIndex] = bc;
+					mDatabase[index] = null;
+					mDatabase[cpl.mIndex] = null;
+				}
+				else
+				{
+					throw new Exception("Not Implemented");
+				}
+			}
+		}
 	}
 	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem
 	{
 		internal List<int> mCoordIndex = new List<int>();// : LIST [3:?] OF IfcPositiveInteger;
-		//INVERSE
+														 //INVERSE
 		internal IfcPolygonalFaceSet mToFaceSet = null;
 
 		public IEnumerable<int> CoordIndex { get { return mCoordIndex; } set { mCoordIndex = value.ToList(); } }
@@ -207,7 +229,7 @@ namespace GeometryGym.Ifc
 		public IfcTextureVertexList TexCoords { get { return mDatabase[mTexCoords] as IfcTextureVertexList; } set { mTexCoords = value.mIndex; } }
 
 		protected IfcIndexedTextureMap() : base() { }
-		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; } 
+		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; }
 		//internal IfcIndexedTextureMap(IfcTessellatedFaceSet mappedTo, ifctext) : this(pl, nll, selfIntersect, new List<int>()) { }
 		//internal IfcIndexedTextureMap(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs, IfcLogicalEnum selfIntersect) : this(pl, segs, selfIntersect, new List<int>()) { }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
@@ -223,22 +245,22 @@ namespace GeometryGym.Ifc
 			base.postParseRelate();
 			MappedTo.mHasTextures.Add(this);
 		}
-	} 
+	}
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap
 	{
 		internal Tuple<int, int, int>[] mTexCoordList = new Tuple<int, int, int>[0];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
 
 		internal IfcIndexedTriangleTextureMap() : base() { }
-		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db,m) { mTexCoordList = m.mTexCoordList; }
+		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }
 		//public IfcIndexedTriangleTextureMap(DatabaseIfc m, IEnumerable<Tuple<int, int,int>> coords) : base(m) { mTexCoordList = coords.ToArray(); }
 
 		internal static IfcIndexedTriangleTextureMap Parse(string str) { IfcIndexedTriangleTextureMap m = new IfcIndexedTriangleTextureMap(); int pos = 0; m.parseFields(ParserSTEP.SplitLineFields(str), ref pos); return m; }
 		protected override void parseFields(List<string> arrFields, ref int ipos) { base.parseFields(arrFields, ref ipos); mTexCoordList = ParserSTEP.SplitListSTPIntTriple(arrFields[ipos++]); }
-		protected override string BuildStringSTEP() 
+		protected override string BuildStringSTEP()
 		{
 			if (mTexCoordList.Length == 0)
 				return base.BuildStringSTEP() + ",$";
-			Tuple<int, int,int> triple = mTexCoordList[0];
+			Tuple<int, int, int> triple = mTexCoordList[0];
 			string result = base.BuildStringSTEP() + ",((" + triple.Item1 + "," + triple.Item2 + "," + triple.Item3;
 			for (int icounter = 1; icounter < mTexCoordList.Length; icounter++)
 			{
@@ -248,7 +270,7 @@ namespace GeometryGym.Ifc
 
 			return result + "))";
 		}
-	} 
+	}
 	public partial class IfcInterceptor : IfcFlowTreatmentDevice //IFC4  
 	{
 		internal IfcInterceptorTypeEnum mPredefinedType = IfcInterceptorTypeEnum.NOTDEFINED;
@@ -256,7 +278,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcInterceptor() : base() { }
 		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i) : base(db, i) { mPredefinedType = i.mPredefinedType; }
-		internal IfcInterceptor(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcInterceptor a, List<string> arrFields, ref int ipos)
 		{
 			IfcDistributionControlElement.parseFields(a, arrFields, ref ipos);
@@ -280,6 +302,17 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcInterceptorType t, List<string> arrFields, ref int ipos) { IfcFlowTreatmentDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcInterceptorTypeEnum)Enum.Parse(typeof(IfcInterceptorTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcInterceptorType Parse(string strDef) { IfcInterceptorType t = new IfcInterceptorType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
+	}
+	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
+	{
+		internal IfcIntersectionCurve() : base() { }
+		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
+		internal IfcIntersectionCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve,p1,p2,cr) { }
+		internal new static void parseFields(IfcSurfaceCurve c, List<string> arrFields, ref int ipos)
+		{
+			IfcSurfaceCurve.parseFields(c, arrFields, ref ipos);
+		}
+		internal new static IfcIntersectionCurve Parse(string strDef) { IfcIntersectionCurve c = new IfcIntersectionCurve(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
 	public partial class IfcInventory : IfcGroup
 	{

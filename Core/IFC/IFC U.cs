@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcUnitaryControlElement() : base() { }
 		internal IfcUnitaryControlElement(DatabaseIfc db, IfcUnitaryControlElement e) : base(db,e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcUnitaryControlElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
+		internal IfcUnitaryControlElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
 		internal static void parseFields(IfcUnitaryControlElement a, List<string> arrFields, ref int ipos)
 		{
 			IfcDistributionControlElement.parseFields(a, arrFields, ref ipos);
@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcUnitaryEquipment() : base() { }
 		internal IfcUnitaryEquipment(DatabaseIfc db, IfcUnitaryEquipment e) : base(db,e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcUnitaryEquipment(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcUnitaryEquipment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcUnitaryEquipment s, List<string> arrFields, ref int ipos)
 		{
@@ -150,7 +150,7 @@ namespace GeometryGym.Ifc
 			if (Find(IfcUnitEnum.PLANEANGLEUNIT) == null)
 			{
 				IfcSIUnit radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
-				mUnits.Add(mDatabase.mPlaneAngleToRadians == 1 ? radians.mIndex : new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)).mIndex);
+				mUnits.Add(mDatabase.Factory.Options.AngleUnitsInRadians ? radians.mIndex : new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)).mIndex);
 			}
 			if (Find(IfcUnitEnum.TIMEUNIT) == null)
 			{
@@ -300,11 +300,11 @@ namespace GeometryGym.Ifc
 #endif
 							result = d;
 						}
-						if (nu.UnitType == IfcUnitEnum.PLANEANGLEUNIT)
-						{
-							double d = nu.getSIFactor();
-							mDatabase.mPlaneAngleToRadians = d;
-						}
+						//if (nu.UnitType == IfcUnitEnum.PLANEANGLEUNIT)
+						//{
+							//double d = nu.getSIFactor();
+						//	mDatabase.mPlaneAngleToRadians = d;
+						//}
 					}
 					else
 					{

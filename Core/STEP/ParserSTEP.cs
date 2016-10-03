@@ -37,7 +37,7 @@ namespace GeometryGym.STEP
 		}
 		public static string ParseString(string str)
 		{
-			return (str.Length > 2 ? str.Substring(1, str.Length - 2) : str);
+			return (str.Length > 2 ? str.Substring(1, str.Length - 2) : (str == "''" ? "" : str));
 		}	
 		public static bool ParseBool(string str)
 		{
@@ -823,6 +823,92 @@ namespace GeometryGym.STEP
 			pos = icounter + 2;
 			return result;
 		}
+		public static List<List<int>> StripListListLink(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			if (string.IsNullOrEmpty(s) || pos == len)
+				return new List<List<int>>();
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				return new List<List<int>>();
+			}
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+
+			List<List<int>> result = new List<List<int>>();
+			while (s[icounter] != ')')
+			{
+				if (s[icounter++] != '(')
+					throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				List<int> ints = new List<int>();
+
+				while (s[icounter] != ')')
+				{
+					string str = "";
+					char c = s[icounter++];
+					if(c != '#')
+						throw new Exception("Unrecognized format!");
+					c = s[icounter];
+					while (char.IsDigit(c))
+					{
+						str += c;
+						c = s[++icounter];
+						if (icounter == len)
+							break;
+					}
+					ints.Add(int.Parse(str));
+					if (icounter == len)
+						break;
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+					if (s[icounter] != ')')
+					{
+						if (s[icounter++] != ',')
+							throw new Exception("Unrecognized format!");
+						while (char.IsWhiteSpace(s[icounter]))
+							icounter++;
+					}
+				}
+				result.Add(ints);
+				if (icounter == len)
+					break;
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter++] != ')')
+						throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter] != ')')
+				{
+					if (s[icounter++] != ',')
+						throw new Exception("Unrecognized format!");
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+				}
+			}
+			pos = icounter + 2;
+			return result;
+		}
 		public static List<int> StripListInt(string s, ref int pos)
 		{
 			int icounter = pos, len = s.Length;
@@ -874,6 +960,231 @@ namespace GeometryGym.STEP
 						throw new Exception("Unrecognized format!");
 					while (char.IsWhiteSpace(s[icounter]))
 						icounter++;
+				}
+			}
+			pos = icounter + 2;
+			return result;
+		}
+		public static List<List<int>> StripListListInt(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			if (string.IsNullOrEmpty(s) || pos == len)
+				return new List<List<int>>();
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				return new List<List<int>>();
+			}
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+
+			List<List<int>> result = new List<List<int>>();
+			while (s[icounter] != ')')
+			{
+				if (s[icounter++] != '(')
+					throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				List<int> ints = new List<int>();
+
+				while (s[icounter] != ')')
+				{
+					string str = "";
+					char c = s[icounter];
+					while (char.IsDigit(c))
+					{
+						str += c;
+						c = s[++icounter];
+						if (icounter == len)
+							break;
+					}
+					ints.Add(int.Parse(str));
+					if (icounter == len)
+						break;
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+					if (s[icounter] != ')')
+					{
+						if (s[icounter++] != ',')
+							throw new Exception("Unrecognized format!");
+						while (char.IsWhiteSpace(s[icounter]))
+							icounter++;
+					}
+				}
+				result.Add(ints);
+				if (icounter == len)
+					break;
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter++] != ')')
+						throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter] != ')')
+				{
+					if (s[icounter++] != ',')
+						throw new Exception("Unrecognized format!");
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+				}
+			}
+			pos = icounter + 2;
+			return result;
+		}
+		public static List<double> StripListDouble(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			if (string.IsNullOrEmpty(s) || pos == len)
+				return new List<double>();
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				return new List<double>();
+			}
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+
+			List<double> result = new List<double>();
+			while (s[icounter] != ')')
+			{
+				string str = "";
+				char c = s[icounter];
+				while (char.IsDigit(c) || c == '.' || c == '-')
+				{
+					str += c;
+					c = s[++icounter];
+					if (icounter == len)
+						break;
+				}
+				result.Add(double.Parse(str));
+				if (icounter == len)
+					break;
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter] != ')')
+				{
+					if (s[icounter++] != ',')
+						throw new Exception("Unrecognized format!");
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+				}
+			}
+			pos = icounter + 2;
+			return result;
+		}
+		public static List<List<double>> StripListListDouble(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			if (string.IsNullOrEmpty(s) || pos == len)
+				return new List<List<double>>();
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				return new List<List<double>>();
+			}
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (char.IsWhiteSpace(s[icounter]))
+				icounter++;
+
+			List<List<double>> result = new List<List<double>>();
+			while (s[icounter] != ')')
+			{
+				if (s[icounter++] != '(')
+					throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				List<double> doubles = new List<double>();
+
+				while (s[icounter] != ')')
+				{
+					string str = "";
+					char c = s[icounter];
+					while (char.IsDigit(c) || c == '.' || c == '-')
+					{
+						str += c;
+						c = s[++icounter];
+						if (icounter == len)
+							break;
+					}
+					doubles.Add(double.Parse(str));
+					if (icounter == len)
+						break;
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+					if (s[icounter] != ')')
+					{
+						if (s[icounter++] != ',')
+							throw new Exception("Unrecognized format!");
+						while (char.IsWhiteSpace(s[icounter]))
+							icounter++;
+					}
+				}
+				result.Add(doubles);
+				if (icounter == len)
+					break;
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter++] != ')')
+						throw new Exception("Unrecognized format!");
+				while (char.IsWhiteSpace(s[icounter]))
+					icounter++;
+				if (s[icounter] != ')')
+				{
+					if (s[icounter++] != ',')
+						throw new Exception("Unrecognized format!");
+					while (char.IsWhiteSpace(s[icounter]))
+						icounter++;
+					
 				}
 			}
 			pos = icounter + 2;

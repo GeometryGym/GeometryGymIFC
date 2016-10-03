@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBeam() : base() { }
 		internal IfcBeam(DatabaseIfc db, IfcBeam b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
-		public IfcBeam(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcBeam(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
  
 		internal static void parseFields(IfcBeam b, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -123,7 +123,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBoiler() : base() { }
 		internal IfcBoiler(DatabaseIfc db, IfcBoiler b) : base(db,b) { mPredefinedType = b.mPredefinedType; }
-		internal IfcBoiler(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcBoiler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcBoiler a, List<string> arrFields, ref int ipos)
 		{
 			IfcDistributionControlElement.parseFields(a, arrFields, ref ipos);
@@ -143,7 +143,7 @@ namespace GeometryGym.Ifc
 		public IfcBoilerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcBoilerType() : base() { }
 		internal IfcBoilerType(DatabaseIfc db, IfcBoilerType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		public IfcBoilerType(DatabaseIfc m, string name, IfcBoilerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcBoilerType(DatabaseIfc db, string name, IfcBoilerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcBoilerType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcBoilerTypeEnum)Enum.Parse(typeof(IfcBoilerTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcBoilerType Parse(string strDef) { IfcBoilerType t = new IfcBoilerType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
@@ -185,6 +185,13 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcBooleanResult Parse(string strDef) { IfcBooleanResult b = new IfcBooleanResult(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mOperator.ToString() + ".," + ParserSTEP.LinkToString(mFirstOperand) + "," + ParserSTEP.LinkToString(mSecondOperand); }
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			mDatabase[mFirstOperand].changeSchema(schema);
+			mDatabase[mSecondOperand].changeSchema(schema);
+		}
 	}
 	public abstract partial class IfcBoundaryCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundaryEdgeCondition ,IfcBoundaryFaceCondition ,IfcBoundaryNodeCondition));
 	{
@@ -322,6 +329,34 @@ namespace GeometryGym.Ifc
 		protected IfcBoundedCurve(DatabaseIfc db) : base(db) { }
 		protected IfcBoundedCurve(DatabaseIfc db, IfcBoundedCurve c) : base(db,c) { }
 		protected static void parseFields(IfcBoundedCurve c, List<string> arrFields, ref int ipos) { IfcCurve.parseFields(c, arrFields, ref ipos); }
+
+		public static IfcBoundedCurve Generate(DatabaseIfc db, List<Tuple<double,double>> points, List<IfcSegmentIndexSelect> segments)
+		{
+			if(db.Release == ReleaseVersion.IFC2x3)
+			{
+				if(segments == null || segments.Count == 0)
+					return new IfcPolyline(db, points);
+				List<IfcCompositeCurveSegment> segs = new List<IfcCompositeCurveSegment>();
+				List<IfcCartesianPoint> pts = points.ConvertAll(x => new IfcCartesianPoint(db, x.Item1, x.Item2));
+				foreach(IfcSegmentIndexSelect seg in segments)
+				{
+					IfcArcIndex arc = seg as IfcArcIndex;
+					if(arc != null)
+						segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcTrimmedCurve(pts[arc.mA - 1], points[arc.mB - 1], pts[arc.mC - 1])));
+					else
+					{
+						IfcLineIndex line = seg as IfcLineIndex;
+						if(line != null)
+						{
+							for(int icounter = 1; icounter < line.mIndices.Count; icounter++)
+								segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcPolyline(pts[line.mIndices[icounter - 1]-1], pts[line.mIndices[icounter]-1])));
+						}
+					}
+				}
+				return new IfcCompositeCurve(segs);
+			}
+			return new IfcIndexedPolyCurve(new IfcCartesianPointList2D(db, points), segments);
+		}
 	}
 	public abstract partial class IfcBoundedSurface : IfcSurface //	ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveBoundedPlane,IfcRectangularTrimmedSurface))
 	{
@@ -400,15 +435,18 @@ namespace GeometryGym.Ifc
 		protected IfcBSplineCurve(int degree, List<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form)
 			: this(controlPoints[0].mDatabase, degree, form) { mControlPointsList = controlPoints.ConvertAll(x => x.mIndex); }
 
-		protected static void parseFields(IfcBSplineCurve c, List<string> arrFields, ref int ipos)
+		
+		protected virtual void parseString(string str, ref int pos)
 		{
-			IfcBoundedCurve.parseFields(c, arrFields, ref ipos);
-			c.mDegree = int.Parse(arrFields[ipos++]);
-			c.mControlPointsList = ParserSTEP.SplitListLinks(arrFields[ipos++]);
-			c.mCurveForm = (IfcBSplineCurveForm)Enum.Parse(typeof(IfcBSplineCurveForm), arrFields[ipos++].Replace(".", ""));
-			c.mClosedCurve = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
-			c.mSelfIntersect = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
+			mDegree = int.Parse(ParserSTEP.StripField(str, ref pos));
+			mControlPointsList = ParserSTEP.StripListLink(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (s[0] == '.')
+				Enum.TryParse<IfcBSplineCurveForm> (s.Replace(".", ""), out mCurveForm);
+			mClosedCurve = ParserIfc.StripLogical(str, ref pos);
+			mSelfIntersect = ParserIfc.StripLogical(str, ref pos);
 		}
+
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + "," + mDegree + ",(";
@@ -442,20 +480,20 @@ namespace GeometryGym.Ifc
 			mMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
-		internal static void parseFields(IfcBSplineCurveWithKnots c, List<string> arrFields, ref int ipos)
+		protected override void parseString(string str, ref int pos)
 		{
-			IfcBSplineCurve.parseFields(c, arrFields, ref ipos);
-			string s = arrFields[ipos++];
-			List<string> arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				c.mMultiplicities.Add(ParserSTEP.ParseInt(arrLists[icounter]));
-			s = arrFields[ipos++];
-			arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				c.mKnots.Add(ParserSTEP.ParseDouble(arrLists[icounter]));
-			c.mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), arrFields[ipos++].Replace(".", ""));
+			base.parseString(str, ref pos);
+			mMultiplicities = ParserSTEP.StripListInt(str, ref pos);
+			mKnots = ParserSTEP.StripListDouble(str, ref pos);
+			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str, ref pos).Replace(".", ""));
 		}
-		internal static IfcBSplineCurveWithKnots Parse(string strDef) { IfcBSplineCurveWithKnots c = new IfcBSplineCurveWithKnots(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
+		internal static IfcBSplineCurveWithKnots Parse(string str)
+		{
+			IfcBSplineCurveWithKnots c = new IfcBSplineCurveWithKnots();
+			int pos = 0;
+			c.parseString(str, ref pos);
+			return c;
+		}
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.IntToString(mMultiplicities[0]);
@@ -490,7 +528,7 @@ namespace GeometryGym.Ifc
 		{
 			mUDegree = s.mUDegree;
 			mVDegree = s.mVDegree;
-			List<List<IfcCartesianPoint>> points = ControlPointsList;
+			List<List<IfcCartesianPoint>> points = s.ControlPointsList;
 			foreach(List<IfcCartesianPoint> ps in points)
 				mControlPointsList.Add(ps.ConvertAll(x=>db.Factory.Duplicate(x).mIndex));
 			mSurfaceForm = s.mSurfaceForm;
@@ -511,27 +549,17 @@ namespace GeometryGym.Ifc
 				mControlPointsList.Add(cps.ConvertAll(x => x.mIndex));
 		}
 
-		protected static void parseFields(IfcBSplineSurface bs, List<string> arrFields, ref int ipos)
+		protected virtual void parseString(string str, ref int pos)
 		{
-			IfcBoundedSurface.parseFields(bs, arrFields, ref ipos);
-			bs.mUDegree = int.Parse(arrFields[ipos++]);
-			bs.mVDegree = int.Parse(arrFields[ipos++]);
-			string s = arrFields[ipos++];
-			List<string> arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			int ilast = arrLists.Count;
-			for (int icounter = 0; icounter < ilast; icounter++)
-			{
-				List<int> points = new List<int>();
-				s = arrLists[icounter];
-				List<string> arrPoints = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-				for (int jcounter = 0; jcounter < arrPoints.Count; jcounter++)
-					points.Add(ParserSTEP.ParseLink(arrPoints[jcounter]));
-				bs.mControlPointsList.Add(points);
-			}
-			bs.mSurfaceForm = (IfcBSplineSurfaceForm)Enum.Parse(typeof(IfcBSplineSurfaceForm), arrFields[ipos++].Replace(".", ""));
-			bs.mUClosed = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
-			bs.mVClosed = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
-			bs.mSelfIntersect = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
+			mUDegree =  int.Parse(ParserSTEP.StripField(str, ref pos));
+			mVDegree = int.Parse(ParserSTEP.StripField(str,ref pos));
+			mControlPointsList = ParserSTEP.StripListListLink(str,ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if(s[0] == '.') 
+				Enum.TryParse<IfcBSplineSurfaceForm>(s.Replace(".", ""),out mSurfaceForm);
+			mUClosed = ParserIfc.StripLogical(str,ref pos);
+			mVClosed = ParserIfc.StripLogical(str,ref pos);
+			mSelfIntersect = ParserIfc.StripLogical(str,ref pos);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -579,28 +607,22 @@ namespace GeometryGym.Ifc
 			mVKnots.AddRange(vKnots);
 		}
 
-		internal static void parseFields(IfcBSplineSurfaceWithKnots ss, List<string> arrFields, ref int ipos)
+		protected override void parseString(string str, ref int pos)
 		{
-			IfcBSplineSurface.parseFields(ss, arrFields, ref ipos);
-			string s = arrFields[ipos++];
-			List<string> arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				ss.mUMultiplicities.Add(ParserSTEP.ParseInt(arrLists[icounter]));
-			s = arrFields[ipos++];
-			arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				ss.mVMultiplicities.Add(ParserSTEP.ParseInt(arrLists[icounter]));
-			s = arrFields[ipos++];
-			arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				ss.mUKnots.Add(ParserSTEP.ParseDouble(arrLists[icounter]));
-			s = arrFields[ipos++];
-			arrLists = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			for (int icounter = 0; icounter < arrLists.Count; icounter++)
-				ss.mVKnots.Add(ParserSTEP.ParseDouble(arrLists[icounter]));
-			ss.mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), arrFields[ipos++].Replace(".", ""));
+			base.parseString(str, ref pos);
+			mUMultiplicities = ParserSTEP.StripListInt(str,	ref pos);
+			mVMultiplicities = ParserSTEP.StripListInt(str, ref pos);
+			mUKnots = ParserSTEP.StripListDouble(str, ref pos);
+			mVKnots = ParserSTEP.StripListDouble(str, ref pos);
+			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str,ref pos).Replace(".", ""));
 		}
-		internal static IfcBSplineSurfaceWithKnots Parse(string strDef) { IfcBSplineSurfaceWithKnots s = new IfcBSplineSurfaceWithKnots(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+		internal static IfcBSplineSurfaceWithKnots Parse(string str)
+		{
+			IfcBSplineSurfaceWithKnots s = new IfcBSplineSurfaceWithKnots();
+			int pos = 0;
+			s.parseString(str, ref pos);
+			return s;
+		}
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.IntToString(mUMultiplicities[0]);
@@ -626,7 +648,7 @@ namespace GeometryGym.Ifc
 
 		public double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set {mElevationOfRefHeight = value; } }
 		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set {mElevationOfTerrain = value; } }
-		public IfcPostalAddress BuildingAddress {get {return mDatabase[mBuildingAddress] as IfcPostalAddress;} set { mBuildingAddress = (value == null ? 0 : value.mIndex); }}
+		public IfcPostalAddress BuildingAddress { get { return mDatabase[mBuildingAddress] as IfcPostalAddress; } set { mBuildingAddress = value.mIndex; } }
 
 		internal IfcBuilding() : base() { }
 		internal IfcBuilding(DatabaseIfc db, IfcBuilding b, bool downStream) : base(db, b, downStream)
@@ -639,7 +661,7 @@ namespace GeometryGym.Ifc
 		public IfcBuilding(DatabaseIfc db, string name) : base(new IfcLocalPlacement(db.Factory.PlaneXYPlacement) ) { Name = name; setDefaultAddress();  }
 		public IfcBuilding(IfcBuilding host, string name) : base(host, name) { setDefaultAddress(); }
 		public IfcBuilding(IfcSite host, string name) : base(host, name) { setDefaultAddress(); }
-		public IfcBuilding(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { setDefaultAddress(); }
+		public IfcBuilding(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { setDefaultAddress(); }
 		
 
 		private void setDefaultAddress()  //Implementers Agreement requires address
@@ -664,7 +686,7 @@ namespace GeometryGym.Ifc
 		protected IfcBuildingElement() : base() { }
 		protected IfcBuildingElement(DatabaseIfc db) : base(db) { }
 		protected IfcBuildingElement(DatabaseIfc db, IfcBuildingElement e) : base(db, e) { }
-		protected IfcBuildingElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcBuildingElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 
 		protected static void parseFields(IfcBuildingElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -681,7 +703,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingElementPart() : base() { }
 		internal IfcBuildingElementPart(DatabaseIfc db, IfcBuildingElementPart p) : base(db, p) { mPredefinedType = p.mPredefinedType; }
-		public IfcBuildingElementPart(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcBuildingElementPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		internal static IfcBuildingElementPart Parse(string strDef, ReleaseVersion schema) { IfcBuildingElementPart p = new IfcBuildingElementPart(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return p; }
 		internal static void parseFields(IfcBuildingElementPart a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -720,7 +742,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingElementProxy() : base() { }
 		internal IfcBuildingElementProxy(DatabaseIfc db, IfcBuildingElementProxy p) : base(db, p) { mPredefinedType = p.mPredefinedType; }
-		public IfcBuildingElementProxy(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = "NOTDEFINED"; }
+		public IfcBuildingElementProxy(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = "NOTDEFINED"; }
 		internal static void parseFields(IfcBuildingElementProxy p, List<string> arrFields, ref int ipos)
 		{
 			IfcBuildingElement.parseFields(p, arrFields, ref ipos);
@@ -809,7 +831,7 @@ namespace GeometryGym.Ifc
 			Name = name;
 			Elevation = elev;
 		}
-		public IfcBuildingStorey(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcBuildingStorey(IfcSpatialStructureElement host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		internal static void parseFields(IfcBuildingStorey s, List<string> arrFields, ref int ipos) { IfcSpatialStructureElement.parseFields(s, arrFields, ref ipos); s.mElevation = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mElevation); }
 		internal static IfcBuildingStorey Parse(string strDef) { IfcBuildingStorey s = new IfcBuildingStorey(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
@@ -840,12 +862,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBurner : IfcEnergyConversionDevice //IFC4
 	{
-		internal IfcBurnerTypeEnum mPredefinedType = IfcBurnerTypeEnum.NOTDEFINED;// OPTIONAL : IfcBurnerTypeEnum;
+		internal IfcBurnerTypeEnum mPredefinedType = IfcBurnerTypeEnum.NOTDEFINED;// OPTIONAL : IfctypeEnum;
 		public IfcBurnerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcBurner() : base() { }
 		internal IfcBurner(DatabaseIfc db, IfcBurner b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
-		internal IfcBurner(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcBurner(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcBurner s, List<string> arrFields, ref int ipos)
 		{

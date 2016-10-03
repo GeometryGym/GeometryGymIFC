@@ -43,6 +43,7 @@ namespace GeometryGym.Ifc
 
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
 		internal virtual void postParseRelate() { }
+
 		public virtual List<T> Extract<T>() where T : IBaseClassIfc
 		{
 			List<T> result = new List<T>();
@@ -51,6 +52,20 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
+		internal virtual void changeSchema(ReleaseVersion schema) { }
+		protected void ReplaceDatabase(BaseClassIfc revised)
+		{
+			mDatabase[revised.mIndex] = null;
+			revised.mIndex = mIndex;
+			mDatabase[mIndex] = revised;
+		}
+		public virtual bool Destruct(bool children)
+		{
+			if (mDatabase == null)
+				return true;
+			mDatabase[mIndex] = null;
+			return true;
+		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 	}
 	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }

@@ -203,7 +203,7 @@ null, Type.EmptyTypes, null);
 					writer.Close();
 				}
 			}
-			catch(Exception x) { }
+			catch(Exception ) { }
 			Thread.CurrentThread.CurrentUICulture = current;
 			return true;
 		}

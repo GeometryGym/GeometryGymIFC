@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
 			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
 #endif
-			mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
+			//mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
 			if (generate)
 				mFactory.initData();
 		}
@@ -83,7 +83,6 @@ namespace GeometryGym.Ifc
 		internal bool mAccuratePreview = false; 
 		public string FolderPath { get; set; } = "";
 		public string FileName { get; set; } = "";
-		internal double mPlaneAngleToRadians = 1;
 		internal bool mTimeInDays = false;
 		public int NextObjectRecord { set { mNextBlank = value; } }
 		public ReleaseVersion Release
@@ -125,6 +124,9 @@ namespace GeometryGym.Ifc
 			get { return (index < mIfcObjects.Count ? mIfcObjects[index] : null); }
 			set
 			{
+				IfcRoot root = this[index] as IfcRoot;
+				if (root != null)
+					mGlobalIDs.Remove(root.GlobalId);
 				if(value == null)
 				{
 					if (mIfcObjects.Count > index)
@@ -164,9 +166,8 @@ namespace GeometryGym.Ifc
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
 			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
 			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
-			hdr += "/* preprocessor_version */ 'GeomGymIFC by Geometry Gym Pty Ltd',\r\n";
+			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
 			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
-
 			hdr += "/* authorization */ 'None');\r\n\r\n";
 			hdr += "FILE_SCHEMA (('" + (mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
@@ -259,7 +260,7 @@ namespace GeometryGym.Ifc
 				mContext.initializeUnitsAndScales();
 
 				if (mContext.mRepresentationContexts.Count > 0)
-					mFactory.mGeomRepContxt = mIfcObjects[mContext.mRepresentationContexts[0]] as IfcGeometricRepresentationContext;
+					mFactory.mGeometricRepresentationContext = mIfcObjects[mContext.mRepresentationContexts[0]] as IfcGeometricRepresentationContext;
 				
 			}
 		}
@@ -332,7 +333,10 @@ namespace GeometryGym.Ifc
 					{
 						InterpretLine(strLine);
 					}
-					catch (Exception ex) { logError("XXX Error in line " + strLine + " " + ex.Message); }
+					catch (Exception ex)
+					{
+						logError("XXX Error in line " + strLine + " " + ex.Message);
+					}
 					strLine = sr.ReadLine();
 				}
 			}
@@ -460,9 +464,9 @@ namespace GeometryGym.Ifc
 						{
 							mIfcObjects[ea.mIndex] = null;
 							mFactory.mApplication = application;
-							mFactory.OwnerHistory(IfcChangeActionEnum.ADDED).mLastModifyingApplication = application.mIndex;
-							if (mFactory.mOwnerHistoryModify != null)
-								mFactory.mOwnerHistoryModify.mLastModifyingApplication = application.mIndex;
+						//	mFactory.OwnerHistory(IfcChangeActionEnum.ADDED).mLastModifyingApplication = application.mIndex;
+						//	if (mFactory.mOwnerHistories.ContainsKey(IfcChangeActionEnum.MODIFIED))
+						//		mFactory.mOwnerHistories[IfcChangeActionEnum.MODIFIED].mLastModifyingApplication = application.mIndex;
 						}
 					}
 				}
@@ -474,7 +478,7 @@ namespace GeometryGym.Ifc
 			if (geometricRepresentationContext != null)
 			{
 				if (string.Compare(geometricRepresentationContext.mContextType, "Plan", true) != 0)
-					mFactory.mGeomRepContxt = geometricRepresentationContext;
+					mFactory.mGeometricRepresentationContext = geometricRepresentationContext;
 				if (geometricRepresentationContext.mPrecision > 1e-6)
 					Tolerance = geometricRepresentationContext.mPrecision;
 
@@ -503,15 +507,21 @@ namespace GeometryGym.Ifc
 		public bool WriteFile(string filename)
 		{
 			StreamWriter sw = null;
+
+			
 			FolderPath = Path.GetDirectoryName(filename);
-			FileName = filename;
+			string fn = Path.GetFileNameWithoutExtension(filename);
+			char[] chars = Path.GetInvalidFileNameChars();
+			foreach (char c in chars)
+				fn = fn.Replace(c, '_');
+			FileName = Path.Combine(FolderPath, fn  + Path.GetExtension(filename));
 			if(filename.EndsWith("xml"))
 			{
-				WriteXMLFile(filename);
+				WriteXMLFile(FileName);
 				return true;
 			}
 #if (IFCJSON)
-			else if(filename.EndsWith("json"))
+			else if(FileName.EndsWith("json"))
 			{
 				WriteJSONFile(filename);
 				return true;
@@ -519,19 +529,19 @@ namespace GeometryGym.Ifc
 
 #endif
 #if (!NOIFCZIP)
-			bool zip = filename.EndsWith(".ifczip");
+			bool zip = FileName.EndsWith(".ifczip");
 			System.IO.Compression.ZipArchive za = null;
 			if (zip)
 			{
-				if (System.IO.File.Exists(filename))
-					System.IO.File.Delete(filename);
-				za = System.IO.Compression.ZipFile.Open(filename, System.IO.Compression.ZipArchiveMode.Create);
-				System.IO.Compression.ZipArchiveEntry zae = za.CreateEntry(System.IO.Path.GetFileNameWithoutExtension(filename) + ".ifc");
+				if (System.IO.File.Exists(FileName))
+					System.IO.File.Delete(FileName);
+				za = System.IO.Compression.ZipFile.Open(FileName, System.IO.Compression.ZipArchiveMode.Create);
+				System.IO.Compression.ZipArchiveEntry zae = za.CreateEntry(System.IO.Path.GetFileNameWithoutExtension(FileName) + ".ifc");
 				sw = new StreamWriter(zae.Open());
 			}
 			else
 #endif
-			sw = new StreamWriter(filename);
+			sw = new StreamWriter(FileName);
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			sw.Write(getHeaderString(filename) + "\r\n");
@@ -540,9 +550,13 @@ namespace GeometryGym.Ifc
 				BaseClassIfc ie = mIfcObjects[icounter];
 				if (ie != null)
 				{
-					string str = ie.ToString();
-					if (!string.IsNullOrEmpty(str))
-						sw.WriteLine(str);
+					try
+					{
+						string str = ie.ToString();
+						if (!string.IsNullOrEmpty(str))
+							sw.WriteLine(str);
+					}
+					catch(Exception) { }
 				}
 			}
 			sw.Write(getFooterString());
@@ -564,7 +578,7 @@ namespace GeometryGym.Ifc
 		public partial class GenerateOptions
 		{
 			public bool GenerateOwnerHistory { get; set; } = true;
-			
+			public bool AngleUnitsInRadians { get; set; } = true;	
 		}
 		internal GenerateOptions mOptions = new GenerateOptions();
 		public GenerateOptions Options { get { return mOptions; } }
@@ -618,19 +632,39 @@ namespace GeometryGym.Ifc
 		public IfcSIUnit SIArea { get { if(mSIArea == null) mSIArea = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SQUARE_METRE); return mSIArea; } }
 		public IfcSIUnit SIVolume { get { if(mSIVolume == null) mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE); return mSIVolume; } }
 
-		internal IfcDirection mXAxis, mYAxis, mZAxis;
+		internal IfcDirection mXAxis, mYAxis, mZAxis, mNegXAxis, mNegYAxis, mNegZAxis;
 
 		public IfcDirection XAxis { get { if (mXAxis == null) mXAxis = new IfcDirection(mDatabase, 1, 0, 0); return mXAxis; } }
 		public IfcDirection YAxis { get { if (mYAxis == null) mYAxis = new IfcDirection(mDatabase, 0, 1, 0); return mYAxis; } }
 		public IfcDirection ZAxis { get { if (mZAxis == null) mZAxis = new IfcDirection(mDatabase, 0, 0, 1); return mZAxis; } }
+		public IfcDirection XAxisNegative { get { if (mNegXAxis == null) mNegXAxis = new IfcDirection(mDatabase, -1, 0, 0); return mNegXAxis; } }
+		public IfcDirection YAxisNegative { get { if (mNegYAxis == null) mNegYAxis = new IfcDirection(mDatabase, 0, -1, 0); return mNegYAxis; } }
+		public IfcDirection ZAxisNegative { get { if (mNegZAxis == null) mNegZAxis = new IfcDirection(mDatabase, 0, 0, -1); return mNegZAxis; } }
 
-		internal IfcGeometricRepresentationContext mGeomRepContxt;
 
 		partial void getApplicationFullName(ref string app);
 		partial void getApplicationIdentifier(ref string app);
 		partial void getApplicationDeveloper(ref string app);
 
 		private string mApplicationFullName = "", mApplicationIdentifier = "", mApplicationDeveloper = "";
+		public string ToolkitName
+		{
+
+			get
+			{
+				try
+				{
+					Assembly assembly = typeof(BaseClassIfc).Assembly;
+					AssemblyName name = assembly.GetName();
+					string date = String.Format("{0:s}", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToUniversalTime());
+					return name.Name + " v" + name.Version.ToString() + " by Geometry Gym Pty Ltd built " + date;
+				}
+				catch (Exception)
+				{
+					return "GeomGymIFC by Geometry Gym Pty Ltd";
+				}
+			}
+		}
 		public string ApplicationFullName
 		{
 			get
@@ -642,11 +676,18 @@ namespace GeometryGym.Ifc
 					{
 						try
 						{
-							Assembly assembly = Assembly.GetExecutingAssembly();
+							Assembly assembly = Assembly.GetEntryAssembly();
+							if (assembly == null)
+								assembly = Assembly.GetCallingAssembly();
+							if (assembly != null)
+							{ 
 							AssemblyName name = assembly.GetName();
-							return name.Name;
+
+							return name.Name + " v" + name.Version.ToString();
+							}
 						}
-						catch (Exception) { return "Unknown Application"; }
+						catch (Exception) {  }
+						return "Unknown Application";
 					}
 				}
 				return mApplicationFullName;
@@ -737,47 +778,47 @@ namespace GeometryGym.Ifc
 			}
 
 		}
-		internal IfcOwnerHistory mOwnerHistoryCreate, mOwnerHistoryModify, mOwnerHistoryDelete;
+		internal Dictionary<IfcChangeActionEnum, IfcOwnerHistory> mOwnerHistories = new Dictionary<IfcChangeActionEnum, IfcOwnerHistory>();
 		internal IfcOwnerHistory OwnerHistory(IfcChangeActionEnum changeAction)
 		{
-			if (changeAction == IfcChangeActionEnum.ADDED)
-			{
-				if (mOwnerHistoryCreate == null)
-					mOwnerHistoryCreate = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);
-				return mOwnerHistoryCreate;
-			}
-			if (changeAction == IfcChangeActionEnum.DELETED)
-			{
-				if (mOwnerHistoryDelete == null)
-					mOwnerHistoryDelete = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.DELETED);
-				return mOwnerHistoryDelete;
-			}
-			if (changeAction == IfcChangeActionEnum.MODIFIED)
-			{
-				if (mOwnerHistoryModify == null)
-					mOwnerHistoryModify = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.MODIFIED);
-				return mOwnerHistoryModify;
-			}
-			return null;
+			if (mOwnerHistories.ContainsKey(changeAction))
+				return mOwnerHistories[changeAction];
+			IfcOwnerHistory result = new IfcOwnerHistory(PersonOrganization, Application, changeAction);
+			mOwnerHistories.Add(changeAction, result);
+			return result;
 		}
 
 		public enum SubContextIdentifier { Axis, Body, Surface, PlanSymbol };
+		internal IfcGeometricRepresentationContext mGeometricRepresentationContext;
+		public IfcGeometricRepresentationContext GeometricRepresentationContext
+		{
+			get
+			{
+				if(mGeometricRepresentationContext == null)
+				{
+					mGeometricRepresentationContext = new IfcGeometricRepresentationContext(mDatabase, 3, mDatabase.Tolerance) { ContextType = "Model" };
+					if (mDatabase.mContext != null)
+						mDatabase.mContext.AddRepresentationContext(mGeometricRepresentationContext);
+				}
+				return mGeometricRepresentationContext;
+			}
+		}
 		public IfcGeometricRepresentationSubContext SubContext(SubContextIdentifier nature)
 		{
 			if (nature == SubContextIdentifier.Axis)
 			{
 				if (mSubContxtAxis == null)
-					mSubContxtAxis = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
+					mSubContxtAxis = new IfcGeometricRepresentationSubContext(GeometricRepresentationContext, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Axis" };
 				return mSubContxtAxis;
 			}
 			else if (nature == SubContextIdentifier.PlanSymbol)
 			{
 				if (mSubContxtPlanSymbol == null)
-					mSubContxtPlanSymbol = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.PLAN_VIEW) { ContextIdentifier = "Annotation" };
+					mSubContxtPlanSymbol = new IfcGeometricRepresentationSubContext(GeometricRepresentationContext, IfcGeometricProjectionEnum.PLAN_VIEW) { ContextIdentifier = "Annotation" };
 				return mSubContxtPlanSymbol;
 			}
 			if (mSubContxtBody == null)
-				mSubContxtBody = new IfcGeometricRepresentationSubContext(mGeomRepContxt, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
+				mSubContxtBody = new IfcGeometricRepresentationSubContext(GeometricRepresentationContext, IfcGeometricProjectionEnum.MODEL_VIEW) { ContextIdentifier = "Body" };
 			return mSubContxtBody;
 
 		}

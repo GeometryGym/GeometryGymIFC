@@ -62,7 +62,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
 			if (xml.HasAttribute("ProductDefinitional"))
-				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["ProductDefinitional"].Value, out mProductDefinitional);
+				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["ProductDefinitional"].Value,true, out mProductDefinitional);
 
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
@@ -229,9 +229,9 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcSpaceTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcSpaceTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 			else if (xml.HasAttribute("InteriorOrExteriorSpace"))
-				Enum.TryParse<IfcSpaceTypeEnum>(xml.Attributes["InteriorOrExteriorSpace"].Value, out mPredefinedType);
+				Enum.TryParse<IfcSpaceTypeEnum>(xml.Attributes["InteriorOrExteriorSpace"].Value,true, out mPredefinedType);
 			if (xml.HasAttribute("ElevationWithFlooring"))
 				ElevationWithFlooring = double.Parse(xml.Attributes["ElevationWithFlooring"].Value);
 		}

@@ -29,6 +29,21 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcValveType : IfcFlowControllerType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcValveTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcValveTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
 	public partial class IfcVector : IfcGeometricRepresentationItem
 	{
 		internal override void ParseXml(XmlElement xml)

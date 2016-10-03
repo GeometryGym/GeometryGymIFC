@@ -50,7 +50,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcHeatExchanger() : base() { }
 		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcHeatExchanger(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcHeatExchanger(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcHeatExchanger s, List<string> arrFields, ref int ipos)
 		{
@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcHumidifier() : base() { }
 		internal IfcHumidifier(DatabaseIfc db, IfcHumidifier h) : base(db,h) { mPredefinedType = h.mPredefinedType; }
-		internal IfcHumidifier(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcHumidifier(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcHumidifier s, List<string> arrFields, ref int ipos)
 		{

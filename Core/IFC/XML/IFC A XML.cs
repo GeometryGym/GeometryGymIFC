@@ -106,8 +106,8 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+			if (xml.HasAttribute("PredefinedType")) 
+				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -446,6 +446,26 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("TopFlangeSlope", mTopFlangeSlope.ToString());
 		}
 	}
+	public partial class IfcAxis1Placement : IfcPlacement
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Axis") == 0)
+					Axis = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mAxis > 0)
+				xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
+		}
+	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -470,14 +490,13 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Axis") == 0)
-					Axis = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
+					mAxis = mDatabase.ParseXml<IfcDirection>(child as XmlElement).mIndex;
 				else if (string.Compare(name, "RefDirection") == 0)
-					RefDirection = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
+					mRefDirection = mDatabase.ParseXml<IfcDirection>(child as XmlElement).mIndex;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)

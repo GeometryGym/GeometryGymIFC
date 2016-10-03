@@ -30,7 +30,7 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcManifoldSolidBrep : IfcSolidModel //ABSTRACT SUPERTYPE OF(ONEOF(IfcAdvancedBrep, IfcFacetedBrep))
 	{
-		private int mOuter;// : IfcClosedShell; 
+		protected int mOuter;// : IfcClosedShell; 
 		public IfcClosedShell Outer { get { return mDatabase[mOuter] as IfcClosedShell; } set { mOuter = value.mIndex; } }
 
 		protected IfcManifoldSolidBrep() : base() { }
@@ -94,6 +94,8 @@ namespace GeometryGym.Ifc
 			base.postParseRelate();
 			MappingSource.mMapUsage.Add(this);
 		}
+
+		internal override void changeSchema(ReleaseVersion schema) { MappingSource.changeSchema(schema); }
 	}
 	public partial class IfcMaterial : IfcMaterialDefinition
 	{
@@ -409,7 +411,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcMaterialLayerSetUsage() : base() { }
 		internal IfcMaterialLayerSetUsage(DatabaseIfc db, IfcMaterialLayerSetUsage m) : base(db, m) { ForLayerSet = db.Factory.Duplicate(m.ForLayerSet) as IfcMaterialLayerSet; mLayerSetDirection = m.mLayerSetDirection; mDirectionSense = m.mDirectionSense; mOffsetFromReferenceLine = m.mOffsetFromReferenceLine; mReferenceExtent = m.mReferenceExtent; }
-		public IfcMaterialLayerSetUsage(DatabaseIfc db, IfcMaterialLayerSet ls, IfcLayerSetDirectionEnum dir, IfcDirectionSenseEnum sense, double offset) : base(db)
+		public IfcMaterialLayerSetUsage(IfcMaterialLayerSet ls, IfcLayerSetDirectionEnum dir, IfcDirectionSenseEnum sense, double offset) : base(ls.mDatabase)
 		{
 			mForLayerSet = ls.mIndex;
 			mLayerSetDirection = dir;
@@ -515,6 +517,15 @@ namespace GeometryGym.Ifc
 			for (int icounter = 1; icounter < mMaterials.Count; icounter++)
 				str += "," + ParserSTEP.LinkToString(mMaterials[icounter]);
 			return str + ")";
+		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			IfcMaterialConstituentSet mcs = new IfcMaterialConstituentSet("", "", Materials.ConvertAll(x => new IfcMaterialConstituent(x.Name, "", x, 0, "")));
+			mDatabase[mcs.mIndex] = null;
+			mcs.mIndex = mIndex;
+			mDatabase[mIndex] = mcs;
+			base.changeSchema(schema);
 		}
 	}
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
@@ -872,7 +883,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMechanicalFastener() : base() { }
 		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f) : base(db, f) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
-		internal IfcMechanicalFastener(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMechanicalFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		
 		internal static IfcMechanicalFastener Parse(string strDef,ReleaseVersion schema) { IfcMechanicalFastener f = new IfcMechanicalFastener(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return f; }
 		internal static void parseFields(IfcMechanicalFastener f, List<string> arrFields, ref int ipos,ReleaseVersion schema)
@@ -1044,7 +1055,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMember() : base() { }
 		internal IfcMember(DatabaseIfc db, IfcMember m) : base(db, m) { mPredefinedType = m.mPredefinedType; }
-		public IfcMember(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcMember Parse(string strDef, ReleaseVersion schema) { IfcMember m = new IfcMember(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return m; }
 		internal static void parseFields(IfcMember m, List<string> arrFields, ref int ipos,ReleaseVersion schema)
@@ -1133,7 +1144,7 @@ namespace GeometryGym.Ifc
 				m.mDataValue = ParserSTEP.ParseLink(str);
 			m.mReferencePath = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mBenchMark.ToString() + (mValueSource == "$" ? ".,$," : ".,'" + mValueSource + "',") + (mDataValueValue == null ? ParserSTEP.LinkToString(mDataValue) : mDataValueValue.ToString()) + "," + ParserSTEP.LinkToString(mReferencePath); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mBenchMark.ToString() + (mValueSource == "$" ? ".,$," : ".,'" + mValueSource + "',") + (mDataValueValue == null ? ParserSTEP.LinkToString(mDataValue) : mDataValueValue.ToString()) + (mDatabase.Release == ReleaseVersion.IFC2x3 ? "" : "," + ParserSTEP.LinkToString(mReferencePath)); }
 	}
 	public interface IfcMetricValueSelect : IBaseClassIfc { } //SELECT ( IfcMeasureWithUnit, IfcTable, IfcTimeSeries, IfcAppliedValue, IfcValue, IfcReference);
 	public partial class IfcMirroredProfileDef : IfcDerivedProfileDef //SUPERTYPE OF(IfcMirroredProfileDef)
@@ -1164,7 +1175,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMotorConnection() : base() { }
 		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c) : base(db, c) { mPredefinedType = c.mPredefinedType; }
-		internal IfcMotorConnection(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcMotorConnection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcMotorConnection s, List<string> arrFields, ref int ipos)
 		{

@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcValve() : base() { }
 		internal IfcValve(DatabaseIfc db, IfcValve v) : base(db, v) { mPredefinedType = v.mPredefinedType; }
-		internal IfcValve(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcValve s, List<string> arrFields, ref int ipos)
 		{
@@ -58,7 +58,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcValveType() : base() { }
 		internal IfcValveType(DatabaseIfc db, IfcValveType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		internal static void parseFields(IfcValveType t, List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcValveTypeEnum)Enum.Parse(typeof(IfcValveTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcValveType Parse(string strDef) { IfcValveType t = new IfcValveType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
@@ -137,7 +137,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcVibrationIsolator() : base() { }
 		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i) : base(db, i) { mPredefinedType = i.mPredefinedType; }
-		public IfcVibrationIsolator(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcVibrationIsolator Parse(string strDef) { int ipos = 0; IfcVibrationIsolator a = new IfcVibrationIsolator(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcVibrationIsolator a, List<string> arrFields, ref int ipos)
@@ -225,6 +225,14 @@ namespace GeometryGym.Ifc
 	//,IfcSectionalAreaIntegralMeasure ,IfcSectionModulusMeasure ,IfcTemperatureGradientMeasure ,IfcThermalExpansionCoefficientMeasure ,IfcWarpingConstantMeasure
 	//,IfcWarpingMomentMeasure ,IfcSoundPowerMeasure ,IfcSoundPressureMeasure ,IfcHeatingValueMeasure,IfcPHMeasure,IfcIonConcentrationMeasure);
 
+	public partial class IfcAreaDensityMeasure : IfcDerivedMeasureValue 
+	{
+		internal double mValue;
+		public object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } }
+		public IfcAreaDensityMeasure(double value) { mValue = value; }
+		public override string ToString() { return "IFCAREADENSITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
 	public partial class IfcDynamicViscosityMeasure : IfcDerivedMeasureValue
 	{
 		internal double mValue;
@@ -232,6 +240,30 @@ namespace GeometryGym.Ifc
 		public double Measure { get { return mValue; } }
 		public IfcDynamicViscosityMeasure(double value) { mValue = value; }
 		public override string ToString() { return "IFCDYNAMICVISCOSITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
+	public partial class IfcElectricCurrentMeasure : IfcDerivedMeasureValue
+	{
+		internal double mValue;
+		public object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } }
+		public IfcElectricCurrentMeasure(double value) { mValue = value; }
+		public override string ToString() { return "IFCELECTRICCURRENTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
+	public partial class IfcElectricVoltageMeasure : IfcDerivedMeasureValue
+	{
+		internal double mValue;
+		public object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } }
+		public IfcElectricVoltageMeasure(double value) { mValue = value; }
+		public override string ToString() { return "IFCELECTRICVOLTAGEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
+	public partial class IfcEnergyMeasure : IfcDerivedMeasureValue
+	{
+		internal double mValue;
+		public object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } }
+		public IfcEnergyMeasure(double value) { mValue = value; }
+		public override string ToString() { return "IFCENERGYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 	}
 	public partial class IfcForceMeasure : IfcDerivedMeasureValue
 	{

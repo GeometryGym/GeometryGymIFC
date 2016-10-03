@@ -101,7 +101,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcGeographicElement() : base() { }
 		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcGeographicElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
 		
 		internal static IfcGeographicElement Parse(string strDef) { IfcGeographicElement e = new IfcGeographicElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcGeographicElement e, List<string> arrFields, ref int ipos)
@@ -193,6 +193,8 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
+			if (db.Context != null)
+				db.Context.AddRepresentationContext(this);
 			mCoordinateSpaceDimension = SpaceDimension;
 			mPrecision = Math.Max(1e-8, precision);
 			WorldCoordinateSystem = new IfcAxis2Placement3D(new IfcCartesianPoint(db,0,0,0));

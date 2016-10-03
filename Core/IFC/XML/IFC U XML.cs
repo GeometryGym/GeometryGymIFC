@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -50,7 +50,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{

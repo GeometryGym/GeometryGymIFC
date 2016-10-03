@@ -216,7 +216,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -231,7 +231,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -302,6 +302,20 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Blue", mBlue.ToString());
 		}
 	}
+	public abstract partial class IfcColourSpecification : IfcPresentationItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcColourRgb)
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+		}
+	}
 	public partial class IfcColumn : IfcBuildingElement
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -323,7 +337,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcColumnTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcColumnTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -718,7 +732,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcCoveringTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcCoveringTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -733,7 +747,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcCoveringTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcCoveringTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -813,7 +827,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcCurtainWallTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcCurtainWallTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -828,7 +842,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcCurtainWallTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcCurtainWallTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{

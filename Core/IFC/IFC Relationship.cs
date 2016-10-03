@@ -98,6 +98,13 @@ namespace GeometryGym.Ifc
 			o.mDecomposes = this;
 			return true;
 		}
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			List<IfcObjectDefinition> ods = RelatedObjects;
+			for (int jcounter = 0; jcounter < ods.Count; jcounter++)
+				ods[jcounter].changeSchema(schema);
+		}
 	}
 	public abstract partial class IfcRelAssigns : IfcRelationship //	ABSTRACT SUPERTYPE OF(ONEOF(IfcRelAssignsToActor, IfcRelAssignsToControl, IfcRelAssignsToGroup, IfcRelAssignsToProcess, IfcRelAssignsToProduct, IfcRelAssignsToResource))
 	{
@@ -325,6 +332,18 @@ namespace GeometryGym.Ifc
 			if (p != null)
 				p.ReferencedBy.Add(this);
 		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			mDatabase[mRelatingProduct].changeSchema(schema);
+			if (schema == ReleaseVersion.IFC2x3)
+			{
+				IfcProduct product = RelatingProduct as IfcProduct;
+				if (product == null)
+					mDatabase[mIndex] = null;
+			}
+		}
 	}
 	//ENTITY IfcRelAssignsToProjectOrder // DEPRECEATED IFC4 
 	public partial class IfcRelAssignsToResource : IfcRelAssigns
@@ -368,10 +387,10 @@ namespace GeometryGym.Ifc
 		protected IfcRelAssociates(DatabaseIfc db) : base(db) { }
 		protected IfcRelAssociates(DatabaseIfc db, IfcRelAssociates r) : base(db, r)
 		{
-			
 			//RelatedObjects = r.mRelatedObjects.ConvertAll(x => db.Factory.Duplicate(r.mDatabase[x]) as IfcDefinitionSelect);
 		}
-		protected IfcRelAssociates(IfcDefinitionSelect related) : base(related.Database) { mRelatedObjects.Add(related.Index); related.HasAssociations.Add(this); }
+		protected IfcRelAssociates(IfcDefinitionSelect related) : base(related.Database) { addAssociation(related); }
+		protected IfcRelAssociates(List<IfcDefinitionSelect> related) : base(related[0].Database) { addAssociation(related); }
 		protected override string BuildStringSTEP()
 		{
 			if (mRelatedObjects.Count == 0)
@@ -473,21 +492,62 @@ namespace GeometryGym.Ifc
 
 		internal static IfcRelAssociatesConstraint Parse(string strDef) { IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcRelAssociatesConstraint a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mIntent = arrFields[ipos++].Replace("'", ""); a.mRelatingConstraint = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mIntent == "$" ? ",$," : ",'" + mIntent + "',") + ParserSTEP.LinkToString(mRelatingConstraint); }
+		protected override string BuildStringSTEP() { return (RelatingConstraint == null ? "" : base.BuildStringSTEP() + (mIntent == "$" ? ",$," : ",'" + mIntent + "',") + ParserSTEP.LinkToString(mRelatingConstraint)); }
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			RelatingConstraint.mConstraintForObjects.Add(this);
 		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			if (schema == ReleaseVersion.IFC2x3)
+			{
+				IfcConstraint constraint = RelatingConstraint;
+				if (constraint != null)
+					constraint.Destruct(true);
+				return;
+#warning implement
+				IfcMetric metric = RelatingConstraint as IfcMetric;
+				// 	TYPE IfcMetricValueSelect = SELECT (IfcDateTimeSelect, IfcMeasureWithUnit, IfcTable, IfcText, IfcTimeSeries, IfcCostValue);
+				if (metric != null)
+				{
+					IfcValue value = metric.mDataValueValue;
+					if (value == null)
+					{
+						IfcMetricValueSelect mv = metric.DataValue;
+						if (mv == null || (mv as IfcMeasureWithUnit == null && mv as IfcDateTimeSelect == null && mv as IfcTable == null && mv as IfcTimeSeries == null && mv as IfcCostValue == null))
+						{
+							mDatabase[mRelatingConstraint] = null;//.Destruct(true);
+							return;
+						}
+					}
+					else
+					{
+						if (value as IfcText == null)
+						{
+							mDatabase[mRelatingConstraint] = null;//.Destruct(true);
+							return;
+						}
+					}
+				}
+
+				if (mIntent == "$")
+					mIntent = "UNKNOWN";
+			}
+			RelatingConstraint.changeSchema(schema);
+		}
 	}
 	public partial class IfcRelAssociatesDocument : IfcRelAssociates
 	{
 		internal int mRelatingDocument;// : IfcDocumentSelect; 
-		public IfcDocumentSelect RelatingDocument { get { return mDatabase[mRelatingDocument] as IfcDocumentSelect; } set { mRelatingDocument = value.Index; } }
+		public IfcDocumentSelect RelatingDocument { get { return mDatabase[mRelatingDocument] as IfcDocumentSelect; } set { mRelatingDocument = value.Index; value.Associates.Add(this); } }
 		internal IfcRelAssociatesDocument() : base() { }
 		internal IfcRelAssociatesDocument(DatabaseIfc db, IfcRelAssociatesDocument r) : base(db,r) { RelatingDocument = db.Factory.Duplicate(r.mDatabase[r.mRelatingDocument]) as IfcDocumentSelect; }
-		public IfcRelAssociatesDocument(IfcDefinitionSelect related, IfcDocumentSelect document) : base(related) { mRelatingDocument = document.Index; }
-		internal IfcRelAssociatesDocument(IfcDocumentSelect document) : base(document.Database) { Name = "DocAssoc"; Description = "Document Associates"; mRelatingDocument = document.Index; document.Associates.Add(this); }
+		public IfcRelAssociatesDocument(IfcDocumentSelect document) : base(document.Database) { Name = "DocAssoc"; Description = "Document Associates"; mRelatingDocument = document.Index; document.Associates.Add(this); }
+		public IfcRelAssociatesDocument(IfcDefinitionSelect related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
+		public IfcRelAssociatesDocument(List<IfcDefinitionSelect> related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; } 
 		internal static IfcRelAssociatesDocument Parse(string strDef) { IfcRelAssociatesDocument a = new IfcRelAssociatesDocument(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcRelAssociatesDocument a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mRelatingDocument = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingDocument); }
@@ -1231,6 +1291,13 @@ namespace GeometryGym.Ifc
 				d.HasContext = this;
 			}
 		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			for (int icounter = 0; icounter < mRelatedDefinitions.Count; icounter++)
+				mDatabase[mRelatedDefinitions[icounter]].changeSchema(schema);
+		}
 	}
 	public abstract partial class IfcRelDecomposes : IfcRelationship //ABSTACT  SUPERTYPE OF (ONEOF (IfcRelAggregates ,IfcRelNests ,IfcRelProjectsElement ,IfcRelVoidsElement))
 	{
@@ -1325,7 +1392,7 @@ namespace GeometryGym.Ifc
 			return d;
 		}
 
-		internal void assign(IfcObjectDefinition od)
+		public void Assign(IfcObjectDefinition od)
 		{
 			mRelatedObjects.Add(od.Index);
 			IfcContext context = od as IfcContext;
@@ -1344,7 +1411,7 @@ namespace GeometryGym.Ifc
 		internal void assign(List<IfcObjectDefinition> objs)
 		{
 			for (int icounter = 0; icounter < objs.Count; icounter++)
-				assign(objs[icounter]);
+				Assign(objs[icounter]);
 		}
 	
 		internal void unassign(List<IfcObjectDefinition> objs)
@@ -1389,6 +1456,12 @@ namespace GeometryGym.Ifc
 						context.mIsDefinedBy.Add(this);
 				}
 			}
+		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			RelatingPropertyDefinition.changeSchema(schema);
 		}
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines //IFC4
@@ -1454,8 +1527,17 @@ namespace GeometryGym.Ifc
 		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcObject;
 		private int mRelatingType;// : IfcTypeObject  
 
+		public List<IfcObject> RelatedObjects
+		{
+			get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject); }
+			set
+			{
+				mRelatedObjects = value.ConvertAll(x => x.mIndex);
+				for (int icounter = 0; icounter < value.Count; icounter++)
+					value[icounter].mIsTypedBy = this;
+			}
+		}
 		public IfcTypeObject RelatingType { get { return mDatabase[mRelatingType] as IfcTypeObject; } set { mRelatingType = value.mIndex; } }
-		public List<IfcObject> RelatedObjects { get { return mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject); } set { mRelatedObjects = value.ConvertAll(x => x.mIndex); for (int icounter = 0; icounter < value.Count; icounter++) value[icounter].mIsTypedBy = this; } }
 
 		internal IfcRelDefinesByType() : base() { }
 		internal IfcRelDefinesByType(IfcTypeObject relType) : base(relType.mDatabase) { mRelatingType = relType.mIndex; relType.mObjectTypeOf = this; }
@@ -1477,8 +1559,15 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mRelatedObjects[icounter]);
 			return str + ")," + ParserSTEP.LinkToString(mRelatingType);
 		}
-		internal static void parseFields(IfcRelDefinesByType t, List<string> arrFields, ref int ipos) { IfcRelDefines.parseFields(t, arrFields, ref ipos); t.mRelatedObjects = ParserSTEP.SplitListLinks(arrFields[ipos++]); t.mRelatingType = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		internal static IfcRelDefinesByType Parse(string strDef) { IfcRelDefinesByType t = new IfcRelDefinesByType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
+		internal static IfcRelDefinesByType Parse(string str)
+		{
+			IfcRelDefinesByType t = new IfcRelDefinesByType();
+			int pos = 0;
+			t.parseString(str, ref pos);
+			t.mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);
+			t.mRelatingType = ParserSTEP.StripLink(str, ref pos);
+			return t;
+		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
@@ -1498,8 +1587,9 @@ namespace GeometryGym.Ifc
 
 		public void AssignObj(IfcObject obj) //TODO CHECK CLASS NAME MATCHES INSTANCE using reflection
 		{
-			mRelatedObjects.Add(obj.mIndex);
-			if (obj.mIsTypedBy != null)
+			if (!mRelatedObjects.Contains(obj.mIndex))
+				mRelatedObjects.Add(obj.mIndex);
+			if (obj.mIsTypedBy != null && obj.mIsTypedBy != this)
 				obj.mIsTypedBy.mRelatedObjects.Remove(obj.mIndex);
 			obj.mIsTypedBy = this;
 		}
@@ -1617,6 +1707,14 @@ namespace GeometryGym.Ifc
 			o.mNests = this;
 			if (!mRelatedObjects.Contains(o.mIndex))
 				mRelatedObjects.Add(o.mIndex);
+		}
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			List<IfcObjectDefinition> ods = RelatedObjects;
+			for (int icounter = 0; icounter < ods.Count; icounter++)
+				ods[icounter].changeSchema(schema);
 		}
 	}
 	//ENTITY IfcRelOccupiesSpaces // DEPRECEATED IFC4

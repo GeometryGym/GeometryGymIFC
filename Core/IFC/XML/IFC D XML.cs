@@ -153,11 +153,11 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("FlowDirection"))
-				Enum.TryParse<IfcFlowDirectionEnum>(xml.Attributes["FlowDirection"].Value,true, out mFlowDirection);
+				Enum.TryParse<IfcFlowDirectionEnum>(xml.Attributes["FlowDirection"].Value, true, out mFlowDirection);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcDistributionPortTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+				Enum.TryParse<IfcDistributionPortTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 			if (xml.HasAttribute("SystemType"))
-				Enum.TryParse<IfcDistributionSystemEnum>(xml.Attributes["SystemType"].Value,true, out mSystemType);
+				Enum.TryParse<IfcDistributionSystemEnum>(xml.Attributes["SystemType"].Value, true, out mSystemType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -170,13 +170,35 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("SystemType", mSystemType.ToString().ToLower());
 		}
 	}
+	public partial class IfcDocumentReference : IfcExternalReference, IfcDocumentSelect
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if(xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ReferencedDocument") == 0)
+					ReferencedDocument = mDatabase.ParseXml<IfcDocumentInformation>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Description", Description);
+			if (mReferencedDocument > 0)
+				xml.AppendChild(ReferencedDocument.GetXML(xml.OwnerDocument, "ReferencedDocument", this, processed));
+		}
+	}
 	public partial class IfcDoor : IfcBuildingElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcDoorTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcDoorTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -191,7 +213,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcDoorTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
+				Enum.TryParse<IfcDoorTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{

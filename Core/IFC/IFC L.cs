@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLamp() : base() { }
 		internal IfcLamp(DatabaseIfc db, IfcLamp l) : base(db, l) { mPredefinedType = l.mPredefinedType; }
-		internal IfcLamp(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcLamp(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcLamp s, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowTerminal.parseFields(s, arrFields, ref ipos);
@@ -182,7 +182,7 @@ namespace GeometryGym.Ifc
 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public IfcLibraryInformation ReferencedLibrary { get { return mDatabase[mReferencedLibrary] as IfcLibraryInformation; } set { mReferencedLibrary = (value == null ? 0 : value.mIndex); if (!value.mHasLibraryReferences.Contains(this)) value.mHasLibraryReferences.Add(this); } }
+		public IfcLibraryInformation ReferencedLibrary { get { return mDatabase[mReferencedLibrary] as IfcLibraryInformation; } set { mReferencedLibrary = (value == null ? 0 : value.mIndex); if (value != null && !value.mHasLibraryReferences.Contains(this)) value.mHasLibraryReferences.Add(this); } }
 
 		internal IfcLibraryReference() : base() { }
 		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db,r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
@@ -222,7 +222,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLightFixture() : base() { }
 		internal IfcLightFixture(DatabaseIfc db, IfcLightFixture f) : base(db, f) { mPredefinedType = f.mPredefinedType; }
-		internal IfcLightFixture(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcLightFixture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcLightFixture t, List<string> arrFields, ref int ipos) { IfcFlowTerminal.parseFields(t, arrFields, ref ipos); string s = arrFields[ipos++]; if (s[0] == '.') t.mPredefinedType = (IfcLightFixtureTypeEnum)Enum.Parse(typeof(IfcLightFixtureTypeEnum), s.Substring(1, s.Length - 2)); }
 		internal new static IfcLightFixture Parse(string strDef) { IfcLightFixture t = new IfcLightFixture(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcLightFixtureTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
@@ -234,7 +234,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLightFixtureType() : base() { }
 		internal IfcLightFixtureType(DatabaseIfc db, IfcLightFixtureType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcLightFixtureType(DatabaseIfc m, string name, IfcLightFixtureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcLightFixtureType(DatabaseIfc m, string name, IfcLightFixtureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 		internal static void parseFields(IfcLightFixtureType t, List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcLightFixtureTypeEnum)Enum.Parse(typeof(IfcLightFixtureTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcLightFixtureType Parse(string strDef) { IfcLightFixtureType t = new IfcLightFixtureType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }

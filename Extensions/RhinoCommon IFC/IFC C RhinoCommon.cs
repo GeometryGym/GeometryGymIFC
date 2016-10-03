@@ -38,8 +38,11 @@ namespace GeometryGym.Ifc
 		internal IfcCartesianPoint(DatabaseIfc m, Point3d pt) : base(m) { Coordinates3d = pt; }
 		internal IfcCartesianPoint(DatabaseIfc m, Point2d pt) : base(m) { Coordinates2d = pt; }
 	}
-
-	public partial class IfcCartesianPointList2D
+	public abstract partial class IfcCartesianPointList : IfcGeometricRepresentationItem //IFC4
+	{
+		internal abstract List<Point3d> Points { get; }
+	}
+	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
 	{
 		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Point2d> coordList) : base(db)
 		{
@@ -48,8 +51,18 @@ namespace GeometryGym.Ifc
 				pts.Add(new Tuple<double, double>(t.X, t.Y));
 			mCoordList = pts.ToArray();
 		}
+		internal override List<Point3d> Points
+		{
+			get
+			{
+				List<Point3d> result = new List<Point3d>(mCoordList.Length);
+				foreach (Tuple<double, double> p in mCoordList)
+					result.Add(new Point3d(p.Item1, p.Item2, 0));
+				return result;
+			}
+		}
 	}
-	public partial class IfcCartesianPointList3D
+	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
 		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Point3d> coordList) : base(db)
 		{
@@ -58,6 +71,7 @@ namespace GeometryGym.Ifc
 				pts.Add(new Tuple<double, double, double>(t.X, t.Y, t.Z));
 			mCoordList = pts.ToArray();
 		}
+		internal override List<Point3d> Points { get { return new List<Tuple<double, double, double>>(mCoordList).ConvertAll(x => new Point3d(x.Item1, x.Item2, x.Item3)); } }
 	}
 	public abstract partial class IfcCartesianTransformationOperator
 	{

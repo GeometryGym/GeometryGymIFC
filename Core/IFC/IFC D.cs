@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDamper() : base() { }
 		internal IfcDamper(DatabaseIfc db, IfcDamper d) : base(db,d) { mPredefinedType = d.mPredefinedType; }
-		internal IfcDamper(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDamper(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcDamper s, List<string> arrFields, ref int ipos)
 		{
@@ -335,6 +335,10 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + ",(" + ParserSTEP.DoubleToString(Math.Round(mDirectionRatioX, 8)) + "," +
 				ParserSTEP.DoubleToString(Math.Round(mDirectionRatioY, 8)) + (double.IsNaN(mDirectionRatioZ) ? "" : "," + ParserSTEP.DoubleToString(Math.Round(mDirectionRatioZ, 8))) + ")";
 		}
+
+		internal bool isXAxis { get { double tol = 1e-6; return ((Math.Abs(mDirectionRatioX - 1) < tol) && (double.IsNaN(mDirectionRatioY) || Math.Abs(mDirectionRatioY) < tol) && (double.IsNaN(mDirectionRatioZ) || Math.Abs(mDirectionRatioZ) < tol)); } }
+		internal bool isYAxis { get { double tol = 1e-6; return ((double.IsNaN(mDirectionRatioX) || Math.Abs(mDirectionRatioX) < tol) && Math.Abs(mDirectionRatioY - 1) < tol && (double.IsNaN(mDirectionRatioZ) || Math.Abs(mDirectionRatioZ) < tol)); } }
+		internal bool isZAxis { get { double tol = 1e-6; return ((double.IsNaN(mDirectionRatioX) || Math.Abs(mDirectionRatioX) < tol) && (double.IsNaN(mDirectionRatioY) || Math.Abs(mDirectionRatioY) < tol) && (Math.Abs(mDirectionRatioZ - 1) < tol)); } }
 	}
 	public partial class IfcDiscreteAccessory : IfcElementComponent
 	{
@@ -343,7 +347,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDiscreteAccessory() : base() { }
 		internal IfcDiscreteAccessory(DatabaseIfc db, IfcDiscreteAccessory a) : base(db, a) { mPredefinedType = a.mPredefinedType; }
-		internal IfcDiscreteAccessory(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcDiscreteAccessory(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		 
 		internal static IfcDiscreteAccessory Parse(string strDef, ReleaseVersion schema) { int ipos = 0; IfcDiscreteAccessory a = new IfcDiscreteAccessory(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return a; }
 		internal static void parseFields(IfcDiscreteAccessory a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -386,7 +390,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDistributionChamberElement() : base() { }
 		internal IfcDistributionChamberElement(DatabaseIfc db, IfcDistributionChamberElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
-		internal IfcDistributionChamberElement(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDistributionChamberElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcDistributionChamberElement e, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -432,7 +436,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDistributionControlElement() : base() { }
 		internal IfcDistributionControlElement(DatabaseIfc db, IfcDistributionControlElement e) : base(db,e) { }
-		internal IfcDistributionControlElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
+		public IfcDistributionControlElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
 		internal static void parseFields(IfcDistributionControlElement e, List<string> arrFields, ref int ipos) { IfcDistributionElement.parseFields(e, arrFields, ref ipos); e.mControlElementId = arrFields[ipos++]; }
 		internal new static IfcDistributionControlElement Parse(string strDef) { IfcDistributionControlElement e = new IfcDistributionControlElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mControlElementId; }
@@ -448,8 +452,8 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDistributionElement() : base() { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e) : base(db,e) { }
-		internal IfcDistributionElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
-		internal IfcDistributionElement(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
+		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
 		
 		internal static void parseFields(IfcDistributionElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 		internal static IfcDistributionElement Parse(string strDef) { IfcDistributionElement e = new IfcDistributionElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
@@ -486,7 +490,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDistributionFlowElement() : base() { }
 		internal IfcDistributionFlowElement(DatabaseIfc db, IfcDistributionFlowElement e) : base(db,e) { }
-		internal IfcDistributionFlowElement(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDistributionFlowElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	 
 		internal static void parseFields(IfcDistributionFlowElement e, List<string> arrFields, ref int ipos) { IfcDistributionElement.parseFields(e, arrFields, ref ipos); }
 		internal new static IfcDistributionFlowElement Parse(string strDef) { IfcDistributionFlowElement e = new IfcDistributionFlowElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
@@ -590,6 +594,7 @@ namespace GeometryGym.Ifc
 		//IsPointedTo	 :	SET OF IfcDocumentInformationRelationship FOR RelatedDocuments;
 		//IsPointer	 :	SET [0:1] OF IfcDocumentInformationRelationship FOR RelatingDocument;
 
+		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
 		public List<IfcDocumentReference> DocumentReferences { get { return mDocumentReferences.ConvertAll(x => mDatabase[x] as IfcDocumentReference); } set { mDocumentReferences = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } } 
 		public List<IfcActorSelect> Editors { get { return mEditors.ConvertAll(x => mDatabase[x] as IfcActorSelect); } set { mEditors = (value == null ? new List<int>() : value.ConvertAll(x => x.Index)); } }
 
@@ -744,7 +749,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDoor() : base() { }
 		internal IfcDoor(DatabaseIfc db, IfcDoor d) : base(db, d) { mOverallHeight = d.mOverallHeight; mOverallWidth = d.mOverallWidth; mPredefinedType = d.mPredefinedType; mOperationType = d.mOperationType; mUserDefinedOperationType = d.mUserDefinedOperationType; }
-		public IfcDoor(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcDoor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		internal static IfcDoor Parse(string strDef, ReleaseVersion schema) { IfcDoor d = new IfcDoor(); int ipos = 0; parseFields(d, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return d; }
 		internal static void parseFields(IfcDoor d, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -996,7 +1001,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDuctFitting() : base() { }
 		internal IfcDuctFitting(DatabaseIfc db, IfcDuctFitting f) : base(db, f) { mPredefinedType = f.mPredefinedType; }
-		internal IfcDuctFitting(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDuctFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcDuctFitting s, List<string> arrFields, ref int ipos)
 		{
@@ -1030,7 +1035,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDuctSegment() : base() { }
 		internal IfcDuctSegment(DatabaseIfc db, IfcDuctSegment s) : base(db,s) { mPredefinedType = s.mPredefinedType; }
-		internal IfcDuctSegment(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDuctSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcDuctSegment s, List<string> arrFields, ref int ipos)
 		{
@@ -1063,7 +1068,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDuctSilencer() : base() { }
 		internal IfcDuctSilencer(DatabaseIfc db, IfcDuctSilencer s) : base(db, s) { mPredefinedType = s.mPredefinedType; }
-		internal IfcDuctSilencer(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcDuctSilencer(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcDuctSilencer a, List<string> arrFields, ref int ipos)
 		{
 			IfcDistributionControlElement.parseFields(a, arrFields, ref ipos);

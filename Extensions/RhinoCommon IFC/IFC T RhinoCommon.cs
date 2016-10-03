@@ -46,6 +46,7 @@ namespace GeometryGym.Ifc
 			if (optStrt == null)
 				optStrt = twoD ? new IfcCartesianPoint(db, new Point2d(s.X, s.Y)) : new IfcCartesianPoint(db, s);
 			end = twoD ? new IfcCartesianPoint(db, new Point2d(e.X, e.Y)) : new IfcCartesianPoint(db,e);
+			double angleFactor = mDatabase.mContext.UnitsInContext.getScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			if (twoD)
 			{
 				if (a.Plane.ZAxis.Z < 0)
@@ -54,7 +55,7 @@ namespace GeometryGym.Ifc
 					x = e - o;
 					IfcAxis2Placement2D ap = new IfcAxis2Placement2D(db, new Point2d(o.X, o.Y), new Vector2d(x.X, x.Y));
 					BasisCurve = new IfcCircle(ap, a.Radius);
-					mTrim1 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, optStrt);
+					mTrim1 = new IfcTrimmingSelect(a.Angle / angleFactor, optStrt);
 					mTrim2 = new IfcTrimmingSelect(0, end);
 				}
 				else
@@ -62,7 +63,7 @@ namespace GeometryGym.Ifc
 					IfcAxis2Placement2D ap = new IfcAxis2Placement2D(db, new Point2d(o.X, o.Y), new Vector2d(x.X, x.Y));
 					BasisCurve = new IfcCircle(ap, a.Radius);
 					mTrim1 = new IfcTrimmingSelect(0, optStrt);
-					mTrim2 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, end);
+					mTrim2 = new IfcTrimmingSelect(a.Angle / angleFactor, end);
 				}
 			}
 			else
@@ -72,7 +73,7 @@ namespace GeometryGym.Ifc
 				IfcAxis2Placement3D ap = new IfcAxis2Placement3D(db, pl);
 				BasisCurve = new IfcCircle(ap, a.Radius);
 				mTrim1 = new IfcTrimmingSelect(0, optStrt);
-				mTrim2 = new IfcTrimmingSelect(a.Angle / mDatabase.mPlaneAngleToRadians, end);
+				mTrim2 = new IfcTrimmingSelect(a.Angle / angleFactor, end);
 			}
 			mMasterRepresentation = IfcTrimmingPreference.PARAMETER;
 		}

@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcJunctionBox() : base() { }
 		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
-		internal IfcJunctionBox(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcJunctionBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 
 		internal static void parseFields(IfcJunctionBox s, List<string> arrFields, ref int ipos)
 		{

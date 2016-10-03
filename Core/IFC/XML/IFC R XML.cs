@@ -260,6 +260,24 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(RelatingConstraint.GetXML(xml.OwnerDocument, "RelatingConstraint", this, processed));
 		}
 	}
+	public partial class IfcRelAssociatesDocument
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingDocument") == 0)
+					RelatingDocument = mDatabase.ParseXml<IfcDocumentSelect>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(mDatabase[mRelatingDocument].GetXML(xml.OwnerDocument, "RelatingDocument", this, processed));
+		}
+	}
 	public partial class IfcRelAssociatesMaterial
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -587,7 +605,6 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 
-
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -651,7 +668,7 @@ namespace GeometryGym.Ifc
 	  //internal string mName = "$";// : OPTIONAL IfcLabel
 	  //internal string mDescription = "$";// : OPTIONAL IfcText; 
 	}
-	public partial class IfcRevolvedAreaSolid : IfcSweptAreaSolid
+	public partial class IfcRevolvedAreaSolid : IfcSweptAreaSolid // SUPERTYPE OF(IfcRevolvedAreaSolidTapered)
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

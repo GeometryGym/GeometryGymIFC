@@ -60,20 +60,23 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Points.GetXML(xml.OwnerDocument, "Points", this, processed));
-			XmlElement element = xml.OwnerDocument.CreateElement("Segments");
-			xml.AppendChild(element);
-			foreach(IfcSegmentIndexSelect seg in Segments)
+			if (mSegments.Count > 0)
 			{
-				XmlElement s = xml.OwnerDocument.CreateElement(seg.GetType().Name + "-wrapper");
-				element.AppendChild(s);
-				IfcArcIndex ai = seg as IfcArcIndex;
-				if (ai != null)
-					s.InnerText = ai.mA + " " + ai.mB + " " + ai.mC;
-				else
+				XmlElement element = xml.OwnerDocument.CreateElement("Segments");
+				xml.AppendChild(element);
+				foreach (IfcSegmentIndexSelect seg in Segments)
 				{
-					IfcLineIndex li = seg as IfcLineIndex;
-					s.InnerText = string.Join(" ", li.mIndices.ConvertAll(x => x.ToString()));
-				} 
+					XmlElement s = xml.OwnerDocument.CreateElement(seg.GetType().Name + "-wrapper");
+					element.AppendChild(s);
+					IfcArcIndex ai = seg as IfcArcIndex;
+					if (ai != null)
+						s.InnerText = ai.mA + " " + ai.mB + " " + ai.mC;
+					else
+					{
+						IfcLineIndex li = seg as IfcLineIndex;
+						s.InnerText = string.Join(" ", li.mIndices.ConvertAll(x => x.ToString()));
+					}
+				}
 			}
 		}
 	}

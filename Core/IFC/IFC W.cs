@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWall() : base() { }
 		internal IfcWall(DatabaseIfc db, IfcWall w) : base(db, w) { mPredefinedType = w.mPredefinedType; }
-		public IfcWall(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcWall Parse(string strDef, ReleaseVersion schema) { IfcWall w = new IfcWall(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
 		internal static void parseFields(IfcWall w, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWasteTerminal() : base() { }
 		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal IfcWasteTerminal(IfcProduct host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcWasteTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcWasteTerminal s, List<string> arrFields, ref int ipos)
 		{
 			IfcFlowTerminal.parseFields(s, arrFields, ref ipos);
@@ -170,7 +170,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWindow() : base() { }
 		internal IfcWindow(DatabaseIfc db, IfcWindow w) : base(db, w) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
-		public IfcWindow(IfcProduct host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcWindow Parse(string strDef, ReleaseVersion schema) { IfcWindow w = new IfcWindow(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
 		internal static void parseFields(IfcWindow w, List<string> arrFields, ref int ipos, ReleaseVersion schema)

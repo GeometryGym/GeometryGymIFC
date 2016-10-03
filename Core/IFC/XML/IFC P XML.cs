@@ -146,6 +146,21 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(TheOrganization.GetXML(xml.OwnerDocument, "TheOrganization", this, processed));
 		}
 	}
+	public partial class IfcPipeFittingType : IfcFlowFittingType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcPipeFittingTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcPipeFittingTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
 	public abstract partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -383,11 +398,11 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("LayerOn"))
-				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerOn"].Value,true,out mLayerOn);
+				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerOn"].Value, true, out mLayerOn);
 			if (xml.HasAttribute("LayerFrozen"))
-				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerFrozen"].Value,true,out mLayerFrozen);
+				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerFrozen"].Value, true, out mLayerFrozen);
 			if (xml.HasAttribute("LayerBlocked"))
-				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerBlocked"].Value,true,out mLayerBlocked);
+				Enum.TryParse<IfcLogicalEnum>(xml.Attributes["LayerBlocked"].Value, true, out mLayerBlocked);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -410,7 +425,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("LayerOn", mLayerOn.ToString().ToLower());
 			xml.SetAttribute("LayerFrozen", mLayerFrozen.ToString().ToLower());
 			xml.SetAttribute("LayerBlocked", mLayerBlocked.ToString().ToLower());
-			if(mLayerStyles.Count > 0)
+			if (mLayerStyles.Count > 0)
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("LayerStyles");
 				xml.AppendChild(element);
@@ -419,8 +434,23 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+		}
+	}
 	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
 	{
+		
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -471,6 +501,46 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(placement);
 			if (mRepresentation > 0)
 				xml.AppendChild(Representation.GetXML(xml.OwnerDocument, "Representation", this, processed));
+		}
+	}
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ShapeOfProduct") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcProduct product = mDatabase.ParseXml<IfcProduct>(cn as XmlElement);
+						if (product != null)
+							mShapeOfProduct.Add(product);
+					}
+				}
+				if (string.Compare(name, "HasShapeAspects") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcShapeAspect aspect = mDatabase.ParseXml<IfcShapeAspect>(cn as XmlElement);
+						if (aspect != null)
+							mHasShapeAspects.Add(aspect);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mHasShapeAspects.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("HasShapeAspects");
+				xml.AppendChild(element);
+				foreach (IfcShapeAspect aspect in mHasShapeAspects)
+					element.AppendChild(aspect.GetXML(xml.OwnerDocument, "", this, processed));
+			}
 		}
 	}
 	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
@@ -658,6 +728,37 @@ namespace GeometryGym.Ifc
 			//}
 		}
 	}
+	public partial class IfcPropertyEnumeratedValue : IfcSimpleProperty
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "EnumerationValues") == 0)
+				{
+					foreach (XmlNode c in child.ChildNodes)
+					{
+						IfcValue val = extractValue(c);
+						if (val != null)
+							mEnumerationValues.Add(val);
+					}
+				}
+				else if (string.Compare(name,"EnumerationReference") == 0)
+					EnumerationReference = mDatabase.ParseXml<IfcPropertyEnumeration>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			XmlElement element = xml.OwnerDocument.CreateElement("EnumerationValues");
+			foreach (IfcValue value in mEnumerationValues)
+				element.AppendChild(convert(xml.OwnerDocument, value, ""));
+			if (mEnumerationReference > 0)
+				element.AppendChild(EnumerationReference.GetXML(xml.OwnerDocument, "EnumerationReference", this, processed));
+		}
+	}
 	public partial class IfcPropertySet : IfcPropertySetDefinition
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -760,6 +861,21 @@ namespace GeometryGym.Ifc
 			//	foreach (IfcAppliedValue v in mAppliedValueFor)
 			//		element.AppendChild(v.GetXML(xml.OwnerDocument, "", this, processed));
 			//}
+		}
+	}
+	public partial class IfcPumpType : IfcFlowMovingDeviceType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcPumpTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcPumpTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 }

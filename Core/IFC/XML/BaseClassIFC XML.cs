@@ -98,10 +98,12 @@ namespace GeometryGym.Ifc
 		}
 		internal static XmlNode convert(XmlDocument doc, IfcValue value,string name)
 		{
-			XmlElement element = doc.CreateElement(name);
 			string keyword = value.GetType().Name;
 			XmlElement v = doc.CreateElement(keyword + "-wrapper");
 			v.InnerText = value.Value.ToString();
+			if (string.IsNullOrEmpty(name))
+				return v;
+			XmlElement element = doc.CreateElement(name);
 			element.AppendChild(v);
 			return element;
 		}
