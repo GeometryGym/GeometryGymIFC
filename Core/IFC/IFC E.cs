@@ -379,6 +379,11 @@ namespace GeometryGym.Ifc
 		//List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		protected IfcElement() : base() { }
+		protected IfcElement(IfcElement basis) : base(basis)
+		{
+			mTag = basis.mTag;
+#warning todo finish inverse
+		}
 		protected IfcElement(DatabaseIfc db) : base(db) { }
 		protected IfcElement(DatabaseIfc db, IfcElement e) : base(db, e)
 		{
@@ -430,7 +435,52 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host,new IfcLocalPlacement(host.Placement,placement), null)
+		{
+			List<IfcShapeModel> reps = new List<IfcShapeModel>();
+			IfcCartesianPoint cp = new IfcCartesianPoint(mDatabase, 0, 0, length);
+			IfcPolyline ipl = new IfcPolyline(mDatabase.Factory.Origin, cp);
+			reps.Add(IfcShapeRepresentation.GetAxisRep(ipl));
+			
+			profile.Associates.addAssociation(this);
 
+			IfcMaterialProfileSet ps = profile.ForProfileSet;
+			IfcMaterialProfileSetUsageTapering psut = profile as IfcMaterialProfileSetUsageTapering;
+			if (psut != null)
+				throw new Exception("Tapering Elements not implemented yet!");
+			IfcProfileDef pd = null;
+			if (ps.mCompositeProfile > 0)
+				pd = ps.CompositeProfile;
+			else
+			{
+				if (ps.mMaterialProfiles.Count > 0)
+					pd = ps.MaterialProfiles[0].Profile;
+				else
+					throw new Exception("Profile not provided");
+			}
+			if (pd != null)
+				reps.Add(new IfcShapeRepresentation( new IfcExtrudedAreaSolid(pd, pd.CalculateTransform(profile.CardinalPoint), length))); 
+			
+			Representation = new IfcProductDefinitionShape(reps);
+		
+		}
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double,double> arcOrigin, double arcAngle) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
+		{
+			IfcMaterialProfileSet ps = profile.ForProfileSet;
+			profile.Associates.addAssociation(this);
+			IfcMaterialProfile mp = ps.MaterialProfiles[0];
+			IfcProfileDef pd = mp.Profile;
+			DatabaseIfc db = host.mDatabase; 
+			List<IfcShapeModel> reps = new List<IfcShapeModel>();
+			double length = Math.Sqrt(Math.Pow(arcOrigin.Item1, 2) + Math.Pow(arcOrigin.Item2, 2)), angMultipler = 1 / mDatabase.mContext.UnitsInContext.getScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
+			Tuple<double, double> normal = new Tuple<double, double>(-arcOrigin.Item2 / length, arcOrigin.Item1 / length);
+			reps.Add(IfcShapeRepresentation.GetAxisRep(new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db,arcOrigin.Item1,arcOrigin.Item2,0),new IfcDirection(db, normal.Item1,normal.Item2, 0), new IfcDirection(db,-arcOrigin.Item1,-arcOrigin.Item2,0)),length),new IfcTrimmingSelect(0),new IfcTrimmingSelect(arcAngle*angMultipler),true, IfcTrimmingPreference.PARAMETER)));
+			IfcAxis2Placement3D translation = pd.CalculateTransform(profile.CardinalPoint);
+			Tuple<double,double,double> pt = translation.Location.Coordinates;
+			IfcAxis1Placement axis = new IfcAxis1Placement(new IfcCartesianPoint(db, arcOrigin.Item1 - pt.Item1, arcOrigin.Item2 - pt.Item2), new IfcDirection(db, normal.Item1, normal.Item2));
+			reps.Add(new IfcShapeRepresentation(new IfcRevolvedAreaSolid(pd, translation, axis, arcAngle * angMultipler)));
+			Representation = new IfcProductDefinitionShape(reps);
+		}
 		protected static void parseFields(IfcElement e, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(e, arrFields, ref ipos); e.mTag = arrFields[ipos++].Replace("'", ""); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + (mTag == "$" ? "$" : "'" + mTag + "'"); }
 
@@ -650,8 +700,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcElementComponentType(DatabaseIfc db) : base(db) { }
 		protected static void parseFields(IfcElementComponentType t, List<string> arrFields, ref int ipos) { IfcElementType.parseFields(t, arrFields, ref ipos); }
 	}
-	public partial class IfcElementQuantity : IfcPropertySetDefinition
+	public partial class IfcElementQuantity : IfcQuantitySet
 	{
+		public override string KeyWord { get { return "IfcElementQuantity"; } }
 		internal string mMethodOfMeasurement = "$";// : OPTIONAL IfcLabel;
 		internal List<int> mQuantities = new List<int>();// : SET [1:?] OF IfcPhysicalQuantity; 
 
@@ -660,12 +711,10 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		
 		internal IfcElementQuantity() : base() { }
 		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q) : base(db, q) { mMethodOfMeasurement = q.mMethodOfMeasurement; Quantities = q.Quantities.ConvertAll(x => db.Factory.Duplicate(x) as IfcPhysicalQuantity); }
-		internal IfcElementQuantity(string name, string methodOfMeasurement, List<IfcPhysicalQuantity> quantities)
-			: base(quantities[0].mDatabase, name)
+		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcElementQuantity(string name, List<IfcPhysicalQuantity> quantities) : base(quantities[0].mDatabase, name)
 		{
-			if (methodOfMeasurement != "")
-				mMethodOfMeasurement = methodOfMeasurement.Replace("'", "");
-			mQuantities = quantities.ConvertAll(x => x.mIndex);
+			Quantities = quantities;
 		}
 		internal static IfcElementQuantity Parse(string strDef) { IfcElementQuantity q = new IfcElementQuantity(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos); return q; }
 		internal static void parseFields(IfcElementQuantity q, List<string> arrFields, ref int ipos) { IfcPropertySetDefinition.parseFields(q, arrFields, ref ipos); q.mMethodOfMeasurement = arrFields[ipos++].Replace("'", ""); q.mQuantities = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
@@ -683,6 +732,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public string ElementType { get { return mElementType == "$" ? "" : mElementType; } set { mElementType = string.IsNullOrEmpty(value) ? "$" : value.Replace("'", ""); } }
 
 		protected IfcElementType() : base() { }
+		protected IfcElementType(IfcElementType basis) : base(basis) { mElementType = basis.mElementType; }
 		protected IfcElementType(DatabaseIfc db, IfcElementType t) : base(db,t) { mElementType = t.mElementType; }
 		protected IfcElementType(DatabaseIfc db) : base(db) { }
 		protected static void parseFields(IfcElementType t, List<string> arrFields, ref int ipos) { IfcTypeProduct.parseFields(t, arrFields, ref ipos); t.mElementType = arrFields[ipos++].Replace("'", ""); }

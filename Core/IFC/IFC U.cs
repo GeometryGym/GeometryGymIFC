@@ -224,7 +224,7 @@ namespace GeometryGym.Ifc
 			if(Find(IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT) == null)
 				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT).mIndex);
 		}
-		internal void AddUnit(IfcUnit u) { mUnits.Add(u.Index); }
+		public void AddUnit(IfcUnit u) { mUnits.Add(u.Index); }
 		internal static void parseFields(IfcUnitAssignment a, List<string> arrFields, ref int ipos) { a.mUnits = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
 		{

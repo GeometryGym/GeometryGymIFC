@@ -455,6 +455,17 @@ namespace GeometryGym.Ifc
 			if (mPlacementRelTo > 0)
 				PlacementRelTo.mReferencedByPlacements.Add(this);
 		}
+
+		internal override bool isWorldXY
+		{
+			get
+			{
+				if (RelativePlacement.IsWorldXY && (mPlacementRelTo == 0 || PlacementRelTo.isWorldXY))
+					return true;
+				//
+				return false;
+			}
+		}
 	}
 	public partial class IfcLocalTime : BaseClassIfc, IfcDateTimeSelect // DEPRECEATED IFC4
 	{

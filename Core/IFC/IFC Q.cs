@@ -33,56 +33,78 @@ namespace GeometryGym.Ifc
 		internal double mAreaValue;// : IfcAreaMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel; IFC4
 
-		public double AreaValue { get { return mAreaValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public double AreaValue { get { return mAreaValue; } set { mAreaValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
 
 		internal IfcQuantityArea() : base() { }
 		internal IfcQuantityArea(DatabaseIfc db, IfcQuantityArea q) : base(db,q) { mAreaValue = q.mAreaValue; mFormula = q.mFormula; }
-		internal IfcQuantityArea(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, double area, string formula) : base(m, name, desc, unit) { mAreaValue = area; mFormula = formula; }
-		internal static void parseFields(IfcQuantityArea q, List<string> arrFields, ref int ipos, ReleaseVersion schema)
+		public IfcQuantityArea(DatabaseIfc db,string name, double area) : base(db,name) { mAreaValue = area;  }
+		internal static IfcQuantityArea Parse(string str, ReleaseVersion schema)
 		{
-			IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos);
-			string str = arrFields[ipos++];
-			if (!double.TryParse(str, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out q.mAreaValue))
+			IfcQuantityArea q = new IfcQuantityArea();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (!double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out q.mAreaValue))
 			{
-				if (str.StartsWith("IFCAREAMEASURE"))
+				if (s.StartsWith("IFCAREAMEASURE"))
 				{
-					str = str.Substring(15, str.Length - 16);
-					double.TryParse(str, out q.mAreaValue);
+					s = s.Substring(15, s.Length - 16);
+					double.TryParse(s, out q.mAreaValue);
 				}
 			}
 			if (schema != ReleaseVersion.IFC2x3)
-				q.mFormula = arrFields[ipos++].Replace("'", "");
+				q.mFormula =  ParserSTEP.StripString(str, ref pos);
+			return q;
 		}
-		internal static IfcQuantityArea Parse(string strDef, ReleaseVersion schema) { IfcQuantityArea q = new IfcQuantityArea(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mAreaValue) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+
+		internal override IfcMeasureValue MeasureValue { get { return new IfcAreaMeasure(mAreaValue); } }
 	}
 	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
 	{
 		internal double mCountValue;// : IfcCountMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
 
-		public double CountValue { get { return mCountValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public double CountValue { get { return mCountValue; } set { mCountValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 
 		internal IfcQuantityCount() : base() { }
 		internal IfcQuantityCount(DatabaseIfc db, IfcQuantityCount q) : base(db,q) { mCountValue = q.mCountValue; mFormula = q.mFormula; }
-		internal IfcQuantityCount(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, double count, string formula) : base(m, name, desc, unit) { mCountValue = count; mFormula = formula; }
-		internal static void parseFields(IfcQuantityCount q, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos); q.mCountValue = ParserSTEP.ParseDouble(arrFields[ipos++]); if (schema != ReleaseVersion.IFC2x3) q.mFormula = arrFields[ipos++].Replace("'", ""); }
-		internal static IfcQuantityCount Parse(string strDef, ReleaseVersion schema) { IfcQuantityCount q = new IfcQuantityCount(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
+		public IfcQuantityCount(DatabaseIfc db, string name, double count) : base(db, name) { mCountValue = count; }
+		internal static IfcQuantityCount Parse(string str, ReleaseVersion schema)
+		{
+			IfcQuantityCount q = new IfcQuantityCount();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (!double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out q.mCountValue))
+			{
+				if (s.StartsWith("IFCCOUNTMEASURE"))
+				{
+					s = s.Substring(16, s.Length - 17);
+					double.TryParse(s, out q.mCountValue);
+				}
+			}
+			if (schema != ReleaseVersion.IFC2x3)
+				q.mFormula = ParserSTEP.StripString(str, ref pos);
+			return q;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mCountValue) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+
+		internal override IfcMeasureValue MeasureValue { get { return new IfcCountMeasure(mCountValue); } }
 	}
 	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
 	{
 		internal double mLengthValue;// : IfcLengthMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
 
-		public double LengthValue { get { return mLengthValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public double LengthValue { get { return mLengthValue; } set { mLengthValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
 
 		internal IfcQuantityLength() : base() { }
 		internal IfcQuantityLength(DatabaseIfc db, IfcQuantityLength q) : base(db,q) { mLengthValue = q.mLengthValue; mFormula = q.mFormula; }
-		internal IfcQuantityLength(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, double length, string formula) : base(m, name, desc, unit) { mLengthValue = length; mFormula = formula; }
+		public IfcQuantityLength(DatabaseIfc db, string name, double length) : base(db, name) { mLengthValue = length; }
 		internal static void parseFields(IfcQuantityLength q, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos);
@@ -98,67 +120,122 @@ namespace GeometryGym.Ifc
 			if (schema != ReleaseVersion.IFC2x3)
 				q.mFormula = arrFields[ipos++].Replace("'", "");
 		}
-		internal static IfcQuantityLength Parse(string strDef, ReleaseVersion schema) { IfcQuantityLength q = new IfcQuantityLength(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
+		internal static IfcQuantityLength Parse(string str, ReleaseVersion schema)
+		{
+			IfcQuantityLength q = new IfcQuantityLength();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (!double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out q.mLengthValue))
+			{
+				if (s.StartsWith("IFCLENGTHMEASURE"))
+				{
+					s = s.Substring(17, s.Length - 18);
+					double.TryParse(s, out q.mLengthValue);
+				}
+			}
+			if (schema != ReleaseVersion.IFC2x3)
+				q.mFormula = ParserSTEP.StripString(str, ref pos);
+			return q;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(Math.Max(0, mLengthValue)) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+
+		internal override IfcMeasureValue MeasureValue { get { return new IfcLengthMeasure(mLengthValue); } }
+	}
+	public abstract partial class IfcQuantitySet : IfcPropertySetDefinition // IFC4  ABSTRACT SUPERTYPE OF(IfcElementQuantity)
+	{
+		protected IfcQuantitySet() : base() { }
+		protected IfcQuantitySet(DatabaseIfc db, string name) : base(db,name) { }
+		protected IfcQuantitySet(DatabaseIfc db, IfcQuantitySet s) : base(db, s) { }
+		protected static void parseFields(IfcExternalSpatialStructureElement s, List<string> arrFields, ref int ipos) { IfcSpatialElement.parseFields(s, arrFields, ref ipos); }
 	}
 	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
 	{
 		internal int mTimeValue;// : IfcTimeMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
 
-		public int TimeValue { get { return mTimeValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public int TimeValue { get { return mTimeValue; } set { mTimeValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
 
 		internal IfcQuantityTime() : base() { }
 		internal IfcQuantityTime(DatabaseIfc db, IfcQuantityTime q) : base(db,q) { mTimeValue = q.mTimeValue; mFormula = q.mFormula; }
-		internal IfcQuantityTime(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, int ifctimemeasure, string formula) : base(m, name, desc, unit) { mTimeValue = ifctimemeasure; mFormula = formula; }
+		public IfcQuantityTime(DatabaseIfc db, string name, int ifctimemeasure) : base(db, name) { mTimeValue = ifctimemeasure; }
 		internal static void parseFields(IfcQuantityTime q, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos); q.mTimeValue = int.Parse(arrFields[ipos++]); if (schema != ReleaseVersion.IFC2x3) q.mFormula = arrFields[ipos++].Replace("'", ""); }
-		internal static IfcQuantityTime Parse(string strDef, ReleaseVersion schema) { IfcQuantityTime q = new IfcQuantityTime(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
+		internal static IfcQuantityTime Parse(string str, ReleaseVersion schema)
+		{
+			IfcQuantityTime q = new IfcQuantityTime();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			int.TryParse(ParserSTEP.StripField(str, ref pos), out q.mTimeValue);
+			if (schema != ReleaseVersion.IFC2x3)
+				q.mFormula = ParserSTEP.StripString(str, ref pos);
+			return q;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mTimeValue.ToString() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+
+		internal override IfcMeasureValue MeasureValue { get { return new IfcTimeMeasure(mTimeValue); } }
 	}
 	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
 	{
 		internal double mVolumeValue;// : IfcVolumeMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
 
-		public double VolumeValue { get { return mVolumeValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public double VolumeValue { get { return mVolumeValue; } set { mVolumeValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 
 		internal IfcQuantityVolume() : base() { }
 		internal IfcQuantityVolume(DatabaseIfc db, IfcQuantityVolume q) : base(db,q) { mVolumeValue = q.mVolumeValue; mFormula = q.mFormula; }
-		internal IfcQuantityVolume(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, double vol, string formula) : base(m, name, desc, unit) { mVolumeValue = vol; mFormula = formula; }
-		internal static void parseFields(IfcQuantityVolume q, List<string> arrFields, ref int ipos, ReleaseVersion schema)
+		public IfcQuantityVolume(DatabaseIfc db, string name, double volume) : base(db, name) { mVolumeValue = volume; }
+		
+		internal static IfcQuantityVolume Parse(string str, ReleaseVersion schema)
 		{
-			IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos);
-			string str = arrFields[ipos++];
-			double vol;
-			if (double.TryParse(str, out vol))
-				q.mVolumeValue = vol;
-			else
+			IfcQuantityVolume q = new IfcQuantityVolume();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (!double.TryParse(s, out q.mVolumeValue))
 			{
-				IfcMeasureValue mv = ParserIfc.parseMeasureValue(str);
+				IfcMeasureValue mv = ParserIfc.parseMeasureValue(s);
 				if (mv != null)
 					q.mVolumeValue = mv.Measure;
 			}
 			if (schema != ReleaseVersion.IFC2x3)
-				q.mFormula = arrFields[ipos++].Replace("'", "");
+				q.mFormula = ParserSTEP.StripString(str, ref pos);
+			return q;
 		}
-		internal static IfcQuantityVolume Parse(string strDef, ReleaseVersion schema) { IfcQuantityVolume q = new IfcQuantityVolume(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mVolumeValue) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		internal override IfcMeasureValue MeasureValue { get { return new IfcVolumeMeasure(mVolumeValue); } }
 	}
 	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
 	{
-		internal double mWeightValue;// : IfcWeightMeasure;	
+		internal double mWeightValue;// : IfcMassMeasure;	
 		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
 
-		public double WeightValue { get { return mWeightValue; } }
-		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } }
+		public double WeightValue { get { return mWeightValue; } set { mWeightValue = value; } }
+		public string Forumla { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 
 		internal IfcQuantityWeight() : base() { }
 		internal IfcQuantityWeight(DatabaseIfc db, IfcQuantityWeight q) : base(db,q) { mWeightValue = q.mWeightValue; mFormula = q.mFormula; }
-		internal IfcQuantityWeight(DatabaseIfc m, string name, string desc, IfcNamedUnit unit, double weight, string formula) : base(m, name, desc, unit) { mWeightValue = weight; mFormula = formula; }
+		internal IfcQuantityWeight(DatabaseIfc db, string name, double weight) : base(db, name) { mWeightValue = weight; }
 		internal static void parseFields(IfcQuantityWeight q, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcPhysicalSimpleQuantity.parseFields(q, arrFields, ref ipos); q.mWeightValue = ParserSTEP.ParseDouble(arrFields[ipos++]); if (schema != ReleaseVersion.IFC2x3) q.mFormula = arrFields[ipos++].Replace("'", ""); }
-		internal static IfcQuantityWeight Parse(string strDef, ReleaseVersion schema) { IfcQuantityWeight q = new IfcQuantityWeight(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return q; }
+		internal static IfcQuantityWeight Parse(string str, ReleaseVersion schema)
+		{
+			IfcQuantityWeight q = new IfcQuantityWeight();
+			int pos = 0;
+			q.parseString(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (!double.TryParse(s, out q.mWeightValue))
+			{
+				IfcMeasureValue mv = ParserIfc.parseMeasureValue(s);
+				if (mv != null)
+					q.mWeightValue = mv.Measure;
+			}
+			if (schema != ReleaseVersion.IFC2x3)
+				q.mFormula = ParserSTEP.StripString(str, ref pos);
+			return q;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mWeightValue) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+
+		internal override IfcMeasureValue MeasureValue { get { return new IfcMassMeasure(mWeightValue); } }
 	}
 }

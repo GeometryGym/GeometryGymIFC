@@ -275,6 +275,8 @@ namespace GeometryGym.Ifc
 	{
 		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcRelAssignsToGroup" : base.KeyWord); } }
 		internal double mFactor = 1;//	 :	IfcRatioMeasure;
+		public double Factor { get { return mFactor; } set { mFactor = value; } }
+
 		internal IfcRelAssignsToGroupByFactor() : base() { }
 		internal IfcRelAssignsToGroupByFactor(DatabaseIfc db, IfcRelAssignsToGroupByFactor a) : base(db,a) { mFactor = a.mFactor; }
 		internal IfcRelAssignsToGroupByFactor(IfcGroup relgroup, double factor) : base(relgroup) { mFactor = factor; }
@@ -468,8 +470,14 @@ namespace GeometryGym.Ifc
 		{
 			RelatingClassification = db.Factory.Duplicate(r.mDatabase[r.mRelatingClassification]) as IfcClassificationSelect;
 		}
-		internal static IfcRelAssociatesClassification Parse(string strDef) { IfcRelAssociatesClassification a = new IfcRelAssociatesClassification(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcRelAssociatesClassification a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mRelatingClassification = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal static IfcRelAssociatesClassification Parse(string strDef)
+		{
+			IfcRelAssociatesClassification a = new IfcRelAssociatesClassification();
+			int pos = 0;
+			a.parseString(strDef, ref pos);
+			a.mRelatingClassification = ParserSTEP.StripLink(strDef, ref pos);
+			return a;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingClassification); }
 		internal override void postParseRelate()
 		{
@@ -490,8 +498,15 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c) : base(db,c) { RelatingConstraint = db.Factory.Duplicate(c.RelatingConstraint) as IfcConstraint; }
 		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, IfcConstraint constraint) : base(related) { RelatingConstraint = constraint; }
 
-		internal static IfcRelAssociatesConstraint Parse(string strDef) { IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcRelAssociatesConstraint a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mIntent = arrFields[ipos++].Replace("'", ""); a.mRelatingConstraint = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal static IfcRelAssociatesConstraint Parse(string strDef)
+		{
+			IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint();
+			int pos = 0;
+			a.parseString(strDef, ref pos);
+			a.mIntent = ParserSTEP.StripString(strDef, ref pos);
+			a.mRelatingConstraint = ParserSTEP.StripLink(strDef, ref pos);
+			return a;
+		}
 		protected override string BuildStringSTEP() { return (RelatingConstraint == null ? "" : base.BuildStringSTEP() + (mIntent == "$" ? ",$," : ",'" + mIntent + "',") + ParserSTEP.LinkToString(mRelatingConstraint)); }
 		internal override void postParseRelate()
 		{
@@ -547,9 +562,15 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesDocument(DatabaseIfc db, IfcRelAssociatesDocument r) : base(db,r) { RelatingDocument = db.Factory.Duplicate(r.mDatabase[r.mRelatingDocument]) as IfcDocumentSelect; }
 		public IfcRelAssociatesDocument(IfcDocumentSelect document) : base(document.Database) { Name = "DocAssoc"; Description = "Document Associates"; mRelatingDocument = document.Index; document.Associates.Add(this); }
 		public IfcRelAssociatesDocument(IfcDefinitionSelect related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
-		public IfcRelAssociatesDocument(List<IfcDefinitionSelect> related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; } 
-		internal static IfcRelAssociatesDocument Parse(string strDef) { IfcRelAssociatesDocument a = new IfcRelAssociatesDocument(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcRelAssociatesDocument a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mRelatingDocument = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		public IfcRelAssociatesDocument(List<IfcDefinitionSelect> related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
+		internal static IfcRelAssociatesDocument Parse(string strDef)
+		{
+			IfcRelAssociatesDocument a = new IfcRelAssociatesDocument();
+			int pos = 0;
+			a.parseString(strDef, ref pos);
+			a.mRelatingDocument = ParserSTEP.StripLink(strDef, ref pos);
+			return a;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingDocument); }
 		internal IfcDocumentSelect getDocument() { return mDatabase[mRelatingDocument] as IfcDocumentSelect; }
 	}
@@ -561,8 +582,14 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesLibrary() : base() { }
 		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r) : base(db,r) { RelatingLibrary = db.Factory.Duplicate(r.mDatabase[r.mRelatingLibrary]) as IfcLibrarySelect; }
 		internal IfcRelAssociatesLibrary(DatabaseIfc m, IfcLibrarySelect lib) : base(m) { Name = "LibAssoc"; Description = "Library Associates"; mRelatingLibrary = lib.Index; }
-		internal static IfcRelAssociatesLibrary Parse(string strDef) { IfcRelAssociatesLibrary a = new IfcRelAssociatesLibrary(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcRelAssociatesLibrary a, List<string> arrFields, ref int ipos) { IfcRelAssociates.parseFields(a, arrFields, ref ipos); a.mRelatingLibrary = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal static IfcRelAssociatesLibrary Parse(string strDef)
+		{
+			IfcRelAssociatesLibrary a = new IfcRelAssociatesLibrary();
+			int pos = 0;
+			a.parseString(strDef, ref pos);
+			a.mRelatingLibrary = ParserSTEP.StripLink(strDef, ref pos);
+			return a;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingLibrary); }
 	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
@@ -598,21 +625,29 @@ namespace GeometryGym.Ifc
 	{
 		private int mRelatingProfileProperties;// : IfcProfileProperties;
 		internal int mProfileSectionLocation;// : OPTIONAL IfcShapeAspect;
-		internal double mProfileOrientation;// : OPTIONAL IfcOrientationSelect; //TYPE IfcOrientationSelect = SELECT(IfcPlaneAngleMeasure,IfcDirection);
-		private bool mAngle = true;
-#warning fix profile orientation select
-		public IfcProfileProperties RelatingProfileProperties { get { return mDatabase[mRelatingProfileProperties] as IfcProfileProperties; } }
+		internal double mProfileOrientationValue = double.NaN;// : OPTIONAL IfcOrientationSelect; //TYPE IfcOrientationSelect = SELECT(IfcPlaneAngleMeasure,IfcDirection);
+		internal int mProfileOrientation = 0; // : OPTIONAL IfcOrientationSelect;
+
+		public IfcProfileProperties RelatingProfileProperties { get { return mDatabase[mRelatingProfileProperties] as IfcProfileProperties; } set { mRelatingProfileProperties = value.mIndex; } }
 		public IfcShapeAspect ProfileSectionLocation { get { return mDatabase[mProfileSectionLocation] as IfcShapeAspect; } set { mProfileSectionLocation = value == null ? 0 : value.mIndex; } }
 		 
 		internal IfcRelAssociatesProfileProperties() : base() { }
 		internal IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
 		internal IfcRelAssociatesProfileProperties(DatabaseIfc db, IfcRelAssociatesProfileProperties r) : base(db,r)
 		{
-			//mRelatingProfileProperties = i.mRelatingProfileProperties; 
+			RelatingProfileProperties = db.Factory.Duplicate(r.RelatingProfileProperties) as IfcProfileProperties; 
 			if (r.mProfileSectionLocation > 0)
 				ProfileSectionLocation = db.Factory.Duplicate(r.ProfileSectionLocation) as IfcShapeAspect;
 			mProfileOrientation = r.mProfileOrientation;
+			if (double.IsNaN(r.mProfileOrientationValue))
+			{
+				if (r.mProfileOrientation > 0)
+					mProfileOrientation = db.Factory.Duplicate(r.mDatabase[r.mProfileOrientation]).mIndex;
+			}
+			else
+				mProfileOrientationValue = r.mProfileOrientationValue;
 		}
+
 		internal static IfcRelAssociatesProfileProperties Parse(string strDef) { IfcRelAssociatesProfileProperties a = new IfcRelAssociatesProfileProperties(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcRelAssociatesProfileProperties a, List<string> arrFields, ref int ipos)
 		{
@@ -622,13 +657,10 @@ namespace GeometryGym.Ifc
 			if (arrFields[ipos].StartsWith("IfcPlaneAngleMeasure(", true, System.Globalization.CultureInfo.CurrentCulture))
 			{
 				string str = arrFields[ipos++];
-				a.mProfileOrientation = ParserSTEP.ParseDouble(str.Substring(21, str.Length - 22));
+				a.mProfileOrientationValue = ParserSTEP.ParseDouble(str.Substring(21, str.Length - 22));
 			}
 			else
-			{
-				a.mAngle = false;
 				a.mProfileOrientation = ParserSTEP.ParseLink(arrFields[ipos++]);
-			}
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -636,7 +668,7 @@ namespace GeometryGym.Ifc
 				return "";
 			string str = base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingProfileProperties) + "," +
 				ParserSTEP.LinkToString(mProfileSectionLocation) + ",";
-			if (mAngle)
+			if (double.IsNaN(mProfileOrientationValue))
 			{
 				if (mProfileOrientation == 0)
 					return str + "$";

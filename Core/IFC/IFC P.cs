@@ -65,7 +65,7 @@ namespace GeometryGym.Ifc
 			}
 			else
 			{
-				if (position.isWorldXY)
+				if (position.IsWorldXY)
 					mPosition = 0;
 			}
 		}
@@ -298,8 +298,13 @@ namespace GeometryGym.Ifc
 
 		protected IfcPhysicalQuantity() : base() { }
 		protected IfcPhysicalQuantity(DatabaseIfc db, IfcPhysicalQuantity q) : base(db,q) { mName = q.mName; mDescription = q.mDescription; }
-		protected IfcPhysicalQuantity(DatabaseIfc m, string name, string desc) : base(m) { Name = name; Description = desc; }
+		protected IfcPhysicalQuantity(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected static void parseFields(IfcPhysicalQuantity q, List<string> arrFields, ref int ipos) { q.mName = arrFields[ipos++].Replace("'", ""); q.mDescription = arrFields[ipos++].Replace("'",""); }
+		protected virtual void parseString(string str, ref int pos)
+		{
+			mName = ParserSTEP.StripString(str, ref pos);
+			mDescription = ParserSTEP.StripString(str, ref pos);
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",'" + mName + (mDescription == "$" ? "',$" : "','" + mDescription + "'"); }
 	}
 	public abstract partial class IfcPhysicalSimpleQuantity : IfcPhysicalQuantity //ABSTRACT SUPERTYPE OF (ONEOF (IfcQuantityArea ,IfcQuantityCount ,IfcQuantityLength ,IfcQuantityTime ,IfcQuantityVolume ,IfcQuantityWeight))
@@ -309,9 +314,16 @@ namespace GeometryGym.Ifc
 		
 		protected IfcPhysicalSimpleQuantity() : base() { }
 		protected IfcPhysicalSimpleQuantity(DatabaseIfc db, IfcPhysicalSimpleQuantity q) : base(db, q) { if (q.mUnit > 0) Unit = db.Factory.Duplicate(q.Unit) as IfcNamedUnit; }
-		protected IfcPhysicalSimpleQuantity(DatabaseIfc m, string name, string desc, IfcNamedUnit unit) : base(m, name, desc) { Unit = unit; }
+		protected IfcPhysicalSimpleQuantity(DatabaseIfc db,string name) : base(db,name) { }
 		protected static void parseFields(IfcPhysicalSimpleQuantity q, List<string> arrFields, ref int ipos) { IfcPhysicalQuantity.parseFields(q, arrFields, ref ipos); q.mUnit = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mUnit); }
+		protected override void parseString(string str, ref int pos)
+		{
+			base.parseString(str, ref pos);
+			mUnit = ParserSTEP.StripLink(str, ref pos);
+		}
+
+		internal abstract IfcMeasureValue MeasureValue { get; }
 	}
 	public partial class IfcPile : IfcBuildingElement
 	{
@@ -482,7 +494,7 @@ namespace GeometryGym.Ifc
 		protected static void parseFields(IfcPlacement p, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(p, arrFields, ref ipos); p.mLocation = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mLocation); }
 
-		internal virtual bool isWorldXY { get { return Location.isOrigin; } }
+		public virtual bool IsWorldXY { get { return Location.isOrigin; } }
 	}
 	public partial class IfcPlanarBox : IfcPlanarExtent
 	{
@@ -1202,6 +1214,7 @@ namespace GeometryGym.Ifc
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
 
 		protected IfcProduct() : base() { }
+		protected IfcProduct(IfcProduct basis) : base(basis) { mPlacement = basis.mPlacement; mRepresentation = basis.mRepresentation; mReferencedBy = basis.mReferencedBy; }
 		protected IfcProduct(IfcProductRepresentation rep) : base(rep.mDatabase) { mRepresentation = rep.mIndex; }
 		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { Placement = placement; }
 		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)
@@ -1429,6 +1442,33 @@ namespace GeometryGym.Ifc
 			p.mProfileName = ParserSTEP.ParseString(arrFields[ipos++]);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mProfileType.ToString() + (mProfileName == "$" ? ".,$" : ".,'" + mProfileName + "'"); }
+
+		internal IfcAxis2Placement3D CalculateTransform(IfcCardinalPointReference ip)
+		{
+			double halfDepth = Depth / 2.0, halfWidth = Width / 2.0;
+
+			if (ip == IfcCardinalPointReference.MID)
+				return null;
+			if (ip == IfcCardinalPointReference.BOTLEFT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, halfWidth, halfDepth, 0));
+			if (ip == IfcCardinalPointReference.BOTMID)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, halfDepth, 0));
+			if (ip == IfcCardinalPointReference.BOTRIGHT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, -halfWidth, halfDepth, 0));
+			if (ip == IfcCardinalPointReference.MIDLEFT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, halfWidth, 0, 0));
+			if (ip == IfcCardinalPointReference.MIDRIGHT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, -halfWidth, 0, 0));
+			if (ip == IfcCardinalPointReference.TOPLEFT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, halfWidth, -halfDepth, 0));
+			if (ip == IfcCardinalPointReference.TOPMID)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, -halfDepth, 0));
+			if (ip == IfcCardinalPointReference.TOPRIGHT)
+				return new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, -halfWidth, -halfDepth, 0));
+			return null;
+		}
+		internal virtual double Depth { get { return 0; } }
+		internal virtual double Width { get { return 0; } } 
 	}
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
@@ -2011,19 +2051,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		internal bool IsInstancePropertySet
-		{
-			get
-			{
-				foreach (IfcRelDefinesByTemplate dbt in mIsDefinedBy)
-				{
-					if (dbt.RelatingTemplate.TemplateType == IfcPropertySetTemplateTypeEnum.PSET_OCCURRENCEDRIVEN)
-						return true;
-				}
-				//Check context declared
-				return false;
-			}
-		}
+		
 		public IfcProperty FindProperty(string name)
 		{
 			List<IfcProperty> props = HasProperties;
@@ -2130,6 +2158,20 @@ namespace GeometryGym.Ifc
 			}
 
 		}
+
+		internal bool IsInstancePropertySet
+		{
+			get
+			{
+				foreach (IfcRelDefinesByTemplate dbt in mIsDefinedBy)
+				{
+					if (dbt.RelatingTemplate.TemplateType == IfcPropertySetTemplateTypeEnum.PSET_OCCURRENCEDRIVEN)
+						return true;
+				}
+				//Check context declared
+				return false;
+			}
+		}
 	}
 
 	public interface IfcPropertySetDefinitionSelect : IBaseClassIfc { }// = SELECT ( IfcPropertySetDefinitionSet,  IfcPropertySetDefinition);
@@ -2215,11 +2257,11 @@ namespace GeometryGym.Ifc
 			IfcPropertySingleValue p = new IfcPropertySingleValue();
 			int pos = 0;
 			p.parseString(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);// arrFields[ipos++];
+			string s = ParserSTEP.StripField(str, ref pos);
 			p.mNominalValue = ParserIfc.parseValue(s);
 			if (p.mNominalValue == null)
 				p.mVal = s;
-			p.mUnit = ParserSTEP.StripLink(str, ref pos); //ParserSTEP.ParseSTPLink(arrFields[ipos++]);
+			p.mUnit = ParserSTEP.StripLink(str, ref pos);
 			return p;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + (mNominalValue == null ? mVal : mNominalValue.ToString()) + "," + ParserSTEP.LinkToString(mUnit); }

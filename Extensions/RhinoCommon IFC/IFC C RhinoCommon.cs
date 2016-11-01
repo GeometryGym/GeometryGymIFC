@@ -31,7 +31,7 @@ namespace GeometryGym.Ifc
 	{
 		internal override Point3d Location
 		{
-			get { return new Point3d(mCoordinateX, mCoordinateY, Double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); }
+			get { return new Point3d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); }
 		}
 		internal Point3d Coordinates3d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = value.Z; } }
 		internal Point2d Coordinates2d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = double.NaN; } }

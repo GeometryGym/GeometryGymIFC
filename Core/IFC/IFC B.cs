@@ -37,6 +37,8 @@ namespace GeometryGym.Ifc
 		internal IfcBeam() : base() { }
 		internal IfcBeam(DatabaseIfc db, IfcBeam b) : base(db, b) { mPredefinedType = b.mPredefinedType; }
 		public IfcBeam(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
+		protected IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement, arcOrigin,arcAngle) { }
  
 		internal static void parseFields(IfcBeam b, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -57,6 +59,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcBeamStandardCase() : base() { }
 		internal IfcBeamStandardCase(DatabaseIfc db, IfcBeamStandardCase b) : base(db, b) { }
+		public IfcBeamStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
+		public IfcBeamStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement,arcOrigin, arcAngle) { }
 
 		internal new static IfcBeamStandardCase Parse(string strDef, ReleaseVersion schema) { IfcBeamStandardCase c = new IfcBeamStandardCase(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return c; }
 		internal static void parseFields(IfcBeamStandardCase c, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcBeam.parseFields(c, arrFields, ref ipos,schema); }
@@ -261,18 +265,48 @@ namespace GeometryGym.Ifc
 		{
 			if (m.mRelease == ReleaseVersion.IFC2x3)
 			{
-				if (x != null && (x.mRigid || x.mStiffness == null))
-					mTranslationalStiffnessX = new IfcTranslationalStiffnessSelect(x.mRigid ? -1 : 0);
-				if (y != null && (y.mRigid || y.mStiffness == null))
-					mTranslationalStiffnessY = new IfcTranslationalStiffnessSelect(y.mRigid ? -1 : 0);
-				if (z != null && (z.mRigid || z.mStiffness == null))
-					mTranslationalStiffnessZ = new IfcTranslationalStiffnessSelect(z.mRigid ? -1 : 0);
-				if (xx != null && (xx.mRigid || xx.mStiffness == null))
-					mRotationalStiffnessX = new IfcRotationalStiffnessSelect(xx.mRigid ? -1 : 0);
-				if (yy != null && (yy.mRigid || yy.mStiffness == null))
-					mRotationalStiffnessY = new IfcRotationalStiffnessSelect(yy.mRigid ? -1 : 0);
-				if (zz != null && (zz.mRigid || zz.mStiffness == null))
-					mRotationalStiffnessZ = new IfcRotationalStiffnessSelect(zz.mRigid ? -1 : 0);
+				if (x != null)
+				{
+					if (x.mRigid || x.mStiffness == null)
+						mTranslationalStiffnessX = new IfcTranslationalStiffnessSelect(x.mRigid ? -1 : 0);
+					else
+						mTranslationalStiffnessX = x;
+				}
+				if (y != null)
+				{
+					if (y.mRigid || y.mStiffness == null)
+						mTranslationalStiffnessY = new IfcTranslationalStiffnessSelect(y.mRigid ? -1 : 0);
+					else
+						mTranslationalStiffnessY = y;
+				}
+				if (z != null)
+				{
+					if (z.mRigid || z.mStiffness == null)
+						mTranslationalStiffnessZ = new IfcTranslationalStiffnessSelect(z.mRigid ? -1 : 0);
+					else
+						mTranslationalStiffnessZ = z;
+				}
+				if (xx != null)
+				{
+					if (xx.mRigid || xx.mStiffness == null)
+						mRotationalStiffnessX = new IfcRotationalStiffnessSelect(xx.mRigid ? -1 : 0);
+					else
+						mRotationalStiffnessX = xx;
+				}
+				if (yy != null)
+				{
+					if (yy.mRigid || yy.mStiffness == null)
+						mRotationalStiffnessY = new IfcRotationalStiffnessSelect(yy.mRigid ? -1 : 0);
+					else
+						mRotationalStiffnessY = yy;
+				}
+				if (zz != null)
+				{
+					if (zz.mRigid || zz.mStiffness == null)
+						mRotationalStiffnessZ = new IfcRotationalStiffnessSelect(zz.mRigid ? -1 : 0);
+					else
+						mRotationalStiffnessZ = zz;
+				}
 			}
 			else
 			{
@@ -687,6 +721,8 @@ namespace GeometryGym.Ifc
 		protected IfcBuildingElement(DatabaseIfc db) : base(db) { }
 		protected IfcBuildingElement(DatabaseIfc db, IfcBuildingElement e) : base(db, e) { }
 		protected IfcBuildingElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement, length) { }
+		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement,arcOrigin, arcAngle) { }
 
 		protected static void parseFields(IfcBuildingElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -892,5 +928,14 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcBurnerType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcBurnerTypeEnum)Enum.Parse(typeof(IfcBurnerTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcBurnerType Parse(string strDef) { IfcBurnerType t = new IfcBurnerType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
+
+		internal override void changeSchema(ReleaseVersion schema)
+		{
+			base.changeSchema(schema);
+			if (schema == ReleaseVersion.IFC2x3)
+			{
+				IfcSpaceHeaterType spaceHeaterType = new IfcSpaceHeaterType(this);
+			}
+		}
 	}
 }

@@ -83,6 +83,7 @@ namespace GeometryGym.Ifc
 		internal bool mAccuratePreview = false; 
 		public string FolderPath { get; set; } = "";
 		public string FileName { get; set; } = "";
+		internal string PreviousApplication { get; set; } = "";
 		internal bool mTimeInDays = false;
 		public int NextObjectRecord { set { mNextBlank = value; } }
 		public ReleaseVersion Release
@@ -131,7 +132,7 @@ namespace GeometryGym.Ifc
 				{
 					if (mIfcObjects.Count > index)
 						mIfcObjects[index] = null;
-					if (index < mNextBlank)
+					if (index < mNextBlank && index > 0)
 						mNextBlank = index;
 					return;
 				}
@@ -273,6 +274,7 @@ namespace GeometryGym.Ifc
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			string strLine = sr.ReadLine(), str = "";
 			DateTime s = DateTime.Now;
+			HashSet<string> toIgnore = new HashSet<string>() { "ISO-10303-21;", "HEADER;", "ENDSEC;", "DATA;" ,"END-ISO-10303-21;" };
 			if (offset > 0)
 			{
 				while (strLine != null)
@@ -295,7 +297,13 @@ namespace GeometryGym.Ifc
 						if (strLine != null && index2 + 2 < str3.Length)
 							strLine += str3.Substring(index2 + 2);
 					}
-					while (!strLine.EndsWith(";"))
+					if(string.IsNullOrEmpty(strLine))
+					{
+						strLine = sr.ReadLine();
+						continue;
+					}
+						
+					while (!strLine.EndsWith(");"))
 					{
 						str = sr.ReadLine();
 						if (str != null)
@@ -363,7 +371,17 @@ namespace GeometryGym.Ifc
 							strLine += str3.Substring(index2 + 2);
 					}
 					strLine = strLine.Trim();
-					while (!strLine.EndsWith(";"))
+					if (string.IsNullOrEmpty(strLine))
+					{
+						strLine = sr.ReadLine();
+						continue;
+					}
+					if (strLine.Length < 20 && toIgnore.Contains(strLine.ToUpper()))
+					{
+						strLine = sr.ReadLine();
+						continue;
+					}
+					while (!strLine.EndsWith(");"))
 					{
 						str = sr.ReadLine();
 						if (str != null)
@@ -437,6 +455,17 @@ namespace GeometryGym.Ifc
 					ts.StartsWith("FILE_SCHEMA(('IFC4", true, System.Globalization.CultureInfo.CurrentCulture))
 			{ 
 				mRelease = ReleaseVersion.IFC4;
+				return null;
+			}
+			if (ts.StartsWith("FILE_DESCRIPTION", true, System.Globalization.CultureInfo.CurrentCulture))
+			{
+				
+				return null;
+			}
+			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
+			{
+				List<string> fields = ParserSTEP.SplitLineFields(ts.Substring(10, ts.Length - 12));
+				PreviousApplication = fields.Count > 6 ? fields[5].Replace("'","") : "";
 				return null;
 			}
 			BaseClassIfc result = ParserIfc.ParseLine(line, mRelease);

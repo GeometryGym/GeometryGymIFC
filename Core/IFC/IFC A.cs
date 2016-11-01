@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mTheActor;//	 :	IfcActorSelect; 
 		//INVERSE
-	    internal List<IfcRelAssignsToActor> mIsActingUpon = new List<IfcRelAssignsToActor>();// : SET [0:?] OF IfcRelAssignsToActor FOR RelatingActor;
+		internal List<IfcRelAssignsToActor> mIsActingUpon = new List<IfcRelAssignsToActor>();// : SET [0:?] OF IfcRelAssignsToActor FOR RelatingActor;
 
 		public IfcActorSelect TheActor { get { return mDatabase[mTheActor] as IfcActorSelect; } set { mTheActor = value.Index; } }
 
@@ -980,7 +980,7 @@ namespace GeometryGym.Ifc
 		internal static IfcAxis1Placement Parse(string strDef) { IfcAxis1Placement p = new IfcAxis1Placement(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcAxis1Placement p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]); }
 	}
-	public partial interface IfcAxis2Placement : IBaseClassIfc { } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
+	public partial interface IfcAxis2Placement : IBaseClassIfc { bool IsWorldXY { get; } } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{ 
 		private int mRefDirection;// : OPTIONAL IfcDirection;
@@ -1000,7 +1000,7 @@ namespace GeometryGym.Ifc
 		internal static IfcAxis2Placement2D Parse(string strDef) { IfcAxis2Placement2D p = new IfcAxis2Placement2D(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcAxis2Placement2D p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
 
-		internal override bool isWorldXY { get { return base.isWorldXY && (mRefDirection == 0 || RefDirection.isXAxis); } }
+		public override bool IsWorldXY { get { return base.IsWorldXY && (mRefDirection == 0 || RefDirection.isXAxis); } }
 	}
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement
 	{
@@ -1053,7 +1053,7 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcAxis2Placement3D p, List<string> arrFields, ref int ipos) { IfcPlacement.parseFields(p, arrFields, ref ipos); p.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]); p.mRefDirection = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mAxis > 0 ? "," + ParserSTEP.LinkToString(mAxis) : ",$") + (mRefDirection > 0 ? "," + ParserSTEP.LinkToString(mRefDirection) : ",$"); }
 
-		internal override bool isWorldXY
+		public override bool IsWorldXY
 		{
 			get
 			{
@@ -1061,7 +1061,7 @@ namespace GeometryGym.Ifc
 					return false;
 				if (mRefDirection > 0 && !RefDirection.isXAxis)
 					return false;
-				return base.isWorldXY;
+				return base.IsWorldXY;
 			}
 		}
 	}

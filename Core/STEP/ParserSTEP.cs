@@ -793,6 +793,8 @@ namespace GeometryGym.STEP
 				throw new Exception("Unrecognized format!");
 			while (char.IsWhiteSpace(s[icounter]))
 				icounter++;
+			if (s[icounter] == ')')
+				return new List<int>();
 			if (s[icounter++] != '#')
 				throw new Exception("Unrecognized format!");
 			List<int> result = new List<int>();

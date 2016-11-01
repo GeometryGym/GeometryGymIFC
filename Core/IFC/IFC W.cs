@@ -60,6 +60,22 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w) : base(db, w) { }
+		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSet layerSet, IfcAxis2Placement3D placement, double length, double height, double offset, bool positive)
+			:base(container,new IfcLocalPlacement(container.Placement, placement),null)
+		{
+			DatabaseIfc db = mDatabase;
+			double tol = mDatabase.Tolerance;
+			IfcMaterialLayerSetUsage lsu = new IfcMaterialLayerSetUsage(layerSet, IfcLayerSetDirectionEnum.AXIS2, (positive ? IfcDirectionSenseEnum.POSITIVE : IfcDirectionSenseEnum.NEGATIVE), offset);
+			setMaterial(lsu);
+
+			IfcShapeRepresentation asr = IfcShapeRepresentation.GetAxisRep(new IfcPolyline(new IfcCartesianPoint(db,0,0,0),new IfcCartesianPoint(db,length,0,0)));
+			List<IfcShapeModel> reps = new List<IfcShapeModel>();
+			reps.Add(asr);
+			double t = layerSet.MaterialLayers.ConvertAll(x=>x.LayerThickness).Sum();
+
+			reps.Add(new IfcShapeRepresentation( new IfcExtrudedAreaSolid(new IfcRectangleProfileDef(db,"",length, t), new IfcAxis2Placement3D(new IfcCartesianPoint(db,length/2.0, offset + (positive ? 1 : -1) * t/2.0, 0)), height)));
+			Representation = new IfcProductDefinitionShape(reps);
+		}
 
 		internal new static IfcWallStandardCase Parse(string strDef, ReleaseVersion schema) { IfcWallStandardCase w = new IfcWallStandardCase(); int ipos = 0; parseFields(w, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return w; }
 		internal static void parseFields(IfcWallStandardCase w, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcWall.parseFields(w, arrFields, ref ipos,schema); }

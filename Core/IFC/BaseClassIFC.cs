@@ -37,6 +37,10 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc Database { get { return mDatabase; } }
 
 		internal BaseClassIfc() : base() { }
+		protected BaseClassIfc(BaseClassIfc basis)
+		{
+			basis.ReplaceDatabase(this);
+		}
 		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) { db.appendObject(this); db.Factory.mDuplicateMapping.Add(e.mIndex, mIndex); }
 		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
 		protected BaseClassIfc(DatabaseIfc db) { db.appendObject(this); }

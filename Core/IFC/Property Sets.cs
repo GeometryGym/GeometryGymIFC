@@ -224,6 +224,14 @@ namespace GeometryGym.Ifc
 		public IfcPropertyBoundedValue<IfcPressureMeasure> Pressure { set { value.Name = "Pressure"; mHasProperties.Add(value.mIndex); } }
 		public Pset_DistributionPortTypePipe(IfcDistributionPort port) : base(port.mDatabase, "Pset_DistributionPortTypePipe") { DefinesOccurrence.Assign(port); }
 	}
+
+	public partial class Pset_LandRegistration : IfcPropertySet
+	{
+		public string LandID { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "LandID", new IfcIdentifier(value)).mIndex); } }
+		public bool IsPermanentID { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "IsPermanentID", new IfcBoolean(value)).mIndex); } }
+		public string LandTitleID { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "LandTitleID", new IfcIdentifier(value)).mIndex); } }
+		public Pset_LandRegistration(IfcSite instance) : base(instance.mDatabase, "Pset_LandRegistration") { DefinesOccurrence.Assign(instance); }
+	}
 	public partial class Pset_LightFixtureTypeCommon : IfcPropertySet
 	{
 		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
@@ -360,6 +368,22 @@ namespace GeometryGym.Ifc
 		public double PlasticShapeFactorZ { set { mProperties.Add(new IfcPropertySingleValue(mDatabase, "PlasticShapeFactorZ", "", new IfcPositiveRatioMeasure(value)).mIndex); } }
 		public Pset_ProfileMechanical(IfcProfileDef profileDef) : base("Pset_ProfileMechanical", profileDef) { Description = profileDef.Name; }
 	}
+	public partial class Pset_PropertyAgreement : IfcPropertySet
+	{
+		public PEnum_PropertyAgreementType AgreementType { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "AgreementType", new IfcLabel(value.ToString())).mIndex); } }
+		public string Identifier { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Identifier", new IfcIdentifier(value)).mIndex); } }
+		public string Version { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Version", new IfcLabel(value)).mIndex); } }
+		//public DateTime VersionDate { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "VersionDate", new IfcDate(value)).mIndex); } }
+		public string PropertyName { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "PropertyName", new IfcLabel(value)).mIndex); } }
+		//public DateTime CommencementDate { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "CommencementDate", new IfcDate(value)).mIndex); } }
+		//public DateTime TerminationDate { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "TerminationDate", new IfcDate(value)).mIndex); } }
+		//public IfcDuration Duration { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Duration", value).mIndex); } }
+		public string Options { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Options", new IfcText(value)).mIndex); } }
+		public string ConditionCommencement { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ConditionCommencement", new IfcText(value)).mIndex); } }
+		public string Restrictions { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Restrictions", new IfcText(value)).mIndex); } }
+		public string ConditionTermination { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ConditionTermination", new IfcText(value)).mIndex); } }
+		public Pset_PropertyAgreement(IfcSpatialStructureElement instance) : base(instance.mDatabase, "Pset_PropertyAgreement") { DefinesOccurrence.Assign(instance); }
+	}
 	public partial class Pset_PumpOccurrence : IfcPropertySet
 	{
 		public double ImpellerDiameter { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ImpellerDiameter", new IfcPositiveLengthMeasure(value)).mIndex); } }
@@ -380,6 +404,16 @@ namespace GeometryGym.Ifc
 		public double NominalRotationSpeed { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NominalRotationSpeed", new IfcRotationalFrequencyMeasure(value)).mIndex); } }
 		public Pset_PumpTypeCommon(IfcPump pump) : base(pump.mDatabase, "Pset_PumpTypeCommon") { Description = pump.Name; DefinesOccurrence.Assign(pump); }
 		public Pset_PumpTypeCommon(IfcPumpType pumpType) : base(pumpType.mDatabase, "Pset_PumpTypeCommon") { Description = pumpType.Name; pumpType.AddPropertySet(this); }
+	}
+	public partial class Pset_SiteCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public double BuildableArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "BuildableArea", new IfcAreaMeasure(value)).mIndex); } }
+		public double SiteCoverageRatio { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "SiteCoverageRatio", new IfcPositiveRatioMeasure(value)).mIndex); } }
+		public double FloorAreaRatio { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "FloorAreaRatio", new IfcPositiveRatioMeasure(value)).mIndex); } }
+		public double BuildingHeightLimit { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "BuildingHeightLimit", new IfcPositiveLengthMeasure(value)).mIndex); } }
+		public double TotalArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "TotalArea", new IfcAreaMeasure(value)).mIndex); } }
+		public Pset_SiteCommon(IfcSite instance) : base(instance.mDatabase, "Pset_SiteCommon") { DefinesOccurrence.Assign(instance); }
 	}
 	public partial class Pset_SlabCommon : IfcPropertySet
 	{
@@ -500,5 +534,14 @@ namespace GeometryGym.Ifc
 		public Pset_WallCommon(IfcWall wall) : base(wall.mDatabase, "Pset_WallCommon") {  DefinesOccurrence.Assign(wall); }
 		public Pset_WallCommon(IfcWallType wallType) : base(wallType.mDatabase, "Pset_WallCommon") { Description = wallType.Name;  wallType.AddPropertySet(this); }
 	}
-
+	public partial class Pset_ZoneCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public bool IsExternal { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value)).mIndex); } }
+		public double GrossPlannedArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "GrossPlannedArea", new IfcAreaMeasure(value)).mIndex); } }
+		public double NetPlannedArea { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "NetPlannedArea", new IfcAreaMeasure(value)).mIndex); } }
+		public bool PubliclyAccessible { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "PubliclyAccessible", new IfcBoolean(value)).mIndex); } }
+		public bool HandicapAccessible { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "HandicapAccessible", new IfcBoolean(value)).mIndex); } }
+		public Pset_ZoneCommon(IfcZone instance) : base(instance.mDatabase, "Pset_ZoneCommon") { DefinesOccurrence.Assign(instance); }
+	}
 }

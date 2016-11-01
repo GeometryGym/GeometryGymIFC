@@ -61,6 +61,7 @@ namespace GeometryGym.Ifc
 		}
 		
 		protected IfcObject() : base() { }
+		protected IfcObject(IfcObject basis) : base(basis) { mObjectType = basis.mObjectType; mIsDeclaredBy = basis.mIsDeclaredBy; mIsTypedBy = basis.mIsTypedBy; mIsDefinedBy = basis.mIsDefinedBy; }
 		protected IfcObject(DatabaseIfc db, IfcObject o) : base(db, o)//, bool downStream) : base(db, o, downStream)
 		{
 			mObjectType = o.mObjectType;
@@ -132,6 +133,16 @@ namespace GeometryGym.Ifc
 		
 		protected IfcObjectDefinition() : base() { }
 		protected IfcObjectDefinition(DatabaseIfc db) : base(db) {  }
+		protected IfcObjectDefinition(IfcObjectDefinition basis) : base(basis)
+		{
+			mHasAssignments = basis.mHasAssignments;
+			mNests = basis.mNests;
+			mIsNestedBy = basis.mIsNestedBy;
+			mHasContext = basis.mHasContext;
+			mIsDecomposedBy = basis.mIsDecomposedBy;
+			mDecomposes = basis.mDecomposes;
+			mHasAssociations = basis.mHasAssociations;
+		}
 		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o) : base (db, o)//, bool downStream) : base(db, o)
 		{
 			foreach(IfcRelAssigns assigns in o.mHasAssignments)
@@ -291,6 +302,15 @@ namespace GeometryGym.Ifc
 				mIsDecomposedBy[icounter].changeSchema(schema);
 			base.changeSchema(schema);
 		}
+		public virtual IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
+		{
+			return (mDecomposes != null ? mDecomposes.RelatingObject.CreateOrFindStructAnalysisModel() : null);
+		}
+
+		public virtual IfcStructuralAnalysisModel FindStructAnalysisModel(bool strict)
+		{
+			return (!strict && mDecomposes != null ? mDecomposes.RelatingObject.FindStructAnalysisModel(false) : null);
+		}
 	}
 	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
 	{	//INVERSE 
@@ -311,6 +331,8 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcObjectPlacement(DatabaseIfc db, IfcObjectPlacement p) : base(db,p) { }
 		protected static void parseFields(IfcObjectPlacement p, List<string> arrFields, ref int ipos) { }
+
+		internal virtual bool isWorldXY { get { return false; } }
 	}
 	public partial class IfcObjective : IfcConstraint
 	{
@@ -393,7 +415,7 @@ namespace GeometryGym.Ifc
 		internal static IfcOneDirectionRepeatFactor Parse(string strDef) { IfcOneDirectionRepeatFactor f = new IfcOneDirectionRepeatFactor(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRepeatFactor); }
 	}
-	public partial class IfcOpeningElement : IfcFeatureElementSubtraction
+	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)
 	{
 		internal IfcOpeningElementTypeEnum mPredefinedType = IfcOpeningElementTypeEnum.NOTDEFINED;// :	OPTIONAL IfcOpeningElementTypeEnum; //IFC4
 		//INVERSE
@@ -404,7 +426,15 @@ namespace GeometryGym.Ifc
 		internal IfcOpeningElement() : base() { }
 		internal IfcOpeningElement(DatabaseIfc db, IfcOpeningElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
 		internal IfcOpeningElement(DatabaseIfc db) : base(db) { }
-		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductRepresentation rep) : base(host.mDatabase) { Placement = placement; Representation = rep; IfcRelVoidsElement rve = new IfcRelVoidsElement(host, this); }
+		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductRepresentation rep) : base(host.mDatabase)
+		{
+			if (placement == null)
+				Placement = new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(Database.Factory.Origin));
+			else
+				Placement = placement;
+			Representation = rep;
+			IfcRelVoidsElement rve = new IfcRelVoidsElement(host, this);
+		}
 	
 		internal static IfcOpeningElement Parse(string strDef, ReleaseVersion schema) { IfcOpeningElement e = new IfcOpeningElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcOpeningElement e, List<string> arrFields, ref int ipos, ReleaseVersion schema)

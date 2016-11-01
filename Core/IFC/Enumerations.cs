@@ -305,6 +305,7 @@ namespace GeometryGym.Ifc
 	public enum PEnum_LightFixturePlacingType { CEILING, FLOOR, FURNITURE, POLE, WALL, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_PipeEndStyleTreatment { BRAZED, COMPRESSION, GROOVED, OUTSIDESLEEVE, SOLDERED, SWEDGE, THREADED, WELDED, OTHER, NONE, USERDEFINED, NOTDEFINED }
 	public enum PEnum_PipeFittingJunctionType { TEE, CROSS, OTHER, NOTKNOWN, UNSET };
+	public enum PEnum_PropertyAgreementType { ASSIGNMENT, LEASE, TENANT, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_PumpBaseType { FRAME, BASE, NONE, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_PumpDriveConnectionType { DIRECTDRIVE, BELTDRIVE, COUPLING, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_SpaceHeaterConvectorType { FORCED, NATURAL, OTHER, NOTKNOWN, UNSET };

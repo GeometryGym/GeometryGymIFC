@@ -1115,9 +1115,9 @@ namespace GeometryGym.Ifc
 			mSenseAgreement = c.mSenseAgreement;
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
-		internal IfcTrimmedCurve(IfcCurve basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp) : base(basis.mDatabase)
+		public IfcTrimmedCurve(IfcCurve basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp) : base(basis.mDatabase)
 		{
-			mBasisCurve = basis.mIndex;
+			BasisCurve = basis;
 			mTrim1 = start;
 			mTrim2 = end;
 			mSenseAgreement = senseAgreement;
@@ -1163,22 +1163,17 @@ namespace GeometryGym.Ifc
 		internal static IfcTrimmedCurve Parse(string strDef) { IfcTrimmedCurve c = new IfcTrimmedCurve(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mBasisCurve) + "," + mTrim1.ToString() + "," + mTrim2.ToString() + "," + ParserSTEP.BoolToString(mSenseAgreement) + ",." + mMasterRepresentation.ToString() + "."; }
 	}
-	public partial struct IfcTrimmingSelect
+	public partial class IfcTrimmingSelect
 	{
-		internal IfcTrimmingSelect(double param, IfcCartesianPoint cp)
-		{
-			mIfcParameterValue = param;
-			mIfcCartesianPoint = 0;
-			if (cp != null)
-				mIfcCartesianPoint = cp.mIndex;
-		}
-		internal IfcTrimmingSelect(IfcCartesianPoint cp)
+		public IfcTrimmingSelect() { }
+		public IfcTrimmingSelect(IfcCartesianPoint cp)
 		{
 			mIfcParameterValue = double.NaN;
-			mIfcCartesianPoint = 0;
-			if (cp != null)
-				mIfcCartesianPoint = cp.mIndex;
+			mIfcCartesianPoint = (cp != null ? cp.mIndex : 0);
 		}
+		public IfcTrimmingSelect(double param) { mIfcParameterValue = param; }
+		public IfcTrimmingSelect(double param, IfcCartesianPoint cp) : this(cp) { mIfcParameterValue = param; }
+		
 		internal double mIfcParameterValue;
 		internal int mIfcCartesianPoint;
 		internal static IfcTrimmingSelect Parse(string str)
@@ -1374,9 +1369,13 @@ namespace GeometryGym.Ifc
 		public IfcRelDefinesByType ObjectTypeOf { get { return mObjectTypeOf; } }
 		//GeomGym
 		internal IfcMaterialProfileSet mTapering = null;
-		protected IfcTypeObject() : base() { }
+
+		public override string Name { set { base.Name = string.IsNullOrEmpty( value) ? "NameNotAssigned" : value; } }
+
+		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
+		protected IfcTypeObject(IfcTypeObject basis) : base(basis) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
 		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t) : base(db,t) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets = t.HasPropertySets.ConvertAll(x=>db.Factory.Duplicate(x) as IfcPropertySetDefinition); }
-		internal IfcTypeObject(DatabaseIfc db) : base(db) { IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
+		internal IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
 		
 		internal static void parseFields(IfcTypeObject t, List<string> arrFields, ref int ipos)
 		{
@@ -1502,6 +1501,11 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
 
 		protected IfcTypeProduct() : base() { }
+		protected IfcTypeProduct(IfcTypeProduct basis) : base(basis)
+		{
+			mRepresentationMaps = basis.mRepresentationMaps;
+			mTag = basis.mTag;
+		}
 		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t) : base(db,t) { RepresentationMaps = t.RepresentationMaps.ConvertAll(x=>db.Factory.Duplicate(x) as IfcRepresentationMap); mTag = t.mTag; }
 		protected IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 

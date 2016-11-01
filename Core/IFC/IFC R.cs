@@ -235,6 +235,9 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcRectangleProfileDef p, List<string> arrFields, ref int ipos) { IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos); p.mXDim = ParserSTEP.ParseDouble(arrFields[ipos++]); p.mYDim = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mXDim) + "," + ParserSTEP.DoubleToString(mYDim); }
 		internal new static IfcRectangleProfileDef Parse(string strDef) { IfcRectangleProfileDef p = new IfcRectangleProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
+
+		internal override double Depth { get { return YDim; } }
+		internal override double Width { get { return XDim; } }
 	}
 	public partial class IfcRectangularPyramid : IfcCsgPrimitive3D
 	{
@@ -1285,6 +1288,7 @@ namespace GeometryGym.Ifc
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcRoot() : base() { mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid()); }
+		protected IfcRoot(IfcRoot basis) : base(basis) { GlobalId = basis.mGlobalId; mOwnerHistory = basis.mOwnerHistory; mName = basis.mName; mDescription = basis.mDescription; }
 		protected IfcRoot(DatabaseIfc db) : base(db)
 		{
 			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());

@@ -564,6 +564,7 @@ namespace GeometryGym.Ifc
 		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTerminal" : base.KeyWord); } }
 
 		internal IfcFlowTerminal() : base() { }
+		protected IfcFlowTerminal(IfcFlowTerminal basis) : base(basis) { }
 		internal IfcFlowTerminal(DatabaseIfc db, IfcFlowTerminal t) : base(db, t) { }
 		public IfcFlowTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcFlowTerminal t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElement.parseFields(t, arrFields, ref ipos); }
@@ -573,6 +574,7 @@ namespace GeometryGym.Ifc
 	{ // IfcElectricApplianceType ,IfcElectricHeaterType ,IfcFireSuppressionTerminalType,IfcLampType ,IfcLightFixtureType ,IfcOutletType ,IfcSanitaryTerminalType ,IfcStackTerminalType ,IfcWasteTerminalType)) 
 		// IFC4 deleted ,IfcGasTerminalType 
 		protected IfcFlowTerminalType() : base() { }
+		protected IfcFlowTerminalType(IfcDistributionFlowElementType basis) : base(basis) { }
 		protected IfcFlowTerminalType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowTerminalType(DatabaseIfc db, IfcFlowTerminalType t) : base(db,t) { }
 		protected static void parseFields(IfcFlowTerminalType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }

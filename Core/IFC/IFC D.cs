@@ -62,11 +62,12 @@ namespace GeometryGym.Ifc
 		internal new static IfcDamperType Parse(string strDef) { IfcDamperType t = new IfcDamperType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public partial class IfcDate
+	public partial class IfcDate : IfcSimpleValue
 	{
 		internal string mDate = "$";
+		public object Value { get { return mDate; } }
 		internal IfcDate(DateTime datetime) { mDate = convert(datetime); }
-		public override string ToString() { return mDate; }
+		public override string ToString() { return mDate; } // "IFCDATE(" + mDate + ")"; }
 		internal static string convert(DateTime date) { return "'" + date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day + "'"; }
 		internal static DateTime convert(string date) { return new DateTime(int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(5, 2)), int.Parse(date.Substring(8, 2))); }
 	}
@@ -196,7 +197,7 @@ namespace GeometryGym.Ifc
 		private int mExponent;// : INTEGER;
 
 		public IfcNamedUnit Unit { get { return mDatabase[mUnit] as IfcNamedUnit; } set { mUnit = value.mIndex; } }
-		public int Exponent { get { return mExponent; } } 
+		public int Exponent { get { return mExponent; } set { mExponent = value; } } 
 
 		internal IfcDerivedUnitElement() : base() { }
 		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Factory.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
@@ -451,6 +452,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcDistributionElement : IfcElement //SUPERTYPE OF (ONEOF (IfcDistributionControlElement ,IfcDistributionFlowElement))
 	{
 		internal IfcDistributionElement() : base() { }
+		protected IfcDistributionElement(IfcDistributionElement basis) : base(basis) { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e) : base(db,e) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
@@ -475,6 +477,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcDistributionElementType : IfcElementType //SUPERTYPE OF(ONEOF(IfcDistributionControlElementType, IfcDistributionFlowElementType))
 	{
 		internal IfcDistributionElementType() : base() { }
+		internal IfcDistributionElementType(IfcDistributionElementType basis) : base(basis) { }
 		protected IfcDistributionElementType(DatabaseIfc db) : base(db) { }
 		protected IfcDistributionElementType(DatabaseIfc db, IfcDistributionElementType t) : base(db, t) { }
 		internal static void parseFields(IfcDistributionElementType t, List<string> arrFields, ref int ipos) { IfcElementType.parseFields(t, arrFields, ref ipos); }
@@ -489,6 +492,7 @@ namespace GeometryGym.Ifc
 		internal IfcDistributionPort mSourcePort, mSinkPort;
 
 		internal IfcDistributionFlowElement() : base() { }
+		protected IfcDistributionFlowElement(IfcDistributionFlowElement basis) : base(basis) { mSourcePort = basis.mSourcePort; mSinkPort = basis.mSinkPort;  }
 		internal IfcDistributionFlowElement(DatabaseIfc db, IfcDistributionFlowElement e) : base(db,e) { }
 		public IfcDistributionFlowElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	 
@@ -498,6 +502,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcDistributionFlowElementType : IfcDistributionElementType //IfcDistributionChamberElementType, IfcEnergyConversionDeviceType, IfcFlowControllerType,
 	{ // IfcFlowFittingType, IfcFlowMovingDeviceType, IfcFlowSegmentType, IfcFlowStorageDeviceType, IfcFlowTerminalType, IfcFlowTreatmentDeviceType))
 		protected IfcDistributionFlowElementType() : base() { }
+		protected IfcDistributionFlowElementType(IfcDistributionFlowElementType basis) : base(basis) { }
 		protected IfcDistributionFlowElementType(DatabaseIfc db) : base(db) { }
 		protected IfcDistributionFlowElementType(DatabaseIfc db, IfcDistributionFlowElementType t) : base(db, t) { }
 		protected static void parseFields(IfcDistributionFlowElementType t, List<string> arrFields, ref int ipos) { IfcDistributionElementType.parseFields(t, arrFields, ref ipos); }
@@ -732,6 +737,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mDescription == "$" ? ",$," : ",'" + mDescription + "',") + ParserSTEP.LinkToString(mReferencedDocument)); }
+
+		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects[0].addAssociation(d); }
 	}
 	public interface IfcDocumentSelect : IBaseClassIfc //IFC4 SELECT (	IfcDocumentReference, IfcDocumentInformation);
 	{
@@ -837,7 +844,7 @@ namespace GeometryGym.Ifc
 		internal double mPanelDepth;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcDoorPanelOperationEnum mOperationType;// : IfcDoorPanelOperationEnum;
 		internal double mPanelWidth;// : OPTIONAL IfcNormalisedRatioMeasure;
-		internal IfcDoorPanelPositionEnum mPanelPosition;// :IfcDoorPanelPositionEnume;
+		internal IfcDoorPanelPositionEnum mPanelPosition;// :IfcDoorPanelPositionEnum;
 		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect;  // DEPRECEATED IFC4
 		internal IfcDoorPanelProperties() : base() { }
 		
@@ -851,7 +858,6 @@ namespace GeometryGym.Ifc
 			if (p.mShapeAspectStyle > 0)
 				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle) as IfcShapeAspect;
 		}
-
 
 		internal static IfcDoorPanelProperties Parse(string strDef) { IfcDoorPanelProperties p = new IfcDoorPanelProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcDoorPanelProperties p, List<string> arrFields, ref int ipos)

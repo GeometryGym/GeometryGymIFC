@@ -221,7 +221,14 @@ namespace GeometryGym.Ifc
 			int len = strLine.Length;
 			int ilast = 1;
 			while (strLine[len - ilast] != ')')
+			{
 				ilast++;
+				if(len - ilast == jcounter)
+				{
+					ilast = 0;
+					break;
+				}
+			}
 			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
 		}
 		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema)

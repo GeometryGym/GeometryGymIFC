@@ -388,5 +388,8 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mOverallWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius)
 				+ (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mFlangeEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope));
 		}
+
+		internal override double Depth { get { return OverallDepth; } }
+		internal override double Width { get { return OverallWidth; } }
 	} 
 }

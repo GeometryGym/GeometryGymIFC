@@ -239,7 +239,8 @@ namespace GeometryGym.Ifc
 		{
 			double tol = (mDatabase.Factory.mGeometricRepresentationContext != null ? mDatabase.Factory.mGeometricRepresentationContext.mPrecision / 100 : 1e-6);
 			int digits = mDatabase.mLengthDigits;
-			double x = Math.Round( mCoordinateX,digits), y = Math.Round( mCoordinateY,digits);
+			double x = Math.Round( mCoordinateX,digits), y = Math.Round( double.IsNaN(mCoordinateY) ? 0 : mCoordinateY,digits);
+
 			if (Math.Abs(x) < tol)
 				x = 0;
 			if (Math.Abs(y) < tol)
@@ -897,6 +898,7 @@ namespace GeometryGym.Ifc
 		internal IfcColumn() : base()  { }
 		internal IfcColumn(DatabaseIfc db, IfcColumn c) : base(db, c) { mPredefinedType = c.mPredefinedType; }
 		public IfcColumn(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcColumn(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	 
 		internal static IfcColumn Parse(string strDef, ReleaseVersion schema) { IfcColumn col = new IfcColumn(); int ipos = 0; parseFields(col, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return col; }
 		internal static void parseFields(IfcColumn c, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -917,6 +919,7 @@ namespace GeometryGym.Ifc
 		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcColumn" : base.KeyWord); } }
 		internal IfcColumnStandardCase() : base() { }
 		internal IfcColumnStandardCase(DatabaseIfc db, IfcColumnStandardCase c) : base(db, c) { }
+		public IfcColumnStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 
 		internal new static IfcColumnStandardCase Parse(string strDef, ReleaseVersion schema) { IfcColumnStandardCase c = new IfcColumnStandardCase(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return c; }
 		internal static void parseFields(IfcColumnStandardCase c, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcColumn.parseFields(c, arrFields, ref ipos,schema); }
@@ -1796,7 +1799,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcConversionBasedUnit() : base() { }
 		internal IfcConversionBasedUnit(DatabaseIfc db, IfcConversionBasedUnit u) : base(db,u) { mName = u.mName; ConversionFactor = db.Factory.Duplicate( u.ConversionFactor) as IfcMeasureWithUnit; }
-		internal IfcConversionBasedUnit(IfcUnitEnum unit, string name, IfcMeasureWithUnit mu)
+		public IfcConversionBasedUnit(IfcUnitEnum unit, string name, IfcMeasureWithUnit mu)
 			: base(mu.mDatabase, unit, true) { Name = name.Replace("'", ""); mConversionFactor = mu.mIndex; }
 		internal static IfcConversionBasedUnit Parse(string strDef) { IfcConversionBasedUnit u = new IfcConversionBasedUnit(); int ipos = 0; parseFields(u, ParserSTEP.SplitLineFields(strDef), ref ipos); return u; }
 		internal static void parseFields(IfcConversionBasedUnit u, List<string> arrFields, ref int ipos) { IfcNamedUnit.parseFields(u, arrFields, ref ipos); u.mName = arrFields[ipos++].Replace("'", ""); u.mConversionFactor = ParserSTEP.ParseLink(arrFields[ipos++]); }

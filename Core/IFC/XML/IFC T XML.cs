@@ -285,7 +285,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("MasterRepresentation", mMasterRepresentation.ToString().ToLower());
 		}
 	}
-	public partial struct IfcTrimmingSelect
+	public partial class IfcTrimmingSelect
 	{
 		internal static IfcTrimmingSelect Parse(XmlElement xml, DatabaseIfc db)
 		{

@@ -1000,6 +1000,7 @@ additional types	some additional representation types are given:
 		public IfcSpaceHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSpaceHeater() : base() { }
+		internal IfcSpaceHeater(IfcFlowTerminal basis) : base(basis) { }
 		internal IfcSpaceHeater(DatabaseIfc db, IfcSpaceHeater h) : base(db, h) { mPredefinedType = h.mPredefinedType; }
 		public IfcSpaceHeater(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 		internal static void parseFields(IfcSpaceHeater s, List<string> arrFields, ref int ipos)
@@ -1018,6 +1019,7 @@ additional types	some additional representation types are given:
 		public IfcSpaceHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSpaceHeaterType() : base() { }
+		internal IfcSpaceHeaterType(IfcDistributionFlowElementType basis) : base(basis) { }
 		internal IfcSpaceHeaterType(DatabaseIfc db, IfcSpaceHeaterType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
 		public IfcSpaceHeaterType(DatabaseIfc m, string name, IfcSpaceHeaterTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 		internal static void parseFields(IfcSpaceHeaterType t, List<string> arrFields, ref int ipos) { IfcEnergyConversionDeviceType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcSpaceHeaterTypeEnum)Enum.Parse(typeof(IfcSpaceHeaterTypeEnum), arrFields[ipos++].Replace(".", "")); }
@@ -1218,6 +1220,36 @@ additional types	some additional representation types are given:
 			}
 			base.changeSchema(schema);
 		}
+		public override IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
+		{
+			IfcStructuralAnalysisModel result = FindStructAnalysisModel(false);
+			if (result != null)
+				return result;
+			if (mDecomposes != null)
+			{
+				IfcObjectDefinition od = mDecomposes.RelatingObject;
+				IfcSite s = od as IfcSite;
+				IfcProject p = od as IfcProject;
+				if (s == null && p == null)
+					return od.CreateOrFindStructAnalysisModel();
+			}
+			return new IfcStructuralAnalysisModel(this, Name, IfcAnalysisModelTypeEnum.LOADING_3D) { Description = Description };
+		}
+		public override IfcStructuralAnalysisModel FindStructAnalysisModel(bool strict)
+		{
+			for (int icounter = 0; icounter < mServicedBySystems.Count; icounter++)
+			{
+				IfcStructuralAnalysisModel sa = mServicedBySystems[icounter].RelatingSystem as IfcStructuralAnalysisModel;
+				if (sa != null)
+					return sa;
+			}
+			if (!strict && mDecomposes != null)
+			{
+				IfcObjectDefinition od = mDecomposes.RelatingObject;
+				return od.FindStructAnalysisModel(false);
+			}
+			return null;
+		}
 	}
 	public abstract partial class IfcSpatialElementType : IfcTypeProduct //IFC4 ABSTRACT SUPERTYPE OF(IfcSpaceType)
 	{
@@ -1403,10 +1435,10 @@ additional types	some additional representation types are given:
 	}
 	public abstract partial class IfcStructuralAction : IfcStructuralActivity // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveAction, IfcStructuralPointAction, IfcStructuralSurfaceAction))
 	{
-		internal bool mDestabilizingLoad = true, mDestabSet = false;//: OPTIONAL BOOLEAN; IFC4 made optional
+		private IfcLogicalEnum mDestabilizingLoad = IfcLogicalEnum.UNKNOWN;//: OPTIONAL BOOLEAN; IFC4 made optional
 		internal int mCausedBy;// : OPTIONAL IfcStructuralReaction; DELETED IFC4 
 
-		public bool DestabilizingLoad { get { return mDestabilizingLoad; } set { mDestabilizingLoad = value; mDestabSet = true; } }
+		public bool DestabilizingLoad { get { return mDestabilizingLoad == IfcLogicalEnum.TRUE; } set { mDestabilizingLoad = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public IfcStructuralReaction CausedBy { get { return mDatabase[mCausedBy] as IfcStructuralReaction; } set { mCausedBy = (value == null ? 0 : value.mIndex); } }
 
 		protected IfcStructuralAction() : base() { }
@@ -1423,14 +1455,11 @@ additional types	some additional representation types are given:
 			IfcStructuralActivity.parseFields(a, arrFields, ref ipos);
 			string s = arrFields[ipos++];
 			if (s.StartsWith("."))
-			{
-				a.mDestabilizingLoad = ParserSTEP.ParseBool(s);
-				a.mDestabSet = true;
-			}
+				a.mDestabilizingLoad = ParserIfc.ParseIFCLogical(s);
 			if (schema == ReleaseVersion.IFC2x3)
 				a.mCausedBy = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDestabSet || mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.BoolToString(mDestabilizingLoad) : ",$") + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.LinkToString(mCausedBy) : ""); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDestabilizingLoad == IfcLogicalEnum.UNKNOWN ? (mDatabase.Release == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.BoolToString(false) : ",$") : "," + ParserIfc.LogicalToString(mDestabilizingLoad)) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.LinkToString(mCausedBy) : ""); }
 	}
 	public abstract partial class IfcStructuralActivity : IfcProduct
 	{
@@ -1545,6 +1574,7 @@ additional types	some additional representation types are given:
 		internal List<IfcRelConnectsStructuralMember> mConnectsStructuralMembers = new List<IfcRelConnectsStructuralMember>();//	 :	SET [1:?] OF IfcRelConnectsStructuralMember FOR RelatedStructuralConnection;
 
 		public IfcBoundaryCondition AppliedCondition { get { return mDatabase[mAppliedCondition] as IfcBoundaryCondition; } set { mAppliedCondition = (value == null ? 0 : value.mIndex); } }
+		public List<IfcRelConnectsStructuralMember> ConnectsStructuralMembers { get { return mConnectsStructuralMembers; } set { mConnectsStructuralMembers = value; } }
 
 		protected IfcStructuralConnection() : base() { }
 		protected IfcStructuralConnection(DatabaseIfc db, IfcStructuralConnection c) : base(db,c) { if(c.mAppliedCondition > 0) AppliedCondition = db.Factory.Duplicate(c.AppliedCondition) as IfcBoundaryCondition; }
@@ -1953,15 +1983,15 @@ additional types	some additional representation types are given:
 	}
 	public partial class IfcStructuralLoadSingleForce : IfcStructuralLoadStatic
 	{
-		internal double mForceX = 0, mForceY = 0, mForceZ = 0;// : OPTIONAL IfcForceMeasure;
-		internal double mMomentX = 0, mMomentY = 0, mMomentZ = 0;// : OPTIONAL IfcTorqueMeasure; 
+		internal double mForceX = double.NaN, mForceY = double.NaN, mForceZ = double.NaN;// : OPTIONAL IfcForceMeasure;
+		internal double mMomentX = double.NaN, mMomentY = double.NaN, mMomentZ = double.NaN;// : OPTIONAL IfcTorqueMeasure; 
 
-		public double ForceX { get { return mForceX; } set { mForceX = value; } }
-		public double ForceY { get { return mForceY; } set { mForceY = value; } }
-		public double ForceZ { get { return mForceZ; } set { mForceZ = value; } }
-		public double MomentX { get { return mMomentX; } set { mMomentX = value; } }
-		public double MomentY { get { return mMomentY; } set { mMomentY = value; } }
-		public double MomentZ { get { return mMomentZ; } set { mMomentZ = value; } }
+		public double ForceX { get { return double.IsNaN(mForceX) ? 0 : mForceX; } set { mForceX = value; } }
+		public double ForceY { get { return double.IsNaN(mForceY) ? 0 : mForceY; } set { mForceY = value; } }
+		public double ForceZ { get { return double.IsNaN(mForceZ) ? 0 : mForceZ; } set { mForceZ = value; } }
+		public double MomentX { get { return double.IsNaN(mMomentX) ? 0 : mMomentX; } set { mMomentX = value; } }
+		public double MomentY { get { return double.IsNaN(mMomentY) ? 0 : mMomentY; } set { mMomentY = value; } }
+		public double MomentZ { get { return double.IsNaN(mMomentZ) ? 0 : mMomentZ; } set { mMomentZ = value; } }
 
 		internal IfcStructuralLoadSingleForce() : base() { }
 		public IfcStructuralLoadSingleForce(DatabaseIfc db) : base(db) { }
@@ -2526,8 +2556,8 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceCurveSweptAreaSolid : IfcSweptAreaSolid
 	{
 		internal int mDirectrix; // : IfcCurve;
-		internal double mStartParam = 0;// : OPT IfcParameterValue; OPT IFC4
-		internal double mEndParam;//: OPT IfcParameterValue; OPT IFC4
+		internal double mStartParam =  double.NaN;// : OPT IfcParameterValue; OPT IFC4
+		internal double mEndParam = double.NaN;//: OPT IfcParameterValue; OPT IFC4
 		internal int mReferenceSurface;// : IfcSurface; 
 
 		public IfcCurve Directrix { get { return mDatabase[mDirectrix] as IfcCurve; } set { mDirectrix = value.mIndex; } }
@@ -2538,7 +2568,12 @@ additional types	some additional representation types are given:
 
 		internal static void parseFields(IfcSurfaceCurveSweptAreaSolid s, List<string> arrFields, ref int ipos) { IfcSweptAreaSolid.parseFields(s, arrFields, ref ipos); s.mDirectrix = ParserSTEP.ParseLink(arrFields[ipos++]); s.mStartParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mEndParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mReferenceSurface = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal static IfcSurfaceCurveSweptAreaSolid Parse(string strDef) { IfcSurfaceCurveSweptAreaSolid s = new IfcSurfaceCurveSweptAreaSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mDirectrix) + "," + ParserSTEP.DoubleToString(mStartParam) + "," + ParserSTEP.DoubleToString(mEndParam) + "," + ParserSTEP.LinkToString(mReferenceSurface); }
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + ",#" + mDirectrix + "," + 
+				(mDatabase.Release == ReleaseVersion.IFC2x3 ? ParserSTEP.DoubleToString(double.IsNaN(mStartParam) ? 0 : mStartParam) : ParserSTEP.DoubleOptionalToString(mStartParam)) + "," + 
+				(mDatabase.Release == ReleaseVersion.IFC2x3 ? ParserSTEP.DoubleToString(double.IsNaN( mEndParam) ? 0 : mEndParam) : ParserSTEP.DoubleOptionalToString(mEndParam)) + ",#" + mReferenceSurface;
+		}
 	}
 	public partial class IfcSurfaceOfLinearExtrusion : IfcSweptSurface
 	{
@@ -2853,7 +2888,7 @@ additional types	some additional representation types are given:
 			}
 			else
 			{
-				if (position != null && position.isWorldXY)
+				if (position != null && position.IsWorldXY)
 					mPosition = 0;
 			}
 		}

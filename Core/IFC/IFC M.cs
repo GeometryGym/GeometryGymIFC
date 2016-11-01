@@ -818,7 +818,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMeasureWithUnit() : base() { }
 		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m) : base(db) { mValueComponent = m.mValueComponent;  UnitComponent = db.Factory.Duplicate(m.Database[ m.mUnitComponent]) as IfcUnit; }
-		internal IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u.Index; }
+		public IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u.Index; }
 		internal IfcMeasureWithUnit(double value, IfcUnit u) : base(u.Database) { mValueComponent = new IfcReal(value); mUnitComponent = u.Index;  }
 		internal static IfcMeasureWithUnit Parse(string strDef) { IfcMeasureWithUnit m = new IfcMeasureWithUnit(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 		internal static void parseFields(IfcMeasureWithUnit m, List<string> arrFields, ref int ipos)
