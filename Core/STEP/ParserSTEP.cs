@@ -571,83 +571,32 @@ namespace GeometryGym.STEP
 			}
 			string result = "";
 			char c = s[icounter++];
-			bool isList = c == '(';
+			if(c == '(')
+			{
+				--icounter;
+				result = striplist(s, ref icounter);
+				icounter++;
+				return result;
+			}
 			while (c != ',' && c != ')')
 			{
-				result += c;
 				if (c == '\'')
 				{
-					if (icounter == len)
-						break;
-					c = s[icounter++];
-					result += c;
-					while (c != '\'')
-					{
-						if (icounter == len)
-							break;
-						c = s[icounter++];
-						result += c;
-					}
-					result += c;
-					c = s[icounter++];
+					--icounter;
+					result += stripstring(s, ref icounter);
 				}
 				else if (c == '(')
 				{
-					while (c != ')')
-					{
-						if (icounter == len)
-							break;
-						c = s[icounter++];
-						result += c;
-						if (c == '\'')
-						{
-							if (icounter == len)
-								break;
-							c = s[icounter++];
-							result += c;
-							while (c != '\'')
-							{
-								if (icounter == len)
-									break;
-								c = s[icounter++];
-								result += c;
-							}
-						}
-					}
-					c = s[icounter++];
-					while (char.IsWhiteSpace(c))
-					{
-						c = s[icounter++];
-						if (icounter == len)
-							break;
-					}
-					if (isList)
-					{
-						if (c == ',')
-						{
-							result += c;
-							c = s[icounter++];
-						}
-					}
+					--icounter;
+					result += striplist(s, ref icounter);
 				}
 				else
-				{
-					if (icounter == len)
-						break;
-					c = s[icounter++];
-				}
+					result += c;
 				if (icounter == len)
 					break;
-			}
-			if (isList)
-			{
-				result += c;
-				while (c != ',')
-				{
-					if (icounter == len)
-						break;
-					c = s[icounter++];
-				}
+				c = s[icounter++];
+				if (icounter == len)
+					break;
 			}
 			pos = icounter;
 			return result;
@@ -701,12 +650,57 @@ namespace GeometryGym.STEP
 					}
 				}
 				pos = icounter;
-				return 0;
+				return double.NaN;
 			}
 
 
 			string str = "";
-			while (char.IsDigit(s[icounter]) || s[icounter] == '.' || s[icounter] == 'e' || s[icounter] == '-')
+			char c = s[icounter];
+			while (char.IsDigit(c) || c == '.' || char.ToLower(c) == 'e' || c == '-')
+			{
+				str += c;
+				if (++icounter == len)
+					break;
+				c = s[icounter];
+			}
+			if (icounter < len)
+			{
+				c = s[icounter++];
+				while (c != ',' && c != ')')
+				{
+					if (icounter == len)
+						break;
+					c = s[icounter++];
+				}
+			}
+			pos = icounter;
+			return double.Parse(str, NumberFormat);
+		}
+		public static int StripInt(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			while (char.IsWhiteSpace(s[icounter]))
+			{
+				icounter++;
+				if (icounter == len)
+					break;
+			}
+			if (s[icounter] == '$')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				pos = icounter;
+				return int.MinValue;
+			}
+
+			string str = "";
+			while (char.IsDigit(s[icounter]))
 			{
 				str += s[icounter++];
 				if (icounter == len)
@@ -721,8 +715,8 @@ namespace GeometryGym.STEP
 				}
 			}
 			pos = icounter;
-			return double.Parse(str, NumberFormat);
-		}  
+			return int.Parse(str);
+		}
 		public static int StripLink(string s, ref int pos)
 		{
 			int icounter = pos, len = s.Length;
@@ -1083,27 +1077,13 @@ namespace GeometryGym.STEP
 			List<double> result = new List<double>();
 			while (s[icounter] != ')')
 			{
-				string str = "";
-				char c = s[icounter];
-				while (char.IsDigit(c) || c == '.' || c == '-')
-				{
-					str += c;
-					c = s[++icounter];
-					if (icounter == len)
-						break;
-				}
-				result.Add(double.Parse(str));
-				if (icounter == len)
-					break;
-				while (char.IsWhiteSpace(s[icounter]))
+				if (s[icounter] == ',')
 					icounter++;
-				if (s[icounter] != ')')
-				{
-					if (s[icounter++] != ',')
-						throw new Exception("Unrecognized format!");
-					while (char.IsWhiteSpace(s[icounter]))
-						icounter++;
-				}
+				double d = StripDouble(s, ref icounter);
+				icounter--;
+				if (double.IsNaN(d))
+					break;
+				result.Add(d);
 			}
 			pos = icounter + 2;
 			return result;
@@ -1214,6 +1194,13 @@ namespace GeometryGym.STEP
 				pos = icounter;
 				return "$";
 			}
+			string result = stripstring(s,ref icounter);
+			pos = icounter + 1;
+			return result;
+		}
+		private static string stripstring(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
 			string result = "";
 			if (s[icounter++] != '\'')
 				throw new Exception("Unrecognized format!");
@@ -1235,10 +1222,36 @@ namespace GeometryGym.STEP
 				result += c;
 				icounter++;
 			}
-			pos = icounter + 2;
+			pos = icounter + 1;
 			return result;
 		}
-
+		private static string striplist(string s, ref int pos)
+		{
+			int icounter = pos, len = s.Length;
+			string result = "(";
+			if (s[icounter++] != '(')
+				throw new Exception("Unrecognized format!");
+			while (icounter < len)
+			{
+				char c = s[icounter];
+				if (c == '\'')
+					result += "'" + stripstring(s, ref icounter) + "'";
+				else if (c == '(')
+					result += striplist(s, ref icounter);
+				else if (c == ')')
+				{
+					result += c;
+					break;
+				}
+				else
+				{
+					result += c;
+					icounter++;
+				}
+			}
+			pos = icounter + 1;
+			return result;
+		}
 		internal static string offsetSTEPRecords(string line, int offset)
 		{
 			string newline = "";

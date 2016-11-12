@@ -103,8 +103,8 @@ namespace GeometryGym.Ifc
 			{
 				if (!double.IsNaN(value))
 				{
-					mModelTolerance = Math.Min(0.0005 / mModelSIScale, value);
-					mLengthDigits = Math.Max(2, -1 * (int)(Math.Log10(mModelTolerance) - 1));
+					mModelTolerance = value;
+					mLengthDigits = Math.Max(2, -1 * (int)(Math.Log10(value) - 1));
 				}
 			}
 		}

@@ -142,4 +142,89 @@ namespace GeometryGym.Ifc
 				element.AppendChild(mDatabase[i].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
+	public partial class IfcGrid : IfcProduct
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "UAxes") == 0)
+					UAxes = extractAxes(child);
+				else if (string.Compare(name, "VAxes") == 0)
+					UAxes = extractAxes(child);
+				else if (string.Compare(name, "WAxes") == 0)
+					UAxes = extractAxes(child);
+			}
+		}
+		internal List<IfcGridAxis> extractAxes(XmlNode node)
+		{
+			List<IfcGridAxis> axes = new List<IfcGridAxis>(node.ChildNodes.Count);
+			foreach (XmlNode cn in node.ChildNodes)
+			{
+				IfcGridAxis a = mDatabase.ParseXml<IfcGridAxis>(cn as XmlElement);
+				if (a != null)
+					axes.Add(a);
+			}
+			return axes;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			XmlElement uAxes = null, vAxes = null, wAxes = null;
+			if (mUAxes.Count > 0)
+			{
+				uAxes = xml.OwnerDocument.CreateElement("UAxes");
+				foreach (IfcGridAxis a in UAxes)
+					uAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+			if (mVAxes.Count > 0)
+			{
+				vAxes = xml.OwnerDocument.CreateElement("VAxes");
+				foreach (IfcGridAxis a in VAxes)
+					vAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+			if (mWAxes.Count > 0)
+			{
+				wAxes = xml.OwnerDocument.CreateElement("WAxes");
+				foreach (IfcGridAxis a in WAxes)
+					wAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+			base.SetXML(xml, host, processed);
+			if(uAxes != null)
+				xml.AppendChild(uAxes);
+			if(vAxes != null)
+				xml.AppendChild(vAxes);
+			if(wAxes != null)
+				xml.AppendChild(wAxes);
+		}
+	}
+	public partial class IfcGridAxis : BaseClassIfc
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("AxisTag"))
+				AxisTag = xml.Attributes["AxisTag"].Value;
+			if (xml.HasAttribute("SameSense"))
+				bool.TryParse(xml.Attributes["SameSense"].Value, out mSameSense);
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "AxisCurve") == 0)
+					AxisCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if(mAxisTag != "$")
+				xml.SetAttribute("AxisTag", mAxisTag);
+			xml.SetAttribute("SameSense", mSameSense.ToString().ToLower());
+			xml.AppendChild(AxisCurve.GetXML(xml.OwnerDocument, "AxisCurve", this, processed));
+		}
+
+	}
 }

@@ -406,7 +406,7 @@ namespace GeometryGym.Ifc
 				return new IfcInteger(int.Parse(str.Substring(11, str.Length - 12)));
 			if (str.StartsWith("IFCLABEL("))
 			{
-				string s = str.Substring(9, str.Length - 10).Replace("'", "");
+				string s = str.Substring(10, str.Length - 12);
 				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
 			}
 			if (str.StartsWith("IFCLOGICAL("))
@@ -423,7 +423,7 @@ namespace GeometryGym.Ifc
 				return new IfcReal(ParserSTEP.ParseDouble(str.Substring(8, str.Length - 9)));
 			if (str.StartsWith("IFCTEXT("))
 			{
-				string s = str.Substring(8, str.Length - 9).Replace("'", "");
+				string s = str.Substring(9, str.Length - 11);
 				return new IfcText((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
 			}
 			int i = 0;

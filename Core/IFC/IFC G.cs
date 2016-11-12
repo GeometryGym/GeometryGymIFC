@@ -144,8 +144,7 @@ namespace GeometryGym.Ifc
 					throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + mIndex);
 			}
 		}
-		internal static void parseFields(IfcGeometricCurveSet s, List<string> arrFields, ref int ipos) { IfcGeometricSet.parseFields(s, arrFields, ref ipos); }
-		internal new static IfcGeometricCurveSet Parse(string strDef) { IfcGeometricCurveSet s = new IfcGeometricCurveSet(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+		internal new static IfcGeometricCurveSet Parse(string str) { IfcGeometricCurveSet s = new IfcGeometricCurveSet(); s.parse(str); return s; }
 	}
 	public partial class IfcGeometricRepresentationContext : IfcRepresentationContext, IfcCoordinateReferenceSystemSelect
 	{
@@ -230,8 +229,6 @@ namespace GeometryGym.Ifc
 		protected IfcGeometricRepresentationItem() : base() { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db) : base(db) { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i) : base(db,i) { }
-		protected static void parseFields(IfcGeometricRepresentationItem i, List<string> arrFields, ref int ipos) { IfcRepresentationItem.parseFields(i, arrFields, ref ipos); }
-		protected override void Parse(string str, ref int ipos) { base.Parse(str, ref ipos); }
 	}
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
@@ -243,7 +240,7 @@ namespace GeometryGym.Ifc
 		public IfcGeometricRepresentationContext ContainerContext { get { return mDatabase[mContainerContext] as IfcGeometricRepresentationContext; } set { mContainerContext = value.mIndex; value.mHasSubContexts.Add(this); } }
 		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
 		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
-		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcGeometricRepresentationSubContext() : base() { }
 		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s) : base(db, s)
@@ -254,7 +251,7 @@ namespace GeometryGym.Ifc
 			mTargetView = s.mTargetView;
 			mUserDefinedTargetView = s.mUserDefinedTargetView;
 		}
-		internal IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, IfcGeometricProjectionEnum view)
+		public IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, IfcGeometricProjectionEnum view)
 			: base(container.mDatabase)
 		{
 			ContainerContext = container;
@@ -294,8 +291,22 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mElements[icounter]);
 			return str + ")";
 		}
-		internal static void parseFields(IfcGeometricSet s, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(s, arrFields, ref ipos); s.mElements = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		internal static IfcGeometricSet Parse(string strDef) { IfcGeometricSet s = new IfcGeometricSet(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+		internal static IfcGeometricSet Parse(string str) { IfcGeometricSet s = new IfcGeometricSet(); s.parse(str); return s; }
+		protected void parse(string str) { mElements = ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)); }
+
+		internal void addElements(List<IfcGeometricSetSelect> elements)
+		{
+			foreach(IfcGeometricSetSelect g in elements)
+			{
+				if (!mElements.Contains(g.Index))
+					mElements.Add(g.Index);
+			}
+		}
+		internal void removeElements(List<IfcGeometricSetSelect> elements)
+		{
+			foreach (IfcGeometricSetSelect g in elements)
+				mElements.Remove(g.Index);
+		}
 	}
 	public partial interface IfcGeometricSetSelect : IBaseClassIfc { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
 	public partial class IfcGrid : IfcProduct
@@ -309,9 +320,36 @@ namespace GeometryGym.Ifc
 
 		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
-		public List<IfcGridAxis> UAxes { get { return mUAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mUAxes = value.ConvertAll(x => x.mIndex); } }
-		public List<IfcGridAxis> VAxes { get { return mVAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mVAxes = value.ConvertAll(x => x.mIndex); } }
-		public List<IfcGridAxis> WAxes { get { return mWAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); } set { mWAxes = value.ConvertAll(x => x.mIndex); } }
+		public List<IfcGridAxis> UAxes
+		{
+			get { return mUAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); }
+			set
+			{
+				removeExistingFromShapeRep(UAxes);
+				mUAxes = value == null ? new List<int>() : value.ConvertAll(x => x.mIndex);
+				setShapeRep(value);
+			}
+		}
+		public List<IfcGridAxis> VAxes
+		{
+			get { return mVAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); }
+			set
+			{
+				removeExistingFromShapeRep(VAxes);
+				mVAxes = value == null ? new List<int>() : value.ConvertAll(x => x.mIndex);
+				setShapeRep(value);
+			}
+		}
+		public List<IfcGridAxis> WAxes
+		{
+			get { return mWAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis); }
+			set
+			{
+				removeExistingFromShapeRep(WAxes);
+				mWAxes = value == null ? new List<int>() : value.ConvertAll(x => x.mIndex);
+				setShapeRep(value);
+			}
+		}
 
 		internal IfcGrid() : base() { }
 		internal IfcGrid(DatabaseIfc db, IfcGrid g) : base(db, g)
@@ -321,6 +359,18 @@ namespace GeometryGym.Ifc
 			WAxes = g.WAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
 			mPredefinedType = g.mPredefinedType;
 		}
+		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes) 
+			: base(new IfcLocalPlacement(host.Placement, placement), getRepresentation(uAxes,vAxes, null))
+		{
+			host.addGrid(this);
+			if(uAxes != null)
+				mUAxes = uAxes.ConvertAll(x=>x.mIndex);
+			if (vAxes != null)
+				mVAxes = vAxes.ConvertAll(x => x.mIndex);
+			
+		}
+		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes, List<IfcGridAxis> wAxes) 
+			:this(host,placement, uAxes,vAxes) { WAxes = wAxes; }
 
 		internal static IfcGrid Parse(string strDef, ReleaseVersion schema) { IfcGrid g = new IfcGrid(); int ipos = 0; parseFields(g, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return g; }
 		internal static void parseFields(IfcGrid g, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -365,12 +415,86 @@ namespace GeometryGym.Ifc
 			return str + "$" + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType.ToString() + ".");
 		}
 
-		internal void AddUAxis(IfcGridAxis a) { mUAxes.Add(a.mIndex); a.mPartOfU = this; }
-		internal void AddVAxis(IfcGridAxis a) { mVAxes.Add(a.mIndex); a.mPartOfV = this; }
-		internal void AddWAxis(IfcGridAxis a) { mWAxes.Add(a.mIndex); a.mPartOfW = this; }
-		internal void RemoveUAxis(IfcGridAxis a) { mUAxes.Remove(a.mIndex); a.mPartOfU = null; }
-		internal void RemoveVAxis(IfcGridAxis a) { mVAxes.Remove(a.mIndex); a.mPartOfV = null; }
-		internal void RemoveWAxis(IfcGridAxis a) { mWAxes.Remove(a.mIndex); a.mPartOfW = null; }
+		internal void AddUAxis(IfcGridAxis a) { mUAxes.Add(a.mIndex); a.mPartOfU = this; setShapeRep(a); }
+		internal void AddVAxis(IfcGridAxis a) { mVAxes.Add(a.mIndex); a.mPartOfV = this; setShapeRep(a); }
+		internal void AddWAxis(IfcGridAxis a) { mWAxes.Add(a.mIndex); a.mPartOfW = this; setShapeRep(a); }
+		internal void RemoveUAxis(IfcGridAxis a) { mUAxes.Remove(a.mIndex); a.mPartOfU = null; removeExistingFromShapeRep(a);  }
+		internal void RemoveVAxis(IfcGridAxis a) { mVAxes.Remove(a.mIndex); a.mPartOfV = null; removeExistingFromShapeRep(a); }
+		internal void RemoveWAxis(IfcGridAxis a) { mWAxes.Remove(a.mIndex); a.mPartOfW = null; removeExistingFromShapeRep(a); }
+
+		private void setShapeRep(IfcGridAxis a) { setShapeRep(new List<IfcGridAxis>() { a }); }
+		private void setShapeRep(List<IfcGridAxis> axis)
+		{
+			if (axis == null || axis.Count == 0)
+				return;
+			IfcProductDefinitionShape pds = Representation as IfcProductDefinitionShape;
+			if (pds == null)
+				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcGeometricCurveSet(axis.ConvertAll(x => (IfcGeometricSetSelect)x.AxisCurve))));
+			else
+			{
+				foreach (IfcShapeModel sm in pds.Representations)
+				{
+					IfcShapeRepresentation sr = sm as IfcShapeRepresentation;
+					if (sr != null)
+					{
+						foreach (IfcRepresentationItem gri in sr.Items)
+						{
+							IfcGeometricCurveSet curveSet = gri as IfcGeometricCurveSet;
+							if (curveSet != null)
+							{
+								curveSet.addElements(axis.ConvertAll(x => (IfcGeometricSetSelect)x.AxisCurve));
+								return;
+							}
+						}
+					}
+				}
+			}
+			
+		}
+		private static IfcProductRepresentation getRepresentation(List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes, List<IfcGridAxis> wAxes)
+		{
+			List<IfcGeometricSetSelect> set = new List<IfcGeometricSetSelect>();
+			if (uAxes != null)
+			{
+				foreach (IfcGridAxis axis in uAxes)
+					set.Add(axis.AxisCurve);
+			}
+			if (vAxes != null)
+			{
+				foreach (IfcGridAxis axis in vAxes)
+					set.Add(axis.AxisCurve);
+			}
+			if (wAxes != null)
+			{
+				foreach (IfcGridAxis axis in wAxes)
+					set.Add(axis.AxisCurve);
+			}
+			return new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcGeometricCurveSet(set)));
+		}
+		private void removeExistingFromShapeRep(IfcGridAxis a) { removeExistingFromShapeRep(new List<IfcGridAxis>() { a }); }
+		private void removeExistingFromShapeRep(List<IfcGridAxis> axis)
+		{
+			if (axis == null || axis.Count == 0)
+				return;
+			IfcProductDefinitionShape pds = Representation as IfcProductDefinitionShape;
+			if (pds != null)
+			{
+				foreach (IfcShapeModel sm in pds.Representations)
+				{
+					IfcShapeRepresentation sr = sm as IfcShapeRepresentation;
+					if (sr != null)
+					{
+						foreach (IfcRepresentationItem gri in sr.Items)
+						{
+							IfcGeometricCurveSet curveSet = gri as IfcGeometricCurveSet;
+							if (curveSet != null)
+								curveSet.removeElements(axis.ConvertAll(x => (IfcGeometricSetSelect)x.AxisCurve));
+						}
+					}
+				}
+			}
+		}
+
 
 		internal override void postParseRelate()
 		{
@@ -399,7 +523,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcVirtualGridIntersection> mHasIntersections = new List<IfcVirtualGridIntersection>();//:	SET OF IfcVirtualGridIntersection FOR IntersectingAxes;
 
 		public override string Name { get { return AxisTag; } set { AxisTag = value; } }
-		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcCurve AxisCurve { get { return mDatabase[mAxisCurve] as IfcCurve; } set { mAxisCurve = value.mIndex; } }
 
 		internal IfcGridAxis() : base() { }

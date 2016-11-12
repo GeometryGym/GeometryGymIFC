@@ -272,12 +272,10 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.SetXML(xml, host, processed);
-			string str = LongName;
-			if (str != null)
-				xml.SetAttribute("LongName", str);
+			base.setAttribute(xml, "LongName", LongName);
 			if (mContainsElements.Count > 0)
 			{
-				XmlElement element = null;
+				XmlElement element = null; 
 				foreach (IfcRelContainedInSpatialStructure rcss in ContainsElements)
 				{
 					if (rcss.mRelatedElements.Count > 0)

@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 			f.mBounds = ParserSTEP.StripListLink(str, ref pos);
 			return f;
 		}
-		internal static void parseFields(IfcFace f, List<string> arrFields, ref int ipos) { IfcTopologicalRepresentationItem.parseFields(f, arrFields, ref ipos); f.mBounds = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
+		internal static void parseFields(IfcFace f, List<string> arrFields, ref int ipos) { f.mBounds = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(";
@@ -65,6 +65,12 @@ namespace GeometryGym.Ifc
 		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { FbsmFaces = s.FbsmFaces.ConvertAll(x => db.Factory.Duplicate(x) as IfcConnectedFaceSet); }
 		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet face) : base(face.mDatabase) { mFbsmFaces.Add(face.mIndex); }
 		public IfcFaceBasedSurfaceModel(List<IfcConnectedFaceSet> faces) : base(faces[0].mDatabase) { FbsmFaces = faces; }
+		internal static IfcFaceBasedSurfaceModel Parse(string str)
+		{
+			IfcFaceBasedSurfaceModel m = new IfcFaceBasedSurfaceModel();
+			m.mFbsmFaces = ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2));
+			return m;
+		}
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mFbsmFaces[0]);
@@ -72,8 +78,6 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mFbsmFaces[icounter]);
 			return str + ")";
 		}
-		internal static void parseFields(IfcFaceBasedSurfaceModel m, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(m, arrFields, ref ipos); m.mFbsmFaces = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		internal static IfcFaceBasedSurfaceModel Parse(string strDef) { IfcFaceBasedSurfaceModel m = new IfcFaceBasedSurfaceModel(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
@@ -89,19 +93,13 @@ namespace GeometryGym.Ifc
 		{
 			IfcFaceBound b = new IfcFaceBound();
 			int pos = 0;
-			parseString(b, str, ref pos);
+			b.Parse( str, ref pos);
 			return b;
 		}
-		protected static void parseString(IfcFaceBound b, string str, ref int pos)
+		protected void Parse( string str, ref int pos)
 		{
-			b.mBound = ParserSTEP.StripLink(str, ref pos);
-			b.mOrientation = ParserSTEP.StripBool(str, ref pos);
-		}
-		internal static void parseFields(IfcFaceBound b, List<string> arrFields, ref int ipos)
-		{
-			IfcTopologicalRepresentationItem.parseFields(b, arrFields, ref ipos);
-			b.mBound = ParserSTEP.ParseLink(arrFields[ipos++]);
-			b.mOrientation = ParserSTEP.ParseBool(arrFields[ipos++]);
+			mBound = ParserSTEP.StripLink(str, ref pos);
+			mOrientation = ParserSTEP.StripBool(str, ref pos);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -117,7 +115,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcFaceOuterBound b = new IfcFaceOuterBound();
 			int pos = 0;
-			parseString(b, str, ref pos);
+			b.Parse(str, ref pos);
 			return b;
 		}
 	}
@@ -143,8 +141,7 @@ namespace GeometryGym.Ifc
 		internal IfcFacetedBrep() : base() { }
 		public IfcFacetedBrep(IfcClosedShell s) : base(s) { }
 		internal IfcFacetedBrep(DatabaseIfc db, IfcFacetedBrep b) : base(db,b) { }
-		internal static IfcFacetedBrep Parse(string strDef) { IfcFacetedBrep b = new IfcFacetedBrep(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
-		internal static void parseFields(IfcFacetedBrep b, List<string> arrFields, ref int ipos) { IfcManifoldSolidBrep.parseFields(b, arrFields, ref ipos); }
+		internal static IfcFacetedBrep Parse(string str) { IfcFacetedBrep b = new IfcFacetedBrep(); int pos = 0; b.Parse(str,ref pos); return b; }
 	}
 	public partial class IfcFacetedBrepWithVoids : IfcFacetedBrep
 	{
@@ -153,8 +150,14 @@ namespace GeometryGym.Ifc
 
 		internal IfcFacetedBrepWithVoids() : base() { }
 		internal IfcFacetedBrepWithVoids(DatabaseIfc db, IfcFacetedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=>db.Factory.Duplicate(x) as IfcClosedShell); }
-		internal new static IfcFacetedBrepWithVoids Parse(string strDef) { IfcFacetedBrepWithVoids b = new IfcFacetedBrepWithVoids(); int ipos = 0; parseFields(b, ParserSTEP.SplitLineFields(strDef), ref ipos); return b; }
-		internal static void parseFields(IfcFacetedBrepWithVoids b, List<string> arrFields, ref int ipos) { IfcManifoldSolidBrep.parseFields(b, arrFields, ref ipos); b.mVoids = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
+		internal new static IfcFacetedBrepWithVoids Parse(string str)
+		{
+			IfcFacetedBrepWithVoids b = new IfcFacetedBrepWithVoids();
+			int pos = 0;
+			b.Parse(str, ref pos);
+			b.mVoids = ParserSTEP.StripListLink(str, ref pos);
+			return b;
+		}
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(";
@@ -283,16 +286,17 @@ namespace GeometryGym.Ifc
 			mHatchLineAngle = h.mHatchLineAngle;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mHatchLineAppearance) + "," + mStartOfNextHatchLine + "," + ParserSTEP.LinkToString(mPointOfReferenceHatchLine) + "," + ParserSTEP.LinkToString(mPatternStart) + "," + ParserSTEP.DoubleToString(mHatchLineAngle); }
-		internal static void parseFields(IfcFillAreaStyleHatching h, List<string> arrFields, ref int ipos)
+		internal static IfcFillAreaStyleHatching Parse(string str)
 		{
-			IfcGeometricRepresentationItem.parseFields(h, arrFields, ref ipos);
-			h.mHatchLineAppearance = ParserSTEP.ParseLink(arrFields[ipos++]);
-			h.mStartOfNextHatchLine = arrFields[ipos++];
-			h.mPointOfReferenceHatchLine = ParserSTEP.ParseLink(arrFields[ipos++]);
-			h.mPatternStart = ParserSTEP.ParseLink(arrFields[ipos++]);
-			h.mHatchLineAngle = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			IfcFillAreaStyleHatching h = new IfcFillAreaStyleHatching();
+			int pos = 0;
+			h.mHatchLineAppearance = ParserSTEP.StripLink(str, ref pos);
+			h.mStartOfNextHatchLine = ParserSTEP.StripString(str, ref pos);
+			h.mPointOfReferenceHatchLine = ParserSTEP.StripLink(str, ref pos);
+			h.mPatternStart = ParserSTEP.StripLink(str,ref pos);
+			h.mHatchLineAngle = ParserSTEP.StripDouble(str,ref pos);
+			return h;
 		}
-		internal static IfcFillAreaStyleHatching Parse(string strDef) { IfcFillAreaStyleHatching h = new IfcFillAreaStyleHatching(); int ipos = 0; parseFields(h, ParserSTEP.SplitLineFields(strDef), ref ipos); return h; }
 	}
 	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
 	//ENTITY IfcFillAreaStyleTiles
@@ -399,9 +403,16 @@ namespace GeometryGym.Ifc
 			Directrix = directrix;
 			FixedReference = reference;
 		}
-
-		internal static void parseFields(IfcFixedReferenceSweptAreaSolid s, List<string> arrFields, ref int ipos) { IfcSweptAreaSolid.parseFields(s, arrFields, ref ipos); s.mDirectrix = ParserSTEP.ParseLink(arrFields[ipos++]); s.mStartParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mEndParam = ParserSTEP.ParseDouble(arrFields[ipos++]); s.mFixedReference = ParserSTEP.ParseLink(arrFields[ipos++]); }
-		internal static IfcFixedReferenceSweptAreaSolid Parse(string strDef) { IfcFixedReferenceSweptAreaSolid s = new IfcFixedReferenceSweptAreaSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+		internal static IfcFixedReferenceSweptAreaSolid Parse(string str)
+		{
+			IfcFixedReferenceSweptAreaSolid s = new IfcFixedReferenceSweptAreaSolid();
+			int pos = 0;
+			s.mDirectrix = ParserSTEP.StripLink(str, ref pos);
+			s.mStartParam = ParserSTEP.StripDouble(str, ref pos);
+			s.mEndParam = ParserSTEP.StripDouble(str, ref pos);
+			s.mFixedReference = ParserSTEP.StripLink(str,ref pos);
+			return s;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mDirectrix) + "," + ParserSTEP.DoubleOptionalToString(mStartParam) + "," + ParserSTEP.DoubleOptionalToString(mEndParam) + "," + ParserSTEP.LinkToString(mFixedReference); }
 	}
 	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
@@ -671,15 +682,15 @@ namespace GeometryGym.Ifc
 		internal IfcFooting(DatabaseIfc db, IfcFooting f) : base(db,f) { mPredefinedType = f.mPredefinedType; }
 		public IfcFooting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcFooting Parse(string strDef) { IfcFooting f = new IfcFooting(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
-		internal static void parseFields(IfcFooting f, List<string> arrFields, ref int ipos)
+		internal static IfcFooting Parse(string str) { IfcFooting f = new IfcFooting(); int pos = 0; f.Parse(str, ref pos); return f; }
+		protected override void Parse(string str, ref int pos)
 		{
-			IfcBuildingElement.parseFields(f, arrFields, ref ipos);
-			string str = arrFields[ipos++];
-			if (str[0] == '.')
-				f.mPredefinedType = (IfcFootingTypeEnum)Enum.Parse(typeof(IfcFootingTypeEnum), str.Substring(1, str.Length - 2));
+			base.Parse(str, ref pos);
+			string s = ParserSTEP.StripField(str, ref pos);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcFootingTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
 	public partial class IfcFootingType : IfcBuildingElementType
 	{

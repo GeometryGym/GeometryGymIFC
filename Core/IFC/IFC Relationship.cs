@@ -145,10 +145,10 @@ namespace GeometryGym.Ifc
 			c.mRelatedObjects = ParserSTEP.SplitListLinks(arrFields[ipos++]);
 			ipos++; //string str = arrFields[ipos++]; //if(!str.Contains("$")) c.mRelatedObjectsType = (IfcObjectTypeEnum) Enum.Parse(typeof(IfcObjectTypeEnum),str.Replace(".",""));  
 		}
-		protected static void parseString(IfcRelAssigns a, string str, ref int pos)
+		protected override void Parse(string str, ref int pos)
 		{
-			a.parseString(str, ref pos);
-			a.mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);
+			base.Parse(str, ref pos);
+			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);
 			ParserSTEP.StripField(str, ref pos);
 		}
 
@@ -250,17 +250,11 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a) : base(db,a) { RelatingGroup = db.Factory.Duplicate(a.RelatingGroup) as IfcGroup; }
 		internal IfcRelAssignsToGroup(IfcGroup relgroup) : base(relgroup.mDatabase) { mRelatingGroup = relgroup.mIndex; relgroup.mIsGroupedBy.Add(this); }
 		internal IfcRelAssignsToGroup(IfcGroup relgroup, List<IfcObjectDefinition> relObjects) : base(relObjects) { mRelatingGroup = relgroup.mIndex; }
-		internal static IfcRelAssignsToGroup Parse(string strDef)
+		internal static IfcRelAssignsToGroup Parse(string str) { IfcRelAssignsToGroup a = new IfcRelAssignsToGroup(); int pos = 0; a.Parse(str, ref pos); return a; }
+		protected override void Parse(string str, ref int pos)
 		{
-			IfcRelAssignsToGroup a = new IfcRelAssignsToGroup();
-			int pos = 0;
-			parseString(a, strDef, ref pos);
-			return a;
-		}
-		protected static void parseString(IfcRelAssignsToGroup a, string str, ref int pos)
-		{
-			IfcRelAssigns.parseString(a, str, ref pos);
-			a.mRelatingGroup = ParserSTEP.StripLink(str, ref pos);
+			base.Parse(str, ref pos);
+			mRelatingGroup = ParserSTEP.StripLink(str, ref pos);
 		}
 		protected override string BuildStringSTEP() { return (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mRelatedObjects.Count == 0 ? "" : base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingGroup)); }
 		internal override void postParseRelate()
@@ -281,12 +275,12 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroupByFactor(DatabaseIfc db, IfcRelAssignsToGroupByFactor a) : base(db,a) { mFactor = a.mFactor; }
 		internal IfcRelAssignsToGroupByFactor(IfcGroup relgroup, double factor) : base(relgroup) { mFactor = factor; }
 		internal IfcRelAssignsToGroupByFactor(IfcGroup relgroup, List<IfcObjectDefinition> relObjects, double factor) : base(relgroup, relObjects) { mFactor = factor; }
-		internal new static IfcRelAssignsToGroup Parse(string strDef)
+		internal new static IfcRelAssignsToGroup Parse(string str)
 		{
 			IfcRelAssignsToGroupByFactor a = new IfcRelAssignsToGroupByFactor();
 			int pos = 0;
-			IfcRelAssignsToGroup.parseString(a, strDef, ref pos);
-			a.mFactor = ParserSTEP.StripDouble(strDef, ref pos);
+			a.Parse(str, ref pos);
+			a.mFactor = ParserSTEP.StripDouble(str, ref pos);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return (mRelatedObjects.Count == 0 ? "" : base.BuildStringSTEP() + (mDatabase.Release == ReleaseVersion.IFC2x3 ? "" : "," + ParserSTEP.DoubleToString(mFactor))); }
@@ -415,9 +409,9 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected static void parseFields(IfcRelAssociates a, List<string> arrFields, ref int ipos) { IfcRelationship.parseFields(a, arrFields, ref ipos); a.mRelatedObjects = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		protected override void parseString(string str, ref int pos)
+		protected override void Parse(string str, ref int pos)
 		{
-			base.parseString(str, ref pos);
+			base.Parse(str, ref pos);
 			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);
 		}
 		internal void addAssociation(IfcDefinitionSelect obj) { mRelatedObjects.Add(obj.Index); obj.HasAssociations.Add(this); }
@@ -474,7 +468,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcRelAssociatesClassification a = new IfcRelAssociatesClassification();
 			int pos = 0;
-			a.parseString(strDef, ref pos);
+			a.Parse(strDef, ref pos);
 			a.mRelatingClassification = ParserSTEP.StripLink(strDef, ref pos);
 			return a;
 		}
@@ -498,13 +492,13 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c) : base(db,c) { RelatingConstraint = db.Factory.Duplicate(c.RelatingConstraint) as IfcConstraint; }
 		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, IfcConstraint constraint) : base(related) { RelatingConstraint = constraint; }
 
-		internal static IfcRelAssociatesConstraint Parse(string strDef)
+		internal static IfcRelAssociatesConstraint Parse(string str)
 		{
 			IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint();
 			int pos = 0;
-			a.parseString(strDef, ref pos);
-			a.mIntent = ParserSTEP.StripString(strDef, ref pos);
-			a.mRelatingConstraint = ParserSTEP.StripLink(strDef, ref pos);
+			a.Parse(str, ref pos);
+			a.mIntent = ParserSTEP.StripString(str, ref pos);
+			a.mRelatingConstraint = ParserSTEP.StripLink(str, ref pos);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return (RelatingConstraint == null ? "" : base.BuildStringSTEP() + (mIntent == "$" ? ",$," : ",'" + mIntent + "',") + ParserSTEP.LinkToString(mRelatingConstraint)); }
@@ -563,12 +557,12 @@ namespace GeometryGym.Ifc
 		public IfcRelAssociatesDocument(IfcDocumentSelect document) : base(document.Database) { Name = "DocAssoc"; Description = "Document Associates"; mRelatingDocument = document.Index; document.Associates.Add(this); }
 		public IfcRelAssociatesDocument(IfcDefinitionSelect related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
 		public IfcRelAssociatesDocument(List<IfcDefinitionSelect> related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
-		internal static IfcRelAssociatesDocument Parse(string strDef)
+		internal static IfcRelAssociatesDocument Parse(string str)
 		{
 			IfcRelAssociatesDocument a = new IfcRelAssociatesDocument();
 			int pos = 0;
-			a.parseString(strDef, ref pos);
-			a.mRelatingDocument = ParserSTEP.StripLink(strDef, ref pos);
+			a.Parse(str, ref pos);
+			a.mRelatingDocument = ParserSTEP.StripLink(str, ref pos);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingDocument); }
@@ -582,12 +576,12 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesLibrary() : base() { }
 		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r) : base(db,r) { RelatingLibrary = db.Factory.Duplicate(r.mDatabase[r.mRelatingLibrary]) as IfcLibrarySelect; }
 		internal IfcRelAssociatesLibrary(DatabaseIfc m, IfcLibrarySelect lib) : base(m) { Name = "LibAssoc"; Description = "Library Associates"; mRelatingLibrary = lib.Index; }
-		internal static IfcRelAssociatesLibrary Parse(string strDef)
+		internal static IfcRelAssociatesLibrary Parse(string str)
 		{
 			IfcRelAssociatesLibrary a = new IfcRelAssociatesLibrary();
 			int pos = 0;
-			a.parseString(strDef, ref pos);
-			a.mRelatingLibrary = ParserSTEP.StripLink(strDef, ref pos);
+			a.Parse(str, ref pos);
+			a.mRelatingLibrary = ParserSTEP.StripLink(str, ref pos);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingLibrary); }
@@ -604,12 +598,12 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesMaterial() : base() { }
 		internal IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { Name = "MatAssoc"; Description = "Material Associates"; mRelatingMaterial = material.Index; material.Associates = this; }
 		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r) : base(db, r) { RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial]) as IfcMaterialSelect; }
-		internal static IfcRelAssociatesMaterial Parse(string strDef)
+		internal static IfcRelAssociatesMaterial Parse(string str)
 		{
 			IfcRelAssociatesMaterial a = new IfcRelAssociatesMaterial();
 			int pos = 0;
-			a.parseString(strDef, ref pos);
-			a.mRelatingMaterial = ParserSTEP.StripLink(strDef, ref pos);
+			a.Parse(str, ref pos);
+			a.mRelatingMaterial = ParserSTEP.StripLink(str, ref pos);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 && string.IsNullOrEmpty(RelatingMaterial.ToString()) ? "" : base.BuildStringSTEP() + ",#" + mRelatingMaterial); }
@@ -1110,13 +1104,13 @@ namespace GeometryGym.Ifc
 			}
 			return base.BuildStringSTEP() + list + "),#" + mRelatingStructure;
 		}
-		internal static IfcRelContainedInSpatialStructure Parse(string strDef)
+		internal static IfcRelContainedInSpatialStructure Parse(string str)
 		{
 			IfcRelContainedInSpatialStructure c = new IfcRelContainedInSpatialStructure();
 			int pos = 0;
-			c.parseString(strDef, ref pos);
-			c.mRelatedElements = ParserSTEP.StripListLink(strDef, ref pos);
-			c.mRelatingStructure = ParserSTEP.StripLink(strDef, ref pos);
+			c.Parse(str, ref pos);
+			c.mRelatedElements = ParserSTEP.StripListLink(str, ref pos);
+			c.mRelatingStructure = ParserSTEP.StripLink(str, ref pos);
 			return c;
 		}
 		internal override void postParseRelate()
@@ -1418,7 +1412,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcRelDefinesByProperties d = new IfcRelDefinesByProperties();
 			int pos = 0;
-			d.parseString(str, ref pos);
+			d.Parse(str, ref pos);
 			d.mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);// splitListSTPLinks(arrFields[ipos++]);
 			d.mRelatingPropertyDefinition = ParserSTEP.StripLink(str, ref pos);//.parseSTPLink(arrFields[ipos++]);
 			return d;
@@ -1595,7 +1589,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcRelDefinesByType t = new IfcRelDefinesByType();
 			int pos = 0;
-			t.parseString(str, ref pos);
+			t.Parse(str, ref pos);
 			t.mRelatedObjects = ParserSTEP.StripListLink(str, ref pos);
 			t.mRelatingType = ParserSTEP.StripLink(str, ref pos);
 			return t;
@@ -1676,15 +1670,15 @@ namespace GeometryGym.Ifc
 			mRelatingObject = relatingObject.mIndex;
 			relatingObject.mIsNestedBy.Add(this);
 		}
-		internal IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition relatedObject) : base(relatingObject.mDatabase)
+		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition relatedObject) : base(relatingObject.mDatabase)
 		{
 			mRelatingObject = relatingObject.mIndex;
 			mRelatedObjects.Add(relatedObject.mIndex);
 			relatingObject.mIsNestedBy.Add(this);
 			relatedObject.mNests = this;
 		}
-		internal IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition ro, IfcObjectDefinition ro2) : this(relatingObject, ro) { mRelatedObjects.Add(ro2.mIndex); ro2.mNests = this; ; }
-		internal IfcRelNests(IfcObjectDefinition relatingObject, List<IfcObjectDefinition> relatedObjects) : base(relatingObject.mDatabase)
+		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition ro, IfcObjectDefinition ro2) : this(relatingObject, ro) { mRelatedObjects.Add(ro2.mIndex); ro2.mNests = this; ; }
+		public IfcRelNests(IfcObjectDefinition relatingObject, List<IfcObjectDefinition> relatedObjects) : base(relatingObject.mDatabase)
 		{
 			mRelatingObject = relatingObject.mIndex;
 			relatingObject.mIsNestedBy.Add(this);

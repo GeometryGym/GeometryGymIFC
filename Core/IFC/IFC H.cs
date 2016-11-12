@@ -39,8 +39,12 @@ namespace GeometryGym.Ifc
 		internal IfcHalfSpaceSolid() : base() { }
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 
-		internal static void parseFields(IfcHalfSpaceSolid s, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(s, arrFields, ref ipos); s.mBaseSurface = ParserSTEP.ParseLink(arrFields[ipos++]); s.mAgreementFlag = ParserSTEP.ParseBool(arrFields[ipos++]); }
-		internal static IfcHalfSpaceSolid Parse(string strDef) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+		internal static IfcHalfSpaceSolid Parse(string str) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int pos = 0; s.Parse(str, ref pos); return s; }
+		protected virtual void Parse(string str, ref int pos)
+		{
+			mBaseSurface = ParserSTEP.StripLink(str, ref pos);
+			mAgreementFlag = ParserSTEP.StripBool(str, ref pos);
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mBaseSurface) + "," + ParserSTEP.BoolToString(mAgreementFlag); }
 	}
 	public partial class IfcHeatExchanger : IfcEnergyConversionDevice //IFC4

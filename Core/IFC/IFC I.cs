@@ -98,14 +98,15 @@ namespace GeometryGym.Ifc
 		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { Segments = segs; }
-		internal static void parseFields(IfcIndexedPolyCurve c, List<string> arrFields, ref int ipos)
+		internal static IfcIndexedPolyCurve Parse(string str)
 		{
-			IfcBoundedCurve.parseFields(c, arrFields, ref ipos);
-			c.mPoints = ParserSTEP.ParseLink(arrFields[ipos++]);
-			string str = arrFields[ipos++];
-			if (str != "$")
+			IfcIndexedPolyCurve c = new IfcIndexedPolyCurve();
+			int pos = 0;
+			c.mPoints = ParserSTEP.StripLink(str, ref pos);
+			string field = ParserSTEP.StripField(str, ref pos);
+			if (field != "$")
 			{
-				List<string> strs = ParserSTEP.SplitLineFields(str.Substring(1, str.Length - 2));
+				List<string> strs = ParserSTEP.SplitLineFields(field.Substring(1, field.Length - 2));
 				foreach (string s in strs)
 				{
 					if (s.ToUpper().StartsWith("IFCLINEINDEX"))
@@ -118,11 +119,11 @@ namespace GeometryGym.Ifc
 
 				}
 			}
-			str = arrFields[ipos++];
-			if (str[0] == '.')
-				c.mSelfIntersect = str[1] == 'T' ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+			field = ParserSTEP.StripField(str, ref pos);
+			if (field[0] == '.')
+				c.mSelfIntersect = field[1] == 'T' ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+			return c;
 		}
-		internal static IfcIndexedPolyCurve Parse(string strDef) { IfcIndexedPolyCurve c = new IfcIndexedPolyCurve(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		protected override string BuildStringSTEP()
 		{
 
@@ -308,11 +309,7 @@ namespace GeometryGym.Ifc
 		internal IfcIntersectionCurve() : base() { }
 		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
 		internal IfcIntersectionCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve,p1,p2,cr) { }
-		internal new static void parseFields(IfcSurfaceCurve c, List<string> arrFields, ref int ipos)
-		{
-			IfcSurfaceCurve.parseFields(c, arrFields, ref ipos);
-		}
-		internal new static IfcIntersectionCurve Parse(string strDef) { IfcIntersectionCurve c = new IfcIntersectionCurve(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
+		internal new static IfcIntersectionCurve Parse(string str) { IfcIntersectionCurve c = new IfcIntersectionCurve(); int pos = 0; c.Parse(str, ref pos); return c; }
 	}
 	public partial class IfcInventory : IfcGroup
 	{
@@ -389,7 +386,7 @@ namespace GeometryGym.Ifc
 				+ (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mFlangeEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope));
 		}
 
-		internal override double Depth { get { return OverallDepth; } }
-		internal override double Width { get { return OverallWidth; } }
+		internal override double ProfileDepth { get { return OverallDepth; } }
+		internal override double ProfileWidth { get { return OverallWidth; } }
 	} 
 }

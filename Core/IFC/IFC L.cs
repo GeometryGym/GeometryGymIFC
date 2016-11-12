@@ -180,8 +180,8 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcLibraryInformation ReferencedLibrary { get { return mDatabase[mReferencedLibrary] as IfcLibraryInformation; } set { mReferencedLibrary = (value == null ? 0 : value.mIndex); if (value != null && !value.mHasLibraryReferences.Contains(this)) value.mHasLibraryReferences.Add(this); } }
 
 		internal IfcLibraryReference() : base() { }
@@ -248,30 +248,28 @@ namespace GeometryGym.Ifc
 		internal double mIntensity;// : OPTIONAL IfcNormalisedRatioMeasure; 
 		protected IfcLightSource() : base() { }
 		protected IfcLightSource(DatabaseIfc db, IfcLightSource l) : base(db,l) { mName = l.mName; mLightColour = l.mLightColour; mAmbientIntensity = l.mAmbientIntensity; mIntensity = l.mIntensity; }
-		protected static void parseFields(IfcLightSource l, List<string> arrFields, ref int ipos)
+		protected virtual void Parse(string str, ref int pos)
 		{
-			IfcGeometricRepresentationItem.parseFields(l, arrFields, ref ipos);
-			l.mName = arrFields[ipos++];
-			l.mLightColour = ParserSTEP.ParseLink(arrFields[ipos++]);
-			l.mAmbientIntensity = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mIntensity = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			mName = ParserSTEP.StripString(str, ref pos);
+			mLightColour = ParserSTEP.StripLink(str, ref pos);
+			mAmbientIntensity = ParserSTEP.StripDouble(str, ref pos);
+			mIntensity = ParserSTEP.StripDouble(str,ref pos);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mName + "," + ParserSTEP.LinkToString(mLightColour) + "," + ParserSTEP.DoubleOptionalToString(mAmbientIntensity) + "," + ParserSTEP.DoubleOptionalToString(mIntensity); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mName == "$" ? ",$," : ",'" + mName + "',") + ParserSTEP.LinkToString(mLightColour) + "," + ParserSTEP.DoubleOptionalToString(mAmbientIntensity) + "," + ParserSTEP.DoubleOptionalToString(mIntensity); }
 	}
 	public partial class IfcLightSourceAmbient : IfcLightSource
 	{
 		internal IfcLightSourceAmbient() : base() { }
 		//internal IfcLightSourceAmbient(IfcLightSourceAmbient el) : base((IfcLightSourceAmbient)el) { }
-		internal static IfcLightSourceAmbient Parse(string strDef) { IfcLightSourceAmbient l = new IfcLightSourceAmbient(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLightSourceAmbient l, List<string> arrFields, ref int ipos) { IfcLightSource.parseFields(l, arrFields, ref ipos); }
+		internal static IfcLightSourceAmbient Parse(string str) { IfcLightSourceAmbient l = new IfcLightSourceAmbient(); int pos = 0; l.Parse(str, ref pos); return l; }
 	}
 	public partial class IfcLightSourceDirectional : IfcLightSource
 	{
 		internal int mOrientation;// : IfcDirection; 
 		internal IfcLightSourceDirectional() : base() { }
 		//internal IfcLightSourceDirectional(IfcLightSourceDirectional el) : base((IfcLightSource)el) { mOrientation = el.mOrientation; }
-		internal static IfcLightSourceDirectional Parse(string strDef) { IfcLightSourceDirectional l = new IfcLightSourceDirectional(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLightSourceDirectional l, List<string> arrFields, ref int ipos) { IfcLightSource.parseFields(l, arrFields, ref ipos); l.mOrientation = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal static IfcLightSourceDirectional Parse(string str) { IfcLightSourceDirectional l = new IfcLightSourceDirectional(); int pos = 0; l.Parse(str, ref pos); return l; }
+		protected override void Parse(string str, ref int pos) { base.Parse(str, ref pos); mOrientation = ParserSTEP.StripLink(str, ref pos); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation); }
 	}
 	public partial class IfcLightSourceGoniometric : IfcLightSource
@@ -293,16 +291,16 @@ namespace GeometryGym.Ifc
 		//	mLightEmissionSource = el.mLightEmissionSource;
 		//	mLightDistributionDataSource = el.mLightDistributionDataSource;
 		//}
-		internal static IfcLightSourceGoniometric Parse(string strDef) { IfcLightSourceGoniometric l = new IfcLightSourceGoniometric(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLightSourceGoniometric l, List<string> arrFields, ref int ipos)
+		internal static IfcLightSourceGoniometric Parse(string str) { IfcLightSourceGoniometric l = new IfcLightSourceGoniometric(); int pos = 0; l.Parse(str, ref pos); return l; }
+		protected override void Parse(string str, ref int pos)
 		{
-			IfcLightSource.parseFields(l, arrFields, ref ipos);
-			l.mPosition = ParserSTEP.ParseLink(arrFields[ipos++]);
-			l.mColourAppearance = ParserSTEP.ParseLink(arrFields[ipos++]);
-			l.mColourTemperature = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mLuminousFlux = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mLightEmissionSource = (IfcLightEmissionSourceEnum)Enum.Parse(typeof(IfcLightEmissionSourceEnum), arrFields[ipos++].Replace(".", ""));
-			l.mLightDistributionDataSource = ParserSTEP.ParseLink(arrFields[ipos++]);
+			base.Parse(str, ref pos);
+			mPosition = ParserSTEP.StripLink(str,ref pos);
+			mColourAppearance = ParserSTEP.StripLink(str, ref pos);
+			mColourTemperature = ParserSTEP.StripDouble(str, ref pos);
+			mLuminousFlux = ParserSTEP.StripDouble(str, ref pos);
+			mLightEmissionSource = (IfcLightEmissionSourceEnum)Enum.Parse(typeof(IfcLightEmissionSourceEnum), ParserSTEP.StripField(str,ref pos).Replace(".", ""));
+			mLightDistributionDataSource = ParserSTEP.StripLink(str, ref pos);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -328,15 +326,15 @@ namespace GeometryGym.Ifc
 		//	mDistanceAttenuation = el.mDistanceAttenuation;
 		//	mQuadricAttenuation = el.mQuadricAttenuation;
 		//}
-		internal static IfcLightSourcePositional Parse(string strDef) { IfcLightSourcePositional l = new IfcLightSourcePositional(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLightSourcePositional l, List<string> arrFields, ref int ipos)
+		internal static IfcLightSourcePositional Parse(string str) { IfcLightSourcePositional l = new IfcLightSourcePositional(); int pos = 0; l.Parse(str, ref pos); return l; }
+		protected override void Parse(string str, ref int pos)
 		{
-			IfcLightSource.parseFields(l, arrFields, ref ipos);
-			l.mPosition = ParserSTEP.ParseLink(arrFields[ipos++]);
-			l.mRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mConstantAttenuation = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mDistanceAttenuation = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			l.mQuadricAttenuation = ParserSTEP.ParseDouble(arrFields[ipos++]);
+			base.Parse(str, ref pos);
+			mPosition = ParserSTEP.StripLink(str,ref pos);
+			mRadius = ParserSTEP.StripDouble(str,ref pos);
+			mConstantAttenuation = ParserSTEP.StripDouble(str,ref pos);
+			mDistanceAttenuation = ParserSTEP.StripDouble(str,ref pos);
+			mQuadricAttenuation = ParserSTEP.StripDouble(str,ref pos);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -353,8 +351,15 @@ namespace GeometryGym.Ifc
 		internal double mBeamWidthAngle;// : IfcPositivePlaneAngleMeasure; 
 		internal IfcLightSourceSpot() : base() { }
 		//internal IfcLightSourceSpot(IfcLightSourceSpot el) : base(el) { mOrientation = el.mOrientation; mConcentrationExponent = el.mConcentrationExponent; mSpreadAngle = el.mSpreadAngle; mBeamWidthAngle = el.mBeamWidthAngle; }
-		internal static IfcLightSourceSpot Parse(string strDef) { IfcLightSourceSpot l = new IfcLightSourceSpot(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLightSourceSpot l, List<string> arrFields, ref int ipos) { IfcLightSource.parseFields(l, arrFields, ref ipos); l.mOrientation = ParserSTEP.ParseLink(arrFields[ipos++]); l.mConcentrationExponent = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mSpreadAngle = ParserSTEP.ParseDouble(arrFields[ipos++]); l.mBeamWidthAngle = ParserSTEP.ParseDouble(arrFields[ipos++]); }
+		internal static IfcLightSourceSpot Parse(string str) { IfcLightSourceSpot l = new IfcLightSourceSpot(); int pos = 0; l.Parse(str, ref pos); return l; }
+		protected override void Parse(string str, ref int pos)
+		{
+			base.Parse(str, ref pos);
+			mOrientation = ParserSTEP.StripLink(str, ref pos);
+			mConcentrationExponent = ParserSTEP.StripDouble(str, ref pos);
+			mSpreadAngle = ParserSTEP.StripDouble(str, ref pos);
+			mBeamWidthAngle = ParserSTEP.StripDouble(str,ref pos);
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mConcentrationExponent) + "," + ParserSTEP.DoubleToString(mSpreadAngle) + "," + ParserSTEP.DoubleToString(mBeamWidthAngle); }
 	}
 	public partial class IfcLine : IfcCurve
@@ -368,16 +373,21 @@ namespace GeometryGym.Ifc
 		internal IfcLine() : base() { }
 		internal IfcLine(DatabaseIfc db, IfcLine l) : base(db,l) { Pnt = db.Factory.Duplicate( l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate( l.Dir) as IfcVector; }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
-		internal static IfcLine Parse(string strDef) { IfcLine l = new IfcLine(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLine l, List<string> arrFields, ref int ipos) { IfcCurve.parseFields(l, arrFields, ref ipos); l.mPnt = ParserSTEP.ParseLink(arrFields[ipos++]); l.mDir = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal static IfcLine Parse(string str)
+		{
+			IfcLine l = new IfcLine();
+			int pos = 0;
+			l.mPnt = ParserSTEP.StripLink(str, ref pos);
+			l.mDir = ParserSTEP.StripLink(str, ref pos);
+			return l;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPnt) + "," + ParserSTEP.LinkToString(mDir); }
 	}
 	public partial class IfcLinearDimension : IfcDimensionCurveDirectedCallout // DEPRECEATED IFC4
 	{
 		internal IfcLinearDimension() : base() { }
 		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
-		internal new static IfcLinearDimension Parse(string strDef) { IfcLinearDimension d = new IfcLinearDimension(); int ipos = 0; parseFields(d, ParserSTEP.SplitLineFields(strDef), ref ipos); return d; }
-		internal static void parseFields(IfcLinearDimension d, List<string> arrFields, ref int ipos) { IfcDimensionCurveDirectedCallout.parseFields(d, arrFields, ref ipos); }
+		internal new static IfcLinearDimension Parse(string str) { IfcLinearDimension d = new IfcLinearDimension(); int pos = 0; d.Parse(str, ref pos); return d; }
 	}
 	public partial class IfcLineIndex : IfcSegmentIndexSelect
 	{
@@ -505,13 +515,11 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcLoop : IfcTopologicalRepresentationItem /*SUPERTYPE OF (ONEOF (IfcEdgeLoop ,IfcPolyLoop ,IfcVertexLoop))*/
+	public abstract partial class IfcLoop : IfcTopologicalRepresentationItem /*SUPERTYPE OF (ONEOF (IfcEdgeLoop ,IfcPolyLoop ,IfcVertexLoop))*/
 	{ 
-		internal IfcLoop() : base() { }
-		internal IfcLoop(DatabaseIfc db) : base(db) { }
-		internal IfcLoop(DatabaseIfc db, IfcLoop l) : base(db,l) { }
-		internal static IfcLoop Parse(string strDef) { IfcLoop l = new IfcLoop(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcLoop l, List<string> arrFields, ref int ipos) { IfcTopologicalRepresentationItem.parseFields(l, arrFields, ref ipos); }
+		protected IfcLoop() : base() { }
+		protected IfcLoop(DatabaseIfc db) : base(db) { }
+		protected IfcLoop(DatabaseIfc db, IfcLoop l) : base(db,l) { }
 	}
 	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef
 	{

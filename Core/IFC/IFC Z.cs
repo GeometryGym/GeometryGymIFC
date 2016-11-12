@@ -31,7 +31,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcZone : IfcSystem
 	{
 		internal string mLongName = "$";// :	OPTIONAL IfcLabel; IFC4
-		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcZone() : base() { }
 		internal IfcZone(DatabaseIfc db, IfcZone z) : base(db, z) { mLongName = z.mLongName; }

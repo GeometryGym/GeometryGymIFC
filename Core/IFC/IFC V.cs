@@ -75,8 +75,14 @@ namespace GeometryGym.Ifc
 		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
 		public IfcVector(IfcDirection orientation, double magnitude) { Orientation = orientation; Magnitude = magnitude; }
 	
-		internal static void parseFields(IfcVector v, List<string> arrFields, ref int ipos) { IfcGeometricRepresentationItem.parseFields(v, arrFields, ref ipos); v.mOrientation = ParserSTEP.ParseLink(arrFields[ipos++]); v.mMagnitude = ParserSTEP.ParseDouble(arrFields[ipos++]); }
-		internal static IfcVector Parse(string strDef) { IfcVector v = new IfcVector(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
+		internal static IfcVector Parse(string str)
+		{
+			IfcVector v = new IfcVector();
+			int pos = 0;
+			v.mOrientation = ParserSTEP.StripLink(str, ref pos);
+			v.mMagnitude = ParserSTEP.StripDouble(str,ref pos);
+			return v;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
 	}
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
@@ -84,8 +90,7 @@ namespace GeometryGym.Ifc
 		internal IfcVertex() : base() { }
 		internal IfcVertex(DatabaseIfc db) : base(db) { }
 		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
-		internal static IfcVertex Parse(string strDef) { IfcVertex v = new IfcVertex(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
-		internal static void parseFields(IfcVertex v, List<string> arrFields, ref int ipos) { IfcTopologicalRepresentationItem.parseFields(v, arrFields, ref ipos); }
+		internal static IfcVertex Parse(string str) { return new IfcVertex(); }
 	}
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
 	{
@@ -114,8 +119,13 @@ namespace GeometryGym.Ifc
 
 		internal IfcVertexloop() : base() { }
 		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
-		internal new static IfcVertexloop Parse(string strDef) { IfcVertexloop l = new IfcVertexloop(); int ipos = 0; parseFields(l, ParserSTEP.SplitLineFields(strDef), ref ipos); return l; }
-		internal static void parseFields(IfcVertexloop l, List<string> arrFields, ref int ipos) { IfcLoop.parseFields(l, arrFields, ref ipos); l.mLoopVertex = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal new static IfcVertexloop Parse(string str)
+		{
+			IfcVertexloop l = new IfcVertexloop();
+			int pos = 0;
+			l.mLoopVertex = ParserSTEP.StripLink(str,ref pos);
+			return l;
+		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mLoopVertex); }
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
@@ -126,8 +136,7 @@ namespace GeometryGym.Ifc
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
 		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
-		internal new static IfcVertexPoint Parse(string strDef) { IfcVertexPoint v = new IfcVertexPoint(); int ipos = 0; parseFields(v, ParserSTEP.SplitLineFields(strDef), ref ipos); return v; }
-		internal static void parseFields(IfcVertexPoint v, List<string> arrFields, ref int ipos) { IfcVertex.parseFields(v, arrFields, ref ipos); v.mVertexGeometry = ParserSTEP.ParseLink(arrFields[ipos++]); }
+		internal new static IfcVertexPoint Parse(string str) { IfcVertexPoint v = new IfcVertexPoint(); int pos = 0;v.mVertexGeometry = ParserSTEP.StripLink(str, ref pos); return v; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
 	}
 	public partial class IfcVibrationIsolator : IfcElementComponent
@@ -164,6 +173,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcVirtualElement() : base() { }
 		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e) : base(db, e) { }
+		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		internal static IfcProduct Parse(string strDef) { IfcVirtualElement e = new IfcVirtualElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcVirtualElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -583,8 +593,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcIdentifier : IfcSimpleValue
 	{
 		internal string mValue;
-		public object Value { get { return mValue; } }
-		public IfcIdentifier(string value) { mValue = value.Replace("'", ""); }
+		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public IfcIdentifier(string value) { mValue = ParserIfc.Encode( value); }
 		public override string ToString() { return "IFCIDENTIFIER('" + mValue + "')"; }
 	}
 	public partial class IfcInteger : IfcSimpleValue
@@ -598,7 +608,7 @@ namespace GeometryGym.Ifc
 	{
 		internal string mValue;
 		public object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcLabel(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value.Replace("'", "")); }
+		public IfcLabel(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCLABEL('" + mValue + "')"; }
 	}
 	public partial class IfcLogical : IfcSimpleValue
@@ -634,7 +644,7 @@ namespace GeometryGym.Ifc
 	{
 		internal string mValue;
 		public object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcText(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value.Replace("'", "")); }
+		public IfcText(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCTEXT('" + mValue + "')"; }
 	}
 
