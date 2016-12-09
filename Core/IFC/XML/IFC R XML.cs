@@ -239,6 +239,29 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mDatabase[mRelatingProduct].GetXML(xml.OwnerDocument, "RelatingProduct", this, processed));
 		}
 	}
+
+	public abstract partial class IfcRelAssociates : IfcRelationship   //ABSTRACT SUPERTYPE OF (ONEOF(IfcRelAssociatesApproval,IfcRelAssociatesclassification,IfcRelAssociatesConstraint,IfcRelAssociatesDocument,IfcRelAssociatesLibrary,IfcRelAssociatesMaterial))
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatedObjects") == 0)
+				{
+					List<IfcDefinitionSelect> objects = new List<IfcDefinitionSelect>();
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcDefinitionSelect o = mDatabase.ParseXml<IfcDefinitionSelect>(cn as XmlElement);
+						if (o != null)
+							objects.Add(o);
+					}
+					RelatedObjects = objects;
+				}
+			}
+		}
+	}
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -278,7 +301,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(mDatabase[mRelatingDocument].GetXML(xml.OwnerDocument, "RelatingDocument", this, processed));
 		}
 	}
-	public partial class IfcRelAssociatesMaterial
+	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

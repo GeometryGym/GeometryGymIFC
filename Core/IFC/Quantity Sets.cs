@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -50,5 +49,14 @@ namespace GeometryGym.Ifc
 		public double NetWeight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "NetWeight", value).mIndex); } }
 		public Qto_FootingBaseQuantities(IfcFooting instance) : base(instance.mDatabase, "Qto_FootingBaseQuantities") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
 		public Qto_FootingBaseQuantities(IfcFootingType type) : base(type.mDatabase, "Qto_FootingBaseQuantities") { Description = type.Name; type.AddPropertySet(this); }
+	}
+	public partial class Qto_WindowBaseQuantities : IfcElementQuantity
+	{
+		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
+		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
+		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
+		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "CrossSectionArea", value).mIndex); } }
+		public Qto_WindowBaseQuantities(IfcWindow instance) : base(instance.mDatabase, "Qto_WindowBaseQuantities") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
+		public Qto_WindowBaseQuantities(IfcWindowType type) : base(type.mDatabase, "Qto_WindowBaseQuantities") { Description = type.Name; type.AddPropertySet(this); }
 	}
 }

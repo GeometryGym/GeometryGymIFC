@@ -54,7 +54,7 @@ namespace GeometryGym.Ifc
 						return result;
 				}
 				if (c == '\'')
-					result += "''";
+					result += "\\X\\27"; // Alternative result += "''";
 				else
 				{
 					int i = (int)c;
@@ -137,10 +137,10 @@ namespace GeometryGym.Ifc
 
 			return IfcLogicalEnum.UNKNOWN;
 		}
-		public static IfcLogicalEnum StripLogical(string s, ref int pos)
+		public static IfcLogicalEnum StripLogical(string s, ref int pos, int len)
 		{
 			IfcLogicalEnum result = IfcLogicalEnum.UNKNOWN;
-			int icounter = pos, len = s.Length;
+			int icounter = pos;
 			while (char.IsWhiteSpace(s[icounter]))
 			{
 				icounter++;
@@ -250,18 +250,25 @@ namespace GeometryGym.Ifc
 			result.mIndex = ifcID;
 			return result;
 		}
+		private static Type[] argSet1 = new Type[] { typeof(string), typeof(ReleaseVersion) }, argSet2 = new Type[] { typeof(string) };
+		private static Dictionary<string, Type> mTypes = new Dictionary<string, Type>();
 		private static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion schema)
 		{
-		
-			Type type = Type.GetType("GeometryGym.Ifc." + keyword,false,true);
+			Type type = null;
+			if (mTypes.ContainsKey(keyword))
+				type = mTypes[keyword];
+			else
+			{
+				type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+				if (type != null)
+					mTypes.Add(keyword, type);
+			}
 			if (type != null)
 			{
-				Type[] arguments = new Type[] { typeof(string), typeof(ReleaseVersion) };
-				MethodInfo parser = type.GetMethod("Parse",BindingFlags.Static | BindingFlags.NonPublic,null,CallingConventions.Any, arguments,null);
+				MethodInfo parser = type.GetMethod("Parse",BindingFlags.Static | BindingFlags.NonPublic,null,CallingConventions.Any, argSet1,null);
 				if (parser != null)
 					return parser.Invoke(null, new object[] { str,schema }) as BaseClassIfc;
-				arguments = new Type[] { typeof(string) };
-				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, arguments, null);
+				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, argSet2, null);
 				if (parser != null)
 					return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
 			}
@@ -296,6 +303,24 @@ namespace GeometryGym.Ifc
 				return IfcColourRgb.Parse(str);
 			return new IfcNormalisedRatioMeasure(ParserSTEP.ParseDouble(def));
 		}
+
+		private static Dictionary<string, Type> mDerivedMeasureValueTypes = null;
+		private static Dictionary<string, Type> DerivedMeasureValueTypes
+		{
+			get
+			{
+				if (mDerivedMeasureValueTypes == null)
+				{
+					mDerivedMeasureValueTypes = new Dictionary<string, Type>();
+					IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
+											  where typeof(IfcDerivedMeasureValue).IsAssignableFrom(type)
+											  select type;
+					foreach (Type t in types)
+						mDerivedMeasureValueTypes.Add(t.Name.ToLower(), t);
+				}
+				return mDerivedMeasureValueTypes;
+			}
+		}
 		internal static IfcDerivedMeasureValue parseDerivedMeasureValue(string str)
 		{
 			try
@@ -312,16 +337,17 @@ namespace GeometryGym.Ifc
 				icounter--;
 				if (icounter > 1)
 				{
-					string kw = str.Substring(0, icounter - 1);
-					double val = 0;
-					if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+					string kw = str.Substring(0, icounter - 1).ToLower();
+					Dictionary<string, Type> dmvtypes = DerivedMeasureValueTypes;
+					if (dmvtypes.ContainsKey(kw))
 					{
-						Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
-						if (type != null)
+						Type type = dmvtypes[kw];
+						double val = 0;
+						if (double.TryParse(str.Substring(icounter, len - icounter), out val))
 						{
 							Type[] types = new Type[] { typeof(double) };
 							ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-			null, types, null);
+				null, types, null);
 							if (constructor != null)
 								return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
 						}
@@ -331,10 +357,29 @@ namespace GeometryGym.Ifc
 			catch(Exception) { }
 			return null;
 		}
+
+		private static Dictionary<string, Type> mMeasureValueTypes = null;
+		private static Dictionary<string,Type> MeasureValueTypes
+		{
+			get
+			{
+				if(mMeasureValueTypes == null)
+				{
+					mMeasureValueTypes = new Dictionary<string, Type>();
+					IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
+								  where typeof(IfcMeasureValue).IsAssignableFrom(type) select type;
+					foreach(Type t in types)
+						mMeasureValueTypes.Add(t.Name.ToLower(), t);
+				}
+				return mMeasureValueTypes;
+			}
+		}
 		internal static IfcMeasureValue parseMeasureValue(string str)
 		{
 			try
 			{
+				if (string.IsNullOrEmpty(str))
+					return null;
 				int len = str.Length;
 				if (str.EndsWith(")"))
 					len--;
@@ -347,14 +392,18 @@ namespace GeometryGym.Ifc
 				icounter--;
 				if (icounter > 1)
 				{
-					string kw = str.Substring(0, icounter - 1);
+					string kw = str.Substring(0, icounter - 1).ToLower();
 					if (kw.All(Char.IsLetter))
 					{
-						Type type = Type.GetType("GeometryGym.Ifc." + kw, false, true);
-						if (type != null)
+						Dictionary<string, Type> types = MeasureValueTypes;
+						if (types.ContainsKey(kw))
 						{
-							if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
-								return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+							Type type = types[kw];
+							if (type != null)
+							{
+								if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+									return extractMeasureValue(type, str.Substring(icounter, len - icounter));
+							}
 						}
 					}
 				}
@@ -474,13 +523,13 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcValue parseValue(string str)
 		{
-			IfcMeasureValue sv = parseMeasureValue(str);
-			if (sv != null)
-				return sv;
-			IfcDerivedMeasureValue mv = parseDerivedMeasureValue(str);
+			IfcMeasureValue mv = parseMeasureValue(str);
 			if (mv != null)
 				return mv;
-			return parseSimpleValue(str);
+			IfcSimpleValue sv = parseSimpleValue(str);
+			if (sv != null)
+				return sv; 
+			return parseDerivedMeasureValue(str);
 		}
 		internal static IfcValue extractValue(string keyword, string value)
 		{

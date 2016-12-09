@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -101,9 +100,9 @@ namespace GeometryGym.Ifc
 		internal static IfcIndexedPolyCurve Parse(string str)
 		{
 			IfcIndexedPolyCurve c = new IfcIndexedPolyCurve();
-			int pos = 0;
-			c.mPoints = ParserSTEP.StripLink(str, ref pos);
-			string field = ParserSTEP.StripField(str, ref pos);
+			int pos = 0, len = str.Length;
+			c.mPoints = ParserSTEP.StripLink(str, ref pos, len);
+			string field = ParserSTEP.StripField(str, ref pos, len);
 			if (field != "$")
 			{
 				List<string> strs = ParserSTEP.SplitLineFields(field.Substring(1, field.Length - 2));
@@ -119,7 +118,7 @@ namespace GeometryGym.Ifc
 
 				}
 			}
-			field = ParserSTEP.StripField(str, ref pos);
+			field = ParserSTEP.StripField(str, ref pos, len);
 			if (field[0] == '.')
 				c.mSelfIntersect = field[1] == 'T' ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 			return c;
@@ -309,7 +308,7 @@ namespace GeometryGym.Ifc
 		internal IfcIntersectionCurve() : base() { }
 		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
 		internal IfcIntersectionCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve,p1,p2,cr) { }
-		internal new static IfcIntersectionCurve Parse(string str) { IfcIntersectionCurve c = new IfcIntersectionCurve(); int pos = 0; c.Parse(str, ref pos); return c; }
+		internal new static IfcIntersectionCurve Parse(string str) { IfcIntersectionCurve c = new IfcIntersectionCurve(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
 	}
 	public partial class IfcInventory : IfcGroup
 	{

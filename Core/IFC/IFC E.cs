@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -384,7 +383,7 @@ namespace GeometryGym.Ifc
 #warning todo finish inverse
 		}
 		protected IfcElement(DatabaseIfc db) : base(db) { }
-		protected IfcElement(DatabaseIfc db, IfcElement e) : base(db, e)
+		protected IfcElement(DatabaseIfc db, IfcElement e, bool downStream) : base(db, e,downStream)
 		{
 			mTag = e.mTag;
 #warning todo finish inverse
@@ -483,10 +482,10 @@ namespace GeometryGym.Ifc
 		protected static void parseFields(IfcElement e, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(e, arrFields, ref ipos); e.mTag = arrFields[ipos++].Replace("'", ""); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + (mTag == "$" ? "$" : "'" + mTag + "'"); }
 
-		protected override void Parse(string str, ref int pos)
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mTag = ParserSTEP.StripString(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mTag = ParserSTEP.StripString(str, ref pos, len);
 		}
 		public IfcMaterialSelect MaterialSelect
 		{
@@ -585,7 +584,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			return element;
 		}
-		internal void addStructuralMember(IfcStructuralMember m)
+		public void AddStructuralMember(IfcStructuralMember m)
 		{
 			if (m == null)
 				return;
@@ -617,7 +616,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcElementarySurface() : base() { }
 		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s) : base(db,s) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; }
 		protected IfcElementarySurface(IfcAxis2Placement3D placement) : base(placement.mDatabase) { mPosition = placement.mIndex; }
-		protected virtual void Parse(string str, ref int pos) { mPosition = ParserSTEP.StripLink(str,ref pos); }
+		protected virtual void Parse(string str, ref int pos, int len) { mPosition = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPosition); }
 	}
 	public partial class IfcElementAssembly : IfcElement
@@ -631,7 +630,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcElementAssemblyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElementAssembly() : base() { }
-		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a) : base(db,a) { mPredefinedType = a.mPredefinedType; }
+		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, bool downStream) : base(db,a,downStream) { mPredefinedType = a.mPredefinedType; }
 		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum place, IfcElementAssemblyTypeEnum type) : base(host.mDatabase) { mHost = host; AssemblyPlace = place; PredefinedType = type; }
 		 
 		internal static IfcElementAssembly Parse(string strDef) { IfcElementAssembly a = new IfcElementAssembly(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
@@ -697,7 +696,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
 	{
 		protected IfcElementComponent() : base() { }
-		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c) : base(db, c) { }
+		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c) : base(db, c,false) { }
 		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
 		
 		protected static void parseFields(IfcElementComponent c, List<string> arrFields, ref int ipos) { IfcElement.parseFields(c, arrFields, ref ipos); }
@@ -733,6 +732,69 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			for (int icounter = 1; icounter < mQuantities.Count; icounter++)
 				str += ",#" + mQuantities[icounter];
 			return str + ")";
+		}
+		internal override List<IBaseClassIfc> retrieveReference(IfcReference reference)
+		{
+			IfcReference ir = reference.InnerReference;
+			List<IBaseClassIfc> result = new List<IBaseClassIfc>();
+			if (ir == null)
+			{
+				if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
+				{
+					List<IfcPhysicalQuantity> quants = Quantities;
+					if (reference.mListPositions.Count == 0)
+					{
+						string name = reference.InstanceName;
+						if (!string.IsNullOrEmpty(name))
+						{
+							foreach (IfcPhysicalQuantity q in quants)
+							{
+								if (string.Compare(q.Name, name) == 0)
+									result.Add(q);
+							}
+						}
+						else
+							result.AddRange(quants);
+					}
+					else
+					{
+						foreach (int i in reference.mListPositions)
+						{
+							result.Add(quants[i - 1]);
+						}
+					}
+					return result;
+				}
+			}
+			if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
+			{
+				List<IfcPhysicalQuantity> quants = Quantities;
+				if (reference.mListPositions.Count == 0)
+				{
+					string name = reference.InstanceName;
+
+					if (string.IsNullOrEmpty(name))
+					{
+						foreach (IfcPhysicalQuantity q in quants)
+							result.AddRange(q.retrieveReference(reference.InnerReference));
+					}
+					else
+					{
+						foreach (IfcPhysicalQuantity q in quants)
+						{
+							if (string.Compare(name, q.Name) == 0)
+								result.AddRange(q.retrieveReference(reference.InnerReference));
+						}
+					}
+				}
+				else
+				{
+					foreach (int i in reference.mListPositions)
+						result.AddRange(quants[i - 1].retrieveReference(ir));
+				}
+				return result;
+			}
+			return base.retrieveReference(reference);
 		}
 	}
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))
@@ -773,12 +835,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEllipse() : base() { }
 		internal IfcEllipse(DatabaseIfc db, IfcEllipse e) : base(db,e) { mSemiAxis1 = e.mSemiAxis1; mSemiAxis2 = e.mSemiAxis2; }
 		internal IfcEllipse(IfcAxis2Placement pl, double axis1, double axis2) : base(pl) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
-		internal static IfcEllipse Parse(string str) { IfcEllipse e = new IfcEllipse(); int pos = 0; e.Parse(str, ref pos); return e; }
-		internal override void Parse(string str, ref int pos)
+		internal static IfcEllipse Parse(string str) { IfcEllipse e = new IfcEllipse(); int pos = 0; e.Parse(str, ref pos, str.Length); return e; }
+		internal override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mSemiAxis1 = ParserSTEP.StripDouble(str, ref pos);
-			mSemiAxis2 = ParserSTEP.StripDouble(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mSemiAxis1 = ParserSTEP.StripDouble(str, ref pos, len);
+			mSemiAxis2 = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mSemiAxis1) + "," + ParserSTEP.DoubleToString(mSemiAxis2); }
 	}
@@ -860,8 +922,17 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal static void parseFields(IfcEnvironmentalImpactValue v, List<string> arrFields, ref int ipos, ReleaseVersion schema) { IfcAppliedValue.parseFields(v, arrFields, ref ipos, schema); v.mImpactType = arrFields[ipos++]; v.mEnvCategory = (IfcEnvironmentalImpactCategoryEnum)Enum.Parse(typeof(IfcEnvironmentalImpactCategoryEnum), arrFields[ipos++].Replace(".", "")); v.mUserDefinedCategory = arrFields[ipos++]; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + mImpactType + ",." + mEnvCategory.ToString() + ".," + mUserDefinedCategory; }
 	}
-	public partial class IfcEquipmentElement : IfcElement { }//IFC2x2 Depreceated 
-	public partial class IfcEquipmentStandard : IfcControl // DEPRECEATED IFC4
+	
+	[Obsolete("DEPRECEATED IFC2x2", false)]
+	public partial class IfcEquipmentElement : IfcElement  
+	{
+		internal IfcEquipmentElement() : base() { }
+		internal IfcEquipmentElement(DatabaseIfc db, IfcEquipmentElement e) : base(db,e,false) { }
+		internal static IfcEquipmentElement Parse(string strDef) { IfcEquipmentElement e = new IfcEquipmentElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
+		internal static void parseFields(IfcCivilElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
+	}
+	[Obsolete("DEPRECEATED IFC4", false)]
+	public partial class IfcEquipmentStandard : IfcControl 
 	{
 		internal IfcEquipmentStandard() : base() { }
 		internal IfcEquipmentStandard(DatabaseIfc db, IfcEquipmentStandard s) : base(db,s) { }
@@ -1189,12 +1260,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, double depth) : base(prof, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
-		internal static IfcExtrudedAreaSolid Parse(string str) { IfcExtrudedAreaSolid e = new IfcExtrudedAreaSolid(); int pos = 0; e.Parse(str, ref pos); return e; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcExtrudedAreaSolid Parse(string str) { IfcExtrudedAreaSolid e = new IfcExtrudedAreaSolid(); int pos = 0; e.Parse(str, ref pos, str.Length); return e; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mExtrudedDirection = ParserSTEP.StripLink(str, ref pos);
-			mDepth = ParserSTEP.StripDouble(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mExtrudedDirection = ParserSTEP.StripLink(str, ref pos, len);
+			mDepth = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + ParserSTEP.DoubleToString(Math.Round(mDepth, mDatabase.mLengthDigits)); }
 	}
@@ -1207,11 +1278,11 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcExtrudedAreaSolidTapered(DatabaseIfc db, IfcExtrudedAreaSolidTapered e) : base(db,e) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea) as IfcProfileDef; }
 		public IfcExtrudedAreaSolidTapered(IfcParameterizedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcParameterizedProfileDef end) : base(start, placement, new IfcDirection(start.mDatabase,0,0,1), depth) { EndSweptArea = end; }
 		public IfcExtrudedAreaSolidTapered(IfcDerivedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcDerivedProfileDef end) : base(start, placement,new IfcDirection(start.mDatabase,0,0,1), depth ) { EndSweptArea = end; }
-		internal new static IfcExtrudedAreaSolidTapered Parse(string str) { IfcExtrudedAreaSolidTapered e = new IfcExtrudedAreaSolidTapered(); int pos = 0; e.Parse(str, ref pos); return e; }
-		protected override void Parse(string str, ref int pos)
+		internal new static IfcExtrudedAreaSolidTapered Parse(string str) { IfcExtrudedAreaSolidTapered e = new IfcExtrudedAreaSolidTapered(); int pos = 0; e.Parse(str, ref pos, str.Length); return e; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mEndSweptArea = ParserSTEP.StripLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mEndSweptArea = ParserSTEP.StripLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mEndSweptArea); }
 	}

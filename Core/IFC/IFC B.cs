@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 
@@ -39,14 +38,14 @@ namespace GeometryGym.Ifc
 		public IfcBeam(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		protected IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 		protected IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement, arcOrigin,arcAngle) { }
-		internal static IfcBeam Parse(string str, ReleaseVersion schema) { IfcBeam b = new IfcBeam(); int pos = 0; b.Parse(str,ref pos,schema); return b; }
+		internal static IfcBeam Parse(string str, ReleaseVersion schema) { IfcBeam b = new IfcBeam(); int pos = 0; b.Parse(str,ref pos, str.Length, schema); return b; }
 
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
+			base.Parse(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str,ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					mPredefinedType = (IfcBeamTypeEnum)Enum.Parse(typeof(IfcBeamTypeEnum), s.Substring(1, s.Length - 2));
 			}
@@ -63,7 +62,7 @@ namespace GeometryGym.Ifc
 		public IfcBeamStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 		public IfcBeamStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement,arcOrigin, arcAngle) { }
 
-		internal new static IfcBeamStandardCase Parse(string str, ReleaseVersion schema) { IfcBeamStandardCase b = new IfcBeamStandardCase(); int pos = 0; b.Parse(str,ref pos,schema); return b; }
+		internal new static IfcBeamStandardCase Parse(string str, ReleaseVersion schema) { IfcBeamStandardCase b = new IfcBeamStandardCase(); int pos = 0; b.Parse(str,ref pos, str.Length, schema); return b; }
 	}
 	public partial class IfcBeamType : IfcBuildingElementType
 	{
@@ -92,7 +91,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcBezierCurve() : base() { }
 		internal IfcBezierCurve(DatabaseIfc db, IfcBezierCurve c) : base(db,c) { }
-		internal static IfcBezierCurve Parse(string str) { IfcBezierCurve c = new IfcBezierCurve(); int pos = 0; c.Parse(str, ref pos); return c; }
+		internal static IfcBezierCurve Parse(string str) { IfcBezierCurve c = new IfcBezierCurve(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
 	}	
 	public partial class IfcBlobTexture : IfcSurfaceTexture
 	{
@@ -118,11 +117,11 @@ namespace GeometryGym.Ifc
 		internal static IfcBlock Parse(string str)
 		{
 			IfcBlock b = new IfcBlock();
-			int pos = 0;
-			b.Parse(str, ref pos);
-			b.mXLength = ParserSTEP.StripDouble(str,ref pos);
-			b.mYLength = ParserSTEP.StripDouble(str, ref pos);
-			b.mZLength = ParserSTEP.StripDouble(str, ref pos);
+			int pos = 0, len = str.Length;
+			b.Parse(str, ref pos, len);
+			b.mXLength = ParserSTEP.StripDouble(str, ref pos, len);
+			b.mYLength = ParserSTEP.StripDouble(str, ref pos, len);
+			b.mZLength = ParserSTEP.StripDouble(str, ref pos, len);
 			return b;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mXLength) + "," + ParserSTEP.DoubleToString(mYLength) + "," + ParserSTEP.DoubleToString(mZLength); }
@@ -218,7 +217,7 @@ namespace GeometryGym.Ifc
 		internal IfcBoundaryCurve() : base() { }
 		internal IfcBoundaryCurve(DatabaseIfc db, IfcBoundaryCurve c) : base(db,c) { }
 		internal IfcBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface) : base(segs,surface) { }
-		internal new static IfcBoundaryCurve Parse(string str) { IfcBoundaryCurve b = new IfcBoundaryCurve(); int pos = 0; b.Parse(str, ref pos); return b; }
+		internal new static IfcBoundaryCurve Parse(string str) { IfcBoundaryCurve b = new IfcBoundaryCurve(); int pos = 0; b.Parse(str, ref pos, str.Length); return b; }
 	}
 	public partial class IfcBoundaryEdgeCondition : IfcBoundaryCondition
 	{
@@ -440,8 +439,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcBoxedHalfSpace() : base() { }
 		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
-		internal new static IfcBoxedHalfSpace Parse(string str) { IfcBoxedHalfSpace s = new IfcBoxedHalfSpace(); int pos = 0; s.Parse(str,ref pos); return s; }
-		protected override void Parse(string str, ref int pos) { base.Parse(str, ref pos); mEnclosure = ParserSTEP.StripLink(str,ref pos); }
+		internal new static IfcBoxedHalfSpace Parse(string str) { IfcBoxedHalfSpace s = new IfcBoxedHalfSpace(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len) { base.Parse(str, ref pos, len); mEnclosure = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mEnclosure); }
 	}
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
@@ -472,15 +471,15 @@ namespace GeometryGym.Ifc
 			: this(controlPoints[0].mDatabase, degree, form) { mControlPointsList = controlPoints.ConvertAll(x => x.mIndex); }
 
 		
-		protected virtual void Parse(string str, ref int pos)
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mDegree = int.Parse(ParserSTEP.StripField(str, ref pos));
-			mControlPointsList = ParserSTEP.StripListLink(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			mDegree = int.Parse(ParserSTEP.StripField(str, ref pos, len));
+			mControlPointsList = ParserSTEP.StripListLink(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcBSplineCurveForm> (s.Replace(".", ""), out mCurveForm);
-			mClosedCurve = ParserIfc.StripLogical(str, ref pos);
-			mSelfIntersect = ParserIfc.StripLogical(str, ref pos);
+			mClosedCurve = ParserIfc.StripLogical(str, ref pos, len);
+			mSelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 
 		protected override string BuildStringSTEP()
@@ -520,15 +519,15 @@ namespace GeometryGym.Ifc
 		{
 			IfcBSplineCurveWithKnots c = new IfcBSplineCurveWithKnots();
 			int pos = 0;
-			c.Parse(str, ref pos);
+			c.Parse(str, ref pos, str.Length);
 			return c;
 		}
-		protected override void Parse(string str, ref int pos)
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mMultiplicities = ParserSTEP.StripListInt(str, ref pos);
-			mKnots = ParserSTEP.StripListDouble(str, ref pos);
-			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str, ref pos).Replace(".", ""));
+			base.Parse(str, ref pos, len);
+			mMultiplicities = ParserSTEP.StripListInt(str, ref pos, len);
+			mKnots = ParserSTEP.StripListDouble(str, ref pos, len);
+			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str, ref pos, len).Replace(".", ""));
 		}
 		
 		protected override string BuildStringSTEP()
@@ -586,17 +585,17 @@ namespace GeometryGym.Ifc
 				mControlPointsList.Add(cps.ConvertAll(x => x.mIndex));
 		}
 
-		protected virtual void parseString(string str, ref int pos)
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mUDegree =  int.Parse(ParserSTEP.StripField(str, ref pos));
-			mVDegree = int.Parse(ParserSTEP.StripField(str,ref pos));
-			mControlPointsList = ParserSTEP.StripListListLink(str,ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			mUDegree =  int.Parse(ParserSTEP.StripField(str, ref pos, len));
+			mVDegree = int.Parse(ParserSTEP.StripField(str, ref pos, len));
+			mControlPointsList = ParserSTEP.StripListListLink(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if(s[0] == '.') 
 				Enum.TryParse<IfcBSplineSurfaceForm>(s.Replace(".", ""),out mSurfaceForm);
-			mUClosed = ParserIfc.StripLogical(str,ref pos);
-			mVClosed = ParserIfc.StripLogical(str,ref pos);
-			mSelfIntersect = ParserIfc.StripLogical(str,ref pos);
+			mUClosed = ParserIfc.StripLogical(str,ref pos, len);
+			mVClosed = ParserIfc.StripLogical(str,ref pos, len);
+			mSelfIntersect = ParserIfc.StripLogical(str,ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -644,20 +643,20 @@ namespace GeometryGym.Ifc
 			mVKnots.AddRange(vKnots);
 		}
 
-		protected override void parseString(string str, ref int pos)
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.parseString(str, ref pos);
-			mUMultiplicities = ParserSTEP.StripListInt(str,	ref pos);
-			mVMultiplicities = ParserSTEP.StripListInt(str, ref pos);
-			mUKnots = ParserSTEP.StripListDouble(str, ref pos);
-			mVKnots = ParserSTEP.StripListDouble(str, ref pos);
-			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str,ref pos).Replace(".", ""));
+			base.Parse(str, ref pos,len);
+			mUMultiplicities = ParserSTEP.StripListInt(str,	ref pos, len);
+			mVMultiplicities = ParserSTEP.StripListInt(str, ref pos, len);
+			mUKnots = ParserSTEP.StripListDouble(str, ref pos, len);
+			mVKnots = ParserSTEP.StripListDouble(str, ref pos, len);
+			mKnotSpec = (IfcKnotType)Enum.Parse(typeof(IfcKnotType), ParserSTEP.StripField(str, ref pos, len).Replace(".", ""));
 		}
 		internal static IfcBSplineSurfaceWithKnots Parse(string str)
 		{
 			IfcBSplineSurfaceWithKnots s = new IfcBSplineSurfaceWithKnots();
 			int pos = 0;
-			s.parseString(str, ref pos);
+			s.Parse(str, ref pos, str.Length);
 			return s;
 		}
 		protected override string BuildStringSTEP()
@@ -722,7 +721,7 @@ namespace GeometryGym.Ifc
 	{ //,IfcMember,IfcPile,IfcPlate,IfcRailing,IfcRamp,IfcRampFlight,IfcRoof,IfcSlab,IfcStair,IfcStairFlight,IfcWall,IfcWindow) IFC2x3 IfcBuildingElementComponent IFC4  IfcShadingDevice
 		protected IfcBuildingElement() : base() { }
 		protected IfcBuildingElement(DatabaseIfc db) : base(db) { }
-		protected IfcBuildingElement(DatabaseIfc db, IfcBuildingElement e) : base(db, e) { }
+		protected IfcBuildingElement(DatabaseIfc db, IfcBuildingElement e) : base(db, e,false) { }
 		protected IfcBuildingElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement, length) { }
 		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement,arcOrigin, arcAngle) { }
@@ -781,11 +780,11 @@ namespace GeometryGym.Ifc
 		internal IfcBuildingElementProxy() : base() { }
 		internal IfcBuildingElementProxy(DatabaseIfc db, IfcBuildingElementProxy p) : base(db, p) { mPredefinedType = p.mPredefinedType; }
 		public IfcBuildingElementProxy(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = "NOTDEFINED"; }
-		internal static IfcBuildingElementProxy Parse(string str) { IfcBuildingElementProxy p = new IfcBuildingElementProxy(); int pos = 0; p.Parse(str,ref pos); return p; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcBuildingElementProxy Parse(string str) { IfcBuildingElementProxy p = new IfcBuildingElementProxy(); int pos = 0; p.Parse(str, ref pos, str.Length); return p; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			string s = ParserSTEP.StripField(str,ref pos);
+			base.Parse(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 			{
 				try { mPredefinedType = (IfcBuildingElementProxyTypeEnum)Enum.Parse(typeof(IfcBuildingElementProxyTypeEnum),s.Replace(".", "")); } catch (Exception) { }

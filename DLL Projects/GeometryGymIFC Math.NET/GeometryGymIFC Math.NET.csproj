@@ -139,6 +139,9 @@
     <Compile Include="..\..\core\ifc\Property Sets.cs">
       <Link>IFC\Core\Property Sets.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\Quantity Sets.cs">
+      <Link>IFC\Core\Quantity Sets.cs</Link>
+    </Compile>
     <Compile Include="..\..\core\ifc\xml\BaseClassIFC XML.cs">
       <Link>IFC\XML\BaseClassIFC XML.cs</Link>
     </Compile>
@@ -190,6 +193,9 @@
     <Compile Include="..\..\core\ifc\xml\IFC P XML.cs">
       <Link>IFC\XML\IFC P XML.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\XML\IFC Q XML.cs">
+      <Link>IFC\XML\IFC Q XML.cs</Link>
+    </Compile>
     <Compile Include="..\..\core\ifc\xml\IFC R XML.cs">
       <Link>IFC\XML\IFC R XML.cs</Link>
     </Compile>
@@ -216,6 +222,18 @@
     </Compile>
     <Compile Include="..\..\core\step\ParserSTEP.cs">
       <Link>STEP\ParserSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\extensions\drawing\system\IFC C System.Drawing.cs">
+      <Link>IFC\Drawing\IFC C System.Drawing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\extensions\drawing\system\IFC N System.Drawing.cs">
+      <Link>IFC\Drawing\IFC N System.Drawing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\extensions\drawing\system\IFC P System.Drawing.cs">
+      <Link>IFC\Drawing\IFC P System.Drawing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\extensions\drawing\system\IFC S System.Drawing.cs">
+      <Link>IFC\Drawing\IFC S System.Drawing.cs</Link>
     </Compile>
     <Compile Include="..\..\Extensions\Math.NET IFC\IFC A Math.NET.cs">
       <Link>IFC\Math.NET\IFC A Math.NET.cs</Link>

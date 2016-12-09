@@ -234,6 +234,42 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("ReferenceExtent", mReferenceExtent.ToString());
 		}
 	}
+	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
+			if (xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Material") == 0)
+					Material = mDatabase.ParseXml<IfcMaterial>(child as XmlElement);
+				else if (string.Compare(name, "Profile") == 0)
+					Profile = mDatabase.ParseXml<IfcProfileDef>(child as XmlElement);
+			}
+			if (xml.HasAttribute("Priority"))
+				int.TryParse(xml.Attributes["Priority"].Value, out mPriority);
+			if (xml.HasAttribute("Category"))
+				Category = xml.Attributes["Category"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+			setAttribute(xml, "Description", Description);
+			if (mMaterial > 0)
+				xml.AppendChild(Material.GetXML(xml.OwnerDocument, "Material", this, processed));
+			if (mProfile > 0)
+				xml.AppendChild(Profile.GetXML(xml.OwnerDocument, "Profile", this, processed));
+			if (mPriority != int.MaxValue)
+				setAttribute(xml, "Priority", mPriority.ToString());
+			setAttribute(xml, "Category", Category);
+		}
+	}
 	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect
 	{
 		internal override void ParseXml(XmlElement xml)

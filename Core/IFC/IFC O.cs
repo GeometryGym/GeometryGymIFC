@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -62,7 +61,7 @@ namespace GeometryGym.Ifc
 		
 		protected IfcObject() : base() { }
 		protected IfcObject(IfcObject basis) : base(basis) { mObjectType = basis.mObjectType; mIsDeclaredBy = basis.mIsDeclaredBy; mIsTypedBy = basis.mIsTypedBy; mIsDefinedBy = basis.mIsDefinedBy; }
-		protected IfcObject(DatabaseIfc db, IfcObject o) : base(db, o)//, bool downStream) : base(db, o, downStream)
+		protected IfcObject(DatabaseIfc db, IfcObject o, bool downStream) : base(db, o,downStream)//, bool downStream) : base(db, o, downStream)
 		{
 			mObjectType = o.mObjectType;
 			foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
@@ -74,10 +73,10 @@ namespace GeometryGym.Ifc
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy,false) as IfcRelDefinesByType;
 		}
 		internal IfcObject(DatabaseIfc db) : base(db) { }
-		protected override void Parse(string str, ref int pos)
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mObjectType = ParserSTEP.StripString(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mObjectType = ParserSTEP.StripString(str, ref pos, len);
 		}
 		protected static void parseFields(IfcObject obj, List<string> arrFields, ref int ipos) { IfcObjectDefinition.parseFields(obj, arrFields, ref ipos); obj.mObjectType = arrFields[ipos++].Replace("'", ""); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mObjectType == "$" ? ",$" : ",'" + mObjectType + "'"); }
@@ -93,8 +92,9 @@ namespace GeometryGym.Ifc
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
 			IfcSpatialElement spatial = this as IfcSpatialElement;
-			if (spatial != null)
-				db.Factory.Duplicate(spatial, true);
+			IfcElementAssembly eas = this as IfcElementAssembly;
+			if (spatial != null || eas != null)
+				db.Factory.Duplicate(this, true);
 			else
 				db.Factory.Duplicate(this);
 			db.WriteFile(filename);
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 			mDecomposes = basis.mDecomposes;
 			mHasAssociations = basis.mHasAssociations;
 		}
-		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o) : base (db, o)//, bool downStream) : base(db, o)
+		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, bool downStream) : base(db, o)
 		{
 			foreach(IfcRelAssigns assigns in o.mHasAssignments)
 			{
@@ -167,6 +167,13 @@ namespace GeometryGym.Ifc
 			}
 			if (mHasContext != null)
 				(db.Factory.Duplicate(mHasContext, false) as IfcRelDeclares).AddRelated(this);	
+			if(downStream)
+			{
+				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
+					mDatabase.Factory.Duplicate(rag, true);
+				foreach (IfcRelNests rn in o.mIsNestedBy)
+					mDatabase.Factory.Duplicate(rn, true);
+			}
 		}
 		
 		protected static void parseFields(IfcObjectDefinition objDef, List<string> arrFields, ref int ipos) { IfcRoot.parseFields(objDef, arrFields, ref ipos); }
@@ -421,10 +428,10 @@ namespace GeometryGym.Ifc
 
 		internal IfcOneDirectionRepeatFactor() : base() { }
 		internal IfcOneDirectionRepeatFactor(DatabaseIfc db, IfcOneDirectionRepeatFactor f) : base(db, f) { RepeatFactor = db.Factory.Duplicate(f.RepeatFactor) as IfcVector; }
-		internal static IfcOneDirectionRepeatFactor Parse(string str) { IfcOneDirectionRepeatFactor f = new IfcOneDirectionRepeatFactor(); int pos = 0; f.Parse(str, ref pos); return f; }
-		protected virtual void Parse(string str,ref int pos)
+		internal static IfcOneDirectionRepeatFactor Parse(string str) { IfcOneDirectionRepeatFactor f = new IfcOneDirectionRepeatFactor(); int pos = 0; f.Parse(str, ref pos, str.Length); return f; }
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mRepeatFactor = ParserSTEP.StripLink(str, ref pos);
+			mRepeatFactor = ParserSTEP.StripLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRepeatFactor); }
 	}
@@ -577,7 +584,7 @@ namespace GeometryGym.Ifc
 		internal IfcOuterBoundaryCurve() : base() { }
 		internal IfcOuterBoundaryCurve(DatabaseIfc db, IfcOuterBoundaryCurve c) : base(db,c) { }
 		internal IfcOuterBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface ) : base(segs,surface) { }
-		internal new static IfcOuterBoundaryCurve Parse(string str) { IfcOuterBoundaryCurve b = new IfcOuterBoundaryCurve(); int pos = 0; b.Parse(str, ref pos); return b; }
+		internal new static IfcOuterBoundaryCurve Parse(string str) { IfcOuterBoundaryCurve b = new IfcOuterBoundaryCurve(); int pos = 0; b.Parse(str, ref pos, str.Length); return b; }
 	}
 	public partial class IfcOutlet : IfcFlowTerminal //IFC4
 	{

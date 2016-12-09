@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -51,13 +50,8 @@ namespace GeometryGym.Ifc
 		public IfcActorSelect TheActor { get { return mDatabase[mTheActor] as IfcActorSelect; } set { mTheActor = value.Index; } }
 
 		internal IfcActor() : base() { }
-		internal IfcActor(DatabaseIfc db, IfcActor a) : base(db,a) { TheActor = db.Factory.Duplicate(a.mDatabase[ a.mTheActor]) as IfcActorSelect; }
-		internal IfcActor(IfcActorSelect a) : base(a.Database)
-		{
- 			if(mDatabase.mModelView != ModelView.If2x3NotAssigned && mDatabase.mModelView != ModelView.Ifc4NotAssigned )
-				throw new Exception("Invalid Model View for IfcActor : " + mDatabase.ModelView.ToString());
-			mTheActor = a.Index; 
-		}
+		internal IfcActor(DatabaseIfc db, IfcActor a) : base(db,a,false) { TheActor = db.Factory.Duplicate(a.mDatabase[ a.mTheActor]) as IfcActorSelect; }
+		public IfcActor(IfcActorSelect a) : base(a.Database) { mTheActor = a.Index; }
 		internal static IfcActor Parse(string strDef) { IfcActor a = new IfcActor(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcActor a, List<string> arrFields, ref int ipos) { IfcObject.parseFields(a, arrFields, ref ipos); a.mTheActor = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mTheActor); }
@@ -163,7 +157,7 @@ namespace GeometryGym.Ifc
 		internal IfcAdvancedBrep(DatabaseIfc db, IfcAdvancedBrep b) : base(db,b) { }
 		internal IfcAdvancedBrep(IfcClosedShell s) : base(s) { }
 
-		internal static IfcAdvancedBrep Parse(string str) { IfcAdvancedBrep b = new IfcAdvancedBrep(); int pos = 0; b.Parse(str,ref pos); return b; }
+		internal static IfcAdvancedBrep Parse(string str) { IfcAdvancedBrep b = new IfcAdvancedBrep(); int pos = 0; b.Parse(str,ref pos, str.Length); return b; }
 		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP()); }
 	}
 	public partial class IfcAdvancedBrepWithVoids : IfcAdvancedBrep
@@ -174,11 +168,11 @@ namespace GeometryGym.Ifc
 		internal IfcAdvancedBrepWithVoids() : base() { }
 		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=> db.Factory.Duplicate(x) as IfcClosedShell); }
 
-		internal new static IfcAdvancedBrepWithVoids Parse(string str) { IfcAdvancedBrepWithVoids b = new IfcAdvancedBrepWithVoids(); int pos = 0; b.Parse(str,ref pos); return b; }
-		protected override void Parse(string str, ref int pos)
+		internal new static IfcAdvancedBrepWithVoids Parse(string str) { IfcAdvancedBrepWithVoids b = new IfcAdvancedBrepWithVoids(); int pos = 0; b.Parse(str,ref pos, str.Length); return b; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mVoids = ParserSTEP.StripListLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mVoids = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -339,13 +333,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout //IFC4 depreceated
 	{
 		internal IfcAngularDimension() : base() { }
-		internal new static IfcAngularDimension Parse(string str) { IfcAngularDimension d = new IfcAngularDimension(); int pos = 0; d.Parse(str, ref pos); return d; }
+		internal new static IfcAngularDimension Parse(string str) { IfcAngularDimension d = new IfcAngularDimension(); int pos = 0; d.Parse(str, ref pos, str.Length); return d; }
 	}
 	public partial class IfcAnnotation : IfcProduct
 	{	 //INVERSE
 		internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		internal IfcAnnotation() : base() { }
-		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a) : base(db,a) { }
+		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a) : base(db,a,false) { }
 		public IfcAnnotation(DatabaseIfc db) : base(db) { }
 		internal static IfcAnnotation Parse(string strDef) { int ipos = 0; IfcAnnotation a = new IfcAnnotation(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcAnnotation a, List<string> arrFields, ref int ipos)  { IfcProduct.parseFields(a,arrFields, ref ipos); }
@@ -394,12 +388,12 @@ namespace GeometryGym.Ifc
 		internal IfcGlobalOrLocalEnum  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
 		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f) : base(db,f) { }
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
-		internal new static IfcAnnotationFillAreaOccurrence Parse(string str) { IfcAnnotationFillAreaOccurrence a = new IfcAnnotationFillAreaOccurrence(); int pos = 0; a.Parse(str, ref pos); return a; }
-		protected override void Parse(string str, ref int pos)
+		internal new static IfcAnnotationFillAreaOccurrence Parse(string str) { IfcAnnotationFillAreaOccurrence a = new IfcAnnotationFillAreaOccurrence(); int pos = 0; a.Parse(str, ref pos, str.Length); return a; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mFillStyleTarget = ParserSTEP.StripLink(str,ref pos);
-			string s = ParserSTEP.StripField(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mFillStyleTarget = ParserSTEP.StripLink(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if(s != "$")
 				mGlobalOrLocal = (IfcGlobalOrLocalEnum)Enum.Parse(typeof(IfcGlobalOrLocalEnum),s.Replace(".","")); 
 		}
@@ -423,9 +417,9 @@ namespace GeometryGym.Ifc
 		internal static IfcAnnotationSurface Parse(string str)
 		{
 			IfcAnnotationSurface a = new IfcAnnotationSurface();
-			int pos = 0;
-			a.mItem = ParserSTEP.StripLink(str, ref pos);
-			a.mTextureCoordinates = ParserSTEP.StripLink(str, ref pos);
+			int pos = 0, len = str.Length;
+			a.mItem = ParserSTEP.StripLink(str, ref pos, len);
+			a.mTextureCoordinates = ParserSTEP.StripLink(str, ref pos, len);
 			return a;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mItem) + "," + ParserSTEP.LinkToString(mTextureCoordinates); }
@@ -434,18 +428,18 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcAnnotationSurfaceOccurrence(DatabaseIfc db, IfcAnnotationSurfaceOccurrence o) : base(db,o) { }
 		internal IfcAnnotationSurfaceOccurrence() : base() { }
-		internal new static IfcAnnotationSurfaceOccurrence Parse(string str) { IfcAnnotationSurfaceOccurrence a = new IfcAnnotationSurfaceOccurrence(); int pos = 0; a.Parse(str, ref pos); return a; }
+		internal new static IfcAnnotationSurfaceOccurrence Parse(string str) { IfcAnnotationSurfaceOccurrence a = new IfcAnnotationSurfaceOccurrence(); int pos = 0; a.Parse(str, ref pos, str.Length); return a; }
 	}
 	public partial class IfcAnnotationSymbolOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
 	{
 		internal IfcAnnotationSymbolOccurrence() : base() { }
-		internal new static IfcAnnotationSymbolOccurrence Parse(string str) { IfcAnnotationSymbolOccurrence a = new IfcAnnotationSymbolOccurrence(); int pos = 0; a.Parse(str, ref pos); return a; }
+		internal new static IfcAnnotationSymbolOccurrence Parse(string str) { IfcAnnotationSymbolOccurrence a = new IfcAnnotationSymbolOccurrence(); int pos = 0; a.Parse(str, ref pos, str.Length); return a; }
 	}
 	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
 	{
 		internal IfcAnnotationTextOccurrence() : base() { }
 		internal IfcAnnotationTextOccurrence(DatabaseIfc db, IfcAnnotationTextOccurrence o) : base(db,o) { }
-		internal new static IfcAnnotationTextOccurrence Parse(string str) { IfcAnnotationTextOccurrence a = new IfcAnnotationTextOccurrence(); int pos = 0; a.Parse(str, ref pos); return a; }
+		internal new static IfcAnnotationTextOccurrence Parse(string str) { IfcAnnotationTextOccurrence a = new IfcAnnotationTextOccurrence(); int pos = 0; a.Parse(str, ref pos, str.Length); return a; }
 	}
 	public partial class IfcApplication : BaseClassIfc
 	{
@@ -971,11 +965,11 @@ namespace GeometryGym.Ifc
 		internal IfcAxis1Placement(DatabaseIfc db, IfcAxis1Placement p) : base(db,p) { if(p.mAxis > 0) Axis = db.Factory.Duplicate( p.Axis) as IfcDirection; }
  
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mAxis); }
-		internal static IfcAxis1Placement Parse(string str) { IfcAxis1Placement p = new IfcAxis1Placement(); int pos = 0; p.Parse(str, ref pos); return p; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcAxis1Placement Parse(string str) { IfcAxis1Placement p = new IfcAxis1Placement(); int pos = 0; p.Parse(str, ref pos, str.Length); return p; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mAxis = ParserSTEP.StripLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mAxis = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
 	public partial interface IfcAxis2Placement : IBaseClassIfc { bool IsWorldXY { get; } } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
@@ -995,11 +989,11 @@ namespace GeometryGym.Ifc
 		
 
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRefDirection); }
-		internal static IfcAxis2Placement2D Parse(string str) { IfcAxis2Placement2D p = new IfcAxis2Placement2D(); int pos = 0; p.Parse(str, ref pos); return p; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcAxis2Placement2D Parse(string str) { IfcAxis2Placement2D p = new IfcAxis2Placement2D(); int pos = 0; p.Parse(str, ref pos, str.Length); return p; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mRefDirection = ParserSTEP.StripLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mRefDirection = ParserSTEP.StripLink(str, ref pos, len);
 		}
 
 		public override bool IsWorldXY { get { return base.IsWorldXY && (mRefDirection == 0 || RefDirection.isXAxis); } }
@@ -1051,12 +1045,12 @@ namespace GeometryGym.Ifc
 				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
 		}
 
-		internal static IfcAxis2Placement3D Parse(string str) { IfcAxis2Placement3D p = new IfcAxis2Placement3D(); int pos = 0; p.Parse(str,ref pos); return p; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcAxis2Placement3D Parse(string str) { IfcAxis2Placement3D p = new IfcAxis2Placement3D(); int pos = 0; p.Parse(str,ref pos, str.Length); return p; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mAxis = ParserSTEP.StripLink(str, ref pos);
-			mRefDirection = ParserSTEP.StripLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mAxis = ParserSTEP.StripLink(str, ref pos, len);
+			mRefDirection = ParserSTEP.StripLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mAxis > 0 ? "," + ParserSTEP.LinkToString(mAxis) : ",$") + (mRefDirection > 0 ? "," + ParserSTEP.LinkToString(mRefDirection) : ",$"); }
 

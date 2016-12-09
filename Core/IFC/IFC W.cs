@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -37,13 +36,13 @@ namespace GeometryGym.Ifc
 		internal IfcWall(DatabaseIfc db, IfcWall w) : base(db, w) { mPredefinedType = w.mPredefinedType; }
 		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcWall Parse(string str, ReleaseVersion schema) { IfcWall w = new IfcWall(); int pos = 0; w.Parse(str, ref pos, schema); return w; }
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		internal static IfcWall Parse(string str, ReleaseVersion schema) { IfcWall w = new IfcWall(); int pos = 0; w.Parse(str, ref pos, str.Length, schema); return w; }
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
+			base.Parse(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str, ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					Enum.TryParse< IfcWallTypeEnum >(s.Substring(1, s.Length - 2), out mPredefinedType);
 			}
@@ -56,7 +55,7 @@ namespace GeometryGym.Ifc
 		internal IfcWallElementedCase(DatabaseIfc db, IfcWallElementedCase w) : base(db, w) { }
 		
 
-		internal new static IfcWallElementedCase Parse(string str, ReleaseVersion schema) { IfcWallElementedCase w = new IfcWallElementedCase(); int pos = 0; w.Parse(str, ref pos, schema); return w; }
+		internal new static IfcWallElementedCase Parse(string str, ReleaseVersion schema) { IfcWallElementedCase w = new IfcWallElementedCase(); int pos = 0; w.Parse(str, ref pos, str.Length, schema); return w; }
 	}
 	public partial class IfcWallStandardCase : IfcWall
 	{
@@ -78,7 +77,7 @@ namespace GeometryGym.Ifc
 			Representation = new IfcProductDefinitionShape(reps);
 		}
 
-		internal new static IfcWallStandardCase Parse(string str, ReleaseVersion schema) { IfcWallStandardCase w = new IfcWallStandardCase(); int pos = 0; w.Parse(str, ref pos, schema); return w; }
+		internal new static IfcWallStandardCase Parse(string str, ReleaseVersion schema) { IfcWallStandardCase w = new IfcWallStandardCase(); int pos = 0; w.Parse(str, ref pos, str.Length, schema); return w; }
 	}
 	public partial class IfcWallType : IfcBuildingElementType
 	{
@@ -188,21 +187,21 @@ namespace GeometryGym.Ifc
 		internal IfcWindow(DatabaseIfc db, IfcWindow w) : base(db, w) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
 		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcWindow Parse(string str, ReleaseVersion schema) { IfcWindow w = new IfcWindow(); int pos = 0; w.Parse(str, ref pos, schema); return w; }
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		internal static IfcWindow Parse(string str, ReleaseVersion schema) { IfcWindow w = new IfcWindow(); int pos = 0; w.Parse(str, ref pos, str.Length, schema); return w; }
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
-			mOverallHeight = ParserSTEP.StripDouble(str, ref pos);
-			mOverallWidth = ParserSTEP.StripDouble(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mOverallHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mOverallWidth = ParserSTEP.StripDouble(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str, ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					mPredefinedType = (IfcWindowTypeEnum)Enum.Parse(typeof(IfcWindowTypeEnum), s.Replace(".", ""));
-				s = ParserSTEP.StripField(str, ref pos);
+				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					mPredefinedType = (IfcWindowTypeEnum)Enum.Parse(typeof(IfcWindowTypeEnum), s.Replace(".", ""));
-				mUserDefinedPartitioningType = ParserSTEP.StripString(str, ref pos);
+				mUserDefinedPartitioningType = ParserSTEP.StripString(str, ref pos, len);
 			}
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mOverallHeight) + "," + ParserSTEP.DoubleOptionalToString(mOverallWidth) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + (mUserDefinedPartitioningType == "$" ? ".,$" : ".,'" + mUserDefinedPartitioningType + "'")); }
@@ -323,7 +322,7 @@ namespace GeometryGym.Ifc
 		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcWindow" : base.KeyWord); } }
 		internal IfcWindowStandardCase() : base() { }
 		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w) : base(db,w) { }
-		internal new static IfcWindowStandardCase Parse(string str, ReleaseVersion schema) { IfcWindowStandardCase w = new IfcWindowStandardCase(); int pos = 0; w.Parse(str, ref pos, schema); return w; }
+		internal new static IfcWindowStandardCase Parse(string str, ReleaseVersion schema) { IfcWindowStandardCase w = new IfcWindowStandardCase(); int pos = 0; w.Parse(str, ref pos, str.Length, schema); return w; }
 	}
 	public partial class IfcWindowStyle : IfcTypeProduct // IFC2x3
 	{

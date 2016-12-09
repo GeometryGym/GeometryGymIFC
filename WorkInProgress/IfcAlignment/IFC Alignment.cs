@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 
@@ -242,12 +241,12 @@ namespace GeometryGym.Ifc
 			mRadius = radius;
 			mIsCCW = isCCW;
 		}
-		internal static IfcCircularArcSegment2D Parse(string str) { IfcCircularArcSegment2D c = new IfcCircularArcSegment2D(); int pos = 0; c.Parse(str, ref pos); return c; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcCircularArcSegment2D Parse(string str) { IfcCircularArcSegment2D c = new IfcCircularArcSegment2D(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mRadius = ParserSTEP.StripDouble(str, ref pos);
-			mIsCCW = ParserSTEP.StripBool(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mIsCCW = ParserSTEP.StripBool(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
 	}
@@ -273,14 +272,14 @@ namespace GeometryGym.Ifc
 			mIsEntry = isEntry;
 			mClothoidConstant = clothoidConstant;
 		}
-		internal static IfcClothoidalArcSegment2D Parse(string str) { IfcClothoidalArcSegment2D c = new IfcClothoidalArcSegment2D(); int pos = 0; c.Parse(str, ref pos); return c; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcClothoidalArcSegment2D Parse(string str) { IfcClothoidalArcSegment2D c = new IfcClothoidalArcSegment2D(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mStartRadius = ParserSTEP.StripDouble(str,ref pos);
-			mIsCCW = ParserSTEP.StripBool(str,ref pos);
-			mIsEntry = ParserSTEP.StripBool(str,ref pos);
-			mClothoidConstant = ParserSTEP.StripDouble(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mStartRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mIsCCW = ParserSTEP.StripBool(str, ref pos, len);
+			mIsEntry = ParserSTEP.StripBool(str, ref pos, len);
+			mClothoidConstant = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mStartRadius) + "," + ParserSTEP.BoolToString(mIsCCW) + "," + ParserSTEP.BoolToString(mIsEntry) + "," + ParserSTEP.DoubleToString(mClothoidConstant); }
 	}
@@ -302,11 +301,11 @@ namespace GeometryGym.Ifc
 			mSegmentLength = length;
 		}
 
-		protected virtual void Parse(string str, ref int pos)
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mStartPoint = ParserSTEP.StripLink(str,ref pos);
-			mStartDirection = ParserSTEP.StripDouble(str,ref pos);
-			mSegmentLength = ParserSTEP.StripDouble(str,ref pos);
+			mStartPoint = ParserSTEP.StripLink(str, ref pos, len);
+			mStartDirection = ParserSTEP.StripDouble(str, ref pos, len);
+			mSegmentLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + ParserSTEP.DoubleToString(mSegmentLength); }
 	}
@@ -317,13 +316,13 @@ namespace GeometryGym.Ifc
 		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s) : base(db, s) { }
 		internal IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
 			: base(start, startDirection, length) { }
-		internal static IfcLineSegment2D Parse(string str) { IfcLineSegment2D c = new IfcLineSegment2D(); int pos = 0; c.Parse(str, ref pos); return c; }
+		internal static IfcLineSegment2D Parse(string str) { IfcLineSegment2D c = new IfcLineSegment2D(); int pos = 0, len = str.Length; c.Parse(str, ref pos, len); return c; }
 	}
 	
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{
 		protected IfcPositioningElement() : base() { }
-		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e) : base(db,e) { }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e) : base(db,e,false) { }
 		protected static void parseFields(IfcPositioningElement p, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(p, arrFields, ref ipos); }
 	}
 }

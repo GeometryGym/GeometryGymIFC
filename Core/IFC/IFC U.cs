@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -295,7 +294,7 @@ namespace GeometryGym.Ifc
 							if (GGYM.ggAssembly.mOptions.RhinoDocTolerance)
 							{
 								double docScale = Rhino.RhinoMath.UnitScale(Rhino.UnitSystem.Meters, Rhino.RhinoDoc.ActiveDoc.ModelUnitSystem);
-								mDatabase.Tolerance = docScale * Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance * d;
+								mDatabase.Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance * d / docScale;
 							}
 #endif
 							result = d;

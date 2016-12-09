@@ -146,6 +146,23 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(TheOrganization.GetXML(xml.OwnerDocument, "TheOrganization", this, processed));
 		}
 	}
+	public abstract partial class IfcPhysicalQuantity : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF(ONEOF(IfcPhysicalComplexQuantity, IfcPhysicalSimpleQuantity));
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
+			if (xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Name", Name);
+			setAttribute(xml, "Description", Description);
+		}
+	}
 	public partial class IfcPipeFittingType : IfcFlowFittingType
 	{
 		internal override void ParseXml(XmlElement xml)

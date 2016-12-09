@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -42,7 +41,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcFace f = new IfcFace();
 			int pos = 0;
-			f.mBounds = ParserSTEP.StripListLink(str, ref pos);
+			f.mBounds = ParserSTEP.StripListLink(str, ref pos, str.Length);
 			return f;
 		}
 		internal static void parseFields(IfcFace f, List<string> arrFields, ref int ipos) { f.mBounds = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
@@ -93,13 +92,13 @@ namespace GeometryGym.Ifc
 		{
 			IfcFaceBound b = new IfcFaceBound();
 			int pos = 0;
-			b.Parse( str, ref pos);
+			b.Parse( str, ref pos, str.Length);
 			return b;
 		}
-		protected void Parse( string str, ref int pos)
+		protected void Parse( string str, ref int pos, int len)
 		{
-			mBound = ParserSTEP.StripLink(str, ref pos);
-			mOrientation = ParserSTEP.StripBool(str, ref pos);
+			mBound = ParserSTEP.StripLink(str, ref pos, len);
+			mOrientation = ParserSTEP.StripBool(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -115,7 +114,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcFaceOuterBound b = new IfcFaceOuterBound();
 			int pos = 0;
-			b.Parse(str, ref pos);
+			b.Parse(str, ref pos, str.Length);
 			return b;
 		}
 	}
@@ -141,7 +140,7 @@ namespace GeometryGym.Ifc
 		internal IfcFacetedBrep() : base() { }
 		public IfcFacetedBrep(IfcClosedShell s) : base(s) { }
 		internal IfcFacetedBrep(DatabaseIfc db, IfcFacetedBrep b) : base(db,b) { }
-		internal static IfcFacetedBrep Parse(string str) { IfcFacetedBrep b = new IfcFacetedBrep(); int pos = 0; b.Parse(str,ref pos); return b; }
+		internal static IfcFacetedBrep Parse(string str) { IfcFacetedBrep b = new IfcFacetedBrep(); int pos = 0; b.Parse(str,ref pos, str.Length); return b; }
 	}
 	public partial class IfcFacetedBrepWithVoids : IfcFacetedBrep
 	{
@@ -153,9 +152,9 @@ namespace GeometryGym.Ifc
 		internal new static IfcFacetedBrepWithVoids Parse(string str)
 		{
 			IfcFacetedBrepWithVoids b = new IfcFacetedBrepWithVoids();
-			int pos = 0;
-			b.Parse(str, ref pos);
-			b.mVoids = ParserSTEP.StripListLink(str, ref pos);
+			int pos = 0, len = str.Length;
+			b.Parse(str, ref pos, len);
+			b.mVoids = ParserSTEP.StripListLink(str, ref pos, len);
 			return b;
 		}
 		protected override string BuildStringSTEP()
@@ -238,7 +237,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcFeatureElement() : base() { }
 		protected IfcFeatureElement(DatabaseIfc db) : base(db) {  }
-		protected IfcFeatureElement(DatabaseIfc db, IfcFeatureElement e) : base(db, e) { }
+		protected IfcFeatureElement(DatabaseIfc db, IfcFeatureElement e) : base(db, e,false) { }
 		protected IfcFeatureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		protected static void parseFields(IfcFeatureElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
@@ -271,30 +270,35 @@ namespace GeometryGym.Ifc
 	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem
 	{
 		internal int mHatchLineAppearance;// : IfcCurveStyle;
-		internal string mStartOfNextHatchLine;// : IfcHatchLineDistanceSelect;
-		//IfcOneDirectionRepeatFacton,IfcPositiveLengthMeasure
+		internal string mStartOfNextHatchLine;// : IfcHatchLineDistanceSelect; IfcOneDirectionRepeatFactor,IfcPositiveLengthMeasure
 		internal int mPointOfReferenceHatchLine;// : OPTIONAL IfcCartesianPoint; //DEPRECEATED IFC4
 		internal int mPatternStart;// : OPTIONAL IfcCartesianPoint;
 		internal double mHatchLineAngle;// : IfcPlaneAngleMeasure;
+
+		public IfcCurveStyle HatchLineAppearance { get { return mDatabase[mHatchLineAppearance] as IfcCurveStyle; } set { mHatchLineAppearance = value.mIndex; } }
+		public IfcCartesianPoint PatternStart { get { return mDatabase[mPatternStart] as IfcCartesianPoint; } set { mPatternStart = (value == null ? 0 : value.mIndex); } }
+			
 		internal IfcFillAreaStyleHatching() : base() { }
 		internal IfcFillAreaStyleHatching(DatabaseIfc db, IfcFillAreaStyleHatching h) : base(db,h)
 		{
-			mHatchLineAppearance = h.mHatchLineAppearance;
+			mHatchLineAppearance = db.Factory.Duplicate( h.HatchLineAppearance).mIndex;
 			mStartOfNextHatchLine = h.mStartOfNextHatchLine;
-			mPointOfReferenceHatchLine = h.mPointOfReferenceHatchLine;
-			//mPatternStart = h.mPatternStart;
+			if(h.mPointOfReferenceHatchLine > 0)
+				mPointOfReferenceHatchLine = db.Factory.Duplicate( h.mDatabase[h.mPointOfReferenceHatchLine]).mIndex;
+			if(h.mPatternStart > 0)
+				PatternStart = db.Factory.Duplicate( h.PatternStart) as IfcCartesianPoint;
 			mHatchLineAngle = h.mHatchLineAngle;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mHatchLineAppearance) + "," + mStartOfNextHatchLine + "," + ParserSTEP.LinkToString(mPointOfReferenceHatchLine) + "," + ParserSTEP.LinkToString(mPatternStart) + "," + ParserSTEP.DoubleToString(mHatchLineAngle); }
 		internal static IfcFillAreaStyleHatching Parse(string str)
 		{
 			IfcFillAreaStyleHatching h = new IfcFillAreaStyleHatching();
-			int pos = 0;
-			h.mHatchLineAppearance = ParserSTEP.StripLink(str, ref pos);
-			h.mStartOfNextHatchLine = ParserSTEP.StripString(str, ref pos);
-			h.mPointOfReferenceHatchLine = ParserSTEP.StripLink(str, ref pos);
-			h.mPatternStart = ParserSTEP.StripLink(str,ref pos);
-			h.mHatchLineAngle = ParserSTEP.StripDouble(str,ref pos);
+			int pos = 0, len = str.Length;
+			h.mHatchLineAppearance = ParserSTEP.StripLink(str, ref pos, len);
+			h.mStartOfNextHatchLine = ParserSTEP.StripField(str, ref pos, len);
+			h.mPointOfReferenceHatchLine = ParserSTEP.StripLink(str, ref pos, len);
+			h.mPatternStart = ParserSTEP.StripLink(str, ref pos, len);
+			h.mHatchLineAngle = ParserSTEP.StripDouble(str, ref pos, len);
 			return h;
 		}
 	}
@@ -407,11 +411,16 @@ namespace GeometryGym.Ifc
 		{
 			IfcFixedReferenceSweptAreaSolid s = new IfcFixedReferenceSweptAreaSolid();
 			int pos = 0;
-			s.mDirectrix = ParserSTEP.StripLink(str, ref pos);
-			s.mStartParam = ParserSTEP.StripDouble(str, ref pos);
-			s.mEndParam = ParserSTEP.StripDouble(str, ref pos);
-			s.mFixedReference = ParserSTEP.StripLink(str,ref pos);
+			s.Parse(str, ref pos, str.Length);
 			return s;
+		}
+		protected override void Parse(string str, ref int pos, int len)
+		{
+			base.Parse(str, ref pos, len);
+			mDirectrix = ParserSTEP.StripLink(str, ref pos, len);
+			mStartParam = ParserSTEP.StripDouble(str, ref pos, len);
+			mEndParam = ParserSTEP.StripDouble(str, ref pos, len);
+			mFixedReference = ParserSTEP.StripLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mDirectrix) + "," + ParserSTEP.DoubleOptionalToString(mStartParam) + "," + ParserSTEP.DoubleOptionalToString(mEndParam) + "," + ParserSTEP.LinkToString(mFixedReference); }
 	}
@@ -607,7 +616,8 @@ namespace GeometryGym.Ifc
 		protected IfcFlowTreatmentDeviceType(DatabaseIfc db,  IfcFlowTreatmentDeviceType t) : base(db, t) { }
 		protected static void parseFields(IfcFlowTreatmentDeviceType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }
 	}
-	public partial class IfcFluidFlowProperties : IfcPropertySetDefinition // DEPRECEATED IFC4
+	[Obsolete("DEPRECEATED IFC4", false)]
+	public partial class IfcFluidFlowProperties : IfcPropertySetDefinition 
 	{
 		internal IfcPropertySourceEnum mPropertySource;// : IfcPropertySourceEnum;
 		internal int mFlowConditionTimeSeries, mVelocityTimeSeries, mFlowrateTimeSeries;// : OPTIONAL IfcTimeSeries;
@@ -682,11 +692,11 @@ namespace GeometryGym.Ifc
 		internal IfcFooting(DatabaseIfc db, IfcFooting f) : base(db,f) { mPredefinedType = f.mPredefinedType; }
 		public IfcFooting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcFooting Parse(string str) { IfcFooting f = new IfcFooting(); int pos = 0; f.Parse(str, ref pos); return f; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcFooting Parse(string str) { IfcFooting f = new IfcFooting(); int pos = 0; f.Parse(str, ref pos, str.Length); return f; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			base.Parse(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcFootingTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
@@ -706,11 +716,12 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."); }
 
 	}
-	//ENTITY IfcFuelProperties // DEPRECEATED IFC4
+	//[Obsolete("DEPRECEATED IFC4", false)]
+	//ENTITY IfcFuelProperties
 	public partial class IfcFurnishingElement : IfcElement // DEPRECEATED IFC4 to make abstract SUPERTYPE OF(ONEOF(IfcFurniture, IfcSystemFurnitureElement))
 	{
 		internal IfcFurnishingElement() : base() { }
-		internal IfcFurnishingElement(DatabaseIfc db, IfcFurnishingElement e) : base(db, e) { }
+		internal IfcFurnishingElement(DatabaseIfc db, IfcFurnishingElement e) : base(db, e,false) { }
 		internal IfcFurnishingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static void parseFields(IfcFurnishingElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
@@ -742,7 +753,8 @@ namespace GeometryGym.Ifc
 		internal new static IfcFurniture Parse(string strDef) { IfcFurniture e = new IfcFurniture(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType + "."); }
 	}
-	internal class IfcFurnitureStandard : IfcControl // DEPRECEATED IFC4
+	[Obsolete("DEPRECEATED IFC4", false)]
+	internal class IfcFurnitureStandard : IfcControl 
 	{
 		internal IfcFurnitureStandard() : base() { }
 		internal IfcFurnitureStandard(DatabaseIfc db, IfcFurnitureStandard s) : base(db,s) { }

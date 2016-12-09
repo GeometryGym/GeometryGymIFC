@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -78,9 +77,9 @@ namespace GeometryGym.Ifc
 		internal static IfcVector Parse(string str)
 		{
 			IfcVector v = new IfcVector();
-			int pos = 0;
-			v.mOrientation = ParserSTEP.StripLink(str, ref pos);
-			v.mMagnitude = ParserSTEP.StripDouble(str,ref pos);
+			int pos = 0, len = str.Length;
+			v.mOrientation = ParserSTEP.StripLink(str, ref pos, len);
+			v.mMagnitude = ParserSTEP.StripDouble(str, ref pos, len);
 			return v;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
@@ -119,11 +118,11 @@ namespace GeometryGym.Ifc
 
 		internal IfcVertexloop() : base() { }
 		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
-		internal new static IfcVertexloop Parse(string str)
+		internal static IfcVertexloop Parse(string str)
 		{
 			IfcVertexloop l = new IfcVertexloop();
 			int pos = 0;
-			l.mLoopVertex = ParserSTEP.StripLink(str,ref pos);
+			l.mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length);
 			return l;
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mLoopVertex); }
@@ -136,7 +135,7 @@ namespace GeometryGym.Ifc
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
 		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
-		internal new static IfcVertexPoint Parse(string str) { IfcVertexPoint v = new IfcVertexPoint(); int pos = 0;v.mVertexGeometry = ParserSTEP.StripLink(str, ref pos); return v; }
+		internal new static IfcVertexPoint Parse(string str) { IfcVertexPoint v = new IfcVertexPoint(); int pos = 0;v.mVertexGeometry = ParserSTEP.StripLink(str, ref pos, str.Length); return v; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
 	}
 	public partial class IfcVibrationIsolator : IfcElementComponent
@@ -172,7 +171,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }
-		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e) : base(db, e) { }
+		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e) : base(db, e,false) { }
 		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 		internal static IfcProduct Parse(string strDef) { IfcVirtualElement e = new IfcVirtualElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
 		internal static void parseFields(IfcVirtualElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
@@ -485,7 +484,6 @@ namespace GeometryGym.Ifc
 		public object Value { get { return mValue; } }
 		public double Measure { get { return mValue; } }
 		public IfcNormalisedRatioMeasure(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
-		public IfcNormalisedRatioMeasure(Color col) : this(Color.FromArgb(0, col.R, col.G, col.B).ToArgb() / 16581375.0) { }
 		public override string ToString() { return "IFCNORMALISEDRATIOMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 	}
 	public partial class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect
@@ -647,6 +645,14 @@ namespace GeometryGym.Ifc
 		public IfcText(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCTEXT('" + mValue + "')"; }
 	}
+	public partial class IfcURIReference : IfcSimpleValue
+	{
+		internal string mValue;
+		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public IfcURIReference(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
+		public override string ToString() { return "IFCURIREFERENCE('" + mValue + "')"; }
+	}
+	
 
 	public interface IfcSizeSelect { } //TYPE IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);  
 }

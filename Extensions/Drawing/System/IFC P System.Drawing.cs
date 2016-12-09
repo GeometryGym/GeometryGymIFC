@@ -1,0 +1,47 @@
+﻿using System;
+using System.Drawing;
+using System.Collections.Generic;
+
+namespace GeometryGym.Ifc
+{
+	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
+	{
+		public Color Colour { get { return Color.Empty; } }
+	}
+	public partial class IfcPresentationLayerAssignment : BaseClassIfc //SUPERTYPE OF	(IfcPresentationLayerWithStyle);
+	{
+		internal virtual Color LayerColour { get { return Color.Empty; } }
+	}
+	public partial class IfcPresentationLayerWithStyle : IfcPresentationLayerAssignment
+	{
+		internal override Color LayerColour
+		{
+			get
+			{
+				List<IfcPresentationStyle> styles = LayerStyles;
+				foreach (IfcPresentationStyle ps in styles)
+				{
+					IfcSurfaceStyle ss = ps as IfcSurfaceStyle;
+					if (ss != null)
+					{
+						List<IfcSurfaceStyleShading> sss = ss.Extract<IfcSurfaceStyleShading>();
+						if (sss.Count > 0)
+							return sss[0].SurfaceColour.Colour;
+					}
+				}
+				foreach (IfcPresentationStyle ps in styles)
+				{
+					IfcCurveStyle cs = ps as IfcCurveStyle;
+					if (cs != null)
+					{
+						IfcColour col = cs.CurveColour;
+						if (col != null)
+							return col.Colour;
+					}
+				}
+				return base.LayerColour;
+			}
+		}
+	}
+}
+

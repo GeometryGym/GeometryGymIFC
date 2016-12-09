@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -156,7 +155,7 @@ namespace GeometryGym.Ifc
 		internal IfcSeamCurve() : base() { }
 		internal IfcSeamCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
 		internal IfcSeamCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
-		internal new static IfcSeamCurve Parse(string str) { IfcSeamCurve c = new IfcSeamCurve(); int pos = 0;c.Parse(str, ref pos); return c; }
+		internal new static IfcSeamCurve Parse(string str) { IfcSeamCurve c = new IfcSeamCurve(); int pos = 0;c.Parse(str, ref pos, str.Length); return c; }
 	}
 	public partial class IfcSectionedSpine : IfcGeometricRepresentationItem
 	{
@@ -173,10 +172,10 @@ namespace GeometryGym.Ifc
 		internal static IfcSectionedSpine Parse(string str)
 		{
 			IfcSectionedSpine s = new IfcSectionedSpine();
-			int pos = 0;
-			s.mSpineCurve = ParserSTEP.StripLink(str, ref pos);
-			s.mCrossSections = ParserSTEP.StripListLink(str, ref pos);
-			s.mCrossSectionPositions = ParserSTEP.StripListLink(str,ref pos);
+			int pos = 0, len = str.Length;
+			s.mSpineCurve = ParserSTEP.StripLink(str, ref pos, len);
+			s.mCrossSections = ParserSTEP.StripListLink(str, ref pos, len);
+			s.mCrossSectionPositions = ParserSTEP.StripListLink(str, ref pos, len);
 			return s;
 		}
 		protected override string BuildStringSTEP()
@@ -284,11 +283,11 @@ namespace GeometryGym.Ifc
 		internal IfcShadingDevice(DatabaseIfc db, IfcShadingDevice d) : base(db, d) { mPredefinedType = d.mPredefinedType; }
 		public IfcShadingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcShadingDevice Parse(string str) { IfcShadingDevice s = new IfcShadingDevice(); int pos = 0; s.Parse(str,ref pos); return s; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcShadingDevice Parse(string str) { IfcShadingDevice s = new IfcShadingDevice(); int pos = 0; s.Parse(str,ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			base.Parse(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcShadingDeviceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
@@ -390,7 +389,7 @@ namespace GeometryGym.Ifc
 #warning todo
 			//internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
 		}
-		protected static void parseString(IfcShapeModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos); }
+		protected static void parseString(IfcShapeModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos, str.Length); }
 	}
 	public partial class IfcShapeRepresentation : IfcShapeModel
 	{
@@ -610,7 +609,7 @@ additional types	some additional representation types are given:
 					if (fb != null)
 					{
 						IfcConnectedFaceSet cfs = fb.Outer;
-#if (RHCOMM)
+#if (RHCOMM && !BULLANT)
 						IfcTriangulatedFaceSet tfs = cfs.Convert();
 						if (tfs != null)
 						{
@@ -632,7 +631,7 @@ additional types	some additional representation types are given:
 							List<IfcConnectedFaceSet> faces = fbsm.FbsmFaces;
 							if (faces.Count == 1)
 							{
-#if (RHCOMM)
+#if (RHCOMM && !BULLANT)
 								IfcTriangulatedFaceSet tfs = faces[0].Convert();
 								if (tfs != null)
 								{
@@ -813,11 +812,11 @@ additional types	some additional representation types are given:
 		internal IfcSlab(DatabaseIfc db, IfcSlab s) : base(db, s) { mPredefinedType = s.mPredefinedType; }
 		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcSlab Parse(string str) { IfcSlab s = new IfcSlab(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcSlab Parse(string str) { IfcSlab s = new IfcSlab(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			base.Parse(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcSlabTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
@@ -829,7 +828,7 @@ additional types	some additional representation types are given:
 		internal IfcSlabElementedCase() : base() { }
 		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s) : base(db, s) { }
 
-		internal new static IfcSlabElementedCase Parse(string str) { IfcSlabElementedCase s = new IfcSlabElementedCase(); int pos = 0; s.Parse(str, ref pos); return s; }
+		internal new static IfcSlabElementedCase Parse(string str) { IfcSlabElementedCase s = new IfcSlabElementedCase(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
 	}
 	public partial class IfcSlabStandardCase : IfcSlab
 	{
@@ -843,7 +842,7 @@ additional types	some additional representation types are given:
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(perimeter, position, layerSetUsage.DirectionSense == IfcDirectionSenseEnum.POSITIVE ? mDatabase.Factory.ZAxis : mDatabase.Factory.ZAxisNegative, layerSetUsage.ForLayerSet.MaterialLayers.Sum(x=>x.LayerThickness))));
 		}
 
-		internal new static IfcSlabStandardCase Parse(string str) { IfcSlabStandardCase s = new IfcSlabStandardCase(); int pos = 0; s.Parse(str, ref pos); return s; }
+		internal new static IfcSlabStandardCase Parse(string str) { IfcSlabStandardCase s = new IfcSlabStandardCase(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
 	}
 	public partial class IfcSlabType : IfcBuildingElementType
 	{
@@ -1098,7 +1097,7 @@ additional types	some additional representation types are given:
 		public List<IfcRelServicesBuildings> ServicedBySystems { get { return mServicedBySystems; } }
 
 		protected IfcSpatialElement() : base() { }
-		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, bool downStream) : base(db, e)
+		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, bool downStream) : base(db, e,downStream)
 		{
 			mLongName = e.mLongName;
 			if (downStream)
@@ -1339,14 +1338,15 @@ additional types	some additional representation types are given:
 		internal static void parseFields(IfcSpatialZoneType t, List<string> arrFields, ref int ipos) { IfcSpatialElementType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcSpatialZoneTypeEnum)Enum.Parse(typeof(IfcSpatialZoneTypeEnum), arrFields[ipos++].Replace(".", "")); }
 		internal new static IfcSpatialZoneType Parse(string strDef) { IfcSpatialZoneType t = new IfcSpatialZoneType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 	}
+	public interface IfcSpecularHighlightSelect { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
 	public partial class IfcSphere : IfcCsgPrimitive3D
 	{
 		internal double mRadius;// : IfcPositiveLengthMeasure; 
 		internal IfcSphere() : base() { }
 		internal IfcSphere(DatabaseIfc db, IfcSphere s) : base(db,s) { mRadius = s.mRadius; }
 
-		internal static IfcSphere Parse(string str) { IfcSphere s = new IfcSphere(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos) { base.Parse(str, ref pos); mRadius = ParserSTEP.StripDouble(str, ref pos); }
+		internal static IfcSphere Parse(string str) { IfcSphere s = new IfcSphere(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len) { base.Parse(str, ref pos, len); mRadius = ParserSTEP.StripDouble(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius); }
 	}
 	public partial class IfcStackTerminal : IfcFlowTerminal //IFC4
@@ -1387,11 +1387,11 @@ additional types	some additional representation types are given:
 		internal IfcStair() : base() { }
 		internal IfcStair(DatabaseIfc db, IfcStair s) : base(db, s) { mPredefinedType = s.mPredefinedType; }
 		public IfcStair(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		internal static IfcStair Parse(string str) { IfcStair s = new IfcStair(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcStair Parse(string str) { IfcStair s = new IfcStair(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			string s = ParserSTEP.StripField(str, ref pos);
+			base.Parse(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcStairTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
@@ -1411,17 +1411,17 @@ additional types	some additional representation types are given:
 		internal IfcStairFlight(DatabaseIfc db, IfcStairFlight f) : base(db, f) { mNumberOfRiser = f.mNumberOfRiser; mNumberOfTreads = f.mNumberOfTreads; mRiserHeight = f.mRiserHeight; mTreadLength = f.mTreadLength; mPredefinedType = f.mPredefinedType; }
 		public IfcStairFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcStairFlight Parse(string str, ReleaseVersion schema) { IfcStairFlight f = new IfcStairFlight(); int pos = 0; f.Parse(str, ref pos, schema); return f; }
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		internal static IfcStairFlight Parse(string str, ReleaseVersion schema) { IfcStairFlight f = new IfcStairFlight(); int pos = 0; f.Parse(str, ref pos, str.Length, schema); return f; }
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
-			mNumberOfRiser = ParserSTEP.StripInt(str,ref pos);
-			mNumberOfTreads = ParserSTEP.StripInt(str, ref pos);
-			mRiserHeight = ParserSTEP.StripDouble(str,ref pos);
-			mTreadLength = ParserSTEP.StripDouble(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mNumberOfRiser = ParserSTEP.StripInt(str,ref pos, len);
+			mNumberOfTreads = ParserSTEP.StripInt(str, ref pos, len);
+			mRiserHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mTreadLength = ParserSTEP.StripDouble(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str, ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					Enum.TryParse<IfcStairFlightTypeEnum>(s.Substring(1, s.Length - 2),out mPredefinedType);
 			}
@@ -1474,8 +1474,16 @@ additional types	some additional representation types are given:
 			if(a.mCausedBy > 0)
 				CausedBy = a.CausedBy;
 		}
-		protected IfcStructuralAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global)
-			: base(lc.mDatabase, item, load, global, lc.IsGroupedBy[0]) { }
+		protected IfcStructuralAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item,  IfcStructuralLoad load, IfcTopologyRepresentation location, bool global)
+			: base(item, load, global, lc.IsGroupedBy[0])
+		{
+			if (location != null)
+			{
+				if (lc.mLoadGroupFor.Count > 0)
+					Placement = lc.mLoadGroupFor[0].SharedPlacement;
+				Representation = new IfcProductDefinitionShape(location);
+			}
+		}
 		protected static void parseFields(IfcStructuralAction a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
 			IfcStructuralActivity.parseFields(a, arrFields, ref ipos);
@@ -1487,7 +1495,7 @@ additional types	some additional representation types are given:
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDestabilizingLoad == IfcLogicalEnum.UNKNOWN ? (mDatabase.Release == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.BoolToString(false) : ",$") : "," + ParserIfc.LogicalToString(mDestabilizingLoad)) + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "," + ParserSTEP.LinkToString(mCausedBy) : ""); }
 	}
-	public abstract partial class IfcStructuralActivity : IfcProduct
+	public abstract partial class IfcStructuralActivity : IfcProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcStructuralAction, IfcStructuralReaction))
 	{
 		private int mAppliedLoad;// : IfcStructuralLoad;
 		private IfcGlobalOrLocalEnum mGlobalOrLocal = IfcGlobalOrLocalEnum.GLOBAL_COORDS;// : IfcGlobalOrLocalEnum; 
@@ -1499,14 +1507,15 @@ additional types	some additional representation types are given:
 		public IfcRelConnectsStructuralActivity AssignedToStructuralItem { get { return mAssignedToStructuralItem; } set { mAssignedToStructuralItem = value; } }
 
 		protected IfcStructuralActivity() : base() { }
-		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivity a) : base(db,a)
+		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivity a) : base(db,a,false)
 		{
 			AppliedLoad = db.Factory.Duplicate(a.AppliedLoad) as IfcStructuralLoad;
 			mGlobalOrLocal = a.mGlobalOrLocal;
 		}
-		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, IfcRelAssignsToGroup loadcase) : base(db)
+		protected IfcStructuralActivity(IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, IfcRelAssignsToGroup loadcase) : base(load.mDatabase)
 		{
-			mAssignedToStructuralItem = new IfcRelConnectsStructuralActivity(item, this);
+			if(item != null)
+				mAssignedToStructuralItem = new IfcRelConnectsStructuralActivity(item, this);
 			mAppliedLoad = load.mIndex;
 			mGlobalOrLocal = global ? IfcGlobalOrLocalEnum.GLOBAL_COORDS : IfcGlobalOrLocalEnum.LOCAL_COORDS;
 			loadcase.AddRelated(this);
@@ -1629,9 +1638,9 @@ additional types	some additional representation types are given:
 		internal IfcStructuralCurveAction() : base() { }
 		internal IfcStructuralCurveAction(DatabaseIfc db, IfcStructuralCurveAction a) : base(db,a) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoadSingleForce force, double length, bool global)
-			: base(lc, member, new IfcStructuralLoadConfiguration(force, length), global) { mPredefinedType = IfcStructuralCurveActivityTypeEnum.DISCRETE; }
+			: base(lc, member, new IfcStructuralLoadConfiguration(force, length), null, global) { mPredefinedType = IfcStructuralCurveActivityTypeEnum.DISCRETE; }
 		public IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoad load, bool global, bool projected, IfcStructuralCurveActivityTypeEnum type)
-			: base(lc, member, load, global) { ProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; PredefinedType = type; }
+			: base(lc, member, load,null, global) { ProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; PredefinedType = type; }
 
 		internal static IfcStructuralCurveAction Parse(string strDef,ReleaseVersion schema) { IfcStructuralCurveAction a = new IfcStructuralCurveAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralCurveAction a, List<string> arrFields, ref int ipos,ReleaseVersion schema)
@@ -1657,10 +1666,10 @@ additional types	some additional representation types are given:
 	}
 	public partial class IfcStructuralCurveMember : IfcStructuralMember
 	{
-		internal IfcStructuralCurveTypeEnum mPredefinedType= IfcStructuralCurveTypeEnum.NOTDEFINED;// : IfcStructuralCurveTypeEnum; 
+		internal IfcStructuralCurveMemberTypeEnum mPredefinedType= IfcStructuralCurveMemberTypeEnum.NOTDEFINED;// : IfcStructuralCurveMemberTypeEnum; 
 		internal int mAxis; //: IfcDirection
 
-		public IfcStructuralCurveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcStructuralCurveMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcDirection Axis { get { return mDatabase[mAxis] as IfcDirection; } set { mAxis = value.mIndex; } }
 
 		public IfcEdgeCurve EdgeCurve { get; set; } //Used for load applications in ifc2x3
@@ -1684,7 +1693,7 @@ additional types	some additional representation types are given:
 		{
 			IfcStructuralMember.parseFields(m, arrFields, ref ipos);
 			string s = arrFields[ipos++];
-			m.mPredefinedType = (IfcStructuralCurveTypeEnum)Enum.Parse(typeof(IfcStructuralCurveTypeEnum), s.Substring(1, s.Length - 2));
+			m.mPredefinedType = (IfcStructuralCurveMemberTypeEnum)Enum.Parse(typeof(IfcStructuralCurveMemberTypeEnum), s.Substring(1, s.Length - 2));
 			if (schema != ReleaseVersion.IFC2x3)
 				m.mAxis = ParserSTEP.ParseLink(arrFields[ipos++]);
 		}
@@ -1733,7 +1742,7 @@ additional types	some additional representation types are given:
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 		public List<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return mAssignedStructuralActivity; } }
 		protected IfcStructuralItem() : base() { }
-		protected IfcStructuralItem(DatabaseIfc db, IfcStructuralItem i) : base(db,i)
+		protected IfcStructuralItem(DatabaseIfc db, IfcStructuralItem i) : base(db,i,false)
 		{
 			foreach(IfcRelConnectsStructuralActivity rcss in i.mAssignedStructuralActivity)
 			{
@@ -2084,10 +2093,14 @@ additional types	some additional representation types are given:
 	{
 		internal IfcStructuralPlanarAction() : base() { }
 		internal IfcStructuralPlanarAction(DatabaseIfc db, IfcStructuralPlanarAction a) : base(db,a) {  }
-		internal IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadPlanarForce load, bool global, bool projected)
-			: base(lc, item, load, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " in IFC4 Only"); }
-		internal IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadTemperature load, bool global, bool projected)
-			: base(lc, item, load, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " in IFC4 Only"); }
+		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadPlanarForce load, bool global, bool projected)
+			: base(lc, item, load, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { }
+		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadTemperature load, bool global, bool projected)
+			: base(lc, item, load, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { }
+		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralLoadPlanarForce load, IfcFaceSurface extent, bool global, bool projected)
+			: base(lc,load, extent, global,projected,IfcStructuralSurfaceActivityTypeEnum.CONST ) { }
+		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadPlanarForce load, IfcFaceSurface extent, bool global, bool projected)
+			: base(lc, item, load, extent, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { }
 
 		internal new static IfcStructuralPlanarAction Parse(string strDef, ReleaseVersion schema) { IfcStructuralPlanarAction a = new IfcStructuralPlanarAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralPlanarAction a, List<string> arrFields, ref int ipos,ReleaseVersion schema) { IfcStructuralSurfaceAction.parseFields(a, arrFields, ref ipos,schema); }
@@ -2097,8 +2110,8 @@ additional types	some additional representation types are given:
 	{
 		internal IfcStructuralPointAction() : base() { }
 		internal IfcStructuralPointAction(DatabaseIfc db, IfcStructuralPointAction a) : base(db,a) { }
-		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleForce l, bool global) : base(lc, point, l, global) { }
-		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, point, l, global) { }
+		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleForce l, bool global) : base(lc, point, l, null, global) { }
+		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, point, l, null, global) { }
 		internal static IfcStructuralPointAction Parse(string strDef,ReleaseVersion schema)
 		{
 			IfcStructuralPointAction a = new IfcStructuralPointAction();
@@ -2280,10 +2293,25 @@ additional types	some additional representation types are given:
 	{
 		internal IfcProjectedOrTrueLengthEnum mProjectedOrTrue = IfcProjectedOrTrueLengthEnum.TRUE_LENGTH;// : IfcProjectedOrTrueLengthEnum
 		internal IfcStructuralSurfaceActivityTypeEnum mPredefinedType = IfcStructuralSurfaceActivityTypeEnum.NOTDEFINED;//IfcStructuralCurveActivityTypeEnum
+		
+		public IfcProjectedOrTrueLengthEnum ProjectedOrTrue { get { return mProjectedOrTrue; } set { mProjectedOrTrue = value; } }
+		public IfcStructuralSurfaceActivityTypeEnum PredefinedType {  get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcStructuralSurfaceAction() : base() { }
 		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a) : base(db,a) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
-		internal IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
-			: base(lc, item, load, global) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " in IFC4 Only"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
+			: base(lc, item, load,null, global) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
+			: base(lc,null,load,new IfcTopologyRepresentation(extent, "Reference"), global)
+		{
+			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				throw new Exception(KeyWord + "added in IFC4");
+			mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH;
+			mPredefinedType = type;
+		}
+		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
+			: base(lc, item, load, new IfcTopologyRepresentation(extent, "Reference"), global) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+
 		internal static IfcStructuralSurfaceAction Parse(string strDef, ReleaseVersion schema) { IfcStructuralSurfaceAction a = new IfcStructuralSurfaceAction(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return a; }
 		internal static void parseFields(IfcStructuralSurfaceAction a, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -2306,10 +2334,10 @@ additional types	some additional representation types are given:
 	}
 	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
 	{
-		internal IfcStructuralSurfaceTypeEnum mPredefinedType = IfcStructuralSurfaceTypeEnum.NOTDEFINED;// : IfcStructuralSurfaceTypeEnum;
+		internal IfcStructuralSurfaceMemberTypeEnum mPredefinedType = IfcStructuralSurfaceMemberTypeEnum.NOTDEFINED;// : IfcStructuralSurfaceMemberTypeEnum;
 		internal double mThickness;// : OPTIONAL IfcPositiveLengthMeasure; 
 
-		public IfcStructuralSurfaceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcStructuralSurfaceMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public double Thickness { get { return mThickness; } set { mThickness = value; } }
 
 		public IfcStructuralSurfaceMember() : base() { }
@@ -2323,7 +2351,7 @@ additional types	some additional representation types are given:
 		}
 
 		internal static IfcStructuralSurfaceMember Parse(string strDef) { IfcStructuralSurfaceMember m = new IfcStructuralSurfaceMember(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
-		internal static void parseFields(IfcStructuralSurfaceMember sm, List<string> arrFields, ref int ipos) { IfcStructuralMember.parseFields(sm, arrFields, ref ipos); sm.mPredefinedType = (IfcStructuralSurfaceTypeEnum)Enum.Parse(typeof(IfcStructuralSurfaceTypeEnum), arrFields[ipos++].Replace(".", "")); sm.mThickness = ParserSTEP.ParseDouble(arrFields[ipos++]); }
+		internal static void parseFields(IfcStructuralSurfaceMember sm, List<string> arrFields, ref int ipos) { IfcStructuralMember.parseFields(sm, arrFields, ref ipos); sm.mPredefinedType = (IfcStructuralSurfaceMemberTypeEnum)Enum.Parse(typeof(IfcStructuralSurfaceMemberTypeEnum), arrFields[ipos++].Replace(".", "")); sm.mThickness = ParserSTEP.ParseDouble(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".," + ParserSTEP.DoubleOptionalToString(mThickness); }
 	}
 	public partial class IfcStructuralSurfaceMemberVarying : IfcStructuralSurfaceMember
@@ -2356,7 +2384,7 @@ additional types	some additional representation types are given:
 	{
 		internal IfcStructuredDimensionCallout() : base() { }
 		//internal IfcStructuredDimensionCallout(IfcStructuredDimensionCallout i) : base(i) { }
-		internal new static IfcStructuredDimensionCallout Parse(string str) { IfcStructuredDimensionCallout d = new IfcStructuredDimensionCallout(); int pos = 0; d.Parse(str, ref pos); return d; }
+		internal new static IfcStructuredDimensionCallout Parse(string str) { IfcStructuredDimensionCallout d = new IfcStructuredDimensionCallout(); int pos = 0; d.Parse(str, ref pos, str.Length); return d; }
 	}
 	public partial interface IfcStyleAssignmentSelect : IBaseClassIfc //(IfcPresentationStyle ,IfcPresentationStyleAssignment); 
 	{
@@ -2407,12 +2435,12 @@ additional types	some additional representation types are given:
 			else
 				mStyles.Add(style.Index);
 		}
-		internal static IfcStyledItem Parse(string str) { IfcStyledItem i = new IfcStyledItem(); int pos = 0; i.Parse(str, ref pos); return i; }
-		protected virtual void Parse(string str, ref int pos)
+		internal static IfcStyledItem Parse(string str) { IfcStyledItem i = new IfcStyledItem(); int pos = 0; i.Parse(str, ref pos, str.Length); return i; }
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mItem = ParserSTEP.StripLink(str,ref pos);
-			mStyles = ParserSTEP.StripListLink(str, ref pos);
-			mName = ParserSTEP.StripString(str, ref pos);
+			mItem = ParserSTEP.StripLink(str, ref pos, len);
+			mStyles = ParserSTEP.StripListLink(str, ref pos, len);
+			mName = ParserSTEP.StripString(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -2469,7 +2497,7 @@ additional types	some additional representation types are given:
 		{
 			IfcStyledRepresentation r = new IfcStyledRepresentation();
 			int pos = 0;
-			IfcShapeModel.parseString(r, strDef, ref pos);
+			IfcShapeModel.parseString(r, strDef, ref pos, strDef.Length);
 			return r;
 		}
 	}
@@ -2480,7 +2508,7 @@ additional types	some additional representation types are given:
 		protected IfcStyleModel(IfcRepresentationItem ri) : base(ri) { }
 		protected IfcStyleModel(List<IfcRepresentationItem> reps) : base(reps, "", "") { }
 
-		protected static void parseString(IfcStyleModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos); }
+		protected static void parseString(IfcStyleModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos, str.Length); }
 	}
 	public partial class IfcSubContractResource : IfcConstructionResource
 	{
@@ -2562,12 +2590,12 @@ additional types	some additional representation types are given:
 			AssociatedGeometry = new List<IfcPCurve>() { p1, p2 };
 			mMasterRepresentation = cr;
 		}
-		internal static IfcSurfaceCurve Parse(string str) { IfcSurfaceCurve c = new IfcSurfaceCurve(); int pos = 0; c.Parse(str, ref pos); return c; }
-		protected void Parse(string str,ref int pos)
+		internal static IfcSurfaceCurve Parse(string str) { IfcSurfaceCurve c = new IfcSurfaceCurve(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
+		protected void Parse(string str, ref int pos, int len)
 		{ 
-			mCurve3D = ParserSTEP.StripLink(str,ref pos);
-			mAssociatedGeometry = ParserSTEP.StripListLink(str,ref pos);
-			mMasterRepresentation = (IfcPreferredSurfaceCurveRepresentation)Enum.Parse(typeof(IfcPreferredSurfaceCurveRepresentation), ParserSTEP.StripField(str,ref pos).Replace(".", ""));
+			mCurve3D = ParserSTEP.StripLink(str, ref pos, len);
+			mAssociatedGeometry = ParserSTEP.StripListLink(str, ref pos, len);
+			mMasterRepresentation = (IfcPreferredSurfaceCurveRepresentation)Enum.Parse(typeof(IfcPreferredSurfaceCurveRepresentation), ParserSTEP.StripField(str, ref pos, len).Replace(".", ""));
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -2586,14 +2614,14 @@ additional types	some additional representation types are given:
 
 		internal IfcSurfaceCurveSweptAreaSolid() : base() { }
 		internal IfcSurfaceCurveSweptAreaSolid(DatabaseIfc db, IfcSurfaceCurveSweptAreaSolid s) : base(db, s) { Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve; mStartParam = s.mStartParam; mEndParam = s.mEndParam; ReferenceSurface = db.Factory.Duplicate(s.ReferenceSurface) as IfcSurface; }
-		internal static IfcSurfaceCurveSweptAreaSolid Parse(string str) { IfcSurfaceCurveSweptAreaSolid s = new IfcSurfaceCurveSweptAreaSolid(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcSurfaceCurveSweptAreaSolid Parse(string str) { IfcSurfaceCurveSweptAreaSolid s = new IfcSurfaceCurveSweptAreaSolid(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mDirectrix = ParserSTEP.StripLink(str, ref pos);
-			mStartParam = ParserSTEP.StripDouble(str, ref pos);
-			mEndParam = ParserSTEP.StripDouble(str,ref pos);
-			mReferenceSurface = ParserSTEP.StripLink(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mDirectrix = ParserSTEP.StripLink(str, ref pos, len);
+			mStartParam = ParserSTEP.StripDouble(str, ref pos, len);
+			mEndParam = ParserSTEP.StripDouble(str, ref pos, len);
+			mReferenceSurface = ParserSTEP.StripLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -2612,12 +2640,12 @@ additional types	some additional representation types are given:
 		internal IfcSurfaceOfLinearExtrusion() : base() { }
 		internal IfcSurfaceOfLinearExtrusion(DatabaseIfc db, IfcSurfaceOfLinearExtrusion s) : base(db,s) { ExtrudedDirection = db.Factory.Duplicate(s.ExtrudedDirection) as IfcDirection; mDepth = s.mDepth; }
 
-		internal static IfcSurfaceOfLinearExtrusion Parse(string str) { IfcSurfaceOfLinearExtrusion s = new IfcSurfaceOfLinearExtrusion(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos)
+		internal static IfcSurfaceOfLinearExtrusion Parse(string str) { IfcSurfaceOfLinearExtrusion s = new IfcSurfaceOfLinearExtrusion(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mExtrudedDirection = ParserSTEP.StripLink(str, ref pos);
-			mDepth = ParserSTEP.StripDouble(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mExtrudedDirection = ParserSTEP.StripLink(str, ref pos, len);
+			mDepth = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + ParserSTEP.DoubleToString(mDepth); }
 	}
@@ -2628,8 +2656,8 @@ additional types	some additional representation types are given:
 
 		internal IfcSurfaceOfRevolution() : base() { }
 		internal IfcSurfaceOfRevolution(DatabaseIfc db, IfcSurfaceOfRevolution s) : base(db,s) { AxisPosition = db.Factory.Duplicate( s.AxisPosition) as IfcAxis1Placement; }
-		internal static IfcSurfaceOfRevolution Parse(string str) { IfcSurfaceOfRevolution s = new IfcSurfaceOfRevolution(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos) { base.Parse(str, ref pos); mAxisPosition = ParserSTEP.StripLink(str, ref pos); }
+		internal static IfcSurfaceOfRevolution Parse(string str) { IfcSurfaceOfRevolution s = new IfcSurfaceOfRevolution(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len) { base.Parse(str, ref pos, len); mAxisPosition = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mAxisPosition); }
 	}
 	public interface IfcSurfaceOrFaceSurface : IBaseClassIfc { }  // = SELECT (	IfcSurface, IfcFaceSurface, IfcFaceBasedSurfaceModel);
@@ -2690,6 +2718,10 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleLighting : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
 		internal int mDiffuseTransmissionColour, mDiffuseReflectionColour, mTransmissionColour, mReflectanceColour;//	 :	IfcColourRgb;
+		public IfcColourRgb DiffuseTransmissionColour {  get { return mDatabase[mDiffuseTransmissionColour] as IfcColourRgb; } set { mDiffuseTransmissionColour = value.mIndex; } }
+		public IfcColourRgb DiffuseReflectionColour {  get { return mDatabase[mDiffuseReflectionColour] as IfcColourRgb; } set { mDiffuseReflectionColour = value.mIndex; } }
+		public IfcColourRgb TransmissionColour {  get { return mDatabase[mTransmissionColour] as IfcColourRgb; } set { mTransmissionColour = value.mIndex; } }
+		public IfcColourRgb ReflectanceColour {  get { return mDatabase[mReflectanceColour] as IfcColourRgb; } set { mReflectanceColour = value.mIndex; } }
 		internal IfcSurfaceStyleLighting() : base() { }
 		internal IfcSurfaceStyleLighting(DatabaseIfc db, IfcSurfaceStyleLighting i) : base(db,i)
 		{
@@ -2698,7 +2730,14 @@ additional types	some additional representation types are given:
 			mTransmissionColour = i.mTransmissionColour;
 			mReflectanceColour = i.mReflectanceColour;
 		}
-		
+		public IfcSurfaceStyleLighting(IfcColourRgb diffuseTransmission, IfcColourRgb diffuseReflection, IfcColourRgb transmission, IfcColourRgb reflection)
+			: base(diffuseTransmission.mDatabase)
+		{
+			DiffuseTransmissionColour = diffuseTransmission;
+			DiffuseReflectionColour = diffuseReflection;
+			TransmissionColour = transmission;
+			ReflectanceColour = reflection;
+		}
 		protected override void parseFields(List<string> arrFields, ref int ipos)
 		{
 			base.parseFields(arrFields, ref ipos);
@@ -2732,9 +2771,75 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
 	{
 		internal double mTransparency = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
-		internal IfcColourOrFactor mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
+		private int mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
+		private IfcNormalisedRatioMeasure mDiffuseColourMeasure, mTransmissionColourMeasure, mDiffuseTransmissionColourMeasure, mReflectionColourMeasure, mSpecularColourMeasure;//:	OPTIONAL IfcColourOrFactor;
 		internal IfcSpecularHighlightSelect mSpecularHighlight;// : OPTIONAL 
 		internal IfcReflectanceMethodEnum mReflectanceMethod = IfcReflectanceMethodEnum.NOTDEFINED;// : IfcReflectanceMethodEnum; 
+
+		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
+		public IfcColourOrFactor DiffuseColour
+		{
+			get { return (mDiffuseColour > 0 ? mDatabase[mDiffuseColour] as IfcColourOrFactor : mDiffuseColourMeasure); }
+			set
+			{
+				IfcColourRgb col = value as IfcColourRgb;
+				if (col != null)
+					mDiffuseColour = col.mIndex;
+				else
+					mDiffuseColourMeasure = value as IfcNormalisedRatioMeasure;
+			}
+		}
+		public IfcColourOrFactor TransmissionColour
+		{
+			get { return (mTransmissionColour > 0 ? mDatabase[mTransmissionColour] as IfcColourOrFactor : mTransmissionColourMeasure); }
+			set
+			{
+				IfcColourRgb col = value as IfcColourRgb;
+				if (col != null)
+					mTransmissionColour = col.mIndex;
+				else
+					mTransmissionColourMeasure = value as IfcNormalisedRatioMeasure;
+			}
+		}
+		public IfcColourOrFactor DiffuseTransmissionColour
+		{
+			get { return (mDiffuseTransmissionColour > 0 ? mDatabase[mDiffuseTransmissionColour] as IfcColourOrFactor : mDiffuseTransmissionColourMeasure); }
+			set
+			{
+				IfcColourRgb col = value as IfcColourRgb;
+				if (col != null)
+					mDiffuseTransmissionColour = col.mIndex;
+				else
+					mDiffuseTransmissionColourMeasure = value as IfcNormalisedRatioMeasure;
+			}
+		}
+		public IfcColourOrFactor ReflectionColour
+		{
+			get { return (mReflectionColour > 0 ? mDatabase[mReflectionColour] as IfcColourOrFactor : mReflectionColourMeasure); }
+			set
+			{
+				IfcColourRgb col = value as IfcColourRgb;
+				if (col != null)
+					mReflectionColour = col.mIndex;
+				else
+					mReflectionColourMeasure = value as IfcNormalisedRatioMeasure;
+			}
+		}
+		public IfcColourOrFactor SpecularColour
+		{
+			get { return (mSpecularColour > 0 ? mDatabase[mSpecularColour] as IfcColourOrFactor : mSpecularColourMeasure); }
+			set
+			{
+				IfcColourRgb col = value as IfcColourRgb;
+				if (col != null)
+					mSpecularColour = col.mIndex;
+				else
+					mSpecularColourMeasure = value as IfcNormalisedRatioMeasure;
+			}
+		}
+		public IfcSpecularHighlightSelect SpecularHighlight { get { return mSpecularHighlight; } set { mSpecularHighlight = value; } }
+		public IfcReflectanceMethodEnum ReflectanceMethod { get { return mReflectanceMethod; } set { mReflectanceMethod = value; } }
+
 		internal IfcSurfaceStyleRendering() : base() { }
 		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r) : base(db, r)
 		{
@@ -2747,41 +2852,37 @@ additional types	some additional representation types are given:
 			mSpecularHighlight = r.mSpecularHighlight;
 			mReflectanceMethod = r.mReflectanceMethod;
 		}
-		internal IfcSurfaceStyleRendering(DatabaseIfc m, Color surface, double transparency, Color diffuse, Color transmission, Color reflection, Color specular, IfcSpecularHighlightSelect highlight, IfcReflectanceMethodEnum rm)
-			: base(m, surface)
-		{
-			mTransparency = transparency;
-			if (!diffuse.IsEmpty)
-				mDiffuseColour = new IfcNormalisedRatioMeasure(diffuse);
-			if (!transmission.IsEmpty)
-				mTransmissionColour = new IfcNormalisedRatioMeasure(transmission);
-			if (!reflection.IsEmpty)
-				mReflectionColour = new IfcNormalisedRatioMeasure(reflection);
-			if (!specular.IsEmpty)
-				mSpecularColour = new IfcNormalisedRatioMeasure(specular);
-			mSpecularHighlight = highlight;
-			mReflectanceMethod = rm;
-		}
+		public IfcSurfaceStyleRendering(IfcColourRgb surfaceColour) : base(surfaceColour) { }
 		internal static void parseFields(IfcSurfaceStyleRendering s, List<string> arrFields, ref int ipos)
 		{
 			IfcSurfaceStyleShading.parseFields(s, arrFields, ref ipos);
 			s.mTransparency = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			string str = arrFields[ipos++];
-			if (str != "$")
-				s.mDiffuseColour = ParserIfc.parseColourOrFactor(str);
-			str = arrFields[ipos++];
-			if (str != "$")
-				s.mTransmissionColour = ParserIfc.parseColourOrFactor(str);
-			str = arrFields[ipos++];
-			if (str != "$")
-				s.mDiffuseTransmissionColour = ParserIfc.parseColourOrFactor(str);
-			str = arrFields[ipos++];
-			if (str != "$")
-				s.mReflectionColour = ParserIfc.parseColourOrFactor(str);
-			str = arrFields[ipos++];
-			if (str != "$")
-				s.mSpecularColour = ParserIfc.parseColourOrFactor(str);
-			str = arrFields[ipos++];
+			string str = arrFields[ipos++].Trim();
+			if (str.StartsWith("#"))
+				s.mDiffuseColour = ParserSTEP.ParseLink(str);
+			else
+				s.mDiffuseColourMeasure = ParserIfc.parseColourOrFactor(str) as IfcNormalisedRatioMeasure;
+			str = arrFields[ipos++].Trim();
+			if (str.StartsWith("#"))
+				s.mTransmissionColour = ParserSTEP.ParseLink(str);
+			else
+				s.mTransmissionColourMeasure = ParserIfc.parseColourOrFactor(str) as IfcNormalisedRatioMeasure;
+			str = arrFields[ipos++].Trim();
+			if (str.StartsWith("#"))
+				s.mDiffuseTransmissionColour = ParserSTEP.ParseLink(str);
+			else
+				s.mDiffuseTransmissionColourMeasure = ParserIfc.parseColourOrFactor(str) as IfcNormalisedRatioMeasure;
+			str = arrFields[ipos++].Trim();
+			if (str.StartsWith("#"))
+				s.mReflectionColour = ParserSTEP.ParseLink(str);
+			else
+				s.mReflectionColourMeasure = ParserIfc.parseColourOrFactor(str) as IfcNormalisedRatioMeasure;
+			str = arrFields[ipos++].Trim();
+			if (str.StartsWith("#"))
+				s.mSpecularColour = ParserSTEP.ParseLink(str);
+			else
+				s.mSpecularColourMeasure = ParserIfc.parseColourOrFactor(str) as IfcNormalisedRatioMeasure;
+			str = arrFields[ipos++].Trim();
 			if (str != "$")
 			{
 				if (str.StartsWith("IFCSPECULARROUGHNESS"))
@@ -2797,8 +2898,11 @@ additional types	some additional representation types are given:
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mTransparency) +
-				(mDiffuseColour == null ? ",$" : "," + mDiffuseColour.ToString()) + (mTransmissionColour == null ? ",$" : "," + mTransmissionColour.ToString()) +
-				(mDiffuseTransmissionColour == null ? ",$" : "," + mDiffuseTransmissionColour) + (mReflectionColour == null ? ",$" : mReflectionColour.ToString()) + (mSpecularColour == null ? ",$" : "," + mSpecularColour.ToString()) +
+				(mDiffuseColour > 0 ? ",#" + mDiffuseColour : (mDiffuseColourMeasure == null ? ",$" : "," + mDiffuseColourMeasure.ToString())) + 
+				(mTransmissionColour > 0 ? ",#" + mTransmissionColour : (mTransmissionColourMeasure == null ? ",$" : "," + mTransmissionColourMeasure.ToString())) +
+				(mDiffuseTransmissionColour > 0 ? ",#" + mDiffuseTransmissionColour : (mDiffuseTransmissionColourMeasure == null ? ",$" : "," + mDiffuseTransmissionColourMeasure.ToString())) + 
+				(mReflectionColour > 0 ? ",#" + mReflectionColour : (mReflectionColourMeasure == null ? ",$" : "," + mReflectionColourMeasure.ToString())) + 
+				(mSpecularColour > 0 ? ",#" + mSpecularColour : (mSpecularColourMeasure == null ? ",$" : "," + mSpecularColourMeasure.ToString())) +
 				(mSpecularHighlight == null ? ",$" : "," + mSpecularHighlight.ToString()) + ",." + mReflectanceMethod.ToString() + ".";
 		}
 	}
@@ -2809,8 +2913,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSurfaceStyleShading() : base() { }
 		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) { SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb; }
-		public IfcSurfaceStyleShading(IfcColourRgb colour) : base(colour.mDatabase) { SurfaceColour = colour; }
-		public IfcSurfaceStyleShading(DatabaseIfc db, Color colour) : base(db) { SurfaceColour =  new IfcColourRgb(db,"",colour); }
+		public IfcSurfaceStyleShading(IfcColourRgb surfaceColour) : base(surfaceColour.mDatabase) { SurfaceColour = surfaceColour; }
 		internal static void parseFields(IfcSurfaceStyleShading s, List<string> arrFields, ref int ipos) { s.mSurfaceColour = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal static IfcSurfaceStyleShading Parse(string strDef) { IfcSurfaceStyleShading s = new IfcSurfaceStyleShading(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mSurfaceColour); }
@@ -2903,7 +3006,7 @@ additional types	some additional representation types are given:
 		}
 		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release == ReleaseVersion.IFC2x3) Position = sweptArea.mDatabase.Factory.PlaneXYPlacement; }
 		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase,0,0,0)) : position); }
-		protected virtual void Parse(string str, ref int pos) { mSweptArea = ParserSTEP.StripLink(str,ref pos); mPosition = ParserSTEP.StripLink(str,ref pos); }
+		protected virtual void Parse(string str, ref int pos, int len) { mSweptArea = ParserSTEP.StripLink(str, ref pos, len); mPosition = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mSweptArea) + (mPosition > 0 ? ",#" + mPosition : ",$"); }
 
 		internal override void changeSchema(ReleaseVersion schema)
@@ -2937,14 +3040,14 @@ additional types	some additional representation types are given:
 		internal IfcSweptDiskSolid(DatabaseIfc db, IfcSweptDiskSolid s) : base(db,s) { Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve; mRadius = s.mRadius; mInnerRadius = s.mInnerRadius; mStartParam = s.mStartParam; mEndParam = s.mEndParam; }
 		public IfcSweptDiskSolid(IfcCurve directrix, double radius) : base(directrix.mDatabase) { Directrix = directrix; mRadius = radius; }
 		public IfcSweptDiskSolid(IfcCurve directrix, double radius, double innerRadius) : base(directrix.mDatabase) { Directrix = directrix; mRadius = radius; mInnerRadius = innerRadius; }
-		internal static IfcSweptDiskSolid Parse(string str) { IfcSweptDiskSolid s = new IfcSweptDiskSolid(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected virtual void Parse(string str,ref int pos)
+		internal static IfcSweptDiskSolid Parse(string str) { IfcSweptDiskSolid s = new IfcSweptDiskSolid(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected virtual void Parse(string str, ref int pos, int len)
 		{ 
-			mDirectrix = ParserSTEP.StripLink(str,ref pos);
-			mRadius = ParserSTEP.StripDouble(str,ref pos);
-			mInnerRadius = ParserSTEP.StripDouble(str, ref pos);
-			mStartParam = ParserSTEP.StripDouble(str, ref pos);
-			mEndParam = ParserSTEP.StripDouble(str, ref pos);
+			mDirectrix = ParserSTEP.StripLink(str, ref pos, len);
+			mRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mInnerRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mStartParam = ParserSTEP.StripDouble(str, ref pos, len);
+			mEndParam = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mDirectrix) + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.DoubleOptionalToString(mInnerRadius) + "," + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ParserSTEP.DoubleToString(mStartParam) + "," + ParserSTEP.DoubleToString(mEndParam) : ParserSTEP.DoubleOptionalToString(mStartParam) + "," + ParserSTEP.DoubleOptionalToString(mEndParam)); }
 	}
@@ -2953,8 +3056,8 @@ additional types	some additional representation types are given:
 		internal double mFilletRadius;// : OPTIONAL IfcPositiveLengthMeasure; 
 		internal IfcSweptDiskSolidPolygonal() : base() { }
 		internal IfcSweptDiskSolidPolygonal(DatabaseIfc db, IfcSweptDiskSolidPolygonal p) : base(db,p) { mFilletRadius = p.mFilletRadius; }
-		internal new static IfcSweptDiskSolidPolygonal Parse(string str) { IfcSweptDiskSolidPolygonal s = new IfcSweptDiskSolidPolygonal(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected override void Parse(string str, ref int pos) { base.Parse(str, ref pos); mFilletRadius = ParserSTEP.StripDouble(str, ref pos); }
+		internal new static IfcSweptDiskSolidPolygonal Parse(string str) { IfcSweptDiskSolidPolygonal s = new IfcSweptDiskSolidPolygonal(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected override void Parse(string str, ref int pos, int len) { base.Parse(str, ref pos, len); mFilletRadius = ParserSTEP.StripDouble(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mFilletRadius); }
 	}
 	public abstract partial class IfcSweptSurface : IfcSurface /*	ABSTRACT SUPERTYPE OF (ONEOF (IfcSurfaceOfLinearExtrusion ,IfcSurfaceOfRevolution))*/
@@ -2967,7 +3070,7 @@ additional types	some additional representation types are given:
 
 		protected IfcSweptSurface() : base() { }
 		protected IfcSweptSurface(DatabaseIfc db, IfcSweptSurface s) : base(db,s) { SweptCurve = db.Factory.Duplicate(s.SweptCurve) as IfcProfileDef; Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; }
-		protected virtual void Parse(string str, ref int pos) { mSweptCurve = ParserSTEP.StripLink(str,ref pos); mPosition = ParserSTEP.StripLink(str,ref pos); }
+		protected virtual void Parse(string str, ref int pos, int len) { mSweptCurve = ParserSTEP.StripLink(str, ref pos, len); mPosition = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mSweptCurve) + "," + ParserSTEP.LinkToString(mPosition); }
 		internal IfcProfileDef getProfile() { return mDatabase[mSweptCurve] as IfcProfileDef; }
 	}

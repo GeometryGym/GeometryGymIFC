@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using System.Globalization;
 using System.Threading;
 using GeometryGym.STEP;
@@ -71,7 +70,7 @@ namespace GeometryGym.Ifc
 			mRelease = schema;
 			mModelView = view;
 #if (RHINO)
-			mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
+			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
 			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
 #endif
 			//mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
@@ -267,6 +266,7 @@ namespace GeometryGym.Ifc
 		}
 		private IfcContext ReadFile(TextReader sr, int offset)
 		{
+			
 			mRelease = ReleaseVersion.IFC2x3;
 			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
 			mFactory.Options.GenerateOwnerHistory = false;
@@ -941,8 +941,64 @@ namespace GeometryGym.Ifc
 				return mOrigin;
 			}
 		}
-		
 
+		private Dictionary<string, IfcBoundaryNodeCondition> mBoundaryNodeConditions = new Dictionary<string, IfcBoundaryNodeCondition>();
+		public IfcBoundaryNodeCondition FindOrCreateBoundaryNodeCondition(bool isPointRestraint, bool x, bool y, bool z, bool xx, bool yy, bool zz)
+		{ return FindOrCreateBoundaryNodeCondition(isPointRestraint, new IfcTranslationalStiffnessSelect(x), new IfcTranslationalStiffnessSelect(y), new IfcTranslationalStiffnessSelect(z), new IfcRotationalStiffnessSelect(xx), new IfcRotationalStiffnessSelect(yy), new IfcRotationalStiffnessSelect(zz)); }
+		public IfcBoundaryNodeCondition FindOrCreateBoundaryNodeCondition(bool isPointRestraint, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz)
+		{
+			string name = "";
+			bool partial = false;
+			double tol = 1e-6;
+
+			if (x == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!x.mRigid && x.mStiffness != null)
+				partial = true;
+			else
+				name += (x.mRigid ? 'T' : 'F');
+			if (y == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!y.mRigid && y.mStiffness != null)
+				partial = true;
+			else
+				name += (y.mRigid ? 'T' : 'F');
+			if (z == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!z.mRigid && z.mStiffness != null)
+				partial = true;
+			else
+				name += (z.mRigid ? 'T' : 'F');
+			if (xx == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!xx.mRigid && xx.mStiffness != null)
+				partial = true;
+			else
+				name += (xx.mRigid ? 'T' : 'F');
+			if (yy == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!yy.mRigid && yy.mStiffness != null)
+				partial = true;
+			else
+				name += (yy.mRigid ? 'T' : 'F');
+			if (zz == null)
+				name += isPointRestraint ? 'F' : 'T';
+			else if (!zz.mRigid && zz.mStiffness != null)
+				partial = true;
+			else
+				name += (zz.mRigid ? 'T' : 'F');
+
+			if (partial)
+			{
+#warning implement
+				return new IfcBoundaryNodeCondition(mDatabase, "", x, y, z, xx, yy, zz);
+			}
+			if (mBoundaryNodeConditions.ContainsKey(name))
+				return mBoundaryNodeConditions[name];
+			IfcBoundaryNodeCondition result = new IfcBoundaryNodeCondition(mDatabase, name, x, y, z, xx, yy, zz);
+			mBoundaryNodeConditions.Add(name, result);
+			return result;
+		}
 	}
 }
 

@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -211,7 +210,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDiameterDimension() : base() { }
 		//internal IfcDiameterDimension(IfcDiameterDimension el) : base(el) { }
-		internal new static IfcDiameterDimension Parse(string str) { IfcDiameterDimension d = new IfcDiameterDimension(); int pos = 0; d.Parse(str, ref pos); return d; }
+		internal new static IfcDiameterDimension Parse(string str) { IfcDiameterDimension d = new IfcDiameterDimension(); int pos = 0; d.Parse(str, ref pos, str.Length); return d; }
 	}
 	public partial class IfcDimensionalExponents : BaseClassIfc
 	{
@@ -227,7 +226,7 @@ namespace GeometryGym.Ifc
 			mAmountOfSubstanceExponent = e.mAmountOfSubstanceExponent;
 			mLuminousIntensityExponent = e.mLuminousIntensityExponent;
 		}
-		internal IfcDimensionalExponents(DatabaseIfc m, int len, int mass, int time, int elecCurr, int themrmo, int amountSubs, int luminous) : base(m)
+		public IfcDimensionalExponents(DatabaseIfc db, int len, int mass, int time, int elecCurr, int themrmo, int amountSubs, int luminous) : base(db)
 		{
 			mLengthExponent = len;
 			mMassExponent = mass;
@@ -262,11 +261,11 @@ namespace GeometryGym.Ifc
 		internal List<int> mAnnotatedBySymbols = new List<int>();// SET [0:2] OF IfcTerminatorSymbol FOR AnnotatedCurve; 
 		internal IfcDimensionCurve() : base() { }
 		//internal IfcDimensionCurve(DatabaseIfc db, IfcDimensionCurve p) : base(p) { mAnnotatedBySymbols = new List<int>(p.mAnnotatedBySymbols.ToArray()); }
-		internal new static IfcDimensionCurve Parse(string str) { IfcDimensionCurve d = new IfcDimensionCurve(); int pos = 0; d.Parse(str, ref pos); return d; }
-		protected override void Parse(string str, ref int pos)
+		internal new static IfcDimensionCurve Parse(string str) { IfcDimensionCurve d = new IfcDimensionCurve(); int pos = 0; d.Parse(str, ref pos, str.Length); return d; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mAnnotatedBySymbols = ParserSTEP.StripListLink(str,ref pos);
+			base.Parse(str, ref pos, len);
+			mAnnotatedBySymbols = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP()
 		{
@@ -284,18 +283,18 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDimensionCurveDirectedCallout() : base() { }
 	//	internal IfcDimensionCurveDirectedCallout(DatabaseIfc db, IfcDimensionCurveDirectedCallout c) : base(db,c) { }
-		internal new static IfcDimensionCurveDirectedCallout Parse(string str) { IfcDimensionCurveDirectedCallout d = new IfcDimensionCurveDirectedCallout(); int pos = 0; d.Parse(str, ref pos); return d; }
+		internal new static IfcDimensionCurveDirectedCallout Parse(string str) { IfcDimensionCurveDirectedCallout d = new IfcDimensionCurveDirectedCallout(); int pos = 0; d.Parse(str, ref pos, str.Length); return d; }
 	}
 	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol // DEPRECEATED IFC4
 	{
 		internal IfcDimensionExtentUsage mRole;// : IfcDimensionExtentUsage;
 		internal IfcDimensionCurveTerminator() : base() { }
 	//	internal IfcDimensionCurveTerminator(IfcDimensionCurveTerminator i) : base(i) { mRole = i.mRole; }
-		internal new static IfcDimensionCurveTerminator Parse(string str) { IfcDimensionCurveTerminator t = new IfcDimensionCurveTerminator(); int pos = 0; t.Parse(str, ref pos); return t; }
-		protected override void Parse(string str, ref int pos)
+		internal new static IfcDimensionCurveTerminator Parse(string str) { IfcDimensionCurveTerminator t = new IfcDimensionCurveTerminator(); int pos = 0; t.Parse(str, ref pos, str.Length); return t; }
+		protected override void Parse(string str, ref int pos, int len)
 		{
-			base.Parse(str, ref pos);
-			mRole = (IfcDimensionExtentUsage)Enum.Parse(typeof(IfcDimensionExtentUsage), ParserSTEP.StripField(str,ref pos));
+			base.Parse(str, ref pos, len);
+			mRole = (IfcDimensionExtentUsage)Enum.Parse(typeof(IfcDimensionExtentUsage), ParserSTEP.StripField(str, ref pos, len));
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mRole.ToString() + "."; }
 	}
@@ -309,7 +308,7 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcDimensionalExponents;
 	public partial class IfcDirection : IfcGeometricRepresentationItem
 	{
-		private double mDirectionRatioX = 0, mDirectionRatioY = 0, mDirectionRatioZ = 0;
+		private double mDirectionRatioX = 0, mDirectionRatioY = 0, mDirectionRatioZ = double.NaN;
 
 		public double DirectionRatioX { get { return mDirectionRatioX; } set { mDirectionRatioX = value; } }
 		public double DirectionRatioY { get { return mDirectionRatioY; } set { mDirectionRatioY = value; } }
@@ -323,21 +322,22 @@ namespace GeometryGym.Ifc
 		internal static IfcDirection Parse(string str)
 		{
 			IfcDirection d = new IfcDirection();
-			if (str[0] == '(')
+			string s = str.Trim();
+			if (s[0] == '(')
 			{
-				int pos = 0;
-				List<double> ratios = ParserSTEP.StripListDouble(str, ref pos);
-
-				if (ratios.Count > 0)
+				string[] fields = str.Substring(1,str.Length-2).Split(",".ToCharArray());
+				if (fields != null && fields.Length > 0)
 				{
-					d.mDirectionRatioX = ratios[0];
-					if (ratios.Count > 1)
+					d.mDirectionRatioX = ParserSTEP.ParseDouble(fields[0]);
+					if (fields.Length > 1)
 					{
-						d.mDirectionRatioY = ratios[1];
-						d.mDirectionRatioZ = (ratios.Count > 2 ? ratios[2] : double.NaN);
+						d.mDirectionRatioY = ParserSTEP.ParseDouble(fields[1]);
+						if (fields.Length > 2)
+							d.mDirectionRatioZ = ParserSTEP.ParseDouble(fields[2]);
 					}
 				}
 			}
+			
 			return d;
 		}
 		protected override string BuildStringSTEP()
@@ -462,7 +462,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDistributionElement() : base() { }
 		protected IfcDistributionElement(IfcDistributionElement basis) : base(basis) { }
-		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e) : base(db,e) { }
+		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e) : base(db,e,false) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
 		
@@ -733,7 +733,7 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAssociatesDocument> Associates { get { return mDocumentRefForObjects; } set { mDocumentRefForObjects = value; } }
 
 		internal IfcDocumentReference() : base() { }
-		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
+		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; if(r.mReferencedDocument > 0) ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 		internal static IfcDocumentReference Parse(string strDef, ReleaseVersion schema) { IfcDocumentReference r = new IfcDocumentReference(); int ipos = 0; parseFields(r, ParserSTEP.SplitLineFields(strDef), ref ipos, schema); return r; }
 		internal static void parseFields(IfcDocumentReference r, List<string> arrFields, ref int ipos, ReleaseVersion schema)
@@ -766,24 +766,24 @@ namespace GeometryGym.Ifc
 		internal IfcDoor() : base() { }
 		internal IfcDoor(DatabaseIfc db, IfcDoor d) : base(db, d) { mOverallHeight = d.mOverallHeight; mOverallWidth = d.mOverallWidth; mPredefinedType = d.mPredefinedType; mOperationType = d.mOperationType; mUserDefinedOperationType = d.mUserDefinedOperationType; }
 		public IfcDoor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		internal static IfcDoor Parse(string str, ReleaseVersion schema) { IfcDoor d = new IfcDoor(); int pos = 0; d.Parse(str, ref pos, schema); return d; }
+		internal static IfcDoor Parse(string str, ReleaseVersion schema) { IfcDoor d = new IfcDoor(); int pos = 0; d.Parse(str, ref pos, str.Length, schema); return d; }
 		
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
-			mOverallHeight = ParserSTEP.StripDouble(str,ref pos);
-			mOverallWidth = ParserSTEP.StripDouble(str, ref pos);
+			base.Parse(str, ref pos, len);
+			mOverallHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mOverallWidth = ParserSTEP.StripDouble(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str,ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					PredefinedType = (IfcDoorTypeEnum)Enum.Parse(typeof(IfcDoorTypeEnum), s.Substring(1, s.Length - 2));
-				s = ParserSTEP.StripField(str,ref pos);
+				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					mOperationType = (IfcDoorTypeOperationEnum)Enum.Parse(typeof(IfcDoorTypeOperationEnum), s.Substring(1, s.Length - 2));
 				try
 				{
-					mUserDefinedOperationType = ParserSTEP.StripString(str,ref pos);
+					mUserDefinedOperationType = ParserSTEP.StripString(str,ref pos, len);
 				}
 				catch (Exception) { }
 			}
@@ -892,7 +892,7 @@ namespace GeometryGym.Ifc
 		internal IfcDoorStandardCase() : base() { }
 		internal IfcDoorStandardCase(DatabaseIfc db, IfcDoorStandardCase d) : base(db,d) { }
 
-		internal new static IfcDoorStandardCase Parse(string str, ReleaseVersion schema) { IfcDoorStandardCase d = new IfcDoorStandardCase(); int pos = 0; d.Parse(str,ref pos, schema); return d; }
+		internal new static IfcDoorStandardCase Parse(string str, ReleaseVersion schema) { IfcDoorStandardCase d = new IfcDoorStandardCase(); int pos = 0; d.Parse(str,ref pos, str.Length, schema); return d; }
 	}
 	public partial class IfcDoorStyle : IfcTypeProduct //IFC2x3 
 	{
@@ -974,10 +974,10 @@ namespace GeometryGym.Ifc
 		{
 			IfcDraughtingCallout d = new IfcDraughtingCallout();
 			int pos = 0;
-			d.Parse(str, ref pos);
+			d.Parse(str, ref pos, str.Length);
 			return d;
 		}
-		protected virtual void Parse(string str, ref int pos) { mContents = ParserSTEP.StripListLink(str,ref pos); }
+		protected virtual void Parse(string str, ref int pos, int len) { mContents = ParserSTEP.StripListLink(str, ref pos, len); }
 		protected override string BuildStringSTEP()
 		{
 			string str = ",(" + ParserSTEP.LinkToString(mContents[0]);

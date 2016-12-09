@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -39,11 +38,11 @@ namespace GeometryGym.Ifc
 		internal IfcHalfSpaceSolid() : base() { }
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 
-		internal static IfcHalfSpaceSolid Parse(string str) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int pos = 0; s.Parse(str, ref pos); return s; }
-		protected virtual void Parse(string str, ref int pos)
+		internal static IfcHalfSpaceSolid Parse(string str) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
+		protected virtual void Parse(string str, ref int pos, int len)
 		{
-			mBaseSurface = ParserSTEP.StripLink(str, ref pos);
-			mAgreementFlag = ParserSTEP.StripBool(str, ref pos);
+			mBaseSurface = ParserSTEP.StripLink(str, ref pos, len);
+			mAgreementFlag = ParserSTEP.StripBool(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mBaseSurface) + "," + ParserSTEP.BoolToString(mAgreementFlag); }
 	}

@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -100,7 +99,7 @@ namespace GeometryGym.Ifc
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcGeographicElement() : base() { }
-		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e) : base(db, e) { mPredefinedType = e.mPredefinedType; }
+		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e) : base(db, e,false) { mPredefinedType = e.mPredefinedType; }
 		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
 		
 		internal static IfcGeographicElement Parse(string strDef) { IfcGeographicElement e = new IfcGeographicElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
@@ -352,7 +351,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcGrid() : base() { }
-		internal IfcGrid(DatabaseIfc db, IfcGrid g) : base(db, g)
+		internal IfcGrid(DatabaseIfc db, IfcGrid g) : base(db, g,false)
 		{
 			UAxes = g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
 			VAxes = g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis);
@@ -559,7 +558,7 @@ namespace GeometryGym.Ifc
 		public List<IfcRelAssignsToGroup> IsGroupedBy { get { return mIsGroupedBy; } }
 
 		internal IfcGroup() : base() { }
-		internal IfcGroup(DatabaseIfc db, IfcGroup g) : base(db,g) { }
+		internal IfcGroup(DatabaseIfc db, IfcGroup g) : base(db,g,false) { }
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; mIsGroupedBy.Add(new IfcRelAssignsToGroup(this)); }
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(this, ods)); }
 

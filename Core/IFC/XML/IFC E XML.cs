@@ -44,6 +44,28 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Tag", Tag);
 		}
 	}
+
+	public partial class IfcElementQuantity : IfcQuantitySet
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("MethodOfMeasurement"))
+				Name = xml.Attributes["MethodOfMeasurement"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Quantities") == 0)
+					Quantities = mDatabase.ParseXMLList<IfcPhysicalQuantity>(child);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.SetXML(xml, host, processed);
+			base.setAttribute(xml, "MethodOfMeasurement", MethodOfMeasurement);
+			setChild(xml, "Quantities", Quantities, processed);
+		}
+	}
 	public abstract partial class IfcElementarySurface : IfcSurface //	ABSTRACT SUPERTYPE OF(ONEOF(IfcCylindricalSurface, IfcPlane))
 	{
 		internal override void ParseXml(XmlElement xml)

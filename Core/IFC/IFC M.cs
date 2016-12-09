@@ -23,7 +23,6 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Drawing;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -36,7 +35,7 @@ namespace GeometryGym.Ifc
 		protected IfcManifoldSolidBrep() : base() { }
 		protected IfcManifoldSolidBrep(IfcClosedShell s) : base(s.mDatabase) { Outer = s; }
 		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b) : base(db,b) { Outer = db.Factory.Duplicate( b.Outer) as IfcClosedShell; }
-		protected virtual void Parse(string str, ref int pos) { mOuter = ParserSTEP.StripLink(str,ref pos); }
+		protected virtual void Parse(string str, ref int pos, int len) { mOuter = ParserSTEP.StripLink(str, ref pos, len); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOuter); }
 	} 
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
@@ -1056,13 +1055,13 @@ namespace GeometryGym.Ifc
 		internal IfcMember(DatabaseIfc db, IfcMember m) : base(db, m) { mPredefinedType = m.mPredefinedType; }
 		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		internal static IfcMember Parse(string str, ReleaseVersion schema) { IfcMember m = new IfcMember(); int pos = 0; m.Parse(str,ref pos,schema); return m; }
-		protected void Parse(string str, ref int pos, ReleaseVersion schema)
+		internal static IfcMember Parse(string str, ReleaseVersion schema) { IfcMember m = new IfcMember(); int pos = 0; m.Parse(str,ref pos,str.Length, schema); return m; }
+		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
-			base.Parse(str, ref pos);
+			base.Parse(str, ref pos, len);
 			if (schema != ReleaseVersion.IFC2x3)
 			{
-				string s = ParserSTEP.StripField(str, ref pos);
+				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
 					mPredefinedType = (IfcMemberTypeEnum)Enum.Parse(typeof(IfcMemberTypeEnum), s.Substring(1, s.Length - 2));
 			}
@@ -1077,7 +1076,7 @@ namespace GeometryGym.Ifc
 		internal IfcMemberStandardCase() : base() { }
 		internal IfcMemberStandardCase(DatabaseIfc db, IfcMemberStandardCase m) : base(db, m) { }
 
-		internal new static IfcMemberStandardCase Parse(string str,ReleaseVersion schema) { IfcMemberStandardCase c = new IfcMemberStandardCase(); int pos = 0; c.Parse(str, ref pos, schema); return c; }
+		internal new static IfcMemberStandardCase Parse(string str,ReleaseVersion schema) { IfcMemberStandardCase c = new IfcMemberStandardCase(); int pos = 0; c.Parse(str, ref pos, str.Length, schema); return c; }
 	}
 	public partial class IfcMemberType : IfcBuildingElementType
 	{
@@ -1161,7 +1160,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcMonetaryUnit() : base() { }
 		internal IfcMonetaryUnit(DatabaseIfc db, IfcMonetaryUnit m) : base(db, m) { mCurrency = m.mCurrency; }
-		internal IfcMonetaryUnit(DatabaseIfc db, string currency) : base(db) { mCurrency = currency; }
+		public IfcMonetaryUnit(DatabaseIfc db, string currency) : base(db) { mCurrency = currency; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? ",." + mCurrency + "." : ",'" + mCurrency + "'"); }
 		internal static void parseFields(IfcMonetaryUnit u, List<string> arrFields, ref int ipos,ReleaseVersion schema) { u.mCurrency = arrFields[ipos++].Replace(schema == ReleaseVersion.IFC2x3 ? "." : "'", ""); }
 		internal static IfcMonetaryUnit Parse(string strDef,ReleaseVersion schema) { IfcMonetaryUnit u = new IfcMonetaryUnit(); int ipos = 0; parseFields(u, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return u; }
