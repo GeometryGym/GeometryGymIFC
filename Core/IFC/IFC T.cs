@@ -1119,7 +1119,10 @@ namespace GeometryGym.Ifc
 
 		public IfcCurve BasisCurve { get { return mDatabase[mBasisCurve] as IfcCurve; } set { mBasisCurve = value.mIndex; } }
 		public bool SenseAgreement { get { return mSenseAgreement; } }
-		public IfcTrimmingPreference MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } } 
+		public IfcTrimmingPreference MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
+		public IfcTrimmingSelect Trim1 { get { return mTrim1; } }
+		public IfcTrimmingSelect Trim2 { get { return mTrim2; } }
+
 
 		internal IfcTrimmedCurve() : base() { }
 		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c) : base(db,c)
@@ -1203,7 +1206,9 @@ namespace GeometryGym.Ifc
 		public IfcTrimmingSelect(double param, IfcCartesianPoint cp) : this(cp) { mIfcParameterValue = param; }
 		
 		internal double mIfcParameterValue;
+		public double IfcParameterValue { get { return mIfcParameterValue; } }
 		internal int mIfcCartesianPoint;
+		public int IfcCartesianPoint { get { return mIfcCartesianPoint; } }
 		internal static IfcTrimmingSelect Parse(string str)
 		{
 			IfcTrimmingSelect ts = new IfcTrimmingSelect();

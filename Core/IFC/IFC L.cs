@@ -526,6 +526,15 @@ namespace GeometryGym.Ifc
 		internal double mFilletRadius = double.NaN, mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mLegSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
 		internal double mCentreOfGravityInX = double.NaN, mCentreOfGravityInY = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure 
+
+		public double Depth { get { return mDepth; } }
+		public double Width { get { return mWidth; } }
+		public double Thickness { get { return mThickness; } }
+		public double FilletRadius { get { return mFilletRadius; } }
+		public double EdgeRadius { get { return mEdgeRadius; } }
+		public double LegSlope { get { return mLegSlope; } }
+		public double CentreOfGravityInX { get { return mCentreOfGravityInX; } }
+		public double CentreOfGravityInY { get { return mCentreOfGravityInY; } }
 		internal IfcLShapeProfileDef() : base() { }
 		internal IfcLShapeProfileDef(DatabaseIfc db, IfcLShapeProfileDef p) : base(db, p)
 		{
