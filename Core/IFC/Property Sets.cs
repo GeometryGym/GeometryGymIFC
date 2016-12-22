@@ -125,6 +125,19 @@ namespace GeometryGym.Ifc
 		public Pset_typeCommon(IfcBurner instance) : base(instance.mDatabase, "Pset_typeCommon") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
 		public Pset_typeCommon(IfcBurnerType type) : base(type.mDatabase, "Pset_typeCommon") { Description = type.Name; type.AddPropertySet(this); }
 	}
+	public partial class Pset_ColumnCommon : IfcPropertySet
+	{
+		public string Reference { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value)).mIndex); } }
+		public PEnum_ElementStatus Status { set { mHasProperties.Add(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString())).mIndex); } }
+		public double Slope { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Slope", new IfcPlaneAngleMeasure(value)).mIndex); } }
+		public double Roll { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "Roll", new IfcPlaneAngleMeasure(value)).mIndex); } }
+		public bool IsExternal { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value)).mIndex); } }
+		public double ThermalTransmittance { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ThermalTransmittance", new IfcThermalTransmittanceMeasure(value)).mIndex); } }
+		public bool LoadBearing { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value)).mIndex); } }
+		public string FireRating { set { mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "FireRating", new IfcLabel(value)).mIndex); } }
+		public Pset_ColumnCommon(IfcColumn instance) : base(instance.mDatabase, "Pset_ColumnCommon") { DefinesOccurrence.Assign(instance); }
+		public Pset_ColumnCommon(IfcColumnType type) : base(type.mDatabase, "Pset_ColumnCommon") { Description = type.Name; type.AddPropertySet(this); }
+	}
 	public partial class Pset_ConcreteElementGeneral : IfcPropertySet
 	{
 		public string ConstructionMethod { set {  mHasProperties.Add(new IfcPropertySingleValue(mDatabase, "ConstructionMethod", new IfcLabel(value)).mIndex); } }

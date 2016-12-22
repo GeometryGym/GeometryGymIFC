@@ -1118,11 +1118,10 @@ namespace GeometryGym.Ifc
 		internal IfcTrimmingPreference mMasterRepresentation = IfcTrimmingPreference.UNSPECIFIED;// : IfcTrimmingPreference; 
 
 		public IfcCurve BasisCurve { get { return mDatabase[mBasisCurve] as IfcCurve; } set { mBasisCurve = value.mIndex; } }
-		public bool SenseAgreement { get { return mSenseAgreement; } }
+		public IfcTrimmingSelect Trim1 { get { return mTrim1; } set { mTrim1 = value; } }
+		public IfcTrimmingSelect Trim2 { get { return mTrim2; } set { mTrim2 = value; } }
+		public bool SenseAgreement { get { return mSenseAgreement; } set { mSenseAgreement = value; } }
 		public IfcTrimmingPreference MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
-		public IfcTrimmingSelect Trim1 { get { return mTrim1; } }
-		public IfcTrimmingSelect Trim2 { get { return mTrim2; } }
-
 
 		internal IfcTrimmedCurve() : base() { }
 		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c) : base(db,c)
@@ -1424,17 +1423,25 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP()
 		{
-			string str = base.BuildStringSTEP() + "," + mApplicableOccurrence;
+			string psetlist = "";
 			if (mHasPropertySets.Count > 0)
 			{
-				str += ",(" + ParserSTEP.LinkToString(mHasPropertySets[0]);
-				for (int icounter = 1; icounter < mHasPropertySets.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mHasPropertySets[icounter]);
-				str += ")";
+				int icounter = 0;
+				List<IfcPropertySetDefinition> psets = HasPropertySets;
+				for(icounter = 0; icounter < psets.Count; icounter++ )
+				{
+					if (psets[icounter].isEmpty)
+						continue;
+					psetlist = "#" + psets[icounter].mIndex;
+					break;
+				}
+				for (icounter = 0; icounter < psets.Count; icounter++)
+				{
+					if (!psets[icounter].isEmpty)
+						psetlist += ",#" + psets[icounter].mIndex;
+				}
 			}
-			else
-				str += ",$";
-			return str;
+			return base.BuildStringSTEP() + "," + mApplicableOccurrence + (string.IsNullOrEmpty(psetlist) ? ",$" : ",(" + psetlist + ")");
 		}
 		internal static IfcTypeObject Parse(string strDef) { IfcTypeObject o = new IfcTypeObject(); int ipos = 0; parseFields(o, ParserSTEP.SplitLineFields(strDef), ref ipos); return o; }
 

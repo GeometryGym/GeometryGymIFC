@@ -845,16 +845,17 @@ namespace GeometryGym.Ifc
 			mRepresentationType = r.mRepresentationType;
 			Items = r.Items.ConvertAll(x => db.Factory.Duplicate(x) as IfcRepresentationItem);
 		}
-		protected IfcRepresentation(DatabaseIfc db, string identifier, string repType) : base(db)
+		protected IfcRepresentation(IfcRepresentationContext context, string identifier, string repType) : base(context.mDatabase)
 		{
+			ContextOfItems = context;
 			RepresentationIdentifier = identifier;
 			RepresentationType = repType;
 		}
-		protected IfcRepresentation(IfcRepresentationItem ri) : this(ri.mDatabase,"","") { mItems.Add(ri.mIndex); }
-		protected IfcRepresentation(IfcRepresentationItem ri, string identifier, string repType)
-			: this(ri.mDatabase, identifier, repType) { mItems.Add(ri.mIndex); }
-		protected IfcRepresentation(List<IfcRepresentationItem> reps, string identifier, string repType)
-			: this(reps[0].mDatabase, identifier, repType) { mItems = reps.ConvertAll(x => x.mIndex); }
+		protected IfcRepresentation(IfcRepresentationContext context, IfcRepresentationItem ri) : this(context,"","") { mItems.Add(ri.mIndex); }
+		protected IfcRepresentation(IfcRepresentationContext context, IfcRepresentationItem ri, string identifier, string repType)
+			: this(context, identifier, repType) { mItems.Add(ri.mIndex); }
+		protected IfcRepresentation(IfcRepresentationContext context, List<IfcRepresentationItem> reps, string identifier, string repType)
+			: this(context, identifier, repType) { mItems = reps.ConvertAll(x => x.mIndex); }
 
 		internal static IfcRepresentation Parse(string str) { IfcRepresentation r = new IfcRepresentation(); int pos = 0; parseString(r, str, ref pos, str.Length); return r; }
 		protected static void parseString(IfcRepresentation r, string str, ref int pos, int len)

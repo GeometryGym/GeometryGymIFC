@@ -353,10 +353,10 @@ namespace GeometryGym.Ifc
 		//INVERSE  
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal List<IfcRelConnectsElements> mConnectedTo = new List<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
-		//IsInterferedByElements	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
-		//InterferesElements	 :	SET OF IfcRelInterferesElements FOR RelatingElement;
+		internal List<IfcRelInterferesElements> mIsInterferedByElements = new List<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
+		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
-		//ReferencedInStructures	 : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
+		internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		internal List<IfcRelVoidsElement> mHasOpenings = new List<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
 		internal List<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new List<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
 		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
@@ -370,9 +370,20 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMember = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public List<IfcRelFillsElement> FillsVoids { get { return mFillsVoids; }  }
+		public List<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
+		public List<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
+		public List<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
+		public List<IfcRelProjectsElement> HasProjections { get { return mHasProjections; } }
+		public List<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 		public List<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
-		public List<IfcRelCoversBldgElements> HasCoverings { get { return mHasCoverings; } }
+		public List<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
+		public List<IfcRelSpaceBoundary> ProvidesBoundaries { get { return mProvidesBoundaries; } }
+		public List<IfcRelConnectsElements> ConnectedFrom { get { return mConnectedFrom; } }
+		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		public List<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return mAssignedStructuralActivity; } }
+
+		public List<IfcRelCoversBldgElements> HasCoverings { get { return mHasCoverings; } }
 		//GEOMGYM
 		//List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
@@ -796,6 +807,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			return base.retrieveReference(reference);
 		}
+		internal override bool isEmpty { get { return mQuantities.Count == 0; } }
 	}
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))
 	{

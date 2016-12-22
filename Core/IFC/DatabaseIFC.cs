@@ -244,12 +244,12 @@ namespace GeometryGym.Ifc
 					ReadXMLStream(fs.mStreamReader);
 					break;
 				case FormatIfc.JSON:
-#if (IFCJSON)
-					ReadJSONFile(fs.mStreamReader);
-					break;
-#else
+#if (NOIFCJSON)
 					logError("IfcJSON not enabled!");
 					return;
+#else
+					ReadJSONFile(fs.mStreamReader);
+					break;
 #endif
 				default:
 					ReadFile(fs.mStreamReader, 0);
@@ -549,10 +549,10 @@ namespace GeometryGym.Ifc
 				WriteXMLFile(FileName);
 				return true;
 			}
-#if (IFCJSON)
+#if (!NOIFCJSON)
 			else if(FileName.EndsWith("json"))
 			{
-				WriteJSONFile(filename);
+				ToJSON(filename);
 				return true;
 			}
 

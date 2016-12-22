@@ -35,6 +35,15 @@ namespace GeometryGym.Ifc
 		public Qto_AirTerminalBaseQuantities(IfcAirTerminal instance) : base(instance.mDatabase, "Qto_AirTerminalBaseQuantities") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
 		public Qto_AirTerminalBaseQuantities(IfcAirTerminalType type) : base(type.mDatabase, "Qto_AirTerminalBaseQuantities") { Description = type.Name; type.AddPropertySet(this); }
 	}
+	public partial class Qto_DoorBaseQuantities : IfcElementQuantity
+	{
+		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
+		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
+		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
+		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "Area", value).mIndex); } }
+		public Qto_DoorBaseQuantities(IfcDoor instance) : base(instance.mDatabase, "Qto_DoorBaseQuantities") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
+		public Qto_DoorBaseQuantities(IfcDoorType type) : base(type.mDatabase, "Qto_DoorBaseQuantities") { Description = type.Name; type.AddPropertySet(this); }
+	}
 	public partial class Qto_FootingBaseQuantities : IfcElementQuantity
 	{
 		public double Length { set { mQuantities.Add(new IfcQuantityLength(mDatabase,"Length",value).mIndex); } }
@@ -55,7 +64,7 @@ namespace GeometryGym.Ifc
 		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
 		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
 		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
-		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "CrossSectionArea", value).mIndex); } }
+		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "Area", value).mIndex); } }
 		public Qto_WindowBaseQuantities(IfcWindow instance) : base(instance.mDatabase, "Qto_WindowBaseQuantities") { Description = instance.Name; DefinesOccurrence.Assign(instance); }
 		public Qto_WindowBaseQuantities(IfcWindowType type) : base(type.mDatabase, "Qto_WindowBaseQuantities") { Description = type.Name; type.AddPropertySet(this); }
 	}

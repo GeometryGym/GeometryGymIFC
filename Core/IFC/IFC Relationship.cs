@@ -494,7 +494,7 @@ namespace GeometryGym.Ifc
 		internal static IfcRelAssociatesConstraint Parse(string str)
 		{
 			IfcRelAssociatesConstraint a = new IfcRelAssociatesConstraint();
-			int pos = 0, len = pos;
+			int pos = 0, len = str.Length;
 			a.Parse(str, ref pos, len);
 			a.mIntent = ParserSTEP.StripString(str, ref pos, len);
 			a.mRelatingConstraint = ParserSTEP.StripLink(str, ref pos, len);
@@ -700,8 +700,8 @@ namespace GeometryGym.Ifc
 		{
 			if (r.mConnectionGeometry >0)
 				ConnectionGeometry = db.Factory.Duplicate(r.ConnectionGeometry) as IfcConnectionGeometry;
-			//RelatingElement = db.Factory.Duplicate(r.RelatingElement) as IfcElement;
-			//RelatedElement = db.Factory.Duplicate( r.RelatedElement) as IfcElement;
+			RelatingElement = db.Factory.Duplicate(r.RelatingElement) as IfcElement;
+			RelatedElement = db.Factory.Duplicate( r.RelatedElement) as IfcElement;
 		}
 		internal IfcRelConnectsElements(IfcElement relating, IfcElement related)
 			: base(relating.mDatabase)
@@ -711,7 +711,6 @@ namespace GeometryGym.Ifc
 			mRelatedElement = related.mIndex;
 			related.mConnectedTo.Add(this);
 		}
-		internal IfcRelConnectsElements(IfcConnectionGeometry cg, IfcElement relating, IfcElement related) : this(relating, related) { mConnectionGeometry = cg.mIndex; }
 		internal static IfcRelConnectsElements Parse(string strDef) { IfcRelConnectsElements i = new IfcRelConnectsElements(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		internal static void parseFields(IfcRelConnectsElements i, List<string> arrFields, ref int ipos) { IfcRelConnects.parseFields(i, arrFields, ref ipos); i.mConnectionGeometry = ParserSTEP.ParseLink(arrFields[ipos++]); i.mRelatingElement = ParserSTEP.ParseLink(arrFields[ipos++]); i.mRelatedElement = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return (mRelatingElement == 0 || mRelatedElement == 0 ? "" : base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mConnectionGeometry) + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedElement)); }
@@ -720,9 +719,9 @@ namespace GeometryGym.Ifc
 			base.postParseRelate();
 			IfcElement relating = RelatingElement, related = RelatedElement;
 			if (relating != null)
-				relating.mConnectedFrom.Add(this);
+				relating.mConnectedTo.Add(this);
 			if (related != null)
-				related.mConnectedTo.Add(this);
+				related.mConnectedFrom.Add(this);
 		}
 		internal IfcElement getConnected(IfcElement e) { return mDatabase[(mRelatingElement == e.mIndex ? mRelatedElement : mRelatingElement)] as IfcElement; }
 	}
@@ -788,9 +787,9 @@ namespace GeometryGym.Ifc
 			RelatingPort = db.Factory.Duplicate(r.RelatingPort) as IfcPort;
 			RelatedPort = db.Factory.Duplicate(r.RelatedPort) as IfcPort;
 			if(r.mRealizingElement > 0)
-				RealizingElement = db.Factory.Duplicate(r.RealizingElement) as IfcElement; }
-		internal IfcRelConnectsPorts(IfcPort relatingPort, IfcPort relatedPort, IfcElement realizingElement)
-			: base(relatingPort.mDatabase) { mRelatingPort = relatingPort.mIndex; mRelatedPort = relatedPort.mIndex; if (realizingElement != null) mRealizingElement = realizingElement.mIndex; }
+				RealizingElement = db.Factory.Duplicate(r.RealizingElement) as IfcElement;
+		}
+		public IfcRelConnectsPorts(IfcPort relatingPort, IfcPort relatedPort) : base(relatingPort.mDatabase) { RelatingPort = relatingPort; RelatedPort = relatedPort; }
 		internal static IfcRelConnectsPorts Parse(string strDef) { IfcRelConnectsPorts i = new IfcRelConnectsPorts(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		internal static void parseFields(IfcRelConnectsPorts i, List<string> arrFields, ref int ipos)
 		{
@@ -1400,7 +1399,8 @@ namespace GeometryGym.Ifc
 		
 		protected override string BuildStringSTEP()
 		{
-			if (mRelatedObjects.Count == 0 || RelatingPropertyDefinition == null || string.IsNullOrEmpty(RelatingPropertyDefinition.ToString()))
+			IfcPropertySetDefinition pset = RelatingPropertyDefinition;
+			if (mRelatedObjects.Count == 0 || pset == null || pset.isEmpty)
 				return "";
 			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mRelatedObjects[0]);
 			for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
@@ -1653,7 +1653,56 @@ namespace GeometryGym.Ifc
 		internal static void parseFields(IfcRelFlowControlElements i, List<string> arrFields, ref int ipos) { IfcRelConnects.parseFields(i, arrFields, ref ipos); i.mRelatingPort = ParserSTEP.ParseLink(arrFields[ipos++]); i.mRelatedElement = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingPort) + "," + ParserSTEP.LinkToString(mRelatedElement); }
 	}
+
 	//ENTITY IfcRelInteractionRequirements  // DEPRECEATED IFC4
+	public partial class IfcRelInterferesElements : IfcRelConnects
+	{
+		internal int mRelatingElement;// : IfcElement;
+		internal int mRelatedElement;// : IfcElement;
+		internal int mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
+		internal string mInterferenceType = "$";// : OPTIONAL IfcIdentifier;
+		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
+
+		public IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } set { mRelatingElement = value.mIndex; } }
+		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
+		public IfcConnectionGeometry InterferenceGeometry { get { return mDatabase[mInterferenceGeometry] as IfcConnectionGeometry; } set { mInterferenceGeometry = value == null ? 0 : value.mIndex; } }
+		public string InterferenceType { get { return (mInterferenceType == "$" ? "" : ParserIfc.Decode(mInterferenceType)); } set { mInterferenceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
+
+		internal IfcRelInterferesElements() : base() { }
+		internal IfcRelInterferesElements(DatabaseIfc db, IfcRelInterferesElements r) : base(db, r)
+		{
+			RelatingElement = db.Factory.Duplicate(r.RelatingElement) as IfcElement;
+			RelatedElement = db.Factory.Duplicate(r.RelatedElement) as IfcElement;
+			if (r.mInterferenceGeometry > 0)
+				InterferenceGeometry = db.Factory.Duplicate(r.InterferenceGeometry) as IfcConnectionGeometry;
+			mInterferenceType = r.mInterferenceType;
+			mImpliedOrder = r.mImpliedOrder;
+		}
+		internal IfcRelInterferesElements(IfcElement relatingElement, IfcElement relatedElement)
+			: base(relatingElement.mDatabase) { RelatingElement = relatingElement; RelatedElement = relatedElement; }
+		internal static IfcRelInterferesElements Parse(string strDef) { IfcRelInterferesElements i = new IfcRelInterferesElements(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
+		internal static void parseFields(IfcRelInterferesElements i, List<string> arrFields, ref int ipos)
+		{
+			IfcRelConnects.parseFields(i, arrFields, ref ipos);
+			i.mRelatingElement = ParserSTEP.ParseLink(arrFields[ipos++]);
+			i.mRelatedElement = ParserSTEP.ParseLink(arrFields[ipos++]);
+			i.mInterferenceGeometry = ParserSTEP.ParseLink(arrFields[ipos++]);
+			i.mInterferenceType = arrFields[ipos++].Replace("'", "");
+			i.mImpliedOrder = ParserIfc.ParseIFCLogical(arrFields[ipos++]);
+		}
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedElement) + "," + 
+				ParserSTEP.LinkToString(mInterferenceGeometry) + (mInterferenceType == "$" ? ",$," : ",'" + mInterferenceType + "',") + ParserIfc.LogicalToString(mImpliedOrder);
+		}
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			RelatingElement.mInterferesElements.Add(this);
+			RelatedElement.mIsInterferedByElements.Add(this);
+		}
+	}
 	public partial class IfcRelNests : IfcRelDecomposes
 	{
 		internal int mRelatingObject;// : IfcObjectDefinition 
@@ -1756,6 +1805,7 @@ namespace GeometryGym.Ifc
 		protected IfcRelProjectsElement(DatabaseIfc db, IfcRelProjectsElement p) : base(db, p) { RelatingElement = db.Factory.Duplicate(p.RelatingElement) as IfcElement; RelatedFeatureElement = db.Factory.Duplicate(p.RelatedFeatureElement) as IfcFeatureElementAddition; }
 		protected IfcRelProjectsElement(IfcElement e, IfcFeatureElementAddition a) : base(e.mDatabase) { mRelatingElement = e.mIndex; mRelatedFeatureElement = a.mIndex; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedFeatureElement); }
+		internal static IfcRelProjectsElement Parse(string strDef) { IfcRelProjectsElement i = new IfcRelProjectsElement(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
 		protected static void parseFields(IfcRelProjectsElement c, List<string> arrFields, ref int ipos) { IfcRelDecomposes.parseFields(c, arrFields, ref ipos); c.mRelatingElement = ParserSTEP.ParseLink(arrFields[ipos++]); c.mRelatedFeatureElement = ParserSTEP.ParseLink(arrFields[ipos++]); }
 		internal override void postParseRelate()
 		{
@@ -1763,8 +1813,121 @@ namespace GeometryGym.Ifc
 			RelatingElement.mHasProjections.Add(this);
 			RelatedFeatureElement.mProjectsElements.Add(this);
 		}
+
 	}
-	//ENTITY IfcRelReferencedInSpatialStructure
+	public partial class IfcRelReferencedInSpatialStructure : IfcRelConnects
+	{
+		internal List<int> mRelatedElements = new List<int>();// : SET [1:?] OF IfcProduct;
+		private int mRelatingStructure;//  IfcSpatialElement 
+
+		public List<IfcProduct> RelatedElements { get { return (mRelatedElements.Count == 0 ? new List<IfcProduct>() : mRelatedElements.ConvertAll(x => mDatabase[x] as IfcProduct)); } set { mRelatedElements = value.ConvertAll(x => x.mIndex); foreach (IfcProduct p in value) relate(p); } }
+		public IfcSpatialElement RelatingStructure { get { return mDatabase[mRelatingStructure] as IfcSpatialElement; } set { mRelatingStructure = value.mIndex; value.mReferencesElements.Add(this); } }
+
+		internal IfcRelReferencedInSpatialStructure() : base() { }
+		internal IfcRelReferencedInSpatialStructure(DatabaseIfc db, IfcRelReferencedInSpatialStructure r, bool downstream) : base(db, r)
+		{
+			if (downstream)
+				RelatedElements = r.RelatedElements.ConvertAll(x => db.Factory.Duplicate(x) as IfcProduct);
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, false) as IfcSpatialElement;
+		}
+		internal IfcRelReferencedInSpatialStructure(IfcSpatialElement e) : base(e.mDatabase)
+		{
+			mRelatingStructure = e.mIndex;
+			e.mReferencesElements.Add(this);
+		}
+
+		protected override string BuildStringSTEP()
+		{
+			if (mRelatedElements.Count <= 0)
+				return "";
+			string list = "";
+			int icounter;
+			if (mRelatedElements.Count > 100)
+			{
+				StringBuilder sb = new StringBuilder();
+				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
+				{
+					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
+					{
+						sb.Append(",(#" + mRelatedElements[0]);
+						break;
+					}
+				}
+				for (icounter++; icounter < mRelatedElements.Count; icounter++)
+				{
+					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
+						sb.Append(",#" + mRelatedElements[icounter]);
+				}
+				list = sb.ToString();
+			}
+			else
+			{
+				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
+				{
+					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
+					{
+						list = ",(#" + mRelatedElements[0];
+						break;
+					}
+
+				}
+				for (icounter++; icounter < mRelatedElements.Count; icounter++)
+				{
+					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
+						list += ",#" + mRelatedElements[icounter];
+				}
+			}
+			return base.BuildStringSTEP() + list + "),#" + mRelatingStructure;
+		}
+		internal static IfcRelReferencedInSpatialStructure Parse(string str)
+		{
+			IfcRelReferencedInSpatialStructure c = new IfcRelReferencedInSpatialStructure();
+			int pos = 0, len = str.Length;
+			c.Parse(str, ref pos, len);
+			c.mRelatedElements = ParserSTEP.StripListLink(str, ref pos, len);
+			c.mRelatingStructure = ParserSTEP.StripLink(str, ref pos, len);
+			return c;
+		}
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			IfcSpatialElement se = RelatingStructure;
+			if (se != null)
+				se.mReferencesElements.Add(this);
+			List<IfcProduct> products = RelatedElements;
+			for (int icounter = 0; icounter < products.Count; icounter++)
+				relate(products[icounter] as IfcProduct);
+		}
+		internal void add(IfcProduct product) { if (!mRelatedElements.Contains(product.mIndex)) { mRelatedElements.Add(product.mIndex); relate(product); } }
+		private void relate(IfcProduct product)
+		{
+			IfcElement element = product as IfcElement;
+			if (element != null)
+			{
+				if (element.mContainedInStructure != null)
+					element.mContainedInStructure.removeObject(element);
+				element.mReferencedInStructures.Add(this);
+			}
+			else
+			{
+				//IfcGrid grid = product as IfcGrid;
+				//if (grid != null)
+				//	grid.mContainedInStructure = this;
+				//else
+				//{
+				//	IfcAnnotation annotation = product as IfcAnnotation;
+				//	if (annotation != null)
+				//		annotation.mContainedInStructure = this;
+				//}
+			}
+		}
+		
+		internal void removeObject(IfcElement e)
+		{
+			e.mReferencedInStructures.Remove(this);
+			mRelatedElements.Remove(e.mIndex);
+		}
+	}
 	//ENTITY IfcRelSchedulesCostItems // DEPRECEATED IFC4 
 	public partial class IfcRelSequence : IfcRelConnects
 	{

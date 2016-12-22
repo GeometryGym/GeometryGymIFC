@@ -341,6 +341,7 @@ namespace GeometryGym.Ifc
 		internal IfcAnnotation() : base() { }
 		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a) : base(db,a,false) { }
 		public IfcAnnotation(DatabaseIfc db) : base(db) { }
+		public IfcAnnotation(IfcSpatialElement host) : base(host.Database) { host.AddElement(this); }
 		internal static IfcAnnotation Parse(string strDef) { int ipos = 0; IfcAnnotation a = new IfcAnnotation(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal static void parseFields(IfcAnnotation a, List<string> arrFields, ref int ipos)  { IfcProduct.parseFields(a,arrFields, ref ipos); }
 	}

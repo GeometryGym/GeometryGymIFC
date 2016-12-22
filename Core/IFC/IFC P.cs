@@ -2087,7 +2087,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		
+		internal override bool isEmpty { get { return mHasProperties.Count == 0; } }
 		public IfcProperty FindProperty(string name)
 		{
 			List<IfcProperty> props = HasProperties;
@@ -2164,7 +2164,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public abstract partial class IfcPropertySetDefinition : IfcPropertyDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcElementQuantity,IfcEnergyProperties ,
-	{ // IfcFluidFlowProperties,IfcPropertySet, IfcServiceLifeFactor ,IfcSoundProperties ,IfcSoundValue ,IfcSpaceThermalLoadProperties ))
+	{ // IfcFluidFlowProperties,IfcPropertySet, IfcServiceLifeFactor, IfcSoundProperties ,IfcSoundValue ,IfcSpaceThermalLoadProperties ))
 		//INVERSE
 		internal List<IfcTypeObject> mDefinesType = new List<IfcTypeObject>();// :	SET OF IfcTypeObject FOR HasPropertySets; IFC4change
 		internal List<IfcRelDefinesByTemplate> mIsDefinedBy = new List<IfcRelDefinesByTemplate>();//IsDefinedBy	 :	SET OF IfcRelDefinesByTemplate FOR RelatedPropertySets;
@@ -2208,6 +2208,7 @@ namespace GeometryGym.Ifc
 				return false;
 			}
 		}
+		internal virtual bool isEmpty { get { return false; } } 
 	}
 
 	public interface IfcPropertySetDefinitionSelect : IBaseClassIfc { }// = SELECT ( IfcPropertySetDefinitionSet,  IfcPropertySetDefinition);

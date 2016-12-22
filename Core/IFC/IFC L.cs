@@ -527,14 +527,15 @@ namespace GeometryGym.Ifc
 		internal double mLegSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure;
 		internal double mCentreOfGravityInX = double.NaN, mCentreOfGravityInY = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure 
 
-		public double Depth { get { return mDepth; } }
-		public double Width { get { return mWidth; } }
-		public double Thickness { get { return mThickness; } }
-		public double FilletRadius { get { return mFilletRadius; } }
-		public double EdgeRadius { get { return mEdgeRadius; } }
-		public double LegSlope { get { return mLegSlope; } }
-		public double CentreOfGravityInX { get { return mCentreOfGravityInX; } }
-		public double CentreOfGravityInY { get { return mCentreOfGravityInY; } }
+		public double Depth { get { return mDepth; } set { mDepth = value; } }
+		public double Width { get { return mWidth; } set { mWidth = value; } }
+		public double Thickness { get { return mThickness; } set { mThickness = value; } }
+		public double FilletRadius { get { return mFilletRadius; } set { mFilletRadius = value; } }
+		public double EdgeRadius { get { return mEdgeRadius; } set { mEdgeRadius = value; } }
+		public double LegSlope { get { return mLegSlope; } set { mLegSlope = value; } }
+		public double CentreOfGravityInX { get { return mCentreOfGravityInX; } set { mCentreOfGravityInX = value; } }
+		public double CentreOfGravityInY { get { return mCentreOfGravityInY; } set { mCentreOfGravityInY = value; } }
+
 		internal IfcLShapeProfileDef() : base() { }
 		internal IfcLShapeProfileDef(DatabaseIfc db, IfcLShapeProfileDef p) : base(db, p)
 		{

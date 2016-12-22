@@ -376,14 +376,10 @@ namespace GeometryGym.Ifc
 		internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
 
 		protected IfcShapeModel() : base() { }
-		protected IfcShapeModel(IfcRepresentationItem ri, string identifier, string repType) : base(ri, identifier, repType)
-		{
-			ContextOfItems = mDatabase.Factory.SubContext(string.Compare(identifier, "Axis", true) == 0 ? FactoryIfc.SubContextIdentifier.Axis : FactoryIfc.SubContextIdentifier.Body);
-		}
-		protected IfcShapeModel(List<IfcRepresentationItem> reps, string identifier, string repType) : base(reps, identifier, repType)
-		{
-			ContextOfItems = mDatabase.Factory.SubContext(string.Compare(identifier, "Axis", true) == 0 ? FactoryIfc.SubContextIdentifier.Axis : FactoryIfc.SubContextIdentifier.Body);
-		}
+		protected IfcShapeModel(IfcRepresentationItem ri, string identifier, string repType)
+			: base(ri.Database.Factory.SubContext(string.Compare(identifier, "Axis", true) == 0 ? FactoryIfc.SubContextIdentifier.Axis : FactoryIfc.SubContextIdentifier.Body), ri, identifier, repType) { }
+		protected IfcShapeModel(List<IfcRepresentationItem> reps, string identifier, string repType) 
+			: base(reps[0].Database.Factory.SubContext(string.Compare(identifier, "Axis", true) == 0 ? FactoryIfc.SubContextIdentifier.Axis : FactoryIfc.SubContextIdentifier.Body), reps, identifier, repType) { }
 		protected IfcShapeModel(DatabaseIfc db, IfcShapeModel m) : base(db, m)
 		{
 #warning todo
@@ -1091,10 +1087,12 @@ additional types	some additional representation types are given:
 									   //INVERSE
 		internal List<IfcRelContainedInSpatialStructure> mContainsElements = new List<IfcRelContainedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
 		internal List<IfcRelServicesBuildings> mServicedBySystems = new List<IfcRelServicesBuildings>();// : SET [0:?] OF IfcRelServicesBuildings FOR RelatedBuildings;	
+		internal List<IfcRelReferencedInSpatialStructure> mReferencesElements = new List<IfcRelReferencedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
 
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public List<IfcRelContainedInSpatialStructure> ContainsElements { get { return mContainsElements; } }
 		public List<IfcRelServicesBuildings> ServicedBySystems { get { return mServicedBySystems; } }
+		public List<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return mReferencesElements; } }
 
 		protected IfcSpatialElement() : base() { }
 		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, bool downStream) : base(db, e,downStream)
@@ -2421,9 +2419,8 @@ additional types	some additional representation types are given:
 			Styles = i.mStyles.ConvertAll(x => db.Factory.Duplicate(i.mDatabase[x]) as IfcStyleAssignmentSelect);
 			mName = i.mName;
 		}
-		public IfcStyledItem(IfcStyleAssignmentSelect style, string name) : base(style.Database)
+		public IfcStyledItem(IfcStyleAssignmentSelect style) : base(style.Database)
 		{
-			Name = name;
 			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
 			{
 				IfcPresentationStyle ps = style as IfcPresentationStyle;
@@ -2435,6 +2432,7 @@ additional types	some additional representation types are given:
 			else
 				mStyles.Add(style.Index);
 		}
+	
 		internal static IfcStyledItem Parse(string str) { IfcStyledItem i = new IfcStyledItem(); int pos = 0; i.Parse(str, ref pos, str.Length); return i; }
 		protected virtual void Parse(string str, ref int pos, int len)
 		{
@@ -2491,8 +2489,10 @@ additional types	some additional representation types are given:
 
 		internal IfcStyledRepresentation() : base() { }
 		internal IfcStyledRepresentation(DatabaseIfc db, IfcStyledRepresentation r) : base(db, r) { }
-		public IfcStyledRepresentation(IfcStyledItem ri) : base(ri) { }
-		public IfcStyledRepresentation(List<IfcStyledItem> reps) : base(reps.ConvertAll(x => x as IfcRepresentationItem)) { }
+		public IfcStyledRepresentation(IfcStyledItem ri) : base(ri.Database.Factory.SubContext(FactoryIfc.SubContextIdentifier.Body), ri) { }
+		public IfcStyledRepresentation(List<IfcStyledItem> reps) : base(reps[0].Database.Factory.SubContext(FactoryIfc.SubContextIdentifier.Body), reps.ConvertAll(x => x as IfcRepresentationItem)) { }
+		public IfcStyledRepresentation(IfcRepresentationContext context, IfcStyledItem ri) : base(context, ri) { }
+		public IfcStyledRepresentation(IfcRepresentationContext context, List<IfcStyledItem> reps) : base(context, reps.ConvertAll(x => x as IfcRepresentationItem)) { }
 		internal new static IfcStyledRepresentation Parse(string strDef)
 		{
 			IfcStyledRepresentation r = new IfcStyledRepresentation();
@@ -2505,8 +2505,8 @@ additional types	some additional representation types are given:
 	{
 		protected IfcStyleModel() : base() { }
 		protected IfcStyleModel(DatabaseIfc db, IfcStyleModel m) : base(db, m) { }
-		protected IfcStyleModel(IfcRepresentationItem ri) : base(ri) { }
-		protected IfcStyleModel(List<IfcRepresentationItem> reps) : base(reps, "", "") { }
+		protected IfcStyleModel(IfcRepresentationContext context, IfcRepresentationItem ri) : base(context, ri) { }
+		protected IfcStyleModel(IfcRepresentationContext context, List<IfcRepresentationItem> reps) : base(context,reps, "", "") { }
 
 		protected static void parseString(IfcStyleModel shape, string str, ref int pos) { IfcRepresentation.parseString(shape, str, ref pos, str.Length); }
 	}
@@ -2671,6 +2671,11 @@ additional types	some additional representation types are given:
 		internal IfcSurfaceStyle() : base() { }
 		internal IfcSurfaceStyle(DatabaseIfc db, IfcSurfaceStyle s) : base(db,s) { mSide = s.mSide; Styles = s.mStyles.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x]) as IfcSurfaceStyleElementSelect ); }
 		internal IfcSurfaceStyle(DatabaseIfc db) : base(db,"") { }
+		public IfcSurfaceStyle(IfcSurfaceStyleShading shading) : base(shading.Database,"") { mStyles.Add(shading.mIndex); }
+		public IfcSurfaceStyle(IfcSurfaceStyleLighting lighting) : base(lighting.Database,"") { mStyles.Add(lighting.mIndex); }
+		public IfcSurfaceStyle(IfcSurfaceStyleWithTextures textures) : base(textures.Database,"") { mStyles.Add(textures.mIndex); }
+		public IfcSurfaceStyle(IfcExternallyDefinedSurfaceStyle external) : base(external.Database,"") { mStyles.Add(external.mIndex); }
+		public IfcSurfaceStyle(IfcSurfaceStyleRefraction refraction) : base(refraction.Database,"") { mStyles.Add(refraction.mIndex); }
 		public IfcSurfaceStyle(IfcSurfaceStyleShading shading, IfcSurfaceStyleLighting lighting, IfcSurfaceStyleWithTextures textures, IfcExternallyDefinedSurfaceStyle external, IfcSurfaceStyleRefraction refraction)
 			:base(shading != null ? shading.mDatabase : (lighting != null ? lighting.mDatabase : (textures != null ? textures.mDatabase : (external != null ? external.mDatabase : refraction.mDatabase))),"")
 		{
