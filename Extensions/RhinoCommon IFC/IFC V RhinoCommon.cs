@@ -30,7 +30,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcVector : IfcGeometricRepresentationItem
 	{
-		internal Vector3d Vector { get { return Orientation.Vector * mMagnitude; } }
+		internal Vector3d Vector { get { return Orientation.Vector3d * mMagnitude; } }
 
 		public IfcVector(DatabaseIfc db, Vector3d v) : base(db) { Orientation = new IfcDirection(db, v); mMagnitude = v.Length; }
 	}

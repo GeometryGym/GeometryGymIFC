@@ -116,7 +116,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			ApplicableOccurrence = extractString(obj.GetValue("ApplicableOccurrence", StringComparison.InvariantCultureIgnoreCase));
-			HasPropertySets = mDatabase.extractJArray<IfcPropertySetDefinition>(obj.GetValue("HasPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcPropertySetDefinition>(obj.GetValue("HasPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddPropertySet(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
 		{
@@ -124,7 +124,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "ApplicableOccurrence", ApplicableOccurrence);
 			
 			if (mHasPropertySets.Count > 0)
-				obj["HasPropertySets"] = new JArray(HasPropertySets.ConvertAll(x => x.getJson(this, processed)));
+				obj["HasPropertySets"] = new JArray(HasPropertySets.ToList().ConvertAll(x => x.getJson(this, processed)));
 			//IfcRelDefinesByType objectTypeOf = ObjectTypeOf;
 			//if(objectTypeOf != null)
 			//	obj["ObjectTypeOf"] = objectTypeOf.getJson(this, processed);
@@ -135,14 +135,14 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RepresentationMaps = mDatabase.extractJArray<IfcRepresentationMap>(obj.GetValue("RepresentationMaps", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcRepresentationMap>(obj.GetValue("RepresentationMaps", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRepresentationMap(x));
 			Tag = extractString(obj.GetValue("Tag", StringComparison.InvariantCultureIgnoreCase));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
 			if(mRepresentationMaps.Count > 0)
-				obj["RepresentationMaps"] = new JArray(RepresentationMaps.ConvertAll(x=>x.getJson(this, processed)));
+				obj["RepresentationMaps"] = new JArray(RepresentationMaps.ToList().ConvertAll(x=>x.getJson(this, processed)));
 			setAttribute(obj, "Tag", Tag);
 		}
 	}

@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 					Position = mDatabase.ParseXml<IfcAxis2Placement2D>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPosition > 0)
@@ -66,36 +66,22 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "MiddleNames") == 0)
 				{
-					List<string> names = new List<string>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
-						names.Add(cn.InnerText);
-					MiddleNames = names;
+						AddMiddleName(cn.InnerText);
 				}
 				else if (string.Compare(name, "Roles") == 0)
 				{
-					List<IfcActorRole> roles = new List<IfcActorRole>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
-					{
-						IfcActorRole role = mDatabase.ParseXml<IfcActorRole>(cn as XmlElement);
-						if (role != null)
-							roles.Add(role);
-					}
-					Roles = roles;
+						AddRole( mDatabase.ParseXml<IfcActorRole>(cn as XmlElement));
 				}
 				else if (string.Compare(name, "Addresses") == 0)
 				{
-					List<IfcAddress> addresses = new List<IfcAddress>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
-					{
-						IfcAddress address = mDatabase.ParseXml<IfcAddress>(cn as XmlElement);
-						if (address != null)
-							addresses.Add(address);
-					}
-					Addresses = addresses;
+						AddAddress(mDatabase.ParseXml<IfcAddress>(cn as XmlElement));
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			string str = Identification;
@@ -139,7 +125,7 @@ namespace GeometryGym.Ifc
 					TheOrganization = mDatabase.ParseXml<IfcOrganization>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(ThePerson.GetXML(xml.OwnerDocument, "ThePerson", this, processed));
@@ -156,7 +142,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
@@ -171,7 +157,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcPipeFittingTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcPipeFittingTypeEnum.NOTDEFINED)
@@ -190,7 +176,7 @@ namespace GeometryGym.Ifc
 					Location = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Location.GetXML(xml.OwnerDocument, "Location", this, processed));
@@ -206,7 +192,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("SizeInY"))
 				mSizeInY = double.Parse(xml.Attributes["SizeInY"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("SizeInY", mSizeInY.ToString());
@@ -227,7 +213,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PointParameter"))
 				mPointParameter = double.Parse(xml.Attributes["PointParameter"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(BasisCurve.GetXML(xml.OwnerDocument, "BasisCurve", this, processed));
@@ -250,7 +236,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PointParameterV"))
 				mPointParameterV = double.Parse(xml.Attributes["PointParameterV"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(BasisSurface.GetXML(xml.OwnerDocument, "BasisSurface", this, processed));
@@ -268,18 +254,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Points") == 0)
 				{
-					List<IfcCartesianPoint> points = new List<IfcCartesianPoint>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcCartesianPoint p = mDatabase.ParseXml<IfcCartesianPoint>(cn as XmlElement);
 						if (p != null)
-							points.Add(p);
+							addPoint(p);
 					}
-					Points = points;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Points");
@@ -298,18 +282,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Polygon") == 0)
 				{
-					List<IfcCartesianPoint> points = new List<IfcCartesianPoint>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcCartesianPoint p = mDatabase.ParseXml<IfcCartesianPoint>(cn as XmlElement);
 						if (p != null)
-							points.Add(p);
+							addPoint(p);
 					}
-					Polygon = points;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Polygon");
@@ -330,10 +312,8 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "AddressLines") == 0)
 				{
-					List<string> lines = new List<string>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
-						lines.Add(cn.InnerText);
-					AddressLines = lines;
+						AddAddressLine(cn.InnerText);
 				}
 			}
 			if (xml.HasAttribute("PostalBox"))
@@ -348,7 +328,7 @@ namespace GeometryGym.Ifc
 				Country = xml.Attributes["Country"].Value;
 
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "InternalLocation", InternalLocation);
@@ -384,20 +364,18 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "AssignedItems") == 0)
 				{
-					List<IfcLayeredItem> items = new List<IfcLayeredItem>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcLayeredItem i = mDatabase.ParseXml<IfcLayeredItem>(cn as XmlElement);
 						if (i != null)
-							items.Add(i);
+							assign(i);
 					}
-					AssignedItems = items;
 				}
 			}
 			if (xml.HasAttribute("Identifier"))
 				Identifier = xml.Attributes["Identifier"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
@@ -425,18 +403,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "LayerStyles") == 0)
 				{
-					List<IfcPresentationStyle> styles = new List<IfcPresentationStyle>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcPresentationStyle s = mDatabase.ParseXml<IfcPresentationStyle>(cn as XmlElement);
 						if (s != null)
-							styles.Add(s);
+							addLayerStyle(s);
 					}
-					LayerStyles = styles;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("LayerOn", mLayerOn.ToString().ToLower());
@@ -459,7 +435,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Name"))
 				Name = xml.Attributes["Name"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
@@ -467,7 +443,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
 	{
-		
+
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -476,18 +452,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Styles") == 0)
 				{
-					List<IfcPresentationStyleSelect> styles = new List<IfcPresentationStyleSelect>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcPresentationStyleSelect s = mDatabase.ParseXml<IfcPresentationStyleSelect>(cn as XmlElement);
 						if (s != null)
-							styles.Add(s);
+							addStyle(s);
 					}
-					Styles = styles;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Styles");
@@ -510,7 +484,7 @@ namespace GeometryGym.Ifc
 					Representation = mDatabase.ParseXml<IfcProductRepresentation>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			XmlElement placement = (mPlacement > 0 ? Placement.GetXML(xml.OwnerDocument, "Placement", this, processed) : null);
 			base.SetXML(xml, host, processed);
@@ -548,7 +522,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mHasShapeAspects.Count > 0)
@@ -575,18 +549,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Representations") == 0)
 				{
-					List<IfcRepresentation> reps = new List<IfcRepresentation>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcRepresentation r = mDatabase.ParseXml<IfcRepresentation>(cn as XmlElement);
 						if (r != null)
-							reps.Add(r);
+							AddRepresentation(r);
 					}
-					Representations = reps;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
@@ -610,7 +582,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("ProfileName"))
 				ProfileName = xml.Attributes["ProfileName"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("ProfileType", mProfileType.ToString().ToLower());
@@ -634,7 +606,7 @@ namespace GeometryGym.Ifc
 					MapUnit = mDatabase.ParseXml<IfcNamedUnit>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "MapProjection", MapProjection);
@@ -653,7 +625,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
@@ -681,7 +653,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mHasAssociations.Count > 0)
@@ -726,7 +698,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mHasExternalReferences.Count > 0)
@@ -762,11 +734,11 @@ namespace GeometryGym.Ifc
 							mEnumerationValues.Add(val);
 					}
 				}
-				else if (string.Compare(name,"EnumerationReference") == 0)
+				else if (string.Compare(name, "EnumerationReference") == 0)
 					EnumerationReference = mDatabase.ParseXml<IfcPropertyEnumeration>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("EnumerationValues");
@@ -774,6 +746,40 @@ namespace GeometryGym.Ifc
 				element.AppendChild(convert(xml.OwnerDocument, value, ""));
 			if (mEnumerationReference > 0)
 				element.AppendChild(EnumerationReference.GetXML(xml.OwnerDocument, "EnumerationReference", this, processed));
+		}
+	}
+	public partial class IfcPropertyEnumeration : IfcPropertyAbstraction
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			Name = extractString(xml, "Name");
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "EnumerationValues") == 0)
+				{
+					foreach (XmlNode node in child.ChildNodes)
+					{
+						IfcValue val = extractValue(node);
+						if (val != null)
+							mEnumerationValues.Add(val);
+					}
+				}
+				else if (string.Compare(name, "Unit") == 0)
+					Unit = mDatabase.ParseXml<IfcUnit>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+			XmlElement element = xml.OwnerDocument.CreateElement("EnumerationValues");
+			xml.AppendChild(element);
+			foreach (IfcValue val in mEnumerationValues)
+				element.AppendChild(convert(xml.OwnerDocument, val, ""));
+			if (mUnit > 0)
+				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
 		}
 	}
 	public partial class IfcPropertySet : IfcPropertySetDefinition
@@ -785,13 +791,13 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "HasProperties") == 0)
-					HasProperties = mDatabase.ParseXMLList<IfcProperty>(child);
+					mDatabase.ParseXMLList<IfcProperty>(child).ForEach(x=>AddProperty(x));
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			setChild(xml, "HasProperties", HasProperties, processed);	
+			setChild(xml, "HasProperties", mPropertyIndices.ConvertAll(x=>mDatabase[x]), processed);	
 		}
 	}
 	public partial class IfcPropertySetDefinition : IfcPropertyDefinition
@@ -810,7 +816,7 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "IsDefinedBy") == 0)
 				{
 					foreach (IfcRelDefinesByTemplate r in mDatabase.ParseXMLList<IfcRelDefinesByTemplate>(child))
-						r.assign(this);
+						r.AddRelated(this);
 				}
 				else if (string.Compare(name, "DefinesOccurrence") == 0)
 				{
@@ -819,7 +825,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			setChild(xml, "IsDefinedBy", IsDefinedBy, processed);
@@ -838,10 +844,10 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "HasPropertyTemplates") == 0)
-					HasPropertyTemplates = mDatabase.ParseXMLList<IfcPropertyTemplate>(child);
+					mDatabase.ParseXMLList<IfcPropertyTemplate>(child).ForEach(x=>addPropertyTemplate(x));
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mTemplateType != IfcPropertySetTemplateTypeEnum.NOTDEFINED)
@@ -851,7 +857,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public partial class IfcPropertySingleValue : IfcSimpleProperty
-	{//INVERSE
+	{
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -864,7 +870,7 @@ namespace GeometryGym.Ifc
 					Unit = mDatabase.ParseXml<IfcUnit>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mNominalValue != null)
@@ -888,7 +894,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcPumpTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcPumpTypeEnum.NOTDEFINED)

@@ -123,7 +123,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
-			obj["CountValue"] = VolumeValue;
+			obj["VolumeValue"] = VolumeValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
 

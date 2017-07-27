@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -104,7 +105,11 @@ namespace GeometryGym.Ifc
 		internal new static IfcLampType Parse(string strDef) { IfcLampType t = new IfcLampType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
-	public interface IfcLayeredItem : IBaseClassIfc { List<IfcPresentationLayerAssignment> LayerAssignments { get; } }// = SELECT(IfcRepresentationItem, IfcRepresentation);
+	public interface IfcLayeredItem : IBaseClassIfc // = SELECT(IfcRepresentationItem, IfcRepresentation);
+	{
+		ReadOnlyCollection<IfcPresentationLayerAssignment> LayerAssignments { get; }
+		void AssignLayer(IfcPresentationLayerAssignment layer);
+	}
 	public partial class IfcLibraryInformation : IfcExternalInformation
 	{
 		internal string mName;// :	IfcLabel;
@@ -382,6 +387,7 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPnt) + "," + ParserSTEP.LinkToString(mDir); }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcLinearDimension : IfcDimensionCurveDirectedCallout // DEPRECEATED IFC4
 	{
 		internal IfcLinearDimension() : base() { }
@@ -441,6 +447,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)
+		
 		{
 			if (relativeTo != null)
 			{
@@ -455,7 +462,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0)
 				return "";
-			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementRelTo) + "," + ParserSTEP.LinkToString(mRelativePlacement == 0 ? mDatabase.Factory.PlaneXYPlacement.mIndex : mRelativePlacement);
+			return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mPlacementRelTo) + "," + ParserSTEP.LinkToString(mRelativePlacement == 0 ? mDatabase.Factory.XYPlanePlacement.mIndex : mRelativePlacement);
 		}
 
 		internal override void postParseRelate()
@@ -465,17 +472,29 @@ namespace GeometryGym.Ifc
 				PlacementRelTo.mReferencedByPlacements.Add(this);
 		}
 
-		internal override bool isWorldXY
+		internal override bool isXYPlane
 		{
 			get
 			{
-				if (RelativePlacement.IsWorldXY && (mPlacementRelTo == 0 || PlacementRelTo.isWorldXY))
+				IfcLocalPlacement placement = PlacementRelTo as IfcLocalPlacement;
+				if (RelativePlacement.IsXYPlane && (placement == null || placement.isXYPlane))
 					return true;
-				//
 				return false;
 			}
 		}
+		//internal override bool isWorldXY
+		//{
+		//	get
+		//	{
+		//		base.isWorldXY
+		//		if (mIndex == mDatabase.Factory.WorldCoordinatePlacement.mIndex)
+		//			return true;
+		//		IfcLocalPlacement placement = PlacementRelTo as IfcLocalPlacement;
+		//		return RelativePlacement.IsXYPlane && (placement != null && placement.isWorldXY);
+		//	}
+		//}
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcLocalTime : BaseClassIfc, IfcDateTimeSelect // DEPRECEATED IFC4
 	{
 		internal int mHourComponent;// : IfcHourInDay;

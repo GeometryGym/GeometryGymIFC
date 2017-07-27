@@ -27,5 +27,5 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	 
+	
 }

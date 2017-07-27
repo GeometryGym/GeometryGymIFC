@@ -36,6 +36,7 @@ namespace GeometryGym.Ifc
 	{
 		internal virtual void parseJObject(JObject obj) { }
 		//internal JObject obj = null;
+		
 		internal JObject getJson(BaseClassIfc host, HashSet<int> processed)
 		{
 			if(processed.Contains(mIndex))

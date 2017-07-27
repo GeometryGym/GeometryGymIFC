@@ -17,12 +17,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections;
-using System.Text;
-using System.Reflection;
-using System.IO;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GeometryGym.STEP
 {
@@ -30,12 +32,20 @@ namespace GeometryGym.STEP
 	{
 		internal int mIndex = 0; 
 		internal List<string> mComments = new List<string>();
+		internal string mSTEPString = "";
 
 		public int Index { get { return mIndex; } }
 		public List<string> Comments { get { return mComments; } set { mComments = value; } }
 
+		protected static  ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
+		protected static ConcurrentDictionary<string, MethodInfo> mConstructorsSchema = new ConcurrentDictionary<string, MethodInfo>();
+		protected static ConcurrentDictionary<string, MethodInfo> mConstructorsNoSchema = new ConcurrentDictionary<string, MethodInfo>();
+
+		internal STEPEntity() { }
+		internal STEPEntity(int record, string kw, string line) { mIndex = record; mSTEPString = line; }
 		public virtual string KeyWord {get { return this.GetType().Name;}}
 
+		internal virtual void Initialize() { }
 		public override string ToString()
 		{
 			string str = BuildStringSTEP();

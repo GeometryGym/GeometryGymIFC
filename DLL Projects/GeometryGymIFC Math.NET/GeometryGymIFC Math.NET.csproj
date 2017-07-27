@@ -38,6 +38,10 @@
       <HintPath>..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -133,6 +137,81 @@
     <Compile Include="..\..\core\ifc\IFC Z.cs">
       <Link>IFC\Core\IFC Z.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\BaseClassIFC JSON.cs">
+      <Link>IFC\JSON\BaseClassIFC JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\DatabaseIFC JSON.cs">
+      <Link>IFC\JSON\DatabaseIFC JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC A JSON.cs">
+      <Link>IFC\JSON\IFC A JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC B JSON.cs">
+      <Link>IFC\JSON\IFC B JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC C JSON.cs">
+      <Link>IFC\JSON\IFC C JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC D JSON.cs">
+      <Link>IFC\JSON\IFC D JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC E JSON.cs">
+      <Link>IFC\JSON\IFC E JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC F JSON.cs">
+      <Link>IFC\JSON\IFC F JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC G JSON.cs">
+      <Link>IFC\JSON\IFC G JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC H JSON.cs">
+      <Link>IFC\JSON\IFC H JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC I JSON.cs">
+      <Link>IFC\JSON\IFC I JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC J JSON.cs">
+      <Link>IFC\JSON\IFC J JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC L JSON.cs">
+      <Link>IFC\JSON\IFC L JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC M JSON.cs">
+      <Link>IFC\JSON\IFC M JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC N JSON.cs">
+      <Link>IFC\JSON\IFC N JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC O JSON.cs">
+      <Link>IFC\JSON\IFC O JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC P JSON.cs">
+      <Link>IFC\JSON\IFC P JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC Q JSON.cs">
+      <Link>IFC\JSON\IFC Q JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC R JSON.cs">
+      <Link>IFC\JSON\IFC R JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC S JSON.cs">
+      <Link>IFC\JSON\IFC S JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC T JSON.cs">
+      <Link>IFC\JSON\IFC T JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC U JSON.cs">
+      <Link>IFC\JSON\IFC U JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC V JSON.cs">
+      <Link>IFC\JSON\IFC V JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC W JSON.cs">
+      <Link>IFC\JSON\IFC W JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC Z JSON.cs">
+      <Link>IFC\JSON\IFC Z JSON.cs</Link>
+    </Compile>
     <Compile Include="..\..\core\ifc\ParserIFC.cs">
       <Link>IFC\Core\ParserIFC.cs</Link>
     </Compile>
@@ -219,6 +298,9 @@
     </Compile>
     <Compile Include="..\..\core\step\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\STEP\DatabaseSTEP.cs">
+      <Link>STEP\DatabaseSTEP.cs</Link>
     </Compile>
     <Compile Include="..\..\core\step\ParserSTEP.cs">
       <Link>STEP\ParserSTEP.cs</Link>

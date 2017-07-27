@@ -80,7 +80,7 @@ namespace GeometryGym.Ifc
 				Category = token.Value<string>();
 
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
 
@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 				Priority = token.Value<double>();
 
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
 
@@ -137,16 +137,39 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			MaterialLayers = mDatabase.extractJArray<IfcMaterialLayer>(obj.GetValue("MaterialLayers", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcMaterialLayer>(obj.GetValue("MaterialLayers", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addMaterialLayer(x));
 			LayerSetName = extractString(obj.GetValue("LayerSetName", StringComparison.InvariantCultureIgnoreCase));
 			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
-			obj["MaterialLayers"] = new JArray(MaterialLayers.ConvertAll(x => x.getJson(this, processed)));
+			obj["MaterialLayers"] = new JArray(MaterialLayers.ToList().ConvertAll(x => x.getJson(this, processed)));
 			setAttribute(obj, "LayerSetName", Name);
 			setAttribute(obj, "Description", Description);
+		}
+	}
+	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("ValueComponent", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				mValueComponent = DatabaseIfc.ParseValue(jobj);
+			JObject jo = obj.GetValue("UnitComponent", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jo != null)
+				UnitComponent = mDatabase.parseJObject<IfcUnit>(jo);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.setJSON(obj, host, processed);
+			IfcValue value = mValueComponent; 
+			if (value != null)
+				obj["ValueComponent"] = DatabaseIfc.extract(value);
+			IfcUnit unit = UnitComponent;
+			if (unit != null)
+				obj["UnitComponent"] = mDatabase[mUnitComponent].getJson(this, processed);
 		}
 	}
 	public partial class IfcMetric : IfcConstraint

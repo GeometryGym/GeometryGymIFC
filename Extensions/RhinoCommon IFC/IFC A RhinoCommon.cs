@@ -29,7 +29,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
-		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector : Vector3d.XAxis); } }
+		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector3d : Vector3d.XAxis); } }
 
 		public override Plane Plane
 		{
@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
-		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? RefDirection.Vector : Vector3d.XAxis); } }
+		internal Vector3d DirectionVector { get { return (mRefDirection > 0 ? RefDirection.Vector3d : Vector3d.XAxis); } }
 
 		internal IfcAxis2Placement2D(DatabaseIfc db, Point2d position, Vector2d dir) : base(db, position)
 		{
@@ -93,8 +93,8 @@ namespace GeometryGym.Ifc
 				{
 					Point3d orig = LocationPoint;
 					IfcDirection axis = Axis, refDirection = RefDirection;
-					Vector3d norm = axis == null ? Vector3d.ZAxis : axis.Vector;
-					Vector3d xaxis = refDirection == null ? Vector3d.XAxis : refDirection.Vector;
+					Vector3d norm = axis == null ? Vector3d.ZAxis : axis.Vector3d;
+					Vector3d xaxis = refDirection == null ? Vector3d.XAxis : refDirection.Vector3d;
 					Vector3d yAxis = Vector3d.CrossProduct(norm, xaxis);
 					mPlane = new Plane(orig, xaxis, yAxis);
 				}

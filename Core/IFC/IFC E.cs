@@ -18,11 +18,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
-using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -73,6 +74,7 @@ namespace GeometryGym.Ifc
 			EdgeGeometry.mEdge = this;
 		}
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECEATED IFC4
 	{
 		internal double mFeatureLength;// OPTIONAL IfcPositiveLengthMeasure; 
@@ -84,9 +86,9 @@ namespace GeometryGym.Ifc
 	public partial class IfcEdgeLoop : IfcLoop
 	{
 		internal List<int> mEdgeList = new List<int>();// LIST [1:?] OF IfcOrientedEdge;
-		public List<IfcOrientedEdge> EdgeList { get { return mEdgeList.ConvertAll(x => mDatabase[x] as IfcOrientedEdge); } set { mEdgeList = value.ConvertAll(x => x.mIndex); } }
+		public ReadOnlyCollection<IfcOrientedEdge> EdgeList { get { return new ReadOnlyCollection<IfcOrientedEdge>(mEdgeList.ConvertAll(x => mDatabase[x] as IfcOrientedEdge)); } }
 		internal IfcEdgeLoop() : base() { }
-		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l) : base(db,l) { EdgeList = l.EdgeList.ConvertAll(x => db.Factory.Duplicate(x) as IfcOrientedEdge); }
+		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l) : base(db,l) { l.EdgeList.ToList().ForEach(x => addEdge( db.Factory.Duplicate(x) as IfcOrientedEdge)); }
 		public IfcEdgeLoop(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
 		public IfcEdgeLoop(IfcOrientedEdge edge1, IfcOrientedEdge edge2) : base(edge1.mDatabase) { mEdgeList.Add(edge1.mIndex); mEdgeList.Add(edge2.mIndex); }
 		public IfcEdgeLoop(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { mEdgeList = edges.ConvertAll(x => x.mIndex); }
@@ -107,6 +109,8 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mEdgeList[icounter]);
 			return str + ")";
 		}
+
+		internal void addEdge(IfcOrientedEdge edge) { mEdgeList.Add(mIndex); }
 	}
 	public partial class IfcElectricAppliance : IfcFlowTerminal //IFC4
 	{
@@ -172,6 +176,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcElectricDistributionBoardType Parse(string strDef) { IfcElectricDistributionBoardType t = new IfcElectricDistributionBoardType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECEATED IFC4
 	{
 		internal IfcElectricDistributionPointFunctionEnum mDistributionPointFunction;// : IfcElectricDistributionPointFunctionEnum;
@@ -259,6 +264,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcElectricGeneratorType Parse(string strDef) { IfcElectricGeneratorType t = new IfcElectricGeneratorType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcElectricHeaterType : IfcFlowTerminalType // DEPRECEATED IFC4
 	{
 		internal IfcElectricHeaterTypeEnum mPredefinedType = IfcElectricHeaterTypeEnum.NOTDEFINED;// : IfcElectricHeaterTypeEnum
@@ -337,19 +343,22 @@ namespace GeometryGym.Ifc
 		internal new static IfcElectricTimeControlType Parse(string strDef) { IfcElectricTimeControlType t = new IfcElectricTimeControlType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
+	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcElectricalBaseProperties // DEPRECEATED IFC4
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcElectricalCircuit : IfcSystem // DEPRECEATED IFC4
 	{
 		internal IfcElectricalCircuit() : base() { }
-		internal IfcElectricalCircuit(DatabaseIfc db, IfcElectricalCircuit c) : base(db,c) { }
+		internal IfcElectricalCircuit(DatabaseIfc db, IfcElectricalCircuit c, bool downStream) : base(db,c,downStream) { }
 		internal new static IfcElectricalCircuit Parse(string strDef) { IfcElectricalCircuit c = new IfcElectricalCircuit(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 		internal static void parseFields(IfcElectricalCircuit c, List<string> arrFields, ref int ipos) { IfcSystem.parseFields(c, arrFields, ref ipos); }
 	}
+	[Obsolete("DEPRECEATED IFC2x2", false)]
 	public partial class IfcElectricalElement : IfcElement  /* DEPRECEATED IFC2x2*/ {  	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
-		
+
 		//INVERSE  
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal List<IfcRelConnectsElements> mConnectedTo = new List<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
@@ -370,20 +379,20 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMember = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
-		public List<IfcRelFillsElement> FillsVoids { get { return mFillsVoids; }  }
-		public List<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
-		public List<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
-		public List<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
-		public List<IfcRelProjectsElement> HasProjections { get { return mHasProjections; } }
-		public List<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
-		public List<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
-		public List<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
-		public List<IfcRelSpaceBoundary> ProvidesBoundaries { get { return mProvidesBoundaries; } }
-		public List<IfcRelConnectsElements> ConnectedFrom { get { return mConnectedFrom; } }
+		public ReadOnlyCollection<IfcRelFillsElement> FillsVoids { get { return new ReadOnlyCollection<IfcRelFillsElement>(mFillsVoids); } }
+		public ReadOnlyCollection<IfcRelConnectsElements> ConnectedTo { get { return new ReadOnlyCollection<IfcRelConnectsElements>(mConnectedTo); } }
+		public ReadOnlyCollection<IfcRelInterferesElements> IsInterferedByElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mIsInterferedByElements); } }
+		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
+		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
+		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
+		public ReadOnlyCollection<IfcRelVoidsElement> HasOpenings { get { return new ReadOnlyCollection<IfcRelVoidsElement>(mHasOpenings); } }
+		public ReadOnlyCollection<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return new ReadOnlyCollection<IfcRelConnectsWithRealizingElements>(mIsConnectionRealization); } }
+		public ReadOnlyCollection<IfcRelSpaceBoundary> ProvidesBoundaries { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>(mProvidesBoundaries); } }
+		public ReadOnlyCollection<IfcRelConnectsElements> ConnectedFrom { get { return new ReadOnlyCollection<IfcRelConnectsElements>(mConnectedFrom); } }
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
-		public List<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return mAssignedStructuralActivity; } }
+		public ReadOnlyCollection<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return new ReadOnlyCollection<IfcRelConnectsStructuralActivity>(mAssignedStructuralActivity); } }
 
-		public List<IfcRelCoversBldgElements> HasCoverings { get { return mHasCoverings; } }
+		public ReadOnlyCollection<IfcRelCoversBldgElements> HasCoverings { get { return new ReadOnlyCollection<IfcRelCoversBldgElements>(mHasCoverings); } }
 		//GEOMGYM
 		//List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
@@ -394,43 +403,41 @@ namespace GeometryGym.Ifc
 #warning todo finish inverse
 		}
 		protected IfcElement(DatabaseIfc db) : base(db) { }
-		protected IfcElement(DatabaseIfc db, IfcElement e, bool downStream) : base(db, e,downStream)
+		protected IfcElement(DatabaseIfc db, IfcElement e, bool downStream) : base(db, e, downStream)
 		{
 			mTag = e.mTag;
 #warning todo finish inverse
-			
+
 			foreach (IfcRelVoidsElement ve in e.mHasOpenings)
 			{
 				IfcRelVoidsElement dve = db.Factory.Duplicate(ve) as IfcRelVoidsElement;
 				dve.RelatingBuildingElement = this;
 			}
-			foreach(IfcRelConnectsElements ce in e.mConnectedTo)
+			List<IfcRelConnectsElements> rces = e.ConnectedTo.ToList();
+			rces.AddRange(e.ConnectedFrom);
+			foreach (IfcRelConnectsElements ce in rces)
 			{
-				IfcElement element = ce.RelatingElement;
-				if(db.Factory.mDuplicateMapping.ContainsKey(element.mIndex))
+				IfcElement relating = ce.RelatingElement, related = ce.RelatedElement;
+				if (relating.mIndex != e.mIndex && db.Factory.mDuplicateMapping.ContainsKey(relating.mIndex))
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce,false) as IfcRelConnectsElements;
 					rce.RelatedElement = this;
-					rce.RelatingElement = db[db.Factory.mDuplicateMapping[element.mIndex]] as IfcElement;
+					rce.RelatedElement = db[db.Factory.mDuplicateMapping[relating.mIndex]] as IfcElement;
 				}
-			}
-			foreach (IfcRelConnectsElements ce in e.mConnectedFrom)
-			{
-				IfcElement element = ce.RelatedElement;
-				if (db.Factory.mDuplicateMapping.ContainsKey(element.mIndex))
+				if (related.mIndex != e.mIndex && db.Factory.mDuplicateMapping.ContainsKey(related.mIndex))
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce,false) as IfcRelConnectsElements;
 					rce.RelatingElement = this;
-					rce.RelatedElement = db[db.Factory.mDuplicateMapping[element.mIndex]] as IfcElement;
+					rce.RelatingElement = db[db.Factory.mDuplicateMapping[related.mIndex]] as IfcElement;
 				}
 			}
-			foreach(IfcRelVoidsElement ve in e.mHasOpenings)
+			foreach (IfcRelVoidsElement ve in e.mHasOpenings)
 			{
 				IfcRelVoidsElement rv = db.Factory.Duplicate(ve) as IfcRelVoidsElement;
 				rv.RelatingBuildingElement = this;
 			}
 			if (e.mContainedInStructure != null)
-				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).add(this);
+				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).addRelated(this);
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
 			{
 				IfcRelConnectsStructuralActivity rc = db.Factory.Duplicate(rcss) as IfcRelConnectsStructuralActivity;
@@ -444,14 +451,14 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
-		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host,new IfcLocalPlacement(host.Placement,placement), null)
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
 		{
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			IfcCartesianPoint cp = new IfcCartesianPoint(mDatabase, 0, 0, length);
 			IfcPolyline ipl = new IfcPolyline(mDatabase.Factory.Origin, cp);
 			reps.Add(IfcShapeRepresentation.GetAxisRep(ipl));
-			
-			profile.Associates.addAssociation(this);
+
+			profile.Associates.addRelated(this);
 
 			IfcMaterialProfileSet ps = profile.ForProfileSet;
 			IfcMaterialProfileSetUsageTapering psut = profile as IfcMaterialProfileSetUsageTapering;
@@ -468,24 +475,24 @@ namespace GeometryGym.Ifc
 					throw new Exception("Profile not provided");
 			}
 			if (pd != null)
-				reps.Add(new IfcShapeRepresentation( new IfcExtrudedAreaSolid(pd, pd.CalculateTransform(profile.CardinalPoint), length))); 
-			
+				reps.Add(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(pd, pd.CalculateTransform(profile.CardinalPoint), length)));
+
 			Representation = new IfcProductDefinitionShape(reps);
-		
+
 		}
-		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double,double> arcOrigin, double arcAngle) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
 		{
 			IfcMaterialProfileSet ps = profile.ForProfileSet;
-			profile.Associates.addAssociation(this);
+			profile.Associates.addRelated(this);
 			IfcMaterialProfile mp = ps.MaterialProfiles[0];
 			IfcProfileDef pd = mp.Profile;
-			DatabaseIfc db = host.mDatabase; 
+			DatabaseIfc db = host.mDatabase;
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			double length = Math.Sqrt(Math.Pow(arcOrigin.Item1, 2) + Math.Pow(arcOrigin.Item2, 2)), angMultipler = 1 / mDatabase.mContext.UnitsInContext.getScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			Tuple<double, double> normal = new Tuple<double, double>(-arcOrigin.Item2 / length, arcOrigin.Item1 / length);
-			reps.Add(IfcShapeRepresentation.GetAxisRep(new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db,arcOrigin.Item1,arcOrigin.Item2,0),new IfcDirection(db, normal.Item1,normal.Item2, 0), new IfcDirection(db,-arcOrigin.Item1,-arcOrigin.Item2,0)),length),new IfcTrimmingSelect(0),new IfcTrimmingSelect(arcAngle*angMultipler),true, IfcTrimmingPreference.PARAMETER)));
+			reps.Add(IfcShapeRepresentation.GetAxisRep(new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db, arcOrigin.Item1, arcOrigin.Item2, 0), new IfcDirection(db, normal.Item1, normal.Item2, 0), new IfcDirection(db, -arcOrigin.Item1, -arcOrigin.Item2, 0)), length), new IfcTrimmingSelect(0), new IfcTrimmingSelect(arcAngle * angMultipler), true, IfcTrimmingPreference.PARAMETER)));
 			IfcAxis2Placement3D translation = pd.CalculateTransform(profile.CardinalPoint);
-			Tuple<double,double,double> pt = translation.Location.Coordinates;
+			Tuple<double, double, double> pt = translation.Location.Coordinates;
 			IfcAxis1Placement axis = new IfcAxis1Placement(new IfcCartesianPoint(db, arcOrigin.Item1 - pt.Item1, arcOrigin.Item2 - pt.Item2), new IfcDirection(db, normal.Item1, normal.Item2));
 			reps.Add(new IfcShapeRepresentation(new IfcRevolvedAreaSolid(pd, translation, axis, arcAngle * angMultipler)));
 			Representation = new IfcProductDefinitionShape(reps);
@@ -502,7 +509,7 @@ namespace GeometryGym.Ifc
 		{
 			get { return GetMaterialSelect(); }
 			set { this.setMaterial(value); }
-		}	
+		}
 		protected override IfcMaterialSelect GetMaterialSelect()
 		{
 			IfcMaterialSelect m = base.GetMaterialSelect();
@@ -522,6 +529,12 @@ namespace GeometryGym.Ifc
 			if (mDecomposes != null)
 				return mDecomposes.RelatingObject as IfcProduct;
 			return (mContainedInStructure != null ? mContainedInStructure.RelatingStructure : null);
+		}
+		internal override void detachFromHost()
+		{
+			base.detachFromHost();
+			if (mContainedInStructure != null)
+				mContainedInStructure.removeObject(this);
 		}
 		internal static IfcElement constructElement(string className, IfcObjectDefinition container, IfcObjectPlacement pl, IfcProductRepresentation r) { return constructElement(className, container, pl, r, null); }
 		internal static IfcElement constructElement(string className, IfcObjectDefinition host, IfcObjectPlacement pl, IfcProductRepresentation r, IfcDistributionSystem system)
@@ -545,7 +558,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				if (ctor == null)
 				{
 					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation), typeof(IfcDistributionSystem) },null);
+null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation), typeof(IfcDistributionSystem) }, null);
 					if (ctor == null)
 						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 					else
@@ -553,7 +566,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				}
 				else
 					element = ctor.Invoke(new object[] { host, pl, r }) as IfcElement;
-				
+
 			}
 			if (element == null)
 				element = new IfcBuildingElementProxy(host, pl, r);
@@ -595,7 +608,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			return element;
 		}
-		public void AddStructuralMember(IfcStructuralMember m)
+		public void AddMember(IfcStructuralMember m)
 		{
 			if (m == null)
 				return;
@@ -618,6 +631,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				IfcRelAssignsToProduct rap = new IfcRelAssignsToProduct(m, this) { Name = s };
 			}
 		}
+		public void AssignStructuralActivity(IfcRelConnectsStructuralActivity connects) { mAssignedStructuralActivity.Add(connects); }
 	}
 	public abstract partial class IfcElementarySurface : IfcSurface //	ABSTRACT SUPERTYPE OF(ONEOF(IfcCylindricalSurface, IfcPlane))
 	{
@@ -671,19 +685,19 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			return (empty ? "" : base.BuildStringSTEP() + ",." + mAssemblyPlace.ToString() + ".,." + mPredefinedType.ToString() + ".");
 		}
-		public override bool AddElement(IfcProduct s)
+		protected override bool addProduct(IfcProduct product)
 		{
 			if (mIsDecomposedBy.Count == 0 || mIsDecomposedBy[0].mRelatedObjects.Count == 0)
 			{
-				IfcProduct product = mHost as IfcProduct;
-				if(product != null)
-					product.AddElement(this);
+				IfcProduct hostproduct = mHost as IfcProduct;
+				if(hostproduct != null)
+					hostproduct.AddElement(this);
 				else
 				{
 					new IfcRelAggregates(mHost, this);
 				}
 			}
-			return base.AddElement(s);
+			return base.addProduct(product);
 		}
 	}
 	public partial class IfcElementAssemblyType : IfcElementType //IFC4
@@ -726,15 +740,15 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal List<int> mQuantities = new List<int>();// : SET [1:?] OF IfcPhysicalQuantity; 
 
 		public string MethodOfMeasurement { get { return (mMethodOfMeasurement == "$" ? "" : ParserIfc.Decode(mMethodOfMeasurement)); } set { mMethodOfMeasurement = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public List<IfcPhysicalQuantity> Quantities { get { return mQuantities.ConvertAll(x => mDatabase[x] as IfcPhysicalQuantity); } set { mQuantities = value.ConvertAll(x => x.mIndex); } }
-		
+		public ReadOnlyCollection<IfcPhysicalQuantity> Quantities { get { return new ReadOnlyCollection<IfcPhysicalQuantity>(mQuantities.ConvertAll(x => mDatabase[x] as IfcPhysicalQuantity)); } }
+
 		internal IfcElementQuantity() : base() { }
-		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q) : base(db, q) { mMethodOfMeasurement = q.mMethodOfMeasurement; Quantities = q.Quantities.ConvertAll(x => db.Factory.Duplicate(x) as IfcPhysicalQuantity); }
+		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q) : base(db, q) { mMethodOfMeasurement = q.mMethodOfMeasurement;  q.Quantities.ToList().ForEach(x => addQuantity( db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
+		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.AddRelated(obj); }
+		protected IfcElementQuantity(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.AddPropertySet(this); }
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
-		public IfcElementQuantity(string name, List<IfcPhysicalQuantity> quantities) : base(quantities[0].mDatabase, name)
-		{
-			Quantities = quantities;
-		}
+		public IfcElementQuantity(string name, IfcPhysicalQuantity quantity) : base(quantity.mDatabase, name) { addQuantity(quantity); }
+		public IfcElementQuantity(string name, IEnumerable<IfcPhysicalQuantity> quantities) : base(quantities.First().mDatabase, name) { foreach(IfcPhysicalQuantity q in quantities) addQuantity(q); }
 		internal static IfcElementQuantity Parse(string strDef) { IfcElementQuantity q = new IfcElementQuantity(); int ipos = 0; parseFields(q, ParserSTEP.SplitLineFields(strDef), ref ipos); return q; }
 		internal static void parseFields(IfcElementQuantity q, List<string> arrFields, ref int ipos) { IfcPropertySetDefinition.parseFields(q, arrFields, ref ipos); q.mMethodOfMeasurement = arrFields[ipos++].Replace("'", ""); q.mQuantities = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
@@ -752,7 +766,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			{
 				if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
 				{
-					List<IfcPhysicalQuantity> quants = Quantities;
+					ReadOnlyCollection<IfcPhysicalQuantity> quants = Quantities;
 					if (reference.mListPositions.Count == 0)
 					{
 						string name = reference.InstanceName;
@@ -779,7 +793,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
 			{
-				List<IfcPhysicalQuantity> quants = Quantities;
+				ReadOnlyCollection<IfcPhysicalQuantity> quants = Quantities;
 				if (reference.mListPositions.Count == 0)
 				{
 					string name = reference.InstanceName;
@@ -808,6 +822,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			return base.retrieveReference(reference);
 		}
 		internal override bool isEmpty { get { return mQuantities.Count == 0; } }
+
+		internal void addQuantity(IfcPhysicalQuantity quantity) { mQuantities.Add(quantity.mIndex); }
 	}
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))
 	{
@@ -839,14 +855,19 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			element.RelatingType = this;
 			return element;
 		}
+
 	}
 	public partial class IfcEllipse : IfcConic
 	{
 		internal double mSemiAxis1;// : IfcPositiveLengthMeasure;
 		internal double mSemiAxis2;// : IfcPositiveLengthMeasure;
+
+		public double SemiAxis1 { get { return mSemiAxis1; } set { mSemiAxis1 = value; } }
+		public double SemiAxis2 { get { return mSemiAxis2; } set { mSemiAxis2 = value; } }
+
 		internal IfcEllipse() : base() { }
 		internal IfcEllipse(DatabaseIfc db, IfcEllipse e) : base(db,e) { mSemiAxis1 = e.mSemiAxis1; mSemiAxis2 = e.mSemiAxis2; }
-		internal IfcEllipse(IfcAxis2Placement pl, double axis1, double axis2) : base(pl) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
+		public IfcEllipse(IfcAxis2Placement placement, double axis1, double axis2) : base(placement) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
 		internal static IfcEllipse Parse(string str) { IfcEllipse e = new IfcEllipse(); int pos = 0; e.Parse(str, ref pos, str.Length); return e; }
 		internal override void Parse(string str, ref int pos, int len)
 		{
@@ -889,6 +910,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcEnergyConversionDeviceType(DatabaseIfc db, IfcEnergyConversionDeviceType t) : base(db, t) { }
 		protected static void parseFields(IfcEnergyConversionDeviceType t, List<string> arrFields, ref int ipos) { IfcDistributionFlowElementType.parseFields(t, arrFields, ref ipos); }
 	}
+	//[Obsolete("DEPRECEATED IFC4", false)]
 	//IfcEnergyProperties // DEPRECEATED IFC4
 	public partial class IfcEngine : IfcEnergyConversionDevice //IFC4
 	{
@@ -923,6 +945,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal new static IfcEngineType Parse(string strDef) { IfcEngineType t = new IfcEngineType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcEnvironmentalImpactValue : IfcAppliedValue //DEPRECEATED
 	{
 		internal string mImpactType;// : IfcLabel;
@@ -1059,18 +1082,19 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal new static IfcEventType Parse(string strDef) { IfcEventType t = new IfcEventType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".,." + mEventTriggerType.ToString() + (mUserDefinedEventTriggerType == "$" ? ".,$" : (".,'" + mUserDefinedEventTriggerType + "'"))); }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcExtendedMaterialProperties : IfcMaterialPropertiesSuperSeded  // DEPRECEATED IFC4
 	{
 		internal List<int> mExtendedProperties = new List<int>(); //: SET [1:?] OF IfcProperty
 		internal string mDescription = "$"; //: OPTIONAL IfcText;
 		internal string mName; //: IfcLabel;
 
-		public List<IfcProperty> ExtendedProperties { get { return mExtendedProperties.ConvertAll(x => mDatabase[x] as IfcProperty); } set { mExtendedProperties = value.ConvertAll(x => x.mIndex); } }
+		public ReadOnlyCollection<IfcProperty> ExtendedProperties { get { return new ReadOnlyCollection<IfcProperty>( mExtendedProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
 
 		internal IfcExtendedMaterialProperties() : base() { }
-		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p) : base(db,p) { ExtendedProperties = p.ExtendedProperties.ConvertAll(x=>db.Factory.Duplicate(x) as IfcProperty); mDescription = p.mDescription; mName = p.mName; }
+		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p) : base(db,p) { p.ExtendedProperties.ToList().ForEach(x=>addProperty( db.Factory.Duplicate(x) as IfcProperty)); mDescription = p.mDescription; mName = p.mName; }
 		internal static IfcExtendedMaterialProperties Parse(string strDef) { IfcExtendedMaterialProperties p = new IfcExtendedMaterialProperties(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
 		internal static void parseFields(IfcExtendedMaterialProperties p, List<string> arrFields, ref int ipos) { IfcMaterialPropertiesSuperSeded.parseFields(p, arrFields, ref ipos); p.mExtendedProperties = ParserSTEP.SplitListLinks(arrFields[ipos++]); p.mDescription = arrFields[ipos++]; p.mName = arrFields[ipos++]; }
 		protected override string BuildStringSTEP()
@@ -1080,25 +1104,34 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				str += "," + ParserSTEP.LinkToString(mExtendedProperties[icounter]);
 			return str + ")" + "," + mDescription + "," + mName;
 		}
+
+		internal void addProperty(IfcProperty property) { mExtendedProperties.Add(property.mIndex); }
 	}
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
 		protected string mName = "$"; //: OPTIONAL IfcLabel;
 		private string mDescription = "$"; //: OPTIONAL IfcText;
-		internal List<int> mProperties = new List<int>(); //: SET [1:?] OF IfcProperty 
+		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
+		private List<int> mPropertyIndices = new List<int>();
 
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public List<IfcProperty> Properties { get { return mProperties.ConvertAll(x => mDatabase[x] as IfcProperty); } set { mProperties = value.ConvertAll(x => x.mIndex); } }
+		public ReadOnlyDictionary<string, IfcProperty> Properties { get { return new ReadOnlyDictionary<string, IfcProperty>( mProperties); } }
+
+		internal override void Initialize()
+		{
+			mProperties = new Dictionary<string, IfcProperty>();
+			mPropertyIndices = new List<int>();
+		}
 
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(DatabaseIfc db) : base(db) {  }
-		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; Properties = p.Properties.ConvertAll(x => db.Factory.Duplicate(x) as IfcProperty);   }
+		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
 		internal IfcExtendedProperties(string name, List<IfcProperty> props) : base(props[0].mDatabase)
 		{
-			Name = name; 
-			if (props != null && props.Count > 0)
-				mProperties = props.ConvertAll(x => x.mIndex);
+			Name = name;
+			if (props != null)
+				props.ForEach(x => AddProperty(x));
 		}
 		internal static void parseFields(IfcExtendedProperties p, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -1107,7 +1140,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			{
 				p.mName = arrFields[ipos++].Replace("'", "");
 				p.mDescription = arrFields[ipos++].Replace("'", "");
-				p.mProperties = ParserSTEP.SplitListLinks(arrFields[ipos++]);
+				p.mPropertyIndices = ParserSTEP.SplitListLinks(arrFields[ipos++]);
 			}
 		}
 		protected override string BuildStringSTEP()
@@ -1116,10 +1149,43 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				return "";
 			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
 				return base.BuildStringSTEP();
-			string str = base.BuildStringSTEP() + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$,(" : "'" + mDescription + "',(") + ParserSTEP.LinkToString(mProperties[0]);
-			for (int icounter = 1; icounter < mProperties.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mProperties[icounter]);
+			string str = base.BuildStringSTEP() + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$,(#" : "'" + mDescription + "',(#") + mPropertyIndices[0];
+			for (int icounter = 1; icounter < mPropertyIndices.Count; icounter++)
+				str += ",#" + mPropertyIndices[icounter];
 			return str + ")";
+		}
+
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			foreach (int i in mPropertyIndices)
+			{
+				IfcProperty p = mDatabase[i] as IfcProperty;
+				if (p != null)
+					mProperties.Add(p.Name, p);
+			}
+		}
+		public void AddProperty(IfcProperty property)
+		{
+			if (property != null && !mProperties.ContainsKey(property.Name))
+			{
+				mProperties.Add(property.Name, property);
+				mPropertyIndices.Add(property.Index);
+			}
+		}
+		public void RemoveProperty(IfcProperty property)
+		{
+			if (property != null)
+			{
+				mProperties.Remove(property.Name);
+				mPropertyIndices.Remove(property.Index);
+			}
+		}
+		public IfcProperty FindProperty(string name)
+		{
+			if (string.IsNullOrEmpty(name))
+				return null;
+			return (mProperties.ContainsKey(name) ? mProperties[name] : null);
 		}
 	}
 	//ENTITY IfcExternallyDefinedHatchStyle
@@ -1131,6 +1197,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal static IfcExternallyDefinedSurfaceStyle Parse(string strDef) { IfcExternallyDefinedSurfaceStyle f = new IfcExternallyDefinedSurfaceStyle(); int ipos = 0; parseFields(f, ParserSTEP.SplitLineFields(strDef), ref ipos); return f; }
 		internal static void parseFields(IfcExternallyDefinedSurfaceStyle f, List<string> arrFields, ref int ipos) { IfcExternalReference.parseFields(f, arrFields, ref ipos); }
 	}
+	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcExternallyDefinedSymbol // DEPRECEATED IFC4
 	internal class IfcExternallyDefinedTextFont : IfcExternalReference
 	{
@@ -1145,19 +1212,22 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
-		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
+		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		protected IfcExternalInformation() : base() { }
 		protected IfcExternalInformation(DatabaseIfc db) : base(db) { }
 		protected IfcExternalInformation(DatabaseIfc db, IfcExternalInformation i) : base(db,i) { }
 		protected static void parseFields(IfcExternalInformation r, List<string> arrFields, ref int ipos) { }
+
+		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcResourceObjectSelect//ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle
+	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect//ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle
 	{ //,IfcExternallyDefinedSurfaceStyle ,IfcExternallyDefinedSymbol ,IfcExternallyDefinedTextFont ,IfcLibraryReference)); 
 		private string mLocation = "$";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
 		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
-		private string mName = "$";//  : IfcLabel;
+		private string mName = "$";//  : OPTIONAL IfcLabel;
 		//INVERSE  
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
@@ -1166,9 +1236,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
-		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
-		public List<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return mExternalReferenceForResources; } }
+		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
+		public ReadOnlyCollection<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mExternalReferenceForResources); } }
 
 		protected IfcExternalReference() : base() { }
 		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) : base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
@@ -1180,6 +1250,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			r.mName = arrFields[ipos++].Replace("'", "");
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mLocation == "$" ? ",$," : ",'" + mLocation + "',") + (mIdentification == "$" ? "$" : "'" + mIdentification + "'") + (mName == "$" ? ",$" : ",'" + mName + "'"); }
+
+		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4
 	{
@@ -1187,16 +1260,16 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		private List<int> mRelatedResourceObjects = new List<int>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
 		public IfcExternalReference RelatingReference { get { return mDatabase[mRelatingReference] as IfcExternalReference; } set { mRelatingReference = value.mIndex; value.mExternalReferenceForResources.Add(this); } }
-		public List<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect); } set { mRelatedResourceObjects = value.ConvertAll(x => x.Index); foreach (IfcResourceObjectSelect rs in value) rs.HasExternalReferences.Add(this); } }
+		public ReadOnlyCollection<IfcResourceObjectSelect> RelatedResourceObjects { get { return new ReadOnlyCollection<IfcResourceObjectSelect>( mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect)); } }
 
 		//INVERSE
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
-		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects = r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(r.mDatabase[x]) as IfcResourceObjectSelect); }
+		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; r.mRelatedResourceObjects.ToList().ForEach(x=>addRelated( db.Factory.Duplicate(r.mDatabase[x]) as IfcResourceObjectSelect)); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, List<IfcResourceObjectSelect> related)
-			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; RelatedResourceObjects = related; }
+			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; related.ForEach(x=>addRelated(x)); }
 		internal static IfcExternalReferenceRelationship Parse(string strDef, ReleaseVersion schema) { IfcExternalReferenceRelationship m = new IfcExternalReferenceRelationship(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return m; }
 		internal static void parseFields(IfcExternalReferenceRelationship m, List<string> arrFields, ref int ipos, ReleaseVersion schema)
 		{
@@ -1217,13 +1290,13 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal void addRelated(IfcResourceObjectSelect r)
 		{
 			mRelatedResourceObjects.Add(r.Index);
-			r.HasExternalReferences.Add(this);
+			r.AddExternalReferenceRelationship(this);
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			foreach (IfcResourceObjectSelect ro in RelatedResourceObjects)
-				ro.HasExternalReferences.Add(this);
+				ro.AddExternalReferenceRelationship(this);
 			RelatingReference.mExternalReferenceForResources.Add(this);
 		}
 	}
@@ -1234,7 +1307,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal List<IfcRelSpaceBoundary> mBoundedBy = new List<IfcRelSpaceBoundary>();  //	BoundedBy : SET [0:?] OF IfcRelExternalSpatialElementBoundary FOR RelatingExternalSpatialElement;
 
 		public IfcExternalSpatialElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public List<IfcRelSpaceBoundary> BoundedBy { get { return mBoundedBy; } }
+		public ReadOnlyCollection<IfcRelSpaceBoundary> BoundedBy { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>( mBoundedBy); } }
 
 		internal IfcExternalSpatialElement() : base() { }
 		internal IfcExternalSpatialElement(DatabaseIfc db, IfcExternalSpatialElement e, bool downStream) : base(db, e,downStream) { mPredefinedType = e.mPredefinedType; }
@@ -1249,6 +1322,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mPredefinedType == IfcExternalSpatialElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."); }
 		internal static IfcExternalSpatialElement Parse(string strDef) { IfcExternalSpatialElement s = new IfcExternalSpatialElement(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
+
+		public void AddBoundary(IfcRelSpaceBoundary boundary) { mBoundedBy.Add(boundary); }
 	}
 	public abstract partial class IfcExternalSpatialStructureElement : IfcSpatialElement //	ABSTRACT SUPERTYPE OF(IfcExternalSpatialElement)
 	{
@@ -1271,7 +1346,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, double depth) : base(prof) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, double depth) : base(prof, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
-		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
+		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { if(dir != null) mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		internal static IfcExtrudedAreaSolid Parse(string str) { IfcExtrudedAreaSolid e = new IfcExtrudedAreaSolid(); int pos = 0; e.Parse(str, ref pos, str.Length); return e; }
 		protected override void Parse(string str, ref int pos, int len)
 		{

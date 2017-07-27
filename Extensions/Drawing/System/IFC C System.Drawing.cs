@@ -11,7 +11,7 @@ namespace GeometryGym.Ifc
 	{
 		public override Color Colour { get { return Color.FromArgb((int)(mRed * 255), (int)(mGreen * 255), (int)(mBlue * 255)); } }
 
-		public IfcColourRgb(DatabaseIfc db, Color col) : base(db) { mRed = col.R / 255.0; mGreen = col.G / 255.0; mBlue = col.B / 255.0; }
+		public IfcColourRgb(DatabaseIfc db, Color col) : base(db) { Name = col.Name; mRed = col.R / 255.0; mGreen = col.G / 255.0; mBlue = col.B / 255.0; }
 	}
 	public partial class IfcColourRgbList : IfcPresentationItem
 	{

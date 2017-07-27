@@ -48,19 +48,22 @@ namespace GeometryGym.Ifc
 				if (!mCalculated)
 				{
 					mCalculated = true;
-					Plane rel = Plane.WorldXY;
-					Point3d o = new Point3d(), x = new Point3d(1, 0, 0), y = new Point3d(0, 1, 0);
-					IfcObjectPlacement pl = PlacementRelTo;
-					Transform tr = pl == null ? Transform.Identity : pl.Transform;
-					o.Transform(tr);
-					x.Transform(tr);
-					y.Transform(tr);
-					rel = new Plane(o, x - o, y - o);
-
-					IfcAxis2Placement apl = RelativePlacement;
-					Plane pln = (apl == null ? Plane.WorldXY : apl.Plane);
-					mtransform = (rel.IsValid ? Transform.ChangeBasis(rel, Plane.WorldXY) * Transform.ChangeBasis(pln, Plane.WorldXY) :
-						 Transform.ChangeBasis(pln, Plane.WorldXY));
+					IfcObjectPlacement placementRelTo = PlacementRelTo;
+					IfcAxis2Placement relativePlacement = RelativePlacement;
+					if (placementRelTo == null || placementRelTo.isXYPlane)
+					{
+						if (relativePlacement == null || relativePlacement.IsXYPlane)
+							mtransform = Transform.Identity;
+						else
+							mtransform = Transform.ChangeBasis(relativePlacement.Plane,Plane.WorldXY);
+					}
+					else
+					{
+						if (relativePlacement == null || relativePlacement.IsXYPlane)
+							mtransform = placementRelTo.Transform;
+						else
+							mtransform = placementRelTo.Transform * Transform.ChangeBasis(relativePlacement.Plane, Plane.WorldXY);
+					}
 				}
 				return mtransform;
 			}

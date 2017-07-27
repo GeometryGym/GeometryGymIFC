@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace GeometryGym.Ifc
 {
@@ -18,7 +19,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				List<IfcPresentationStyle> styles = LayerStyles;
+				ReadOnlyCollection<IfcPresentationStyle> styles = LayerStyles;
 				foreach (IfcPresentationStyle ps in styles)
 				{
 					IfcSurfaceStyle ss = ps as IfcSurfaceStyle;

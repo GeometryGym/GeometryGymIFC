@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -90,13 +91,13 @@ namespace GeometryGym.Ifc
 		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcBoolean
 
 		public IfcCartesianPointList Points { get { return mDatabase[mPoints] as IfcCartesianPointList; } set { mPoints = value.mIndex; } }
-		public List<IfcSegmentIndexSelect> Segments { get { return mSegments; } set { mSegments = new List<IfcSegmentIndexSelect>() { }; mSegments.AddRange(value); } }
+		public ReadOnlyCollection<IfcSegmentIndexSelect> Segments { get { return new ReadOnlyCollection<IfcSegmentIndexSelect>( mSegments); } }
 		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
 		internal IfcIndexedPolyCurve() : base() { }
 		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
-		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { Segments = segs; }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { mSegments = segs; }
 		internal static IfcIndexedPolyCurve Parse(string str)
 		{
 			IfcIndexedPolyCurve c = new IfcIndexedPolyCurve();
@@ -140,6 +141,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + str;
 		}
 
+		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
@@ -149,7 +151,7 @@ namespace GeometryGym.Ifc
 				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;
 				if (cpl2d != null)
 				{
-					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.ToList(), Segments);
+					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.ToList(), Segments.ToList());
 					int index = bc.mIndex;
 					mDatabase[mIndex] = bc;
 					mDatabase[index] = null;
@@ -168,12 +170,12 @@ namespace GeometryGym.Ifc
 														 //INVERSE
 		internal IfcPolygonalFaceSet mToFaceSet = null;
 
-		public IEnumerable<int> CoordIndex { get { return mCoordIndex; } set { mCoordIndex = value.ToList(); } }
+		public ReadOnlyCollection<int> CoordIndex { get { return new ReadOnlyCollection<int>( mCoordIndex); } }
 		public IfcPolygonalFaceSet ToFaceSet { get { return mToFaceSet; } set { mToFaceSet = value; } }
 
 		internal IfcIndexedPolygonalFace() : base() { }
 		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f) : base(db, f) { mCoordIndex.AddRange(f.mCoordIndex); }
-		public IfcIndexedPolygonalFace(DatabaseIfc db, IEnumerable<int> coords) : base(db) { CoordIndex = coords; }
+		public IfcIndexedPolygonalFace(DatabaseIfc db, IEnumerable<int> coords) : base(db) { mCoordIndex = coords.ToList(); }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
 		{
 			base.parseFields(arrFields, ref ipos);
@@ -187,15 +189,17 @@ namespace GeometryGym.Ifc
 				result += "," + mCoordIndex[icounter];
 			return result + ")";
 		}
+
+		public void AddCoordIndex(int index) { mCoordIndex.Add(index); }
 	}
 	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
 	{
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
-		public IEnumerable<IEnumerable<int>> InnerCoordIndices { get { return mInnerCoordIndices; } set { mInnerCoordIndices = value.ToList().ConvertAll(x => x.ToList()); } }
+		public ReadOnlyCollection<ReadOnlyCollection<int>> InnerCoordIndices { get { return new ReadOnlyCollection<ReadOnlyCollection<int>>( mInnerCoordIndices.ConvertAll(x=> new ReadOnlyCollection<int>(x))); }  }
 		internal IfcIndexedPolygonalFaceWithVoids() : base() { }
 		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
-		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) : base(db, coords)
-		{ InnerCoordIndices = inners; }
+		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 
+			: base(db, coords) { mInnerCoordIndices = inners.ToList().ConvertAll(x=>x.ToList()); }
 		protected override void parseFields(List<string> arrFields, ref int ipos)
 		{
 			base.parseFields(arrFields, ref ipos);
@@ -319,7 +323,7 @@ namespace GeometryGym.Ifc
 		internal int mCurrentValue;// : OPTIONAL IfcCostValue;
 		internal int mOriginalValue;// : OPTIONAL IfcCostValue;
 		internal IfcInventory() : base() { }
-		internal IfcInventory(DatabaseIfc db, IfcInventory i) : base(db, i)
+		internal IfcInventory(DatabaseIfc db, IfcInventory i, bool downStream) : base(db, i, downStream)
 		{
 #warning todo
 			//mInventoryType = p.mInventoryType;
@@ -348,8 +352,8 @@ namespace GeometryGym.Ifc
 	{
 		internal double mOverallWidth, mOverallDepth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
 		internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mFlangeEdgeRadius = double.NaN;// : OPTIONAL IfcNonNegativeLengthMeasure;
-		internal double mFlangeSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure; 
+		internal double mFlangeEdgeRadius = double.NaN;// : OPTIONAL IfcNonNegativeLengthMeasure; //IFC4
+		internal double mFlangeSlope = double.NaN;// : OPTIONAL IfcPlaneAngleMeasure; //IFC4
 
 		public double OverallWidth { get { return mOverallWidth; } set { mOverallWidth = value; } }
 		public double OverallDepth { get { return mOverallDepth; } set { mOverallDepth = value; } }

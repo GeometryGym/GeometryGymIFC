@@ -195,8 +195,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, processed);
 			obj["Degree"] = Degree;
 			JArray array = new JArray();
-			List<IfcCartesianPoint> controlPoints = ControlPointsList;
-			foreach (IfcCartesianPoint point in controlPoints)
+			foreach (IfcCartesianPoint point in ControlPointsList)
 				array.Add(point.getJson(this, processed));
 			obj["ControlPointsList"] = array;
 			obj["CurveForm"] = CurveForm.ToString();

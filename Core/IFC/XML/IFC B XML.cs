@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcBeamTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcBeamTypeEnum.NOTDEFINED)
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcBeamTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcBeamTypeEnum.NOTDEFINED)
@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("ZLength"))
 				ZLength = double.Parse(xml.Attributes["ZLength"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("XLength", XLength.ToString());
@@ -95,7 +95,7 @@ namespace GeometryGym.Ifc
 					SecondOperand = mDatabase.ParseXml<IfcBooleanOperand>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Operator", mOperator.ToString().ToLower());
@@ -121,7 +121,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("ZDim"))
 				ZDim = double.Parse(xml.Attributes["ZDim"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Corner.GetXML(xml.OwnerDocument, "Corner", this, processed));
@@ -146,7 +146,7 @@ namespace GeometryGym.Ifc
 					BuildingAddress = mDatabase.ParseXml<IfcPostalAddress>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (!double.IsNaN(mElevationOfRefHeight))
@@ -167,7 +167,7 @@ namespace GeometryGym.Ifc
 			else if (xml.HasAttribute("CompositionType"))
 				Enum.TryParse<IfcBuildingElementProxyTypeEnum>(xml.Attributes["CompositionType"].Value, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcBuildingElementProxyTypeEnum.NOTDEFINED)
@@ -190,7 +190,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcBuildingElementProxyTypeEnum>(xml.Attributes["PredefinedType"].Value, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcBuildingElementProxyTypeEnum.NOTDEFINED)
@@ -205,7 +205,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Elevation"))
 				Elevation = double.Parse(xml.Attributes["Elevation"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (!double.IsNaN(mElevation))

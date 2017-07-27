@@ -39,18 +39,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Bounds") == 0)
 				{
-					List<IfcFaceBound> faces = new List<IfcFaceBound>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcFaceBound f = mDatabase.ParseXml<IfcFaceBound>(cn as XmlElement);
 						if (f != null)
-							faces.Add(f);
+							addBound(f);
 					}
-					Bounds = faces;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Bounds");
@@ -69,18 +67,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "FbsmFaces") == 0)
 				{
-					List<IfcConnectedFaceSet> faces = new List<IfcConnectedFaceSet>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcConnectedFaceSet f = mDatabase.ParseXml<IfcConnectedFaceSet>(cn as XmlElement);
 						if (f != null)
-							faces.Add(f);
+							addFace(f);
 					}
-					FbsmFaces = faces;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("FbsmFaces");
@@ -104,7 +100,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Orientation"))
 				mOrientation = bool.Parse(xml.Attributes["Orientation"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Bound.GetXML(xml.OwnerDocument, "Bound", this, processed));
@@ -121,18 +117,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Voids") == 0)
 				{
-					List<IfcClosedShell> voids = new List<IfcClosedShell>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcClosedShell s = mDatabase.ParseXml<IfcClosedShell>(cn as XmlElement);
 						if (s != null)
-							voids.Add(s);
+							addVoid(s);
 					}
-					Voids = voids;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Voids");
@@ -141,6 +135,8 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
+
+	
 	public partial class IfcFixedReferenceSweptAreaSolid : IfcSweptAreaSolid //IFC4
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -159,7 +155,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("EndParam"))
 				mStartParam = double.Parse(xml.Attributes["EndParam"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));

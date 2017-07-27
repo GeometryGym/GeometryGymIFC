@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -100,46 +101,32 @@ namespace GeometryGym.Ifc
 		public enum Length { Metre, Centimetre, Millimetre, Foot, Inch };
 
 		private List<int> mUnits = new List<int>();// : SET [1:?] OF IfcUnit; 
-		public List<IfcUnit> Units { get { return mUnits.ConvertAll(x => mDatabase[x] as IfcUnit); } set { mUnits = value.ConvertAll(x => x.Index); } }
+		public ReadOnlyCollection<IfcUnit> Units { get { return new ReadOnlyCollection<IfcUnit>( mUnits.ConvertAll(x => mDatabase[x] as IfcUnit)); } }
 
 		internal IfcUnitAssignment() : base() { }
-		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { Units = u.mUnits.ConvertAll(x => db.Factory.Duplicate(u.mDatabase[x]) as IfcUnit); }
-		internal IfcUnitAssignment(DatabaseIfc db) : base(db) { }
-		public IfcUnitAssignment(List<IfcUnit> units) : base(units[0].Database) { Units = units; }
+		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { u.mUnits.ForEach(x => AddUnit( db.Factory.Duplicate(u.mDatabase[x]) as IfcUnit)); }
+		public IfcUnitAssignment(DatabaseIfc db) : base(db) { }
+		public IfcUnitAssignment(DatabaseIfc db, Length length) : base(db) { SetUnits(length); }
+		public IfcUnitAssignment(IfcUnit unit) : base(unit.Database) { AddUnit(unit); }
+		public IfcUnitAssignment(IEnumerable<IfcUnit> units) : base(units.First().Database) { foreach(IfcUnit u in units) AddUnit(u); }
 
-		internal void SetUnits(Length length)
+		public IfcUnitAssignment SetUnits(Length length)
 		{
+			AddUnit(mDatabase.Factory.LengthUnit(length));
 			if (length == Length.Millimetre)
-			{
-				mUnits.Add(new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.MILLI, IfcSIUnitName.METRE).mIndex);
 				mDatabase.ScaleSI = 0.001;
-			}
 			else if (length == Length.Centimetre)
-			{
-				mUnits.Add(new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.CENTI, IfcSIUnitName.METRE).mIndex);
 				mDatabase.ScaleSI = 0.01;
-
-			}
 			else if (length == Length.Inch)
-			{
-				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(0.0254), mDatabase.Factory.SILength);
-				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Inches", mwu).mIndex);
 				mDatabase.ScaleSI = 0.0254;
-			}
 			else if (length == Length.Foot)
-			{
-				IfcMeasureWithUnit mwu = new IfcMeasureWithUnit(new IfcLengthMeasure(FeetToMetre), mDatabase.Factory.SILength);
-				mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, "Feet", mwu).mIndex);
 				mDatabase.ScaleSI = FeetToMetre;
-			}
 			else
-			{
-				mUnits.Add(mDatabase.Factory.SILength.mIndex);
 				mDatabase.ScaleSI = 1;
-			}
 			SetUnits();
+			return this;
 		}
-		internal static double FeetToMetre = 0.3048;
+		public static double FeetToMetre = 0.3048;
 		internal void SetUnits()
 		{
 			if (Find(IfcUnitEnum.AREAUNIT) == null)
@@ -149,7 +136,10 @@ namespace GeometryGym.Ifc
 			if (Find(IfcUnitEnum.PLANEANGLEUNIT) == null)
 			{
 				IfcSIUnit radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
-				mUnits.Add(mDatabase.Factory.Options.AngleUnitsInRadians ? radians.mIndex : new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)).mIndex);
+				if (mDatabase.Factory.Options.AngleUnitsInRadians)
+					AddUnit(radians);
+				else
+					AddUnit(new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)));
 			}
 			if (Find(IfcUnitEnum.TIMEUNIT) == null)
 			{
@@ -157,10 +147,10 @@ namespace GeometryGym.Ifc
 				if (mDatabase.mTimeInDays)
 				{
 					IfcMeasureWithUnit mu = new IfcMeasureWithUnit(new IfcTimeMeasure(60 * 60 * 24), seconds);
-					mUnits.Add(new IfcConversionBasedUnit(IfcUnitEnum.TIMEUNIT, "DAY", mu).mIndex);
+					AddUnit(new IfcConversionBasedUnit(IfcUnitEnum.TIMEUNIT, "DAY", mu));
 				}
 				else
-					mUnits.Add(seconds.mIndex);
+					AddUnit(seconds);
 			}
 		}
 		internal bool mStructuralSet = false;
@@ -175,53 +165,55 @@ namespace GeometryGym.Ifc
 			if (fu == null)
 			{
 				fu = new IfcSIUnit(m, IfcUnitEnum.FORCEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.NEWTON);
-				mUnits.Add(fu.mIndex);
+				AddUnit(fu);
 			}
 			IfcSIUnit lengthSI = m.Factory.SILength, volumeSI = m.Factory.SIVolume;
 			if (Find(IfcDerivedUnitEnum.TORQUEUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), IfcDerivedUnitEnum.TORQUEUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), IfcDerivedUnitEnum.TORQUEUNIT));
 			if (Find(IfcDerivedUnitEnum.LINEARFORCEUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARFORCEUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARFORCEUNIT));
+			if (Find(IfcDerivedUnitEnum.LINEARMOMENTUNIT) == null)
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), IfcDerivedUnitEnum.LINEARMOMENTUNIT));
 			if (Find(IfcDerivedUnitEnum.PLANARFORCEUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.PLANARFORCEUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.PLANARFORCEUNIT));
 			if (Find(IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT));
 
 			IfcNamedUnit time = Find(IfcUnitEnum.TIMEUNIT);
 			if (time == null || Math.Abs(time.getSIFactor() - 1) < mDatabase.Tolerance)
 				time = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND);
 			if(Find(IfcDerivedUnitEnum.ACCELERATIONUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT));
 			if(Find(IfcUnitEnum.PRESSUREUNIT) == null)
-				mUnits.Add(new IfcSIUnit(m, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL).mIndex);
+				AddUnit(new IfcSIUnit(m, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL));
 			if (Find(IfcDerivedUnitEnum.SECTIONMODULUSUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 3), IfcDerivedUnitEnum.SECTIONMODULUSUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 3), IfcDerivedUnitEnum.SECTIONMODULUSUNIT));
 			if(Find(IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 4), IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 4), IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT));
 			IfcSIUnit massu = Find(IfcUnitEnum.MASSUNIT) as IfcSIUnit;
 			if (massu == null)
 			{
 				massu = new IfcSIUnit(m, IfcUnitEnum.MASSUNIT, IfcSIPrefix.KILO, IfcSIUnitName.GRAM);
-				mUnits.Add(massu.mIndex);
+				AddUnit(massu);
 			}
 			if (Find(IfcDerivedUnitEnum.MASSDENSITYUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(massu, 1), new IfcDerivedUnitElement(volumeSI, -1), IfcDerivedUnitEnum.MASSDENSITYUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(massu, 1), new IfcDerivedUnitElement(volumeSI, -1), IfcDerivedUnitEnum.MASSDENSITYUNIT));
 			IfcSIUnit kelvin = Find(IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT) as IfcSIUnit;
 			if (kelvin == null)
 			{
 				kelvin = new IfcSIUnit(m, IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.KELVIN);
-				mUnits.Add(kelvin.mIndex);
+				AddUnit(kelvin);
 			}
 			if (Find(IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(kelvin, -1), IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(kelvin, -1), IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT));
 			if(Find(IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT));
 
 			IfcNamedUnit radians = Find(IfcUnitEnum.PLANEANGLEUNIT);
 			if (radians == null || Math.Abs(radians.getSIFactor() - 1) < mDatabase.Tolerance)
 				radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
 			if(Find(IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT) == null)
-				mUnits.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT).mIndex);
+				AddUnit(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT));
 		}
 		public void AddUnit(IfcUnit u) { mUnits.Add(u.Index); }
 		internal static void parseFields(IfcUnitAssignment a, List<string> arrFields, ref int ipos) { a.mUnits = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
@@ -239,8 +231,7 @@ namespace GeometryGym.Ifc
 		internal static IfcUnitAssignment Parse(string strDef) { IfcUnitAssignment a = new IfcUnitAssignment(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		internal IfcNamedUnit Find(IfcUnitEnum unit)
 		{
-			List<IfcUnit> units = Units;
-			foreach (IfcUnit u in units)
+			foreach (IfcUnit u in Units)
 			{
 				IfcNamedUnit nu = u as IfcNamedUnit;
 				if (nu != null && nu.UnitType == unit)
@@ -250,8 +241,7 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcDerivedUnit Find(IfcDerivedUnitEnum unit)
 		{
-			List<IfcUnit> units = Units;
-			foreach (IfcUnit u in units)
+			foreach (IfcUnit u in Units)
 			{
 				IfcDerivedUnit du = u as IfcDerivedUnit;
 				if (du != null && du.UnitType == unit)
@@ -275,13 +265,12 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				List<IfcUnit> units = Units;
 #if(REVIT)
 			double result = GGYM.Units.MetreToFeet;
 #else
 				double result = 1;
 #endif
-				foreach (IfcUnit u in units)
+				foreach (IfcUnit u in Units)
 				{
 					IfcNamedUnit nu = u as IfcNamedUnit;
 					if (nu != null)
@@ -290,13 +279,6 @@ namespace GeometryGym.Ifc
 						{
 							double d = nu.getSIFactor();
 							mDatabase.ScaleSI = d;
-#if(GGRHINOIFC)
-							if (GGYM.ggAssembly.mOptions.RhinoDocTolerance)
-							{
-								double docScale = Rhino.RhinoMath.UnitScale(Rhino.UnitSystem.Meters, Rhino.RhinoDoc.ActiveDoc.ModelUnitSystem);
-								mDatabase.Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance * d / docScale;
-							}
-#endif
 							result = d;
 						}
 						//if (nu.UnitType == IfcUnitEnum.PLANEANGLEUNIT)
@@ -319,8 +301,7 @@ namespace GeometryGym.Ifc
 		}
 		internal double getScaleSI(IfcUnitEnum unitType)
 		{
-			List<IfcUnit> units = Units;
-			foreach (IfcUnit u in units)
+			foreach (IfcUnit u in Units)
 			{
 				IfcNamedUnit nu = u as IfcNamedUnit;
 				if (nu != null && nu.UnitType == unitType)
@@ -341,8 +322,7 @@ namespace GeometryGym.Ifc
 		}
 		internal double getScaleSI(IfcDerivedUnitEnum unitType)
 		{
-			List<IfcUnit> units = Units;
-			foreach (IfcUnit u in units)
+			foreach (IfcUnit u in Units)
 			{
 				IfcDerivedUnit du = u as IfcDerivedUnit;
 				if (du != null)
@@ -351,6 +331,12 @@ namespace GeometryGym.Ifc
 				}
 			}
 			return 1;
+		}
+
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			mDatabase.Factory.Options.AngleUnitsInRadians = Math.Abs(1- getScaleSI(IfcUnitEnum.PLANEANGLEUNIT)) < 1e-4;
 		}
 	}
 	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef

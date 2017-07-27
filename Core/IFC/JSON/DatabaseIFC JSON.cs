@@ -34,17 +34,27 @@ namespace GeometryGym.Ifc
 {
 	public partial class DatabaseIfc
 	{
-		internal void ReadJSONFile(string filename) { ReadJSONFile(new StreamReader(filename)); }
-		internal void ReadJSONFile(StreamReader reader)
+		internal void ReadJSONFile(string filename) { FileName = filename; ReadJSONFile(new StreamReader(filename)); }
+		internal void ReadJSONFile(TextReader reader)
 		{
+			mRelease = ReleaseVersion.IFC2x3;
+			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
+			mFactory.Options.GenerateOwnerHistory = false;
+			CultureInfo current = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+
 			Release = ReleaseVersion.IFC4;
-			ReadJSON(JObject.Parse(reader.ReadToEnd()));
-			
+			string str = reader.ReadToEnd();
+			ReadJSON(JObject.Parse(str));
+
+			Thread.CurrentThread.CurrentCulture = current;
+			postImport();
+			Factory.Options.GenerateOwnerHistory = ownerHistory;
 		}
 
 		internal int mNextUnassigned = 0;
 
-		internal void ReadJSON(JObject ifcFile)
+		public void ReadJSON(JObject ifcFile)
 		{ 
 			JToken token = ifcFile.First;
 			token = ifcFile["HEADER"];
@@ -125,7 +135,7 @@ null, Type.EmptyTypes, null);
 						if(index == 0)
 						{
 							if(mNextUnassigned == 0)
-								mNextUnassigned = Math.Max(mIfcObjects.Count * 2, 1000);
+								mNextUnassigned = Math.Max(LastKey * 2, 1000);
 							index = mNextUnassigned++;
 						}
 						this[index] = entity;

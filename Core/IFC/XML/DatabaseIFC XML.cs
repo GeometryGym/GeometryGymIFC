@@ -33,13 +33,15 @@ namespace GeometryGym.Ifc
 {
 	public partial class DatabaseIfc
 	{
+		internal bool XMLMandatoryId { get; set; } = false;
 		public void ReadXMLFile(string filename)
 		{
+			FileName = filename;
 			XmlDocument doc = new XmlDocument();
 			doc.Load(filename);
 			ReadXMLDoc(doc);
 		}
-		public void ReadXMLStream(StreamReader stream)
+		public void ReadXMLStream(TextReader stream)
 		{
 			XmlDocument doc = new XmlDocument();
 			doc.Load(stream);
@@ -127,7 +129,13 @@ namespace GeometryGym.Ifc
 			}
 			ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
 null, Type.EmptyTypes, null);
-			if (constructor != null)
+			if(type.IsAbstract && xml.HasChildNodes && xml.ChildNodes.Count == 1)
+			{
+				T result = ParseXml<T>(xml.ChildNodes[0] as XmlElement);
+				if (result != null)
+					return result;
+			}
+			if (!type.IsAbstract && constructor != null)
 			{
 				BaseClassIfc entity = constructor.Invoke(new object[] { }) as BaseClassIfc;
 				if (entity != null)
@@ -156,9 +164,17 @@ null, Type.EmptyTypes, null);
 					return (T)(IBaseClassIfc)entity;
 				}
 			}
-			
 			if (xml.HasChildNodes && xml.ChildNodes.Count == 1)
-				return ParseXml<T>(xml.ChildNodes[0] as XmlElement);
+			{
+				T result = ParseXml<T>(xml.ChildNodes[0] as XmlElement);
+				if (result != null)
+					return result;
+			}
+			foreach (XmlNode node in xml.ChildNodes)
+			{
+				ParseXml<IBaseClassIfc>(node as XmlElement);
+			}
+			
 			return default(T);
 		}
 		internal string mXmlNamespace = "http://www.buildingsmart-tech.org/ifcXML/IFC4_ADD1";
@@ -184,7 +200,7 @@ null, Type.EmptyTypes, null);
 			ns.Value = mXmlNamespace;
 			el.SetAttribute("xlmns", mXmlNamespace);
 
-			XmlElement element = Context.GetXML(doc, "",null, new HashSet<int>());
+			XmlElement element = Context.GetXML(doc, "",null, new Dictionary<int, XmlElement>());
 			el.AppendChild(element);
 
 			XmlTextWriter writer;

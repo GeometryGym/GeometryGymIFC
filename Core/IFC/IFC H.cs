@@ -33,10 +33,11 @@ namespace GeometryGym.Ifc
 		private bool mAgreementFlag;// : BOOLEAN;
 
 		public IfcSurface BaseSurface { get { return mDatabase[mBaseSurface] as IfcSurface; } set { mBaseSurface = value.mIndex; } }
-		public bool AgreementFlag { get { return mAgreementFlag; } }
+		public bool AgreementFlag { get { return mAgreementFlag; } set { mAgreementFlag = value; } }
 
 		internal IfcHalfSpaceSolid() : base() { }
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
+		public IfcHalfSpaceSolid(IfcSurface baseSurface, bool agreementFlag) : base(baseSurface.mDatabase) { BaseSurface = baseSurface; AgreementFlag = agreementFlag; }
 
 		internal static IfcHalfSpaceSolid Parse(string str) { IfcHalfSpaceSolid s = new IfcHalfSpaceSolid(); int pos = 0; s.Parse(str, ref pos, str.Length); return s; }
 		protected virtual void Parse(string str, ref int pos, int len)
@@ -113,6 +114,7 @@ namespace GeometryGym.Ifc
 		internal new static IfcHumidifierType Parse(string strDef) { IfcHumidifierType t = new IfcHumidifierType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcHygroscopicMaterialProperties : IfcMaterialPropertiesSuperSeded // DEPRECEATED IFC4
 	{
 		internal double mUpperVaporResistanceFactor = double.NaN, mLowerVaporResistanceFactor = double.NaN; //: OPTIONAL IfcPositiveRatioMeasure;

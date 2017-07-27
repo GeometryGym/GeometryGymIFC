@@ -41,22 +41,20 @@ namespace GeometryGym.Ifc
 					Points = mDatabase.ParseXml<IfcCartesianPointList>(child as XmlElement);
 				else if (string.Compare(name, "Segments") == 0)
 				{
-					List<IfcSegmentIndexSelect> segs = new List<IfcSegmentIndexSelect>(child.ChildNodes.Count);
 					foreach(XmlNode node in child.ChildNodes)
 					{
 						List<int> ints = node.InnerText.Split(" ".ToCharArray()).ToList().ConvertAll(x => int.Parse(x));
 						if (string.Compare("IfcLineIndex-wrapper", node.Name) == 0)
-							segs.Add(new IfcLineIndex(ints));
+							addSegment(new IfcLineIndex(ints));
 						else
-							segs.Add(new IfcArcIndex(ints[0], ints[1], ints[2]));
+							addSegment(new IfcArcIndex(ints[0], ints[1], ints[2]));
 					}
-					Segments = segs;
 				}
 			}
 			if (xml.HasAttribute("SelfIntersect"))
 				mSelfIntersect = bool.Parse(xml.Attributes["SelfIntersect"].Value) ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Points.GetXML(xml.OwnerDocument, "Points", this, processed));
@@ -100,7 +98,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("FlangeSlope"))
 				mFlangeSlope = double.Parse(xml.Attributes["FlangeSlope"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("OverallWidth", mOverallWidth.ToString());

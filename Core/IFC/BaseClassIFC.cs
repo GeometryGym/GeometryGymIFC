@@ -30,25 +30,25 @@ namespace GeometryGym.Ifc
 {
 	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
-		internal string mIFCString = "";
 		public virtual string Name { get { return ""; } set { } }
 		internal DatabaseIfc mDatabase = null;
 
 		public DatabaseIfc Database { get { return mDatabase; } }
 
-		internal BaseClassIfc() : base() { }
+		public BaseClassIfc() : base() { }
 		protected BaseClassIfc(BaseClassIfc basis)
 		{
 			basis.ReplaceDatabase(this);
 		}
 		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) { db.appendObject(this); db.Factory.mDuplicateMapping.Add(e.mIndex, mIndex); }
-		internal BaseClassIfc(int record, string kw, string line) { mIndex = record; mIFCString = line; }
-		protected BaseClassIfc(DatabaseIfc db) { db.appendObject(this); }
+		internal BaseClassIfc(int record, string kw, string line) : base(record,kw,line) { }
+		protected BaseClassIfc(DatabaseIfc db) { if(db != null) db.appendObject(this); }
 
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
 		internal virtual void postParseRelate() { }
 
-		public virtual List<T> Extract<T>() where T : IBaseClassIfc
+		public List<T> Extract<T>() where T :IBaseClassIfc { return Extract<T>(typeof(T)); }
+		protected virtual List<T> Extract<T>(Type type) where T : IBaseClassIfc
 		{
 			List<T> result = new List<T>();
 			if (this is T)
@@ -71,6 +71,42 @@ namespace GeometryGym.Ifc
 			return true;
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
+
+
+		private static Type[] argSet1 = new Type[] { typeof(string), typeof(ReleaseVersion) }, argSet2 = new Type[] { typeof(string) };
+		internal static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion schema)
+		{
+			MethodInfo parser = null;			
+			if(mConstructorsSchema.TryGetValue(keyword,out parser))
+				return parser.Invoke(null, new object[] { str, schema }) as BaseClassIfc;
+			if(mConstructorsNoSchema.TryGetValue(keyword,out parser))
+				return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
+			Type type = null;
+			if (!mTypes.TryGetValue(keyword, out type))
+			{
+				type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+				if (type != null)
+					mTypes.TryAdd(keyword, type);
+			}
+			if (type != null)
+			{
+				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, argSet1, null);
+				if (parser != null)
+				{
+					mConstructorsSchema.TryAdd(keyword, parser);
+					return parser.Invoke(null, new object[] { str, schema }) as BaseClassIfc;
+				}
+				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, argSet2, null);
+				if (parser != null)
+				{
+					mConstructorsNoSchema.TryAdd(keyword, parser);
+					return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
+				}
+			}
+			if (string.Compare(keyword, "IfcParameterizedProfileDef", true) == 0)
+				return LineParser("IfcProfileDef", str, schema);
+			return null;
+		}
 	}
 	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
 

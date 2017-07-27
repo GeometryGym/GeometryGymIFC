@@ -35,6 +35,62 @@ namespace GeometryGym.STEP
 			CultureInfo ci = new CultureInfo("en-us");
 			NumberFormat = (NumberFormatInfo) ci.NumberFormat.Clone();
 		}
+
+		internal static void GetKeyWord(string line, out int indexID, out string keyword, out string def)
+		{
+			keyword = "";
+			def = "";
+			indexID = 0;
+			if (string.IsNullOrEmpty(line))
+				return;
+			string strLine = line.Trim();
+			int jlast = strLine.Length, jcounter = (line[0] == '#' ? 1 : 0);
+			char c;
+			for (; jcounter < jlast; jcounter++)
+			{
+				c = strLine[jcounter];
+				if (char.IsDigit(c))
+					def += c;
+				else
+					break;
+			}
+			if (!string.IsNullOrEmpty(def))
+				indexID = int.Parse(def);
+			c = strLine[jcounter];
+			while (c == ' ')
+				c = strLine[++jcounter];
+			if (strLine[jcounter] == '=')
+				jcounter++;
+			c = strLine[jcounter];
+			while (c == ' ')
+				c = strLine[++jcounter];
+			//if (c != 'I')
+			//	return;
+			for (; jcounter < jlast; jcounter++)
+			{
+				c = strLine[jcounter];
+				if (c == '(')
+					break;
+				keyword += c;
+			}
+			keyword = keyword.Trim();
+			keyword = keyword.ToUpper();
+			int len = strLine.Length;
+			int ilast = 1;
+			while (strLine[len - ilast] != ')')
+			{
+				ilast++;
+				if (len - ilast == jcounter)
+				{
+					ilast = 0;
+					break;
+				}
+				if (ilast > len)
+					return;
+			}
+			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
+		}
+
 		public static string ParseString(string str)
 		{
 			return (str.Length > 2 ? str.Substring(1, str.Length - 2) : (str == "''" ? "" : str));
@@ -596,7 +652,10 @@ namespace GeometryGym.STEP
 					break;
 				c = s[icounter++];
 				if (icounter == len)
+				{
+					result += c;
 					break;
+				}
 			}
 			pos = icounter;
 			return result;
@@ -674,7 +733,10 @@ namespace GeometryGym.STEP
 				}
 			}
 			pos = icounter;
-			return double.Parse(str, NumberFormat);
+			double result = 0;
+			if (double.TryParse(str, NumberStyles.Any, NumberFormat, out result))
+				return result;
+			return double.NaN;
 		}
 		public static int StripInt(string s, ref int pos, int len)
 		{
@@ -788,7 +850,10 @@ namespace GeometryGym.STEP
 			while (char.IsWhiteSpace(s[icounter]))
 				icounter++;
 			if (s[icounter] == ')')
+			{
+				pos = icounter + 2;
 				return new List<int>();
+			}
 			if (s[icounter++] != '#')
 				throw new Exception("Unrecognized format!");
 			List<int> result = new List<int>();

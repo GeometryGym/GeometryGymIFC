@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 					HasCoordinateOperation = mDatabase.ParseXml<IfcCoordinateOperation>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (this as IfcGeometricRepresentationSubContext == null)
@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("UserDefinedTargetView"))
 				UserDefinedTargetView = xml.Attributes["UserDefinedTargetView"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (!double.IsNaN(mTargetScale))
@@ -122,18 +122,16 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Elements") == 0)
 				{
-					List<IfcGeometricSetSelect> elements = new List<IfcGeometricSetSelect>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcGeometricSetSelect e = mDatabase.ParseXml<IfcGeometricSetSelect>(cn as XmlElement);
 						if (e != null)
-							elements.Add(e);
+							addElement(e);
 					}
-					Elements = elements;
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Elements");
@@ -152,11 +150,11 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "UAxes") == 0)
-					UAxes = extractAxes(child);
+					extractAxes(child).ForEach(x=>AddUAxis(x));
 				else if (string.Compare(name, "VAxes") == 0)
-					UAxes = extractAxes(child);
+					extractAxes(child).ForEach(x=>AddVAxis(x));
 				else if (string.Compare(name, "WAxes") == 0)
-					UAxes = extractAxes(child);
+					extractAxes(child).ForEach(x=>AddWAxis(x));
 			}
 		}
 		internal List<IfcGridAxis> extractAxes(XmlNode node)
@@ -170,7 +168,7 @@ namespace GeometryGym.Ifc
 			}
 			return axes;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			XmlElement uAxes = null, vAxes = null, wAxes = null;
 			if (mUAxes.Count > 0)
@@ -217,7 +215,7 @@ namespace GeometryGym.Ifc
 					AxisCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if(mAxisTag != "$")
@@ -225,6 +223,37 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("SameSense", mSameSense.ToString().ToLower());
 			xml.AppendChild(AxisCurve.GetXML(xml.OwnerDocument, "AxisCurve", this, processed));
 		}
-
+	}
+	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "IsGroupedBy") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcRelAssignsToGroup r = mDatabase.ParseXml<IfcRelAssignsToGroup>(cn as XmlElement);
+						if (r != null)
+							r.RelatingGroup = this;
+					}
+				}
+				
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mIsGroupedBy.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("IsGroupedBy");
+				xml.AppendChild(element);
+				foreach (IfcRelAssignsToGroup rag in mIsGroupedBy)
+					element.AppendChild(rag.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+		}
 	}
 }

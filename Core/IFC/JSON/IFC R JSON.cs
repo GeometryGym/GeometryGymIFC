@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -59,7 +60,7 @@ namespace GeometryGym.Ifc
 				InstanceName = token.Value<string>();
 			JArray array = obj.GetValue("ListPositions", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				ListPositions = array.ToList().ConvertAll(x => x.Value<int>());
+				mListPositions = array.ToList().ConvertAll(x => x.Value<int>());
 			JObject jobj = obj.GetValue("InnerReference", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				InnerReference = mDatabase.parseJObject<IfcReference>(jobj);
@@ -81,7 +82,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatedObjects = mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addObject(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -100,7 +101,13 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatedObjects = mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRelated(x));
+			JToken token = obj.GetValue("RelatedObjectsType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+			{
+				if (!Enum.TryParse<IfcObjectTypeEnum>(token.Value<string>(), true,out mRelatedObjectsType))
+					mRelatedObjectsType = IfcObjectTypeEnum.NOTDEFINED;
+			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -164,7 +171,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatedObjects = mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -306,12 +313,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatedElements = mDatabase.extractJArray<IfcProduct>(obj.GetValue("RelatedElements", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcProduct>(obj.GetValue("RelatedElements", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
-			List<IfcProduct> relatedElements = RelatedElements;
+			ReadOnlyCollection<IfcProduct> relatedElements = RelatedElements;
 			JArray array = new JArray();
 			foreach (IfcProduct product in relatedElements)
 				array.Add(product.getJson(this, processed));
@@ -326,7 +333,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingContext", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				RelatingContext = mDatabase.parseJObject<IfcContext>(jobj);
-			RelatedDefinitions = mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedDefinitions", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedDefinitions", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -341,7 +348,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatedObjects = mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRelated(x));
 			RelatingPropertyDefinition = mDatabase.parseJObject<IfcPropertySetDefinition>(obj.GetValue("RelatingPropertyDefinition", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
@@ -357,7 +364,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JArray array = obj.GetValue("RelatedPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				RelatedPropertySets = mDatabase.extractJArray<IfcPropertySetDefinition>(array);
+				mDatabase.extractJArray<IfcPropertySetDefinition>(array).ForEach(x=>AddRelated(x));
 			RelatingTemplate = extractObject<IfcPropertySetTemplate>(obj.GetValue("RelatingTemplate", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
@@ -378,7 +385,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JArray array = obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				RelatedObjects = mDatabase.extractJArray<IfcObject>(array);
+				mDatabase.extractJArray<IfcObject>(array).ForEach(x=>AddRelated(x));
 			RelatingType = extractObject<IfcTypeObject>(obj.GetValue("RelatingType", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
@@ -392,6 +399,27 @@ namespace GeometryGym.Ifc
 			//obj["RelatedObjects"] = array;
 		}
 	}
+	public partial class IfcRelFillsElement : IfcRelConnects
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("RelatingOpeningElement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				RelatingOpeningElement = mDatabase.parseJObject<IfcOpeningElement>(jobj);
+			jobj = obj.GetValue("RelatedBuildingElement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				RelatedBuildingElement = mDatabase.parseJObject<IfcElement>(jobj);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.setJSON(obj, host, processed);
+			if (host.mIndex != mRelatingOpeningElement)
+				obj["RelatingOpeningElement"] = mDatabase[mRelatingOpeningElement].getJson(this, processed);
+			if (host.mIndex != mRelatedBuildingElement)
+				obj["RelatedBuildingElement"] = mDatabase[mRelatedBuildingElement].getJson(this, processed);
+		}
+	}
 	public partial class IfcRelNests : IfcRelDecomposes
 	{
 		internal override void parseJObject(JObject obj)
@@ -400,14 +428,14 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingObject", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				RelatingObject = mDatabase.parseJObject<IfcObjectDefinition>(jobj);
-			RelatedObjects = mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
 			if (mRelatingObject != host.mIndex)
 				obj["RelatingObject"] = RelatingObject.getJson(this, processed);
-			List<IfcObjectDefinition> relatedObjects = RelatedObjects;
+			ReadOnlyCollection<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			JArray array = new JArray();
 			foreach (IfcObjectDefinition od in relatedObjects)
 				array.Add(od.getJson(this, processed));
@@ -422,7 +450,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingSystem", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				RelatingSystem = mDatabase.parseJObject<IfcSystem>(jobj);
-			RelatedBuildings = mDatabase.extractJArray<IfcSpatialElement>(obj.GetValue("RelatedBuildings", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcSpatialElement>(obj.GetValue("RelatedBuildings", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
@@ -434,6 +462,27 @@ namespace GeometryGym.Ifc
 			//foreach (IfcObjectDefinition od in relatedObjects)
 			//	array.Add(od.getJson(this, processed));
 			//obj["RelatedObjects"] = array;
+		}
+	}
+	public partial class IfcRelVoidsElement : IfcRelDecomposes
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("RelatingBuildingElement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				RelatingBuildingElement = mDatabase.parseJObject<IfcElement>(jobj);
+			jobj = obj.GetValue("RelatedOpeningElement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				RelatedOpeningElement = mDatabase.parseJObject<IfcFeatureElementSubtraction>(jobj);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		{
+			base.setJSON(obj, host, processed);
+			if (host.mIndex != mRelatingBuildingElement)
+				obj["RelatingBuildingElement"] = mDatabase[mRelatingBuildingElement].getJson(this, processed);
+			if (host.mIndex != mRelatedOpeningElement)
+				obj["RelatedOpeningElement"] = mDatabase[mRelatedOpeningElement].getJson(this, processed);
 		}
 	}
 	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
@@ -484,7 +533,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("RepresentationType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				RepresentationType = token.Value<string>();
-			Items = mDatabase.extractJArray<IfcRepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcRepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addItem(x));
 
 			List<IfcPresentationLayerAssignment> assignments = mDatabase.extractJArray<IfcPresentationLayerAssignment>(obj.GetValue("LayerAssignments", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcPresentationLayerAssignment a in assignments)
@@ -496,7 +545,7 @@ namespace GeometryGym.Ifc
 			obj["ContextOfItems"] = ContextOfItems.getJson(this, processed);
 			setAttribute(obj, "RepresentationIdentifier", RepresentationIdentifier);
 			setAttribute(obj, "RepresentationType", RepresentationType);
-			obj["Items"] = new JArray(Items.ConvertAll(x => x.getJson(this, processed)));
+			obj["Items"] = new JArray(Items.ToList().ConvertAll(x => x.getJson(this, processed)));
 
 			if (mLayerAssignments.Count > 0)
 				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, processed)));
@@ -524,6 +573,22 @@ namespace GeometryGym.Ifc
 			string contextType = ContextType;
 			if (!string.IsNullOrEmpty(contextType))
 				obj["ContextType"] = contextType;
+			JArray reps = new JArray();
+			foreach(IfcRepresentation r in RepresentationsInContext)
+			{
+				if (!processed.Contains(r.Index))
+					reps.Add(r.getJson(this, processed));
+			}
+			if (reps.Count > 0)
+				obj["RepresentationsInContext"] = reps;
+
+			DatabaseIfc db = new DatabaseIfc(ModelView.Ifc4NotAssigned);
+			db.Factory.Options.GenerateOwnerHistory = false;
+			IfcProject project = new IfcProject(db, "MyProjectNumber");
+			project.UnitsInContext = new IfcUnitAssignment(db).SetUnits(IfcUnitAssignment.Length.Inch);
+			IfcPolyline line = new IfcPolyline(new IfcCartesianPoint(db, 0, 0, 0), new IfcCartesianPoint(db, 10, 0, 0));
+			new IfcPresentationLayerAssignment("Default", line) { };
+			IfcShapeRepresentation sr = new IfcShapeRepresentation(line);
 		}
 	}
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/
@@ -581,7 +646,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingConstraint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if(jobj != null)
 				RelatingConstraint = mDatabase.parseJObject<IfcConstraint>(jobj);
-			RelatedResourceObjects = mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
 		{
@@ -631,7 +696,11 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("OwnerHistory", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)
 			{
-				mOwnerHistory = token.Value<int>();	
+				JObject jobj = token as JObject;
+				if(jobj != null)
+					OwnerHistory = mDatabase.parseJObject<IfcOwnerHistory>(jobj);
+				else
+					mOwnerHistory = token.Value<int>();	
 			}
 			token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)

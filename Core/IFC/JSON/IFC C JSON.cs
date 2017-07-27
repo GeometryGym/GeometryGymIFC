@@ -274,6 +274,14 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcContext : IfcObjectDefinition//(IfcProject, IfcProjectLibrary)
 	{
+		public string Json
+		{
+			get
+			{
+				JObject jobj = getJson(null, new HashSet<int>());
+				return jobj.ToString();
+			}
+		}
 		internal override void parseJObject(JObject obj)
 		{
 			if (mDatabase.mContext == null) //this as IfcProjectLibrary == null ||
@@ -289,9 +297,10 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Phase", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Phase = token.Value<string>();
-			RepresentationContexts = mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRepresentationContext(x));
 			UnitsInContext = mDatabase.parseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			Declares = mDatabase.extractJArray<IfcRelDeclares>(obj.GetValue("Declares", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>x.AddRelated(this));
+			mDatabase.extractJArray<IfcRelDeclares>(obj.GetValue("Declares", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>x.RelatingContext = this);
 
 
 		}
@@ -390,7 +399,7 @@ namespace GeometryGym.Ifc
 			OuterBoundary = extractObject<IfcCurve>(obj.GetValue("OuterBoundary", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			JArray array = obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				InnerBoundaries = mDatabase.extractJArray<IfcCurve>(array);
+				mDatabase.extractJArray<IfcCurve>(array).ForEach(x=> addInnerBoundary(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
 		{
@@ -398,7 +407,7 @@ namespace GeometryGym.Ifc
 			obj["BasisSurface"] = BasisSurface.getJson(this, processed);
 			obj["OuterBoundary"] = OuterBoundary.getJson(this, processed);
 			if (mInnerBoundaries.Count > 0)
-				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ConvertAll(x => x.getJson(this, processed)));
+				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, processed)));
 		}
 	}
 }

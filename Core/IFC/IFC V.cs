@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -27,7 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public interface IfcValue { object Value { get; } }  //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	public abstract class IfcValue { public abstract object Value { get; } }  //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
 	public partial class IfcValve : IfcFlowController //IFC4
 	{
 		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// OPTIONAL : IfcValveTypeEnum;
@@ -72,7 +73,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcVector() : base() { }
 		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
-		public IfcVector(IfcDirection orientation, double magnitude) { Orientation = orientation; Magnitude = magnitude; }
+		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.Database) { Orientation = orientation; Magnitude = magnitude; }
 	
 		internal static IfcVector Parse(string str)
 		{
@@ -91,6 +92,7 @@ namespace GeometryGym.Ifc
 		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
 		internal static IfcVertex Parse(string str) { return new IfcVertex(); }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
 	{
 		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
@@ -220,295 +222,196 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType + "."); }
 	}
 
-	public interface IfcDerivedMeasureValue : IfcValue { double Measure { get; } } //(IfcVolumetricFlowRateMeasure,IfcTimeStamp ,IfcThermalTransmittanceMeasure ,IfcThermalResistanceMeasure
-	//,IfcThermalAdmittanceMeasure ,IfcPressureMeasure ,IfcPowerMeasure ,IfcMassFlowRateMeasure ,IfcMassDensityMeasure ,IfcLinearVelocityMeasure
-	//,IfcKinematicViscosityMeasure ,IfcIntegerCountRateMeasure ,IfcHeatFluxDensityMeasure ,IfcFrequencyMeasure ,IfcEnergyMeasure ,IfcElectricVoltageMeasure
-	//,IfcDynamicViscosityMeasure ,IfcCompoundPlaneAngleMeasure ,IfcAngularVelocityMeasure ,IfcThermalConductivityMeasure ,IfcMolecularWeightMeasure
-	//,IfcVaporPermeabilityMeasure ,IfcMoistureDiffusivityMeasure ,IfcIsothermalMoistureCapacityMeasure ,IfcSpecificHeatCapacityMeasure ,IfcMonetaryMeasure
-	//,IfcMagneticFluxDensityMeasure ,IfcMagneticFluxMeasure ,IfcLuminousFluxMeasure ,IfcForceMeasure ,IfcInductanceMeasure ,IfcIlluminanceMeasure
-	//,IfcElectricResistanceMeasure ,IfcElectricConductanceMeasure ,IfcElectricChargeMeasure ,IfcDoseEquivalentMeasure ,IfcElectricCapacitanceMeasure
-	//,IfcAbsorbedDoseMeasure ,IfcRadioActivityMeasure ,IfcRotationalFrequencyMeasure ,IfcTorqueMeasure ,IfcAccelerationMeasure ,IfcLinearForceMeasure
-	//,IfcLinearStiffnessMeasure ,IfcModulusOfSubgradeReactionMeasure ,IfcModulusOfElasticityMeasure ,IfcMomentOfInertiaMeasure ,IfcPlanarForceMeasure
-	//,IfcRotationalStiffnessMeasure ,IfcShearModulusMeasure ,IfcLinearMomentMeasure ,IfcLuminousIntensityDistributionMeasure ,IfcCurvatureMeasure
-	//,IfcMassPerLengthMeasure ,IfcModulusOfLinearSubgradeReactionMeasure ,IfcModulusOfRotationalSubgradeReactionMeasure ,IfcRotationalMassMeasure
-	//,IfcSectionalAreaIntegralMeasure ,IfcSectionModulusMeasure ,IfcTemperatureGradientMeasure ,IfcThermalExpansionCoefficientMeasure ,IfcWarpingConstantMeasure
-	//,IfcWarpingMomentMeasure ,IfcSoundPowerMeasure ,IfcSoundPressureMeasure ,IfcHeatingValueMeasure,IfcPHMeasure,IfcIonConcentrationMeasure);
+	public abstract class IfcDerivedMeasureValue : IfcValue
+	{
+		internal double mValue;
+		public override object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } set { mValue = value; } }
+		protected IfcDerivedMeasureValue(double value) { mValue = value; }
+		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	} //(IfcVolumetricFlowRateMeasure,IfcTimeStamp ,IfcThermalTransmittanceMeasure ,IfcThermalResistanceMeasure
+	  //,IfcThermalAdmittanceMeasure ,IfcPressureMeasure ,IfcPowerMeasure ,IfcMassFlowRateMeasure ,IfcMassDensityMeasure ,IfcLinearVelocityMeasure
+	  //,IfcKinematicViscosityMeasure ,IfcIntegerCountRateMeasure ,IfcHeatFluxDensityMeasure ,IfcFrequencyMeasure ,IfcEnergyMeasure ,IfcElectricVoltageMeasure
+	  //,IfcDynamicViscosityMeasure ,IfcCompoundPlaneAngleMeasure ,IfcAngularVelocityMeasure ,IfcThermalConductivityMeasure ,IfcMolecularWeightMeasure
+	  //,IfcVaporPermeabilityMeasure ,IfcMoistureDiffusivityMeasure ,IfcIsothermalMoistureCapacityMeasure ,IfcSpecificHeatCapacityMeasure ,IfcMonetaryMeasure
+	  //,IfcMagneticFluxDensityMeasure ,IfcMagneticFluxMeasure ,IfcLuminousFluxMeasure ,IfcForceMeasure ,IfcInductanceMeasure ,IfcIlluminanceMeasure
+	  //,IfcElectricResistanceMeasure ,IfcElectricConductanceMeasure ,IfcElectricChargeMeasure ,IfcDoseEquivalentMeasure ,IfcElectricCapacitanceMeasure
+	  //,IfcAbsorbedDoseMeasure ,IfcRadioActivityMeasure ,IfcRotationalFrequencyMeasure ,IfcTorqueMeasure ,IfcAccelerationMeasure ,IfcLinearForceMeasure
+	  //,IfcLinearStiffnessMeasure ,IfcModulusOfSubgradeReactionMeasure ,IfcModulusOfElasticityMeasure ,IfcMomentOfInertiaMeasure ,IfcPlanarForceMeasure
+	  //,IfcRotationalStiffnessMeasure ,IfcShearModulusMeasure ,IfcLinearMomentMeasure ,IfcLuminousIntensityDistributionMeasure ,IfcCurvatureMeasure
+	  //,IfcMassPerLengthMeasure ,IfcModulusOfLinearSubgradeReactionMeasure ,IfcModulusOfRotationalSubgradeReactionMeasure ,IfcRotationalMassMeasure
+	  //,IfcSectionalAreaIntegralMeasure ,IfcSectionModulusMeasure ,IfcTemperatureGradientMeasure ,IfcThermalExpansionCoefficientMeasure ,IfcWarpingConstantMeasure
+	  //,IfcWarpingMomentMeasure ,IfcSoundPowerMeasure ,IfcSoundPressureMeasure ,IfcHeatingValueMeasure,IfcPHMeasure,IfcIonConcentrationMeasure);
 
-	public partial class IfcAreaDensityMeasure : IfcDerivedMeasureValue 
+	public class IfcAbsorbedDoseMeasure : IfcDerivedMeasureValue { public IfcAbsorbedDoseMeasure(double value) : base(value) { } }
+	public class IfcAccelerationMeasure : IfcDerivedMeasureValue { public IfcAccelerationMeasure(double value) : base(value) { } }
+	public class IfcAngularVelocityMeasure : IfcDerivedMeasureValue { public IfcAngularVelocityMeasure(double value) : base(value) { } }
+	public class IfcAreaDensityMeasure : IfcDerivedMeasureValue { public IfcAreaDensityMeasure(double value) : base(value) { } }
+	public class IfcCompoundPlaneAngleMeasure //: IfcDerivedMeasureValue
 	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcAreaDensityMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCAREADENSITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcDynamicViscosityMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcDynamicViscosityMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCDYNAMICVISCOSITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcElectricCurrentMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcElectricCurrentMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCELECTRICCURRENTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcElectricVoltageMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcElectricVoltageMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCELECTRICVOLTAGEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcEnergyMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcEnergyMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCENERGYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcForceMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcForceMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCFORCEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcLinearStiffnessMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCLINEARSTIFFNESSMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcLinearVelocityMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcLinearVelocityMeasure(double value) { mValue = value; }
-		public override string ToString() { return  "IFCLINEARVELOCITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcMassDensityMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMassDensityMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMASSDENSITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcMassFlowRateMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMassFlowRateMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMASSFLOWRATEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public class IfcMassPerLengthMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMassPerLengthMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMASSPERLENGTHMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public class IfcModulusOfElasticityMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcModulusOfElasticityMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMODULUSOFELASTICITYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public struct IfcMolecularWeightMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMolecularWeightMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMOLECULARWEIGHTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public class IfcMomentOfInertiaMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMomentOfInertiaMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMOMENTOFINERTIAMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public struct IfcMonetaryMeasure : IfcDerivedMeasureValue//, IfcAppliedValueSelect
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMonetaryMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMONETARYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcPowerMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPowerMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCPOWERMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcPressureMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPressureMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCPRESSUREMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	} //
-	public partial class IfcRotationalFrequencyMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcRotationalFrequencyMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCROTATIONALFREQUENCYMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcRotationalStiffnessMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcRotationalStiffnessMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCROTATIONALSTIFFNESSMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcSectionModulusMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcSectionModulusMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCSECTIONMODULUSMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcThermalExpansionCoefficientMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcThermalExpansionCoefficientMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCTHERMALEXPANSIONCOEFFICIENTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcThermalTransmittanceMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcThermalTransmittanceMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCTHERMALTRANSMITTANCEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcVolumetricFlowRateMeasure : IfcDerivedMeasureValue// IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcVolumetricFlowRateMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCVOLUMETRICFLOWRATEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcWarpingConstantMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcWarpingConstantMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCWARPINGCONSTANTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcWarpingMomentMeasure : IfcDerivedMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcWarpingMomentMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCWARPINGMOMENTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
+		internal int mDegrees = 0, mMinutes = 0, mSeconds = 0, mMicroSeconds = 0;
+		public IfcCompoundPlaneAngleMeasure(double angleDegrees) //: base(angleDegrees)
+		{
+			double ang = Math.Abs(angleDegrees);
+			int sign = angleDegrees < 0 ? -1 : 1;
 
-	public interface IfcMeasureValue : IfcValue { double Measure { get; } } //TYPE IfcMeasureValue = SELECT (IfcVolumeMeasure,IfcTimeMeasure ,IfcThermodynamicTemperatureMeasure ,IfcSolidAngleMeasure ,IfcPositiveRatioMeasure
-	//,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
-	//IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
-	public partial class IfcAreaMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcAreaMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCAREAMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+			mDegrees = sign * (int)Math.Floor(ang);
+			mMinutes = sign * (int)Math.Floor((ang - mDegrees) * 60.0);
+			mSeconds = sign * (int)Math.Floor(((ang - mDegrees) * 60 - mMinutes) * 60);
+			mMicroSeconds = sign * (int)Math.Floor((((ang - mDegrees) * 60 - mMinutes) * 60 - mSeconds) * 1e6);
+
+		}
+		internal IfcCompoundPlaneAngleMeasure(int degrees, int minutes, int seconds, int microSeconds)
+			//:base(degrees + minutes/60 + seconds / 60 / 60 + microSeconds / 60 / 60 / 1e-6)
+		{
+			mDegrees = degrees;
+			mMinutes = minutes;
+			mSeconds = seconds;
+			mMicroSeconds = microSeconds;
+		}
+
+		internal static IfcCompoundPlaneAngleMeasure Parse(string text)
+		{
+			if (string.IsNullOrEmpty(text) || text == "$")
+				return null;
+			double angle = 0;
+			if (double.TryParse(text, out angle))
+				return new IfcCompoundPlaneAngleMeasure(angle);
+			string str = text.Replace("(", "").Replace(")", "");
+			string[] fields = str.Split(",".ToCharArray());
+			if (fields.Length >= 3)
+			{
+				int degrees = 0, minutes = 0, seconds = 0, microSeconds = 0;
+				if (int.TryParse(fields[0], out degrees) && int.TryParse(fields[1], out minutes) && int.TryParse(fields[2], out seconds) && (fields.Length == 3 || int.TryParse(fields[3], out microSeconds)))
+					return new IfcCompoundPlaneAngleMeasure(degrees, minutes, seconds, microSeconds);
+			}
+
+			// handle 50°58'33"S.
+			return null;
+		}
+		public string ToSTEP() { return "(" + mDegrees + "," + mMinutes + "," + mSeconds + (mMicroSeconds == 0 ? ")" : "," + mMicroSeconds + ")"); }
+		public override string ToString()
+		{
+			return this.GetType().Name.ToUpper() + ToSTEP();
+		}
+		internal double computeAngle()
+		{
+			double compound = Math.Abs(mMinutes) / 60.0 + Math.Abs(mSeconds) / 3600.0 + Math.Abs(mMicroSeconds) / 3600 * 1e-6;
+			double multiplier = (mDegrees == 0 ? (mMinutes == 0 ? (mSeconds == 0 ? (mMicroSeconds > 0 ? 1 : -1) : (mSeconds > 0 ? 1 : -1)) : (mMinutes > 0 ? 1 : -1)) : (mDegrees > 0 ? 1 : -1));
+			return mDegrees + multiplier  * compound;
+		}
 	}
-	public partial class IfcCountMeasure : IfcMeasureValue
+	public class IfcCurvatureMeasure : IfcDerivedMeasureValue { public IfcCurvatureMeasure(double value) : base(value) { } }
+	public class IfcDoseEquivalentMeasure : IfcDerivedMeasureValue { public IfcDoseEquivalentMeasure(double value) : base(value) { } }
+	public class IfcDynamicViscosityMeasure : IfcDerivedMeasureValue { public IfcDynamicViscosityMeasure(double value) : base(value) { } }
+	public class IfcElectricCapacitanceMeasure : IfcDerivedMeasureValue { public IfcElectricCapacitanceMeasure(double value) : base(value) { } }
+	public class IfcElectricChargeMeasure : IfcDerivedMeasureValue { public IfcElectricChargeMeasure(double value) : base(value) { } }
+	public class IfcElectricConductanceMeasure : IfcDerivedMeasureValue { public IfcElectricConductanceMeasure(double value) : base(value) { } }
+	public class IfcElectricResistanceMeasure : IfcDerivedMeasureValue { public IfcElectricResistanceMeasure(double value) : base(value) { } }
+	public class IfcElectricVoltageMeasure : IfcDerivedMeasureValue { public IfcElectricVoltageMeasure(double value) : base(value) { } }
+	public class IfcEnergyMeasure : IfcDerivedMeasureValue { public IfcEnergyMeasure(double value) : base(value) { } }
+	public class IfcForceMeasure : IfcDerivedMeasureValue { public IfcForceMeasure(double value) : base(value) { } }
+	public class IfcFrequencyMeasure : IfcDerivedMeasureValue { public IfcFrequencyMeasure(double value) : base(value) { } }
+	public class IfcHeatFluxDensityMeasure : IfcDerivedMeasureValue { public IfcHeatFluxDensityMeasure(double value) : base(value) { } }
+	public class IfcHeatingValueMeasure : IfcDerivedMeasureValue { public IfcHeatingValueMeasure(double value) : base(value) { } }
+	public class IfcIlluminanceMeasure : IfcDerivedMeasureValue { public IfcIlluminanceMeasure(double value) : base(value) { } } 
+	public class IfcInductanceMeasure : IfcDerivedMeasureValue { public IfcInductanceMeasure(double value) : base(value) { } } 
+	public class IfcIntegerCountRateMeasure : IfcDerivedMeasureValue
 	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcCountMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCCOUNTMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public IfcIntegerCountRateMeasure(double value) : base((int)value) { }
+		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + (int)mValue + ")"; }
 	}
-	public partial class IfcDescriptiveMeasure : IfcMeasureValue, IfcSizeSelect
+	public class IfcIonConcentrationMeasure : IfcDerivedMeasureValue { public IfcIonConcentrationMeasure(double value) : base(value) { } } 
+	public class IfcIsothermalMoistureCapacityMeasure : IfcDerivedMeasureValue { public IfcIsothermalMoistureCapacityMeasure(double value) : base(value) { } } 
+	public class IfcKinematicViscosityMeasure : IfcDerivedMeasureValue { public IfcKinematicViscosityMeasure(double value) : base(value) { } } 
+	public class IfcLinearForceMeasure : IfcDerivedMeasureValue { public IfcLinearForceMeasure(double value) : base(value) { } }
+	public class IfcLinearMomentMeasure : IfcDerivedMeasureValue { public IfcLinearMomentMeasure(double value) : base(value) { } }
+	public class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue { public IfcLinearStiffnessMeasure(double value) : base(value) { } }
+	public class IfcLinearVelocityMeasure : IfcDerivedMeasureValue { public IfcLinearVelocityMeasure(double value) : base(value) { } }
+	public class IfcLuminousFluxMeasure : IfcDerivedMeasureValue { public IfcLuminousFluxMeasure(double value) : base(value) { } }
+	public class IfcLuminousIntensityDistributionMeasure : IfcDerivedMeasureValue { public IfcLuminousIntensityDistributionMeasure(double value) : base(value) { } }
+	public class IfcLuminousMeasure : IfcDerivedMeasureValue { public IfcLuminousMeasure(double value) : base(value) { } }
+	public class IfcMagneticFluxDensityMeasure : IfcDerivedMeasureValue { public IfcMagneticFluxDensityMeasure(double value) : base(value) { } }
+	public class IfcMagneticFluxMeasure : IfcDerivedMeasureValue { public IfcMagneticFluxMeasure(double value) : base(value) { } }
+	public class IfcMassDensityMeasure : IfcDerivedMeasureValue { public IfcMassDensityMeasure(double value) : base(value) { } }
+	public class IfcMassFlowRateMeasure : IfcDerivedMeasureValue { public IfcMassFlowRateMeasure(double value) : base(value) { } }
+	public class IfcMassPerLengthMeasure : IfcDerivedMeasureValue { public IfcMassPerLengthMeasure(double value) : base(value) { } }
+	public class IfcModulusOfElasticityMeasure : IfcDerivedMeasureValue { public IfcModulusOfElasticityMeasure(double value) : base(value) { } }
+	public class IfcModulusOfSubgradeReactionMeasure : IfcDerivedMeasureValue { public IfcModulusOfSubgradeReactionMeasure(double value) : base(value) { } }
+	public class IfcModulusOfRotationalSubgradeReactionMeasure : IfcDerivedMeasureValue { public IfcModulusOfRotationalSubgradeReactionMeasure(double value) : base(value) { } }
+	public class IfcMoistureDiffusivityMeasure : IfcDerivedMeasureValue { public IfcMoistureDiffusivityMeasure(double value) : base(value) { } }
+	public class IfcMolecularWeightMeasure : IfcDerivedMeasureValue { public IfcMolecularWeightMeasure(double value) : base(value) { } }
+	public class IfcMomentOfInertiaMeasure : IfcDerivedMeasureValue { public IfcMomentOfInertiaMeasure(double value) : base(value) { } }
+	public class IfcMonetaryMeasure : IfcDerivedMeasureValue { public IfcMonetaryMeasure(double value) : base(value) { } }//, IfcAppliedValueSelect
+	public class IfcPHMeasure : IfcDerivedMeasureValue { public IfcPHMeasure(double value) : base(value) { } }
+	public class IfcPlanarForceMeasure : IfcDerivedMeasureValue { public IfcPlanarForceMeasure(double value) : base(value) { } }
+	public class IfcPowerMeasure : IfcDerivedMeasureValue { public IfcPowerMeasure(double value) : base(value) { } }
+	public class IfcPressureMeasure : IfcDerivedMeasureValue { public IfcPressureMeasure(double value) : base(value) { } } 
+	public class IfcRadioActivityMeasure : IfcDerivedMeasureValue { public IfcRadioActivityMeasure(double value) : base(value) { } }
+	public class IfcRotationalFrequencyMeasure : IfcDerivedMeasureValue { public IfcRotationalFrequencyMeasure(double value) : base(value) { } }
+	public class IfcRotationalStiffnessMeasure : IfcDerivedMeasureValue { public IfcRotationalStiffnessMeasure(double value) : base(value) { } }
+	public class IfcSectionalAreaIntegralMeasure : IfcDerivedMeasureValue { public IfcSectionalAreaIntegralMeasure(double value) : base(value) { } }
+	public class IfcSectionModulusMeasure : IfcDerivedMeasureValue { public IfcSectionModulusMeasure(double value) : base(value) { } }
+	public class IfcShearModulusMeasure : IfcDerivedMeasureValue { public IfcShearModulusMeasure(double value) : base(value) { } }
+	public class IfcSoundPowerMeasure : IfcDerivedMeasureValue { public IfcSoundPowerMeasure(double value) : base(value) { } }
+	public class IfcSoundPressureMeasure : IfcDerivedMeasureValue { public IfcSoundPressureMeasure(double value) : base(value) { } }
+	public class IfcSpecificHeatCapacityMeasure : IfcDerivedMeasureValue { public IfcSpecificHeatCapacityMeasure(double value) : base(value) { } }
+	public class IfcTemperatureGradientMeasure : IfcDerivedMeasureValue { public IfcTemperatureGradientMeasure(double value) : base(value) { } }
+	public class IfcThermalAdmittanceMeasure : IfcDerivedMeasureValue { public IfcThermalAdmittanceMeasure(double value) : base(value) { } }
+	public class IfcThermalConductivityMeasure : IfcDerivedMeasureValue { public IfcThermalConductivityMeasure(double value) : base(value) { } }
+	public class IfcThermalExpansionCoefficientMeasure : IfcDerivedMeasureValue { public IfcThermalExpansionCoefficientMeasure(double value) : base(value) { } }
+	public class IfcThermalTransmittanceMeasure : IfcDerivedMeasureValue { public IfcThermalTransmittanceMeasure(double value) : base(value) { } }
+	public class IfcTimeStamp : IfcDerivedMeasureValue
 	{
-		internal string mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return 0; } }
-		public IfcDescriptiveMeasure(string value) { mValue = value; }
+		public IfcTimeStamp(double value) : base((int)value) { }
+		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + (int)mValue + ")"; }
+	}
+	public class IfcTorqueMeasure : IfcDerivedMeasureValue { public IfcTorqueMeasure(double value) : base(value) { } }
+	public class IfcVaporPermeabilityMeasure : IfcDerivedMeasureValue { public IfcVaporPermeabilityMeasure(double value) : base(value) { } }// IfcMeasureValue
+	public class IfcVolumetricFlowRateMeasure : IfcDerivedMeasureValue { public IfcVolumetricFlowRateMeasure(double value) : base(value) { } }// IfcMeasureValue
+	public class IfcWarpingConstantMeasure : IfcDerivedMeasureValue { public IfcWarpingConstantMeasure(double value) : base(value) { } }
+	public class IfcWarpingMomentMeasure : IfcDerivedMeasureValue { public IfcWarpingMomentMeasure(double value) : base(value) { } }
+
+	public abstract class IfcMeasureValue : IfcValue //TYPE IfcMeasureValue = SELECT (IfcVolumeMeasure,IfcTimeMeasure ,IfcThermodynamicTemperatureMeasure ,IfcSolidAngleMeasure ,IfcPositiveRatioMeasure
+	{ //,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
+      //IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
+		internal double mValue;
+		public override object Value { get { return mValue; } }
+		public double Measure { get { return mValue; } set { mValue = value; } }
+		protected IfcMeasureValue(double value) { mValue = value; }
+		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
+	public class IfcAreaMeasure : IfcMeasureValue { public IfcAreaMeasure(double value) : base(value) { } }
+	public class IfcAmountOfSubstanceMeasure : IfcMeasureValue { public IfcAmountOfSubstanceMeasure(double value) : base(value) { } }
+	public class IfcComplexNumber : IfcMeasureValue
+	{
+		internal double mImaginary = 0;
+		public IfcComplexNumber(double real) : base(real) { }
+		public IfcComplexNumber(double real, double imaginary) : base(real) { mImaginary = imaginary; }
+		public override string ToString() { return this.GetType().Name + "((" + ParserSTEP.DoubleToString(mValue) + "," + ParserSTEP.DoubleToString(mImaginary) + "))"; }
+	}
+	public class IfcContextDependentMeasure : IfcMeasureValue { public IfcContextDependentMeasure(double value) : base(value) { } }
+	public class IfcCountMeasure : IfcMeasureValue { public IfcCountMeasure(double value) : base(value) { } }
+	public class IfcDescriptiveMeasure : IfcMeasureValue, IfcSizeSelect 
+	{
+		internal string mStringValue;
+		public override object Value { get { return mStringValue; } }
+		public IfcDescriptiveMeasure(string value) : base(0) { mStringValue = value; }
 		public override string ToString() { return "IFCDESCRIPTIVEMEASURE(" + mValue + ")"; }
 	}
-	public partial class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect
+	public class IfcElectricCurrentMeasure : IfcMeasureValue { public IfcElectricCurrentMeasure(double value) : base(value) { } }
+	public class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect { public IfcLengthMeasure(double value) : base(value) { } }
+	public class IfcLuminousIntensityMeasure : IfcMeasureValue { public IfcLuminousIntensityMeasure(double value) : base(value) { } }
+	public class IfcMassMeasure : IfcMeasureValue { public IfcMassMeasure(double value) : base(value) { } }
+	public partial class IfcNormalisedRatioMeasure : IfcMeasureValue, IfcColourOrFactor { public IfcNormalisedRatioMeasure(double value) : base(Math.Min(1, Math.Max(0, value))) { }  }
+	public class IfcNumericMeasure : IfcMeasureValue { public IfcNumericMeasure(double value) : base(value) { } }
+	public class IfcParameterValue : IfcMeasureValue { public IfcParameterValue(double value) : base(value) { } }
+	public class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect { public IfcPlaneAngleMeasure(double value) : base(value) { } }
+	public class IfcPositivePlaneAngleMeasure : IfcMeasureValue { public IfcPositivePlaneAngleMeasure(double value) : base(value) { } }
+	public class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect
 	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcLengthMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCLENGTHMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcMassMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcMassMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCMASSMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcNormalisedRatioMeasure : IfcMeasureValue, IfcColourOrFactor
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcNormalisedRatioMeasure(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
-		public override string ToString() { return "IFCNORMALISEDRATIOMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPlaneAngleMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCPLANEANGLEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcPositivePlaneAngleMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPositivePlaneAngleMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCPOSITIVEPLANEANGLEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPositiveLengthMeasure(double value) { mValue = value; }
-		internal IfcPositiveLengthMeasure(string str)
+		public IfcPositiveLengthMeasure(double value) : base(value) { }
+		internal IfcPositiveLengthMeasure(string str) : base(0)
 		{
 			int icounter = 0;
 			for (; icounter < str.Length; icounter++)
@@ -522,15 +425,11 @@ namespace GeometryGym.Ifc
 			if (!double.TryParse(str.Substring(icounter), out mValue))
 				mValue = 0;
 		}
-		public override string ToString() { return "IFCPOSITIVELENGTHMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 	}
-	public partial class IfcPositiveRatioMeasure : IfcMeasureValue
+	public class IfcPositiveRatioMeasure : IfcMeasureValue
 	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcPositiveRatioMeasure(double value) { mValue = value; }
-		public IfcPositiveRatioMeasure(string str)
+		public IfcPositiveRatioMeasure(double value) : base(value) { }
+		public IfcPositiveRatioMeasure(string str) : base(0)
 		{
 			int icounter = 0;
 			for (; icounter < str.Length; icounter++)
@@ -544,115 +443,182 @@ namespace GeometryGym.Ifc
 			if (!double.TryParse(str.Substring(icounter), out mValue))
 				mValue = 0;
 		}
-		public override string ToString() { return "IFCPOSITIVERATIOMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 	}
-	public partial class IfcRatioMeasure : IfcMeasureValue, IfcTimeOrRatioSelect//, IfcAppliedValueSelect
+	public class IfcRatioMeasure : IfcMeasureValue, IfcTimeOrRatioSelect//, IfcAppliedValueSelect
 	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcRatioMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCRATIOMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public IfcRatioMeasure(double value) : base(value) { }
 		public string String { get { return ToString(); } }
 	}
-	public partial class IfcThermodynamicTemperatureMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcThermodynamicTemperatureMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCTHERMODYNAMICTEMPERATRUEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcTimeMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcTimeMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCTIMEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcVolumeMeasure : IfcMeasureValue
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public double Measure { get { return mValue; } }
-		public IfcVolumeMeasure(double value) { mValue = value; }
-		public override string ToString() { return "IFCVOLUMEMEASURE(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
+	public class IfcSolidAngleMeasure : IfcMeasureValue { public IfcSolidAngleMeasure(double value) : base(value) { } }
+	public class IfcThermodynamicTemperatureMeasure : IfcMeasureValue { public IfcThermodynamicTemperatureMeasure(double value) : base(value) { } }
+	public class IfcTimeMeasure : IfcMeasureValue { public IfcTimeMeasure(double value) : base(value) { } }
+	public class IfcVolumeMeasure : IfcMeasureValue { public IfcVolumeMeasure(double value) : base(value) { } }
 
-	public interface IfcSimpleValue : IfcValue { }// = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
+	public abstract class IfcSimpleValue : IfcValue { }// = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
+	//IfcBinary
 	public partial class IfcBoolean : IfcSimpleValue
 	{
 		internal bool mValue;
-		public object Value { get { return mValue; } }
+		public override object Value { get { return mValue; } }
 		public IfcBoolean(bool value) { mValue = value; }
 		public override string ToString() { return "IFCBOOLEAN(" + ParserSTEP.BoolToString(mValue) + ")"; }
+	}
+	public partial class IfcDate : IfcSimpleValue
+	{
+		internal string mDate = "$";
+		public override object Value { get { return convert(mDate); } }
+		internal IfcDate(DateTime datetime) { mDate = convert(datetime); }
+		public override string ToString() { return "IFCDATE(" + mDate + ")"; }
+		internal static string convert(DateTime date) { return "'" + date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day + "'"; }
+		internal static DateTime convert(string date) { return new DateTime(int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(5, 2)), int.Parse(date.Substring(8, 2))); }
+	}
+	public partial class IfcDateTime : IfcSimpleValue
+	{
+		internal string mDateTime = "$";
+		internal IfcDateTime(DateTime datetime) { mDateTime = formatSTEP(datetime); }
+		public override string ToString() { return "IFCDATETIME(" + mDateTime + ")"; }
+		internal static string formatSTEP(DateTime dateTime) { return (dateTime == DateTime.MinValue ? "$" : "'" + dateTime.Year + (dateTime.Month < 10 ? "-0" : "-") + dateTime.Month + (dateTime.Day < 10 ? "-0" : "-") + dateTime.Day + (dateTime.Hour < 10 ? "T0" : "T") + dateTime.Hour + (dateTime.Minute < 10 ? ":0" : ":") + dateTime.Minute + (dateTime.Second < 10 ? ":0" : ":") + dateTime.Second + "'"); }
+		internal static DateTime parseSTEP(string str)
+		{
+			string value = str.Replace("'", "");
+			if (string.IsNullOrEmpty(value) || value == "$")
+				return DateTime.MinValue;
+			try
+			{
+				int year = int.Parse(value.Substring(0, 4)), month = int.Parse(value.Substring(5, 2)), day = int.Parse(value.Substring(8, 2));
+				if (value.Contains("T"))
+				{
+					int hour = int.Parse(value.Substring(11, 2)), min = int.Parse(value.Substring(14, 2));
+					double seconds = double.Parse(value.Substring(17, value.Length - 17));
+					return new DateTime(year, month, day, hour, min, (int)seconds);
+				}
+				return new DateTime(year, month, day);
+			}
+			catch (Exception) { }
+			DateTime result = DateTime.MinValue;
+			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
+		}
+		public override object Value { get { return parseSTEP( mDateTime); } }
+		internal static IfcDateTimeSelect convertDateTimeSelect(DatabaseIfc m, DateTime date)
+		{
+			IfcCalendarDate cd = new IfcCalendarDate(m, date.Day, date.Month, date.Year);
+			if (date.Hour + date.Minute + date.Second < m.Tolerance)
+				return cd;
+			return new IfcDateAndTime(cd, new IfcLocalTime(m, date.Hour, date.Minute, date.Second));
+		}
+	}
+	public partial class IfcDuration : IfcSimpleValue, IfcTimeOrRatioSelect
+	{
+		internal int mYears, mMonths, mDays, mHours, mMinutes;
+		internal double mSeconds = 0;
+		public int Years { get { return mYears; } set { mYears = value; } }
+		public int Months { get { return mMonths; } set { mMonths = value; } }
+		public int Days { get { return mDays; } set { mDays = value; } }
+		public int Hours { get { return mHours; } set { mHours = value; } }
+		public int Minutes { get { return mMinutes; } set { mMinutes = value; } }
+		public double Seconds { get { return mSeconds; } set { mSeconds = value; } }
+
+		public IfcDuration() { }
+		public static string Convert(IfcDuration d) { return (d == null ? "$" : d.ToString()); }
+		public static IfcDuration Convert(string s) { return null; }
+
+		public override string ToString() { return "'P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S'"; }
+		internal double ToSeconds() { return ((((((mYears * 365) + (mMonths * 30) + mDays) * 24) + mHours) * 60) + mMinutes) * 60 + mSeconds; }
+		public override object Value { get { return ToSeconds(); } }
+		public string String { get { return getKW + "(" + ToString() + ")"; } }
+		public string getKW { get { return mKW; } }
+		internal static string mKW = "IFCDURATION";
 	}
 	public partial class IfcIdentifier : IfcSimpleValue
 	{
 		internal string mValue;
-		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public override object Value { get { return ParserIfc.Decode(mValue); } }
 		public IfcIdentifier(string value) { mValue = ParserIfc.Encode( value); }
 		public override string ToString() { return "IFCIDENTIFIER('" + mValue + "')"; }
 	}
 	public partial class IfcInteger : IfcSimpleValue
 	{
 		internal int mValue;
-		public object Value { get { return mValue; } }
+		public override object Value { get { return mValue; } }
 		public IfcInteger(int value) { mValue = value; }
 		public override string ToString() { return "IFCINTEGER(" + mValue.ToString() + ")"; }
 	}
 	public partial class IfcLabel : IfcSimpleValue
 	{
 		internal string mValue;
-		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public override object Value { get { return ParserIfc.Decode(mValue); } }
 		public IfcLabel(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCLABEL('" + mValue + "')"; }
 	}
 	public partial class IfcLogical : IfcSimpleValue
 	{
 		internal IfcLogicalEnum mValue;
-		public object Value { get { return mValue.ToString(); } }
+		public override object Value { get { return mValue.ToString(); } }
 		public IfcLogical(IfcLogicalEnum value) { mValue = value; }
 		public IfcLogical(bool value) { mValue = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; }
 		public override string ToString() { return "IFCLOGICAL(" + ParserIfc.LogicalToString(mValue) + ")"; }
 	}
+	//IfcPositiveInteger
 	public partial class IfcReal : IfcSimpleValue
 	{
 		internal double mValue;
-		public object Value { get { return mValue; } }
+		public override object Value { get { return mValue; } }
 		public IfcReal(double value) { mValue = value; }
 		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcSpecularExponent : IfcSimpleValue, IfcSpecularHighlightSelect
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public IfcSpecularExponent(double value) { mValue = value; }
-		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-	}
-	public partial class IfcSpecularRoughness : IfcSimpleValue, IfcSpecularHighlightSelect
-	{
-		internal double mValue;
-		public object Value { get { return mValue; } }
-		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
-		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 	}
 	public partial class IfcText : IfcSimpleValue
 	{
 		internal string mValue;
-		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public override object Value { get { return ParserIfc.Decode(mValue); } }
 		public IfcText(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCTEXT('" + mValue + "')"; }
 	}
+	public partial class IfcTime : IfcSimpleValue
+	{
+		internal string mTime = "$";
+		public override string ToString() { return mTime; }
+		internal static string formatSTEP(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? ":0" : ":") + date.Minute + (date.Second < 10 ? ":0" : ":") + date.Second + "'"; }
+		internal static DateTime parseSTEP(string str)
+		{
+			string value = str.Replace("'", "");
+			if (string.IsNullOrEmpty(value) || value == "$")
+				return DateTime.MinValue;
+			try
+			{
+				DateTime min = DateTime.MinValue;
+				int hour = int.Parse(value.Substring(1, 2)), minute = int.Parse(value.Substring(4, 2));
+				double seconds = double.Parse(value.Substring(7, value.Length - 7));
+				return new DateTime(min.Year, min.Month, min.Day, hour, minute, (int)seconds);
+			}
+			catch (Exception) { }
+			DateTime result = DateTime.MinValue;
+			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
+		}
+		public override object Value { get { return mTime; } }
+		internal static string convert(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? "-0" : "-") + date.Minute + (date.Second < 10 ? "-0" : "-") + date.Second; }
+	}
+	//IfcTimeStamp
 	public partial class IfcURIReference : IfcSimpleValue
 	{
 		internal string mValue;
-		public object Value { get { return ParserIfc.Decode(mValue); } }
+		public override object Value { get { return ParserIfc.Decode(mValue); } }
 		public IfcURIReference(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
 		public override string ToString() { return "IFCURIREFERENCE('" + mValue + "')"; }
 	}
-	
 
+	public partial class IfcSpecularExponent : IfcValue, IfcSpecularHighlightSelect
+	{
+		internal double mValue;
+		public override object Value { get { return mValue; } }
+		public IfcSpecularExponent(double value) { mValue = value; }
+		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
+	public partial class IfcSpecularRoughness : IfcValue, IfcSpecularHighlightSelect
+	{
+		internal double mValue;
+		public override object Value { get { return mValue; } }
+		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
+		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+	}
 	public interface IfcSizeSelect { } //TYPE IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);  
 }

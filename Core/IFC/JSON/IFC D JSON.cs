@@ -107,13 +107,20 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
-			obj["LengthExponent"] = mLengthExponent;
-			obj["MassExponent"] = mMassExponent;
-			obj["TimeExponent"] = mTimeExponent;
-			obj["ElectricCurrentExponent"] = mElectricCurrentExponent;
-			obj["ThermodynamicTemperatureExponent"] = mThermodynamicTemperatureExponent;
-			obj["AmountOfSubstanceExponent"] = mAmountOfSubstanceExponent;
-			obj["LuminousIntensityExponent"] = mLuminousIntensityExponent;
+			if(mLengthExponent != 0)
+				obj["LengthExponent"] = mLengthExponent;
+			if(mMassExponent != 0)
+				obj["MassExponent"] = mMassExponent;
+			if(mTimeExponent != 0)
+				obj["TimeExponent"] = mTimeExponent;
+			if(mElectricCurrentExponent != 0)
+				obj["ElectricCurrentExponent"] = mElectricCurrentExponent;
+			if(mThermodynamicTemperatureExponent != 0)
+				obj["ThermodynamicTemperatureExponent"] = mThermodynamicTemperatureExponent;
+			if(mAmountOfSubstanceExponent != 0)
+				obj["AmountOfSubstanceExponent"] = mAmountOfSubstanceExponent;
+			if(mLuminousIntensityExponent != 0)
+				obj["LuminousIntensityExponent"] = mLuminousIntensityExponent;
 		}
 	}
 	public partial class IfcDirection : IfcGeometricRepresentationItem

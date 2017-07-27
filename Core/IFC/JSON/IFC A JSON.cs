@@ -67,14 +67,14 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("OuterBoundary", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				OuterBoundary = mDatabase.parseJObject<IfcCurve>(jobj);
-			InnerBoundaries = mDatabase.extractJArray<IfcCurve>(obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcCurve>(obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddInner(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
 		{
 			base.setJSON(obj, host, processed);
 			obj["OuterBoundary"] = OuterBoundary.getJson(this, processed);
 			if(mInnerBoundaries.Count > 0)
-				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ConvertAll(x => x.getJson(this, processed)));
+				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, processed)));
 		}
 		
 	}
@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				UnitBasis = mDatabase.parseJObject<IfcMeasureWithUnit>(jobj);
 
-			Components = mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addComponent(x));
 
 
 			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
@@ -164,9 +164,9 @@ namespace GeometryGym.Ifc
 			if (mArithmeticOperator != IfcArithmeticOperatorEnum.NONE)
 				obj["ArithmeticOperator"] = ArithmeticOperator.ToString();
 			if(mComponents.Count > 0)
-				obj["Components"] = new JArray(Components.ConvertAll(x => x.getJson(this, processed)));
+				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, processed)));
 			if (mHasExternalReferences.Count > 0)
-				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ConvertAll(x => x.getJson(this, processed)));
+				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ToList().ConvertAll(x => x.getJson(this, processed)));
 			if (mHasConstraintRelationships.Count > 0)
 			{
 				JArray array = new JArray();

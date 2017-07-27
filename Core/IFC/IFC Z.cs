@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -33,7 +34,7 @@ namespace GeometryGym.Ifc
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcZone() : base() { }
-		internal IfcZone(DatabaseIfc db, IfcZone z) : base(db, z) { mLongName = z.mLongName; }
+		internal IfcZone(DatabaseIfc db, IfcZone z, bool downStream) : base(db, z, downStream) { mLongName = z.mLongName; }
 		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
 		public IfcZone(IfcSpatialElement e, string name, string longname, List<IfcSpace> spaces) : base(e, name)
 		{

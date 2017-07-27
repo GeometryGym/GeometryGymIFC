@@ -29,7 +29,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcDirection : IfcGeometricRepresentationItem
 	{
-		internal Vector3d Vector { get { return new Vector3d(mDirectionRatioX, mDirectionRatioY, double.IsNaN(mDirectionRatioZ) ? 0 : mDirectionRatioZ); } }
+		public Vector3d Vector3d { get { return new Vector3d(mDirectionRatioX, mDirectionRatioY, double.IsNaN(mDirectionRatioZ) ? 0 : mDirectionRatioZ); } }
 		public IfcDirection(DatabaseIfc db, Vector3d v) : base(db)
 		{
 			Vector3d unit = v;

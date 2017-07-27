@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryGymIFC", "GeometryGymIFC\GeometryGymIFC.csproj", "{6CD3BE38-25BC-4FCF-9426-D15ED4D4657C}"
 EndProject
@@ -27,9 +27,9 @@ Global
 		{6CD3BE38-25BC-4FCF-9426-D15ED4D4657C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6CD3BE38-25BC-4FCF-9426-D15ED4D4657C}.Release|x64.ActiveCfg = Release|Any CPU
 		{6CD3BE38-25BC-4FCF-9426-D15ED4D4657C}.Release|x86.ActiveCfg = Release|Any CPU
-		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|Any CPU.Build.0 = Debug|x64
+		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|x64.ActiveCfg = Debug|x64
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Release|Any CPU.Build.0 = Release|Any CPU

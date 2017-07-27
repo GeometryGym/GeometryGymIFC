@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("EdgeRadius"))
 				mEdgeRadius = double.Parse(xml.Attributes["EdgeRadius"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Depth", mDepth.ToString());

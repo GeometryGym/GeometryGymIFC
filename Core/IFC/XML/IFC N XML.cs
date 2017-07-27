@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("UnitType"))
 				Enum.TryParse<IfcUnitEnum>(xml.Attributes["UnitType"].Value, true, out mUnitType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, HashSet<int> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mDimensions > 0)

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -30,10 +31,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
 		internal List<int> mBounds = new List<int>();// : SET [1:?] OF IfcFaceBound;
-		public List<IfcFaceBound> Bounds { get { return mBounds.ConvertAll(x =>mDatabase[x] as IfcFaceBound); } set { mBounds = value.ConvertAll(x => x.mIndex); } }
+		public ReadOnlyCollection<IfcFaceBound> Bounds { get { return new ReadOnlyCollection<IfcFaceBound>( mBounds.ConvertAll(x =>mDatabase[x] as IfcFaceBound)); } }
 
 		internal IfcFace() : base() { }
-		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { Bounds = f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound); }
+		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { f.Bounds.ToList().ForEach(x=>addBound( db.Factory.Duplicate(x) as IfcFaceBound)); }
 		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer.mIndex); }
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner.mIndex); }
 		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds = bounds.ConvertAll(x => x.mIndex); }
@@ -54,16 +55,18 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mBounds[icounter]);
 			return str + ")";
 		}
+
+		internal void addBound(IfcFaceBound bound) { mBounds.Add(bound.mIndex); }
 	}
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
 		private List<int> mFbsmFaces = new List<int>();// : SET [1:?] OF IfcConnectedFaceSet;
-		public List<IfcConnectedFaceSet> FbsmFaces { get { return mFbsmFaces.ConvertAll(x =>mDatabase[x] as IfcConnectedFaceSet); } set { mFbsmFaces = value.ConvertAll(x => x.mIndex); } }
+		public ReadOnlyCollection<IfcConnectedFaceSet> FbsmFaces { get { return new ReadOnlyCollection<IfcConnectedFaceSet>( mFbsmFaces.ConvertAll(x =>mDatabase[x] as IfcConnectedFaceSet)); } }
 
 		internal IfcFaceBasedSurfaceModel() : base() { }
-		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { FbsmFaces = s.FbsmFaces.ConvertAll(x => db.Factory.Duplicate(x) as IfcConnectedFaceSet); }
+		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { s.FbsmFaces.ToList().ForEach(x => addFace( db.Factory.Duplicate(x) as IfcConnectedFaceSet)); }
 		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet face) : base(face.mDatabase) { mFbsmFaces.Add(face.mIndex); }
-		public IfcFaceBasedSurfaceModel(List<IfcConnectedFaceSet> faces) : base(faces[0].mDatabase) { FbsmFaces = faces; }
+		public IfcFaceBasedSurfaceModel(List<IfcConnectedFaceSet> faces) : base(faces[0].mDatabase) { faces.ForEach(x => addFace(x)); }
 		internal static IfcFaceBasedSurfaceModel Parse(string str)
 		{
 			IfcFaceBasedSurfaceModel m = new IfcFaceBasedSurfaceModel();
@@ -77,6 +80,8 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mFbsmFaces[icounter]);
 			return str + ")";
 		}
+
+		internal void addFace(IfcConnectedFaceSet face) { mFbsmFaces.Add(face.mIndex); }
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
@@ -145,10 +150,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcFacetedBrepWithVoids : IfcFacetedBrep
 	{
 		internal List<int> mVoids = new List<int>();// : SET [1:?] OF IfcClosedShell
-		public List<IfcClosedShell> Voids { get { return mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell); } set { mVoids = value.ConvertAll(x => x.mIndex);  } }
+		public ReadOnlyCollection<IfcClosedShell> Voids { get { return new ReadOnlyCollection<IfcClosedShell>( mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell)); } }
 
 		internal IfcFacetedBrepWithVoids() : base() { }
-		internal IfcFacetedBrepWithVoids(DatabaseIfc db, IfcFacetedBrepWithVoids b) : base(db,b) { Voids = b.Voids.ConvertAll(x=>db.Factory.Duplicate(x) as IfcClosedShell); }
+		internal IfcFacetedBrepWithVoids(DatabaseIfc db, IfcFacetedBrepWithVoids b) : base(db,b) { b.Voids.ToList().ForEach(x=>addVoid( db.Factory.Duplicate(x) as IfcClosedShell)); }
 		internal new static IfcFacetedBrepWithVoids Parse(string str)
 		{
 			IfcFacetedBrepWithVoids b = new IfcFacetedBrepWithVoids();
@@ -168,6 +173,8 @@ namespace GeometryGym.Ifc
 			}
 			return str + ")";
 		}
+
+		internal void addVoid(IfcClosedShell shell) { mVoids.Add(shell.mIndex); }
 	}
 	//ENTITY IfcFailureConnectionCondition
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
@@ -244,7 +251,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcFeatureElementAddition : IfcFeatureElement //ABSTRACT SUPERTYPE OF(IfcProjectionElement)
 	{	//INVERSE
 		internal List<IfcRelProjectsElement> mProjectsElements = new List<IfcRelProjectsElement>();
-		public List<IfcRelProjectsElement> ProjectsElements { get { return mProjectsElements; } }
+		public ReadOnlyCollection<IfcRelProjectsElement> ProjectsElements { get { return new ReadOnlyCollection<IfcRelProjectsElement>( mProjectsElements); } }
 
 		protected IfcFeatureElementAddition() : base() { }
 		protected IfcFeatureElementAddition(DatabaseIfc db, IfcFeatureElementAddition e) : base(db,e) { }
@@ -262,7 +269,7 @@ namespace GeometryGym.Ifc
 		{
 			new IfcRelVoidsElement(host, this);
 			Representation = rep;
-			Placement = new IfcLocalPlacement(host.Placement, mDatabase.Factory.PlaneXYPlacement);	
+			Placement = new IfcLocalPlacement(host.Placement, mDatabase.Factory.XYPlanePlacement);	
 		}
 		
 		protected static void parseFields(IfcFeatureElementSubtraction e, List<string> arrFields, ref int ipos) { IfcFeatureElement.parseFields(e, arrFields, ref ipos); }
@@ -302,8 +309,10 @@ namespace GeometryGym.Ifc
 			return h;
 		}
 	}
+	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
 	//ENTITY IfcFillAreaStyleTiles
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcFilter : IfcFlowTreatmentDevice //IFC4  
 	{
 		internal IfcFilterTypeEnum mPredefinedType = IfcFilterTypeEnum.NOTDEFINED;
@@ -341,7 +350,7 @@ namespace GeometryGym.Ifc
 		internal List<int> mFillStyles = new List<int>();// : SET [1:?] OF IfcFillStyleSelect;
 		internal IfcFillAreaStyle() : base() { }
 		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
-		internal IfcFillAreaStyle(DatabaseIfc m, string name) : base(m, name) { }
+		internal IfcFillAreaStyle(DatabaseIfc db) : base(db) { }
 		internal static void parseFields(IfcFillAreaStyle s, List<string> arrFields, ref int ipos) { IfcPresentationStyle.parseFields(s, arrFields, ref ipos); s.mFillStyles = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		internal static IfcFillAreaStyle Parse(string strDef) { IfcFillAreaStyle s = new IfcFillAreaStyle(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		protected override string BuildStringSTEP()
@@ -689,7 +698,7 @@ namespace GeometryGym.Ifc
 		public IfcFootingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcFooting() : base() { }
-		internal IfcFooting(DatabaseIfc db, IfcFooting f) : base(db,f) { mPredefinedType = f.mPredefinedType; }
+		internal IfcFooting(DatabaseIfc db, IfcFooting f, bool downStream) : base(db, f, downStream) { mPredefinedType = f.mPredefinedType; }
 		public IfcFooting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
 		internal static IfcFooting Parse(string str) { IfcFooting f = new IfcFooting(); int pos = 0; f.Parse(str, ref pos, str.Length); return f; }

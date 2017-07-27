@@ -179,109 +179,34 @@ namespace GeometryGym.Ifc
 			return ".U.";
 		}
 
-		internal static void GetKeyWord(string line, out int ifcID, out string keyword, out string def)
-		{
-			keyword = "";
-			def = "";
-			ifcID = 0;
-			if (string.IsNullOrEmpty(line))
-				return;
-			string strLine = line.Trim();
-			int jlast = strLine.Length, jcounter = (line[0] == '#' ? 1 : 0);
-			char c;
-			for (; jcounter < jlast; jcounter++)
-			{
-				c = strLine[jcounter];
-				if (char.IsDigit(c))
-					def += c;
-				else
-					break;
-			}
-			if (!string.IsNullOrEmpty(def))
-				ifcID = int.Parse(def);
-			c = strLine[jcounter];
-			while (c == ' ')
-				c = strLine[++jcounter];
-			if (strLine[jcounter] == '=')
-				jcounter++;
-			c = strLine[jcounter];
-			while (c == ' ')
-				c = strLine[++jcounter];
-			if (c != 'I')
-				return;
-			for (; jcounter < jlast; jcounter++)
-			{
-				c = strLine[jcounter];
-				if (c == '(')
-					break;
-				keyword += c;
-			}
-			keyword = keyword.Trim();
-			keyword = keyword.ToUpper();
-			int len = strLine.Length;
-			int ilast = 1;
-			while (strLine[len - ilast] != ')')
-			{
-				ilast++;
-				if(len - ilast == jcounter)
-				{
-					ilast = 0;
-					break;
-				}
-			}
-			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
-		}
+		
 		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema)
 		{
 			string kw = "", str = "";
 			int ifcID = 0;
 			if (string.IsNullOrEmpty(line))
 				return null;
-			if (line.Length < 5 || line.StartsWith("ISO"))
+			string upper = line.ToUpper();
+			if (line.Length < 5)
 				return null;
-			GetKeyWord(line, out ifcID, out kw, out str);
-			if (string.IsNullOrEmpty(kw))
+			ParserSTEP.GetKeyWord(line, out ifcID, out kw, out str);
+			if (string.IsNullOrEmpty(kw) || !kw.ToUpper().StartsWith("IFC"))
 				return null;
 			str = str.Trim();
-			BaseClassIfc result = LineParser(kw, str, schema);
+			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema);
 			if (result == null)
 				return null;
-			result.mIFCString = str;
+			result.mSTEPString = str;
 			result.mIndex = ifcID;
 			return result;
 		}
-		private static Type[] argSet1 = new Type[] { typeof(string), typeof(ReleaseVersion) }, argSet2 = new Type[] { typeof(string) };
-		private static Dictionary<string, Type> mTypes = new Dictionary<string, Type>();
-		private static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion schema)
-		{
-			Type type = null;
-			if (mTypes.ContainsKey(keyword))
-				type = mTypes[keyword];
-			else
-			{
-				type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
-				if (type != null)
-					mTypes.Add(keyword, type);
-			}
-			if (type != null)
-			{
-				MethodInfo parser = type.GetMethod("Parse",BindingFlags.Static | BindingFlags.NonPublic,null,CallingConventions.Any, argSet1,null);
-				if (parser != null)
-					return parser.Invoke(null, new object[] { str,schema }) as BaseClassIfc;
-				parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic, null, CallingConventions.Any, argSet2, null);
-				if (parser != null)
-					return parser.Invoke(null, new object[] { str }) as BaseClassIfc;
-			}
-			if (string.Compare(keyword, "IfcParameterizedProfileDef", true) == 0)
-				return LineParser("IfcProfileDef", str, schema);
-			return null;
-		}
+		
 
 		internal static IfcColour parseColour(string str)
 		{
 			string kw = "", def = "";
 			int id = 0;
-			ParserIfc.GetKeyWord(str, out id, out kw, out def);
+			ParserSTEP.GetKeyWord(str, out id, out kw, out def);
 			if (string.IsNullOrEmpty(kw))
 				return null;
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
@@ -292,11 +217,12 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcColourOrFactor parseColourOrFactor(string str)
 		{
-			if (str[0] == '#')
+			if (string.IsNullOrEmpty(str) || str[0] == '#' || str[0] == '$')
 				return null;
+		
 			string kw = "", def = "";
 			int id = 0;
-			ParserIfc.GetKeyWord(str, out id, out kw, out def);
+			ParserSTEP.GetKeyWord(str, out id, out kw, out def);
 			if (string.IsNullOrEmpty(kw))
 				return null;
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
@@ -400,10 +326,7 @@ namespace GeometryGym.Ifc
 						{
 							Type type = types[kw];
 							if (type != null)
-							{
-								if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
-									return extractMeasureValue(type, str.Substring(icounter, len - icounter));
-							}
+								return extractMeasureValue(type, str.Substring(icounter, len - icounter));
 						}
 					}
 				}
@@ -413,7 +336,7 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcMeasureValue extractMeasureValue(Type type, string value)
 		{
-			if (type.GetInterfaces().Contains(typeof(IfcMeasureValue)))
+			if (type.IsSubclassOf(typeof(IfcMeasureValue)))
 			{
 				if (string.Compare(type.Name,"IfcDescriptiveMeasure",true) == 0)
 					return new IfcDescriptiveMeasure(value);
@@ -431,7 +354,7 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcDerivedMeasureValue extractDerivedMeasureValue(Type type, string value)
 		{
-			if (type.GetInterfaces().Contains(typeof(IfcDerivedMeasureValue)))
+			if (type.IsSubclassOf(typeof(IfcDerivedMeasureValue)))
 			{
 				double val = 0;
 				if (double.TryParse(value, out val))
@@ -455,6 +378,8 @@ namespace GeometryGym.Ifc
 				return new IfcInteger(int.Parse(str.Substring(11, str.Length - 12)));
 			if (str.StartsWith("IFCLABEL("))
 			{
+				if (str.Length <= 12)
+					return new IfcLabel("DEFAULT");
 				string s = str.Substring(10, str.Length - 12);
 				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
 			}
@@ -692,6 +617,8 @@ namespace GeometryGym.Ifc
 		/// <returns>GUID correspondig to the string</returns>
 		public static Guid DecodeGlobalID(string guid)
 		{
+			if (string.IsNullOrEmpty(guid))
+				return Guid.Empty;
 			try
 			{
 				if (guid.Length == 22)
@@ -740,7 +667,7 @@ namespace GeometryGym.Ifc
 			// Creation of six 32 Bit integers from the components of the GUID structure
 			num[0] = (uint)(BitConverter.ToUInt32(b, 0) / 16777216);
 			num[1] = (uint)(BitConverter.ToUInt32(b, 0) % 16777216);
-			num[2] = (uint)(BitConverter.ToUInt16(b, 4) * 256 + BitConverter.ToInt16(b, 6) / 256);
+			num[2] = (uint)(BitConverter.ToUInt16(b, 4) * 256 + BitConverter.ToUInt16(b, 6) / 256);
 			num[3] = (uint)((BitConverter.ToUInt16(b, 6) % 256) * 65536 + b[8] * 256 + b[9]);
 			num[4] = (uint)(b[10] * 65536 + b[11] * 256 + b[12]);
 			num[5] = (uint)(b[13] * 65536 + b[14] * 256 + b[15]);
