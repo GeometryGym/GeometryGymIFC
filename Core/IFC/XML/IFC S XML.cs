@@ -35,6 +35,36 @@ namespace GeometryGym.Ifc
 		//internal List<int> mCrossSections = new List<int>();// : LIST [2:?] OF IfcProfileDef;
 		//internal List<int> mCrossSectionPositions = new List<int>();// : LIST [2:?] OF IfcAxis2Placement3D; 
 	}
+
+	public partial class IfcSectionProperties : IfcPreDefinedProperties // IFC2x3 BaseClassIfc
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("SectionType", mSectionType.ToString().ToLower());
+			xml.AppendChild(StartProfile.GetXML(xml.OwnerDocument, "StartProfile", this, processed));
+			if(mEndProfile > 0)
+				xml.AppendChild(EndProfile.GetXML(xml.OwnerDocument, "EndProfile", this, processed));
+		}
+	}
+	public partial class IfcSectionReinforcementProperties : IfcPreDefinedProperties // IFC2x3 STPEntity
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("LongitudinalStartPosition", mLongitudinalStartPosition.ToString());
+			xml.SetAttribute("LongitudinalEndPosition", mLongitudinalEndPosition.ToString());
+			if(!double.IsNaN(mTransversePosition))
+				xml.SetAttribute("TransversePosition", mTransversePosition.ToString());
+			if(mReinforcementRole != IfcReinforcingBarRoleEnum.NOTDEFINED)
+				xml.SetAttribute("ReinforcementRole", mReinforcementRole.ToString().ToLower());
+			xml.AppendChild(SectionDefinition.GetXML(xml.OwnerDocument, "SectionDefinition", this, processed));
+			XmlElement element = xml.OwnerDocument.CreateElement("CrossSectionReinforcementDefinitions");
+			xml.AppendChild(element);
+			foreach (IfcReinforcementBarProperties p in CrossSectionReinforcementDefinitions)
+				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+	}
 	public partial class IfcShapeAspect : BaseClassIfc
 	{
 		internal override void ParseXml(XmlElement xml)

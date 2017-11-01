@@ -37,9 +37,9 @@ namespace GeometryGym.Ifc
 			XDim = obj.GetValue("XDim", StringComparison.InvariantCultureIgnoreCase).Value<double>();
 			YDim = obj.GetValue("YDim", StringComparison.InvariantCultureIgnoreCase).Value<double>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["XDim"] = XDim;
 			obj["YDim"] = YDim;
 		}
@@ -65,16 +65,16 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				InnerReference = mDatabase.parseJObject<IfcReference>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "TypeIdentifier", TypeIdentifier);
 			setAttribute(obj, "AttributeIdentifier", AttributeIdentifier);
 			setAttribute(obj, "InstanceName", InstanceName);
 			if (mListPositions.Count > 0)
 				obj["ListPositions"] = new JArray(mListPositions.ToArray());
 			if (mInnerReference > 0)
-				obj["InnerReference"] = InnerReference.getJson(this, processed);
+				obj["InnerReference"] = InnerReference.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAggregates : IfcRelDecomposes
@@ -84,15 +84,18 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addObject(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			JArray array = new JArray();
-			if (!mRelatedObjects.Contains(host.mIndex))
+			base.setJSON(obj, host, options);
+			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
-				foreach (IfcObjectDefinition od in RelatedObjects)
-					array.Add(od.getJson(this, processed));
-				obj["RelatedObjects"] = array;
+				JArray array = new JArray();
+				if (!mRelatedObjects.Contains(host.mIndex))
+				{
+					foreach (IfcObjectDefinition od in RelatedObjects)
+						array.Add(od.getJson(this, options));
+					obj["RelatedObjects"] = array;
+				}
 			}
 		}
 	}
@@ -109,14 +112,14 @@ namespace GeometryGym.Ifc
 					mRelatedObjectsType = IfcObjectTypeEnum.NOTDEFINED;
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			JArray array = new JArray();
 			if (!mRelatedObjects.Contains(host.mIndex))
 			{
 				foreach (IfcObjectDefinition od in RelatedObjects)
-					array.Add(od.getJson(this, processed));
+					array.Add(od.getJson(this, options));
 				obj["RelatedObjects"] = array;
 			}
 		}
@@ -130,11 +133,11 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatingGroup = mDatabase.parseJObject<IfcGroup>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingGroup)
-				obj["RelatingGroup"] = mDatabase[mRelatingGroup].getJson(this, processed);
+				obj["RelatingGroup"] = mDatabase[mRelatingGroup].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssignsToGroupByFactor : IfcRelAssignsToGroup //IFC4
@@ -146,9 +149,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Factor = token.Value<double>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["Factor"] = mFactor;
 		}
 	}
@@ -159,11 +162,11 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			RelatingProduct = mDatabase.parseJObject<IfcProductSelect>(obj.GetValue("RelatingProduct", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingProduct)
-				obj["RelatingProduct"] = mDatabase[mRelatingProduct].getJson(this, processed);
+				obj["RelatingProduct"] = mDatabase[mRelatingProduct].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociates : IfcRelationship   //ABSTRACT SUPERTYPE OF (ONEOF(IfcRelAssociatesApproval,IfcRelAssociatesclassification,IfcRelAssociatesConstraint,IfcRelAssociatesDocument,IfcRelAssociatesLibrary,IfcRelAssociatesMaterial))
@@ -173,16 +176,32 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			JArray array = new JArray();
 			if (!mRelatedObjects.Contains(host.mIndex))
 			{
 				foreach (int i in mRelatedObjects)
-					array.Add(mDatabase[i].getJson(this, processed));
+					array.Add(mDatabase[i].getJson(this, options));
 				obj["RelatedObjects"] = array;
 			}
+		}
+	}
+	public partial class IfcRelAssociatesClassification : IfcRelAssociates
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("RelatingClassification", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				RelatingClassification = mDatabase.parseJObject<IfcClassificationSelect>(jobj);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (host.mIndex != mRelatingClassification)
+				obj["RelatingClassification"] = mDatabase[mRelatingClassification].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates
@@ -195,20 +214,14 @@ namespace GeometryGym.Ifc
 				Intent = token.Value<string>();
 			JObject jobj = obj.GetValue("RelatingConstraint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
-				token = jobj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
-					mRelatingConstraint = token.Value<int>();
-				else
-					RelatingConstraint = mDatabase.parseJObject<IfcConstraint>(jobj);
-			}
+				RelatingConstraint = mDatabase.parseJObject<IfcConstraint>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "Intent", Intent);
 			if (host.mIndex != mRelatingConstraint)
-				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, processed);
+				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesDocument : IfcRelAssociates
@@ -220,11 +233,11 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatingDocument = mDatabase.parseJObject<IfcDocumentSelect>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingDocument)
-				obj["RelatingDocument"] = mDatabase[mRelatingDocument].getJson(this, processed);
+				obj["RelatingDocument"] = mDatabase[mRelatingDocument].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
@@ -236,11 +249,11 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatingMaterial = mDatabase.parseJObject<IfcMaterialSelect>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingMaterial)
-				obj["RelatingMaterial"] = mDatabase[mRelatingMaterial].getJson(this, processed);
+				obj["RelatingMaterial"] = mDatabase[mRelatingMaterial].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesProfileProperties : IfcRelAssociates //IFC4 DELETED Replaced by IfcRelAssociatesMaterial together with material-profile sets
@@ -269,15 +282,15 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingProfileProperties)
-				obj["RelatingProfileProperties"] = mDatabase[mRelatingProfileProperties].getJson(this, processed);
+				obj["RelatingProfileProperties"] = mDatabase[mRelatingProfileProperties].getJson(this, options);
 			if (mProfileSectionLocation > 0 && host.mIndex != mProfileSectionLocation)
-				obj["ProfileSectionLocation"] = mDatabase[mProfileSectionLocation].getJson(this, processed);
+				obj["ProfileSectionLocation"] = mDatabase[mProfileSectionLocation].getJson(this, options);
 			if (mProfileOrientation > 0)
-				obj["ProfileOrientation"] = mDatabase[mProfileOrientation].getJson(this, processed);
+				obj["ProfileOrientation"] = mDatabase[mProfileOrientation].getJson(this, options);
 			else if (!double.IsNaN(mProfileOrientationValue))
 			{
 				JObject jobj = new JObject();
@@ -298,13 +311,13 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatedStructuralActivity = mDatabase.parseJObject<IfcStructuralActivity>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingElement)
-				obj["RelatingElement"] = mDatabase[mRelatingElement].getJson(this, processed);
+				obj["RelatingElement"] = mDatabase[mRelatingElement].getJson(this, options);
 			if (host.mIndex != mRelatedStructuralActivity)
-				obj["RelatedStructuralActivity"] = mDatabase[mRelatedStructuralActivity].getJson(this, processed);
+				obj["RelatedStructuralActivity"] = mDatabase[mRelatedStructuralActivity].getJson(this, options);
 			
 		}
 	}
@@ -315,14 +328,17 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			mDatabase.extractJArray<IfcProduct>(obj.GetValue("RelatedElements", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			ReadOnlyCollection<IfcProduct> relatedElements = RelatedElements;
-			JArray array = new JArray();
-			foreach (IfcProduct product in relatedElements)
-				array.Add(product.getJson(this, processed));
-			obj["RelatedElements"] = array;
+			base.setJSON(obj, host, options);
+
+			if (options.Style != SetJsonOptions.JsonStyle.Repository)
+			{
+				JArray array = new JArray();
+				foreach (IfcProduct product in RelatedElements)
+					array.Add(product.getJson(this, options));
+				obj["RelatedElements"] = array;
+			}
 		}
 	}
 	public partial class IfcRelDeclares : IfcRelationship //IFC4
@@ -335,12 +351,12 @@ namespace GeometryGym.Ifc
 				RelatingContext = mDatabase.parseJObject<IfcContext>(jobj);
 			mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedDefinitions", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mRelatingContext != host.mIndex)
-				obj["RelatingContext"] = RelatingContext.getJson(this, processed);
-			obj["RelatedDefinitions"] = new JArray(mRelatedDefinitions.ConvertAll(x => mDatabase[x].getJson(this, processed)));
+				obj["RelatingContext"] = RelatingContext.getJson(this, options);
+			obj["RelatedDefinitions"] = new JArray(mRelatedDefinitions.ConvertAll(x => mDatabase[x].getJson(this, options)));
 		}
 	}
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
@@ -351,10 +367,10 @@ namespace GeometryGym.Ifc
 			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRelated(x));
 			RelatingPropertyDefinition = mDatabase.parseJObject<IfcPropertySetDefinition>(obj.GetValue("RelatingPropertyDefinition", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["RelatingPropertyDefinition"] = RelatingPropertyDefinition.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["RelatingPropertyDefinition"] = RelatingPropertyDefinition.getJson(this, options);
 		}
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines
@@ -367,10 +383,10 @@ namespace GeometryGym.Ifc
 				mDatabase.extractJArray<IfcPropertySetDefinition>(array).ForEach(x=>AddRelated(x));
 			RelatingTemplate = extractObject<IfcPropertySetTemplate>(obj.GetValue("RelatingTemplate", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["RelatingTemplate"] = RelatingTemplate.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["RelatingTemplate"] = RelatingTemplate.getJson(this, options);
 			//List<IfcObject> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
 			//foreach (IfcObject obj in relatedObjects)
@@ -386,12 +402,14 @@ namespace GeometryGym.Ifc
 			JArray array = obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
 				mDatabase.extractJArray<IfcObject>(array).ForEach(x=>AddRelated(x));
-			RelatingType = extractObject<IfcTypeObject>(obj.GetValue("RelatingType", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			JObject jobj = obj.GetValue("RelatingType", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if(jobj != null)
+				RelatingType = extractObject<IfcTypeObject>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["RelatingType"] = RelatingType.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["RelatingType"] = RelatingType.getJson(this, options);
 			//List<IfcObject> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
 			//foreach (IfcObject obj in relatedObjects)
@@ -411,13 +429,13 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatedBuildingElement = mDatabase.parseJObject<IfcElement>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingOpeningElement)
-				obj["RelatingOpeningElement"] = mDatabase[mRelatingOpeningElement].getJson(this, processed);
+				obj["RelatingOpeningElement"] = mDatabase[mRelatingOpeningElement].getJson(this, options);
 			if (host.mIndex != mRelatedBuildingElement)
-				obj["RelatedBuildingElement"] = mDatabase[mRelatedBuildingElement].getJson(this, processed);
+				obj["RelatedBuildingElement"] = mDatabase[mRelatedBuildingElement].getJson(this, options);
 		}
 	}
 	public partial class IfcRelNests : IfcRelDecomposes
@@ -430,15 +448,15 @@ namespace GeometryGym.Ifc
 				RelatingObject = mDatabase.parseJObject<IfcObjectDefinition>(jobj);
 			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mRelatingObject != host.mIndex)
-				obj["RelatingObject"] = RelatingObject.getJson(this, processed);
+				obj["RelatingObject"] = RelatingObject.getJson(this, options);
 			ReadOnlyCollection<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			JArray array = new JArray();
 			foreach (IfcObjectDefinition od in relatedObjects)
-				array.Add(od.getJson(this, processed));
+				array.Add(od.getJson(this, options));
 			obj["RelatedObjects"] = array;
 		}
 	}
@@ -452,15 +470,15 @@ namespace GeometryGym.Ifc
 				RelatingSystem = mDatabase.parseJObject<IfcSystem>(jobj);
 			mDatabase.extractJArray<IfcSpatialElement>(obj.GetValue("RelatedBuildings", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mRelatingSystem != host.mIndex)
-				obj["RelatingSystem"] = RelatingSystem.getJson(this, processed);
+				obj["RelatingSystem"] = RelatingSystem.getJson(this, options);
 			//List<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
 			//foreach (IfcObjectDefinition od in relatedObjects)
-			//	array.Add(od.getJson(this, processed));
+			//	array.Add(od.getJson(this, options));
 			//obj["RelatedObjects"] = array;
 		}
 	}
@@ -476,13 +494,13 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				RelatedOpeningElement = mDatabase.parseJObject<IfcFeatureElementSubtraction>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (host.mIndex != mRelatingBuildingElement)
-				obj["RelatingBuildingElement"] = mDatabase[mRelatingBuildingElement].getJson(this, processed);
+				obj["RelatingBuildingElement"] = mDatabase[mRelatingBuildingElement].getJson(this, options);
 			if (host.mIndex != mRelatedOpeningElement)
-				obj["RelatedOpeningElement"] = mDatabase[mRelatedOpeningElement].getJson(this, processed);
+				obj["RelatedOpeningElement"] = mDatabase[mRelatedOpeningElement].getJson(this, options);
 		}
 	}
 	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
@@ -492,63 +510,29 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("ContextOfItems", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
-				JToken tok = jobj["href"];
-				if (tok != null)
-					mContextOfItems = tok.Value<int>();
-				else
-				{
-					IfcRepresentationContext rc = extractObject<IfcRepresentationContext>(jobj);
-					IfcContext context = mDatabase.Context;
-					if (context != null)
-					{
-							
-						foreach(IfcRepresentationContext repContext in context.RepresentationContexts)
-						{
-							IfcGeometricRepresentationSubContext gsc = rc as IfcGeometricRepresentationSubContext;
-							if (gsc != null)
-							{
-								IfcGeometricRepresentationContext grc = repContext as IfcGeometricRepresentationContext;
-								if(grc != null)
-								{
-									foreach(IfcGeometricRepresentationSubContext sub in grc.HasSubContexts)
-									{
-										if(string.Compare(sub.mContextIdentifier,gsc.mContextIdentifier, true) == 0)
-										{
-											ContextOfItems = sub;
-											mDatabase[rc.mIndex] = null;
-										}
-									}
-								}
-							}
-						}
-					}
-					if (mContextOfItems == 0)
-						ContextOfItems = rc;
-				}
-			}
+				ContextOfItems = extractObject<IfcRepresentationContext>(jobj);
 			JToken token = obj.GetValue("RepresentationIdentifier", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				RepresentationIdentifier = token.Value<string>();
+				mRepresentationIdentifier = token.Value<string>();
 			token = obj.GetValue("RepresentationType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				RepresentationType = token.Value<string>();
-			mDatabase.extractJArray<IfcRepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addItem(x));
+			mDatabase.extractJArray<IfcRepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddItem(x));
 
 			List<IfcPresentationLayerAssignment> assignments = mDatabase.extractJArray<IfcPresentationLayerAssignment>(obj.GetValue("LayerAssignments", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcPresentationLayerAssignment a in assignments)
 				a.addItem(this);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["ContextOfItems"] = ContextOfItems.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["ContextOfItems"] = ContextOfItems.getJson(this, options);
 			setAttribute(obj, "RepresentationIdentifier", RepresentationIdentifier);
 			setAttribute(obj, "RepresentationType", RepresentationType);
-			obj["Items"] = new JArray(Items.ToList().ConvertAll(x => x.getJson(this, processed)));
+			obj["Items"] = new JArray(Items.ToList().ConvertAll(x => x.getJson(this, options)));
 
 			if (mLayerAssignments.Count > 0)
-				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, processed)));
+				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public abstract partial class IfcRepresentationContext : BaseClassIfc
@@ -564,9 +548,11 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ContextType = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
+			if(options.Style == SetJsonOptions.JsonStyle.Repository && string.IsNullOrEmpty(mGlobalId))
+				mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 			string contextIdentifier = ContextIdentifier;
 			if (!string.IsNullOrEmpty(contextIdentifier))
 				obj["ContextIdentifier"] = contextIdentifier;
@@ -576,8 +562,8 @@ namespace GeometryGym.Ifc
 			JArray reps = new JArray();
 			foreach(IfcRepresentation r in RepresentationsInContext)
 			{
-				if (!processed.Contains(r.Index))
-					reps.Add(r.getJson(this, processed));
+				if (r.mOfProductRepresentation.Count == 0 && r.mRepresentationMap == null)
+					reps.Add(r.getJson(this, options));
 			}
 			if (reps.Count > 0)
 				obj["RepresentationsInContext"] = reps;
@@ -593,20 +579,23 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/
 	{
-		//internal List<IfcPresentationLayerAssignment> mLayerAssignments = new List<IfcPresentationLayerAssignment>();// null;
-		//internal IfcStyledItem mStyledByItem = null;// : SET [0:1] OF IfcStyledItem FOR Item; 
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
 			List<IfcPresentationLayerAssignment> assignments = mDatabase.extractJArray<IfcPresentationLayerAssignment>(obj.GetValue("LayerAssignments", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcPresentationLayerAssignment a in assignments)
 				a.addItem(this);
+			JObject jobj = obj.GetValue("StyledByItem", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				mStyledByItem = mDatabase.parseJObject<IfcStyledItem>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mLayerAssignments.Count > 0)
-				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, processed)));
+				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, options)));
+			if (mStyledByItem != null)
+				obj["StyledByItem"] = mStyledByItem.getJson(this, options);
 		}
 
 	}
@@ -620,7 +609,7 @@ namespace GeometryGym.Ifc
 				MappingOrigin = mDatabase.parseJObject<IfcAxis2Placement>(jobj);
 			jobj = obj.GetValue("MappedRepresentation", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				MappedRepresentation = mDatabase.parseJObject<IfcRepresentation>(jobj);
+				MappedRepresentation = mDatabase.parseJObject<IfcShapeModel>(jobj);
 			JArray array = obj.GetValue("HasShapeAspects", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
 			{
@@ -629,13 +618,13 @@ namespace GeometryGym.Ifc
 					aspects[icounter].PartOfProductDefinitionShape = this;
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["MappingOrigin"] = mDatabase[mMappingOrigin].getJson(this, processed);
-			obj["MappedRepresentation"] = MappedRepresentation.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["MappingOrigin"] = mDatabase[mMappingOrigin].getJson(this, options);
+			obj["MappedRepresentation"] = MappedRepresentation.getJson(this, options);
 			if (mHasShapeAspects.Count > 0)
-				obj["HasShapeAspects"] = new JArray(mHasShapeAspects.ConvertAll(x => x.getJson(this, processed)));
+				obj["HasShapeAspects"] = new JArray(mHasShapeAspects.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECEATED IFC4 renamed
@@ -648,17 +637,17 @@ namespace GeometryGym.Ifc
 				RelatingConstraint = mDatabase.parseJObject<IfcConstraint>(jobj);
 			mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mRelatingConstraint != host.mIndex)
-				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, processed);
+				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, options);
 			JArray array = new JArray();
 			foreach (IfcResourceObjectSelect r in RelatedResourceObjects)
 			{
 				IfcResourceConstraintRelationship rcr = r as IfcResourceConstraintRelationship;
 				if (r.Index != host.mIndex)
-					array.Add(mDatabase[r.Index].getJson(this, processed));
+					array.Add(mDatabase[r.Index].getJson(this, options));
 			}
 			if (array.Count > 0)
 				obj["RelatedResourceObjects"] = array;
@@ -676,11 +665,11 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				mAngle = token.Value<double>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 
-			obj["Axis"] = Axis.getJson(this, processed);
+			obj["Axis"] = Axis.getJson(this, options);
 			obj["Angle"] = mAngle;
 		}
 	}
@@ -709,13 +698,13 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Description = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["GlobalId"] = GlobalId;
 			IfcOwnerHistory ownerHistory = OwnerHistory;
 			if (ownerHistory != null)
-				obj["OwnerHistory"] = ownerHistory.getJson(this, processed);
+				obj["OwnerHistory"] = ownerHistory.getJson(this, options);
 			base.setAttribute(obj, "Name", Name);
 			base.setAttribute(obj, "Description", Description);
 		}
@@ -749,9 +738,9 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			RoundingRadius = obj.GetValue("RoundingRadius", StringComparison.InvariantCultureIgnoreCase).Value<double>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["RoundingRadius"] = RoundingRadius;
 		}
 	}

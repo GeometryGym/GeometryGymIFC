@@ -34,27 +34,111 @@ namespace GeometryGym.Ifc
 {
 	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
-		internal virtual void parseJObject(JObject obj) { }
-		//internal JObject obj = null;
-		
-		internal JObject getJson(BaseClassIfc host, HashSet<int> processed)
+		public class SetJsonOptions
 		{
-			if(processed.Contains(mIndex))
-			{
-				JObject jobj = new JObject();
-				jobj["href"] = mIndex;
-				return jobj;
-			}
+			public enum JsonStyle { Explicit, Repository, Default };
+			public string ProjectFolder = "";
+			public HashSet<string> Encountered = new HashSet<string>();
+			public JsonStyle Style = JsonStyle.Default;
+			public SetJsonOptions() { }
+		}
+		internal virtual void parseJObject(JObject obj)
+		{
 
+		}
+		internal string removeFileNameIllegal(string filename)
+		{
+			return ParserIfc.Encode(filename).Replace("*", "x").Replace(".", "_").Replace("\"", "").Replace("/", "_").Replace("\\", "_").Replace("[", "(").Replace("]", ")").Replace(":", "-").Replace(";", "-").Replace("|", "-").Replace("=", "-").Replace(",", "_").Replace("<", "(").Replace(">", ")");
+		}
+		internal string RepositoryName { get { return removeFileNameIllegal(genRepositoryName); } }
+		protected string RepositoryNameStub => mGlobalId;
+		protected virtual string genRepositoryName
+		{
+			get
+			{
+				string name = this.Name;
+				return RepositoryNameStub + (string.IsNullOrEmpty(name) ? "" : " " + name);
+			}
+		}
+		//internal JObject obj = null;
+		private JObject writeRepositoryCommon(JObject obj, SetJsonOptions options) { return writeRepositoryCommon(obj, options, ""); }
+		private JObject writeRepositoryCommon(JObject obj, SetJsonOptions options, string folderName)
+		{
+			if (string.IsNullOrEmpty(options.ProjectFolder))
+				return obj;
+			if (string.IsNullOrEmpty(mGlobalId))
+				obj["id"] = mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
+			options.Encountered.Add(mGlobalId);
+			string folder = Path.Combine(options.ProjectFolder, string.IsNullOrEmpty(folderName) ?  KeyWord.Substring(3) : folderName);
+			Directory.CreateDirectory(folder);
+			StreamWriter streamWriter = new StreamWriter(Path.Combine(folder, RepositoryName + ".ifc.json"));
+
+			streamWriter.Write(obj.ToString());
+			streamWriter.Close();
+			JObject	result = new JObject();
+			result["href"] = mGlobalId;
+				return result;
+		}
+		internal JObject getJson(BaseClassIfc host, SetJsonOptions options)
+		{
+			bool isCommon = (options.Style == SetJsonOptions.JsonStyle.Repository && this is IfcApplication || this is IfcOrganization || 
+				this is IfcOwnerHistory || this is IfcPerson || this is IfcPersonAndOrganization || this is IfcPresentationStyleAssignment || 
+				this is IfcPresentationLayerAssignment);
+			if(!isCommon)
+			{
+				IfcProfileDef profile = this as IfcProfileDef;
+				if (profile != null && !string.IsNullOrEmpty(profile.Name))
+					isCommon = true;
+			}
 			JObject obj = new JObject();
-			processed.Add(mIndex);
-			obj["type"] = KeyWord; 
-			setJSON(obj, host, processed);
+			
+			if (!string.IsNullOrEmpty(mGlobalId))
+			{
+				if (options.Encountered.Contains(mGlobalId))
+				{
+					obj["href"] = mGlobalId;
+					return obj;
+				}
+				else
+					options.Encountered.Add(mGlobalId);
+			}
+			obj["type"] = KeyWord;
+			if (isCommon)
+			{
+				if (string.IsNullOrEmpty(mGlobalId))
+				{
+					mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
+					options.Encountered.Add(mGlobalId);
+				}
+				obj["id"] = mGlobalId;
+			}
+			setJSON(obj, host, options);
+			if (options.Style == SetJsonOptions.JsonStyle.Repository)
+			{
+				if (isCommon)
+					return writeRepositoryCommon(obj, options, "");
+				else
+				{
+					IfcRelationship relationship = this as IfcRelationship;
+					if (relationship != null)
+					{
+						if (this is IfcRelAssociates || this is IfcRelDefinesByType)
+							return this.writeRepositoryCommon(obj, options);
+						else
+						{
+							IfcRelDefinesByProperties properties = this as IfcRelDefinesByProperties;
+							if (properties != null && properties.RelatedObjects.Count > 1)
+								return this.writeRepositoryCommon(obj, options);
+						}
+					}
+				}
+			}
 			return obj;
 		}
-		protected virtual void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected virtual void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			obj["id"] = mIndex;
+			if(!(this is IfcRoot) && !string.IsNullOrEmpty(mGlobalId))
+				obj["id"] = mGlobalId;
 		}
 		protected T extractObject<T>(JObject obj) where T : IBaseClassIfc
 		{
@@ -66,12 +150,11 @@ namespace GeometryGym.Ifc
 			if (!string.IsNullOrEmpty(value))
 				obj[attribute] = value;
 		}
-		protected void createArray(JObject obj,string name, IEnumerable<IBaseClassIfc> objects, BaseClassIfc host, HashSet<int> processed)
+		protected void createArray(JObject obj,string name, IEnumerable<IBaseClassIfc> objects, BaseClassIfc host, SetJsonOptions options)
 		{
 			if (objects.Count() == 0)
 				return;
-			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.Index].getJson(host, processed)));
+			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.Index].getJson(host, options)));
 		}
-		
 	}
 }

@@ -41,12 +41,12 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcUnitEnum>(token.Value<string>(), out mUnitType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			IfcDimensionalExponents exponents = Dimensions;
 			if(exponents != null)
-				obj["Dimensions"] = exponents.getJson(this, processed);
+				obj["Dimensions"] = exponents.getJson(this, options);
 			obj["UnitType"] = mUnitType.ToString();
 		}
 	}

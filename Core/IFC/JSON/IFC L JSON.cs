@@ -42,13 +42,13 @@ namespace GeometryGym.Ifc
 //				else if (string.Compare(name, "LibraryRefForObjects") == 0)
 //todo
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["Name"] = Name;
 			setAttribute(obj, "Version", Version);
 			if (mPublisher > 0)
-				obj["Publisher"] = mDatabase[mPublisher].getJson(this, processed);
+				obj["Publisher"] = mDatabase[mPublisher].getJson(this, options);
 			//VersionDate
 			setAttribute(obj, "Location", Location);
 			setAttribute(obj, "Description", Description);
@@ -69,13 +69,13 @@ namespace GeometryGym.Ifc
 					//todo
 		//		}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Language", Language);
 			if (mReferencedLibrary > 0)
-				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, processed);
+				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, options);
 		}
 	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
@@ -96,13 +96,13 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				RelativePlacement = mDatabase.parseJObject<IfcAxis2Placement>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			
 			if(mPlacementRelTo > 0)
-				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, processed);
-			obj["RelativePlacement"] = mDatabase[mRelativePlacement].getJson(this, processed);
+				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, options);
+			obj["RelativePlacement"] = mDatabase[mRelativePlacement].getJson(this, options);
 		}
 	}
 }

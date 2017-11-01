@@ -37,9 +37,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -53,9 +53,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -65,16 +65,63 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcUnit>(obj.GetValue("Units", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddUnit(x));
+			mDatabase.extractJArray<IfcUnit>(obj.GetValue("Units", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddUnit(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			JArray array = new JArray();
-			foreach(int unit in mUnits)
-				array.Add(mDatabase[unit].getJson(this, processed));
+			foreach (int unit in mUnits)
+				array.Add(mDatabase[unit].getJson(this, options));
 			obj["Units"] = array;
 		}
 	}
-
+	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mDepth);
+			token = obj.GetValue("FlangeWidth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFlangeWidth);
+			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mWebThickness);
+			token = obj.GetValue("FlangeThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFlangeThickness);
+			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFilletRadius);
+			token = obj.GetValue("EdgeRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mEdgeRadius);
+			token = obj.GetValue("FlangeSlope", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFlangeSlope);
+			token = obj.GetValue("mCentreOfGravityInX", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mCentreOfGravityInX);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			int digits = mDatabase.mLengthDigits;
+			base.setJSON(obj, host, options);
+			obj["Depth"] = Math.Round(mDepth, digits);
+			obj["FlangeWidth"] = Math.Round(mFlangeWidth, digits);
+			obj["WebThickness"] = Math.Round(mWebThickness, digits);
+			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
+			if (!double.IsNaN(mFilletRadius))
+				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+			if (!double.IsNaN(mEdgeRadius))
+				obj["EdgeRadius"] = Math.Round(mEdgeRadius, digits);
+			if (!double.IsNaN(mFlangeSlope))
+				obj["FlangeSlope"] = mFlangeSlope;
+			if(mDatabase.Release == ReleaseVersion.IFC2x3 && !double.IsNaN(mCentreOfGravityInX))
+				obj["mCentreOfGravityInX"] = mCentreOfGravityInX;
+		}
+	}
 }

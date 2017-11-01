@@ -41,14 +41,14 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				UserDefinedType = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mElements.Count > 0)
 			{
 				JArray array = new JArray();
 				foreach (int i in mElements)
-					array.Add(mDatabase[i].getJson(this, processed));
+					array.Add(mDatabase[i].getJson(this, options));
 				obj["Elements"] = array;
 			}
 			base.setAttribute(obj, "UnitType", mUnitType.ToString());
@@ -69,10 +69,10 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Exponent = token.Value<int>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["Unit"] = Unit.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["Unit"] = Unit.getJson(this, options);
 			obj["Exponent"] = mExponent;
 		}
 	}
@@ -104,9 +104,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				int.TryParse(token.Value<string>(), out mLuminousIntensityExponent);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if(mLengthExponent != 0)
 				obj["LengthExponent"] = mLengthExponent;
 			if(mMassExponent != 0)
@@ -158,9 +158,9 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["DirectionRatios"] = mDirectionRatioX + (double.IsNaN(mDirectionRatioY) ? "" : (" " + mDirectionRatioY + (double.IsNaN(mDirectionRatioZ) ? "" : " " + mDirectionRatioZ)));
 		}
 	}
@@ -179,9 +179,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcDistributionSystemEnum>(token.Value<string>(), true, out mSystemType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mFlowDirection != IfcFlowDirectionEnum.NOTDEFINED)
 				obj["FlowDirection"] = mFlowDirection.ToString();
 			if (mPredefinedType != IfcDistributionPortTypeEnum.NOTDEFINED)
@@ -202,12 +202,12 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				ReferencedDocument = mDatabase.parseJObject<IfcDocumentInformation>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "Description", Description);
 			if (mReferencedDocument > 0)
-				obj["ReferencedDocument"] = ReferencedDocument.getJson(this, processed);
+				obj["ReferencedDocument"] = ReferencedDocument.getJson(this, options);
 		}
 	}
 	public partial class IfcDoorPanelProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
@@ -231,9 +231,9 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				ShapeAspectStyle = mDatabase.parseJObject<IfcShapeAspect>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mPanelDepth))
 				obj["PanelDepth"] = mPanelDepth;
 			obj["OperationType"] = mOperationType.ToString();
@@ -241,7 +241,7 @@ namespace GeometryGym.Ifc
 				obj["PanelWidth"] = mPanelWidth;
 			obj["PanelPosition"] = mPanelPosition.ToString();
 			if (mShapeAspectStyle > 0)
-				obj["ShapeAspectStyle"] = ShapeAspectStyle.getJson(this, processed);
+				obj["ShapeAspectStyle"] = ShapeAspectStyle.getJson(this, options);
 		}
 	}
 	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
@@ -262,9 +262,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				UserDefinedOperationType = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["PredefinedType"] = mPredefinedType.ToString();
 			obj["OperationType"] = mOperationType.ToString();
 			obj["ParameterTakesPrecedence"] = mParameterTakesPrecedence;

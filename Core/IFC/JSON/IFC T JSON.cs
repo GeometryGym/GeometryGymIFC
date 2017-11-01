@@ -29,17 +29,17 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet)
 	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["Coordinates"] = mDatabase[mCoordinates].getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["Coordinates"] = mDatabase[mCoordinates].getJson(this, options);
 			if (mHasColours != null)
-				obj["HasColours"] = mHasColours.getJson(this, processed);
+				obj["HasColours"] = mHasColours.getJson(this, options);
 			if (mHasTextures.Count > 0)
 			{
 				JArray array = new JArray(mHasTextures.Count);
 				foreach (IfcIndexedTextureMap tm in HasTextures)
-					array.Add(tm.getJson(this, processed));
+					array.Add(tm.getJson(this, options));
 				obj["HasTextures"] = array;
 			}
 		}
@@ -66,9 +66,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
 	{
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 
 			if(mNormals.Length > 0)
 			{
@@ -118,16 +118,16 @@ namespace GeometryGym.Ifc
 			ApplicableOccurrence = extractString(obj.GetValue("ApplicableOccurrence", StringComparison.InvariantCultureIgnoreCase));
 			mDatabase.extractJArray<IfcPropertySetDefinition>(obj.GetValue("HasPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddPropertySet(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "ApplicableOccurrence", ApplicableOccurrence);
 			
 			if (mHasPropertySets.Count > 0)
-				obj["HasPropertySets"] = new JArray(HasPropertySets.ToList().ConvertAll(x => x.getJson(this, processed)));
+				obj["HasPropertySets"] = new JArray(HasPropertySets.ToList().ConvertAll(x => x.getJson(this, options)));
 			//IfcRelDefinesByType objectTypeOf = ObjectTypeOf;
 			//if(objectTypeOf != null)
-			//	obj["ObjectTypeOf"] = objectTypeOf.getJson(this, processed);
+			//	obj["ObjectTypeOf"] = objectTypeOf.getJson(this, options);
 		}
 	}
 	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
@@ -138,11 +138,11 @@ namespace GeometryGym.Ifc
 			mDatabase.extractJArray<IfcRepresentationMap>(obj.GetValue("RepresentationMaps", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRepresentationMap(x));
 			Tag = extractString(obj.GetValue("Tag", StringComparison.InvariantCultureIgnoreCase));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if(mRepresentationMaps.Count > 0)
-				obj["RepresentationMaps"] = new JArray(RepresentationMaps.ToList().ConvertAll(x=>x.getJson(this, processed)));
+				obj["RepresentationMaps"] = new JArray(RepresentationMaps.ToList().ConvertAll(x=>x.getJson(this, options)));
 			setAttribute(obj, "Tag", Tag);
 		}
 	}

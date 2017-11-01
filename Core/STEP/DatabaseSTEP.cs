@@ -30,7 +30,7 @@ using System.Collections;
 
 namespace GeometryGym.STEP
 {
-	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity, new()
+	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
 		//private SortedDictionary<int,T> mObjects = new SortedDictionary<int, T>() {  };
 		//public int LastKey { get { return mObjects.Keys.Last(); } }

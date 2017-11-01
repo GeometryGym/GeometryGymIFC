@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "Roles") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
-						AddRole( mDatabase.ParseXml<IfcActorRole>(cn as XmlElement));
+						AddRole(mDatabase.ParseXml<IfcActorRole>(cn as XmlElement));
 				}
 				else if (string.Compare(name, "Addresses") == 0)
 				{
@@ -368,7 +368,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcLayeredItem i = mDatabase.ParseXml<IfcLayeredItem>(cn as XmlElement);
 						if (i != null)
-							assign(i);
+							addItem(i);
 					}
 				}
 			}
@@ -492,6 +492,10 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(placement);
 			if (mRepresentation > 0)
 				xml.AppendChild(Representation.GetXML(xml.OwnerDocument, "Representation", this, processed));
+			XmlElement element = xml.OwnerDocument.CreateElement("ReferencedBy");
+			xml.AppendChild(element);
+			foreach (IfcRelAssignsToProduct rap in mReferencedBy)
+				element.AppendChild(rap.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
@@ -632,10 +636,38 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 		}
 	}
+	public partial class IfcPropertyBoundedValue : IfcSimpleProperty
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mUpperBoundValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mUpperBoundValue, "UpperBoundValue"));
+			if (mLowerBoundValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mLowerBoundValue, "LowerBoundValue"));
+			if (mUnit > 0)
+				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mSetPointValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mSetPointValue, "SetPointValue"));
+		}
+	}
+	public partial class IfcPropertyBoundedValue<T> : IfcSimpleProperty where T : IfcValue
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mUpperBoundValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mUpperBoundValue, "UpperBoundValue"));
+			if (mLowerBoundValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mLowerBoundValue, "LowerBoundValue"));
+			if(mUnit > 0)
+				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mSetPointValue != null)
+				xml.AppendChild(convert(xml.OwnerDocument, mSetPointValue, "SetPointValue"));
+		}
+	}
 	public abstract partial class IfcPropertyDefinition : IfcRoot, IfcDefinitionSelect //(IfcPropertySetDefinition, IfcPropertyTemplateDefinition)
-	{ //INVERSE
-	  //internal IfcRelDeclares mHasContext = null;// :	SET [0:1] OF IfcRelDeclares FOR RelatedDefinitions;
-	  //internal List<IfcRelAssociates> mHasAssociations = new List<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
+	{ 
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -647,8 +679,8 @@ namespace GeometryGym.Ifc
 					foreach (XmlNode node in child.ChildNodes)
 					{
 						IfcRelAssociates ra = mDatabase.ParseXml<IfcRelAssociates>(node as XmlElement);
-						if (ra != null)
-							ra.mRelatedObjects.Add(mIndex);
+                        if (ra != null)
+                            Associate(ra);
 					}
 				}
 			}
@@ -659,15 +691,17 @@ namespace GeometryGym.Ifc
 			if (mHasAssociations.Count > 0)
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("HasAssociations");
-				xml.AppendChild(element);
 				foreach (IfcRelAssociates ra in HasAssociations)
-					element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
+				{
+					if(ra.mRelatedObjects.Count > 0)	
+						element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
+				}
+				if(element.HasChildNodes)
+					xml.AppendChild(element);
 			}
 		}
 
 	}
-
-
 	public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
 	{
 		//internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4 

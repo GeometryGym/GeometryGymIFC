@@ -141,7 +141,7 @@ namespace GeometryGym.STEP
 		}
 		public static string IntOptionalToString(int i)
 		{
-			if (i == 0)
+			if (i == 0 || i == int.MinValue)
 				return "$";
 			return i.ToString();
 		}
@@ -618,6 +618,8 @@ namespace GeometryGym.STEP
 
 		public static string StripField(string s, ref int pos, int len)
 		{
+			if (pos >= len)
+				return "";
 			int icounter = pos;
 			while (char.IsWhiteSpace(s[icounter]))
 			{
@@ -747,6 +749,19 @@ namespace GeometryGym.STEP
 				if (icounter == len)
 					break;
 			}
+			if (s[icounter] == '*')
+			{
+				if (++icounter < len)
+				{
+					while (s[icounter++] != ',')
+					{
+						if (icounter == len)
+							break;
+					}
+				}
+				pos = icounter;
+				return 0;
+			}
 			if (s[icounter] == '$')
 			{
 				if (++icounter < len)
@@ -762,7 +777,7 @@ namespace GeometryGym.STEP
 			}
 
 			string str = "";
-			while (char.IsDigit(s[icounter]))
+			while (char.IsDigit(s[icounter]) || s[icounter] == '-')
 			{
 				str += s[icounter++];
 				if (icounter == len)
@@ -788,7 +803,7 @@ namespace GeometryGym.STEP
 				if (icounter == len)
 					break;
 			}
-			if (s[icounter] == '$')
+			if (s[icounter] == '$' || s[icounter] == '*')
 			{
 				if (++icounter < len)
 				{
@@ -841,6 +856,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<int>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
@@ -905,6 +921,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<List<int>>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
@@ -991,6 +1008,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<int>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
@@ -1047,6 +1065,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<List<int>>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
@@ -1130,6 +1149,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<double>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
@@ -1174,6 +1194,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 				}
+				pos = icounter;
 				return new List<List<double>>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))

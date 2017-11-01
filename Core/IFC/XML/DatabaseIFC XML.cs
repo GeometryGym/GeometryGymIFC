@@ -56,6 +56,7 @@ namespace GeometryGym.Ifc
 			{
 				ParseXml<IBaseClassIfc>( node as XmlElement);
 			}
+			postImport();
 		}
 		Dictionary<string, BaseClassIfc> mParsed = new Dictionary<string, BaseClassIfc>();
 		//internal BaseClassIfc ParseXml(XmlElement xml)
@@ -177,8 +178,8 @@ null, Type.EmptyTypes, null);
 			
 			return default(T);
 		}
-		internal string mXmlNamespace = "http://www.buildingsmart-tech.org/ifcXML/IFC4_ADD1";
-		internal string mXmlSchema = "http://www.buildingsmart-tech.org/ifcXML/IFC4/Add1/IFC4_ADD1.xsd";
+		internal string mXmlNamespace = "http://www.buildingsmart-tech.org/ifcXML/IFC4_ADD2";
+		internal string mXmlSchema = "http://www.buildingsmart-tech.org/ifc/IFC4/Add2/IFC4_ADD2.xsd";
 		internal string mXsiNamespace = "http://www.w3.org/2001/XMLSchema-instance";
 		public bool WriteXMLFile(string filename)
 		{

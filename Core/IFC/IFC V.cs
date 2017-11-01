@@ -28,28 +28,20 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public abstract class IfcValue { public abstract object Value { get; } }  //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	public abstract class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	{
+		public abstract object Value { get; set; }
+		public abstract Type ValueType { get; }
+		public abstract string ValueString { get; }
+	}  
 	public partial class IfcValve : IfcFlowController //IFC4
 	{
 		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// OPTIONAL : IfcValveTypeEnum;
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcValve() : base() { }
-		internal IfcValve(DatabaseIfc db, IfcValve v) : base(db, v) { mPredefinedType = v.mPredefinedType; }
+		internal IfcValve(DatabaseIfc db, IfcValve v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream) { mPredefinedType = v.mPredefinedType; }
 		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
-
-		internal static void parseFields(IfcValve s, List<string> arrFields, ref int ipos)
-		{
-			IfcEnergyConversionDevice.parseFields(s, arrFields, ref ipos);
-			string str = arrFields[ipos++];
-			if (str[0] == '.')
-				s.mPredefinedType = (IfcValveTypeEnum)Enum.Parse(typeof(IfcValveTypeEnum), str);
-		}
-		internal new static IfcValve Parse(string strDef) { IfcValve s = new IfcValve(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcValveTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
-		}
 	}
 	public partial class IfcValveType : IfcFlowControllerType
 	{
@@ -57,11 +49,8 @@ namespace GeometryGym.Ifc
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcValveType() : base() { }
-		internal IfcValveType(DatabaseIfc db, IfcValveType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
+		internal IfcValveType(DatabaseIfc db, IfcValveType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		internal static void parseFields(IfcValveType t, List<string> arrFields, ref int ipos) { IfcFlowControllerType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcValveTypeEnum)Enum.Parse(typeof(IfcValveTypeEnum), arrFields[ipos++].Replace(".", "")); }
-		internal new static IfcValveType Parse(string strDef) { IfcValveType t = new IfcValveType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
 	}
 	public partial class IfcVector : IfcGeometricRepresentationItem
 	{
@@ -74,23 +63,12 @@ namespace GeometryGym.Ifc
 		internal IfcVector() : base() { }
 		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
 		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.Database) { Orientation = orientation; Magnitude = magnitude; }
-	
-		internal static IfcVector Parse(string str)
-		{
-			IfcVector v = new IfcVector();
-			int pos = 0, len = str.Length;
-			v.mOrientation = ParserSTEP.StripLink(str, ref pos, len);
-			v.mMagnitude = ParserSTEP.StripDouble(str, ref pos, len);
-			return v;
-		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
 	}
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
 		internal IfcVertex() : base() { }
-		internal IfcVertex(DatabaseIfc db) : base(db) { }
+		public IfcVertex(DatabaseIfc db) : base(db) { }
 		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
-		internal static IfcVertex Parse(string str) { return new IfcVertex(); }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
@@ -100,18 +78,6 @@ namespace GeometryGym.Ifc
 
 		internal IfcVertexBasedTextureMap() : base() { }
 		internal IfcVertexBasedTextureMap(IfcVertexBasedTextureMap m) : base() { mTextureVertices = new List<int>(m.mTextureVertices.ToArray()); mTexturePoints = new List<int>(m.mTexturePoints.ToArray()); }
-		internal static IfcVertexBasedTextureMap Parse(string strDef) { IfcVertexBasedTextureMap m = new IfcVertexBasedTextureMap(); int ipos = 0; parseFields(m, ParserSTEP.SplitLineFields(strDef), ref ipos); return m; }
-		internal static void parseFields(IfcVertexBasedTextureMap m, List<string> arrFields, ref int ipos) { m.mTextureVertices = ParserSTEP.SplitListLinks(arrFields[ipos++]); m.mTexturePoints = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
-		protected override string BuildStringSTEP()
-		{
-			string str = base.BuildStringSTEP() + ",(" + ParserSTEP.LinkToString(mTextureVertices[0]);
-			for (int icounter = 1; icounter < mTextureVertices.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mTextureVertices[icounter]);
-			str += "),(" + ParserSTEP.LinkToString(mTexturePoints[0]);
-			for (int icounter = 1; icounter < mTexturePoints.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mTexturePoints[icounter]);
-			return str;
-		}
 	}
 	public partial class IfcVertexloop : IfcLoop
 	{
@@ -120,14 +86,6 @@ namespace GeometryGym.Ifc
 
 		internal IfcVertexloop() : base() { }
 		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
-		internal static IfcVertexloop Parse(string str)
-		{
-			IfcVertexloop l = new IfcVertexloop();
-			int pos = 0;
-			l.mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length);
-			return l;
-		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mLoopVertex); }
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
@@ -137,8 +95,6 @@ namespace GeometryGym.Ifc
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
 		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
-		internal new static IfcVertexPoint Parse(string str) { IfcVertexPoint v = new IfcVertexPoint(); int pos = 0;v.mVertexGeometry = ParserSTEP.StripLink(str, ref pos, str.Length); return v; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mVertexGeometry); }
 	}
 	public partial class IfcVibrationIsolator : IfcElementComponent
 	{
@@ -146,18 +102,8 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcVibrationIsolator() : base() { }
-		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i) : base(db, i) { mPredefinedType = i.mPredefinedType; }
+		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
 		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-
-		internal static IfcVibrationIsolator Parse(string strDef) { int ipos = 0; IfcVibrationIsolator a = new IfcVibrationIsolator(); parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
-		internal static void parseFields(IfcVibrationIsolator a, List<string> arrFields, ref int ipos)
-		{
-			IfcElementComponent.parseFields(a, arrFields, ref ipos);
-			string s = arrFields[ipos++];
-			if (s.StartsWith("."))
-				a.mPredefinedType = (IfcVibrationIsolatorTypeEnum)Enum.Parse(typeof(IfcVibrationIsolatorTypeEnum), s.Replace(".", ""));
-		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcVibrationIsolatorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 	}
 	public partial class IfcVibrationIsolatorType : IfcElementComponentType
 	{
@@ -165,18 +111,13 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcVibrationIsolatorType() : base() { }
-		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t) : base(db, t) { mPredefinedType = t.mPredefinedType; }
-		internal static void parseFields(IfcVibrationIsolatorType t, List<string> arrFields, ref int ipos) { IfcDiscreteAccessoryType.parseFields(t, arrFields, ref ipos); t.mPredefinedType = (IfcVibrationIsolatorTypeEnum)Enum.Parse(typeof(IfcVibrationIsolatorTypeEnum), arrFields[ipos++].Replace(".", "")); }
-		internal new static IfcVibrationIsolatorType Parse(string strDef) { IfcVibrationIsolatorType t = new IfcVibrationIsolatorType(); int ipos = 0; parseFields(t, ParserSTEP.SplitLineFields(strDef), ref ipos); return t; }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + "."; }
+		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
 	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }
-		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e) : base(db, e,false) { }
+		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
-		internal static IfcProduct Parse(string strDef) { IfcVirtualElement e = new IfcVirtualElement(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos); return e; }
-		internal static void parseFields(IfcVirtualElement e, List<string> arrFields, ref int ipos) { IfcElement.parseFields(e, arrFields, ref ipos); }
 	}
 	public partial class IfcVirtualGridIntersection : BaseClassIfc
 	{
@@ -185,23 +126,6 @@ namespace GeometryGym.Ifc
 		public Tuple<IfcGridAxis,IfcGridAxis> IntersectingAxes { get { return new Tuple<IfcGridAxis, IfcGridAxis>(mDatabase[mIntersectingAxes.Item1] as IfcGridAxis, mDatabase[mIntersectingAxes.Item2] as IfcGridAxis); } set { mIntersectingAxes = new Tuple<int, int>(value.Item1.mIndex, value.Item2.mIndex); } }
 		internal IfcVirtualGridIntersection() : base() { }
 		internal IfcVirtualGridIntersection(DatabaseIfc db, IfcVirtualGridIntersection i) : base(db, i) { Tuple<IfcGridAxis, IfcGridAxis> axes = i.IntersectingAxes; IntersectingAxes = new Tuple<IfcGridAxis,IfcGridAxis>(db.Factory.Duplicate(axes.Item1) as IfcGridAxis, db.Factory.Duplicate(axes.Item2) as IfcGridAxis); mOffsetDistances = i.mOffsetDistances; }
-		internal static IfcVirtualGridIntersection Parse(string strDef) { IfcVirtualGridIntersection i = new IfcVirtualGridIntersection(); int ipos = 0; parseFields(i, ParserSTEP.SplitLineFields(strDef), ref ipos); return i; }
-		internal static void parseFields(IfcVirtualGridIntersection i, List<string> arrFields, ref int ipos)
-		{
-			List<int> links = ParserSTEP.SplitListLinks(arrFields[ipos++]);
-			i.mIntersectingAxes = new Tuple<int, int>(links[0], links[1]);
-			List<string> lst = ParserSTEP.SplitLineFields(arrFields[ipos++]);
-			i.mOffsetDistances = new Tuple<double,double,double>(ParserSTEP.ParseDouble(lst[0]), ParserSTEP.ParseDouble(lst[1]),(lst.Count > 2 ? ParserSTEP.ParseDouble(lst[2]) : double.NaN));
-		}
-		protected override string BuildStringSTEP()
-		{
-			string str = base.BuildStringSTEP() + ",(#" + mIntersectingAxes.Item1 + ",#" + mIntersectingAxes.Item2 + "),(";
-			str += ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2);
-			if (!double.IsNaN(mOffsetDistances.Item3))
-				str += "," + ParserSTEP.DoubleToString(mOffsetDistances.Item3);
-			str += ")";
-			return str;
-		}
 	}
 	public partial class IfcVoidingFeature : IfcFeatureElementSubtraction //IFC4
 	{
@@ -209,26 +133,19 @@ namespace GeometryGym.Ifc
 		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcVoidingFeature() : base() { }
-		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v) : base(db,v) { mPredefinedType = v.mPredefinedType; }
+		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream) { mPredefinedType = v.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
-		
-		internal static IfcVoidingFeature Parse(string strDef, ReleaseVersion schema) { IfcVoidingFeature e = new IfcVoidingFeature(); int ipos = 0; parseFields(e, ParserSTEP.SplitLineFields(strDef), ref ipos,schema); return e; }
-		internal static void parseFields(IfcVoidingFeature e, List<string> arrFields, ref int ipos, ReleaseVersion schema)
-		{
-			IfcFeatureElementSubtraction.parseFields(e, arrFields, ref ipos);
-			if (schema != ReleaseVersion.IFC2x3)
-				e.mPredefinedType = (IfcVoidingFeatureTypeEnum)Enum.Parse(typeof(IfcVoidingFeatureTypeEnum), arrFields[ipos++].Replace(".", ""));
-		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType + "."); }
 	}
 
 	public abstract class IfcDerivedMeasureValue : IfcValue
 	{
 		internal double mValue;
-		public override object Value { get { return mValue; } }
+		public override object Value { get => mValue; set => mValue = Convert.ToDouble(value); }
+		public override Type ValueType => typeof(double);
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcDerivedMeasureValue(double value) { mValue = value; }
 		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public override string ValueString => Value.ToString();
 	} //(IfcVolumetricFlowRateMeasure,IfcTimeStamp ,IfcThermalTransmittanceMeasure ,IfcThermalResistanceMeasure
 	  //,IfcThermalAdmittanceMeasure ,IfcPressureMeasure ,IfcPowerMeasure ,IfcMassFlowRateMeasure ,IfcMassDensityMeasure ,IfcLinearVelocityMeasure
 	  //,IfcKinematicViscosityMeasure ,IfcIntegerCountRateMeasure ,IfcHeatFluxDensityMeasure ,IfcFrequencyMeasure ,IfcEnergyMeasure ,IfcElectricVoltageMeasure
@@ -376,10 +293,12 @@ namespace GeometryGym.Ifc
 	{ //,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
       //IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
 		internal double mValue;
-		public override object Value { get { return mValue; } }
+		public override object Value { get => mValue; set => mValue = Convert.ToDouble(value); }
+		public override Type ValueType => typeof(double);
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcMeasureValue(double value) { mValue = value; }
 		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public override string ValueString => Value.ToString();
 	}
 	public class IfcAreaMeasure : IfcMeasureValue { public IfcAreaMeasure(double value) : base(value) { } }
 	public class IfcAmountOfSubstanceMeasure : IfcMeasureValue { public IfcAmountOfSubstanceMeasure(double value) : base(value) { } }
@@ -447,38 +366,45 @@ namespace GeometryGym.Ifc
 	public class IfcRatioMeasure : IfcMeasureValue, IfcTimeOrRatioSelect//, IfcAppliedValueSelect
 	{
 		public IfcRatioMeasure(double value) : base(value) { }
-		public string String { get { return ToString(); } }
 	}
 	public class IfcSolidAngleMeasure : IfcMeasureValue { public IfcSolidAngleMeasure(double value) : base(value) { } }
 	public class IfcThermodynamicTemperatureMeasure : IfcMeasureValue { public IfcThermodynamicTemperatureMeasure(double value) : base(value) { } }
 	public class IfcTimeMeasure : IfcMeasureValue { public IfcTimeMeasure(double value) : base(value) { } }
 	public class IfcVolumeMeasure : IfcMeasureValue { public IfcVolumeMeasure(double value) : base(value) { } }
 
-	public abstract class IfcSimpleValue : IfcValue { }// = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
+	public abstract class IfcSimpleValue : IfcValue // = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
+	{
+		public override string ValueString => Value.ToString();
+	}
 	//IfcBinary
 	public partial class IfcBoolean : IfcSimpleValue
 	{
-		internal bool mValue;
-		public override object Value { get { return mValue; } }
-		public IfcBoolean(bool value) { mValue = value; }
-		public override string ToString() { return "IFCBOOLEAN(" + ParserSTEP.BoolToString(mValue) + ")"; }
+		public bool Boolean { get; set; }
+		public override object Value { get => Boolean; set => Boolean = Convert.ToBoolean(value); }
+		public override Type ValueType => typeof(bool);
+		public IfcBoolean(bool value) { Boolean = value; }
+		public override string ToString() { return "IFCBOOLEAN(" + ParserSTEP.BoolToString(Boolean) + ")"; }
 	}
 	public partial class IfcDate : IfcSimpleValue
 	{
 		internal string mDate = "$";
-		public override object Value { get { return convert(mDate); } }
-		internal IfcDate(DateTime datetime) { mDate = convert(datetime); }
+		public override object Value { get => convert(mDate); set => mDate = convert(Convert.ToDateTime(value)); }
+		public override Type ValueType => typeof(DateTime);
+		public IfcDate(DateTime datetime) { mDate = convert(datetime); }
 		public override string ToString() { return "IFCDATE(" + mDate + ")"; }
 		internal static string convert(DateTime date) { return "'" + date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day + "'"; }
 		internal static DateTime convert(string date) { return new DateTime(int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(5, 2)), int.Parse(date.Substring(8, 2))); }
+		public override string ValueString => mDate;
 	}
 	public partial class IfcDateTime : IfcSimpleValue
 	{
-		internal string mDateTime = "$";
-		internal IfcDateTime(DateTime datetime) { mDateTime = formatSTEP(datetime); }
-		public override string ToString() { return "IFCDATETIME(" + mDateTime + ")"; }
-		internal static string formatSTEP(DateTime dateTime) { return (dateTime == DateTime.MinValue ? "$" : "'" + dateTime.Year + (dateTime.Month < 10 ? "-0" : "-") + dateTime.Month + (dateTime.Day < 10 ? "-0" : "-") + dateTime.Day + (dateTime.Hour < 10 ? "T0" : "T") + dateTime.Hour + (dateTime.Minute < 10 ? ":0" : ":") + dateTime.Minute + (dateTime.Second < 10 ? ":0" : ":") + dateTime.Second + "'"); }
-		internal static DateTime parseSTEP(string str)
+		private DateTime mDateTime = DateTime.MinValue;
+		public override object Value { get => mDateTime; set => mDateTime = Convert.ToDateTime(value); }
+		public override Type ValueType => typeof(DateTime);
+		public IfcDateTime(DateTime datetime) { mDateTime = datetime; }
+		public override string ToString() { return "IFCDATETIME(" + (mDateTime ==	DateTime.MinValue ? "$)" : "'" + formatSTEP(mDateTime) + "')"); }
+		internal static string formatSTEP(DateTime dateTime) { return dateTime.Year + (dateTime.Month < 10 ? "-0" : "-") + dateTime.Month + (dateTime.Day < 10 ? "-0" : "-") + dateTime.Day + (dateTime.Hour < 10 ? "T0" : "T") + dateTime.Hour + (dateTime.Minute < 10 ? ":0" : ":") + dateTime.Minute + (dateTime.Second < 10 ? ":0" : ":") + dateTime.Second; }
+		public static DateTime parseSTEP(string str)
 		{
 			string value = str.Replace("'", "");
 			if (string.IsNullOrEmpty(value) || value == "$")
@@ -498,7 +424,6 @@ namespace GeometryGym.Ifc
 			DateTime result = DateTime.MinValue;
 			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
 		}
-		public override object Value { get { return parseSTEP( mDateTime); } }
 		internal static IfcDateTimeSelect convertDateTimeSelect(DatabaseIfc m, DateTime date)
 		{
 			IfcCalendarDate cd = new IfcCalendarDate(m, date.Day, date.Month, date.Year);
@@ -506,6 +431,7 @@ namespace GeometryGym.Ifc
 				return cd;
 			return new IfcDateAndTime(cd, new IfcLocalTime(m, date.Hour, date.Minute, date.Second));
 		}
+		public override string ValueString => formatSTEP(mDateTime);
 	}
 	public partial class IfcDuration : IfcSimpleValue, IfcTimeOrRatioSelect
 	{
@@ -518,65 +444,92 @@ namespace GeometryGym.Ifc
 		public int Minutes { get { return mMinutes; } set { mMinutes = value; } }
 		public double Seconds { get { return mSeconds; } set { mSeconds = value; } }
 
+		public override object Value { get => ToSeconds(); set => fromSeconds(System.Convert.ToDouble(value)); }
+		public override Type ValueType => typeof(double);
+
 		public IfcDuration() { }
 		public static string Convert(IfcDuration d) { return (d == null ? "$" : d.ToString()); }
 		public static IfcDuration Convert(string s) { return null; }
 
-		public override string ToString() { return "'P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S'"; }
+		public override string ValueString => "P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S";
+		public override string ToString() { return "IFCDURATION('" + ValueString + "'"; }
 		internal double ToSeconds() { return ((((((mYears * 365) + (mMonths * 30) + mDays) * 24) + mHours) * 60) + mMinutes) * 60 + mSeconds; }
-		public override object Value { get { return ToSeconds(); } }
-		public string String { get { return getKW + "(" + ToString() + ")"; } }
-		public string getKW { get { return mKW; } }
-		internal static string mKW = "IFCDURATION";
+		private void fromSeconds(double seconds) { mYears = mMonths = mDays = mHours = mMinutes = 0; mSeconds = seconds; }
 	}
 	public partial class IfcIdentifier : IfcSimpleValue
 	{
-		internal string mValue;
-		public override object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcIdentifier(string value) { mValue = ParserIfc.Encode( value); }
-		public override string ToString() { return "IFCIDENTIFIER('" + mValue + "')"; }
+		public string Identifier { get; set; }
+		public override object Value { get => Identifier; set => Identifier = value.ToString(); }
+		public override Type ValueType => typeof(string);
+		public IfcIdentifier(string value) { Identifier = value; }
+		public override string ToString() { return "IFCIDENTIFIER('" + ParserIfc.Encode( Identifier) + "')"; }
 	}
 	public partial class IfcInteger : IfcSimpleValue
 	{
-		internal int mValue;
-		public override object Value { get { return mValue; } }
-		public IfcInteger(int value) { mValue = value; }
-		public override string ToString() { return "IFCINTEGER(" + mValue.ToString() + ")"; }
+		public int Magnitude { get; set; } = 0;
+		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(int);
+		public IfcInteger(int value) { Magnitude = value; }
+		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
 	}
 	public partial class IfcLabel : IfcSimpleValue
 	{
-		internal string mValue;
-		public override object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcLabel(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
-		public override string ToString() { return "IFCLABEL('" + mValue + "')"; }
+		public string Label { get; set; }
+		public override object Value { get => Label; set => Label = value.ToString(); }
+		public override Type ValueType => typeof(string);
+		public IfcLabel(string value) { Label = value; }
+		public override string ToString() { return "IFCLABEL('" + ParserIfc.Encode(Label) + "')"; }
 	}
 	public partial class IfcLogical : IfcSimpleValue
 	{
 		internal IfcLogicalEnum mValue;
-		public override object Value { get { return mValue.ToString(); } }
+		public override object Value
+		{
+			get { return mValue; }
+			set
+			{
+				if(!Enum.TryParse<IfcLogicalEnum>(value.ToString(),out mValue))
+				{
+					bool boolean = Convert.ToBoolean(value);
+					mValue = (boolean ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE);
+				}
+			}
+		}
+		public override Type ValueType => typeof(IfcLogicalEnum);
 		public IfcLogical(IfcLogicalEnum value) { mValue = value; }
 		public IfcLogical(bool value) { mValue = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; }
 		public override string ToString() { return "IFCLOGICAL(" + ParserIfc.LogicalToString(mValue) + ")"; }
 	}
-	//IfcPositiveInteger
+	public partial class IfcPositiveInteger : IfcSimpleValue
+	{
+		public int Magnitude { get; set; } = 0;
+		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(int);
+		public IfcPositiveInteger(int value) { Magnitude = value; }
+		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
+	}
 	public partial class IfcReal : IfcSimpleValue
 	{
-		internal double mValue;
-		public override object Value { get { return mValue; } }
-		public IfcReal(double value) { mValue = value; }
-		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public double Magnitude { get; set; }
+		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(double);
+		public IfcReal(double value) { Magnitude = value; }
+		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(Magnitude) + ")"; }
 	}
 	public partial class IfcText : IfcSimpleValue
 	{
-		internal string mValue;
-		public override object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcText(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
-		public override string ToString() { return "IFCTEXT('" + mValue + "')"; }
+		public string Text { get; set; }
+		public override object Value { get => Text; set => Text = value.ToString(); }
+		public override Type ValueType => typeof(string);
+		public IfcText(string value) { Text = value; }
+		public override string ToString() { return "IFCTEXT('" + ParserIfc.Encode(Text) + "')"; }
 	}
 	public partial class IfcTime : IfcSimpleValue
 	{
 		internal string mTime = "$";
 		public override string ToString() { return mTime; }
+		public override object Value { get => parseSTEP(mTime); set => mTime = formatSTEP(Convert.ToDateTime(value)); }
+		public override Type ValueType => typeof(DateTime);
 		internal static string formatSTEP(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? ":0" : ":") + date.Minute + (date.Second < 10 ? ":0" : ":") + date.Second + "'"; }
 		internal static DateTime parseSTEP(string str)
 		{
@@ -594,31 +547,35 @@ namespace GeometryGym.Ifc
 			DateTime result = DateTime.MinValue;
 			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
 		}
-		public override object Value { get { return mTime; } }
 		internal static string convert(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? "-0" : "-") + date.Minute + (date.Second < 10 ? "-0" : "-") + date.Second; }
 	}
 	//IfcTimeStamp
 	public partial class IfcURIReference : IfcSimpleValue
 	{
-		internal string mValue;
-		public override object Value { get { return ParserIfc.Decode(mValue); } }
-		public IfcURIReference(string value) { mValue = string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value); }
-		public override string ToString() { return "IFCURIREFERENCE('" + mValue + "')"; }
+		public string URI { get; set; }
+		public override object Value { get => URI; set => URI = value.ToString(); }
+		public override Type ValueType => typeof(string);
+		public IfcURIReference(string value) { URI = value; }
+		public override string ToString() { return "IFCURIREFERENCE('" + ParserIfc.Encode(URI) + "')"; }
 	}
 
 	public partial class IfcSpecularExponent : IfcValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
-		public override object Value { get { return mValue; } }
+		public override object Value { get => mValue; set => mValue = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(double);
 		public IfcSpecularExponent(double value) { mValue = value; }
 		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public override string ValueString => Value.ToString();
 	}
 	public partial class IfcSpecularRoughness : IfcValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
-		public override object Value { get { return mValue; } }
+		public override object Value { get => mValue; set => mValue = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(double);
 		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
 		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public override string ValueString => Value.ToString();
 	}
 	public interface IfcSizeSelect { } //TYPE IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);  
 }

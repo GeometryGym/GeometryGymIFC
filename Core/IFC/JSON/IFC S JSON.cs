@@ -45,27 +45,27 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLogicalEnum>(token.Value<string>(), true, out mProductDefinitional);
 			PartOfProductDefinitionShape = mDatabase.parseJObject<IfcProductRepresentationSelect>(obj.GetValue("PartOfProductDefinitionShape", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			JArray array = new JArray();
 			foreach (IfcShapeModel sm in ShapeRepresentations)
-				array.Add(sm.getJson(this, processed));
+				array.Add(sm.getJson(this, options));
 			obj["ShapeRepresentations"] = array;
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "ProductDefinitional", mProductDefinitional.ToString());
 			if (mPartOfProductDefinitionShape > 0 && mPartOfProductDefinitionShape != host.mIndex)
-				obj["PartOfProductDefinitionShape"] = mDatabase[mPartOfProductDefinitionShape].getJson(this, processed);
+				obj["PartOfProductDefinitionShape"] = mDatabase[mPartOfProductDefinitionShape].getJson(this, options);
 		}
 	}
 	public abstract partial class IfcShapeModel : IfcRepresentation//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
 	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mOfShapeAspect != null)
-				obj["OfShapeAspect"] = mOfShapeAspect.getJson(this, processed);
+				obj["OfShapeAspect"] = mOfShapeAspect.getJson(this, options);
 		}
 	}
 	public partial class IfcSimplePropertyTemplate : IfcPropertyTemplate
@@ -86,19 +86,19 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcStateEnum>(token.Value<string>(), true, out mAccessState);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mTemplateType != IfcSimplePropertyTemplateTypeEnum.NOTDEFINED)
 				obj["TemplateType"] = mTemplateType.ToString();
 			setAttribute(obj, "PrimaryMeasureType", PrimaryMeasureType);
 			setAttribute(obj, "SecondaryMeasureType", SecondaryMeasureType);
 			if (mEnumerators > 0)
-				obj["Enumerators"] = Enumerators.getJson(this, processed);
+				obj["Enumerators"] = Enumerators.getJson(this, options);
 			if (mPrimaryUnit > 0)
-				obj["PrimaryUnit"] = mDatabase[mPrimaryUnit].getJson(this, processed);
+				obj["PrimaryUnit"] = mDatabase[mPrimaryUnit].getJson(this, options);
 			if (mSecondaryUnit > 0)
-				obj["SecondaryUnit"] = mDatabase[mSecondaryUnit].getJson(this, processed);
+				obj["SecondaryUnit"] = mDatabase[mSecondaryUnit].getJson(this, options);
 			setAttribute(obj, "Expression", Expression);
 			if (mAccessState != IfcStateEnum.NA)
 				obj["AccessState"] = mAccessState.ToString();
@@ -118,9 +118,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcSIUnitName>(token.Value<string>(), out mName);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPrefix != IfcSIPrefix.NONE)
 				obj["Prefix"] = mPrefix.ToString();
 			obj["Name"] = Name.ToString();
@@ -135,9 +135,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcSlabTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcSlabTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -151,9 +151,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcSlabTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcSlabTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -170,10 +170,12 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				mElevationWithFlooring = token.Value<double>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			if (mPredefinedType != IfcSpaceTypeEnum.NOTDEFINED)
+			base.setJSON(obj, host, options);
+			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				obj["InteriorOrExteriorSpace"] = mPredefinedType == IfcSpaceTypeEnum.INTERNAL || mPredefinedType == IfcSpaceTypeEnum.EXTERNAL ? mPredefinedType.ToString() : "NOTDEFINED";
+			else if (mPredefinedType != IfcSpaceTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 			if (!double.IsNaN(mElevationWithFlooring))
 				obj["ElevationWithFlooring"] = mElevationWithFlooring;
@@ -188,9 +190,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcSpaceHeaterTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcSpaceHeaterTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -204,9 +206,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcSpaceHeaterTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcSpaceHeaterTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -224,26 +226,29 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelServicesBuildings rsbs in mDatabase.extractJArray<IfcRelServicesBuildings>(obj.GetValue("ServicedBySystems", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				rsbs.addRelated(this);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			string longName = LongName;
 			if (!string.IsNullOrEmpty(longName))
 				obj["LongName"] = longName;
 
-			if (mContainsElements.Count > 0)
+			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
-				JArray array = new JArray();
-				foreach (IfcRelContainedInSpatialStructure con in ContainsElements)
-					array.Add(con.getJson(this, processed));
-				obj["ContainsElements"] = array;
+				if (mContainsElements.Count > 0)
+				{
+					JArray array = new JArray();
+					foreach (IfcRelContainedInSpatialStructure con in ContainsElements)
+						array.Add(con.getJson(this, options));
+					obj["ContainsElements"] = array;
+				}
 			}
 			//Reference buildings from system ?? not structural analysis
 			if (mServicedBySystems.Count > 0)
 			{
 				JArray array = new JArray();
 				foreach (IfcRelServicesBuildings systems in ServicedBySystems)
-					array.Add(systems.getJson(this, processed));
+					array.Add(systems.getJson(this, options));
 				obj["ServicedBySystems"] = array;
 			}
 		}
@@ -257,9 +262,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcElementCompositionEnum>(token.Value<string>(), out mCompositionType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mCompositionType != IfcElementCompositionEnum.NA)
 				obj["CompositionType"] = mCompositionType.ToString();
 		}
@@ -276,9 +281,9 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				CausedBy = mDatabase.parseJObject<IfcStructuralReaction>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mDestabilizingLoad == IfcLogicalEnum.UNKNOWN)
 			{
 				if (mDatabase.Release == ReleaseVersion.IFC2x3)
@@ -287,7 +292,7 @@ namespace GeometryGym.Ifc
 			else
 				obj["DestabilizingLoad"] = mDestabilizingLoad == IfcLogicalEnum.TRUE;
 			if (mCausedBy > 0)
-				obj["CausedBy"] = CausedBy.getJson(this, processed);
+				obj["CausedBy"] = CausedBy.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcStructuralActivity : IfcProduct
@@ -305,13 +310,13 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				AssignedToStructuralItem = mDatabase.parseJObject<IfcRelConnectsStructuralActivity>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["AppliedLoad"] = AppliedLoad.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["AppliedLoad"] = AppliedLoad.getJson(this, options);
 			obj["IfcGlobalOrLocalEnum"] = mGlobalOrLocal.ToString();
 			if (mAssignedToStructuralItem != null)
-				obj["AssignedToStructuralItem"] = mAssignedToStructuralItem.getJson(this, processed);
+				obj["AssignedToStructuralItem"] = mAssignedToStructuralItem.getJson(this, options);
 		}
 	}
 	public partial class IfcStructuralAnalysisModel : IfcSystem
@@ -337,19 +342,19 @@ namespace GeometryGym.Ifc
 					mSharedPlacement = token.Value<int>();
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcAnalysisModelTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 			if (mOrientationOf2DPlane > 0)
-				obj["OrientationOf2DPlane"] = OrientationOf2DPlane.getJson(this, processed);
+				obj["OrientationOf2DPlane"] = OrientationOf2DPlane.getJson(this, options);
 			if (mLoadedBy.Count > 0)
-				obj["LoadedBy"] = new JArray(mLoadedBy.ConvertAll(x => mDatabase[x].getJson(this, processed)));
+				obj["LoadedBy"] = new JArray(mLoadedBy.ConvertAll(x => mDatabase[x].getJson(this, options)));
 			if (mHasResults.Count > 0)
-				obj["HasResults"] = new JArray(mHasResults.ConvertAll(x => mDatabase[x].getJson(this, processed)));
+				obj["HasResults"] = new JArray(mHasResults.ConvertAll(x => mDatabase[x].getJson(this, options)));
 			if (mSharedPlacement > 0)
-				obj["SharedPlacement"] = SharedPlacement.getJson(this, processed);
+				obj["SharedPlacement"] = SharedPlacement.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcStructuralConnection : IfcStructuralItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveConnection ,IfcStructuralPointConnection ,IfcStructuralSurfaceConnection))
@@ -363,12 +368,12 @@ namespace GeometryGym.Ifc
 				AppliedCondition = mDatabase.parseJObject<IfcBoundaryCondition>(rp);
 			mConnectsStructuralMembers.AddRange(mDatabase.extractJArray<IfcRelConnectsStructuralMember>(obj.GetValue("ConnectsStructuralMembers", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 
 			if (mAppliedCondition > 0)
-				obj["AppliedCondition"] = AppliedCondition.getJson(this, processed);
+				obj["AppliedCondition"] = AppliedCondition.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcStructuralConnectionCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcFailureConnectionCondition ,IfcSlippageConnectionCondition));
@@ -380,9 +385,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Name = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			base.setAttribute(obj, "Name", Name);
 		}
 	}
@@ -398,9 +403,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcStructuralCurveActivityTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["ProjectedOrTrue"] = mProjectedOrTrue.ToString();
 			if (mPredefinedType != IfcStructuralCurveActivityTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
@@ -418,13 +423,13 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				Axis = mDatabase.parseJObject<IfcDirection>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcStructuralCurveMemberTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 			if (mAxis > 0)
-				obj["Axis"] = Axis.getJson(this, processed);
+				obj["Axis"] = Axis.getJson(this, options);
 		}
 	}
 	public partial class IfcStructuralCurveReaction : IfcStructuralReaction
@@ -436,9 +441,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcStructuralCurveActivityTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcStructuralCurveActivityTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -476,9 +481,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				double.TryParse(token.Value<string>(), out mLinearMomentZ);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mLinearForceX))
 				obj["LinearForceX"] = mLinearForceX;
 			if (!double.IsNaN(mLinearForceY))
@@ -517,9 +522,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				double.TryParse(token.Value<string>(), out mMomentZ);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mForceX))
 				obj["ForceX"] = mForceX;
 			if (!double.IsNaN(mForceY))
@@ -552,11 +557,11 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				ConditionCoordinateSystem = mDatabase.parseJObject<IfcAxis2Placement3D>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mConditionCoordinateSystem > 0)
-				obj["ConditionCoordinateSystem"] = ConditionCoordinateSystem.getJson(this, processed);
+				obj["ConditionCoordinateSystem"] = ConditionCoordinateSystem.getJson(this, options);
 		}
 	}
 	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
@@ -571,12 +576,39 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				double.TryParse(token.Value<string>(), out mThickness);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcStructuralSurfaceMemberTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 			obj["Thickness"] = mThickness;
+		}
+	}
+	public partial class IfcStyledItem : IfcRepresentationItem
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+
+			JObject jobj = obj.GetValue("Item", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Item = extractObject<IfcRepresentationItem>(jobj);
+			foreach (IfcStyleAssignmentSelect sas in mDatabase.extractJArray<IfcStyleAssignmentSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray))
+				addStyle(sas);	
+			JToken token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Name = token.Value<string>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mItem > 0 && Item != host)
+				obj["Item"] = Item.getJson(this, options);
+			JArray array = new JArray();
+			foreach (int style in mStyles)
+				array.Add(mDatabase[style].getJson(this, options));
+			obj["Styles"] = array;
+			base.setAttribute(obj, "Name", Name);
 		}
 	}
 	public partial class IfcSurfaceStyle : IfcPresentationStyle, IfcPresentationStyleSelect
@@ -589,11 +621,11 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSurfaceSide>(token.Value<string>(), out mSide);
 			mDatabase.extractJArray<IfcSurfaceStyleElementSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addStyle(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["Side"] = mSide.ToString();
-			obj["Styles"] = new JArray(mStyles.ConvertAll(x => mDatabase[x].getJson(this, processed)));
+			obj["Styles"] = new JArray(mStyles.ConvertAll(x => mDatabase[x].getJson(this, options)));
 		}
 	}
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect
@@ -605,10 +637,10 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				SurfaceColour = extractObject<IfcColourRgb>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["SurfaceColour"] = SurfaceColour.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["SurfaceColour"] = SurfaceColour.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
@@ -629,12 +661,12 @@ namespace GeometryGym.Ifc
 					Position = mDatabase.parseJObject<IfcAxis2Placement3D>(jobj);
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["SweptArea"] = SweptArea.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["SweptArea"] = SweptArea.getJson(this, options);
 			if (mPosition > 0)
-				obj["Position"] = Position.getJson(this, processed);
+				obj["Position"] = Position.getJson(this, options);
 		}
 	}
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))

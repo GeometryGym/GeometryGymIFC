@@ -100,11 +100,11 @@ namespace GeometryGym.Ifc
 			foreach (IBaseClassIfc o in objects)
 				element.AppendChild(mDatabase[o.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
-		internal static XmlNode convert(XmlDocument doc, IfcValue value,string name)
+		internal static XmlNode convert(XmlDocument doc, IfcValue value, string name)
 		{
 			string keyword = value.GetType().Name;
 			XmlElement v = doc.CreateElement(keyword + "-wrapper");
-			v.InnerText = value.Value.ToString();
+			v.InnerText = value.ValueString;
 			if (string.IsNullOrEmpty(name))
 				return v;
 			XmlElement element = doc.CreateElement(name);

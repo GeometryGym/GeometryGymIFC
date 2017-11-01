@@ -38,8 +38,7 @@ namespace GeometryGym.STEP
 		public List<string> Comments { get { return mComments; } set { mComments = value; } }
 
 		protected static  ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
-		protected static ConcurrentDictionary<string, MethodInfo> mConstructorsSchema = new ConcurrentDictionary<string, MethodInfo>();
-		protected static ConcurrentDictionary<string, MethodInfo> mConstructorsNoSchema = new ConcurrentDictionary<string, MethodInfo>();
+		protected static ConcurrentDictionary<string, ConstructorInfo> mConstructors = new ConcurrentDictionary<string, ConstructorInfo>();
 
 		internal STEPEntity() { }
 		internal STEPEntity(int record, string kw, string line) { mIndex = record; mSTEPString = line; }

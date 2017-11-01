@@ -41,9 +41,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["AreaValue"] = AreaValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
@@ -61,9 +61,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["CountValue"] = CountValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
@@ -81,9 +81,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["LengthValue"] = LengthValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
@@ -100,9 +100,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["TimeValue"] = TimeValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
@@ -120,9 +120,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["VolumeValue"] = VolumeValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
@@ -140,9 +140,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Formula = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["WeightValue"] = WeightValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}

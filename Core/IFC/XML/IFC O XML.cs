@@ -312,9 +312,9 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("ChangeAction"))
 				Enum.TryParse<IfcChangeActionEnum>(xml.Attributes["ChangeAction"].Value,true, out mChangeAction);
 			if (xml.HasAttribute("LastModifiedDate"))
-				LastModifiedDate = int.Parse(xml.Attributes["LastModifiedDate"].Value);
+				mLastModifiedDate = int.Parse(xml.Attributes["LastModifiedDate"].Value);
 			if (xml.HasAttribute("CreationDate"))
-				CreationDate = int.Parse(xml.Attributes["CreationDate"].Value);
+				mCreationDate = int.Parse(xml.Attributes["CreationDate"].Value);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

@@ -155,8 +155,8 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			IfcMaterial material = Material;
-			if(material != null)
-			xml.AppendChild(material.GetXML(xml.OwnerDocument, "Material", this, processed));
+			if (material != null)
+				xml.AppendChild(material.GetXML(xml.OwnerDocument, "Material", this, processed));
 			xml.SetAttribute("LayerThickness", mLayerThickness.ToString());
 			xml.SetAttribute("IsVentilated", mIsVentilated.ToString().ToLower());
 			if (mDatabase.Release != ReleaseVersion.IFC2x3)
@@ -270,6 +270,33 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Category", Category);
 		}
 	}
+	public partial class IfcMaterialProfileSet : IfcMaterialDefinition //IFC4
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+			setAttribute(xml, "Description", Description);
+			XmlElement element = xml.OwnerDocument.CreateElement("MaterialProfiles");
+			xml.AppendChild(element);
+			foreach (IfcMaterialProfile p in MaterialProfiles)
+				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
+			if (mCompositeProfile > 0)
+				xml.AppendChild(CompositeProfile.GetXML(xml.OwnerDocument, "CompositeProfile", this, processed));
+		}
+	}
+	public partial class IfcMaterialProfileSetUsage : IfcMaterialUsageDefinition //IFC4
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(ForProfileSet.GetXML(xml.OwnerDocument, "ForProfileSet", this, processed));
+			if (mCardinalPoint != IfcCardinalPointReference.DEFAULT)
+				xml.SetAttribute("CardinalPoint", ((int)mCardinalPoint).ToString());
+			if(!double.IsNaN(mReferenceExtent))
+				setAttribute(xml, "ReferenceExtent", ReferenceExtent);
+		}
+	}
 	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -308,7 +335,14 @@ namespace GeometryGym.Ifc
 					if(child.HasChildNodes)
 						mDataValueValue = extractValue(child.FirstChild);
 					if (mDataValueValue == null)
-						DataValue = mDatabase.ParseXml<IfcMetricValueSelect>(child as XmlElement);
+					{
+						BaseClassIfc baseClass = mDatabase.ParseXml<BaseClassIfc>(child as XmlElement);
+						IfcMetricValueSelect metric = baseClass as IfcMetricValueSelect;
+						if (metric != null)
+							DataValue = metric;
+						else
+							mDataValueValue = extractValue(child as XmlNode);
+					}
 				}
 				else if (string.Compare(name, "ReferencePath") == 0)
 					ReferencePath = mDatabase.ParseXml<IfcReference>(child as XmlElement);

@@ -205,14 +205,22 @@ namespace GeometryGym.Ifc
 		internal static IfcColour parseColour(string str)
 		{
 			string kw = "", def = "";
-			int id = 0;
+			int id = 0,pos = 0;
 			ParserSTEP.GetKeyWord(str, out id, out kw, out def);
 			if (string.IsNullOrEmpty(kw))
 				return null;
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
-				return IfcColourRgb.Parse(str);
+			{
+				IfcColourRgb color = new IfcColourRgb();
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				return color;
+			}
 			if (string.Compare(kw, "IFCDRAUGHTINGPREDEFINEDCOLOUR", false) == 0)
-				return IfcDraughtingPreDefinedColour.Parse(str);
+			{
+				IfcDraughtingPreDefinedColour color = new IfcDraughtingPreDefinedColour();
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				return color;
+			}
 			return null;
 		}
 		internal static IfcColourOrFactor parseColourOrFactor(string str)
@@ -221,12 +229,16 @@ namespace GeometryGym.Ifc
 				return null;
 		
 			string kw = "", def = "";
-			int id = 0;
+			int id = 0,pos = 0;
 			ParserSTEP.GetKeyWord(str, out id, out kw, out def);
 			if (string.IsNullOrEmpty(kw))
 				return null;
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
-				return IfcColourRgb.Parse(str);
+			{
+				IfcColourRgb color = new IfcColourRgb();
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				return color;
+			}
 			return new IfcNormalisedRatioMeasure(ParserSTEP.ParseDouble(def));
 		}
 
@@ -373,7 +385,7 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCBOOLEAN("))
 				return new IfcBoolean(string.Compare(str.Substring(11, str.Length - 12), ".T.") == 0);
 			if (str.StartsWith("IFCIDENTIFIER("))
-				return new IfcIdentifier(str.Substring(15, str.Length - 17));
+				return new IfcIdentifier(ParserIfc.Decode(str.Substring(15, str.Length - 17)));
 			if (str.StartsWith("IFCINTEGER("))
 				return new IfcInteger(int.Parse(str.Substring(11, str.Length - 12)));
 			if (str.StartsWith("IFCLABEL("))
@@ -381,7 +393,7 @@ namespace GeometryGym.Ifc
 				if (str.Length <= 12)
 					return new IfcLabel("DEFAULT");
 				string s = str.Substring(10, str.Length - 12);
-				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
+				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCLOGICAL("))
 			{
@@ -398,8 +410,10 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCTEXT("))
 			{
 				string s = str.Substring(9, str.Length - 11);
-				return new IfcText((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : s));
+				return new IfcText((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : ParserIfc.Decode(s)));
 			}
+			if (str.StartsWith("IFCURIREFERENCE("))
+				return new IfcURIReference(ParserIfc.Decode(str.Substring(15, str.Length - 17)));
 			int i = 0;
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);
@@ -416,9 +430,10 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcSimpleValue extractSimpleValue(Type type, string value)
 		{
-			if(type.GetInterfaces().Contains(typeof(IfcSimpleValue)))
+			if(type.IsSubclassOf(typeof(IfcSimpleValue)))
 			{
 				string name = type.Name.ToUpper();
+                     //  ifcbinary
 				if(string.Compare(name,"IFCBOOLEAN") == 0)
 				{
 					bool result = false;
@@ -443,6 +458,8 @@ namespace GeometryGym.Ifc
 					return new IfcReal(double.Parse(value));
 				if (string.Compare(name, "IFCTEXT") == 0)
 					return new IfcText(value);
+				if (string.Compare(name, "IFCURIREFERENCE") == 0)
+					return new IfcURIReference(value);
 			}
 			return null;
 		}
@@ -461,12 +478,11 @@ namespace GeometryGym.Ifc
 			Type type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
 			if (type != null)
 			{
-				Type[] interfaces = type.GetInterfaces();
-				if (interfaces.Contains(typeof(IfcSimpleValue)))
+			    if(type.IsSubclassOf(typeof(IfcSimpleValue)))	
 					return extractSimpleValue(type, value);
-				if (interfaces.Contains(typeof(IfcMeasureValue)))
+			    if(type.IsSubclassOf(typeof(IfcMeasureValue)))	
 					return extractMeasureValue(type, value);
-				if (interfaces.Contains(typeof(IfcDerivedMeasureValue)))
+			    if(type.IsSubclassOf(typeof(IfcDerivedMeasureValue)))	
 					return extractDerivedMeasureValue(type, value);
 			}
 			return null;
@@ -476,13 +492,13 @@ namespace GeometryGym.Ifc
 			IfcReal r = v as IfcReal;
 			if (r != null)
 			{
-				val = r.mValue;
+				val = r.Magnitude;
 				return true;
 			}
 			IfcInteger i = v as IfcInteger;
 			if (i != null)
 			{
-				val = i.mValue;
+				val = i.Magnitude;
 				return true;
 			}
 			IfcPositiveLengthMeasure plm = v as IfcPositiveLengthMeasure;

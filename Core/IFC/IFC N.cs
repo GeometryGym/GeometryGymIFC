@@ -32,11 +32,11 @@ namespace GeometryGym.Ifc
 		internal int mDimensions;// : IfcDimensionalExponents;
 		private IfcUnitEnum mUnitType;// : IfcUnitEnum 
 
-		public IfcDimensionalExponents Dimensions { get { return mDatabase[mDimensions] as IfcDimensionalExponents;  } set { mDimensions = value.Index; } }
+		public IfcDimensionalExponents Dimensions { get { return mDatabase[mDimensions] as IfcDimensionalExponents; } set { mDimensions = value.Index; } }
 		public IfcUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
 
 		protected IfcNamedUnit() : base() { }
-		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db,u) { if(u.mDimensions > 0) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
+		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db, u) { if (u.mDimensions > 0) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
 		protected IfcNamedUnit(DatabaseIfc m, IfcUnitEnum unitEnum, bool gendims) : base(m)
 		{
 			mUnitType = unitEnum;
@@ -52,8 +52,7 @@ namespace GeometryGym.Ifc
 					mDimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0).mIndex;
 			}
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + (mDimensions == 0 ? "*" : ParserSTEP.LinkToString(mDimensions)) + ",." + mUnitType.ToString() + "."; }
-		protected static void parseFields(IfcNamedUnit u, List<string> arrFields, ref int ipos) { u.mDimensions = ParserSTEP.ParseLink(arrFields[ipos++]); u.mUnitType = (IfcUnitEnum)Enum.Parse(typeof(IfcUnitEnum), arrFields[ipos++].Replace(".", "")); }
-		internal virtual double getSIFactor() { return 1; }
+
+		internal abstract double SIFactor { get; }
 	}
 }

@@ -37,9 +37,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcValveTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcValveTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -53,10 +53,10 @@ namespace GeometryGym.Ifc
 			if (rp != null)
 				VertexGeometry = mDatabase.parseJObject<IfcPoint>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-				obj["VertexGeometry"] = VertexGeometry.getJson(this, processed);
+			base.setJSON(obj, host, options);
+				obj["VertexGeometry"] = VertexGeometry.getJson(this, options);
 		}
 	}
 }

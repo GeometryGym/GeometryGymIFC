@@ -47,6 +47,9 @@ namespace GeometryGym.Ifc
 			string str = reader.ReadToEnd();
 			ReadJSON(JObject.Parse(str));
 
+			if (mContext != null)
+				mContext.initializeUnitsAndScales();
+
 			Thread.CurrentThread.CurrentCulture = current;
 			postImport();
 			Factory.Options.GenerateOwnerHistory = ownerHistory;
@@ -54,20 +57,22 @@ namespace GeometryGym.Ifc
 
 		internal int mNextUnassigned = 0;
 
-		public void ReadJSON(JObject ifcFile)
-		{ 
+		public List<IBaseClassIfc> ReadJSON(JObject ifcFile)
+		{
+			List<IBaseClassIfc> result = new List<IBaseClassIfc>();
 			JToken token = ifcFile.First;
 			token = ifcFile["HEADER"];
 			token = ifcFile["DATA"];
 			JArray array = token as JArray;
 			if (array != null)
-				extractJArray<IBaseClassIfc>(array);	
+				result = extractJArray<IBaseClassIfc>(array);
 			else
 			{
-				parseJObject<IBaseClassIfc>(ifcFile);	
+				IBaseClassIfc obj = parseJObject<IBaseClassIfc>(ifcFile);
+				if (obj != null)
+					result.Add(obj);
 			}
-			if(mContext != null)
-				mContext.initializeUnitsAndScales();
+			return result;
 		}
 		internal List<T> extractJArray<T>(JArray array) where T : IBaseClassIfc 
 		{
@@ -94,59 +99,80 @@ namespace GeometryGym.Ifc
 		{
 			if (obj == null)
 				return default(T);
+			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)
 			{
-				int index = token.Value<int>();
-				try
+				if (token.Type == JTokenType.Integer)
 				{
-					return (T)(IBaseClassIfc)this[index];
+					int index = token.Value<int>();
+					result = this[index];
 				}
-				catch(Exception) { }
-				return default(T);
+				else if (token.Type == JTokenType.String)
+				{
+					mDictionary.TryGetValue(token.Value<string>(), out result);
+				}
+				if (result != null && obj.Count == 1)
+					return (T)(IBaseClassIfc)result;
 			}
-			Type type = null;
-			token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
+			if (result == null)
 			{
-				string keyword = token.Value<string>();
-				type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
-			}
-			if (token == null)
-				type = typeof(T);
-			if (type != null)
-			{
-				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, Type.EmptyTypes, null);
-				if (constructor != null)
-				{ 
-					BaseClassIfc entity = constructor.Invoke(new object[] { }) as BaseClassIfc;
-					if (entity != null)
+				Type type = null;
+				token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
+				if (token != null)
+				{
+					string keyword = token.Value<string>();
+					type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+				}
+				if (token == null)
+					type = typeof(T);
+				if (type != null && !type.IsAbstract)
+				{
+					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+	null, Type.EmptyTypes, null);
+					if (constructor != null)
 					{
-						token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-						int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
-						if (token != null)
+						result  = constructor.Invoke(new object[] { }) as BaseClassIfc;
+						if (result != null)
 						{
-							int i = token.Value<int>();
-							if (this[i] == null)
-								index = i;
-							// TODO merge if existing equivalent
+							token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+							int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
+							if (token != null)
+							{
+								if (token.Type == JTokenType.Integer)
+								{
+									try
+									{
+										int i = token.Value<int>();
+										if (this[i] == null)
+											index = i;
+									}
+									catch (Exception) { }
+									// TODO merge if existing equivalent
+								}
+								else if(token.Type == JTokenType.String)
+								{
+									result.mGlobalId = token.Value<string>();
+									mDictionary.Add(result.mGlobalId, result);
+								}
+							}
+							if (index == 0)
+							{
+								if (mNextUnassigned == 0)
+									mNextUnassigned = Math.Max(LastKey * 2, 1000);
+								index = mNextUnassigned++;
+							}
+							this[index] = result;
+							
 						}
-						if(index == 0)
-						{
-							if(mNextUnassigned == 0)
-								mNextUnassigned = Math.Max(LastKey * 2, 1000);
-							index = mNextUnassigned++;
-						}
-						this[index] = entity;
-						entity.parseJObject(obj);
-						parseBespoke(entity, obj);	
-						return (T)(IBaseClassIfc) entity;
 					}
 				}
-				
 			}
-			return default(T);
+			if(result == null)
+				return default(T);
+			result.parseJObject(obj);
+			parseBespoke(result, obj);
+			return (T)(IBaseClassIfc)result;
 		}
 
 		partial void parseBespoke(BaseClassIfc entity, JObject jObject);
@@ -178,7 +204,7 @@ null, Type.EmptyTypes, null);
 			ifcFile["HEADER"] = header;
 
 			IfcContext context = this.mContext;
-			JObject jcontext = context.getJson(null, new HashSet<int>()); //null);//
+			JObject jcontext = context.getJson(null, new BaseClassIfc.SetJsonOptions()); //null);//
 
 			JArray data = new JArray();
 			data.Add(jcontext);
@@ -197,7 +223,7 @@ null, Type.EmptyTypes, null);
 		internal static JObject extract(IfcValue value)
 		{
 			JObject result = new JObject();
-			result[value.GetType().Name] = value.Value.ToString();
+			result[value.GetType().Name] = value.ValueString;
 			return result;
 		}
 		internal static IfcValue ParseValue(JObject obj)
@@ -205,8 +231,40 @@ null, Type.EmptyTypes, null);
 			JProperty token = (JProperty) obj.First;
 			return ParserIfc.extractValue(token.Name, token.Value.ToString());
 		}
+
 	}
 
+	public static class JsonIFCExtensions
+	{
+		public static void StripToEssentialIFC(this JToken containerToken)
+		{
+			HashSet<string> toStrip = new HashSet<string>();
+			toStrip.Add("globalid");
+			stripEssential(containerToken, toStrip);
+		}
+		private static void stripEssential(JToken containerToken, HashSet<string> toStrip)
+		{
+			if (containerToken.Type == JTokenType.Object)
+			{
+				List<JProperty> children = containerToken.Children<JProperty>().ToList();
+				foreach (JProperty child in children)
+				{
+					if (toStrip.Contains(child.Name.ToLower()))
+					{
+						child.Remove();
+					}
+					stripEssential(child.Value, toStrip);
+				}
+			}
+			else if (containerToken.Type == JTokenType.Array)
+			{
+				foreach (JToken child in containerToken.Children())
+				{
+					stripEssential(child, toStrip);
+				}
+			}
+		}
+	}
 }
 
  

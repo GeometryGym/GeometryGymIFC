@@ -40,22 +40,22 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public string LinearRefMethod { get { return (mLinearRefMethod == "$" ? "" : ParserIfc.Decode(mLinearRefMethod)); } set { mLinearRefMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		internal IfcAlignment() : base() { }
-		internal IfcAlignment(DatabaseIfc db, IfcAlignment a) : base(db, a) { mPredefinedType = a.mPredefinedType; mLinearRefMethod = a.mLinearRefMethod; }
-		internal static void parseFields(IfcAlignment a, List<string> arrFields, ref int ipos) 
-		{ 
-			IfcPositioningElement.parseFields(a, arrFields, ref ipos);
-			string str = arrFields[ipos++];
-			if(str != "$")
-				a.mPredefinedType = (IfcAlignmentTypeEnum)Enum.Parse(typeof(IfcAlignmentTypeEnum), str.Replace(".", ""));
-			a.mHorizontal = ParserSTEP.ParseLink(arrFields[ipos++]);
-			a.mVertical = ParserSTEP.ParseLink(arrFields[ipos++]);
-			a.mLinearRefMethod = arrFields[ipos++].Replace("'", "");
-		}
-		internal static IfcAlignment Parse(string strDef) { IfcAlignment a = new IfcAlignment(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
+		internal IfcAlignment(DatabaseIfc db, IfcAlignment a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; mLinearRefMethod = a.mLinearRefMethod; }
+
 		protected override string BuildStringSTEP() 
 		{ 
 			return base.BuildStringSTEP() + (mPredefinedType== IfcAlignmentTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType.ToString() + ".,") + 
 				ParserSTEP.LinkToString(mHorizontal) + "," + ParserSTEP.LinkToString(mVertical) + "," +	( mLinearRefMethod == "$" ? "$" : "'" + mLinearRefMethod + "'");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			base.parse(str, ref pos, release, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcAlignmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+			mHorizontal = ParserSTEP.StripLink(str, ref pos, len);
+			mVertical = ParserSTEP.StripLink(str, ref pos, len);
+			mLinearRefMethod = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcAlignment2DHorizontal : BaseClassIfc //IFC4.1
@@ -68,11 +68,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlignment2DHorizontal() : base() { }
 		internal IfcAlignment2DHorizontal(IfcAlignment2DHorizontal a) : base() { mStartDistAlong = a.mStartDistAlong; mSegments = new List<int>(a.mSegments.ToArray()); }
-		internal static void parseFields(IfcAlignment2DHorizontal a, List<string> arrFields, ref int ipos)
-		{
-			a.mStartDistAlong = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			a.mSegments = ParserSTEP.SplitListLinks(arrFields[ipos++]); 
-		}
+		
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," + ParserSTEP.LinkToString(mSegments[0]);
@@ -80,7 +76,11 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mSegments[icounter]);
 			return str + ")";
 		}
-		internal static IfcAlignment2DHorizontal Parse(string strDef) { IfcAlignment2DHorizontal a = new IfcAlignment2DHorizontal(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			mStartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
+			mSegments = ParserSTEP.StripListLink(str, ref pos, len);
+		}
 	}
 	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
 	{
@@ -90,13 +90,12 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment2DHorizontalSegment() : base() { }
 		internal IfcAlignment2DHorizontalSegment(IfcAlignment2DHorizontalSegment p) : base(p) { mCurveGeometry = p.mCurveGeometry; }
 		internal IfcAlignment2DHorizontalSegment(bool tangential, string startTag, string endTag, IfcCurveSegment2D seg) : base(seg.mDatabase, tangential, startTag, endTag) { mCurveGeometry = seg.mIndex; }	
-		internal static void parseFields(IfcAlignment2DHorizontalSegment s, List<string> arrFields, ref int ipos)
-		{
-			IfcAlignment2DSegment.parseFields(s, arrFields, ref ipos);
-			s.mCurveGeometry = ParserSTEP.ParseLink(arrFields[ipos++]);
-		}
-		internal static IfcAlignment2DHorizontalSegment Parse(string strDef) { IfcAlignment2DHorizontalSegment a = new IfcAlignment2DHorizontalSegment(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.LinkToString(mCurveGeometry); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			base.parse(str, ref pos, release, len);
+			mCurveGeometry = ParserSTEP.StripLink(str, ref pos, len);
+		}
 	}
 	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1
 	{
@@ -111,16 +110,17 @@ namespace GeometryGym.Ifc
 		protected IfcAlignment2DSegment() : base() { }
 		protected IfcAlignment2DSegment(IfcAlignment2DSegment s) : base() { mTangentialContinuity = s.mTangentialContinuity; mStartTag = s.mStartTag; mEndTag = s.mEndTag; }
 		protected IfcAlignment2DSegment(DatabaseIfc m, bool tangential, string startTag, string endTag) : base(m) { mTangentialContinuity = (tangential ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); StartTag = startTag; EndTag = endTag; }	
-		protected static void parseFields(IfcAlignment2DSegment a, List<string> arrFields, ref int ipos) 
-		{
-			a.mTangentialContinuity = ParserIfc.ParseIFCLogical(arrFields[ipos++]); 
-			a.mStartTag = arrFields[ipos++].Replace("'", "");
-			a.mEndTag = arrFields[ipos++].Replace("'", "");
-		}
+		
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + (mTangentialContinuity == IfcLogicalEnum.UNKNOWN ? ",$," : (mTangentialContinuity == IfcLogicalEnum.TRUE ? ",.T.," : ",.F.")) +
 				(mStartTag == "$" ? "$," : "'" + mStartTag + "',") + (mEndTag == "$" ? "$" : "'" + mEndTag + "'");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			mTangentialContinuity = ParserIfc.StripLogical(str, ref pos, len);
+			mStartTag = ParserSTEP.StripString(str, ref pos, len);
+			mEndTag = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
@@ -139,15 +139,15 @@ namespace GeometryGym.Ifc
 			mRadius = radius;
 			mIsConvex = isConvex;
 		}
-		internal static void parseFields(IfcAlignment2DVerSegCircularArc c, List<string> arrFields, ref int ipos)
-		{
-			IfcAlignment2DVerticalSegment.parseFields(c, arrFields, ref ipos);
-			c.mRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			c.mIsConvex = ParserSTEP.ParseBool(arrFields[ipos++]);
-		}
-		internal static IfcAlignment2DVerSegCircularArc Parse(string strDef) { IfcAlignment2DVerSegCircularArc c = new IfcAlignment2DVerSegCircularArc(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
+		
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.BoolToString(mIsConvex); }
 
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			base.parse(str, ref pos, release, len);
+			mRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mIsConvex = ParserSTEP.StripBool(str, ref pos, len);
+		}
 	}
 	public partial class IfcAlignment2DVerSegLine : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
@@ -155,8 +155,6 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment2DVerSegLine(IfcAlignment2DVerSegLine s) : base(s) { }
 		internal IfcAlignment2DVerSegLine(DatabaseIfc m, bool tangential, string startTag, string endTag, double startDist, double horizontalLength, double startHeight, double startGradient)
 			: base(m, tangential, startTag, endTag, startDist, horizontalLength, startHeight, startGradient) { }
-		internal static void parseFields(IfcAlignment2DVerSegLine c, List<string> arrFields, ref int ipos) { IfcAlignment2DVerticalSegment.parseFields(c, arrFields, ref ipos); }
-		internal static IfcAlignment2DVerSegLine Parse(string strDef) { IfcAlignment2DVerSegLine c = new IfcAlignment2DVerSegLine(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
 	}
 	public partial class IfcAlignment2DVerSegParabolicArc : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
@@ -174,14 +172,14 @@ namespace GeometryGym.Ifc
 			mParabolaConstant = radius;
 			mIsConvex = isConvex;
 		}
-		internal static void parseFields(IfcAlignment2DVerSegParabolicArc c, List<string> arrFields, ref int ipos)
-		{
-			IfcAlignment2DVerticalSegment.parseFields(c, arrFields, ref ipos);
-			c.mParabolaConstant = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			c.mIsConvex = ParserSTEP.ParseBool(arrFields[ipos++]);
-		}
-		internal static IfcAlignment2DVerSegParabolicArc Parse(string strDef) { IfcAlignment2DVerSegParabolicArc c = new IfcAlignment2DVerSegParabolicArc(); int ipos = 0; parseFields(c, ParserSTEP.SplitLineFields(strDef), ref ipos); return c; }
+
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mParabolaConstant) + "," + ParserSTEP.BoolToString(mIsConvex); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			base.parse(str, ref pos, release, len);
+			mParabolaConstant = ParserSTEP.StripDouble(str, ref pos, len);
+			mIsConvex = ParserSTEP.StripBool(str, ref pos, len);
+		}
 	}
 	public partial class IfcAlignment2DVertical : BaseClassIfc //IFC4.1
 	{
@@ -189,7 +187,6 @@ namespace GeometryGym.Ifc
 		public List<IfcAlignment2DVerticalSegment> Segments { get { return mSegments.ConvertAll(x => mDatabase[x] as IfcAlignment2DVerticalSegment); } set { mSegments = value.ConvertAll(x => x.mIndex); } }
 		internal IfcAlignment2DVertical() : base() { }
 		internal IfcAlignment2DVertical(IfcAlignment2DVertical o) : base() { mSegments = new List<int>(o.mSegments.ToArray()); }
-		internal static void parseFields(IfcAlignment2DVertical a, List<string> arrFields, ref int ipos) { a.mSegments = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ","  + ParserSTEP.LinkToString(mSegments[0]);
@@ -197,7 +194,7 @@ namespace GeometryGym.Ifc
 				str += "," + ParserSTEP.LinkToString(mSegments[icounter]);
 			return str + ")";
 		}
-		internal static IfcAlignment2DVertical Parse(string strDef) { IfcAlignment2DVertical a = new IfcAlignment2DVertical(); int ipos = 0; parseFields(a, ParserSTEP.SplitLineFields(strDef), ref ipos); return a; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len) { mSegments = ParserSTEP.StripListLink(str, ref pos, len); }
 	}
 	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment //IFC4.1
 	{
@@ -214,15 +211,15 @@ namespace GeometryGym.Ifc
 		protected IfcAlignment2DVerticalSegment() : base() { }
 		protected IfcAlignment2DVerticalSegment(IfcAlignment2DVerticalSegment s) : base(s) { mStartDistAlong = s.mStartDistAlong; mHorizontalLength = s.mHorizontalLength; mStartHeight = s.mStartHeight; mStartGradient = s.mStartGradient; }
 		protected IfcAlignment2DVerticalSegment(DatabaseIfc m, bool tangential, string startTag, string endTag, double startDist, double horizontalLength,double startHeight, double startGradient) : base(m, tangential, startTag, endTag) {  }
-		protected static void parseFields(IfcAlignment2DVerticalSegment s, List<string> arrFields, ref int ipos)
-		{
-			IfcAlignment2DSegment.parseFields(s, arrFields, ref ipos);
-			s.mStartDistAlong = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			s.mHorizontalLength = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			s.mStartHeight = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			s.mStartGradient = ParserSTEP.ParseDouble(arrFields[ipos++]);
-		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mStartDistAlong) + "," + ParserSTEP.DoubleToString(mHorizontalLength) + "," + ParserSTEP.DoubleToString(mStartHeight) + "," + ParserSTEP.DoubleToString(mStartGradient); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		{
+			base.parse(str, ref pos, release, len);
+			mStartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
+			mHorizontalLength = ParserSTEP.StripDouble(str, ref pos, len);
+			mStartHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mStartGradient = ParserSTEP.StripDouble(str, ref pos, len);
+		}
 	}
 	
 	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
@@ -241,11 +238,10 @@ namespace GeometryGym.Ifc
 			mRadius = radius;
 			mIsCCW = isCCW;
 		}
-		internal static IfcCircularArcSegment2D Parse(string str) { IfcCircularArcSegment2D c = new IfcCircularArcSegment2D(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
-		protected override void Parse(string str, ref int pos, int len)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
 		{
-			base.Parse(str, ref pos, len);
-			mRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			base.parse(str, ref pos, release, len);
+			Radius = ParserSTEP.StripDouble(str, ref pos, len);
 			mIsCCW = ParserSTEP.StripBool(str, ref pos, len);
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
@@ -272,16 +268,16 @@ namespace GeometryGym.Ifc
 			mIsEntry = isEntry;
 			mClothoidConstant = clothoidConstant;
 		}
-		internal static IfcClothoidalArcSegment2D Parse(string str) { IfcClothoidalArcSegment2D c = new IfcClothoidalArcSegment2D(); int pos = 0; c.Parse(str, ref pos, str.Length); return c; }
-		protected override void Parse(string str, ref int pos, int len)
+		
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mStartRadius) + "," + ParserSTEP.BoolToString(mIsCCW) + "," + ParserSTEP.BoolToString(mIsEntry) + "," + ParserSTEP.DoubleToString(mClothoidConstant); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
 		{
-			base.Parse(str, ref pos, len);
+			base.parse(str, ref pos, release, len);
 			mStartRadius = ParserSTEP.StripDouble(str, ref pos, len);
 			mIsCCW = ParserSTEP.StripBool(str, ref pos, len);
 			mIsEntry = ParserSTEP.StripBool(str, ref pos, len);
 			mClothoidConstant = ParserSTEP.StripDouble(str, ref pos, len);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mStartRadius) + "," + ParserSTEP.BoolToString(mIsCCW) + "," + ParserSTEP.BoolToString(mIsEntry) + "," + ParserSTEP.DoubleToString(mClothoidConstant); }
 	}
 	
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
@@ -301,13 +297,13 @@ namespace GeometryGym.Ifc
 			mSegmentLength = length;
 		}
 
-		protected virtual void Parse(string str, ref int pos, int len)
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + ParserSTEP.DoubleToString(mSegmentLength); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
 		{
 			mStartPoint = ParserSTEP.StripLink(str, ref pos, len);
 			mStartDirection = ParserSTEP.StripDouble(str, ref pos, len);
 			mSegmentLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + ParserSTEP.DoubleToString(mSegmentLength); }
 	}
 	
 	public partial class IfcLineSegment2D : IfcCurveSegment2D  //IFC4x1
@@ -316,13 +312,11 @@ namespace GeometryGym.Ifc
 		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s) : base(db, s) { }
 		internal IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
 			: base(start, startDirection, length) { }
-		internal static IfcLineSegment2D Parse(string str) { IfcLineSegment2D c = new IfcLineSegment2D(); int pos = 0, len = str.Length; c.Parse(str, ref pos, len); return c; }
 	}
 	
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{
 		protected IfcPositioningElement() : base() { }
-		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e) : base(db,e,false) { }
-		protected static void parseFields(IfcPositioningElement p, List<string> arrFields, ref int ipos) { IfcProduct.parseFields(p, arrFields, ref ipos); }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 	}
 }

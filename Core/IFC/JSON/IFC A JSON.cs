@@ -37,9 +37,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcAirTerminalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcAirTerminalTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
@@ -53,9 +53,9 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Enum.TryParse<IfcAirTerminalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
@@ -69,12 +69,12 @@ namespace GeometryGym.Ifc
 				OuterBoundary = mDatabase.parseJObject<IfcCurve>(jobj);
 			mDatabase.extractJArray<IfcCurve>(obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddInner(x));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["OuterBoundary"] = OuterBoundary.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["OuterBoundary"] = OuterBoundary.getJson(this, options);
 			if(mInnerBoundaries.Count > 0)
-				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, processed)));
+				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, options)));
 		}
 		
 	}
@@ -83,8 +83,10 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			ApplicationDeveloper = mDatabase.parseJObject<IfcOrganization>(obj.GetValue("ApplicationDeveloper", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			JToken token = obj.GetValue("Version", StringComparison.InvariantCultureIgnoreCase);
+			JToken token = obj.GetValue("ApplicationDeveloper", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ApplicationDeveloper = mDatabase.parseJObject<IfcOrganization>(token as JObject);
+			token = obj.GetValue("Version", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Version = token.Value<string>();
 			token = obj.GetValue("ApplicationFullName", StringComparison.InvariantCultureIgnoreCase);
@@ -94,10 +96,11 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ApplicationIdentifier = token.Value<string>();
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["ApplicationDeveloper"] = ApplicationDeveloper.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			
+			obj["ApplicationDeveloper"] = ApplicationDeveloper.getJson(this, options);
 			obj["Version"] = Version;
 			obj["ApplicationFullName"] = ApplicationFullName;
 			obj["ApplicationIdentifier"] = ApplicationIdentifier;
@@ -147,33 +150,33 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcArithmeticOperatorEnum>(token.Value<string>(),out mArithmeticOperator);
 
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			if (mAppliedValueIndex > 0)
-				obj["AppliedValue"] = mDatabase[mAppliedValueIndex].getJson(this, processed);
+				obj["AppliedValue"] = mDatabase[mAppliedValueIndex].getJson(this, options);
 			else if (mAppliedValueValue != null)
 				obj["AppliedValue"] = DatabaseIfc.extract(mAppliedValueValue);
 			if (mUnitBasis > 0)
-				obj["UnitBasis"] = UnitBasis.getJson(this, processed);
+				obj["UnitBasis"] = UnitBasis.getJson(this, options);
 			//todo
 			setAttribute(obj, "Category", Category);
 			setAttribute(obj, "Condition", Condition);
 			if (mArithmeticOperator != IfcArithmeticOperatorEnum.NONE)
 				obj["ArithmeticOperator"] = ArithmeticOperator.ToString();
 			if(mComponents.Count > 0)
-				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, processed)));
+				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mHasExternalReferences.Count > 0)
-				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ToList().ConvertAll(x => x.getJson(this, processed)));
+				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mHasConstraintRelationships.Count > 0)
 			{
 				JArray array = new JArray();
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
 					if (r.mIndex != host.mIndex)
-						array.Add(r.getJson(this, processed));
+						array.Add(r.getJson(this, options));
 				}
 				if(array.Count > 0)
 					obj["HasConstraintRelationships"] = array;
@@ -189,10 +192,10 @@ namespace GeometryGym.Ifc
 			if(jobj != null)
 				OuterCurve = mDatabase.parseJObject<IfcBoundedCurve>(jobj);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
-			obj["OuterCurve"] = OuterCurve.getJson(this, processed);
+			base.setJSON(obj, host, options);
+			obj["OuterCurve"] = OuterCurve.getJson(this, options);
 		}
 	}
 	public partial class IfcAxis1Placement : IfcPlacement
@@ -202,12 +205,12 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			Axis = mDatabase.parseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			IfcDirection axis = Axis;
 			if (axis != null)
-				obj["Axis"] = axis.getJson(this, processed);
+				obj["Axis"] = axis.getJson(this, options);
 		}
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
@@ -225,12 +228,12 @@ namespace GeometryGym.Ifc
 					RefDirection = mDatabase.parseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			IfcDirection refDirection = RefDirection;
 			if (refDirection != null)
-				obj["RefDirection"] = refDirection.getJson(this, processed);
+				obj["RefDirection"] = refDirection.getJson(this, options);
 		}
 	}
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement
@@ -256,15 +259,15 @@ namespace GeometryGym.Ifc
 				dir.DirectionRatioZ = dir.DirectionRatioZ;
 			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host,  HashSet<int> processed)
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, processed);
+			base.setJSON(obj, host, options);
 			IfcDirection axis = Axis;
 			if (axis != null)
-				obj["Axis"] = axis.getJson(this, processed);
+				obj["Axis"] = axis.getJson(this, options);
 			IfcDirection refDirection = RefDirection;
 			if (refDirection != null)
-				obj["RefDirection"] = refDirection.getJson(this, processed);
+				obj["RefDirection"] = refDirection.getJson(this, options);
 		}
 	}
 }

@@ -34,16 +34,13 @@ namespace GeometryGym.Ifc
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcZone() : base() { }
-		internal IfcZone(DatabaseIfc db, IfcZone z, bool downStream) : base(db, z, downStream) { mLongName = z.mLongName; }
+		internal IfcZone(DatabaseIfc db, IfcZone z, IfcOwnerHistory ownerHistory, bool downStream) : base(db, z, ownerHistory, downStream) { mLongName = z.mLongName; }
 		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
-		public IfcZone(IfcSpatialElement e, string name, string longname, List<IfcSpace> spaces) : base(e, name)
+		public IfcZone(IfcSpatialElement e, string name, List<IfcSpace> spaces) : base(e, name)
 		{
 			if (spaces != null)
 				mIsGroupedBy[0].mRelatedObjects.AddRange(spaces.ConvertAll(x => x.mIndex));
 		}
-		internal new static IfcZone Parse(string strDef) { IfcZone z = new IfcZone(); int ipos = 0; parseFields(z, ParserSTEP.SplitLineFields(strDef), ref ipos); return z; }
-		internal static void parseFields(IfcZone z, List<string> arrFields, ref int ipos) { IfcGroup.parseFields(z, arrFields, ref ipos); }
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mLongName == "$" ? ",$" : ",'" + mLongName + "'")); }
 	}
 	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
 	{
@@ -56,18 +53,5 @@ namespace GeometryGym.Ifc
 
 		internal IfcZShapeProfileDef() : base() { }
 		internal IfcZShapeProfileDef(DatabaseIfc db, IfcZShapeProfileDef p) : base(db, p) { mDepth = p.mDepth; mFlangeWidth = p.mFlangeWidth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mEdgeRadius = p.mEdgeRadius; }
-
-		internal new static IfcZShapeProfileDef Parse(string strDef) { IfcZShapeProfileDef p = new IfcZShapeProfileDef(); int ipos = 0; parseFields(p, ParserSTEP.SplitLineFields(strDef), ref ipos); return p; }
-		internal static void parseFields(IfcZShapeProfileDef p, List<string> arrFields, ref int ipos)
-		{
-			IfcParameterizedProfileDef.parseFields(p, arrFields, ref ipos);
-			p.mDepth = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mFlangeWidth = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mWebThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mFlangeThickness = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mFilletRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
-			p.mEdgeRadius = ParserSTEP.ParseDouble(arrFields[ipos++]);
-		}
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius); }
 	}
 }
