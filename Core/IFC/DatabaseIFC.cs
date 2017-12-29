@@ -139,14 +139,14 @@ namespace GeometryGym.Ifc
 			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + viewDefinition + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
-			DateTime now = DateTime.Now;
+            hdr += "/* name */ '" + ParserIfc.ReplaceAe(ParserIfc.Encode(Path.GetFileName(fileName))) + "',\r\n";
+            DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
-			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
-			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
-			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
-			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
-			hdr += "/* authorization */ 'None');\r\n\r\n";
+            hdr += "/* author */ ('" + ParserIfc.ReplaceAe(System.Environment.UserName) + "'),\r\n";
+            hdr += "/* organization */ ('" + ParserIfc.ReplaceAe(IfcOrganization.Organization) + "'),\r\n";
+            hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
+            hdr += "/* originating_system */ '" + ParserIfc.ReplaceAe(mFactory.ApplicationFullName) + "',\r\n";
+            hdr += "/* authorization */ 'None');\r\n\r\n";
 			hdr += "FILE_SCHEMA (('" + (mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";
@@ -684,7 +684,7 @@ namespace GeometryGym.Ifc
 				{
 					Assembly assembly = typeof(BaseClassIfc).Assembly;
 					AssemblyName name = assembly.GetName();
-					string date = String.Format("{0:s}", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToUniversalTime());
+					string date = String.Format("{0:s}", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToUniversalTime(), CultureInfo.InvariantCulture);
 					return name.Name + " v" + name.Version.ToString() + " by Geometry Gym Pty Ltd built " + date;
 				}
 				catch (Exception)

@@ -45,7 +45,17 @@ namespace GeometryGym.Ifc
 			f.mBounds = ParserSTEP.StripListLink(str, ref pos, str.Length);
 			return f;
 		}
-		internal static void parseFields(IfcFace f, List<string> arrFields, ref int ipos) { f.mBounds = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
+
+        /// <summary>
+        /// - abbreviation
+        /// </summary>
+        public static IfcFace GenFace(DatabaseIfc db, IfcCartesianPoint v1, IfcCartesianPoint v2, IfcCartesianPoint v3, IfcCartesianPoint v4)
+        {
+            IfcPolyloop polyloop1 = new IfcPolyloop(new List<IfcCartesianPoint> { v1, v2, v3, v4 });
+            return new IfcFace(new IfcFaceOuterBound(polyloop1, true));
+        }
+
+        internal static void parseFields(IfcFace f, List<string> arrFields, ref int ipos) { f.mBounds = ParserSTEP.SplitListLinks(arrFields[ipos++]); }
 		protected override string BuildStringSTEP()
 		{
 			string str = base.BuildStringSTEP() + ",(";

@@ -92,7 +92,7 @@ namespace GeometryGym.Ifc
 					return (T)(IBaseClassIfc)mParsed[str];
 				if(xml.HasAttribute("xsi:nil"))
 				{
-					string query = string.Format("//*[@id='{0}']", str); 
+					string query = string.Format("//*[@id='{0}']", str, CultureInfo.InvariantCulture); 
 					xml = (XmlElement)xml.OwnerDocument.SelectSingleNode(query);
 					if (xml == null)
 						return default(T);
@@ -105,7 +105,7 @@ namespace GeometryGym.Ifc
 					return (T)(IBaseClassIfc)mParsed[str];
 				if (xml.HasAttribute("xsi:nil"))
 				{
-					string query = string.Format("//*[@id='{0}']", str); // or "//book[@id='{0}']"
+					string query = string.Format("//*[@id='{0}']", str, CultureInfo.InvariantCulture); // or "//book[@id='{0}']"
 					xml = (XmlElement)xml.OwnerDocument.SelectSingleNode(query);
 					if (xml == null)
 						return default(T);

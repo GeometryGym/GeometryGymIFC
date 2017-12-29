@@ -131,8 +131,8 @@ namespace GeometryGym.STEP
 		}
 
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
-		public static string DoubleToString(double d) { return String.Format("{0:0.0################}", d); }
-		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) ? "$" : String.Format("{0:0.0################}", i)); }
+		public static string DoubleToString(double d) { return String.Format("{0:0.0################}", d, CultureInfo.InvariantCulture); }
+		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) ? "$" : String.Format("{0:0.0################}", i, CultureInfo.InvariantCulture)); }
 		public static string IntToString(int i)
 		{
 			if (i == 0)

@@ -749,7 +749,12 @@ namespace GeometryGym.Ifc
 		internal IfcDoor() : base() { }
 		internal IfcDoor(DatabaseIfc db, IfcDoor d, bool downStream) : base(db, d, downStream) { mOverallHeight = d.mOverallHeight; mOverallWidth = d.mOverallWidth; mPredefinedType = d.mPredefinedType; mOperationType = d.mOperationType; mUserDefinedOperationType = d.mUserDefinedOperationType; }
 		public IfcDoor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		internal static IfcDoor Parse(string str, ReleaseVersion schema) { IfcDoor d = new IfcDoor(); int pos = 0; d.Parse(str, ref pos, str.Length, schema); return d; }
+        public IfcDoor(IfcObjectDefinition host, IfcOpeningElement openingElement, IfcObjectPlacement placement, IfcProductRepresentation representation) :
+            this(host, placement, representation)
+        {
+            IfcRelFillsElement relFillsElement = new IfcRelFillsElement(openingElement, this);
+        }
+        internal static IfcDoor Parse(string str, ReleaseVersion schema) { IfcDoor d = new IfcDoor(); int pos = 0; d.Parse(str, ref pos, str.Length, schema); return d; }
 		
 		protected void Parse(string str, ref int pos, int len, ReleaseVersion schema)
 		{
@@ -885,7 +890,17 @@ namespace GeometryGym.Ifc
 		internal bool mParameterTakesPrecedence = false;// : BOOLEAN; 
 		internal bool mSizeable = false;// : BOOLEAN;  //IFC2x3
 		internal IfcDoorStyle() : base() { }
-		internal IfcDoorStyle(DatabaseIfc db, IfcDoorStyle s) : base(db, s) { mOperationType = s.mOperationType; mConstructionType = s.mConstructionType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
+        public IfcDoorStyle(IfcDoor door, IfcDoorTypeOperationEnum operationType, IfcDoorStyleConstructionEnum constructionType, bool parameterTakesPrecedence, bool sizeable)
+            : base(door.Database)
+        {
+            this.mOperationType = operationType;
+            this.mConstructionType = constructionType;
+            mParameterTakesPrecedence = parameterTakesPrecedence;
+            mSizeable = sizeable;
+
+            IfcRelDefinesByType relDefinesByType = new IfcRelDefinesByType(door, this);
+        }
+        internal IfcDoorStyle(DatabaseIfc db, IfcDoorStyle s) : base(db, s) { mOperationType = s.mOperationType; mConstructionType = s.mConstructionType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 		internal new static IfcDoorStyle Parse(string strDef) { IfcDoorStyle s = new IfcDoorStyle(); int ipos = 0; parseFields(s, ParserSTEP.SplitLineFields(strDef), ref ipos); return s; }
 		internal static void parseFields(IfcDoorStyle s, List<string> arrFields, ref int ipos)
 		{

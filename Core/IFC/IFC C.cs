@@ -363,7 +363,7 @@ namespace GeometryGym.Ifc
 		public double Scale2 { get { return mScale2; } set { mScale2 = value; } }
 
 		internal IfcCartesianTransformationOperator2DnonUniform() : base() { }
-		internal IfcCartesianTransformationOperator2DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator2DnonUniform o) : base(db,o) { mScale2 = o.mScale2; }
+        internal IfcCartesianTransformationOperator2DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator2DnonUniform o) : base(db,o) { mScale2 = o.mScale2; }
 		internal new static IfcCartesianTransformationOperator2DnonUniform Parse(string str) { IfcCartesianTransformationOperator2DnonUniform o = new IfcCartesianTransformationOperator2DnonUniform(); int pos = 0; o.Parse(str, ref pos, str.Length); return o; }
 		protected override void Parse(string str, ref int pos, int len)
 		{
@@ -406,7 +406,8 @@ namespace GeometryGym.Ifc
 		public double Scale3 { get { return mScale3; } set { mScale3 = value; } }
 
 		internal IfcCartesianTransformationOperator3DnonUniform() { }
-		internal IfcCartesianTransformationOperator3DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator3DnonUniform o) : base(db,o) { mScale2 = o.mScale2; mScale3 = o.mScale3; }
+        public IfcCartesianTransformationOperator3DnonUniform(DatabaseIfc db) : base(db) { }
+        internal IfcCartesianTransformationOperator3DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator3DnonUniform o) : base(db,o) { mScale2 = o.mScale2; mScale3 = o.mScale3; }
 		internal new static IfcCartesianTransformationOperator3DnonUniform Parse(string str) { IfcCartesianTransformationOperator3DnonUniform o = new IfcCartesianTransformationOperator3DnonUniform(); int pos = 0; o.Parse(str, ref pos, str.Length); return o; }
 		protected override void Parse(string str, ref int pos, int len)
 		{
@@ -1240,7 +1241,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcFace> CfsFaces { get { return new ReadOnlyCollection<IfcFace>(mCfsFaces.ConvertAll(x => mDatabase[x] as IfcFace)); } }
 
 		internal IfcConnectedFaceSet() : base() { }
-		internal IfcConnectedFaceSet(List<IfcFace> faces) : base(faces[0].mDatabase) { mCfsFaces = faces.ConvertAll(x => x.mIndex); }
+		public IfcConnectedFaceSet(List<IfcFace> faces) : base(faces[0].mDatabase) { mCfsFaces = faces.ConvertAll(x => x.mIndex); }
 		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c) : base(db,c) { c.CfsFaces.ToList().ForEach(x=>AddFace(db.Factory.Duplicate(x) as IfcFace)); }
 		protected override string BuildStringSTEP()
 		{

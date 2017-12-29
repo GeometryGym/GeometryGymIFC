@@ -25,6 +25,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Globalization;
 
 using GeometryGym.STEP;
 
@@ -59,7 +60,7 @@ namespace GeometryGym.Ifc
 				{
 					int i = (int)c;
 					if (i < 32 || i > 126)
-						result += "\\X2\\" + string.Format("{0:x4}", i).ToUpper() + "\\X0\\";
+						result += "\\X2\\" + string.Format("{0:x4}", i, CultureInfo.InvariantCulture).ToUpper() + "\\X0\\";
 					else
 						result += c;
 				}
@@ -523,24 +524,38 @@ namespace GeometryGym.Ifc
 			}
 			val = 0;
 			return false;
-		}
+        }
+
+        internal static String ReplaceAe(String s)
+        {
+            String ss = new String(s.ToCharArray());
+            ss = ss.Replace("Ä", "Ae");
+            ss = ss.Replace("Ö", "Oe");
+            ss = ss.Replace("Ü", "Ue");
+            ss = ss.Replace("ß", "ss");
+            ss = ss.Replace("ä", "ae");
+            ss = ss.Replace("ö", "oe");
+            ss = ss.Replace("ü", "ue");
+
+            return System.Text.Encoding.ASCII.GetString(System.Text.Encoding.ASCII.GetBytes(ss), 0, ss.Length);
+        }
 
 
-		//http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID.aspx
-		/// <summary>
-		/// Conversion methods between an IFC 
-		/// encoded GUID string and a .NET GUID.
-		/// This is a translation of the C code 
-		/// found here: 
-		/// http://www.iai-tech.org/ifc/IFC2x3/TC1/html/index.htm
-		/// </summary>
-		/// 
-		 
-		#region Private Members
-		/// <summary>
-		/// The replacement table
-		/// </summary>
-		private static readonly char[] base64Chars = new char[]
+    //http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID.aspx
+    /// <summary>
+    /// Conversion methods between an IFC 
+    /// encoded GUID string and a .NET GUID.
+    /// This is a translation of the C code 
+    /// found here: 
+    /// http://www.iai-tech.org/ifc/IFC2x3/TC1/html/index.htm
+    /// </summary>
+    /// 
+
+    #region Private Members
+    /// <summary>
+    /// The replacement table
+    /// </summary>
+    private static readonly char[] base64Chars = new char[]
     { '0','1','2','3','4','5','6','7','8','9'
     , 'A','B','C','D','E','F','G','H','I','J'
     , 'K','L','M','N','O','P','Q','R','S','T'

@@ -585,9 +585,10 @@ namespace GeometryGym.Ifc
 			string name = mName;
 			if(string.IsNullOrEmpty(name))
 				name = mDatabase.Factory.ApplicationDeveloper;
-			string str = base.BuildStringSTEP() + "," + mIdentification + ",'" + name + "'," + mDescription + (mRoles.Count == 0 ? ",$" : ",(#" + mRoles[0]);
+           string str = base.BuildStringSTEP() + "," + ParserIfc.ReplaceAe(mIdentification) + ",'" + ParserIfc.ReplaceAe(name) + "'," +
+                ParserIfc.ReplaceAe(mDescription) + (mRoles.Count == 0 ? ",$" : ",(#" + mRoles[0]);
 
-			for (int icounter = 1; icounter < mRoles.Count; icounter++)
+            for (int icounter = 1; icounter < mRoles.Count; icounter++)
 				str += ",#" + mRoles;
 			str += (mRoles.Count == 0 ? "" : ")") + (mAddresses.Count == 0 ? ",$" : ",(#" + mAddresses[0]);
 			for (int icounter = 1; icounter < mAddresses.Count; icounter++)
