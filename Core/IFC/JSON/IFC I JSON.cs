@@ -122,17 +122,17 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
+			int digits = mDatabase == null ? 4 : mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["OverallWidth"] = Math.Round(mOverallWidth,digits);
+			obj["OverallWidth"] = Math.Round(mOverallWidth, digits);
 			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
 			obj["WebThickness"] = Math.Round(mWebThickness, digits);
 			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
-			if (!double.IsNaN(mFilletRadius))
+			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
 				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
-			if (!double.IsNaN(mFlangeEdgeRadius))
+			if (!double.IsNaN(mFlangeEdgeRadius) && mFlangeEdgeRadius > 0)
 				obj["FlangeEdgeRadius"] = Math.Round(mFlangeEdgeRadius, digits);
-			if (!double.IsNaN(mFlangeSlope))
+			if (!double.IsNaN(mFlangeSlope) && mFlangeSlope > 0)
 				obj["FlangeSlope"] = mFlangeSlope;
 		}
 	}

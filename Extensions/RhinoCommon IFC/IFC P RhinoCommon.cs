@@ -55,29 +55,30 @@ namespace GeometryGym.Ifc
 		public Transform Transform { get { return Transform.ChangeBasis(Plane, Plane.WorldXY); } }
 		public abstract Plane Plane { get; }
 	}
+	public partial class IfcPlane : IfcElementarySurface
+	{
+		public Plane Plane { get { return Position.Plane; } }
+	}
 	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
 	{
 		public virtual Point3d Location { get { return Point3d.Unset; } }
 	}
 	public partial class IfcPolyline
 	{
-		internal IfcPolyline(DatabaseIfc db, Line l) : base(db) { addPoint(new IfcCartesianPoint(db, l.From)); addPoint( new IfcCartesianPoint(db, l.To)); }
+		internal IfcPolyline(DatabaseIfc db, Line l) : base(db) { Points.Add(new IfcCartesianPoint(db, l.From)); Points.Add( new IfcCartesianPoint(db, l.To)); }
 		internal IfcPolyline(DatabaseIfc db, Polyline pl) : base(db)
 		{
 			if (pl.IsClosed)
 			{
 				int ilast = pl.Count - 1;
 				IfcCartesianPoint cp = new IfcCartesianPoint(db, pl[0]);
-				addPoint(cp);
+				Points.Add(cp);
 				for (int icounter = 1; icounter < ilast; icounter++)
-					addPoint(new IfcCartesianPoint(db, pl[icounter]));
-				addPoint(cp);
+					Points.Add(new IfcCartesianPoint(db, pl[icounter]));
+				Points.Add(cp);
 			}
 			else
-			{
-				for (int icounter = 0; icounter < pl.Count; icounter++)
-					addPoint(new IfcCartesianPoint(db, pl[icounter]));
-			}
+				Points = new STEP.LIST<IfcCartesianPoint>(pl.ConvertAll(x => new IfcCartesianPoint(db, x)));
 		}
 	}
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))

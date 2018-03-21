@@ -17,6 +17,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
@@ -68,6 +69,8 @@ namespace GeometryGym.Ifc
 		}
 		public static string Decode(string str) //http://www.buildingsmart-tech.org/implementation/get-started/string-encoding/string-encoding-decoding-summary
 		{
+			if (str == "$")
+				return "";
 			int ilast = str.Length - 4, icounter = 0;
 			string result = "";
 			while (icounter < ilast)
@@ -91,9 +94,15 @@ namespace GeometryGym.Ifc
 						else if (str[icounter + 1] == 'X' && str.Length > icounter + 4)
 						{
 							string s = str.Substring(icounter + 3, 2);
-							c = System.Text.Encoding.ASCII.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+							Int32 i = Convert.ToInt32(s, 16);
+							//byte[] byteArray = BitConverter.GetBytes(i);
+							//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
+							Encoding wind1252 = Encoding.GetEncoding(1252);
+							string istr = wind1252.GetString(new byte[] { (byte) i });
+							result += istr[0];
+							//c = charArray[0];
 							//result += (char)();
-							result += c;
+							//result += c;
 							icounter += 4;
 						}
 						else
@@ -180,23 +189,18 @@ namespace GeometryGym.Ifc
 		}
 
 		
-		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema)
+		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			string kw = "", str = "";
 			int ifcID = 0;
-			if (string.IsNullOrEmpty(line))
-				return null;
-			string upper = line.ToUpper();
-			if (line.Length < 5)
-				return null;
+			
 			ParserSTEP.GetKeyWord(line, out ifcID, out kw, out str);
 			if (string.IsNullOrEmpty(kw) || !kw.ToUpper().StartsWith("IFC"))
 				return null;
 			str = str.Trim();
-			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema);
+			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dictionary);
 			if (result == null)
 				return null;
-			result.mSTEPString = str;
 			result.mIndex = ifcID;
 			return result;
 		}
@@ -212,13 +216,13 @@ namespace GeometryGym.Ifc
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
 			{
 				IfcColourRgb color = new IfcColourRgb();
-				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length, null);
 				return color;
 			}
 			if (string.Compare(kw, "IFCDRAUGHTINGPREDEFINEDCOLOUR", false) == 0)
 			{
 				IfcDraughtingPreDefinedColour color = new IfcDraughtingPreDefinedColour();
-				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length, null);
 				return color;
 			}
 			return null;
@@ -236,7 +240,7 @@ namespace GeometryGym.Ifc
 			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
 			{
 				IfcColourRgb color = new IfcColourRgb();
-				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length);
+				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length, null);
 				return color;
 			}
 			return new IfcNormalisedRatioMeasure(ParserSTEP.ParseDouble(def));
@@ -307,7 +311,7 @@ namespace GeometryGym.Ifc
 					IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
 								  where typeof(IfcMeasureValue).IsAssignableFrom(type) select type;
 					foreach(Type t in types)
-						mMeasureValueTypes.Add(t.Name.ToLower(), t);
+						mMeasureValueTypes[t.Name.ToLower()] = t;
 				}
 				return mMeasureValueTypes;
 			}
@@ -391,9 +395,9 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCLABEL("))
 			{
 				if (str.Length <= 12)
-					return new IfcLabel("DEFAULT");
+					return new IfcLabel("");
 				string s = str.Substring(10, str.Length - 12);
-				return new IfcLabel((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : ParserIfc.Decode(s)));
+				return new IfcLabel((s == "$" || s == null ? "" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCLOGICAL("))
 			{
@@ -410,7 +414,7 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCTEXT("))
 			{
 				string s = str.Substring(9, str.Length - 11);
-				return new IfcText((s == "$" || string.IsNullOrEmpty(s) ? "DEFAULT" : ParserIfc.Decode(s)));
+				return new IfcText((s == "$" || s == null ? "" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCURIREFERENCE("))
 				return new IfcURIReference(ParserIfc.Decode(str.Substring(15, str.Length - 17)));
@@ -441,6 +445,10 @@ namespace GeometryGym.Ifc
 						return new IfcBoolean(result);
 					return new IfcBoolean( value.Contains("T"));
 				}
+				if (string.Compare(name, "IFCDATEE") == 0)
+					return new IfcDate(DateTime.Parse(value));
+				if (string.Compare(name, "IFCDATETIME") == 0)
+					return new IfcDateTime(DateTime.Parse(value));
 				if (string.Compare(name, "IFCIDENTIFIER") == 0)
 					return new IfcIdentifier(value);
 				if (string.Compare(name, "IFCINTEGER") == 0)
@@ -475,6 +483,8 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcValue extractValue(string keyword, string value)
 		{
+            if (string.IsNullOrEmpty(value))
+                return null;
 			Type type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
 			if (type != null)
 			{

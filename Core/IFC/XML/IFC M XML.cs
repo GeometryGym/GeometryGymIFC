@@ -261,9 +261,9 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if (mMaterial > 0)
+			if (mMaterial != null)
 				xml.AppendChild(Material.GetXML(xml.OwnerDocument, "Material", this, processed));
-			if (mProfile > 0)
+			if (mProfile != null)
 				xml.AppendChild(Profile.GetXML(xml.OwnerDocument, "Profile", this, processed));
 			if (mPriority != int.MaxValue)
 				setAttribute(xml, "Priority", mPriority.ToString());
@@ -281,7 +281,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(element);
 			foreach (IfcMaterialProfile p in MaterialProfiles)
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
-			if (mCompositeProfile > 0)
+			if (mCompositeProfile != null)
 				xml.AppendChild(CompositeProfile.GetXML(xml.OwnerDocument, "CompositeProfile", this, processed));
 		}
 	}

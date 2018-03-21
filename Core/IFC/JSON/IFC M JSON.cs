@@ -28,6 +28,22 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public abstract partial class IfcManifoldSolidBrep : IfcSolidModel //ABSTRACT SUPERTYPE OF(ONEOF(IfcAdvancedBrep, IfcFacetedBrep))
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Outer", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Outer = mDatabase.parseJObject<IfcClosedShell>(jobj);
+
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Outer"] = Outer.getJson(this, options);
+		}
+	}
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -87,6 +103,22 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Category", Category);
+		}
+	}
+
+	public abstract partial class IfcMaterialDefinition : BaseClassIfc, IfcObjectReferenceSelect, IfcMaterialSelect, IfcResourceObjectSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterial ,IfcMaterialConstituent ,IfcMaterialConstituentSet ,IfcMaterialLayer ,IfcMaterialProfile ,IfcMaterialProfileSet));
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			mDatabase.extractJArray<IfcMaterialProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddProperties(x));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+
+			if (mHasProperties.Count > 0)
+				obj["HasProperties"] = new JArray(HasProperties.ToList().ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
@@ -154,31 +186,25 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase) as JToken;
-			if (token != null)
-				Name = token.Value<string>();
-			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase) as JToken;
-			if (token != null)
-				Description = token.Value<string>();
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj.GetValue("Material", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				Material = mDatabase.parseJObject<IfcMaterial>(jobj);
 			jobj = obj.GetValue("Profile", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				Profile = mDatabase.parseJObject<IfcProfileDef>(jobj);
-			token = obj.GetValue("Priority", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			JToken token = obj.GetValue("Priority", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Priority = token.Value<int>();
-			token = obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (token != null)
-				Category = token.Value<string>();
+			Category = extractString(obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			if (mMaterial > 0)
+			if (mMaterial != null)
 				obj["Material"] = Material.getJson(this, options);
 			if (mProfile != null)
 				obj["Profile"] = Profile.getJson(this, options);
@@ -192,12 +218,8 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase) as JToken;
-			if (token != null)
-				Name = token.Value<string>();
-			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase) as JToken;
-			if (token != null)
-				Description = token.Value<string>();
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 			JArray array = obj.GetValue("MaterialProfiles") as JArray;
 			if(array != null)
 			{
@@ -205,7 +227,7 @@ namespace GeometryGym.Ifc
 				{
 					IfcMaterialProfile mp = mDatabase.parseJObject<IfcMaterialProfile>(o);
 					if (mp != null)
-						addMaterialProfile(mp);
+						MaterialProfiles.Add(mp);
 				}
 			}
 			JObject jobj = obj.GetValue("CompositeProfile", StringComparison.InvariantCultureIgnoreCase) as JObject;
@@ -217,11 +239,8 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			JArray array = new JArray();
-			foreach (IfcMaterialProfile p in MaterialProfiles)
-				array.Add(p.getJson(this, options));
-			obj["MaterialProfiles"] = array;
-			if (mCompositeProfile > 0)
+			obj["MaterialProfiles"] = new JArray(MaterialProfiles.ConvertAll(x => x.getJson(this, options)));
+			if (mCompositeProfile != null)
 				obj["CompositeProfile"] = CompositeProfile.getJson(this, options);
 		}
 	}

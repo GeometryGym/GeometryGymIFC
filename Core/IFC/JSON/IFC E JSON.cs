@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("MethodOfMeasurement", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				MethodOfMeasurement = token.Value<string>();
-			mDatabase.extractJArray<IfcPhysicalQuantity>(obj.GetValue("Quantities", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addQuantity(x));
+			mDatabase.extractJArray<IfcPhysicalQuantity>(obj.GetValue("Quantities", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addQuantity(x));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -138,6 +138,21 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "ElementType", ElementType);
+		}
+	}
+	public partial class IfcEllipseProfileDef : IfcParameterizedProfileDef
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			SemiAxis1 = obj.GetValue("SemiAxis1", StringComparison.InvariantCultureIgnoreCase).Value<double>();
+			SemiAxis2 = obj.GetValue("SemiAxis2", StringComparison.InvariantCultureIgnoreCase).Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["SemiAxis1"] = SemiAxis1;
+			obj["SemiAxis2"] = SemiAxis2;
 		}
 	}
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))

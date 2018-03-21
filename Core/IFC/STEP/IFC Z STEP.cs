@@ -17,6 +17,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -30,20 +31,20 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcZone : IfcSystem
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "" : (mLongName == "$" ? ",$" : ",'" + mLongName + "'")); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release == ReleaseVersion.IFC2x3 ? "" : (mLongName == "$" ? ",$" : ",'" + mLongName + "'")); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			base.parse(str, ref pos, release, len);
+			base.parse(str, ref pos, release, len, dictionary);
 			if (release != ReleaseVersion.IFC2x3)
 				mLongName = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len)
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mDepth) + "," + ParserSTEP.DoubleToString(mFlangeWidth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mEdgeRadius); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			base.parse(str, ref pos, release, len);
+			base.parse(str, ref pos, release, len, dictionary);
 			mDepth = ParserSTEP.StripDouble(str, ref pos, len);
 			mFlangeWidth = ParserSTEP.StripDouble(str, ref pos, len);
 			mWebThickness = ParserSTEP.StripDouble(str, ref pos, len);

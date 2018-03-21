@@ -78,6 +78,13 @@ namespace GeometryGym.Ifc
 		public Qto_FootingBaseQuantities(IfcFooting instance) : base(instance) { }
 		public Qto_FootingBaseQuantities(IfcFootingType type) : base(type) { }
 	}
+	public partial class Qto_ReinforcingElementBaseQuantities : IfcElementQuantity
+	{
+		public double Count { set { mQuantities.Add(new IfcQuantityCount(mDatabase, "Count", value).mIndex); } }
+		public double Length { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Length", value).mIndex); } }
+		public double Weight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "Weight", value).mIndex); } }
+		public Qto_ReinforcingElementBaseQuantities(IfcReinforcingElement instance) : base(instance) { }
+	}
 	public partial class Qto_SpaceBaseQuantities : IfcElementQuantity
 	{
 		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }

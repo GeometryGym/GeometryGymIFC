@@ -28,6 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcImageTexture : IfcSurfaceTexture
 	{
 		internal string mUrlReference;// : IfcIdentifier; 
@@ -37,6 +38,7 @@ namespace GeometryGym.Ifc
 		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t) : base(db, t) { mUrlReference = t.mUrlReference; }
 		public IfcImageTexture(DatabaseIfc db, bool repeatS, bool repeatT, string urlReference) : base(db, repeatS, repeatT) { UrlReference = urlReference; }
 	}
+	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		internal int mMappedTo;// : IfcTessellatedFaceSet; 
@@ -53,13 +55,14 @@ namespace GeometryGym.Ifc
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
 			: base(fs.mDatabase) { mMappedTo = fs.mIndex; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
 	}
+	[Serializable]
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve 
 	{
-		private int mPoints; // IfcCartesianPointList
+		private IfcCartesianPointList mPoints; // IfcCartesianPointList
 		internal List<IfcSegmentIndexSelect> mSegments = new List<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
 		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcBoolean
 
-		public IfcCartesianPointList Points { get { return mDatabase[mPoints] as IfcCartesianPointList; } set { mPoints = value.mIndex; } }
+		public IfcCartesianPointList Points { get { return mPoints; } set { mPoints = value; } }
 		public ReadOnlyCollection<IfcSegmentIndexSelect> Segments { get { return new ReadOnlyCollection<IfcSegmentIndexSelect>( mSegments); } }
 		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
@@ -78,7 +81,7 @@ namespace GeometryGym.Ifc
 				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;
 				if (cpl2d != null)
 				{
-					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.ToList(), Segments.ToList());
+					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.Select(x=>new Tuple<double,double>(x[0],x[1])), Segments.ToList());
 					int index = bc.mIndex;
 					mDatabase[mIndex] = bc;
 					mDatabase[index] = null;
@@ -91,6 +94,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	[Serializable]
 	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem //SUPERTYPE OF (ONEOF (IfcIndexedPolygonalFaceWithVoids))
 	{
 		internal List<int> mCoordIndex = new List<int>();// : LIST [3:?] OF IfcPositiveInteger;
@@ -106,6 +110,7 @@ namespace GeometryGym.Ifc
 
 		public void AddCoordIndex(int index) { mCoordIndex.Add(index); }
 	}
+	[Serializable]
 	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
 	{
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
@@ -115,6 +120,7 @@ namespace GeometryGym.Ifc
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 
 			: base(db, coords) { mInnerCoordIndices = inners.ToList().ConvertAll(x=>x.ToList()); }
 	}
+	[Serializable]
 	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)
 	{
 		internal int mMappedTo = 0;// : IfcTessellatedFaceSet;
@@ -128,6 +134,7 @@ namespace GeometryGym.Ifc
 		//internal IfcIndexedTextureMap(IfcTessellatedFaceSet mappedTo, ifctext) : this(pl, nll, selfIntersect, new List<int>()) { }
 		//internal IfcIndexedTextureMap(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs, IfcLogicalEnum selfIntersect) : this(pl, segs, selfIntersect, new List<int>()) { }
 	}
+	[Serializable]
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap
 	{
 		internal Tuple<int, int, int>[] mTexCoordList = new Tuple<int, int, int>[0];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
@@ -136,6 +143,7 @@ namespace GeometryGym.Ifc
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }
 		//public IfcIndexedTriangleTextureMap(DatabaseIfc m, IEnumerable<Tuple<int, int,int>> coords) : base(m) { mTexCoordList = coords.ToArray(); }
 	}
+	[Serializable]
 	public partial class IfcInterceptor : IfcFlowTreatmentDevice //IFC4  
 	{
 		internal IfcInterceptorTypeEnum mPredefinedType = IfcInterceptorTypeEnum.NOTDEFINED;
@@ -145,6 +153,7 @@ namespace GeometryGym.Ifc
 		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
 		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcInterceptorType : IfcFlowTreatmentDeviceType
 	{
 		internal IfcInterceptorTypeEnum mPredefinedType = IfcInterceptorTypeEnum.NOTDEFINED;// : IfcInterceptorTypeEnum;
@@ -153,12 +162,14 @@ namespace GeometryGym.Ifc
 		internal IfcInterceptorType() : base() { }
 		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
 	{
 		internal IfcIntersectionCurve() : base() { }
 		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
 		internal IfcIntersectionCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve,p1,p2,cr) { }
 	}
+	[Serializable]
 	public partial class IfcInventory : IfcGroup
 	{
 		internal IfcInventoryTypeEnum mInventoryType;// : IfcInventoryTypeEnum;
@@ -181,7 +192,8 @@ namespace GeometryGym.Ifc
 		internal IfcInventory(DatabaseIfc m, string name) : base(m, name) { }
 	}
 	//ENTITY IfcIrregularTimeSeries
-	//ENTITY IfcIrregularTimeSeriesValue;ductFittingTypeEnum;
+	//ENTITY IfcIrregularTimeSeriesValue;
+	[Serializable]
 	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{
 		internal double mOverallWidth, mOverallDepth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;

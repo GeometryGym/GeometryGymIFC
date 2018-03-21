@@ -28,6 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcWall : IfcBuildingElement
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;//: OPTIONAL IfcWallTypeEnum; 
@@ -37,14 +38,16 @@ namespace GeometryGym.Ifc
 		internal IfcWall(DatabaseIfc db, IfcWall w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { mPredefinedType = w.mPredefinedType; }
 		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcWallElementedCase : IfcWall
 	{
 		internal IfcWallElementedCase() : base() { }
 		internal IfcWallElementedCase(DatabaseIfc db, IfcWallElementedCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcWallStandardCase : IfcWall
 	{
-		public override string KeyWord { get { return "IfcWall" + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "StandardCase" : ""); } }
+		internal override string KeyWord { get { return "IfcWall" + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "StandardCase" : ""); } }
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
@@ -63,6 +66,7 @@ namespace GeometryGym.Ifc
 			Representation = new IfcProductDefinitionShape(reps);
 		}
 	}
+	[Serializable]
 	public partial class IfcWallType : IfcBuildingElementType
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;
@@ -73,6 +77,7 @@ namespace GeometryGym.Ifc
 		public IfcWallType(DatabaseIfc m, string name, IfcWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcWallType(string name, IfcMaterialLayerSet ls, IfcWallTypeEnum type) : base(ls.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = ls; }
 	}
+	[Serializable]
 	public partial class IfcWarpingStiffnessSelect
 	{
 		internal bool mFixed;
@@ -80,6 +85,7 @@ namespace GeometryGym.Ifc
 		internal IfcWarpingStiffnessSelect(bool fix) { mFixed = fix; mStiffness = 0; }
 		internal IfcWarpingStiffnessSelect(double stiff) { mFixed = false; mStiffness = stiff; }
 	}
+	[Serializable]
 	public partial class IfcWasteTerminal : IfcFlowTerminal //IFC4
 	{
 		internal IfcWasteTerminalTypeEnum mPredefinedType = IfcWasteTerminalTypeEnum.NOTDEFINED;// OPTIONAL : IfcWasteTerminalTypeEnum;
@@ -89,6 +95,7 @@ namespace GeometryGym.Ifc
 		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcWasteTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcWasteTerminalType : IfcFlowTerminalType
 	{
 		internal IfcWasteTerminalTypeEnum mPredefinedType = IfcWasteTerminalTypeEnum.NOTDEFINED;// : IfcWasteTerminalTypeEnum; 
@@ -99,6 +106,7 @@ namespace GeometryGym.Ifc
 		internal IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcWaterProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
 	{
 		internal bool mIsPotable = false;// : 	OPTIONAL BOOLEAN;
@@ -118,6 +126,7 @@ namespace GeometryGym.Ifc
 			mDissolvedSolidsContent = p.mDissolvedSolidsContent;
 		}
 	}
+	[Serializable]
 	public partial class IfcWindow : IfcBuildingElement
 	{
 		internal double mOverallHeight = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -136,6 +145,7 @@ namespace GeometryGym.Ifc
 		internal IfcWindow(DatabaseIfc db, IfcWindow w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
 		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcWindowLiningProperties : IfcPreDefinedPropertySet //IFC2x3 : IfcPropertySetDefinition
 	{
 		internal double mLiningDepth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -180,6 +190,7 @@ namespace GeometryGym.Ifc
 			mLiningToPanelOffsetY = lngToPnlOffstY;
 		}
 	}
+	[Serializable]
 	public partial class IfcWindowPanelProperties : IfcPreDefinedPropertySet //IFC2x3: IfcPropertySetDefinition
 	{
 		internal IfcWindowPanelOperationEnum mOperationType;// : IfcWindowPanelOperationEnum;
@@ -209,12 +220,15 @@ namespace GeometryGym.Ifc
 			mFrameThickness = frameThick;
 		}
 	}
+	[Serializable]
 	public partial class IfcWindowStandardCase : IfcWindow
 	{
-		public override string KeyWord { get { return "IfcWindow"; } }
+		internal override string KeyWord { get { return "IfcWindow"; } }
 		internal IfcWindowStandardCase() : base() { }
 		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcWindowStyle : IfcTypeProduct // IFC2x3
 	{
 		internal IfcWindowStyleConstructionEnum mConstructionType;// : IfcWindowStyleConstructionEnum;
@@ -224,9 +238,10 @@ namespace GeometryGym.Ifc
 		internal IfcWindowStyle() : base() { }
 		internal IfcWindowStyle(DatabaseIfc db, IfcWindowStyle s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mConstructionType = s.mConstructionType; mOperationType = s.mOperationType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 	}
+	[Serializable]
 	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcWindowStyle" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcWindowStyle" : base.KeyWord); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
 		internal bool mParameterTakesPrecedence;// : BOOLEAN; 
@@ -247,13 +262,14 @@ namespace GeometryGym.Ifc
 			mPartitioningType = partition;
 			mParameterTakesPrecedence = true;
 			if (wlp != null)
-				mHasPropertySets.Add(wlp.mIndex);
+				mHasPropertySets.Add(wlp);
 			if (pps != null && pps.Count > 0)
-				mHasPropertySets.AddRange(pps.ConvertAll(x => x.mIndex));
+				mHasPropertySets.AddRange(pps);
 			if (!string.IsNullOrEmpty(userDefinedPartionType))
 				mUserDefinedPartitioningType = userDefinedPartionType.Replace("'", "");
 		}
 	}
+	[Serializable]
 	public partial class IfcWorkCalendar : IfcControl //IFC4
 	{
 		internal List<int> mWorkingTimes = new List<int>();// :	OPTIONAL SET [1:?] OF IfcWorkTime;
@@ -283,6 +299,7 @@ namespace GeometryGym.Ifc
 		internal void addWorkingTime(IfcWorkTime time) { mWorkingTimes.Add(time.mIndex); }
 		internal void addExceptionTimes(IfcWorkTime time) { mExceptionTimes.Add(time.mIndex); }
 	}
+	[Serializable]
 	public abstract partial class IfcWorkControl : IfcControl //ABSTRACT SUPERTYPE OF(ONEOF(IfcWorkPlan, IfcWorkSchedule))
 	{
 		//internal string mIdentifier	 : 	IfcIdentifier; IFC4 moved to control
@@ -315,26 +332,33 @@ namespace GeometryGym.Ifc
 		internal DateTime getStart() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
 		
 	}
+	[Serializable]
 	public partial class IfcWorkPlan : IfcWorkControl
 	{
 		internal IfcWorkPlanTypeEnum mPredefinedType = IfcWorkPlanTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkPlanTypeEnum; IFC4
 		internal IfcWorkPlan() : base() { }
 		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcWorkSchedule : IfcWorkControl
 	{
 		internal IfcWorkScheduleTypeEnum mPredefinedType = IfcWorkScheduleTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkScheduleTypeEnum; IFC4
 		internal IfcWorkSchedule() : base() { }
 		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcWorkTime : IfcSchedulingTime //IFC4
 	{
 		internal int mRecurrencePattern;// OPTIONAL	IfcRecurrencePattern
-		internal string mStart = "$";//	 :	OPTIONAL IfcDate;
-		internal string mFinish = "$";//	 :	OPTIONAL IfcDate; 
+		internal DateTime mStart = DateTime.MinValue;//	 :	OPTIONAL IfcDate;
+		internal DateTime mFinish = DateTime.MinValue;//	 :	OPTIONAL IfcDate; 
+
+		internal IfcRecurrencePattern RecurrencePattern { get => mDatabase[mRecurrencePattern] as IfcRecurrencePattern; set => mRecurrencePattern = (value == null ? 0 : value.mIndex); }
+		public DateTime Start { get => mStart; set => mStart = value; }
+		public DateTime Finish { get => mFinish; set => mFinish = value; }
+
 		internal IfcWorkTime() : base() { }
 		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t) : base(db,t) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
-		internal IfcWorkTime(DatabaseIfc db, IfcRecurrencePattern recur, DateTime start, DateTime finish)
-			: base(db) { if (recur != null) mRecurrencePattern = recur.mIndex; if (start != DateTime.MinValue) mStart = IfcDate.convert(start); if (finish != DateTime.MinValue) mFinish = IfcDate.convert(finish); }
+		public IfcWorkTime(DatabaseIfc db) : base(db) { }
 	}
 }

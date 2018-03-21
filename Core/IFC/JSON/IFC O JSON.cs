@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcRelAssigns ra in HasAssignments)
 				{
-					if (ra.mIndex != host.mIndex)
+					if (host == null || ra.mIndex != host.mIndex)
 						array.Add(ra.getJson(this, options));
 				}
 				if (array.Count > 0)
@@ -236,7 +236,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOwnerHistory : BaseClassIfc
 	{
-		protected override string genRepositoryName => IfcDateTime.formatSTEP(LastModifiedDate == DateTime.MinValue ? CreationDate : LastModifiedDate).Replace("'","") + " " + mChangeAction.ToString();
+		protected override string genRepositoryName => IfcDateTime.FormatSTEP(LastModifiedDate == DateTime.MinValue ? CreationDate : LastModifiedDate).Replace("'","") + " " + mChangeAction.ToString();
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
@@ -270,14 +270,14 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			obj["OwningUser"] = OwningUser.getJson(this, options);
 			obj["OwningApplication"] = OwningApplication.getJson(this, options);
-			if (mState != IfcStateEnum.NA)
+			if (mState != IfcStateEnum.NOTDEFINED)
 				obj["State"] = mState.ToString();
 			obj["ChangeAction"] = mChangeAction.ToString();
 			if (mLastModifiedDate > 0)
 				obj["LastModifiedDate"] = mLastModifiedDate;
-			if (mLastModifyingUser > 0)
+			if (mLastModifyingUser != null)
 				obj["LastModifyingUser"] = LastModifyingUser.getJson(this, options);
-			if (mLastModifyingApplication > 0)
+			if (mLastModifyingApplication != null)
 				obj["LastModifyingApplication"] = LastModifyingApplication.getJson(this, options);
 			if (mCreationDate > 0)
 				obj["CreationDate"] = mCreationDate;

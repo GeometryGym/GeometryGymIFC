@@ -135,6 +135,7 @@ namespace GeometryGym.Ifc
 						result  = constructor.Invoke(new object[] { }) as BaseClassIfc;
 						if (result != null)
 						{
+							result.mDatabase = this;
 							token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
 							int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
 							if (token != null)
@@ -153,16 +154,64 @@ namespace GeometryGym.Ifc
 								else if(token.Type == JTokenType.String)
 								{
 									result.mGlobalId = token.Value<string>();
-									mDictionary.Add(result.mGlobalId, result);
+									mDictionary.TryAdd(result.mGlobalId, result);
 								}
 							}
+							IfcCartesianPoint point = result as IfcCartesianPoint;
+							IfcDirection direction = result as IfcDirection;
+							IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
 							if (index == 0)
 							{
+								
+								if (point != null)
+								{
+									point.parseJObject(obj);
+									if (point.isOrigin)
+									{
+										if (point.is2D)
+											return (T)(IBaseClassIfc)Factory.Origin2d;
+										return (T)(IBaseClassIfc)Factory.Origin;
+									}
+								}
+								else
+								{
+									if (direction != null)
+									{
+										direction.parseJObject(obj);
+										if (!direction.is2D)
+										{
+											if (direction.isXAxis)
+												return (T)(IBaseClassIfc)Factory.XAxis;
+											if (direction.isYAxis)
+												return (T)(IBaseClassIfc)Factory.YAxis;
+											if (direction.isZAxis)
+												return (T)(IBaseClassIfc)Factory.ZAxis;
+											if (direction.isXAxisNegative)
+												return (T)(IBaseClassIfc)Factory.XAxisNegative;
+											if (direction.isYAxisNegative)
+												return (T)(IBaseClassIfc)Factory.YAxisNegative;
+											if (direction.isZAxisNegative)
+												return (T)(IBaseClassIfc)Factory.ZAxisNegative;
+										}
+									}
+									if (placement != null)
+									{
+										placement.parseJObject(obj);
+										if (placement.IsXYPlane)
+											return (T)(IBaseClassIfc)Factory.XYPlanePlacement;
+									}
+								}
+							
 								if (mNextUnassigned == 0)
 									mNextUnassigned = Math.Max(LastKey * 2, 1000);
 								index = mNextUnassigned++;
+								this[index] = result;
+
+								if (point != null || direction != null || placement != null)
+									return (T)(IBaseClassIfc)result;
 							}
-							this[index] = result;
+							else
+								this[index] = result;
 							
 						}
 					}

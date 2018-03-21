@@ -105,11 +105,11 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("OverallDepth", mOverallDepth.ToString());
 			xml.SetAttribute("WebThickness", mWebThickness.ToString());
 			xml.SetAttribute("FlangeThickness", mFlangeThickness.ToString());
-			if (!double.IsNaN(mFilletRadius))
+			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
 				xml.SetAttribute("FilletRadius", mFilletRadius.ToString());
-			if (!double.IsNaN(mFlangeEdgeRadius))
+			if (!double.IsNaN(mFlangeEdgeRadius) && mFlangeEdgeRadius > 0)
 				xml.SetAttribute("FlangeEdgeRadius", mFlangeEdgeRadius.ToString());
-			if (!double.IsNaN(mFlangeSlope))
+			if (!double.IsNaN(mFlangeSlope) && mFlangeSlope > 0)
 				xml.SetAttribute("FlangeSlope", mFlangeSlope.ToString());
 		}
 	}

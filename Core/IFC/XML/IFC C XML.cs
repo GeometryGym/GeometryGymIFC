@@ -54,7 +54,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("Coordinates", mCoordinateX.ToString() + (double.IsNaN(mCoordinateY) ? "" : " " + mCoordinateY.ToString()) + (double.IsNaN(mCoordinateZ) ? "" : " " + mCoordinateZ.ToString()));
+			Tuple<double, double, double> coordinates = SerializeCoordinates;
+			xml.SetAttribute("Coordinates", coordinates.Item1 + (double.IsNaN(coordinates.Item2) ? "" : " " + coordinates.Item2) + (double.IsNaN(coordinates.Item3) ? "" : " " + coordinates.Item3));
 		}
 	}
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
@@ -65,23 +66,16 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("CoordList"))
 			{
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
-				mCoordList = new Tuple<double, double>[fields.Length / 2];
-				int pos = 0;
+				List<double[]> coords = new List<double[]>(fields.Length / 2);
 				for (int icounter = 0; icounter < fields.Length; icounter += 2)
-					mCoordList[pos++] = new Tuple<double, double>(double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]));
+					coords.Add( new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1])});
+				CoordList = coords.ToArray();
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			Tuple<double, double> tuple = mCoordList[0];
-			string str = tuple.Item1 + " " + tuple.Item2;
-			for (int icounter = 1; icounter < mCoordList.Length; icounter++)
-			{
-				tuple = mCoordList[icounter];
-				str += " " + tuple.Item1 + " " + tuple.Item2;
-			}
-			xml.SetAttribute("CoordList", str);
+			xml.SetAttribute("CoordList", string.Join(" ", CoordList.Select(x=> x[0] + " " + x[1])));
 		}
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
@@ -92,23 +86,16 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("CoordList"))
 			{
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
-				mCoordList = new Tuple<double, double, double>[fields.Length / 3];
-				int pos = 0;
+				List<double[]> points = new List<double[]>(fields.Length / 3);
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					mCoordList[pos++] = new Tuple<double, double, double>(double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]));
+					points.Add( new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]) });
+				mCoordList = points.ToArray();
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			Tuple<double, double, double> tuple = mCoordList[0];
-			string str = tuple.Item1 + " " + tuple.Item2 + " " + tuple.Item3;
-			for (int icounter = 1; icounter < mCoordList.Length; icounter++)
-			{
-				tuple = mCoordList[icounter];
-				str += " " + tuple.Item1 + " " + tuple.Item2 + " " + tuple.Item3;
-			}
-			xml.SetAttribute("CoordList", str);
+			xml.SetAttribute("CoordList", string.Join(" ", mCoordList.Select(x=> x[0] + " " + x[1] + " " + x[2])));
 		}
 	}
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -499,7 +486,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRepresentationContext rc = mDatabase.ParseXml<IfcRepresentationContext>(cn as XmlElement);
 						if (rc != null)
-							addRepresentationContext(rc);
+							RepresentationContexts.Add(rc);
 					}
 				}
 				else if (string.Compare(name, "UnitsInContext") == 0)
@@ -653,7 +640,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("PropertiesForConstraint");
 				foreach (IfcResourceConstraintRelationship r in mPropertiesForConstraint)
 				{
-					if (host.Index != r.mIndex && !processed.ContainsKey(r.mIndex))
+					if (host.mIndex != r.mIndex && !processed.ContainsKey(r.mIndex))
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -664,7 +651,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
-					if (host.Index != r.mIndex)
+					if (host.mIndex != r.mIndex)
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)

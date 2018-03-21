@@ -226,7 +226,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
-					if (host.Index != r.mIndex)
+					if (host.mIndex != r.mIndex)
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -237,7 +237,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources");
 				foreach (IfcExternalReferenceRelationship r in ExternalReferenceForResources)
 				{
-					if (host.Index != r.mIndex)
+					if (host.mIndex != r.mIndex)
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)

@@ -27,6 +27,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcHalfSpaceSolid : IfcGeometricRepresentationItem, IfcBooleanOperand /* SUPERTYPE OF (ONEOF (IfcBoxedHalfSpace ,IfcPolygonalBoundedHalfSpace)) */
 	{
 		private int mBaseSurface;// : IfcSurface;
@@ -39,6 +40,7 @@ namespace GeometryGym.Ifc
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 		public IfcHalfSpaceSolid(IfcSurface baseSurface, bool agreementFlag) : base(baseSurface.mDatabase) { BaseSurface = baseSurface; AgreementFlag = agreementFlag; }
 	}
+	[Serializable]
 	public partial class IfcHeatExchanger : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcHeatExchangerTypeEnum mPredefinedType = IfcHeatExchangerTypeEnum.NOTDEFINED;// OPTIONAL : IfcHeatExchangerTypeEnum;
@@ -48,6 +50,7 @@ namespace GeometryGym.Ifc
 		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
 		public IfcHeatExchanger(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcHeatExchangerType : IfcEnergyConversionDeviceType
 	{
 		internal IfcHeatExchangerTypeEnum mPredefinedType = IfcHeatExchangerTypeEnum.NOTDEFINED;// : IfcHeatExchangerTypeEnum;
@@ -57,6 +60,7 @@ namespace GeometryGym.Ifc
 		internal IfcHeatExchangerType(DatabaseIfc db, IfcHeatExchangerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
+	[Serializable]
 	public partial class IfcHumidifier : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcHumidifierTypeEnum mPredefinedType = IfcHumidifierTypeEnum.NOTDEFINED;// OPTIONAL : IfcHumidifierTypeEnum;
@@ -66,6 +70,7 @@ namespace GeometryGym.Ifc
 		internal IfcHumidifier(DatabaseIfc db, IfcHumidifier h, IfcOwnerHistory ownerHistory, bool downStream) : base(db,h, ownerHistory, downStream) { mPredefinedType = h.mPredefinedType; }
 		public IfcHumidifier(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcHumidifierType : IfcEnergyConversionDeviceType
 	{
 		internal IfcHumidifierTypeEnum mPredefinedType = IfcHumidifierTypeEnum.NOTDEFINED;// : IfcHumidifierExchangerEnum;
@@ -75,6 +80,7 @@ namespace GeometryGym.Ifc
 		internal IfcHumidifierType(DatabaseIfc m, string name, IfcHumidifierTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcHygroscopicMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
 	{
 		internal double mUpperVaporResistanceFactor = double.NaN, mLowerVaporResistanceFactor = double.NaN; //: OPTIONAL IfcPositiveRatioMeasure;

@@ -129,9 +129,9 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if(mPlacementRelTo > 0)
-				xml.AppendChild(PlacementRelTo.GetXML(xml.OwnerDocument, "PlacementRelTo", this, processed));
-			xml.AppendChild(mDatabase[mRelativePlacement].GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
+			if(mPlacementRelTo != null)
+				xml.AppendChild(mPlacementRelTo.GetXML(xml.OwnerDocument, "PlacementRelTo", this, processed));
+			xml.AppendChild(mDatabase[mRelativePlacement.Index].GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
 		}
 	}
 	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef

@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 			if (mSecondaryUnit > 0)
 				obj["SecondaryUnit"] = mDatabase[mSecondaryUnit].getJson(this, options);
 			setAttribute(obj, "Expression", Expression);
-			if (mAccessState != IfcStateEnum.NA)
+			if (mAccessState != IfcStateEnum.NOTDEFINED)
 				obj["AccessState"] = mAccessState.ToString();
 		}
 
@@ -374,6 +374,15 @@ namespace GeometryGym.Ifc
 
 			if (mAppliedCondition > 0)
 				obj["AppliedCondition"] = AppliedCondition.getJson(this, options);
+			JArray array = new JArray();
+			foreach(IfcRelConnectsStructuralMember connects in mConnectsStructuralMembers)
+			{
+				IfcStructuralMember member = connects.RelatingStructuralMember;
+				if(host == null || member.mIndex != host.mIndex)
+					array.Add(member.getJson(this, options));
+			}
+			if (array.Count > 0)
+				obj["ConnectsStructuralMembers"] = array;
 		}
 	}
 	public abstract partial class IfcStructuralConnectionCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcFailureConnectionCondition ,IfcSlippageConnectionCondition));
@@ -547,6 +556,19 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelConnectsStructuralMember rcsm in mDatabase.extractJArray<IfcRelConnectsStructuralMember>(obj.GetValue("ConnectedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				rcsm.RelatingStructuralMember = this;
 		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			JArray array = new JArray();
+			foreach (IfcRelConnectsStructuralMember connects in mConnectedBy)
+			{
+				IfcStructuralConnection connection = connects.RelatedStructuralConnection;
+				if (host == null || connection.mIndex != host.mIndex)
+					array.Add(connects.getJson(this, options));
+			}
+			if (array.Count > 0)
+				obj["ConnectedBy"] = array;
+		}
 	}
 	public partial class IfcStructuralPointConnection : IfcStructuralConnection
 	{
@@ -667,6 +689,21 @@ namespace GeometryGym.Ifc
 			obj["SweptArea"] = SweptArea.getJson(this, options);
 			if (mPosition > 0)
 				obj["Position"] = Position.getJson(this, options);
+		}
+	}
+	public partial class IfcSweptDiskSolid : IfcSolidModel
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Directrix"] = Directrix.getJson(this, options);
+			obj["Radius"] = Radius;
+			if (!double.IsNaN(mInnerRadius) && mInnerRadius < mDatabase.Tolerance)
+				obj["InnerRadius"] = InnerRadius;
+			if (!double.IsNaN(mStartParam))
+				obj["StartParam"] = InnerRadius;
+			if (!double.IsNaN(mEndParam))
+				obj["EndParam"] = InnerRadius;
 		}
 	}
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))

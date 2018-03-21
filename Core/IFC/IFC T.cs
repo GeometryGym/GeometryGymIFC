@@ -28,13 +28,14 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcTable : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect
+	[Serializable]
+	public partial class IfcTable : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, NamedObjectIfc
 	{
 		internal string mName = "$"; //:	OPTIONAL IfcLabel;
 		private List<int> mRows = new List<int>();// OPTIONAL LIST [1:?] OF IfcTableRow;
 		private List<int> mColumns = new List<int>();// :	OPTIONAL LIST [1:?] OF IfcTableColumn;
 
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
+		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
 		public ReadOnlyCollection<IfcTableRow> Rows { get { return new ReadOnlyCollection<IfcTableRow>( mRows.ConvertAll(x => mDatabase[x] as IfcTableRow)); } }
 		public ReadOnlyCollection<IfcTableColumn> Columns { get { return new ReadOnlyCollection<IfcTableColumn>( mColumns.ConvertAll(x => mDatabase[x] as IfcTableColumn)); } }
 
@@ -51,7 +52,8 @@ namespace GeometryGym.Ifc
 		internal void addRow(IfcTableRow row) { mRows.Add(row.mIndex);  }
 		internal void addColumn(IfcTableColumn column) { mColumns.Add(column.mIndex); }
 	}
-	public partial class IfcTableColumn : BaseClassIfc
+	[Serializable]
+	public partial class IfcTableColumn : BaseClassIfc, NamedObjectIfc 
 	{
 		internal string mIdentifier = "$";//	 :	OPTIONAL IfcIdentifier;
 		internal string mName = "$";//	 :	OPTIONAL IfcLabel;
@@ -60,7 +62,7 @@ namespace GeometryGym.Ifc
 		private int mReferencePath;//	 :	OPTIONAL IfcReference;
 
 		public string Identifier { get { return (mIdentifier == "$" ? "" : ParserIfc.Decode(mIdentifier)); } set { mIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
 		public IfcReference ReferencePath { get { return mDatabase[mReferencePath] as IfcReference; } set { mReferencePath = (value == null ? 0 : value.mIndex); } }
@@ -69,6 +71,7 @@ namespace GeometryGym.Ifc
 		public IfcTableColumn(DatabaseIfc db) : base(db) { }
 		internal IfcTableColumn(DatabaseIfc db, IfcTableColumn c) : base(db,c) { mIdentifier = c.mIdentifier; mName = c.mName; mDescription = c.mDescription; if(c.mUnit >0) Unit = db.Factory.Duplicate(c.mDatabase[ c.mUnit]) as IfcUnit; if(c.mReferencePath > 0) ReferencePath = db.Factory.Duplicate(c.ReferencePath) as IfcReference; }
 	}
+	[Serializable]
 	public partial class IfcTableRow : BaseClassIfc
 	{
 		internal List<IfcValue> mRowCells = new List<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
@@ -86,6 +89,7 @@ namespace GeometryGym.Ifc
 			mIsHeading = isHeading;
 		}
 	}
+	[Serializable]
 	public partial class IfcTank : IfcFlowStorageDevice //IFC4
 	{
 		internal IfcTankTypeEnum mPredefinedType = IfcTankTypeEnum.NOTDEFINED;// OPTIONAL : IfcTankTypeEnum;
@@ -95,6 +99,7 @@ namespace GeometryGym.Ifc
 		internal IfcTank(DatabaseIfc db, IfcTank t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcTank(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcTankType : IfcFlowStorageDeviceType
 	{
 		internal IfcTankTypeEnum mPredefinedType = IfcTankTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum; 
@@ -103,6 +108,7 @@ namespace GeometryGym.Ifc
 		internal IfcTankType() : base() { }
 		internal IfcTankType(DatabaseIfc db, IfcTankType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcTask : IfcProcess //SUPERTYPE OF (ONEOF(IfcMove,IfcOrderAction) both depreceated IFC4) 
 	{
 		//internal string mTaskId; //  : 	IfcIdentifier; IFC4 midentification
@@ -119,6 +125,7 @@ namespace GeometryGym.Ifc
 		internal IfcTask() : base() { }
 		internal IfcTask(DatabaseIfc db, IfcTask t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mStatus = t.mStatus; mWorkMethod = t.mWorkMethod; mIsMilestone = t.mIsMilestone; mPriority = t.mPriority; if(t.mTaskTime > 0) TaskTime = db.Factory.Duplicate(t.TaskTime) as IfcTaskTime; mPredefinedType = t.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcTaskTime : IfcSchedulingTime //IFC4
 	{
 		internal IfcTaskDurationEnum mDurationType = IfcTaskDurationEnum.NOTDEFINED;	// :	OPTIONAL IfcTaskDurationEnum;
@@ -160,6 +167,7 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcTaskTime(DatabaseIfc db) : base(db) { }
 	}
+	[Serializable]
 	public partial class IfcTaskType : IfcTypeProcess //IFC4
 	{
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : IfcTaskTypeEnum; 
@@ -172,6 +180,7 @@ namespace GeometryGym.Ifc
 		internal IfcTaskType(DatabaseIfc db, IfcTaskType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
 		internal IfcTaskType(DatabaseIfc m, string name, IfcTaskTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
+	[Serializable]
 	public partial class IfcTelecomAddress : IfcAddress
 	{
 		internal List<string> mTelephoneNumbers = new List<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
@@ -197,9 +206,10 @@ namespace GeometryGym.Ifc
 		public void AddElectronicMailAddress(string address) { if(!string.IsNullOrEmpty(address))  mElectronicMailAddresses.Add(ParserIfc.Encode(address)); }
 		public void AddMessagingID(string id) { if(!string.IsNullOrEmpty(id)) mMessagingIDs.Add(ParserIfc.Encode(id)); }
 	}
+	[Serializable]
 	public partial class IfcTendon : IfcReinforcingElement
 	{
-		internal IfcTendonTypeEnum mPredefinedType;// : IfcTendonTypeEnum;//
+		internal IfcTendonTypeEnum mPredefinedType = IfcTendonTypeEnum.NOTDEFINED;// : IfcTendonTypeEnum;//
 		internal double mNominalDiameter;// : IfcPositiveLengthMeasure;
 		internal double mCrossSectionArea;// : IfcAreaMeasure;
 		internal double mTensionForce;// : OPTIONAL IfcForceMeasure;
@@ -232,6 +242,7 @@ namespace GeometryGym.Ifc
 			mMinCurvatureRadius = minCurveRadius;
 		}
 	}
+	[Serializable]
 	public partial class IfcTendonAnchor : IfcReinforcingElement
 	{
 		internal IfcTendonAnchorTypeEnum mPredefinedType = IfcTendonAnchorTypeEnum.NOTDEFINED;// :	OPTIONAL IfcTendonAnchorTypeEnum;
@@ -242,6 +253,7 @@ namespace GeometryGym.Ifc
 		public IfcTendonAnchor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	//IfcTendonAnchorType
+	[Serializable]
 	public partial class IfcTendonType : IfcReinforcingElementType  //IFC4
 	{
 		internal IfcTendonTypeEnum mPredefinedType = IfcTendonTypeEnum.NOTDEFINED;// : IfcTendonType; //IFC4
@@ -272,12 +284,14 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcTerminatorSymbol : IfcAnnotationSymbolOccurrence // DEPRECEATED IFC4
 	{
 		internal int mAnnotatedCurve;// : IfcAnnotationCurveOccurrence; 
 		internal IfcTerminatorSymbol() : base() { }
 		//internal IfcTerminatorSymbol(IfcTerminatorSymbol i) : base(i) { mAnnotatedCurve = i.mAnnotatedCurve; }
 	}
+	[Serializable]
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
 	{
 		internal int mCoordinates;// : 	IfcCartesianPointList;
@@ -294,12 +308,14 @@ namespace GeometryGym.Ifc
 		protected IfcTessellatedFaceSet(DatabaseIfc db, IfcTessellatedFaceSet s) : base(db,s) { Coordinates = db.Factory.Duplicate( s.Coordinates) as IfcCartesianPointList; }
 		protected IfcTessellatedFaceSet(IfcCartesianPointList3D pl) : base(pl.mDatabase) { mCoordinates = pl.mIndex; }
 	}
+	[Serializable]
 	public abstract partial class IfcTessellatedItem : IfcGeometricRepresentationItem //IFC4
 	{
 		protected IfcTessellatedItem() : base() { }
 		protected IfcTessellatedItem(DatabaseIfc db, IfcTessellatedItem i) : base(db,i) { }
 		protected IfcTessellatedItem(DatabaseIfc db) : base(db) { }
 	}
+	[Serializable]
 	public partial class IfcTextLiteral : IfcGeometricRepresentationItem //SUPERTYPE OF	(IfcTextLiteralWithExtent)
 	{
 		internal string mLiteral;// : IfcPresentableText;
@@ -313,6 +329,7 @@ namespace GeometryGym.Ifc
 		internal IfcTextLiteral() : base() { }
 		internal IfcTextLiteral(DatabaseIfc db, IfcTextLiteral l) : base(db,l) { mLiteral = l.mLiteral; mPlacement = db.Factory.Duplicate(l.mDatabase[l.mPlacement]).mIndex; mPath = l.mPath; }
 	}
+	[Serializable]
 	public partial class IfcTextLiteralWithExtent : IfcTextLiteral
 	{
 		internal int mExtent;// : IfcPlanarExtent;
@@ -323,6 +340,7 @@ namespace GeometryGym.Ifc
 		internal IfcTextLiteralWithExtent() : base() { }
 		//internal IfcTextLiteralWithExtent(IfcTextLiteralWithExtent o) : base(o) { mExtent = o.mExtent; mBoxAlignment = o.mBoxAlignment; }
 	}
+	[Serializable]
 	public partial class IfcTextStyle : IfcPresentationStyle, IfcPresentationStyleSelect
 	{
 		internal int mTextCharacterAppearance;// : OPTIONAL IfcCharacterStyleSelect;
@@ -332,6 +350,7 @@ namespace GeometryGym.Ifc
 		internal IfcTextStyle() : base() { }
 	//	internal IfcTextStyle(IfcTextStyle v) : base(v) { mTextCharacterAppearance = v.mTextCharacterAppearance; mTextStyle = v.mTextStyle; mTextFontStyle = v.mTextFontStyle; mModelOrDraughting = v.mModelOrDraughting; }
 	}
+	[Serializable]
 	public partial class IfcTextStyleFontModel : IfcPreDefinedTextFont
 	{
 		internal List<string> mFontFamily = new List<string>(1);// : OPTIONAL LIST [1:?] OF IfcTextFontName;
@@ -349,6 +368,7 @@ namespace GeometryGym.Ifc
 			mFontSize = m.mFontSize;
 		}
 	}
+	[Serializable]
 	public partial class IfcTextStyleForDefinedFont : BaseClassIfc
 	{
 		internal int mColour;// : IfcColour;
@@ -356,6 +376,7 @@ namespace GeometryGym.Ifc
 		internal IfcTextStyleForDefinedFont() : base() { }
 	//	internal IfcTextStyleForDefinedFont(IfcTextStyleForDefinedFont o) : base() { mColour = o.mColour; mBackgroundColour = o.mBackgroundColour; }
 	}
+	[Serializable]
 	public partial class IfcTextStyleTextModel : IfcPresentationItem
 	{
 		//internal int mDiffuseTransmissionColour, mDiffuseReflectionColour, mTransmissionColour, mReflectanceColour;//	 :	IfcColourRgb;
@@ -364,6 +385,7 @@ namespace GeometryGym.Ifc
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcTextStyleWithBoxCharacteristics; // DEPRECEATED IFC4
+	[Serializable]
 	public abstract partial class IfcTextureCoordinate : IfcPresentationItem  //ABSTRACT SUPERTYPE OF(ONEOF(IfcIndexedTextureMap, IfcTextureCoordinateGenerator, IfcTextureMap))
 	{
 		internal List<int> mMaps = new List<int>();// : LIST [1:?] OF IfcSurfaceTexture
@@ -378,15 +400,17 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcTextureCoordinateGenerator
 	//ENTITY IfcTextureMap
 	//ENTITY IfcTextureVertex;
+	[Serializable]
 	public partial class IfcTextureVertexList : IfcPresentationItem
 	{
-		internal Tuple<double, double>[] mTexCoordsList = new Tuple<double, double>[0];// : LIST [1:?] OF IfcSurfaceTexture
+		internal double[][] mTexCoordsList = new double[0][];// : LIST [1:?] OF IfcSurfaceTexture
 
 		internal IfcTextureVertexList() : base() { }
 		internal IfcTextureVertexList(DatabaseIfc db, IfcTextureVertexList l) : base(db,l) { mTexCoordsList = l.mTexCoordsList; }
-		public IfcTextureVertexList(DatabaseIfc m, IEnumerable<Tuple<double, double>> coords) : base(m) { mTexCoordsList = coords.ToArray(); }
+		public IfcTextureVertexList(DatabaseIfc m, IEnumerable<Tuple<double, double>> coords) : base(m) { mTexCoordsList = coords.Select(x=>new double[] { x.Item1, x.Item2 }).ToArray(); }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcThermalMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
 	{
 		internal double mSpecificHeatCapacity = double.NaN;// : OPTIONAL IfcSpecificHeatCapacityMeasure;
@@ -397,6 +421,7 @@ namespace GeometryGym.Ifc
 		internal IfcThermalMaterialProperties(DatabaseIfc db, IfcThermalMaterialProperties p) : base(db,p) { mSpecificHeatCapacity = p.mSpecificHeatCapacity; mBoilingPoint = p.mBoilingPoint; mFreezingPoint = p.mFreezingPoint; mThermalConductivity = p.mThermalConductivity; }
 	}
 	public interface IfcTimeOrRatioSelect { } // IFC4 	IfcRatioMeasure, IfcDuration	
+	[Serializable]
 	public partial class IfcTimePeriod : BaseClassIfc // IFC4
 	{
 		internal string mStart; //:	IfcTime;
@@ -405,8 +430,9 @@ namespace GeometryGym.Ifc
 		internal IfcTimePeriod(IfcTimePeriod m) : base() { mStart = m.mStart; mFinish = m.mFinish; }
 		internal IfcTimePeriod(DatabaseIfc m, DateTime start, DateTime finish) : base(m) { mStart = IfcTime.convert(start); mFinish = IfcTime.convert(finish);}
 	}
-	public abstract partial class IfcTimeSeries : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcIrregularTimeSeries,IfcRegularTimeSeries));
-	{
+	[Serializable]
+	public abstract partial class IfcTimeSeries : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
+	{ // ABSTRACT SUPERTYPE OF (ONEOF(IfcIrregularTimeSeries,IfcRegularTimeSeries));
 		internal string mName = "$";// : OPTIONAL IfcLabel;		
 		internal string mDescription;// : OPTIONAL IfcText;
 		internal int mStartTime;// : IfcDateTimeSelect;
@@ -419,7 +445,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
@@ -446,12 +472,14 @@ namespace GeometryGym.Ifc
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcTimeSeriesSchedule // DEPRECEATED IFC4
 	//ENTITY IfcTimeSeriesValue;  
+	[Serializable]
 	public abstract partial class IfcTopologicalRepresentationItem : IfcRepresentationItem  /*(IfcConnectedFaceSet,IfcEdge,IfcFace,IfcFaceBound,IfcLoop,IfcPath,IfcVertex))*/
 	{
 		protected IfcTopologicalRepresentationItem() : base() { }
 		protected IfcTopologicalRepresentationItem(DatabaseIfc db) : base(db) { }
 		protected IfcTopologicalRepresentationItem(DatabaseIfc db, IfcTopologicalRepresentationItem i) : base(db,i) { }
 	}
+	[Serializable]
 	public partial class IfcTopologyRepresentation : IfcShapeModel
 	{
 		internal IfcTopologyRepresentation() : base() { }
@@ -477,6 +505,7 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 	}
+	[Serializable]
 	public partial class IfcToroidalSurface : IfcElementarySurface //IFC4.2
 	{
 		internal double mMajorRadius;// : IfcPositiveLengthMeasure; 
@@ -485,7 +514,9 @@ namespace GeometryGym.Ifc
 		public double MinorRadius { get { return mMinorRadius; } set { mMinorRadius = value; } }
 		internal IfcToroidalSurface() : base() { }
 		internal IfcToroidalSurface(DatabaseIfc db, IfcToroidalSurface s) : base(db, s) { mMajorRadius = s.mMajorRadius; mMinorRadius = s.mMinorRadius; }
+		public IfcToroidalSurface(IfcAxis2Placement3D placement, double majorRadius, double minorRadius) : base(placement) { MajorRadius = majorRadius; MinorRadius = minorRadius; }
 	}
+	[Serializable]
 	public partial class IfcTransformer : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcTransformerTypeEnum mPredefinedType = IfcTransformerTypeEnum.NOTDEFINED;// OPTIONAL : IfcTransformerTypeEnum;
@@ -495,6 +526,7 @@ namespace GeometryGym.Ifc
 		internal IfcTransformer(DatabaseIfc db, IfcTransformer t, IfcOwnerHistory ownerHistory, bool downStream) : base(db,t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransformer(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcTransformerType : IfcEnergyConversionDeviceType
 	{
 		internal IfcTransformerTypeEnum mPredefinedType = IfcTransformerTypeEnum.NOTDEFINED;// : IfcTransformerEnum; 
@@ -504,6 +536,7 @@ namespace GeometryGym.Ifc
 		internal IfcTransformerType(DatabaseIfc db, IfcTransformerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
+	[Serializable]
 	public partial class IfcTranslationalStiffnessSelect
 	{
 		internal bool mRigid = false;
@@ -516,6 +549,7 @@ namespace GeometryGym.Ifc
 		public IfcTranslationalStiffnessSelect(double stiff) { mStiffness = new IfcLinearStiffnessMeasure(stiff); }
 		public IfcTranslationalStiffnessSelect(IfcLinearStiffnessMeasure stiff) { mStiffness = stiff; }
 	}
+	[Serializable]
 	public partial class IfcTransportElement : IfcElement
 	{
 		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcTransportElementTypeEnum;
@@ -530,15 +564,17 @@ namespace GeometryGym.Ifc
 		internal IfcTransportElement(DatabaseIfc db, IfcTransportElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcTransportElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcTransportElementType : IfcElementType
 	{
-		internal IfcTransportElementTypeEnum mPredefinedType;// IfcTransportElementTypeEnum; 
+		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// IfcTransportElementTypeEnum; 
 		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransportElementType() : base() { }
 		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
+	[Serializable]
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef
 	{
 		internal double mBottomXDim;// : IfcPositiveLengthMeasure;
@@ -557,15 +593,16 @@ namespace GeometryGym.Ifc
 			mTopXOffset = topXOffset;
 		}
 	}
+	[Serializable]
 	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
 	{
-		internal Tuple<double, double, double>[] mNormals = new Tuple<double, double, double>[0];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
+		internal double[][] mNormals = new double[0][];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
 		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
 		internal Tuple<int, int, int>[] mCoordIndex = new Tuple<int, int, int>[0];// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
 		internal Tuple<int, int, int>[] mNormalIndex = new Tuple<int, int, int>[0];// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
 		internal List<int> mPnIndex = new List<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
-		public ReadOnlyCollection< Tuple<double, double,double>> Normals { get { return new ReadOnlyCollection<Tuple<double, double, double>>( mNormals); } }
+		public double[][] Normals { get { return mNormals; } set { mNormals = value; } }
 		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public ReadOnlyCollection<Tuple<int, int, int>> CoordIndex { get { return new ReadOnlyCollection<Tuple<int, int, int>>(mCoordIndex); } }
 		public ReadOnlyCollection<Tuple<int, int, int>> NormalIndex { get { return new ReadOnlyCollection<Tuple<int, int, int>>( mNormalIndex); } }
@@ -586,6 +623,7 @@ namespace GeometryGym.Ifc
 
 		internal void setCoordIndex(IEnumerable<Tuple<int,int,int>> coords) { mCoordIndex = coords.ToArray(); }
 	}
+	[Serializable]
 	public partial class IfcTrimmedCurve : IfcBoundedCurve
 	{
 		private int mBasisCurve;//: IfcCurve;
@@ -614,9 +652,9 @@ namespace GeometryGym.Ifc
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
 		public IfcTrimmedCurve(IfcConic basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp) 
-			: this(basis.Database, start,end, senseAgreement,tp) { BasisCurve = basis; }
+			: this(basis.mDatabase, start,end, senseAgreement,tp) { BasisCurve = basis; }
 		public IfcTrimmedCurve(IfcLine basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
-			: this(basis.Database, start, end, senseAgreement, tp) { BasisCurve = basis; }
+			: this(basis.mDatabase, start, end, senseAgreement, tp) { BasisCurve = basis; }
 		//public IfcTrimmedCurve(IfcClothoid basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
 		//	: this(basis.Database, start, end, senseAgreement, tp) { BasisCurve = basis; }
 		private IfcTrimmedCurve(DatabaseIfc db, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp) : base(db)
@@ -628,18 +666,18 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcTrimmedCurve(IfcCartesianPoint start, Tuple<double, double> arcInteriorPoint, IfcCartesianPoint end) : base(start.mDatabase)
 		{
-			Tuple<double, double, double> pt1 = start.Coordinates, pt3 = end.Coordinates;
-			DatabaseIfc db = start.Database;
-			double xDelta_a = arcInteriorPoint.Item1 - pt1.Item1;
-			double yDelta_a = arcInteriorPoint.Item2 - pt1.Item2;
-			double xDelta_b = pt3.Item1 - arcInteriorPoint.Item1;
-			double yDelta_b = pt3.Item2 - arcInteriorPoint.Item2;
+			LIST<double> pt1 = start.Coordinates, pt3 = end.Coordinates;
+			DatabaseIfc db = start.mDatabase;
+			double xDelta_a = arcInteriorPoint.Item1 - pt1[0];
+			double yDelta_a = arcInteriorPoint.Item2 - pt1[1];
+			double xDelta_b = pt3[0] - arcInteriorPoint.Item1;
+			double yDelta_b = pt3[1] - arcInteriorPoint.Item2;
 			double x = 0, y = 0;
 			double tol = 1e-9;
 			if (Math.Abs(xDelta_a) < tol && Math.Abs(yDelta_b) < tol)
 			{
-				x = (arcInteriorPoint.Item1 + pt3.Item1) / 2;
-				y = (pt1.Item2 + arcInteriorPoint.Item2) / 2;
+				x = (arcInteriorPoint.Item1 + pt3[0]) / 2;
+				y = (pt1[1] + arcInteriorPoint.Item2) / 2;
 			}
 			else
 			{
@@ -656,22 +694,23 @@ namespace GeometryGym.Ifc
 				}
 
 				// calc center
-				x = (aSlope * bSlope * (pt1.Item2 - pt3.Item2) + bSlope * (pt1.Item1 + arcInteriorPoint.Item1)
-					- aSlope * (arcInteriorPoint.Item1 + pt3.Item1)) / (2 * (bSlope - aSlope));
-				y = -1 * (x - (pt1.Item1 + arcInteriorPoint.Item1) / 2) / aSlope + (pt1.Item2 + arcInteriorPoint.Item2) / 2;
+				x = (aSlope * bSlope * (pt1[0] - pt3[1]) + bSlope * (pt1[0] + arcInteriorPoint.Item1)
+					- aSlope * (arcInteriorPoint.Item1 + pt3[0])) / (2 * (bSlope - aSlope));
+				y = -1 * (x - (pt1[0] + arcInteriorPoint.Item1) / 2) / aSlope + (pt1[1] + arcInteriorPoint.Item2) / 2;
 			}
 
-			double radius = Math.Sqrt(Math.Pow(pt1.Item1 - x, 2) + Math.Pow(pt1.Item2 - y, 2));
-			BasisCurve = new IfcCircle(new IfcAxis2Placement2D(new IfcCartesianPoint(db, x, y)) { RefDirection = new IfcDirection(db, pt1.Item1-x, pt1.Item2-y) }, radius);
+			double radius = Math.Sqrt(Math.Pow(pt1[0] - x, 2) + Math.Pow(pt1[1] - y, 2));
+			BasisCurve = new IfcCircle(new IfcAxis2Placement2D(new IfcCartesianPoint(db, x, y)) { RefDirection = new IfcDirection(db, pt1[0]-x, pt1[1]-y) }, radius);
 			mTrim1 = new IfcTrimmingSelect(0,start);
-			mSenseAgreement = (((arcInteriorPoint.Item1 - pt1.Item1) * (pt3.Item2 - arcInteriorPoint.Item2)) - ((arcInteriorPoint.Item2 - pt1.Item2) * (pt3.Item1 - arcInteriorPoint.Item1))) > 0;
-			double t3 = Math.Atan2(pt3.Item2 - y, pt3.Item1 - x), t1 = Math.Atan2(pt1.Item2 - y, pt1.Item1 - x);
+			mSenseAgreement = (((arcInteriorPoint.Item1 - pt1[0]) * (pt3[1] - arcInteriorPoint.Item2)) - ((arcInteriorPoint.Item2 - pt1[1]) * (pt3[0] - arcInteriorPoint.Item1))) > 0;
+			double t3 = Math.Atan2(pt3[1] - y, pt3[0] - x), t1 = Math.Atan2(pt1[1] - y, pt1[0] - x);
 			if (t3 < 0)
 				t3 = 2 * Math.PI + t3;
-			mTrim2 = new IfcTrimmingSelect((t3 - t1 ) / db.mContext.UnitsInContext.getScaleSI(IfcUnitEnum.PLANEANGLEUNIT), end );
+			mTrim2 = new IfcTrimmingSelect((t3 - t1 ) / db.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT), end );
 			mMasterRepresentation = IfcTrimmingPreference.PARAMETER;
 		}	
 	}
+	[Serializable]
 	public partial class IfcTrimmingSelect
 	{
 		public IfcTrimmingSelect() { }
@@ -688,6 +727,7 @@ namespace GeometryGym.Ifc
 		internal int mIfcCartesianPoint;
 		public int IfcCartesianPoint { get { return mIfcCartesianPoint; } }
 	}
+	[Serializable]
 	public partial class IfcTShapeProfileDef : IfcParameterizedProfileDef
 	{
 		internal double mDepth, mFlangeWidth, mWebThickness, mFlangeThickness;// : IfcPositiveLengthMeasure;
@@ -727,6 +767,7 @@ namespace GeometryGym.Ifc
 			mFlangeThickness = flangeThickness;
 		}
 	}
+	[Serializable]
 	public partial class IfcTubeBundle : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcTubeBundleTypeEnum mPredefinedType = IfcTubeBundleTypeEnum.NOTDEFINED;// OPTIONAL : IfcTubeBundleTypeEnum;
@@ -736,6 +777,7 @@ namespace GeometryGym.Ifc
 		internal IfcTubeBundle(DatabaseIfc db, IfcTubeBundle b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream) { mPredefinedType = b.mPredefinedType; }
 		public IfcTubeBundle(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcTubeBundleType : IfcEnergyConversionDeviceType
 	{
 		internal IfcTubeBundleTypeEnum mPredefinedType = IfcTubeBundleTypeEnum.NOTDEFINED;// : IfcTubeBundleEnum; 
@@ -746,6 +788,7 @@ namespace GeometryGym.Ifc
 		internal IfcTubeBundleType(DatabaseIfc m, string name, IfcTubeBundleTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcTwoDirectionRepeatFactor : IfcOneDirectionRepeatFactor // DEPRECEATED IFC4
 	{
 		internal int mSecondRepeatFactor;//  : IfcVector 
@@ -754,33 +797,68 @@ namespace GeometryGym.Ifc
 		internal IfcTwoDirectionRepeatFactor() : base() { }
 		internal IfcTwoDirectionRepeatFactor(DatabaseIfc db, IfcTwoDirectionRepeatFactor f) : base(db,f) { SecondRepeatFactor = db.Factory.Duplicate(f.SecondRepeatFactor) as IfcVector; }
 	}
+	[Serializable]
 	public partial class IfcTypeObject : IfcObjectDefinition //(IfcTypeProcess, IfcTypeProduct, IfcTypeResource) IFC4 ABSTRACT 
 	{
 		internal string mApplicableOccurrence = "$";// : OPTIONAL IfcLabel;
-		internal List<int> mHasPropertySets = new List<int>();// : OPTIONAL SET [1:?] OF IfcPropertySetDefinition 
+		internal SET<IfcPropertySetDefinition> mHasPropertySets = new SET<IfcPropertySetDefinition>();// : OPTIONAL SET [1:?] OF IfcPropertySetDefinition 
 		//INVERSE 
 		internal IfcRelDefinesByType mObjectTypeOf = null;
 
 		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } set { mApplicableOccurrence = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcPropertySetDefinition> HasPropertySets { get { return new ReadOnlyCollection<IfcPropertySetDefinition>(mHasPropertySets.ConvertAll(x => mDatabase[x] as IfcPropertySetDefinition)); } }
+		public SET<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets; } set { mHasPropertySets.Clear(); if (value != null) { mHasPropertySets.CollectionChanged -= mHasPropertySets_CollectionChanged; mHasPropertySets = value; mHasPropertySets.CollectionChanged += mHasPropertySets_CollectionChanged; } } }
 		public IfcRelDefinesByType ObjectTypeOf { get { return mObjectTypeOf; } }
 		//GeomGym
 		internal IfcMaterialProfileSet mTapering = null;
 
-		public override string Name { set { base.Name = string.IsNullOrEmpty( value) ? "NameNotAssigned" : value; } }
+		public new string Name { get { return base.Name; } set { base.Name = string.IsNullOrEmpty( value) ? "NameNotAssigned" : value; } }
 
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
 		protected IfcTypeObject(IfcTypeObject basis) : base(basis) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
-		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mApplicableOccurrence = t.mApplicableOccurrence; t.HasPropertySets.ToList().ForEach(x=>AddPropertySet(db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
+		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
 		internal IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
-		
-		public void AddPropertySet(IfcPropertySetDefinition psd) { mHasPropertySets.Add(psd.mIndex); psd.mDefinesType.Add(this); }
+
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasPropertySets.CollectionChanged += mHasPropertySets_CollectionChanged;
+		}
+		private void mHasPropertySets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcPropertySetDefinition s in e.NewItems)
+				{
+					if (!s.mDefinesType.Contains(this))
+						s.mDefinesType.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcPropertySetDefinition s in e.OldItems)
+					s.mDefinesType.Remove(this);
+			}
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
 			foreach (IfcPropertySetDefinition psd in HasPropertySets)
 				result.AddRange(psd.Extract<T>());
 			return result;
+		}
+		public override IfcProperty FindProperty(string name)
+		{
+			foreach (IfcPropertySet pset in HasPropertySets.OfType<IfcPropertySet>())
+			{
+				if(pset != null)
+				{
+					IfcProperty property = pset[name];
+					if (property != null)
+						return property;
+				}
+			}
+			return null;
 		}
 		internal override IfcPropertySetDefinition findPropertySet(string name)
 		{
@@ -790,6 +868,14 @@ namespace GeometryGym.Ifc
 					return pset;
 			}
 			return null;
+		}
+		public IfcProfileProperties ProfileProperties
+		{
+			get
+			{
+				IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
+				return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
+			}
 		}
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference r)
 		{
@@ -802,7 +888,7 @@ namespace GeometryGym.Ifc
 			if (string.Compare(r.mAttributeIdentifier, "HasPropertySets", true) == 0)
 			{
 
-				ReadOnlyCollection<IfcPropertySetDefinition> psets = HasPropertySets;
+				SET<IfcPropertySetDefinition> psets = HasPropertySets;
 				if (r.mListPositions.Count == 0)
 				{
 					string name = r.InstanceName;
@@ -858,6 +944,7 @@ namespace GeometryGym.Ifc
 			db.WriteFile(filename);
 		}
 	}
+	[Serializable]
 	public abstract partial class IfcTypeProcess : IfcTypeObject //ABSTRACT SUPERTYPE OF(ONEOF(IfcEventType, IfcProcedureType, IfcTaskType))
 	{
 		private string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
@@ -872,16 +959,17 @@ namespace GeometryGym.Ifc
 		protected IfcTypeProcess(DatabaseIfc db, IfcTypeProcess t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mProcessType = t.mProcessType; }
 		protected IfcTypeProcess(DatabaseIfc db) : base(db) { }
 	}
+	[Serializable]
 	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
 	{ 
-		internal List<int> mRepresentationMaps = new List<int>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcRepresentationMap;
+		internal LIST<IfcRepresentationMap> mRepresentationMaps = new LIST<IfcRepresentationMap>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcRepresentationMap;
 		private string mTag = "$";// : OPTIONAL IfcLabel 
 		//INVERSE
-		internal List<IfcRelAssignsToProduct> mReferencedBy = new List<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
+		internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
 		
-		public ReadOnlyCollection<IfcRepresentationMap> RepresentationMaps { get { return new ReadOnlyCollection<IfcRepresentationMap>(mRepresentationMaps.ConvertAll(x => mDatabase[x] as IfcRepresentationMap)); } }
+		public LIST<IfcRepresentationMap> RepresentationMaps { get { return mRepresentationMaps; } set { mRepresentationMaps.Clear(); if (value != null) { mRepresentationMaps.CollectionChanged -= mRepresentationMaps_CollectionChanged; mRepresentationMaps = value; mRepresentationMaps.CollectionChanged += mRepresentationMaps_CollectionChanged; } } }
 		public string Tag { get { return (mTag == "$" ? "" : mTag); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : value); } }
-		public ReadOnlyCollection<IfcRelAssignsToProduct> ReferencedBy { get { return new ReadOnlyCollection<IfcRelAssignsToProduct>(mReferencedBy); } }
+		public SET<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
 
 		protected IfcTypeProduct() : base() { }
 		protected IfcTypeProduct(IfcTypeProduct basis) : base(basis)
@@ -889,23 +977,57 @@ namespace GeometryGym.Ifc
 			mRepresentationMaps = basis.mRepresentationMaps;
 			mTag = basis.mTag;
 		}
-		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { t.RepresentationMaps.ToList().ForEach(x=>AddRepresentationMap( db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
+		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
 		protected IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 
-		public void Assign(IfcRelAssignsToProduct assigns) { mReferencedBy.Add(assigns); }
-		public void Remove(IfcRelAssignsToProduct assigns) { mReferencedBy.Remove(assigns); }
-		public void AddRepresentationMap(IfcRepresentationMap representationMap)
+		protected override void initialize()
 		{
-			mRepresentationMaps.Add(representationMap.mIndex);
-			representationMap.mRepresents.Add(this);
+			base.initialize();
+
+			mRepresentationMaps.CollectionChanged += mRepresentationMaps_CollectionChanged;
+			mReferencedBy.CollectionChanged += mReferencedBy_CollectionChanged;
 		}
+		private void mRepresentationMaps_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRepresentationMap m in e.NewItems)
+				{
+					if (!m.mRepresents.Contains(this))
+						m.mRepresents.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRepresentationMap m in e.OldItems)
+					m.mRepresents.Remove(this);
+			}
+		}
+		private void mReferencedBy_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRelAssignsToProduct r in e.NewItems)
+				{
+					if (r.RelatingProduct != this)
+						r.RelatingProduct = this;
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRelAssignsToProduct r in e.OldItems)
+				{
+					if (r.RelatingProduct == this)
+						r.RelatingProduct = null;
+				}
+			}
+		}
+		
 		internal override void changeSchema(ReleaseVersion schema)
 		{
-			ReadOnlyCollection<IfcRepresentationMap> repMaps = RepresentationMaps;
-			foreach(IfcRepresentationMap repMap in repMaps)
+			foreach(IfcRepresentationMap repMap in RepresentationMaps)
 				repMap.changeSchema(schema);
-			ReadOnlyCollection<IfcPropertySetDefinition> psets = HasPropertySets;
-			foreach(IfcPropertySetDefinition pset in psets)
+			foreach(IfcPropertySetDefinition pset in HasPropertySets)
 				pset.changeSchema(schema);
 			base.changeSchema(schema);
 		}
@@ -918,7 +1040,7 @@ namespace GeometryGym.Ifc
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
 			IfcElement element = IfcElement.ConstructElement(typename, container, null, pds);
 			element.RelatingType = this;
-			foreach (IfcRelNests nests in mIsNestedBy)
+			foreach (IfcRelNests nests in IsNestedBy)
 			{
 				foreach (IfcObjectDefinition od in nests.RelatedObjects)
 				{
@@ -935,8 +1057,7 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-			ReadOnlyCollection<IfcPropertySetDefinition> psets = HasPropertySets;
-			foreach(IfcPropertySetDefinition pset in psets)
+			foreach(IfcPropertySetDefinition pset in HasPropertySets)
 			{
 				if (pset.IsInstancePropertySet)
 					pset.AssignObjectDefinition(element);
@@ -1014,6 +1135,7 @@ null, new[] { typeof(DatabaseIfc), typeof(string), enumType }, null);
 			return result;
 		}
 	}
+	[Serializable]
 	public abstract partial class IfcTypeResource : IfcTypeObject //ABSTRACT SUPERTYPE OF(IfcConstructionResourceType)
 	{
 		internal string mIdentification = "$";// :	OPTIONAL IfcIdentifier;

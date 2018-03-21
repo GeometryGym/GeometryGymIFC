@@ -25,7 +25,53 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+using Newtonsoft.Json.Linq;
+
 namespace GeometryGym.Ifc
 {
-	
+	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
+	{
+		//internal double mDepth;// : IfcPositiveLengthMeasure;
+		//internal double mFlangeWidth;// : IfcPositiveLengthMeasure;
+		//internal double mWebThickness;// : IfcPositiveLengthMeasure;
+		//internal double mFlangeThickness;// : IfcPositiveLengthMeasure;
+		//internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		//internal double mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
+
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mDepth);
+			token = obj.GetValue("FlangeWidth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFlangeWidth);
+			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mWebThickness);
+			token = obj.GetValue("FlangeThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFlangeThickness);
+			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFilletRadius);
+			token = obj.GetValue("EdgeRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mEdgeRadius);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			int digits = mDatabase.mLengthDigits;
+			base.setJSON(obj, host, options);
+			obj["Depth"] = Math.Round(mDepth, digits);
+			obj["FlangeWidth"] = Math.Round(mFlangeWidth, digits);
+			obj["WebThickness"] = Math.Round(mWebThickness, digits);
+			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
+			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
+				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+			if (!double.IsNaN(mEdgeRadius) && mEdgeRadius > 0)
+				obj["FlangeEdgeRadius"] = Math.Round(mEdgeRadius, digits);
+		}
+	}
 }

@@ -68,9 +68,9 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("CoordinateSpaceDimension", mCoordinateSpaceDimension.ToString());
 				if (!double.IsNaN(mPrecision))
 					xml.SetAttribute("Precision", mPrecision.ToString());
-				if (mWorldCoordinateSystem > 0)
-					xml.AppendChild(mDatabase[mWorldCoordinateSystem].GetXML(xml.OwnerDocument, "WorldCoordinateSystem", this, processed));
-				if (mTrueNorth > 0)
+				if (mWorldCoordinateSystem != null)
+					xml.AppendChild(mDatabase[mWorldCoordinateSystem.Index].GetXML(xml.OwnerDocument, "WorldCoordinateSystem", this, processed));
+				if (mTrueNorth != null)
 					xml.AppendChild(TrueNorth.GetXML(xml.OwnerDocument, "TrueNorth", this, processed));
 			}
 			if (mHasSubContexts.Count > 0)
@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcGeometricSetSelect e = mDatabase.ParseXml<IfcGeometricSetSelect>(cn as XmlElement);
 						if (e != null)
-							addElement(e);
+							mElements.Add(e);
 					}
 				}
 			}
@@ -136,8 +136,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Elements");
 			xml.AppendChild(element);
-			foreach (int i in mElements)
-				element.AppendChild(mDatabase[i].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (IfcGeometricSetSelect el in mElements)
+				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcGrid : IfcProduct
@@ -150,11 +150,11 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "UAxes") == 0)
-					extractAxes(child).ForEach(x=>AddUAxis(x));
+					extractAxes(child).ForEach(x=>UAxes.Add(x));
 				else if (string.Compare(name, "VAxes") == 0)
-					extractAxes(child).ForEach(x=>AddVAxis(x));
+					extractAxes(child).ForEach(x=>VAxes.Add(x));
 				else if (string.Compare(name, "WAxes") == 0)
-					extractAxes(child).ForEach(x=>AddWAxis(x));
+					extractAxes(child).ForEach(x=>WAxes.Add(x));
 			}
 		}
 		internal List<IfcGridAxis> extractAxes(XmlNode node)

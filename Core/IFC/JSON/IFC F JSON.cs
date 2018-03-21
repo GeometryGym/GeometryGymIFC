@@ -25,7 +25,40 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+using Newtonsoft.Json.Linq;
+
 namespace GeometryGym.Ifc
 {
-	
+	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			mDatabase.extractJArray<IfcFaceBound>(obj.GetValue("Bounds", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addBound(x));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Bounds"] = new JArray(mBounds.ConvertAll(x => mDatabase[x].getJson(this, options)));
+		}
+	}
+	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Bound", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Bound = extractObject<IfcLoop>(jobj);
+			JToken token = obj.GetValue("Orientation", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Orientation = token.Value<bool>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Bound"] = Bound.getJson(this, options);
+			obj["Orientation"] = Orientation;
+		}
+	}
 }

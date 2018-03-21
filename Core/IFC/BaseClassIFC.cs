@@ -17,6 +17,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
@@ -28,21 +29,30 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable()]
 	public abstract partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
 		internal string mGlobalId = ""; // :	IfcGloballyUniqueId;
-		public virtual string Name { get { return ""; } set { } }
-		internal DatabaseIfc mDatabase = null;
 
-		public DatabaseIfc Database { get { return mDatabase; } }
+		[NonSerialized] internal DatabaseIfc mDatabase = null;
 
-		public BaseClassIfc() : base() { }
-		protected BaseClassIfc(BaseClassIfc basis)
+		public DatabaseIfc Database { get { return mDatabase; } private set { mDatabase = value; } }
+
+#if (NOIFCJSON)
+		public BaseClassIfc() : this(new DatabaseIfc(ModelView.Ifc4NotAssigned)) { }
+#else
+		public BaseClassIfc() : this(new DatabaseIfc(ModelView.Ifc4NotAssigned) { Format = FormatIfcSerialization.JSON }) { }
+#endif
+		protected BaseClassIfc(BaseClassIfc basis) : base()
 		{
 			basis.ReplaceDatabase(this);
 		}
-		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) { mGlobalId = e.mGlobalId; db.appendObject(this); db.Factory.mDuplicateMapping.Add(e.mIndex, mIndex);  }
-		protected BaseClassIfc(DatabaseIfc db) { if(db != null) db.appendObject(this); }
+		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base() { mGlobalId = e.mGlobalId; db.appendObject(this); db.Factory.mDuplicateMapping.AddObject(e, mIndex);  }
+		protected BaseClassIfc(DatabaseIfc db) : base()
+		{
+			if(db != null)
+				db.appendObject(this);
+		}
 
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
 		internal virtual void postParseRelate() { }
@@ -54,6 +64,20 @@ namespace GeometryGym.Ifc
 			if (this is T)
 				result.Add((T)(IBaseClassIfc)this);
 			return result;
+		}
+
+		public override string ToString()
+		{
+#if (!NOIFCJSON)
+			if (mDatabase == null || mDatabase.Format == FormatIfcSerialization.JSON)
+				return getJson(null, new BaseClassIfc.SetJsonOptions()).ToString();
+#endif
+			if(mDatabase != null)
+			{
+				if (mDatabase.Format == FormatIfcSerialization.XML)
+					return GetXML(new System.Xml.XmlDocument(), "", null, new Dictionary<int, System.Xml.XmlElement>()).OuterXml;
+			}
+			return base.ToString();
 		}
 
 		internal virtual void changeSchema(ReleaseVersion schema) { }
@@ -72,39 +96,99 @@ namespace GeometryGym.Ifc
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 
-
-		internal static BaseClassIfc LineParser(string keyword, string str, ReleaseVersion release)
+		public static BaseClassIfc Construct(string className)
 		{
 			ConstructorInfo constructor = null;
-			if (!mConstructors.TryGetValue(keyword, out constructor))
+			if (!mConstructors.TryGetValue(className, out constructor))
 			{
 				Type type = null;
-				if (!mTypes.TryGetValue(keyword, out type))
+				if (!mTypes.TryGetValue(className, out type))
 				{
-					type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+					type = Type.GetType("GeometryGym.Ifc." + className, false, true);
 					if (type != null)
-						mTypes.TryAdd(keyword, type);
+						mTypes.TryAdd(className, type);
 				}
 				if (type == null)
 					return null;
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				if (constructor == null)
 				{
-					if (string.Compare(keyword, "IfcParameterizedProfileDef", true) == 0)
-						return LineParser("IfcProfileDef", str, release);
+					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
+						return Construct("IfcProfileDef");
 				}
-				mConstructors.TryAdd(keyword, constructor);
+				mConstructors.TryAdd(className, constructor);
 			}
-			BaseClassIfc result = constructor.Invoke(new object[] { }) as BaseClassIfc;
+			return constructor.Invoke(new object[] { }) as BaseClassIfc;
+		}
+		internal static BaseClassIfc LineParser(string className, string str, ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			BaseClassIfc result = Construct(className);	
 			if(result == null)
 				return null;
 			int pos = 0;
-			result.parse(str, ref pos, release, str.Length);
+			result.parse(str, ref pos, release, str.Length, dictionary);
 			return result;
 		}
 
 		internal virtual bool isDuplicate(BaseClassIfc e) { return true; }
-	}
-	public interface IBaseClassIfc { int Index { get; } string Name { get; set; } DatabaseIfc Database { get; } }
 
+		internal class RepositoryAttributes
+		{
+			internal DateTime Created { get; set; } = DateTime.MinValue;
+			internal DateTime Modified { get; set; } = DateTime.MinValue;
+
+			internal RepositoryAttributes() { }
+			internal RepositoryAttributes(DateTime created, DateTime modified) { Created = created; Modified = modified; }
+		}
+
+		internal void setFolderAttributes(string folderPath)
+		{
+			IfcRoot root = this as IfcRoot;
+			IfcOwnerHistory ownerHistory = (root == null ? null : root.OwnerHistory);
+			if (ownerHistory == null)
+				return;
+			setFolderAttributes(folderPath, new RepositoryAttributes(ownerHistory.CreationDate, ownerHistory.LastModifiedDate));
+		}
+		internal void setFolderAttributes(string folderPath, RepositoryAttributes attributes)
+		{
+			try
+			{
+				DateTime created = attributes.Created, modified = attributes.Modified;
+				if (created != DateTime.MinValue && created < Directory.GetCreationTime(folderPath))
+				{
+					Directory.SetCreationTime(folderPath, created);
+					Directory.SetLastWriteTime(folderPath, created);
+				}
+				if (modified != DateTime.MinValue && modified > Directory.GetLastWriteTime(folderPath))
+					Directory.SetLastWriteTime(folderPath, modified);
+			}
+			catch (Exception) { }
+		}
+
+		internal void setFileAttributes(string filePath)
+		{
+			IfcRoot root = this as IfcRoot;
+			IfcOwnerHistory ownerHistory = (root == null ? null : root.OwnerHistory);
+			if (ownerHistory == null)
+				return;
+			setFileAttributes(filePath, new RepositoryAttributes(ownerHistory.CreationDate, ownerHistory.LastModifiedDate));
+		}
+		internal void setFileAttributes(string filePath, RepositoryAttributes attributes)
+		{
+			try
+			{
+				DateTime created = attributes.Created, modified = attributes.Modified;
+				if (created != DateTime.MinValue && created < File.GetCreationTime(filePath))
+				{
+					File.SetCreationTime(filePath, created);
+					File.SetLastWriteTime(filePath, created);
+				}
+				if (modified != DateTime.MinValue && modified > File.GetLastWriteTime(filePath))
+					File.SetLastWriteTime(filePath, modified);
+			}
+			catch (Exception) { }
+		}
+	}
+	public partial interface IBaseClassIfc { int Index { get; }  DatabaseIfc Database { get; } }
+	public interface NamedObjectIfc : IBaseClassIfc { string Name { get; } } // GG interface
 }

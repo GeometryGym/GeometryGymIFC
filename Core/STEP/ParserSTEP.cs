@@ -38,9 +38,14 @@ namespace GeometryGym.STEP
 
 		internal static void GetKeyWord(string line, out int indexID, out string keyword, out string def)
 		{
+			indexID = 0;
 			keyword = "";
 			def = "";
-			indexID = 0;
+			if (string.IsNullOrEmpty(line))
+				return;
+			string upper = line.ToUpper();
+			if (line.Length < 5)
+				return;
 			if (string.IsNullOrEmpty(line))
 				return;
 			string strLine = line.Trim();
@@ -132,7 +137,7 @@ namespace GeometryGym.STEP
 
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
 		public static string DoubleToString(double d) { return String.Format("{0:0.0################}", d); }
-		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) ? "$" : String.Format("{0:0.0################}", i)); }
+		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) || double.IsInfinity(i) ? "$" : String.Format("{0:0.0################}", i)); }
 		public static string IntToString(int i)
 		{
 			if (i == 0)
@@ -152,6 +157,7 @@ namespace GeometryGym.STEP
 			else
 				return "#" + link;
 		}
+		public static string ObjToLinkString(STEPEntity obj) { return obj == null ? "$" : "#" + obj.mIndex; }
 		public static string ListLinksToString(List<int> links)
 		{
 			if (links.Count == 0)
@@ -433,11 +439,11 @@ namespace GeometryGym.STEP
 			}
 			return result;
 		}
-		public static Tuple<double, double>[] SplitListDoubleTuple(string s)
+		public static double[][] SplitListDoubleTuple(string s)
 		{
-			List<Tuple<double, double>> tss = new List<Tuple<double, double>>(100);
+			List<double[]> tss = new List<double[]>(100);
 			if (s == "$")
-				return new Tuple<double, double>[0];
+				return new double[0][];
 			string field = "";
 			int ilast = s.Length;
 			int icounter = 0;
@@ -451,7 +457,7 @@ namespace GeometryGym.STEP
 
 			char c = s[icounter];
 			if (c != '(')
-				return new Tuple<double, double>[0];
+				return new double[0][];
 			for (icounter++; icounter < ilast; icounter++)
 			{
 				c = s[icounter];
@@ -477,7 +483,7 @@ namespace GeometryGym.STEP
 							j = double.Parse(field, NumberFormat);
 							field = "";
 
-							tss.Add(new Tuple<double, double>(i, j));
+							tss.Add(new double[] { i, j });
 							break;
 						}
 						field += c;
@@ -486,11 +492,11 @@ namespace GeometryGym.STEP
 			}
 			return tss.ToArray();
 		}
-		public static Tuple<double, double, double>[] SplitListDoubleTriple(string s)
+		public static double[][] SplitListDoubleTriple(string s)
 		{
-			List<Tuple<double, double, double>> tss = new List<Tuple<double, double, double>>(100);
+			List<double[]> tss = new List<double[]>(100);
 			if (s == "$")
-				return new Tuple<double, double, double>[0];
+				return new double[0][];
 			string field = "";
 			int ilast = s.Length;
 			int icounter = 0;
@@ -504,7 +510,7 @@ namespace GeometryGym.STEP
 
 			char c = s[icounter];
 			if (c != '(')
-				return new Tuple<double, double, double>[0];
+				return new double[0][];
 			for (icounter++; icounter < ilast; icounter++)
 			{
 				c = s[icounter];
@@ -541,7 +547,7 @@ namespace GeometryGym.STEP
 							k = double.Parse(field, NumberFormat);
 							field = "";
 
-							tss.Add(new Tuple<double, double, double>(i, j, k));
+							tss.Add(new double[] { i, j, k });
 							break;
 						}
 						field += c;

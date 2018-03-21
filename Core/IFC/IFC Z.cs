@@ -28,6 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcZone : IfcSystem
 	{
 		internal string mLongName = "$";// :	OPTIONAL IfcLabel; IFC4
@@ -42,6 +43,7 @@ namespace GeometryGym.Ifc
 				mIsGroupedBy[0].mRelatedObjects.AddRange(spaces.ConvertAll(x => x.mIndex));
 		}
 	}
+	[Serializable]
 	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
 	{
 		internal double mDepth;// : IfcPositiveLengthMeasure;

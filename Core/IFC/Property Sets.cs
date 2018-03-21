@@ -34,10 +34,10 @@ namespace GeometryGym.Ifc
 		public string SkillLevel { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SkillLevel", new IfcLabel(value))); } }
 		public Pset_ActorCommon(IfcActor instance) : base(instance) { }
 	}
-	//public partial class Pset_ActuatorPHistory : IfcPropertySet
-	//{
-	//	public Pset_ActuatorPHistory(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorPHistory") { Description = instance.Name; DefinesOccurrence.AddRelated(instance); }
-	//}
+	public partial class Pset_ActuatorPHistory : IfcPropertySet
+	{
+		public Pset_ActuatorPHistory(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorPHistory") { Description = instance.Name; DefinesOccurrence.AddRelated(instance); }
+	}
 	public partial class Pset_ActuatorTypeCommon : IfcPropertySet
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
@@ -114,8 +114,8 @@ namespace GeometryGym.Ifc
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> AirFlowrateRange { set { value.Name = "AirFlowrateRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> AirPressureRange { set { value.Name = "AirPressureRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> AirFlowrateRange { set { value.Name = "AirFlowrateRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> AirPressureRange { set { value.Name = "AirPressureRange"; addProperty(value); } }
 		public double NominalAirFlowRate { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalAirFlowRate", new IfcVolumetricFlowRateMeasure(value))); } }
 		public PEnum_AirTerminalBoxArrangementType ArrangementType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ArrangementType", new IfcLabel(value.ToString()))); } }
 		public PEnum_AirTerminalBoxArrangementType ReheatType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ReheatType", new IfcLabel(value.ToString()))); } }
@@ -125,8 +125,8 @@ namespace GeometryGym.Ifc
 		public double NominalInletAirPressure { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalInletAirPressure", new IfcPressureMeasure(value))); } }
 		public double NominalDamperDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalDamperDiameter", new IfcPositiveLengthMeasure(value))); } }
 		public double HousingThickness { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HousingThickness", new IfcLengthMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OperationTemperatureRange { set { value.Name = "OperationTemperatureRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPositiveRatioMeasure> ReturnAirFractionRange { set { value.Name = "ReturnAirFractionRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OperationTemperatureRange { set { value.Name = "OperationTemperatureRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPositiveRatioMeasure> ReturnAirFractionRange { set { value.Name = "ReturnAirFractionRange"; addProperty(value); } }
 		public Pset_AirTerminalBoxTypeCommon(IfcAirTerminalBox instance) : base(instance) { }
 		public Pset_AirTerminalBoxTypeCommon(IfcAirTerminalBoxType type) : base(type) { }
 	}
@@ -149,8 +149,8 @@ namespace GeometryGym.Ifc
 		public double SlotLength { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SlotLength", new IfcPositiveLengthMeasure(value))); } }
 		public int NumberOfSlots { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NumberOfSlots", new IfcInteger(value))); } }
 		public PEnum_AirTerminalFlowPattern FlowPattern { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "FlowPattern", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> AirFlowrateRange { set { value.Name = "AirFlowrateRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> AirFlowrateRange { set { value.Name = "AirFlowrateRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; addProperty(value); } }
 		public PEnum_AirTerminalDischargeDirection DischargeDirection { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "DischargeDirection", new IfcLabel(value.ToString()))); } }
 		public double ThrowLength { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThrowLength", new IfcLengthMeasure(value))); } }
 		public double AirDiffusionPerformanceIndex { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AirDiffusionPerformanceIndex", new IfcReal(value))); } }
@@ -166,7 +166,7 @@ namespace GeometryGym.Ifc
 		public bool HasThermalInsulation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HasThermalInsulation", new IfcBoolean(value))); } }
 		public double NeckArea { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NeckArea", new IfcAreaMeasure(value))); } }
 		public double EffectiveArea { set { AddProperty(new IfcPropertySingleValue(mDatabase, "EffectiveArea", new IfcAreaMeasure(value))); } }
-		public IfcPropertyTableValue<IfcVolumetricFlowRateMeasure, IfcPositiveRatioMeasure> AirFlowrateVersusFlowControlElement { set { value.Name = "AirFlowrateVersusFlowControlElement"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcVolumetricFlowRateMeasure, IfcPositiveRatioMeasure> AirFlowrateVersusFlowControlElement { set { value.Name = "AirFlowrateVersusFlowControlElement"; addProperty(value); } }
 		public Pset_AirTerminalTypeCommon(IfcAirTerminal instance) : base(instance) { }
 		public Pset_AirTerminalTypeCommon(IfcAirTerminalType type) : base(type) { }
 	}
@@ -177,9 +177,9 @@ namespace GeometryGym.Ifc
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
 		public PEnum_HeatTransferType HeatTransferTypeEnum { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "HeatTransferTypeEnum", new IfcLabel(value.ToString()))); } }
 		public bool HasDefrost { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HasDefrost", new IfcBoolean(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OperationalTemperatureRange { set { value.Name = "OperationalTemperatureRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> PrimaryAirflowRateRange { set { value.Name = "PrimaryAirflowRateRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> SecondaryAirflowRateRange { set { value.Name = "SecondaryAirflowRateRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OperationalTemperatureRange { set { value.Name = "OperationalTemperatureRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> PrimaryAirflowRateRange { set { value.Name = "PrimaryAirflowRateRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> SecondaryAirflowRateRange { set { value.Name = "SecondaryAirflowRateRange"; addProperty(value); } }
 		public Pset_AirToAirHeatRecoveryTypeCommon(IfcAirToAirHeatRecovery instance) : base(instance) { }
 		public Pset_AirToAirHeatRecoveryTypeCommon(IfcAirToAirHeatRecoveryType type) : base(type) { }
 	}
@@ -224,8 +224,8 @@ namespace GeometryGym.Ifc
 	public partial class Pset_AudioVisualApplianceTypeAmplifier : IfcPropertySet
 	{
 		public PEnum_AssetAccountingType AmplifierType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "AmplifierType", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcSoundPowerMeasure> AudioAmplification { set { value.Name = "AudioAmplification"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> AudioMode { set { value.Name = "AudioMode"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcSoundPowerMeasure> AudioAmplification { set { value.Name = "AudioAmplification"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> AudioMode { set { value.Name = "AudioMode"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeAmplifier(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeAmplifier(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -235,14 +235,14 @@ namespace GeometryGym.Ifc
 		public bool IsOutdoors { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsOutdoors", new IfcBoolean(value))); } }
 		public int VideoResolutionWidth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionWidth", new IfcInteger(value))); } }
 		public int VideoResolutionHeight { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionHeight", new IfcInteger(value))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptureInterval { set { value.Name = "VideoCaptureInterval"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> PanTiltZoomPreset { set { value.Name = "PanTiltZoomPreset"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcLengthMeasure> PanHorizontal { set { value.Name = "PanHorizontal"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcLengthMeasure> PanVertical { set { value.Name = "PanVertical"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPlaneAngleMeasure> TiltHorizontal { set { value.Name = "TiltHorizontal"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPlaneAngleMeasure> TiltVertical { set { value.Name = "TiltVertical"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPositiveLengthMeasure> Zoom { set { value.Name = "Zoom"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptureInterval { set { value.Name = "VideoCaptureInterval"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> PanTiltZoomPreset { set { value.Name = "PanTiltZoomPreset"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcLengthMeasure> PanHorizontal { set { value.Name = "PanHorizontal"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcLengthMeasure> PanVertical { set { value.Name = "PanVertical"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPlaneAngleMeasure> TiltHorizontal { set { value.Name = "TiltHorizontal"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPlaneAngleMeasure> TiltVertical { set { value.Name = "TiltVertical"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPositiveLengthMeasure> Zoom { set { value.Name = "Zoom"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeCamera(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeCamera(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -250,8 +250,8 @@ namespace GeometryGym.Ifc
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> MediaSource { set { value.Name = "MediaSource"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcInteger, IfcSoundPowerMeasure> AudioVolume { set { value.Name = "AudioVolume"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> MediaSource { set { value.Name = "MediaSource"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcInteger, IfcSoundPowerMeasure> AudioVolume { set { value.Name = "AudioVolume"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeCommon(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeCommon(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -267,10 +267,10 @@ namespace GeometryGym.Ifc
 		public PEnum_AudioVisualDisplayTouchScreen TouchScreen { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "TouchScreen", new IfcLabel(value.ToString()))); } }
 		public int VideoResolutionWidth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionWidth", new IfcInteger(value))); } }
 		public int VideoResolutionHeight { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionHeight", new IfcInteger(value))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoScaleMode { set { value.Name = "VideoScaleMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptionMode { set { value.Name = "VideoCaptionMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> AudioMode { set { value.Name = "AudioMode"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoScaleMode { set { value.Name = "VideoScaleMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptionMode { set { value.Name = "VideoCaptionMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> AudioMode { set { value.Name = "AudioMode"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeDisplay(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeDisplay(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -278,7 +278,7 @@ namespace GeometryGym.Ifc
 	{
 		public PEnum_AudioVisualPlayerType PlayerType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "PlayerType", new IfcLabel(value.ToString()))); } }
 		public bool PlayerMediaEject { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlayerMediaEject", new IfcBoolean(value))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> PlayerMediaFormat { set { value.Name = "PlayerMediaFormat"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> PlayerMediaFormat { set { value.Name = "PlayerMediaFormat"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypePlayer(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypePlayer(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -287,17 +287,17 @@ namespace GeometryGym.Ifc
 		public PEnum_AudioVisualProjectorType ProjectorType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "PlayerType", new IfcLabel(value.ToString()))); } }
 		public int VideoResolutionWidth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionWidth", new IfcInteger(value))); } }
 		public int VideoResolutionHeight { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VideoResolutionHeight", new IfcInteger(value))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoScaleMode { set { value.Name = "VideoScaleMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptionMode { set { value.Name = "VideoCaptionMode"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoResolutionMode { set { value.Name = "VideoResolutionMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> VideoScaleMode { set { value.Name = "VideoScaleMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcTimeMeasure> VideoCaptionMode { set { value.Name = "VideoCaptionMode"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeProjector(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeProjector(IfcAudioVisualApplianceType type) : base(type) { }
 	}
 	public partial class Pset_AudioVisualApplianceTypeReceiver : IfcPropertySet
 	{
 		public PEnum_AudioVisualReceiverType ReceiverType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ReceiverType", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcRatioMeasure> AudioAmplification { set { value.Name = "AudioAmplification"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> AudioMode { set { value.Name = "AudioMode"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcRatioMeasure> AudioAmplification { set { value.Name = "AudioAmplification"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> AudioMode { set { value.Name = "AudioMode"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeReceiver(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeReceiver(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -305,8 +305,8 @@ namespace GeometryGym.Ifc
 	{
 		public PEnum_AudioVisualSpeakerType SpeakerType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "SpeakerType", new IfcLabel(value.ToString()))); } }
 		public PEnum_AudioVisualSpeakerMounting SpeakerMounting { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "SpeakerMounting", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcPositiveLengthMeasure> SpeakerDriverSize { set { value.Name = "SpeakerDriverSize"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcSoundPowerMeasure> FrequencyResponse { set { value.Name = "FrequencyResponse"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcPositiveLengthMeasure> SpeakerDriverSize { set { value.Name = "SpeakerDriverSize"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcFrequencyMeasure, IfcSoundPowerMeasure> FrequencyResponse { set { value.Name = "FrequencyResponse"; addProperty(value); } }
 		public double Impedence { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Impedence", new IfcFrequencyMeasure(value))); } }
 		public Pset_AudioVisualApplianceTypeSpeaker(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeSpeaker(IfcAudioVisualApplianceType type) : base(type) { }
@@ -314,9 +314,9 @@ namespace GeometryGym.Ifc
 	public partial class Pset_AudioVisualApplianceTypeTuner : IfcPropertySet
 	{
 		public PEnum_AudioVisualTunerType TunerType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "TunerType", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> TunerMode { set { value.Name = "TunerMode"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> TunerChannel { set { value.Name = "TunerChannel"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcFrequencyMeasure> TunerFrequency { set { value.Name = "TunerFrequency"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> TunerMode { set { value.Name = "TunerMode"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcIdentifier, IfcLabel> TunerChannel { set { value.Name = "TunerChannel"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcFrequencyMeasure> TunerFrequency { set { value.Name = "TunerFrequency"; addProperty(value); } }
 		public Pset_AudioVisualApplianceTypeTuner(IfcAudioVisualAppliance instance) : base(instance) { }
 		public Pset_AudioVisualApplianceTypeTuner(IfcAudioVisualApplianceType type) : base(type) { }
 	}
@@ -343,11 +343,11 @@ namespace GeometryGym.Ifc
 		public PEnum_BoilerOperatingMode OperatingMode { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "OperatingMode", new IfcLabel(value.ToString()))); } }
 		public double HeatTransferSurfaceArea { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HeatTransferSurfaceArea", new IfcAreaMeasure(value))); } }
 		public double NominalPartLoadRatio { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalPartLoadRatio", new IfcReal(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> WaterInletTemperatureRange { set { value.Name = "WaterInletTemperatureRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> WaterInletTemperatureRange { set { value.Name = "WaterInletTemperatureRange"; addProperty(value); } }
 		public double WaterStorageCapacity { set { AddProperty(new IfcPropertySingleValue(mDatabase, "WaterStorageCapacity", new IfcVolumeMeasure(value))); } }
 		public bool IsWaterStorageHeater { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsWaterStorageHeater", new IfcBoolean(value))); } }
-		public IfcPropertyTableValue<IfcPositiveRatioMeasure, IfcNormalisedRatioMeasure> PartialLoadEfficiencyCurves { set { value.Name = "PartialLoadEfficiencyCurves"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OutletTemperatureRange { set { value.Name = "OutletTemperatureRange"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcPositiveRatioMeasure, IfcNormalisedRatioMeasure> PartialLoadEfficiencyCurves { set { value.Name = "PartialLoadEfficiencyCurves"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> OutletTemperatureRange { set { value.Name = "OutletTemperatureRange"; addProperty(value); } }
 		public double NominalEnergyConsumption { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalEnergyConsumption", new IfcPowerMeasure(value))); } }
 		public PEnum_EnergySource EnergySource { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "EnergySource", new IfcLabel(value.ToString()))); } }
 		public Pset_BoilerTypeCommon(IfcBoiler instance) : base(instance) { }
@@ -356,15 +356,15 @@ namespace GeometryGym.Ifc
 	public partial class Pset_BoilerTypeSteam : IfcPropertySet
 	{
 		public string MaximumOutletPressure { set {  AddProperty(new IfcPropertySingleValue(mDatabase, "MaximumOutletPressure", new IfcLabel(value))); } }
-		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcNormalisedRatioMeasure> NominalEfficiency { set { value.Name = "NominalEfficiency"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcEnergyMeasure> HeatOutput { set { value.Name = "HeatOutput"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcNormalisedRatioMeasure> NominalEfficiency { set { value.Name = "NominalEfficiency"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcEnergyMeasure> HeatOutput { set { value.Name = "HeatOutput"; addProperty(value); } }
 		public Pset_BoilerTypeSteam(IfcBoiler instance) : base(instance) { }
 		public Pset_BoilerTypeSteam(IfcBoilerType type) : base(type) { }
 	}
 	public partial class Pset_BoilerTypeWater : IfcPropertySet
 	{
-		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcNormalisedRatioMeasure> NominalEfficiency { set { value.Name = "NominalEfficiency"; AddProperty(value); } }
-		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcEnergyMeasure> HeatOutput { set { value.Name = "HeatOutput"; AddProperty(value); } }
+		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcNormalisedRatioMeasure> NominalEfficiency { set { value.Name = "NominalEfficiency"; addProperty(value); } }
+		public IfcPropertyTableValue<IfcThermodynamicTemperatureMeasure, IfcEnergyMeasure> HeatOutput { set { value.Name = "HeatOutput"; addProperty(value); } }
 		public Pset_BoilerTypeWater(IfcBoiler instance) : base(instance) { }
 		public Pset_BoilerTypeWater(IfcBoilerType type) : base(type) { }
 	}
@@ -432,13 +432,13 @@ namespace GeometryGym.Ifc
 		public string PlanningControlStatus { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlanningControlStatus", new IfcLabel(value))); } }
 		public string NarrativeText { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NarrativeText", new IfcText(value))); } }
 		public double VacancyRateInCategoryNow { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VacancyRateInCategoryNow", new IfcPositiveRatioMeasure(value))); } }
-		public IfcPropertyListValue<IfcLabel> TenureModesAvailableNow { set { value.Name = "TenureModesAvailableNow"; AddProperty(value); } }
-		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableNow { set { value.Name = "MarketSubCategoriesAvailableNow"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryNow { set { value.Name = "RentalRatesInCategoryNow"; AddProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> TenureModesAvailableNow { set { value.Name = "TenureModesAvailableNow"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableNow { set { value.Name = "MarketSubCategoriesAvailableNow"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryNow { set { value.Name = "RentalRatesInCategoryNow"; addProperty(value); } }
 		public double VacancyRateInCategoryFuture { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VacancyRateInCategoryFuture", new IfcPositiveRatioMeasure(value))); } }
-		public IfcPropertyListValue<IfcLabel> TenureModesAvailableFuture { set { value.Name = "TenureModesAvailableFuture"; AddProperty(value); } }
-		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableFuture { set { value.Name = "MarketSubCategoriesAvailableFuture"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryFuture { set { value.Name = "RentalRatesInCategoryFuture"; AddProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> TenureModesAvailableFuture { set { value.Name = "TenureModesAvailableFuture"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableFuture { set { value.Name = "MarketSubCategoriesAvailableFuture"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryFuture { set { value.Name = "RentalRatesInCategoryFuture"; addProperty(value); } }
 		public Pset_BuildingUse(IfcBuilding instance) : base(instance) { }
 	}
 	public partial class Pset_BuildingUseAdjacent : IfcPropertySet
@@ -624,10 +624,10 @@ namespace GeometryGym.Ifc
 		public PEnum_DistributionPortGender ConnectionGender { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ConnectionGender", new IfcLabel(value.ToString()))); } }
 		public PEnum_ConductorFunctionEnum ConductorFunction { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ConductorFunction", new IfcLabel(value.ToString()))); } }
 		public double CurrentContent3rdHarmonic { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CurrentContent3rdHarmonic", new IfcPositiveRatioMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcElectricCurrentMeasure> Current { set { value.Name = "Current"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcElectricVoltageMeasure> Voltage { set { value.Name = "Voltage"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPowerMeasure> Power { set { value.Name = "Power"; AddProperty(value); } }
-		public IfcPropertyListValue<IfcIdentifier> Protocols { set { value.Name = "Protocols"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcElectricCurrentMeasure> Current { set { value.Name = "Current"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcElectricVoltageMeasure> Voltage { set { value.Name = "Voltage"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPowerMeasure> Power { set { value.Name = "Power"; addProperty(value); } }
+		public IfcPropertyListValue<IfcIdentifier> Protocols { set { value.Name = "Protocols"; addProperty(value); } }
 		public Pset_DistributionPortTypeCable(IfcDistributionPort instance) : base(instance) { }
 	}
 	public partial class Pset_DistributionPortTypeDuct : IfcPropertySet
@@ -637,11 +637,11 @@ namespace GeometryGym.Ifc
 		public double NominalWidth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalWidth", new IfcPositiveLengthMeasure(value))); } }
 		public double NominalHeight { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalHeight", new IfcPositiveLengthMeasure(value))); } }
 		public double NominalThickness { set {  AddProperty(new IfcPropertySingleValue(mDatabase, "NominalThickness", new IfcPositiveLengthMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> DryBulbTemperature { set { value.Name = "DryBulbTemperature"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> WetBulbTemperature { set { value.Name = "WetBulbTemperature"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> VolumetricFlowRate { set { value.Name = "VolumetricFlowRate"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcLinearVelocityMeasure> Velocity { set { value.Name = "Velocity"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> Pressure { set { value.Name = "Pressure"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> DryBulbTemperature { set { value.Name = "DryBulbTemperature"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> WetBulbTemperature { set { value.Name = "WetBulbTemperature"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> VolumetricFlowRate { set { value.Name = "VolumetricFlowRate"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcLinearVelocityMeasure> Velocity { set { value.Name = "Velocity"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> Pressure { set { value.Name = "Pressure"; addProperty(value); } }
 		public Pset_DistributionPortTypeDuct(IfcDistributionPort instance) : base(instance) { }
 	}
 	public partial class Pset_DistributionPortTypePipe : IfcPropertySet
@@ -651,11 +651,11 @@ namespace GeometryGym.Ifc
 		public double NominalDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalDiameter", new IfcPositiveLengthMeasure(value))); } }
 		public double InnerDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "InnerDiameter", new IfcPositiveLengthMeasure(value))); } }
 		public double OuterDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "OuterDiameter", new IfcPositiveLengthMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> Temperature { set { value.Name = "Temperature"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> VolumetricFlowRate { set { value.Name = "VolumetricFlowRate"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcMassFlowRateMeasure> MassFlowRate { set { value.Name = "MassFlowRate"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcLinearVelocityMeasure> Velocity { set { value.Name = "Velocity"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> Pressure { set { value.Name = "Pressure"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> Temperature { set { value.Name = "Temperature"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcVolumetricFlowRateMeasure> VolumetricFlowRate { set { value.Name = "VolumetricFlowRate"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcMassFlowRateMeasure> MassFlowRate { set { value.Name = "MassFlowRate"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcLinearVelocityMeasure> Velocity { set { value.Name = "Velocity"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> Pressure { set { value.Name = "Pressure"; addProperty(value); } }
 		public Pset_DistributionPortTypePipe(IfcDistributionPort instance) : base(instance) { }
 	}
 	//Pset_DistributionSystemCommon
@@ -855,18 +855,52 @@ namespace GeometryGym.Ifc
 		public double HardeningModule { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HardeningModule", new IfcModulusOfElasticityMeasure(value))); } }
 		public double ProportionalStress { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ProportionalStress", new IfcPressureMeasure(value))); } }
 		public double PlasticStrain { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlasticStrain", new IfcPositiveRatioMeasure(value))); } }
-		//public double Relaxations { set { if (value > 0) AddProperty(new ifctableValue IfcPropertySingleValue(mDatabase, "Relaxations", new IfcPositiveRatioMeasure(value))); } }
+		public IfcPropertyTableValue<IfcNormalisedRatioMeasure, IfcNormalisedRatioMeasure> Relaxations { set { value.Name = "Relaxations"; AddProperty(value); } }
 		public Pset_MaterialSteel(IfcMaterialDefinition material) : base(material) {}
 	}
 	//Pset_MaterialThermal
 	//Pset_MaterialWater
 	//Pset_MaterialWood
-	//Pset_MaterialWoodBasedBeam
+	public partial class Pset_MaterialWood : IfcMaterialProperties
+	{
+		public string Species { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Species", new IfcLabel(value))); } }
+		public string StrengthGrade { set { AddProperty(new IfcPropertySingleValue(mDatabase, "StrengthGrade", new IfcLabel(value))); } }
+		public string AppearanceGrade { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AppearanceGrade", new IfcLabel(value))); } }
+		public string Layup { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Layup", new IfcLabel(value))); } }
+		public int Layers { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Layers", new IfcInteger(value))); } }
+		public int Plies { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Plies", new IfcInteger(value))); } }
+		public double MoistureContent { set { AddProperty(new IfcPropertySingleValue(mDatabase, "MoistureContent", new IfcPositiveRatioMeasure(value))); } }
+		public double DimensionalChangeCoefficient { set { AddProperty(new IfcPropertySingleValue(mDatabase, "DimensionalChangeCoefficient", new IfcPositiveRatioMeasure(value))); } }
+		public double ThicknessSwelling { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThicknessSwelling	", new IfcPositiveRatioMeasure(value))); } }
+		public Pset_MaterialWood(IfcMaterialDefinition material) : base(material) { }
+	}
+	public partial class Pset_MaterialWoodBasedBeam : IfcMaterialProperties
+	{
+		public string ApplicableStructuralDesignMethod { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ApplicableStructuralDesignMethod", new IfcLabel(value))); } }
+		public CP_MaterialMechanicalBeam InPlane { set { value.UsageName = "InPlane"; AddProperty(value); } }
+		public CP_MaterialMechanicalBeam InPlaneNegative { set { value.UsageName = "InPlaneNegative"; AddProperty(value); } }
+		public CP_MaterialMechanicalBeam OutOfPlane { set { value.UsageName = "OutOfPlane"; AddProperty(value); } }
+		public Pset_MaterialWoodBasedBeam(IfcMaterialDefinition material) : base(material) { }
+	}
 	//Pset_MaterialWoodBasedPanel
 	//Pset_MechanicalFastenerAnchorBolt
 	//Pset_MechanicalFastenerBolt
 	//Pset_MedicalDeviceTypeCommon
 	//Pset_MemberCommon
+	public partial class Pset_MemberCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public double Span { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Span", new IfcPositiveLengthMeasure(value))); } }
+		public double Slope { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Slope", new IfcPlaneAngleMeasure(value))); } }
+		public double Roll { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Roll", new IfcPlaneAngleMeasure(value))); } }
+		public bool IsExternal { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value))); } }
+		public double ThermalTransmittance { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThermalTransmittance", new IfcThermalTransmittanceMeasure(value))); } }
+		public bool LoadBearing { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value))); } }
+		public string FireRating { set { AddProperty(new IfcPropertySingleValue(mDatabase, "FireRating", new IfcLabel(value))); } }
+		public Pset_MemberCommon(IfcMember instance) : base(instance) { }
+		public Pset_MemberCommon(IfcMemberType type) : base(type) { }
+	}
 	//Pset_MotorConnectionTypeCommon
 	//Pset_OpeningElementCommon
 	//Pset_OutletTypeCommon
@@ -894,8 +928,8 @@ namespace GeometryGym.Ifc
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
 		public double PressureClass { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PressureClass", new IfcPressureMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> PressureRange { set { value.Name = "PressureRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> PressureRange { set { value.Name = "PressureRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; addProperty(value); } }
 		public Pset_PipeFittingTypeCommon(IfcPipeFitting instance) : base(instance) { }
 		public Pset_PipeFittingTypeCommon(IfcPipeFittingType type) : base(type) { }
 	}
@@ -1103,10 +1137,10 @@ namespace GeometryGym.Ifc
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
-		public IfcPropertyBoundedValue<IfcMassFlowRateMeasure> FlowRateRange { set { value.Name = "FlowRateRange"; AddProperty(value); } }
-		public IfcPropertyBoundedValue<IfcPressureMeasure> FlowResistanceRange { set { value.Name = "FlowResistanceRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcMassFlowRateMeasure> FlowRateRange { set { value.Name = "FlowRateRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> FlowResistanceRange { set { value.Name = "FlowResistanceRange"; addProperty(value); } }
 		public double ConnectionSize { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ConnectionSize", new IfcPositiveLengthMeasure(value))); } }
-		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; addProperty(value); } }
 		public double NetPositiveSuctionHead { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NetPositiveSuctionHead", new IfcPressureMeasure(value))); } }
 		public double NominalRotationSpeed { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalRotationSpeed", new IfcRotationalFrequencyMeasure(value))); } }
 		public Pset_PumpTypeCommon(IfcPump instance) : base(instance) { }
@@ -1138,8 +1172,34 @@ namespace GeometryGym.Ifc
 		public Pset_ReinforcementBarPitchOfColumn(IfcColumn instance) : base(instance) { }
 		public Pset_ReinforcementBarPitchOfColumn(IfcColumnType type) : base(type) { }
 	}
-	//Pset_ReinforcementBarPitchOfContinuousFooting
-	//Pset_ReinforcementBarPitchOfSlab
+	public partial class Pset_ReinforcementBarPitchOfContinuousFooting : IfcPropertySet
+	{
+		public new string Description { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Description", new IfcText(value))); } }
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public double CrossingUpperBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CrossingUpperBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double CrossingLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CrossingLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public Pset_ReinforcementBarPitchOfContinuousFooting(IfcFooting instance) : base(instance) { }
+		public Pset_ReinforcementBarPitchOfContinuousFooting(IfcFootingType type) : base(type) { }
+	}
+	public partial class Pset_ReinforcementBarPitchOfSlab : IfcPropertySet
+	{
+		public new string Description { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Description", new IfcText(value))); } }
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public double LongOutsideTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongOutsideTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double LongInsideCenterTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongInsideCenterTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double LongInsideEndTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongInsideEndTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortOutsideTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortOutsideTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortInsideCenterTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortInsideCenterTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortInsideEndTopBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortInsideEndTopBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double LongOutsideLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongOutsideLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double LongInsideCenterLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongInsideCenterLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double LongInsideEndLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LongInsideEndLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortOutsideLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortOutsideLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortInsideCenterLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortInsideCenterLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public double ShortInsideEndLowerBarPitch { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShortInsideEndLowerBarPitch", new IfcPositiveLengthMeasure(value))); } }
+		public Pset_ReinforcementBarPitchOfSlab(IfcSlab instance) : base(instance) { }
+		public Pset_ReinforcementBarPitchOfSlab(IfcSlabType type) : base(type) { }
+	}
 	public partial class Pset_ReinforcementBarPitchOfWall : IfcPropertySet
 	{
 		public new string Description { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Description", new IfcText(value))); } }
@@ -1190,7 +1250,7 @@ namespace GeometryGym.Ifc
 	//Pset_SensorTypeWindSensor
 	public partial class Pset_ServiceLife : IfcPropertySet
 	{
-		public IfcPropertyBoundedValue<IfcDuration> ServiceLifeDuration { set { value.Name = "ServiceLifeDuration"; AddProperty(value); } }
+		public IfcPropertyBoundedValue<IfcDuration> ServiceLifeDuration { set { value.Name = "ServiceLifeDuration"; addProperty(value); } }
 		public IfcDuration MeanTimeBetweenFailure { set { AddProperty(new IfcPropertySingleValue(mDatabase, "MeanTimeBetweenFailure", value)); } }
 		public Pset_ServiceLife(IfcElement instance) : base(instance) { }
 		public Pset_ServiceLife(IfcElementType type) : base(type) { }
@@ -1236,7 +1296,7 @@ namespace GeometryGym.Ifc
 		public bool PubliclyAccessible { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PubliclyAccessible", new IfcBoolean(value))); } }
 		public bool HandicapAccessible { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HandicapAccessible", new IfcBoolean(value))); } }
 		public Pset_SpaceCommon(IfcSpace instance) : base(instance) { }
-		public Pset_SpaceCommon(IfcSpaceType type) : base(type.mDatabase, "Pset_SpaceCommon") { Description = type.Name; type.AddPropertySet(this); }
+		public Pset_SpaceCommon(IfcSpaceType type) : base(type) { }
 	}
 	//Pset_SpaceCoveringRequirements
 	//Pset_SpaceFireSafetyRequirements
@@ -1263,7 +1323,7 @@ namespace GeometryGym.Ifc
 	{
 		public PEnum_SpaceHeaterConvectorType ConvectorType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ConvectorType", new IfcLabel(value.ToString()))); } }
 		public Pset_SpaceHeaterTypeConvector(IfcSpaceHeater instance) : base(instance) { }
-		public Pset_SpaceHeaterTypeConvector(IfcSpaceHeaterType spaceHeaterType) : base(spaceHeaterType.mDatabase, "Pset_SpaceHeaterTypeConvector") { Description = spaceHeaterType.Name; spaceHeaterType.AddPropertySet(this); }
+		public Pset_SpaceHeaterTypeConvector(IfcSpaceHeaterType spaceHeaterType) : base(spaceHeaterType) { }
 	}
 	public partial class Pset_SpaceHeaterTypeRadiator : IfcPropertySet
 	{
@@ -1441,6 +1501,27 @@ namespace GeometryGym.Ifc
 		public bool PubliclyAccessible { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PubliclyAccessible", new IfcBoolean(value))); } }
 		public bool HandicapAccessible { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HandicapAccessible", new IfcBoolean(value))); } }
 		public Pset_ZoneCommon(IfcZone instance) : base(instance) { }
+	}
+
+	public class CP_MaterialMechanicalBeam : IfcComplexProperty
+	{
+		public double YoungModulus { set { addProperty(new IfcPropertySingleValue(mDatabase, "YoungModulus", new IfcModulusOfElasticityMeasure(value))); } }
+		public double YoungModulusMin { set { addProperty(new IfcPropertySingleValue(mDatabase, "YoungModulusMin", new IfcModulusOfElasticityMeasure(value))); } }
+		public double YoungModulusPerp { set { addProperty(new IfcPropertySingleValue(mDatabase, "YoungModulusPerp", new IfcModulusOfElasticityMeasure(value))); } }
+		public double YoungModulusPerpMin { set { addProperty(new IfcPropertySingleValue(mDatabase, "YoungModulusPerpMin", new IfcModulusOfElasticityMeasure(value))); } }
+		public double ShearModulus { set { addProperty(new IfcPropertySingleValue(mDatabase, "ShearModulus", new IfcModulusOfElasticityMeasure(value))); } }
+		public double ShearModulusMin { set { addProperty(new IfcPropertySingleValue(mDatabase, "ShearModulusMin", new IfcModulusOfElasticityMeasure(value))); } }
+		public double BendingStrength { set { addProperty(new IfcPropertySingleValue(mDatabase, "BendingStrength", new IfcPressureMeasure(value))); } }
+		public double TensileStrength { set { addProperty(new IfcPropertySingleValue(mDatabase, "TensileStrength", new IfcPressureMeasure(value))); } }
+		public double TensileStrengthPerp { set { addProperty(new IfcPropertySingleValue(mDatabase, "TensileStrengthPerp", new IfcPressureMeasure(value))); } }
+		public double CompStrength { set { addProperty(new IfcPropertySingleValue(mDatabase, "CompStrength", new IfcPressureMeasure(value))); } }
+		public double CompStrengthPerp { set { addProperty(new IfcPropertySingleValue(mDatabase, "CompStrengthPerp", new IfcPressureMeasure(value))); } }
+		public double RaisedCompStrengthPerp { set { addProperty(new IfcPropertySingleValue(mDatabase, "RaisedCompStrengthPerp", new IfcPressureMeasure(value))); } }
+		public double ShearStrength { set { addProperty(new IfcPropertySingleValue(mDatabase, "ShearStrength", new IfcPressureMeasure(value))); } }
+		public double TorsionalStrength { set { addProperty(new IfcPropertySingleValue(mDatabase, "TorsionalStrength", new IfcPressureMeasure(value))); } }
+		public double ReferenceDepth { set { addProperty(new IfcPropertySingleValue(mDatabase, "ReferenceDepth", new IfcPositiveLengthMeasure(value))); } }
+		public IfcPropertyTableValue<IfcPositiveRatioMeasure, IfcPositiveRatioMeasure> InstabilityFactors { set { value.Name = "InstabilityFactors"; addProperty(value); } }
+		public CP_MaterialMechanicalBeam(DatabaseIfc db, string usageName) : base(db, "CP_MaterialMechanicalBeam", usageName) { }
 	}
 
 

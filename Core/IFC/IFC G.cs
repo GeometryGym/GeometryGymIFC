@@ -29,6 +29,7 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcGasTerminalType : IfcFlowTerminalType // DEPRECEATED IFC4
 	{
 		internal IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
@@ -39,6 +40,7 @@ namespace GeometryGym.Ifc
 		internal IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
 	{
 		internal double mMolecularWeight = double.NaN; //: OPTIONAL IfcMolecularWeightMeasure;
@@ -59,6 +61,8 @@ namespace GeometryGym.Ifc
 			mMassDensity = massDensity;
 		}
 	}
+	[Obsolete("DELETED IFC4", false)]
+	[Serializable]
 	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
 	{ 
 		internal double mPhysicalWeight = double.NaN;// : OPTIONAL IfcMassPerLengthMeasure;
@@ -78,6 +82,7 @@ namespace GeometryGym.Ifc
 		public IfcGeneralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
 		internal IfcGeneralProfileProperties(string name, List<IfcProperty> props, IfcProfileDef p) : base(name, props, p) { }
 	}
+	[Serializable]
 	public partial class IfcGeographicElement : IfcElement  //IFC4
 	{
 		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// OPTIONAL IfcGeographicElementTypeEnum; 
@@ -96,12 +101,13 @@ namespace GeometryGym.Ifc
 		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
 	}
+	[Serializable]
 	public partial class IfcGeometricCurveSet : IfcGeometricSet
 	{
 		internal IfcGeometricCurveSet() : base() { }
 		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s) : base(db,s) { }
 		public IfcGeometricCurveSet(IfcGeometricSetSelect element) : base(element) { if(element is IfcSurface) throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + mIndex); }
-		public IfcGeometricCurveSet(List<IfcGeometricSetSelect> set) : base(set)
+		public IfcGeometricCurveSet(IEnumerable<IfcGeometricSetSelect> set) : base(set)
 		{
 			foreach(IfcGeometricSetSelect item in set)
 			{
@@ -110,35 +116,26 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	[Serializable]
 	public partial class IfcGeometricRepresentationContext : IfcRepresentationContext, IfcCoordinateReferenceSystemSelect // SUPERTYPE OF(IfcGeometricRepresentationSubContext)
 	{
-		public enum GeometricContextIdentifier { Annotation, Model };
+		public enum GeometricContextIdentifier { Model, Plan, NotDefined };
 
 		internal int mCoordinateSpaceDimension;// : IfcDimensionCount;
 		internal double mPrecision = 1e-8;// : OPTIONAL REAL;
-		internal int mWorldCoordinateSystem;// : IfcAxis2Placement;
-		internal int mTrueNorth;// : OPTIONAL IfcDirection; 
+		internal IfcAxis2Placement mWorldCoordinateSystem = null;// : IfcAxis2Placement;
+		internal IfcDirection mTrueNorth = null;// : OPTIONAL IfcDirection; 
 		//INVERSE
 		internal List<IfcGeometricRepresentationSubContext> mHasSubContexts = new List<IfcGeometricRepresentationSubContext>();//	 :	SET OF IfcGeometricRepresentationSubContext FOR ParentContext;
 		private IfcCoordinateOperation mHasCoordinateOperation = null; //IFC4
 
 		public int CoordinateSpaceDimension { get { return mCoordinateSpaceDimension; } set { mCoordinateSpaceDimension = value; } }
 		public double Precision { get { return mPrecision; } set { mPrecision = value; } }
-		public IfcAxis2Placement WorldCoordinateSystem { get { return mDatabase[mWorldCoordinateSystem] as IfcAxis2Placement; } set { mWorldCoordinateSystem = (value == null ? 0 : value.Index); } }
+		public IfcAxis2Placement WorldCoordinateSystem { get { return mWorldCoordinateSystem; } set { mWorldCoordinateSystem = value; } }
 		public IfcDirection TrueNorth 
 		{ 
-			get { return mDatabase[mTrueNorth] as IfcDirection; }  
-			set 
-			{
-				if (value == null)
-					mTrueNorth = 0;
-				else
-				{
-					if (Math.Abs(value.DirectionRatioZ) > mDatabase.Tolerance)
-						throw new Exception("True North direction must be 2 dimensional direction");
-					mTrueNorth = value.mIndex; 
-				}
-			} 
+			get { return mTrueNorth; }  
+			set { mTrueNorth = value; if (value != null) value.DirectionRatioZ = double.NaN; } 
 		}
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
 		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != mIndex) value.SourceCRS = this; } }
@@ -149,9 +146,9 @@ namespace GeometryGym.Ifc
 		{
 			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
 			mPrecision = c.mPrecision;
-			if(c.mWorldCoordinateSystem > 0)
-				WorldCoordinateSystem = db.Factory.Duplicate(c.mDatabase[ c.mWorldCoordinateSystem]) as IfcAxis2Placement;
-			if (c.mTrueNorth > 0)
+			if(c.mWorldCoordinateSystem != null)
+				WorldCoordinateSystem = db.Factory.Duplicate(c.mDatabase[c.mWorldCoordinateSystem.Index]) as IfcAxis2Placement;
+			if (c.mTrueNorth != null)
 				TrueNorth = db.Factory.Duplicate(c.TrueNorth) as IfcDirection;
 
 			foreach (IfcGeometricRepresentationSubContext sc in mHasSubContexts)
@@ -160,7 +157,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
 			if (db.Context != null)
-				db.Context.addRepresentationContext(this);
+				db.Context.RepresentationContexts.Add(this);
 			mCoordinateSpaceDimension = SpaceDimension;
 			mPrecision = Math.Max(1e-8, precision);
 			WorldCoordinateSystem = new IfcAxis2Placement3D(new IfcCartesianPoint(db,0,0,0));
@@ -168,6 +165,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcGeometricRepresentationContext(int coordinateSpaceDimension, IfcAxis2Placement worldCoordinateSystem) : base(worldCoordinateSystem.Database) { mCoordinateSpaceDimension = coordinateSpaceDimension; WorldCoordinateSystem = worldCoordinateSystem; }
 	}
+	[Serializable]
 	public abstract partial class IfcGeometricRepresentationItem : IfcRepresentationItem 
 	{
 		//ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotationFillArea, IfcBooleanResult, IfcBoundingBox, IfcCartesianTransformationOperator, 
@@ -180,16 +178,17 @@ namespace GeometryGym.Ifc
 		protected IfcGeometricRepresentationItem(DatabaseIfc db) : base(db) { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i) : base(db,i) { }
 	}
+	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
-		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row };// Surface };
+		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline };// Surface };
 
-		internal int mContainerContext;// : IfcGeometricRepresentationContext;
+		internal IfcGeometricRepresentationContext mContainerContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
 		private IfcGeometricProjectionEnum mTargetView;// : IfcGeometricProjectionEnum;
 		internal string mUserDefinedTargetView = "$";// : OPTIONAL IfcLabel;
 
-		public IfcGeometricRepresentationContext ContainerContext { get { return mDatabase[mContainerContext] as IfcGeometricRepresentationContext; } set { mContainerContext = value.mIndex; value.mHasSubContexts.Add(this); } }
+		public IfcGeometricRepresentationContext ContainerContext { get { return mContainerContext; } set { mContainerContext = value; value.mHasSubContexts.Add(this); } }
 		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
 		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
 		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -211,71 +210,118 @@ namespace GeometryGym.Ifc
 			mTargetView = view;
 		}
 	}
+	[Serializable]
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
 	{
-		private List<int> mElements = new List<int>(); //SET [1:?] OF IfcGeometricSetSelect; 
-		public ReadOnlyCollection<IfcGeometricSetSelect> Elements { get { return new ReadOnlyCollection<IfcGeometricSetSelect>( mElements.ConvertAll(x => mDatabase[x] as IfcGeometricSetSelect)); } }
+		private SET<IfcGeometricSetSelect> mElements = new SET<IfcGeometricSetSelect>(); //SET [1:?] OF IfcGeometricSetSelect; 
+		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } set { mElements = value; } }
 
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { s.mElements.ToList().ForEach(x=>addElement( db.Factory.Duplicate(s.mDatabase[x]) as IfcGeometricSetSelect)); }
-		public IfcGeometricSet(IfcGeometricSetSelect element) : base(element.Database) { mElements.Add(element.Index); }
-		public IfcGeometricSet(List<IfcGeometricSetSelect> set) : base(set[0].Database) { mElements = set.ConvertAll(x => x.Index); }
-
-		internal void addElement(IfcGeometricSetSelect element)
-		{
-			if (!mElements.Contains(element.Index))
-				mElements.Add(element.Index);
-		}
-		internal void removeElement(IfcGeometricSetSelect element)
-		{
-			if(element != null)
-				mElements.Remove(element.Index);
-		}
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x.Index]) as IfcGeometricSetSelect)); }
+		public IfcGeometricSet(IfcGeometricSetSelect element) : base(element.Database) { mElements.Add(element); }
+		public IfcGeometricSet(IEnumerable<IfcGeometricSetSelect> set) : base(set.First().Database) { mElements.AddRange(set); }
 	}
 	public partial interface IfcGeometricSetSelect : IBaseClassIfc { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
+	[Serializable]
 	public partial class IfcGrid : IfcProduct
 	{
-		private List<int> mUAxes = new List<int>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
-		private List<int> mVAxes = new List<int>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
-		private List<int> mWAxes = new List<int>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcGridAxis;
+		private LIST<IfcGridAxis> mUAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
+		private LIST<IfcGridAxis> mVAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
+		private LIST<IfcGridAxis> mWAxes = new LIST<IfcGridAxis>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcGridAxis;
 		internal IfcGridTypeEnum mPredefinedType = IfcGridTypeEnum.NOTDEFINED;// :OPTIONAL IfcGridTypeEnum; //IFC4 CHANGE  New attribute.
 																			  //INVERSE
-		internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
+		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 
 		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
-		public ReadOnlyCollection<IfcGridAxis> UAxes { get { return new ReadOnlyCollection<IfcGridAxis>( mUAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis)); } }
-		public ReadOnlyCollection<IfcGridAxis> VAxes { get { return new ReadOnlyCollection<IfcGridAxis>( mVAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis)); } }
-		public ReadOnlyCollection<IfcGridAxis> WAxes { get { return new ReadOnlyCollection<IfcGridAxis>( mWAxes.ConvertAll(x => mDatabase[x] as IfcGridAxis)); } }
+		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } set { mUAxes.Clear(); if (value != null) { mUAxes.CollectionChanged -= mUAxes_CollectionChanged; mUAxes = value; mUAxes.CollectionChanged += mUAxes_CollectionChanged; } } }
+		public LIST<IfcGridAxis> VAxes { get { return mVAxes; } set { mVAxes.Clear(); if (value != null) { mVAxes.CollectionChanged -= mVAxes_CollectionChanged; mVAxes = value; mVAxes.CollectionChanged += mVAxes_CollectionChanged; } } }
+		public LIST<IfcGridAxis> WAxes { get { return mWAxes; } set { mWAxes.Clear(); if (value != null) { mWAxes.CollectionChanged -= mWAxes_CollectionChanged; mWAxes = value; mWAxes.CollectionChanged += mWAxes_CollectionChanged; } } }
 
 		internal IfcGrid() : base() { }
 		internal IfcGrid(DatabaseIfc db, IfcGrid g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream)
 		{
-			g.UAxes.ToList().ForEach(x => AddUAxis( db.Factory.Duplicate(x) as IfcGridAxis));
-			g.VAxes.ToList().ForEach(x => AddVAxis( db.Factory.Duplicate(x) as IfcGridAxis));
-			g.WAxes.ToList().ForEach(x => AddWAxis( db.Factory.Duplicate(x) as IfcGridAxis));
+			UAxes.AddRange(g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
+			VAxes.AddRange(g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
+			WAxes.AddRange(g.WAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
 			mPredefinedType = g.mPredefinedType;
 		}
 		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes) 
 			: base(new IfcLocalPlacement(host.Placement, placement), getRepresentation(uAxes,vAxes, null))
 		{
 			host.addGrid(this);
-			if(uAxes != null)
-				mUAxes = uAxes.ConvertAll(x=>x.mIndex);
-			if (vAxes != null)
-				mVAxes = vAxes.ConvertAll(x => x.mIndex);
+			UAxes.AddRange(uAxes);
+			VAxes.AddRange(vAxes);
 			
 		}
 		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes, List<IfcGridAxis> wAxes) 
-			:this(host,placement, uAxes,vAxes) { wAxes.ForEach(x=>AddWAxis(x)); }
+			:this(host,placement, uAxes,vAxes) { WAxes.AddRange(wAxes); }
 
-		internal void AddUAxis(IfcGridAxis a) { mUAxes.Add(a.mIndex); a.mPartOfU = this; setShapeRep(a); }
-		internal void AddVAxis(IfcGridAxis a) { mVAxes.Add(a.mIndex); a.mPartOfV = this; setShapeRep(a); }
-		internal void AddWAxis(IfcGridAxis a) { mWAxes.Add(a.mIndex); a.mPartOfW = this; setShapeRep(a); }
-		internal void RemoveUAxis(IfcGridAxis a) { mUAxes.Remove(a.mIndex); a.mPartOfU = null; removeExistingFromShapeRep(a);  }
-		internal void RemoveVAxis(IfcGridAxis a) { mVAxes.Remove(a.mIndex); a.mPartOfV = null; removeExistingFromShapeRep(a); }
-		internal void RemoveWAxis(IfcGridAxis a) { mWAxes.Remove(a.mIndex); a.mPartOfW = null; removeExistingFromShapeRep(a); }
+		protected override void initialize()
+		{
+			base.initialize();
 
+			mUAxes.CollectionChanged += mUAxes_CollectionChanged;
+			mVAxes.CollectionChanged += mVAxes_CollectionChanged;
+			mWAxes.CollectionChanged += mWAxes_CollectionChanged;
+		}
+		private void mUAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcGridAxis a in e.NewItems)
+				{
+					a.mPartOfU = this;
+					setShapeRep(a);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcGridAxis a in e.OldItems)
+				{
+					removeExistingFromShapeRep(a);
+					a.mPartOfU = null;
+				}
+			}
+		}
+		private void mVAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcGridAxis a in e.NewItems)
+				{
+					a.mPartOfV = this;
+					setShapeRep(a);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcGridAxis a in e.OldItems)
+				{
+					removeExistingFromShapeRep(a);
+					a.mPartOfV = null;
+				}
+			}
+		}
+		private void mWAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcGridAxis a in e.NewItems)
+				{
+					a.mPartOfW = this;
+					setShapeRep(a);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcGridAxis a in e.OldItems)
+				{
+					removeExistingFromShapeRep(a);
+					a.mPartOfW = null;
+				}
+			}
+		}
 		private void setShapeRep(IfcGridAxis a) { setShapeRep(new List<IfcGridAxis>() { a }); }
 		private void setShapeRep(List<IfcGridAxis> axis)
 		{
@@ -296,7 +342,7 @@ namespace GeometryGym.Ifc
 							IfcGeometricCurveSet curveSet = gri as IfcGeometricCurveSet;
 							if (curveSet != null)
 							{
-								axis.ForEach(x => curveSet.addElement( (IfcGeometricSetSelect)x.AxisCurve));
+								axis.ForEach(x => curveSet.Elements.Add(x.AxisCurve));
 								return;
 							}
 						}
@@ -343,16 +389,12 @@ namespace GeometryGym.Ifc
 						{
 							IfcGeometricCurveSet curveSet = gri as IfcGeometricCurveSet;
 							if (curveSet != null)
-								axis.ForEach(x=>curveSet.removeElement((IfcGeometricSetSelect)x.AxisCurve));
+								axis.ForEach(x=>curveSet.Elements.Remove(x.AxisCurve));
 						}
 					}
 				}
 			}
 		}
-
-		//removeExistingFromShapeRep(UAxes);
-		//mUAxes = value == null ? new List<int>() : value.ConvertAll(x => x.mIndex);
-		//		setShapeRep(value);
 
 		internal override void detachFromHost()
 		{
@@ -364,10 +406,10 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcGridAxis : BaseClassIfc
+	[Serializable]
+	public partial class IfcGridAxis : BaseClassIfc, NamedObjectIfc
 	{
 		private string mAxisTag = "$";// : OPTIONAL IfcLabel;
-		private int mAxisCurve;// : IfcCurve;
 		internal bool mSameSense;// : IfcBoolean;
 
 		//INVERSE
@@ -376,14 +418,16 @@ namespace GeometryGym.Ifc
 		internal IfcGrid mPartOfU = null;//	:	SET [0:1] OF IfcGrid FOR UAxes;
 		internal List<IfcVirtualGridIntersection> mHasIntersections = new List<IfcVirtualGridIntersection>();//:	SET OF IfcVirtualGridIntersection FOR IntersectingAxes;
 
-		public override string Name { get { return AxisTag; } set { AxisTag = value; } }
+		public string Name { get { return AxisTag; } set { AxisTag = value; } }
 		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcCurve AxisCurve { get { return mDatabase[mAxisCurve] as IfcCurve; } set { mAxisCurve = value.mIndex; } }
+		public IfcCurve AxisCurve { get;  set; }
+		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 
 		internal IfcGridAxis() : base() { }
 		internal IfcGridAxis(DatabaseIfc db, IfcGridAxis a) : base(db) { mAxisTag = a.mAxisTag; AxisCurve = db.Factory.Duplicate(a.AxisCurve) as IfcCurve; mSameSense = a.mSameSense; }
-		public IfcGridAxis(string tag, IfcCurve axis, bool sameSense) : base(axis.Database) { if (!string.IsNullOrEmpty(tag)) mAxisTag = tag.Replace("'", ""); mAxisCurve = axis.mIndex; mSameSense = sameSense; }
+		public IfcGridAxis(string tag, IfcCurve axis, bool sameSense) : base(axis.mDatabase) { if (!string.IsNullOrEmpty(tag)) mAxisTag = tag.Replace("'", ""); AxisCurve = axis; mSameSense = sameSense; }
 	}
+	[Serializable]
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
 		internal int mPlacementLocation;// : IfcVirtualGridIntersection ;
@@ -400,6 +444,7 @@ namespace GeometryGym.Ifc
 				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcVirtualGridIntersection;
 		}
 	}
+	[Serializable]
 	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{
 		//INVERSE
@@ -412,5 +457,16 @@ namespace GeometryGym.Ifc
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(this, ods)); }
 
 		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].AddRelated(o); }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			foreach (IfcRelAssignsToGroup rags in mIsGroupedBy)
+			{
+				foreach (IfcObjectDefinition d in rags.RelatedObjects)
+					result.AddRange(d.Extract<T>());
+			}
+			return result;
+		}
 	}
 }

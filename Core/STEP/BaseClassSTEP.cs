@@ -28,24 +28,22 @@ using System.Threading.Tasks;
 
 namespace GeometryGym.STEP
 {
-	public partial class STEPEntity 
+	[Serializable]
+	public partial class STEPEntity
 	{
-		internal int mIndex = 0; 
-		internal List<string> mComments = new List<string>();
-		internal string mSTEPString = "";
+		[NonSerialized] internal int mIndex = 0;
+		[NonSerialized] internal List<string> mComments = new List<string>();
 
-		public int Index { get { return mIndex; } }
-		public List<string> Comments { get { return mComments; } set { mComments = value; } }
+		public int Index { get { return mIndex; } private set { mIndex = value; } }
 
-		protected static  ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
+		protected static ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
 		protected static ConcurrentDictionary<string, ConstructorInfo> mConstructors = new ConcurrentDictionary<string, ConstructorInfo>();
 
-		internal STEPEntity() { }
-		internal STEPEntity(int record, string kw, string line) { mIndex = record; mSTEPString = line; }
-		public virtual string KeyWord {get { return this.GetType().Name;}}
+		internal STEPEntity() { initialize(); }
+		internal virtual string KeyWord { get { return this.GetType().Name; } }
 
-		internal virtual void Initialize() { }
-		public override string ToString()
+		protected virtual void initialize() { }
+		public string StringSTEP()
 		{
 			string str = BuildStringSTEP();
 			if (string.IsNullOrEmpty(str))
@@ -58,6 +56,9 @@ namespace GeometryGym.STEP
 			}
 			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord.ToUpper() + "(" + str.Substring(1) + ");";
 		}
+		public override string ToString() { return StringSTEP(); }
 		protected virtual string BuildStringSTEP() { return ""; } 
+		public void  AddComment(string comment) { mComments.Add(comment); }
+
 	}
 }

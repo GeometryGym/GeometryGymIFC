@@ -486,17 +486,17 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Axis") == 0)
-					mAxis = mDatabase.ParseXml<IfcDirection>(child as XmlElement).mIndex;
+					Axis = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
 				else if (string.Compare(name, "RefDirection") == 0)
-					mRefDirection = mDatabase.ParseXml<IfcDirection>(child as XmlElement).mIndex;
+					RefDirection = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mAxis > 0)
+			if (mAxis != null)
 				xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
-			if (mRefDirection > 0)
+			if (mRefDirection != null)
 				xml.AppendChild(RefDirection.GetXML(xml.OwnerDocument, "RefDirection", this, processed));
 		}
 	}

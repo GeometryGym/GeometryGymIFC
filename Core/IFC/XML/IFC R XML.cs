@@ -264,8 +264,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (host.mIndex != mRelatingProduct)
-				xml.AppendChild(mDatabase[mRelatingProduct].GetXML(xml.OwnerDocument, "RelatingProduct", this, processed));
+			if (host != mRelatingProduct)
+				xml.AppendChild(mDatabase[mRelatingProduct.Index].GetXML(xml.OwnerDocument, "RelatingProduct", this, processed));
 		}
 	}
 
@@ -346,6 +346,35 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(mDatabase[mRelatingDocument].GetXML(xml.OwnerDocument, "RelatingDocument", this, processed));
 		}
 	}
+	public partial class IfcRelAssociatesLibrary
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingLibrary") == 0)
+				{
+					if(child.HasChildNodes)
+						RelatingLibrary = mDatabase.ParseXml<IfcLibrarySelect>(child.ChildNodes[0] as XmlElement);
+					else
+						RelatingLibrary = mDatabase.ParseXml<IfcLibrarySelect>(child as XmlElement);
+				}
+				if(string.Compare(name, "RelatedObjects")== 0)
+				{
+					foreach (XmlNode n in child.ChildNodes)
+						addRelated(mDatabase.ParseXml<IfcDefinitionSelect>(n as XmlElement));
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if(host.mIndex != mRelatingLibrary)
+				xml.AppendChild(mDatabase[mRelatingLibrary].GetXML(xml.OwnerDocument, "RelatingLibrary", this, processed));
+		}
+	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -408,7 +437,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcDefinitionSelect d = mDatabase.ParseXml<IfcDefinitionSelect>(cn as XmlElement);
 						if (d != null)
-							AddRelated(d);
+							RelatedDefinitions.Add(d);
 					}
 				}
 				else if (string.Compare(name, "RelatingContext") == 0)
@@ -420,8 +449,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("RelatedDefinitions");
 			xml.AppendChild(element);
-			foreach (int i in mRelatedDefinitions)
-				element.AppendChild(mDatabase[i].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (IfcDefinitionSelect d in mRelatedDefinitions)
+				element.AppendChild(mDatabase[d.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines
@@ -465,7 +494,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcObject o = mDatabase.ParseXml<IfcObject>(cn as XmlElement);
 						if (o != null)
-							AddRelated(o);
+							RelatedObjects.Add(o);
 					}
 				}
 				else if (string.Compare(name, "RelatingType") == 0)
@@ -622,7 +651,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRepresentationItem ri = mDatabase.ParseXml<IfcRepresentationItem>(cn as XmlElement);
 						if (ri != null)
-							AddItem(ri);
+							Items.Add(ri);
 					}
 				}
 				else if (string.Compare(name, "LayerAssignments") == 0)
@@ -868,7 +897,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("GlobalId", GlobalId);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if (mOwnerHistory > 0)
+			if (OwnerHistory != null)
 				xml.AppendChild(OwnerHistory.GetXML(xml.OwnerDocument, "OwnerHistory", this, processed));
 		}
 	}

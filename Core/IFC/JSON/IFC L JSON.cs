@@ -39,8 +39,8 @@ namespace GeometryGym.Ifc
 			Location = extractString(obj.GetValue("Location", StringComparison.InvariantCultureIgnoreCase));
 			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 			Publisher = extractObject<IfcActorSelect>(obj.GetValue("Publisher", StringComparison.InvariantCultureIgnoreCase) as JObject);
-//				else if (string.Compare(name, "LibraryRefForObjects") == 0)
-//todo
+			//				else if (string.Compare(name, "LibraryRefForObjects") == 0)
+			//todo
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -63,11 +63,11 @@ namespace GeometryGym.Ifc
 			Language = extractString(obj.GetValue("Language", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj.GetValue("ReferencedLibrary", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				ReferencedLibrary = mDatabase.parseJObject< IfcLibraryInformation> (jobj); 
-//				else if (string.Compare(name, "LibraryRefForObjects") == 0)
-	//			{
-					//todo
-		//		}
+				ReferencedLibrary = mDatabase.parseJObject<IfcLibraryInformation>(jobj);
+			//				else if (string.Compare(name, "LibraryRefForObjects") == 0)
+			//			{
+			//todo
+			//		}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -89,8 +89,6 @@ namespace GeometryGym.Ifc
 				JObject jobj = token as JObject;
 				if (jobj != null)
 					PlacementRelTo = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
-				else
-					mPlacementRelTo = token.Value<int>();
 			}
 			JObject rp = obj.GetValue("RelativePlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
@@ -99,10 +97,62 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			
-			if(mPlacementRelTo > 0)
+
+			if (mPlacementRelTo != null)
 				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, options);
-			obj["RelativePlacement"] = mDatabase[mRelativePlacement].getJson(this, options);
+			obj["RelativePlacement"] = mRelativePlacement.getJson(this, options);
+		}
+	}
+	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mDepth);
+			token = obj.GetValue("Width", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mWidth);
+			token = obj.GetValue("Thickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mThickness);
+			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mFilletRadius);
+			token = obj.GetValue("EdgeRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mEdgeRadius);
+			token = obj.GetValue("LegSlope", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mLegSlope);
+			token = obj.GetValue("CentreOfGravityInX", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mCentreOfGravityInX);
+			token = obj.GetValue("CentreOfGravityInY", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mCentreOfGravityInY);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			int digits = mDatabase.mLengthDigits;
+			base.setJSON(obj, host, options);
+			obj["Depth"] = Math.Round(mDepth, digits);
+			obj["Width"] = Math.Round(mWidth, digits);
+			obj["Thickness"] = Math.Round(mThickness, digits);
+			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
+				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+			if (!double.IsNaN(mEdgeRadius) && mEdgeRadius > 0)
+				obj["EdgeRadius"] = Math.Round(mEdgeRadius, digits);
+			if (!double.IsNaN(mLegSlope) && mLegSlope > 0)
+				obj["LegSlope"] = mLegSlope;
+			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
+			{
+				if (!double.IsNaN(mCentreOfGravityInX) && mCentreOfGravityInX > 0)
+					obj["CentreOfGravityInX"] = mCentreOfGravityInX;
+				if (!double.IsNaN(mCentreOfGravityInY) && mCentreOfGravityInY > 0)
+					obj["CentreOfGravityInY"] = mCentreOfGravityInY;
+			}
 		}
 	}
 }

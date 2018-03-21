@@ -17,25 +17,56 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
+using System.Collections.ObjectModel;
+using System.Collections;
 using System.ComponentModel;
+using System.Linq;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
-using GeometryGym.STEP;
-
-namespace GeometryGym.Ifc
+namespace GeometryGym.STEP
 {
-	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
+	[Serializable]
+	public class SET<T> : ObservableCollection<T>
 	{
-		internal abstract void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary);
-		protected override string BuildStringSTEP()
+		public SET() : base() { }
+		public SET(T item) : base() { Add(item); }
+		public SET(IEnumerable<T> collection) { Clear();  AddRange(collection); }
+		public void AddRange(IEnumerable<T> collection)
 		{
-			return BuildStringSTEP(mDatabase == null ? ReleaseVersion.IFC4A2 : mDatabase.Release);
+			if (collection != null)
+			{
+				foreach (T t in collection)
+				{
+					if (t != null)
+						this.Add(t);
+				}
+			}
 		}
-		protected virtual string BuildStringSTEP(ReleaseVersion release) { return ""; }
+		
+		public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return this.ToList().ConvertAll(converter); }
+	}
+	[Serializable]
+	public class LIST<T> : ObservableCollection<T>
+	{
+		public LIST() : base() { }
+		public LIST(T item) : base() { Add(item); }
+		public LIST(IEnumerable<T> collection) { Clear();  AddRange(collection); }
+		public void AddRange(IEnumerable<T> collection)
+		{
+			if (collection != null)
+			{
+				foreach (T t in collection)
+				{
+					if(t != null)
+						this.Add(t);
+				}
+			}
+		}
+		public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return this.ToList().ConvertAll(converter); }
 	}
 }

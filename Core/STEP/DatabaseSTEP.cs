@@ -119,6 +119,7 @@ namespace GeometryGym.STEP
 
 		
 
+		public string FolderPath { get; protected set; } = "";
 		internal string PreviousApplication { get; set; } = "";
 	}
 }

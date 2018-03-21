@@ -27,29 +27,30 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcNamedUnit : BaseClassIfc, IfcUnit //ABSTRACT SUPERTYPE OF (ONEOF(IfcContextDependentUnit,IfcConversionBasedUnit,IfcSIUnit));
+	[Serializable]
+	public abstract partial class IfcNamedUnit : BaseClassIfc, IfcUnit  //ABSTRACT SUPERTYPE OF (ONEOF(IfcContextDependentUnit,IfcConversionBasedUnit,IfcSIUnit));
 	{
-		internal int mDimensions;// : IfcDimensionalExponents;
+		internal IfcDimensionalExponents mDimensions = null;// : IfcDimensionalExponents;
 		private IfcUnitEnum mUnitType;// : IfcUnitEnum 
 
-		public IfcDimensionalExponents Dimensions { get { return mDatabase[mDimensions] as IfcDimensionalExponents; } set { mDimensions = value.Index; } }
+		public IfcDimensionalExponents Dimensions { get { return mDimensions as IfcDimensionalExponents; } set { mDimensions = value; } }
 		public IfcUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
 
 		protected IfcNamedUnit() : base() { }
-		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db, u) { if (u.mDimensions > 0) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
+		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db, u) { if (u.mDimensions != null) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
 		protected IfcNamedUnit(DatabaseIfc m, IfcUnitEnum unitEnum, bool gendims) : base(m)
 		{
 			mUnitType = unitEnum;
 			if (gendims)
 			{
 				if (unitEnum == IfcUnitEnum.LENGTHUNIT)
-					mDimensions = new IfcDimensionalExponents(m, 1, 0, 0, 0, 0, 0, 0).mIndex;
+					Dimensions = new IfcDimensionalExponents(m, 1, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.AREAUNIT)
-					mDimensions = new IfcDimensionalExponents(m, 2, 0, 0, 0, 0, 0, 0).mIndex;
+					Dimensions = new IfcDimensionalExponents(m, 2, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.VOLUMEUNIT)
-					mDimensions = new IfcDimensionalExponents(m, 3, 0, 0, 0, 0, 0, 0).mIndex;
+					Dimensions = new IfcDimensionalExponents(m, 3, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.PLANEANGLEUNIT)
-					mDimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0).mIndex;
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0);
 			}
 		}
 

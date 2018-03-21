@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mDimensions > 0)
+			if (mDimensions != null)
 				xml.AppendChild(Dimensions.GetXML(xml.OwnerDocument, "Dimensions", this, processed));
 			xml.SetAttribute("UnitType", mUnitType.ToString().ToLower());
 		}

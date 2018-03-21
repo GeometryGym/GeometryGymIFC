@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 			if (optStrt == null)
 				optStrt = twoD ? new IfcCartesianPoint(db, new Point2d(s.X, s.Y)) : new IfcCartesianPoint(db, s);
 			end = twoD ? new IfcCartesianPoint(db, new Point2d(e.X, e.Y)) : new IfcCartesianPoint(db,e);
-			double angleFactor = mDatabase.mContext.UnitsInContext.getScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
+			double angleFactor = mDatabase.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			if (twoD)
 			{
 				if (a.Plane.ZAxis.Z < 0)

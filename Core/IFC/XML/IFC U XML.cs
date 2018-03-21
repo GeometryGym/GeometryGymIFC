@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcUnit u = mDatabase.ParseXml<IfcUnit>(cn as XmlElement);
 						if (u != null)
-							AddUnit(u);
+							Units.Add(u);
 					}
 				}
 			}

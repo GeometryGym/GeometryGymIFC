@@ -322,14 +322,14 @@ namespace GeometryGym.Ifc
 			
 			xml.AppendChild(OwningUser.GetXML(xml.OwnerDocument, "OwningUser", this, processed));
 			xml.AppendChild(OwningApplication.GetXML(xml.OwnerDocument, "OwningApplication", this, processed));
-			if (mState != IfcStateEnum.NA)
+			if (mState != IfcStateEnum.NOTDEFINED)
 				xml.SetAttribute("State", mState.ToString().ToLower());
 			xml.SetAttribute("ChangeAction", mChangeAction.ToString().ToLower());
 			if (mLastModifiedDate > 0)
 				xml.SetAttribute("LastModifiedDate", mLastModifiedDate.ToString());
-			if(mLastModifyingUser > 0)
+			if(mLastModifyingUser != null)
 				xml.AppendChild(LastModifyingUser.GetXML(xml.OwnerDocument, "LastModifyingUser", this, processed));
-			if (mLastModifyingApplication > 0)
+			if (mLastModifyingApplication != null)
 				xml.AppendChild(LastModifyingApplication.GetXML(xml.OwnerDocument, "LastModifyingApplication", this, processed));
 			xml.SetAttribute("CreationDate", mCreationDate.ToString());
 		}

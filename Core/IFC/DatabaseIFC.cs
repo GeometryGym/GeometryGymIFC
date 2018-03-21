@@ -49,12 +49,14 @@ namespace GeometryGym.Ifc
 			Z = z;
 		}
 	}
+	public enum FormatIfcSerialization { STEP, XML, JSON };
 	public partial class DatabaseIfc : DatabaseSTEP<BaseClassIfc>
 	{
-		internal Guid id = Guid.NewGuid();
+		internal string id = ParserIfc.EncodeGuid(Guid.NewGuid());
 		
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
-
+		public FormatIfcSerialization Format { get; set; } = FormatIfcSerialization.STEP;
+		
 		private FactoryIfc mFactory = null;
 		public FactoryIfc Factory { get { return mFactory; } }
 
@@ -83,7 +85,17 @@ namespace GeometryGym.Ifc
 			{
 				IfcRoot root = this[index] as IfcRoot;
 				if (root != null)
-					mDictionary.Remove(root.GlobalId);
+				{
+					BaseClassIfc obj = null;
+					mDictionary.TryRemove(root.GlobalId, out obj);
+				}
+				root = value as IfcRoot;
+				if(root != null)
+				{
+					if (mDictionary.ContainsKey(root.GlobalId))
+						root.Guid = Guid.NewGuid();
+					mDictionary.TryAdd(root.GlobalId, value);
+				}
 				base[index] = value;
 				if(value != null)
 					value.mDatabase = this;
@@ -92,7 +104,6 @@ namespace GeometryGym.Ifc
 		internal ModelView mModelView = ModelView.Ifc2x3NotAssigned;
 		internal bool mAccuratePreview = false;
 		internal string mFileName = "";
-		public string FolderPath { get; private set; } = "";
 		public string FileName { get { return mFileName; } set { mFileName = value; FolderPath = Path.GetDirectoryName(value); } }
 		internal bool mTimeInDays = false;
 		public ReleaseVersion Release
@@ -119,10 +130,25 @@ namespace GeometryGym.Ifc
 		}
 		public double ScaleSI
 		{
-			get { return mModelSIScale; }
-			set { mModelSIScale = value; }
+			get
+			{
+				if(double.IsNaN(mModelSIScale))
+				{
+					IfcContext context = Context;
+					if(context != null)
+					{
+						IfcUnitAssignment units = context.UnitsInContext;
+						if (units != null)
+							mModelSIScale = units.ScaleSI(IfcUnitEnum.LENGTHUNIT); 
+					}
+					if (double.IsNaN(mModelSIScale))
+						return 1;
+				}
+				return mModelSIScale;
+			}
+			internal set { mModelSIScale = value; }
 		}
-		private double mModelTolerance = 0.0001,mModelSIScale = 1;
+		private double mModelTolerance = 0.0001,mModelSIScale = double.NaN;
 		internal int mLengthDigits = 5;
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }
@@ -130,7 +156,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcContext mContext = null;
 		
-		internal Dictionary<string, BaseClassIfc> mDictionary = new Dictionary<string,BaseClassIfc>();
+		internal ConcurrentDictionary<string, BaseClassIfc> mDictionary = new ConcurrentDictionary<string, BaseClassIfc>();
 
 		
 		private string viewDefinition { get { return (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" : (mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned"))); } }
@@ -164,26 +190,47 @@ namespace GeometryGym.Ifc
 			}
 			return result + getFooterString();
 		}
+		public static DatabaseIfc ParseString(string str)
+		{
+			if (string.IsNullOrEmpty(str))
+				return null;
+
+			DatabaseIfc db = new DatabaseIfc(false, ReleaseVersion.IFC4);
+#if (!NOIFCJSON)
+			if(str.StartsWith("{"))
+			{
+				Newtonsoft.Json.Linq.JObject jobj = Newtonsoft.Json.Linq.JObject.Parse(str);
+				if (str != null)
+					db.ReadJSON(jobj);
+			}
+#endif
+			if(str.StartsWith("<"))
+			{
+				System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+				doc.LoadXml(str);
+				db.ReadXMLDoc(doc);
+			}
+			return db;
+		}
 	
-		internal enum FormatIfc { JSON, STEP, XML }
 		internal class FileStreamIfc
 		{
-			internal FormatIfc mFormat;
+			internal FormatIfcSerialization mFormat;
 			internal TextReader mTextReader;
-			internal FileStreamIfc(FormatIfc format, TextReader sr)
+			internal FileStreamIfc(FormatIfcSerialization format, TextReader sr)
 			{
 				mFormat = format;
 				mTextReader = sr;
 			} 
 		}
-		private FormatIfc detectFormat(string fileName)
+		private FormatIfcSerialization detectFormat(string fileName)
 		{
 			string lower = fileName.ToLower();
 			if (lower.EndsWith("xml"))
-				return FormatIfc.XML; 
+				return FormatIfcSerialization.XML; 
 			if (lower.EndsWith("json"))
-				return FormatIfc.JSON;
-			return FormatIfc.STEP;
+				return FormatIfcSerialization.JSON;
+			return FormatIfcSerialization.STEP;
 		}
 		internal FileStreamIfc getStreamReader(string fileName)
 		{
@@ -199,14 +246,14 @@ namespace GeometryGym.Ifc
 					return null;
 				}
 				string filename = za.Entries[0].Name.ToLower();
-				FormatIfc fformat = detectFormat(filename);
-				StreamReader str = (fformat == FormatIfc.STEP ? new StreamReader(za.Entries[0].Open(), Encoding.GetEncoding("windows-1252")) :
+				FormatIfcSerialization fformat = detectFormat(filename);
+				StreamReader str = (fformat == FormatIfcSerialization.STEP ? new StreamReader(za.Entries[0].Open(), Encoding.GetEncoding("windows-1252")) :
 					new StreamReader(za.Entries[0].Open()));
 				return new FileStreamIfc(fformat,str);
 			}
 #endif
-			FormatIfc format = detectFormat(fileName);
-			StreamReader sr = format == FormatIfc.STEP ? new StreamReader(fileName, Encoding.GetEncoding("windows-1252")) :
+			FormatIfcSerialization format = detectFormat(fileName);
+			StreamReader sr = format == FormatIfcSerialization.STEP ? new StreamReader(fileName, Encoding.GetEncoding("windows-1252")) :
 				new StreamReader(fileName);
 			return new FileStreamIfc(format, sr);
 		}
@@ -215,6 +262,7 @@ namespace GeometryGym.Ifc
 		{
 			if (string.IsNullOrEmpty(filename))
 				return;
+
 			FolderPath = Path.GetDirectoryName(filename);
 			if(filename.ToLower().EndsWith("ifc"))
 				importLines(File.ReadAllLines(filename));
@@ -225,12 +273,15 @@ namespace GeometryGym.Ifc
 		{
 			if (fs == null)
 				return;
+			CultureInfo current = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+
 			switch (fs.mFormat)
 			{
-				case FormatIfc.XML:
+				case FormatIfcSerialization.XML:
 					ReadXMLStream(fs.mTextReader);
 					break;
-				case FormatIfc.JSON:
+				case FormatIfcSerialization.JSON:
 #if (NOIFCJSON)
 					logError("IfcJSON not enabled!");
 					return;
@@ -242,7 +293,7 @@ namespace GeometryGym.Ifc
 					ReadFile(fs.mTextReader, 0);
 					break;
 			}
-			
+			Thread.CurrentThread.CurrentCulture = current;
 		}
 
 		private IfcContext ReadFile(TextReader sr, int offset)
@@ -252,7 +303,12 @@ namespace GeometryGym.Ifc
 				return null;
 			if (i == (int)'{')
 			{
-				ReadFile(new FileStreamIfc(FormatIfc.JSON, sr));
+				ReadFile(new FileStreamIfc(FormatIfcSerialization.JSON, sr));
+				return mContext;
+			}
+			else if (i == (int)'<')
+			{
+				ReadFile(new FileStreamIfc(FormatIfcSerialization.XML, sr));
 				return mContext;
 			}
 			else
@@ -279,7 +335,13 @@ namespace GeometryGym.Ifc
 			}
 			
 		}
-		private void  importLines(IEnumerable<string> lines)
+		private class ConstructorClass
+		{
+			internal BaseClassIfc Object { get; }
+			internal string DefinitionString { get; }
+			internal ConstructorClass(BaseClassIfc obj, string definition) { Object = obj; DefinitionString = definition; }
+		}
+		internal void importLines(IEnumerable<string> lines)
 		{
 			mRelease = ReleaseVersion.IFC2x3;
 			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
@@ -374,41 +436,55 @@ namespace GeometryGym.Ifc
 					continue;
 				revised.Add(strLine);
 			}
-			
-#if (MULTITHREAD)
-			ConcurrentBag<BaseClassIfc> objects = new ConcurrentBag<BaseClassIfc>();
+
+			ConcurrentDictionary<int, BaseClassIfc> dictionary = new ConcurrentDictionary<int, BaseClassIfc>();
+			dictionary[0] = null;
+			ConcurrentBag<ConstructorClass> bag = new ConcurrentBag<ConstructorClass>();
+			foreach(string str in revised)
+			{
+				int ifcID = 0;
+				string kw = "", def  = "";
+				ParserSTEP.GetKeyWord(str, out ifcID, out kw, out def);
+				if(!string.IsNullOrEmpty(kw))
+				{
+					BaseClassIfc obj = BaseClassIfc.Construct(kw);
+					if (obj != null)
+					{
+						dictionary[ifcID] = obj;
+						bag.Add(new ConstructorClass(obj, def));
+						this[ifcID] = obj;
+					}
+				}
+			}
+
+			ReleaseVersion release = Release;
+#if (qMULTITHREAD)
 			ConcurrentBag<string> errors = new ConcurrentBag<string>();
-			Parallel.ForEach(revised, new ParallelOptions { MaxDegreeOfParallelism = 4 }, line =>
+			Parallel.ForEach(bag, new ParallelOptions { MaxDegreeOfParallelism = 4 }, obj =>
 			{
 				try
 				{
-					BaseClassIfc obj = interpretLine(line);
-					if (obj != null)
-						objects.Add(obj);
+					int pos = 0;
+					string def = obj.DefinitionString;
+					obj.Object.parse(def, ref pos,release, def.Length, dictionary);
 				}
-				catch (Exception x) { errors.Add("XXX Error in line " + line + " " + x.Message); }
+				catch (Exception x) { errors.Add("XXX Error in line #" + obj.Object.Index + " " + obj.Object.KeyWord + " " + x.Message); }
 			});
-			BaseClassIfc last = objects.Last();
-			if (last != null)
-				setSize(last.mIndex);
 
-			foreach (BaseClassIfc obj in objects)
-				this[obj.mIndex] = obj;
 			foreach (string error in errors)
 				logError(error);
 #else
-			foreach (string line in revised)
+			foreach (ConstructorClass obj in bag)
 			{
 				try
 				{
-					BaseClassIfc obj = interpretLine(line);
-					if (obj != null)
-						this[obj.mIndex] = obj;
+					int pos = 0;
+					string def = obj.DefinitionString;
+					obj.Object.parse(def, ref pos, release, def.Length, dictionary);
 				}
-				catch (Exception x) { logError("XXX Error in line " + line + " " + x.Message); }
+				catch (Exception x) { logError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.KeyWord + " " + x.Message); }
 			}
 #endif
-
 			Thread.CurrentThread.CurrentCulture = current;
 			postParseRelate();
 			postImport();
@@ -461,9 +537,9 @@ namespace GeometryGym.Ifc
 			}
 			//	customPostImport();
 		}
-		internal BaseClassIfc interpretLine(string line)
+		internal BaseClassIfc interpretLine(string line, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			BaseClassIfc result = ParserIfc.ParseLine(line, mRelease);
+			BaseClassIfc result = ParserIfc.ParseLine(line, mRelease, dictionary);
 			if (result == null)
 			{
 				if (line.StartsWith("ISO"))
@@ -490,9 +566,6 @@ namespace GeometryGym.Ifc
 						{
 							this[ea.mIndex] = null;
 							mFactory.mApplication = application;
-							//	mFactory.OwnerHistory(IfcChangeActionEnum.ADDED).mLastModifyingApplication = application.mIndex;
-							//	if (mFactory.mOwnerHistories.ContainsKey(IfcChangeActionEnum.MODIFIED))
-							//		mFactory.mOwnerHistories[IfcChangeActionEnum.MODIFIED].mLastModifyingApplication = application.mIndex;
 						}
 					}
 				}
@@ -518,7 +591,6 @@ namespace GeometryGym.Ifc
 		{
 			StreamWriter sw = null;
 
-			
 			FolderPath = Path.GetDirectoryName(filename);
 			string fn = Path.GetFileNameWithoutExtension(filename);
 			char[] chars = Path.GetInvalidFileNameChars();
@@ -561,7 +633,7 @@ namespace GeometryGym.Ifc
 				{
 					try
 					{
-						string str = e.ToString();
+						string str = e.StringSTEP();
 						if (!string.IsNullOrEmpty(str))
 							sw.WriteLine(str);
 					}
@@ -578,7 +650,28 @@ namespace GeometryGym.Ifc
 			return true;
 		}
 	}
-
+	public class DuplicateMapping
+	{
+		private Dictionary<string, int> mDictionary = new Dictionary<string, int>();
+		internal int FindExisting(BaseClassIfc obj)
+		{
+			if (obj == null)
+				return 0;
+			int result = 0;
+			mDictionary.TryGetValue(key(obj), out result);
+			return result;
+		}
+		internal void AddObject(BaseClassIfc obj, int index) { mDictionary.Add(key(obj), index); }
+		private string key(BaseClassIfc obj) { return obj.mDatabase.id + "|" + obj.mIndex; }
+		internal bool Remove(BaseClassIfc obj)
+		{
+			string k = key(obj);
+			if (mDictionary.Remove(k))
+				return true;
+			return false;
+		}
+		internal void Clear() { mDictionary.Clear(); }
+	}
 	public partial class FactoryIfc
 	{
 		private DatabaseIfc mDatabase = null;
@@ -594,25 +687,22 @@ namespace GeometryGym.Ifc
 
 		public BaseClassIfc Construct(string className)
 		{
-			Type type = Type.GetType("GeometryGym.Ifc." + className);
-			if (type == null)
+			BaseClassIfc result = BaseClassIfc.Construct(className);
+			if (result == null)
 				return null;
-			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
-			if (ctor == null)
-				return null;
-			BaseClassIfc result = ctor.Invoke(new object[0] ) as BaseClassIfc;
 			mDatabase[mDatabase.NextBlank] = result;
 			return result; 
 		}
-		internal Dictionary<int, int> mDuplicateMapping = new Dictionary<int, int>();
+		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping(); 
 		internal BaseClassIfc Duplicate(BaseClassIfc entity) { return Duplicate(entity, true); }
 		
 		internal BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
 		{
 			if (entity == null)
 				return null;
-			if (mDuplicateMapping.ContainsKey(entity.mIndex))
-				return mDatabase[mDuplicateMapping[entity.mIndex]];
+			int index = mDuplicateMapping.FindExisting(entity);
+			if(index > 0)
+				return mDatabase[index];
 			if (!string.IsNullOrEmpty(entity.mGlobalId))
 			{
 				BaseClassIfc result = null;
@@ -620,7 +710,7 @@ namespace GeometryGym.Ifc
 				{
 					if (result != null)
 					{
-						mDuplicateMapping.Add(entity.mIndex, result.mIndex);
+						mDuplicateMapping.AddObject(entity, result.mIndex);
 						return result;
 					}
 				}
@@ -648,8 +738,9 @@ namespace GeometryGym.Ifc
 		{
 			if (entity == null)
 				return null;
-			if (mDuplicateMapping.ContainsKey(entity.mIndex))
-				return mDatabase[mDuplicateMapping[entity.mIndex]] as IfcRoot;
+			int index = mDuplicateMapping.FindExisting(entity);
+			if (index > 0)
+				return mDatabase[index] as IfcRoot;
 			if(!string.IsNullOrEmpty(entity.mGlobalId))
 			{
 				BaseClassIfc result = null;
@@ -657,7 +748,7 @@ namespace GeometryGym.Ifc
 				{
 					if (result != null)
 					{
-						mDuplicateMapping.Add(entity.mIndex, result.mIndex);
+						mDuplicateMapping.AddObject(entity, result.mIndex);
 						return result;
 					}
 				}
@@ -845,10 +936,10 @@ namespace GeometryGym.Ifc
 				if (Enum.TryParse<IfcRoleEnum>(str, out role))
 				{
 					if (role != IfcRoleEnum.NOTDEFINED)
-						mPerson.AddRole(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
+						mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
 				}
 				else
-					mPerson.AddRole(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
+					mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
 			}
 #endif
 				}
@@ -906,7 +997,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				if (!mOptions.GenerateOwnerHistory)
+				if (mDatabase.Release > ReleaseVersion.IFC2x3 && !mOptions.GenerateOwnerHistory)
 					return null;
 				if(mOwnerHistoryAdded == null)
 					mOwnerHistoryAdded = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);
@@ -925,8 +1016,8 @@ namespace GeometryGym.Ifc
 
 			result = new IfcGeometricRepresentationContext(mDatabase, dimension, mDatabase.Tolerance) { ContextType = type };
 			IfcContext context = mDatabase.Context;
-			if (context != null)
-				context.addRepresentationContext(result);
+			if (context != null && !context.RepresentationContexts.Contains(result))
+				context.RepresentationContexts.Add(result);
 			mContexts.Add(nature, result);
 			return result;
 		}
@@ -966,6 +1057,10 @@ namespace GeometryGym.Ifc
 			{
 				identifier = "FootPrint";
 			}
+			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Outline)
+			{
+				identifier = "Outline";
+			}
 			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.PlanSymbol3d)
 			{
 				projection = IfcGeometricProjectionEnum.PLAN_VIEW;
@@ -975,7 +1070,12 @@ namespace GeometryGym.Ifc
 			{
 				projection = IfcGeometricProjectionEnum.PLAN_VIEW;
 				identifier = "Annotation";
-				context = GeometricRepresentationContext(IfcGeometricRepresentationContext.GeometricContextIdentifier.Annotation);
+				context = GeometricRepresentationContext(IfcGeometricRepresentationContext.GeometricContextIdentifier.Plan);
+			}
+			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Row)
+			{
+				projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
+				identifier = "Row";
 			}
 			if (context == null)
 				context = GeometricRepresentationContext(IfcGeometricRepresentationContext.GeometricContextIdentifier.Model);

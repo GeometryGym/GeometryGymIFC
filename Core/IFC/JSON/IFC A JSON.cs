@@ -198,6 +198,86 @@ namespace GeometryGym.Ifc
 			obj["OuterCurve"] = OuterCurve.getJson(this, options);
 		}
 	}
+	public partial class IfcAsymmetricIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 IfcIShapeProfileDef 
+	{
+		//internal double mBottomFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
+		//internal double mBottomFlangeSlope = double.NaN;//	:	OPTIONAL IfcPlaneAngleMeasure;
+		//internal double mTopFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
+		//internal double mTopFlangeSlope = double.NaN;//:	OPTIONAL IfcPlaneAngleMeasure;
+		//internal double mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure IFC4 deleted
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("BottomFlangeWidth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mBottomFlangeWidth);
+			token = obj.GetValue("OverallDepth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mOverallDepth);
+			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mWebThickness);
+			token = obj.GetValue("BottomFlangeThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mBottomFlangeThickness);
+			token = obj.GetValue("BottomFlangeFilletRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mBottomFlangeFilletRadius);
+			token = obj.GetValue("TopFlangeWidth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mTopFlangeWidth);
+			token = obj.GetValue("TopFlangeThickness", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mTopFlangeThickness);
+			token = obj.GetValue("TopFlangeFilletRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mTopFlangeFilletRadius);
+			token = obj.GetValue("BottomFlangeEdgeRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mBottomFlangeEdgeRadius);
+			token = obj.GetValue("BottomFlangeSlope", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mBottomFlangeSlope);
+			token = obj.GetValue("TopFlangeEdgeRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mTopFlangeEdgeRadius);
+			token = obj.GetValue("TopFlangeSlope", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mTopFlangeSlope);
+			token = obj.GetValue("CentreOfGravityInY", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				double.TryParse(token.Value<string>(), out mCentreOfGravityInY);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			int digits = mDatabase.mLengthDigits;
+			base.setJSON(obj, host, options);
+			obj["BottomFlangeWidth"] = Math.Round(mBottomFlangeWidth, digits);
+			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
+			obj["WebThickness"] = Math.Round(mWebThickness, digits);
+			obj["BottomFlangeThickness"] = Math.Round(mBottomFlangeThickness, digits);
+			if (!double.IsNaN(mBottomFlangeFilletRadius) && mBottomFlangeFilletRadius > 0)
+				obj["BottomFlangeFilletRadius"] = Math.Round(mBottomFlangeFilletRadius, digits);
+			obj["TopFlangeWidth"] = Math.Round(mTopFlangeWidth, digits);
+			if (!double.IsNaN(mTopFlangeThickness) && mTopFlangeThickness > 0)
+				obj["TopFlangeThickness"] = Math.Round(mTopFlangeThickness, digits);
+			if (!double.IsNaN(mTopFlangeFilletRadius) && mTopFlangeFilletRadius > 0)
+				obj["TopFlangeFilletRadius"] = Math.Round(mTopFlangeFilletRadius, digits);
+			if (!double.IsNaN(mBottomFlangeEdgeRadius) && mBottomFlangeEdgeRadius > 0)
+				obj["BottomFlangeEdgeRadius"] = Math.Round(mBottomFlangeEdgeRadius, digits);
+			if (!double.IsNaN(mBottomFlangeSlope) && mBottomFlangeSlope > 0)
+				obj["BottomFlangeSlope"] = mBottomFlangeSlope;
+			if (!double.IsNaN(mTopFlangeEdgeRadius) && mTopFlangeEdgeRadius > 0)
+				obj["TopFlangeEdgeRadius"] = Math.Round(mTopFlangeEdgeRadius, digits);
+			if (!double.IsNaN(mTopFlangeSlope) && mTopFlangeSlope > 0)
+				obj["TopFlangeSlope"] = mTopFlangeSlope;
+			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
+			{
+				if (!double.IsNaN(mCentreOfGravityInY) && mCentreOfGravityInY > 0)
+					obj["CentreOfGravityInY"] = mCentreOfGravityInY;
+			}
+		}
+	}
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		internal override void parseJObject(JObject obj)
@@ -241,33 +321,32 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			IfcCartesianPoint cp = Location;
-			if(cp != null)
-				cp.Coordinates = cp.Coordinates; // Force 3d
-			IfcDirection dir = mDatabase.parseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			if (dir != null)
-			{
-				mAxis = dir.mIndex;
-				dir.DirectionRatioY = dir.DirectionRatioY;
-				dir.DirectionRatioZ = dir.DirectionRatioZ;
-			}
-			dir = mDatabase.parseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			if (dir != null)
-			{
-				mRefDirection = dir.mIndex;
-				dir.DirectionRatioY = dir.DirectionRatioY;
-				dir.DirectionRatioZ = dir.DirectionRatioZ;
-			}
+			Axis = mDatabase.parseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			RefDirection = mDatabase.parseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			IfcDirection axis = Axis;
-			if (axis != null)
+			IfcDirection axis = Axis, refDirection = RefDirection;
+
+			if (axis == null)
+			{
+				if(refDirection != null)
+				{
+					obj["Axis"] = mDatabase.Factory.ZAxis.getJson(this, options);
+					obj["RefDirection"] = refDirection.getJson(this, options);
+				}
+			}
+			else if (refDirection == null)
+			{
 				obj["Axis"] = axis.getJson(this, options);
-			IfcDirection refDirection = RefDirection;
-			if (refDirection != null)
+				obj["RefDirection"] = mDatabase.Factory.XAxis.getJson(this, options);
+			}
+			else if(!axis.isZAxis || !refDirection.isXAxis)
+			{
+				obj["Axis"] = axis.getJson(this, options);
 				obj["RefDirection"] = refDirection.getJson(this, options);
+			}
 		}
 	}
 }

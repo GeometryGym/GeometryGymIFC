@@ -207,7 +207,7 @@ null, Type.EmptyTypes, null);
 			XmlTextWriter writer;
 			try
 			{
-				writer = new XmlTextWriter(filename,Encoding.Default);
+				writer = new XmlTextWriter(filename,Encoding.UTF8);
 				writer.Formatting = Formatting.Indented;
 				try
 				{

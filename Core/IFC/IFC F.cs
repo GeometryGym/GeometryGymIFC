@@ -28,6 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
 		internal List<int> mBounds = new List<int>();// : SET [1:?] OF IfcFaceBound;
@@ -41,6 +42,7 @@ namespace GeometryGym.Ifc
 
 		internal void addBound(IfcFaceBound bound) { mBounds.Add(bound.mIndex); }
 	}
+	[Serializable]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
 		private List<int> mFbsmFaces = new List<int>();// : SET [1:?] OF IfcConnectedFaceSet;
@@ -53,23 +55,27 @@ namespace GeometryGym.Ifc
 
 		internal void addFace(IfcConnectedFaceSet face) { mFbsmFaces.Add(face.mIndex); }
 	}
+	[Serializable]
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
 		internal int mBound;// : IfcLoop;
 		internal bool mOrientation = true;// : BOOLEAN;
 
 		public IfcLoop Bound { get { return mDatabase[mBound] as IfcLoop; } set { mBound = value.mIndex; } }
+		public bool Orientation { get { return mOrientation; } set { mOrientation = value; } }
 
 		internal IfcFaceBound() : base() { }
 		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b) : base(db,b) { Bound = db.Factory.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
 		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { mBound = l.mIndex; mOrientation = orientation; }
 	}
+	[Serializable]
 	public partial class IfcFaceOuterBound : IfcFaceBound
 	{
 		internal IfcFaceOuterBound() : base() { }
 		internal IfcFaceOuterBound(DatabaseIfc db, IfcFaceOuterBound b) : base(db,b) { }
 		public IfcFaceOuterBound(IfcLoop l, bool orientation) : base(l, orientation) { }
 	}
+	[Serializable]
 	public partial class IfcFaceSurface : IfcFace, IfcSurfaceOrFaceSurface //SUPERTYPE OF(IfcAdvancedFace)
 	{
 		internal int mFaceSurface;// : IfcSurface;
@@ -84,12 +90,14 @@ namespace GeometryGym.Ifc
 		public IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 		public IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense) : base(bounds) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
 	}
+	[Serializable]
 	public partial class IfcFacetedBrep : IfcManifoldSolidBrep
 	{
 		internal IfcFacetedBrep() : base() { }
 		public IfcFacetedBrep(IfcClosedShell s) : base(s) { }
 		internal IfcFacetedBrep(DatabaseIfc db, IfcFacetedBrep b) : base(db,b) { }
 	}
+	[Serializable]
 	public partial class IfcFacetedBrepWithVoids : IfcFacetedBrep
 	{
 		internal List<int> mVoids = new List<int>();// : SET [1:?] OF IfcClosedShell
@@ -101,6 +109,7 @@ namespace GeometryGym.Ifc
 		internal void addVoid(IfcClosedShell shell) { mVoids.Add(shell.mIndex); }
 	}
 	//ENTITY IfcFailureConnectionCondition
+	[Serializable]
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
 	{
 		internal IfcFanTypeEnum mPredefinedType = IfcFanTypeEnum.NOTDEFINED;// OPTIONAL : IfcFanTypeEnum;
@@ -110,6 +119,7 @@ namespace GeometryGym.Ifc
 		internal IfcFan(DatabaseIfc db, IfcFan f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		internal IfcFan(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcFanType : IfcFlowMovingDeviceType
 	{
 		internal IfcFanTypeEnum mPredefinedType = IfcFanTypeEnum.NOTDEFINED;// : IfcFanTypeEnum;
@@ -118,6 +128,7 @@ namespace GeometryGym.Ifc
 		internal IfcFanType() : base() { }
 		internal IfcFanType(DatabaseIfc db, IfcFanType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcFastener : IfcElementComponent
 	{
 		internal IfcFastenerTypeEnum mPredefinedType = IfcFastenerTypeEnum.NOTDEFINED;// : IfcFastenerTypeEnum; //IFC4
@@ -127,6 +138,7 @@ namespace GeometryGym.Ifc
 		internal IfcFastener(DatabaseIfc db, IfcFastener f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		internal IfcFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcFastenerType : IfcElementComponentType
 	{
 		internal IfcFastenerTypeEnum mPredefinedType = IfcFastenerTypeEnum.NOTDEFINED;// : IfcFastenerTypeEnum; //IFC4
@@ -136,6 +148,7 @@ namespace GeometryGym.Ifc
 		internal IfcFastenerType(DatabaseIfc db, IfcFastenerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcFastenerType(DatabaseIfc m, string name, IfcFastenerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
+	[Serializable]
 	public abstract partial class IfcFeatureElement : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcFeatureElementAddition, IfcFeatureElementSubtraction, IfcSurfaceFeature))
 	{
 		protected IfcFeatureElement() : base() { }
@@ -143,6 +156,7 @@ namespace GeometryGym.Ifc
 		protected IfcFeatureElement(DatabaseIfc db, IfcFeatureElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		protected IfcFeatureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFeatureElementAddition : IfcFeatureElement //ABSTRACT SUPERTYPE OF(IfcProjectionElement)
 	{	//INVERSE
 		internal List<IfcRelProjectsElement> mProjectsElements = new List<IfcRelProjectsElement>();
@@ -151,6 +165,7 @@ namespace GeometryGym.Ifc
 		protected IfcFeatureElementAddition() : base() { }
 		protected IfcFeatureElementAddition(DatabaseIfc db, IfcFeatureElementAddition e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream){ }
 	}
+	[Serializable]
 	public abstract partial class IfcFeatureElementSubtraction : IfcFeatureElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcOpeningElement ,IfcVoidingFeature)) 
 	{ //INVERSE
 		internal IfcRelVoidsElement mVoidsElement = null;
@@ -166,6 +181,7 @@ namespace GeometryGym.Ifc
 			Placement = new IfcLocalPlacement(host.Placement, mDatabase.Factory.XYPlanePlacement);	
 		}
 	}
+	[Serializable]
 	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem
 	{
 		internal int mHatchLineAppearance;// : IfcCurveStyle;
@@ -193,6 +209,7 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
 	//ENTITY IfcFillAreaStyleTiles
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcFilter : IfcFlowTreatmentDevice //IFC4  
 	{
 		internal IfcFilterTypeEnum mPredefinedType = IfcFilterTypeEnum.NOTDEFINED;
@@ -202,6 +219,7 @@ namespace GeometryGym.Ifc
 		internal IfcFilter(DatabaseIfc db, IfcFilter f, IfcOwnerHistory ownerHistory, bool downStream) : base(db,f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		internal IfcFilter(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcFilterType : IfcFlowTreatmentDeviceType
 	{
 		internal IfcFilterTypeEnum mPredefinedType = IfcFilterTypeEnum.NOTDEFINED;// : IfcFilterTypeEnum;
@@ -210,6 +228,7 @@ namespace GeometryGym.Ifc
 		internal IfcFilterType() : base() { }
 		internal IfcFilterType(DatabaseIfc db, IfcFilterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
+	[Serializable]
 	public partial class IfcFillAreaStyle : IfcPresentationStyle
 	{
 		internal List<int> mFillStyles = new List<int>();// : SET [1:?] OF IfcFillStyleSelect;
@@ -218,6 +237,7 @@ namespace GeometryGym.Ifc
 		internal IfcFillAreaStyle(DatabaseIfc db) : base(db) { }
 	}
 	public interface IfcFillStyleSelect { } // SELECT ( IfcFillAreaStyleHatching, IfcFillAreaStyleTiles, IfcExternallyDefinedHatchStyle, IfcColour);
+	[Serializable]
 	public partial class IfcFireSuppressionTerminal : IfcFlowTerminal //IFC4
 	{
 		internal IfcFireSuppressionTerminalTypeEnum mPredefinedType = IfcFireSuppressionTerminalTypeEnum.NOTDEFINED;// OPTIONAL : IfcFireSuppressinTerminalTypeEnum;
@@ -227,6 +247,7 @@ namespace GeometryGym.Ifc
 		internal IfcFireSuppressionTerminal(DatabaseIfc db, IfcFireSuppressionTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcFireSuppressionTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcFireSuppressionTerminalType : IfcFlowTerminalType
 	{
 		internal IfcFireSuppressionTerminalTypeEnum mPredefinedType = IfcFireSuppressionTerminalTypeEnum.NOTDEFINED;// : IfcFireSuppressionTerminalTypeEnum;
@@ -236,6 +257,7 @@ namespace GeometryGym.Ifc
 		internal IfcFireSuppressionTerminalType(DatabaseIfc db, IfcFireSuppressionTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcFireSuppressionTerminalType(DatabaseIfc m, string name, IfcFireSuppressionTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
+	[Serializable]
 	public partial class IfcFixedReferenceSweptAreaSolid : IfcSweptAreaSolid //IFC4
 	{
 		internal int mDirectrix; // : IfcCurve;
@@ -260,34 +282,39 @@ namespace GeometryGym.Ifc
 			FixedReference = reference;
 		}
 	}
+	[Serializable]
 	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
 	{ //, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve))
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IfcFlowController" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IfcFlowController" : base.KeyWord; } }
 
 		internal IfcFlowController() : base() { }
 		internal IfcFlowController(DatabaseIfc db, IfcFlowController c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream) { }
 		public IfcFlowController(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowControllerType : IfcDistributionFlowElementType
 	{
 		protected IfcFlowControllerType() : base() { }
 		protected IfcFlowControllerType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowControllerType(DatabaseIfc db, IfcFlowControllerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowFitting : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcCableCarrierFitting, IfcCableFitting, IfcDuctFitting, IfcJunctionBox, IfcPipeFitting))
 	{
-		public override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowFitting" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowFitting" : base.KeyWord; } }
 
 		internal IfcFlowFitting() : base() { }
 		internal IfcFlowFitting(DatabaseIfc db, IfcFlowFitting f, IfcOwnerHistory ownerHistory, bool downStream) : base(db,f, ownerHistory, downStream) { }
 		public IfcFlowFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowFittingType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcCableCarrierFittingType ,IfcDuctFittingType ,IfcJunctionBoxType ,IfcPipeFittingType))
 	{
 		protected IfcFlowFittingType() : base() { }
 		protected IfcFlowFittingType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowFittingType(DatabaseIfc db, IfcFlowFittingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowInstrument : IfcDistributionControlElement //IFC4  
 	{
 		internal IfcFlowInstrumentTypeEnum mPredefinedType = IfcFlowInstrumentTypeEnum.NOTDEFINED;
@@ -297,6 +324,7 @@ namespace GeometryGym.Ifc
 		internal IfcFlowInstrument(DatabaseIfc db, IfcFlowInstrument i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
 		internal IfcFlowInstrument(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcFlowInstrumentType : IfcDistributionControlElementType
 	{
 		internal IfcFlowInstrumentTypeEnum mPredefinedType = IfcFlowInstrumentTypeEnum.NOTDEFINED;// : IfcFlowInstrumentTypeEnum;
@@ -306,6 +334,7 @@ namespace GeometryGym.Ifc
 		internal IfcFlowInstrumentType(DatabaseIfc db, IfcFlowInstrumentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcFlowInstrumentType(DatabaseIfc m, string name, IfcFlowInstrumentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
+	[Serializable]
 	public partial class IfcFlowMeter : IfcFlowController //IFC4
 	{
 		internal IfcFlowMeterTypeEnum mPredefinedType = IfcFlowMeterTypeEnum.NOTDEFINED;// OPTIONAL : IfcDamperTypeEnum;
@@ -315,6 +344,7 @@ namespace GeometryGym.Ifc
 		internal IfcFlowMeter(DatabaseIfc db, IfcFlowMeter m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { mPredefinedType = m.mPredefinedType; }
 		internal IfcFlowMeter(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public partial class IfcFlowMeterType : IfcFlowControllerType
 	{
 		internal IfcFlowMeterTypeEnum mPredefinedType = IfcFlowMeterTypeEnum.NOTDEFINED;// : IfcFlowMeterTypeEnum;
@@ -324,56 +354,64 @@ namespace GeometryGym.Ifc
 		internal IfcFlowMeterType(DatabaseIfc db, IfcFlowMeterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		internal IfcFlowMeterType(DatabaseIfc m, string name, IfcFlowMeterTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
+	[Serializable]
 	public partial class IfcFlowMovingDevice : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCompressor, IfcFan, IfcPump))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowMovingDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowMovingDevice" : base.KeyWord); } }
 
 		internal IfcFlowMovingDevice() : base() { }
 		internal IfcFlowMovingDevice(DatabaseIfc db, IfcFlowMovingDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory ,downStream) { }
 		internal IfcFlowMovingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowMovingDeviceType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF(ONEOF(IfcCompressorType, IfcFanType, IfcPumpType))
 	{
 		protected IfcFlowMovingDeviceType() : base() { }
 		protected IfcFlowMovingDeviceType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowMovingDeviceType(DatabaseIfc db, IfcFlowMovingDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowSegment : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCableCarrierSegment, IfcCableSegment, IfcDuctSegment, IfcPipeSegment))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowSegment" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowSegment" : base.KeyWord); } }
 
 		internal IfcFlowSegment() : base() { }
 		internal IfcFlowSegment(DatabaseIfc db, IfcFlowSegment s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 		public IfcFlowSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowSegmentType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcCableCarrierSegmentType ,IfcCableSegmentType ,IfcDuctSegmentType ,IfcPipeSegmentType))
 	{
 		protected IfcFlowSegmentType() : base() { }
 		protected IfcFlowSegmentType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowSegmentType(DatabaseIfc db, IfcFlowSegmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowStorageDevice : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcElectricFlowStorageDevice, IfcTank))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowStorageDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowStorageDevice" : base.KeyWord); } }
 
 		internal IfcFlowStorageDevice() : base() { }
 		internal IfcFlowStorageDevice(DatabaseIfc db, IfcFlowStorageDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db,d, ownerHistory, downStream) { }
 		internal IfcFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowStorageDeviceType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcElectricFlowStorageDeviceType ,IfcTankType))
 	{
 		protected IfcFlowStorageDeviceType() : base() { }
 		protected IfcFlowStorageDeviceType(DatabaseIfc db, IfcFlowStorageDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowTerminal : IfcDistributionFlowElement 	//SUPERTYPE OF(ONEOF(IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTerminal" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTerminal" : base.KeyWord); } }
 
 		internal IfcFlowTerminal() : base() { }
 		protected IfcFlowTerminal(IfcFlowTerminal basis) : base(basis) { }
 		internal IfcFlowTerminal(DatabaseIfc db, IfcFlowTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 		public IfcFlowTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowTerminalType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcAirTerminalType ,
 	{ // IfcElectricApplianceType ,IfcElectricHeaterType ,IfcFireSuppressionTerminalType,IfcLampType ,IfcLightFixtureType ,IfcOutletType ,IfcSanitaryTerminalType ,IfcStackTerminalType ,IfcWasteTerminalType)) 
 		// IFC4 deleted ,IfcGasTerminalType 
@@ -382,20 +420,23 @@ namespace GeometryGym.Ifc
 		protected IfcFlowTerminalType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowTerminalType(DatabaseIfc db, IfcFlowTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFlowTreatmentDevice : IfcDistributionFlowElement // 	SUPERTYPE OF(ONEOF(IfcDuctSilencer, IfcFilter, IfcInterceptor))
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTreatmentDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTreatmentDevice" : base.KeyWord); } }
 
 		internal IfcFlowTreatmentDevice() : base() { }
 		internal IfcFlowTreatmentDevice(DatabaseIfc db, IfcFlowTreatmentDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }
 		internal IfcFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
+	[Serializable]
 	public abstract partial class IfcFlowTreatmentDeviceType : IfcDistributionFlowElementType //ABSTRACT SUPERTYPE OF(ONEOF(IfcDuctSilencerType, IfcFilterType, IfcInterceptorType))
 	{
 		protected IfcFlowTreatmentDeviceType() : base() { }
 		protected IfcFlowTreatmentDeviceType(DatabaseIfc db,  IfcFlowTreatmentDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcFluidFlowProperties : IfcPropertySetDefinition 
 	{
 		internal IfcPropertySourceEnum mPropertySource;// : IfcPropertySourceEnum;
@@ -433,6 +474,7 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcFluidFlowProperties(DatabaseIfc db, string name) : base(db, name) { }
 	}
+	[Serializable]
 	public partial class IfcFooting : IfcBuildingElement
 	{
 		internal IfcFootingTypeEnum mPredefinedType = IfcFootingTypeEnum.NOTDEFINED;// OPTIONAL : IfcFootingTypeEnum;
@@ -442,6 +484,7 @@ namespace GeometryGym.Ifc
 		internal IfcFooting(DatabaseIfc db, IfcFooting f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		public IfcFooting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcFootingType : IfcBuildingElementType
 	{
 		internal IfcFootingTypeEnum mPredefinedType = IfcFootingTypeEnum.NOTDEFINED;
@@ -453,32 +496,37 @@ namespace GeometryGym.Ifc
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcFuelProperties
+	[Serializable]
 	public partial class IfcFurnishingElement : IfcElement // DEPRECEATED IFC4 to make abstract SUPERTYPE OF(ONEOF(IfcFurniture, IfcSystemFurnitureElement))
 	{
 		internal IfcFurnishingElement() : base() { }
 		internal IfcFurnishingElement(DatabaseIfc db, IfcFurnishingElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		internal IfcFurnishingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
+	[Serializable]
 	public partial class IfcFurnishingElementType : IfcElementType //IFC4 Depreceated //SUPERTYPE OF (ONEOF (IfcFurnitureType ,IfcSystemFurnitureElementType))
 	{
 		internal IfcFurnishingElementType() : base() { }
 		internal IfcFurnishingElementType(DatabaseIfc db, IfcFurnishingElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 		internal IfcFurnishingElementType(DatabaseIfc db,string name) : base(db) { Name = name; }
 	}
+	[Serializable]
 	public partial class IfcFurniture : IfcFurnishingElement
 	{
-		public override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFurnishingElement" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFurnishingElement" : base.KeyWord); } }
 		internal IfcFurnitureTypeEnum mPredefinedType = IfcFurnitureTypeEnum.NOTDEFINED;//: OPTIONAL IfcFurnitureTypeEnum;
 		internal IfcFurniture() : base() { }
 		internal IfcFurniture(DatabaseIfc db, IfcFurniture f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		internal IfcFurniture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
 	public partial class IfcFurnitureStandard : IfcControl 
 	{
 		internal IfcFurnitureStandard() : base() { }
 		internal IfcFurnitureStandard(DatabaseIfc db, IfcFurnitureStandard s, IfcOwnerHistory ownerHistory, bool downStream) : base(db,s, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcFurnitureType : IfcFurnishingElementType
 	{
 		internal IfcAssemblyPlaceEnum mAssemblyPlace = IfcAssemblyPlaceEnum.NOTDEFINED;

@@ -28,6 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable]
 	public partial class IfcQuantityArea : IfcPhysicalSimpleQuantity
 	{
 		internal double mAreaValue;// : IfcAreaMeasure;	
@@ -42,6 +43,7 @@ namespace GeometryGym.Ifc
 		
 		internal override IfcMeasureValue MeasureValue { get { return new IfcAreaMeasure(mAreaValue); } }
 	}
+	[Serializable]
 	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
 	{
 		internal double mCountValue;// : IfcCountMeasure;	
@@ -56,6 +58,7 @@ namespace GeometryGym.Ifc
 		
 		internal override IfcMeasureValue MeasureValue { get { return new IfcCountMeasure(mCountValue); } }
 	}
+	[Serializable]
 	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
 	{
 		internal double mLengthValue;// : IfcLengthMeasure;	
@@ -70,12 +73,14 @@ namespace GeometryGym.Ifc
 		
 		internal override IfcMeasureValue MeasureValue { get { return new IfcLengthMeasure(mLengthValue); } }
 	}
+	[Serializable]
 	public abstract partial class IfcQuantitySet : IfcPropertySetDefinition // IFC4  ABSTRACT SUPERTYPE OF(IfcElementQuantity)
 	{
 		protected IfcQuantitySet() : base() { }
 		protected IfcQuantitySet(DatabaseIfc db, string name) : base(db,name) { }
 		protected IfcQuantitySet(DatabaseIfc db, IfcQuantitySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 	}
+	[Serializable]
 	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
 	{
 		internal double mTimeValue;// : IfcTimeMeasure;	
@@ -90,6 +95,7 @@ namespace GeometryGym.Ifc
 		
 		internal override IfcMeasureValue MeasureValue { get { return new IfcTimeMeasure(mTimeValue); } }
 	}
+	[Serializable]
 	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
 	{
 		internal double mVolumeValue;// : IfcVolumeMeasure;	
@@ -104,6 +110,7 @@ namespace GeometryGym.Ifc
 		
 		internal override IfcMeasureValue MeasureValue { get { return new IfcVolumeMeasure(mVolumeValue); } }
 	}
+	[Serializable]
 	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
 	{
 		internal double mWeightValue;// : IfcMassMeasure;	

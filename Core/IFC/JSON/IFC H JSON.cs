@@ -25,7 +25,27 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+using Newtonsoft.Json.Linq;
+
 namespace GeometryGym.Ifc
 {
-	
+	public partial class IfcHalfSpaceSolid : IfcGeometricRepresentationItem, IfcBooleanOperand /* SUPERTYPE OF (ONEOF (IfcBoxedHalfSpace ,IfcPolygonalBoundedHalfSpace)) */
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("BaseSurface", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				BaseSurface = mDatabase.parseJObject<IfcSurface>(jobj);
+			JToken token = obj.GetValue("AgreementFlag", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				bool.TryParse(token.Value<string>(), out mAgreementFlag);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["BaseSurface"] = BaseSurface.getJson(this, options);
+			obj["AgreementFlag"] = mAgreementFlag.ToString();
+		}
+	}
 }

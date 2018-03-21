@@ -148,7 +148,12 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Enumerators") == 0)
-					Enumerators = mDatabase.ParseXml<IfcPropertyEnumeration>(child as XmlElement);
+				{
+					if(child.HasChildNodes)
+						Enumerators = mDatabase.ParseXml<IfcPropertyEnumeration>(child.ChildNodes[0] as XmlElement);
+					else
+						Enumerators = mDatabase.ParseXml<IfcPropertyEnumeration>(child as XmlElement);
+				}
 				else if (string.Compare(name, "PrimaryUnit") == 0)
 					PrimaryUnit = mDatabase.ParseXml<IfcUnit>(child as XmlElement);
 				else if (string.Compare(name, "SecondaryUnit") == 0)
@@ -172,7 +177,7 @@ namespace GeometryGym.Ifc
 			if (mSecondaryUnit > 0)
 				xml.AppendChild(mDatabase[mSecondaryUnit].GetXML(xml.OwnerDocument, "SecondaryUnit", this, processed));
 			setAttribute(xml, "Expression", Expression);
-			if (mAccessState != IfcStateEnum.NA)
+			if (mAccessState != IfcStateEnum.NOTDEFINED)
 				xml.SetAttribute("AccessState", mAccessState.ToString().ToLower());
 		}
 	}

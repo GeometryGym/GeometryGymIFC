@@ -141,7 +141,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("DirectionRatios", mDirectionRatioX.ToString() + " " + mDirectionRatioY.ToString() + (double.IsNaN(mDirectionRatioZ) ? "" : " " + mDirectionRatioZ.ToString()));
+			xml.SetAttribute("DirectionRatios", RoundRatio(mDirectionRatioX) + " " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ)));
 		}
 	}
 	public partial class IfcDistributionPort : IfcPort
