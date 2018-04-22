@@ -399,6 +399,9 @@
     <Compile Include="..\..\Core\STEP\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\STEP\CollectionsSTEP.cs">
+      <Link>STEP\CollectionsSTEP.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\STEP\DatabaseSTEP.cs">
       <Link>STEP\DatabaseSTEP.cs</Link>
     </Compile>

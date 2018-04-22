@@ -391,16 +391,12 @@ namespace GeometryGym.Ifc
 			mCentreOfGravityInX = p.mCentreOfGravityInX;
 			mCentreOfGravityInY = p.mCentreOfGravityInY;
 		}
-		public IfcLShapeProfileDef(DatabaseIfc db, string name, double depth, double width, double thickness, double filletRadius, double edgeRadius, double legSlope)
+		public IfcLShapeProfileDef(DatabaseIfc db, string name, double depth, double width, double thickness)
 			: base(db,name)
 		{
 			mDepth = depth;
 			mWidth = width;
 			mThickness = thickness;
-			mFilletRadius = filletRadius;
-			mEdgeRadius = edgeRadius;
-			mLegSlope = legSlope;
-			
 		}
 	}
 }

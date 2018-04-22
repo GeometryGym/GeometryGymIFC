@@ -294,7 +294,7 @@ namespace GeometryGym.Ifc
 			CreatingActor = mDatabase.parseJObject<IfcActorSelect>(obj.GetValue("CreatingActor", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcExternalReferenceRelationship er in ers)
-				er.addRelated(this);
+				er.RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> rcr = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("PropertiesForConstraint", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcResourceConstraintRelationship r in rcr)
 				r.RelatingConstraint = this;

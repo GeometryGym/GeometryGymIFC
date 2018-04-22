@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -928,11 +929,11 @@ namespace GeometryGym.Ifc
 		public string UserDefinedGrade { get { return (mUserDefinedGrade == "$" ? "" : ParserIfc.Decode(mUserDefinedGrade)); } set { mUserDefinedGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		//	INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mPropertiesForConstraint = new List<IfcResourceConstraintRelationship>();//	 :	SET OF IfcResourceConstraintRelationship FOR RelatingConstraint;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //ggc
 		internal List<IfcRelAssociatesConstraint> mConstraintForObjects = new List<IfcRelAssociatesConstraint>();// gg	 :	SET [0:?] OF IfcRelAssociatesConstraint FOR RelatedResourceObjects;
-		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		protected IfcConstraint() : base() { }
@@ -950,7 +951,28 @@ namespace GeometryGym.Ifc
 			mUserDefinedGrade = c.mUserDefinedGrade;
 		}
 		protected IfcConstraint(DatabaseIfc db, string name, IfcConstraintEnum constraint) : base(db) { Name = name; mConstraintGrade = constraint; }
-		
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		public override bool Destruct(bool children)
 		{
 			foreach (IfcRelAssociatesConstraint rac in mConstraintForObjects)
@@ -961,7 +983,6 @@ namespace GeometryGym.Ifc
 			return base.Destruct(children);
 		}
 
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -1277,10 +1298,10 @@ namespace GeometryGym.Ifc
 	{
 		private string mName = "";// : IfcLabel;
 		private int mConversionFactor;// : IfcMeasureWithUnit; 
-		//INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+									  //INVERSE
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }
@@ -1290,10 +1311,30 @@ namespace GeometryGym.Ifc
 		internal IfcConversionBasedUnit(DatabaseIfc db, IfcConversionBasedUnit u) : base(db,u) { mName = u.mName; ConversionFactor = db.Factory.Duplicate( u.ConversionFactor) as IfcMeasureWithUnit; }
 		public IfcConversionBasedUnit(IfcUnitEnum unit, string name, IfcMeasureWithUnit mu)
 			: base(mu.mDatabase, unit, true) { Name = name.Replace("'", ""); mConversionFactor = mu.mIndex; }
+		protected override void initialize()
+		{
+			base.initialize();
 
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		internal override double SIFactor { get { return ConversionFactor.getSIFactor(); } }
 
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	[Serializable]

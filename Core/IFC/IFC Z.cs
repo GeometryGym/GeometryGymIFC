@@ -55,5 +55,6 @@ namespace GeometryGym.Ifc
 
 		internal IfcZShapeProfileDef() : base() { }
 		internal IfcZShapeProfileDef(DatabaseIfc db, IfcZShapeProfileDef p) : base(db, p) { mDepth = p.mDepth; mFlangeWidth = p.mFlangeWidth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mEdgeRadius = p.mEdgeRadius; }
+		public IfcZShapeProfileDef(DatabaseIfc db, string name, double depth, double flangeWidth, double webThickness, double flangeThickness) : base(db, name) { mDepth = depth; mFlangeWidth = flangeWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; }
 	}
 }

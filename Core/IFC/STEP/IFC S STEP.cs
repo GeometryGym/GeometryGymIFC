@@ -98,24 +98,41 @@ namespace GeometryGym.Ifc
 			mUserDefinedDataOrigin = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
+	public partial class IfcSectionedSolid : IfcSolidModel
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",#" + Directrix.Index + ",(#" +
+				string.Join(",#", CrossSections.ConvertAll(x => x.Index)) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCompositeCurve;
+			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
+		}
+	}
+	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", CrossSectionPositions.ConvertAll(x => x.Index)) + (mFixedAxisVertical ? "),.T." : "),$");		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDistanceExpression));
+			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
+		}
+	}
 	public partial class IfcSectionedSpine : IfcGeometricRepresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mSpineCurve) + ",("
-				+ ParserSTEP.LinkToString(mCrossSections[0]);
-			for (int icounter = 1; icounter < mCrossSections.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mCrossSections[icounter]);
-			str += "),(" + ParserSTEP.LinkToString(mCrossSectionPositions[0]);
-			for (int icounter = 1; icounter < mCrossSectionPositions.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mCrossSectionPositions[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",#" + SpineCurve.Index + ",(#" + 
+				string.Join(",#", CrossSections.ConvertAll(x => x.Index)) + "),(#" + string.Join(",#", mCrossSectionPositions.ConvertAll(x=>x.mIndex)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mSpineCurve = ParserSTEP.StripLink(str, ref pos, len);
-			mCrossSections = ParserSTEP.StripListLink(str, ref pos, len);
-			mCrossSectionPositions = ParserSTEP.StripListLink(str, ref pos, len);
+			SpineCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCompositeCurve;
+			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcProfileDef));
+			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAxis2Placement3D));
 		}
 	} 
 	public partial class IfcSectionProperties : IfcPreDefinedProperties // IFC2x3 STPEntity

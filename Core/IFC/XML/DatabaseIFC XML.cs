@@ -201,8 +201,19 @@ null, Type.EmptyTypes, null);
 			ns.Value = mXmlNamespace;
 			el.SetAttribute("xlmns", mXmlNamespace);
 
-			XmlElement element = Context.GetXML(doc, "",null, new Dictionary<int, XmlElement>());
-			el.AppendChild(element);
+			Dictionary<int, XmlElement> processed = new Dictionary<int, XmlElement>();
+			IfcContext context = Context;
+			if(context != null)
+				el.AppendChild(Context.GetXML(doc, "", null, processed));
+
+			if (context == null || (context.mIsDecomposedBy.Count == 0 && context.Declares.Count == 0))
+			{
+				foreach (BaseClassIfc e in this)
+				{
+					if (!processed.ContainsKey(e.Index))
+						el.AppendChild(e.GetXML(doc, "", null, processed));
+				}
+			}
 
 			XmlTextWriter writer;
 			try

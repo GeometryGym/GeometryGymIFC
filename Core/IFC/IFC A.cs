@@ -19,6 +19,7 @@
 using System;  
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -55,22 +56,43 @@ namespace GeometryGym.Ifc
 		internal IfcRoleEnum mRole = IfcRoleEnum.NOTDEFINED;// : OPTIONAL IfcRoleEnum
 		internal string mUserDefinedRole = "$";// : OPTIONAL IfcLabel
 		internal string mDescription = "$";// : OPTIONAL IfcText; 
-		//INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+										   //INVERSE
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public IfcRoleEnum Role { get { return mRole; } set { mRole = value; } }
 		public string UserDefinedRole { get { return (mUserDefinedRole == "$" ? "" : ParserIfc.Decode(mUserDefinedRole)); } set { mUserDefinedRole = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcActorRole() : base() { }
 		internal IfcActorRole(DatabaseIfc db, IfcActorRole r) : base(db,r) { mRole = r.mRole; mDescription = r.mDescription; mUserDefinedRole = r.mUserDefinedRole; }
 		public IfcActorRole(DatabaseIfc db) : base(db) { }
-		
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
+
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	public interface IfcActorSelect : IBaseClassIfc {  }// IfcOrganization,  IfcPerson,  IfcPersonAndOrganization);
@@ -374,8 +396,8 @@ namespace GeometryGym.Ifc
 		internal string mCondition = "$";// : OPTIONAL IfcLabel; IFC4
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
 		internal List<int> mComponents = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
-		//INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+														 //INVERSE
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcAppliedValue> mComponentFor = new List<IfcAppliedValue>(); //gg
 
@@ -390,7 +412,7 @@ namespace GeometryGym.Ifc
 		public string Condition { get { return (mCondition == "$" ? "" : ParserIfc.Decode(mCondition)); } set { mCondition = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
 		public ReadOnlyCollection<IfcAppliedValue> Components { get { return new ReadOnlyCollection<IfcAppliedValue>( mComponents.ConvertAll(x => mDatabase[x] as IfcAppliedValue)); } }
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcAppliedValue() : base() { }
@@ -405,7 +427,30 @@ namespace GeometryGym.Ifc
 			mApplicableDate = v.mApplicableDate; mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator;
 			v.Components.ToList().ForEach(x=>addComponent(db.Factory.Duplicate(x) as IfcAppliedValue));
 		}
-	
+
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
+
 		public override bool Destruct(bool children)
 		{
 			if (children)
@@ -422,7 +467,6 @@ namespace GeometryGym.Ifc
 			return base.Destruct(children);
 		}
 
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 		internal void addComponent(IfcAppliedValue value) { mComponents.Add(value.mIndex); value.mComponentFor.Add(this); }
 	}
@@ -459,11 +503,11 @@ namespace GeometryGym.Ifc
 		internal string mApprovalQualifier = "$";// : OPTIONAL IfcText;
 		internal string mName = "$";// :OPTIONAL IfcLabel;
 		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier;
-		//INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+										  //INVERSE
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>(mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcApproval() : base() { }
@@ -477,8 +521,28 @@ namespace GeometryGym.Ifc
 		//	mName = o.mName;
 		//	mIdentifier = o.mIdentifier;
 		//}
-		
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -532,7 +596,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcArbitraryOpenProfileDef() : base() { }
 		internal IfcArbitraryOpenProfileDef(DatabaseIfc db, IfcArbitraryOpenProfileDef p) : base(db, p) { Curve = db.Factory.Duplicate(p.Curve) as IfcBoundedCurve; }
-		public IfcArbitraryOpenProfileDef(string name, IfcBoundedCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mCurve = boundedCurve.mIndex; }
+		public IfcArbitraryOpenProfileDef(string name, IfcBoundedCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mCurve = boundedCurve.mIndex; mProfileType = IfcProfileTypeEnum.CURVE; }
 	}
 	[Serializable]
 	public partial class IfcArbitraryProfileDefWithVoids : IfcArbitraryClosedProfileDef

@@ -189,6 +189,22 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDiscreteAccessoryTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
 	}
+	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(DistanceAlong) + "," + ParserSTEP.DoubleOptionalToString(OffsetLateral) + "," +
+				ParserSTEP.DoubleOptionalToString(OffsetVertical) + "," + ParserSTEP.DoubleOptionalToString(mOffsetLongitudinal) + "," + ParserSTEP.BoolToString(AlongHorizontal);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			DistanceAlong = ParserSTEP.StripDouble(str, ref pos, len);
+			OffsetLateral = ParserSTEP.StripDouble(str, ref pos, len);
+			OffsetVertical = ParserSTEP.StripDouble(str, ref pos, len);
+			OffsetLongitudinal = ParserSTEP.StripDouble(str, ref pos, len);
+			AlongHorizontal = ParserSTEP.StripBool(str, ref pos, len); 
+		}
+	}
 	public partial class IfcDistributionChamberElement : IfcDistributionFlowElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release == ReleaseVersion.IFC2x3 ? "" : (mPredefinedType == IfcDistributionChamberElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }

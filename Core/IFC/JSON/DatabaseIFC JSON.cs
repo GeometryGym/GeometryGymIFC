@@ -252,16 +252,39 @@ namespace GeometryGym.Ifc
 			header["FILE_SCHEMA"] = fileSchema;
 			ifcFile["HEADER"] = header;
 
-			IfcContext context = this.mContext;
-			JObject jcontext = context.getJson(null, new BaseClassIfc.SetJsonOptions()); //null);//
-
 			JArray data = new JArray();
-			data.Add(jcontext);
+			IfcContext context = this.mContext;
+			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions();
+			if (context != null)
+			{
+				JObject jcontext = context.getJson(null, options); //null);//
+				data.Add(jcontext);
+			}
+			if(context == null || (context.mIsDecomposedBy.Count == 0 && context.Declares.Count == 0))
+			{
+				foreach (BaseClassIfc e in this)
+				{
+					if (!string.IsNullOrEmpty(e.mGlobalId))
+					{
+						if (!options.Encountered.Contains(e.mGlobalId))
+							data.Add(e.getJson(null, options));
+					}
+					else if (e is NamedObjectIfc named)
+					{
+						data.Add(e.getJson(null, options));
+					}
+
+				}
+			}
 			ifcFile["DATA"] = data;
 			if (!string.IsNullOrEmpty(filename))
 			{
 				StreamWriter sw = new StreamWriter(filename);
+#if(DEBUG)
 				sw.Write(ifcFile.ToString());
+#else
+				sw.Write(ifcFile.ToString(Newtonsoft.Json.Formatting.None, new Newtonsoft.Json.JsonConverter[0]));
+#endif
 				sw.Close();
 			}
 			Thread.CurrentThread.CurrentUICulture = current;

@@ -1651,7 +1651,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRelatingConstraint = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedResourceObjects = ParserSTEP.StripListLink(str, ref pos, len);
+			mRelatedResourceObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len));
 		}
 		internal override void postParseRelate()
 		{

@@ -134,7 +134,7 @@ namespace GeometryGym.Ifc
 
 			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			for (int icounter = 0; icounter < ers.Count; icounter++)
-				ers[icounter].addRelated(this);
+				ers[icounter].RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> crs = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			for (int icounter = 0; icounter < crs.Count; icounter++)
 				crs[icounter].addRelated(this);

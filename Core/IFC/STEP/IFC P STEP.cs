@@ -267,8 +267,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mSizeInX) + "," + ParserSTEP.DoubleToString(mSizeInY); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mSizeInX = ParserSTEP.StripDouble(str, ref pos, len);
-			mSizeInY = ParserSTEP.StripDouble(str, ref pos, len);
+			SizeInX = ParserSTEP.StripDouble(str, ref pos, len);
+			SizeInY = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcPlate : IfcBuildingElement

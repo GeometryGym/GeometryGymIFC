@@ -120,26 +120,55 @@ namespace GeometryGym.Ifc
 		internal IfcSeamCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
+	public partial class IfcSectionedSolid : IfcSolidModel
+	{
+		internal IfcCurve mDirectrix;// : IfcCurve;
+		internal LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>();// : LIST [2:?] OF IfcProfileDef;
+
+		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
+
+		internal IfcSectionedSolid() : base() { }
+		internal IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s) : base(db, s)
+		{
+			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
+			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
+		}
+	}
+	[Serializable]
+	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid 
+	{
+		internal LIST<IfcDistanceExpression> mCrossSectionPositions = new LIST<IfcDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
+		internal bool mFixedAxisVertical;// : IfcBoolean
+
+		public LIST<IfcDistanceExpression> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
+		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
+
+		internal IfcSectionedSolidHorizontal() : base() { }
+		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s) : base(db, s)
+		{
+			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcDistanceExpression));
+			FixedAxisVertical = s.FixedAxisVertical;
+		}
+	}
+	[Serializable]
 	public partial class IfcSectionedSpine : IfcGeometricRepresentationItem
 	{
-		internal int mSpineCurve;// : IfcCompositeCurve;
-		internal List<int> mCrossSections = new List<int>();// : LIST [2:?] OF IfcProfileDef;
-		internal List<int> mCrossSectionPositions = new List<int>();// : LIST [2:?] OF IfcAxis2Placement3D; 
+		internal IfcCompositeCurve mSpineCurve;// : IfcCompositeCurve;
+		internal LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>();// : LIST [2:?] OF IfcProfileDef;
+		internal LIST<IfcAxis2Placement3D> mCrossSectionPositions = new LIST<IfcAxis2Placement3D>();// : LIST [2:?] OF IfcAxis2Placement3D; 
 
-		public IfcCompositeCurve SpineCurve { get { return mDatabase[mSpineCurve] as IfcCompositeCurve; } set { mSpineCurve = value.mIndex; } }
-		public ReadOnlyCollection<IfcProfileDef> CrossSections { get { return new ReadOnlyCollection<IfcProfileDef>( mCrossSections.ConvertAll(x => mDatabase[x] as IfcProfileDef)); } }
-		public ReadOnlyCollection<IfcAxis2Placement3D> CrossSectionPositions { get { return new ReadOnlyCollection<IfcAxis2Placement3D>( mCrossSectionPositions.ConvertAll(x => mDatabase[x] as IfcAxis2Placement3D)); } }
+		public IfcCompositeCurve SpineCurve { get { return mSpineCurve; } set { mSpineCurve = value; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
+		public LIST<IfcAxis2Placement3D> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if(value != null) mCrossSectionPositions = value; } }
 
 		internal IfcSectionedSpine() : base() { }
 		internal IfcSectionedSpine(DatabaseIfc db, IfcSectionedSpine s) : base(db,s)
 		{
 			SpineCurve = db.Factory.Duplicate(s.SpineCurve) as IfcCompositeCurve;
-			s.CrossSections.ToList().ForEach(x => addCrossSection( db.Factory.Duplicate(x) as IfcProfileDef));
-			s.CrossSectionPositions.ToList().ForEach(x=>addPosition( db.Factory.Duplicate(x) as IfcAxis2Placement3D));
+			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
+			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x=>db.Factory.Duplicate(x) as IfcAxis2Placement3D));
 		}
-
-		internal void addCrossSection(IfcProfileDef section) { mCrossSections.Add(section.mIndex); }
-		internal void addPosition(IfcAxis2Placement3D position) { mCrossSectionPositions.Add(position.mIndex); }
 	} 
 	[Serializable]
 	public partial class IfcSectionProperties : IfcPreDefinedProperties // IFC2x3 BaseClassIfc
@@ -1700,6 +1729,7 @@ additional types	some additional representation types are given:
 		internal IfcStructuralPointReaction() : base() { }
 		internal IfcStructuralPointReaction(DatabaseIfc db, IfcStructuralPointReaction r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { }
 	}
+	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
 	public partial class IfcStructuralProfileProperties : IfcGeneralProfileProperties //IFC4 DELETED Entity replaced by IfcProfileProperties
 	{
@@ -1748,7 +1778,7 @@ additional types	some additional representation types are given:
 			mCentreOfGravityInX = p.mCentreOfGravityInX; 
 			mCentreOfGravityInY = p.mCentreOfGravityInY;
 		}
-		public IfcStructuralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
+		public IfcStructuralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralReaction : IfcStructuralActivity
@@ -2074,6 +2104,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSurfaceOfLinearExtrusion() : base() { }
 		internal IfcSurfaceOfLinearExtrusion(DatabaseIfc db, IfcSurfaceOfLinearExtrusion s) : base(db,s) { ExtrudedDirection = db.Factory.Duplicate(s.ExtrudedDirection) as IfcDirection; mDepth = s.mDepth; }
+		public IfcSurfaceOfLinearExtrusion(IfcProfileDef sweptCurve, IfcAxis2Placement3D position, double depth) : base(sweptCurve, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 	}
 	[Serializable]
 	public partial class IfcSurfaceOfRevolution : IfcSweptSurface
@@ -2366,7 +2397,7 @@ additional types	some additional representation types are given:
 		internal int mPosition;// : OPTIONAL IfcAxis2Placement3D; IFC4 Optional
 
 		public IfcProfileDef SweptCurve { get { return mDatabase[mSweptCurve] as IfcProfileDef; } set { mSweptCurve = value.mIndex; } }
-		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mSweptCurve = (value == null ? 0 : value.mIndex); } }
+		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mPosition = (value == null ? 0 : value.mIndex); } }
 
 		protected IfcSweptSurface() : base() { }
 		protected IfcSweptSurface(DatabaseIfc db, IfcSweptSurface s) : base(db,s)
@@ -2375,6 +2406,8 @@ additional types	some additional representation types are given:
 			if(s.mPosition > 0)
 				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
 		}
+		protected IfcSweptSurface(IfcProfileDef sweptCurve) : base(sweptCurve.mDatabase) { SweptCurve = sweptCurve; if (sweptCurve.mDatabase.Release == ReleaseVersion.IFC2x3) Position = sweptCurve.mDatabase.Factory.XYPlanePlacement; }
+		protected IfcSweptSurface(IfcProfileDef sweptCurve, IfcAxis2Placement3D position) : this(sweptCurve) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase,0,0,0)) : position); }
 	}
 	[Serializable]
 	public partial class IfcSwitchingDevice : IfcFlowController //IFC4

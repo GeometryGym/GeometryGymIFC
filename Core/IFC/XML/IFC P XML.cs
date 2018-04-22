@@ -591,6 +591,31 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("ProfileType", mProfileType.ToString().ToLower());
 			setAttribute(xml, "ProfileName", ProfileName);
+
+			if (mDatabase.Release >= ReleaseVersion.IFC2x3)
+			{
+				XmlElement externalReferences = xml.OwnerDocument.CreateElement("HasExternalReferences");
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				{
+					if (r == host)
+						continue;
+					XmlElement e = r.GetXML(xml.OwnerDocument, "", this, processed);
+					if (e != null)
+						externalReferences.AppendChild(e);
+				}
+				if (externalReferences.ChildNodes.Count > 0)
+					xml.AppendChild(externalReferences);
+
+				XmlElement hasProperties = xml.OwnerDocument.CreateElement("HasProperties");
+				foreach (IfcProfileProperties p in mHasProperties)
+				{
+					XmlElement e = p.GetXML(xml.OwnerDocument, "", this, processed);
+					if (e != null)
+						hasProperties.AppendChild(e);
+				}
+				if (hasProperties.ChildNodes.Count > 0)
+					xml.AppendChild(hasProperties);
+			}
 		}
 	}
 	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4
@@ -718,7 +743,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 				else if (string.Compare(name, "HasConstraintRelationships") == 0)

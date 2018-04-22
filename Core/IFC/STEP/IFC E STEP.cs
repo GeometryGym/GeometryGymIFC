@@ -520,23 +520,18 @@ namespace GeometryGym.Ifc
 		{
 			if (release == ReleaseVersion.IFC2x3)
 				return "";
-			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingReference) + ",(" + ParserSTEP.LinkToString(mRelatedResourceObjects[0]);
-			for (int icounter = 1; icounter < mRelatedResourceObjects.Count; icounter++)
-				result += "," + ParserSTEP.LinkToString(mRelatedResourceObjects[icounter]);
-			return result + ")";
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingReference) + ",(#" + string.Join(",#", mRelatedResourceObjects.ConvertAll(x=>x.Index)) + ")";
 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRelatingReference = ParserSTEP.StripLink(str,ref pos, len);
-			mRelatedResourceObjects = ParserSTEP.StripListLink(str, ref pos, len);
+			mRelatedResourceObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcResourceObjectSelect));
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
-			foreach (IfcResourceObjectSelect ro in RelatedResourceObjects)
-				ro.AddExternalReferenceRelationship(this);
 			RelatingReference.mExternalReferenceForResources.Add(this);
 		}
 	}

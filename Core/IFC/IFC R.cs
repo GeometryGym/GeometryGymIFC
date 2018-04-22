@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -907,7 +908,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating { get { return RelatingMaterial; } }
 
 		internal IfcRelAssociatesMaterial() : base() { }
-		internal IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { Name = "MatAssoc"; Description = "Material Associates"; RelatingMaterial = material; }
+		internal IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { RelatingMaterial = material; }
 		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], ownerHistory, downStream) as IfcMaterialSelect; }
 
 	}
@@ -1371,7 +1372,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcDefinitionSelect> RelatedDefinitions { get { return mRelatedDefinitions; } set { mRelatedDefinitions.Clear(); if (value != null) { mRelatedDefinitions = value; } } }
 
 		internal IfcRelDeclares() : base() { }
-		internal IfcRelDeclares(IfcContext c) : base(c.mDatabase) { mRelatingContext = c; }
+		internal IfcRelDeclares(IfcContext c) : base(c.mDatabase) { mRelatingContext = c; c.mDeclares.Add(this); }
 		internal IfcRelDeclares(DatabaseIfc db, IfcRelDeclares r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
 		{
 			RelatingContext = db.Factory.Duplicate(r.RelatingContext, ownerHistory, false) as IfcContext;
@@ -2184,7 +2185,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcResourceObjectSelect : IBaseClassIfc //IFC4 SELECT (	IfcPropertyAbstraction, IfcPhysicalQuantity, IfcAppliedValue, 
 	{   //IfcContextDependentUnit, IfcConversionBasedUnit, IfcProfileDef, IfcActorRole, IfcApproval, IfcConstraint, IfcTimeSeries, IfcMaterialDefinition, IfcPerson, IfcPersonAndOrganization, IfcOrganization, IfcExternalReference, IfcExternalInformation););
-		void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship);
+		SET<IfcExternalReferenceRelationship> HasExternalReferences { get; set; }
 		void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship);
 	}
 	[Serializable]

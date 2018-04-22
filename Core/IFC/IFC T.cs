@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -441,12 +442,12 @@ namespace GeometryGym.Ifc
 		internal IfcDataOriginEnum mDataOrigin = IfcDataOriginEnum.NOTDEFINED;// : IfcDataOriginEnum;
 		internal string mUserDefinedDataOrigin = "$";// : OPTIONAL IfcLabel;
 		internal int mUnit;// : OPTIONAL IfcUnit; 
-		//INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+						   //INVERSE
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		protected IfcTimeSeries() : base() { }
@@ -463,8 +464,28 @@ namespace GeometryGym.Ifc
 		//	mUnit = i.mUnit;
 		//}
 		protected IfcTimeSeries(DatabaseIfc db) : base(db) { }
-		
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -626,13 +647,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTrimmedCurve : IfcBoundedCurve
 	{
-		private int mBasisCurve;//: IfcCurve;
+		private IfcCurve mBasisCurve;//: IfcCurve;
 		internal IfcTrimmingSelect mTrim1;// : SET [1:2] OF IfcTrimmingSelect;
 		internal IfcTrimmingSelect mTrim2;//: SET [1:2] OF IfcTrimmingSelect;
 		private bool mSenseAgreement = false;// : BOOLEAN;
 		internal IfcTrimmingPreference mMasterRepresentation = IfcTrimmingPreference.UNSPECIFIED;// : IfcTrimmingPreference; 
 
-		public IfcCurve BasisCurve { get { return mDatabase[mBasisCurve] as IfcCurve; } set { mBasisCurve = value.mIndex; } }
+		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
 		public IfcTrimmingSelect Trim1 { get { return mTrim1; } set { mTrim1 = value; } }
 		public IfcTrimmingSelect Trim2 { get { return mTrim2; } set { mTrim2 = value; } }
 		public bool SenseAgreement { get { return mSenseAgreement; } set { mSenseAgreement = value; } }

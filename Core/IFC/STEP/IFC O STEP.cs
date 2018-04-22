@@ -74,8 +74,30 @@ namespace GeometryGym.Ifc
 			mTheActor = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
+	public partial class IfcOffsetCurve : IfcCurve
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mBasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+		}
+	}
 	//ENTITY IfcOffsetCurve2D
 	//ENTITY IfcOffsetCurve3D
+	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
+	{
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			OffsetValues.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDistanceExpression));
+			mTag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+		}
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mOffsetValues.ConvertAll(x=>x.mIndex)) +
+				(string.IsNullOrEmpty(mTag) ? "$" : "'" + ParserIfc.Encode(mTag) + "'");
+		}
+	}
 	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRepeatFactor); }

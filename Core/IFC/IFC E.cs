@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -363,7 +364,12 @@ namespace GeometryGym.Ifc
 					throw new Exception("Profile not provided");
 			}
 			if (pd != null)
-				reps.Add(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(pd, pd.CalculateTransform(profile.CardinalPoint), length)));
+			{
+				if(pd.ProfileType == IfcProfileTypeEnum.AREA)
+					reps.Add(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(pd, pd.CalculateTransform(profile.CardinalPoint), length)));
+				else
+					reps.Add(new IfcShapeRepresentation(new IfcSurfaceOfLinearExtrusion(pd, pd.CalculateTransform(profile.CardinalPoint), length)));
+			}
 
 			Representation = new IfcProductDefinitionShape(reps);
 
@@ -721,6 +727,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEllipseProfileDef() : base() { }
 		internal IfcEllipseProfileDef(DatabaseIfc db, IfcEllipseProfileDef p) : base(db, p) { mSemiAxis1 = p.mSemiAxis1; mSemiAxis2 = p.mSemiAxis2; }
+		public IfcEllipseProfileDef(DatabaseIfc db, string name, double semiAxis1, double semiAxis2) : base(db, name) { SemiAxis1 = semiAxis1; SemiAxis2 = semiAxis2;  }
 	}
 	[Serializable]
 	public partial class IfcEnergyConversionDevice : IfcDistributionFlowElement //IFC4 Abstract
@@ -891,9 +898,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(DatabaseIfc db) : base(db) {  }
 		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
-		internal IfcExtendedProperties(string name, List<IfcProperty> props) : base(props[0].mDatabase)
+		internal IfcExtendedProperties(List<IfcProperty> props) : base(props[0].mDatabase)
 		{
-			Name = name;
 			if (props != null)
 				props.ForEach(x => AddProperty(x));
 		}
@@ -924,17 +930,37 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public abstract partial class IfcExternalInformation : BaseClassIfc, IfcResourceObjectSelect // NEW IFC4	ABSTRACT SUPERTYPE OF(ONEOF(IfcClassification, IfcDocumentInformation, IfcLibraryInformation));
 	{ //INVERSE
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>(mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		protected IfcExternalInformation() : base() { }
 		protected IfcExternalInformation(DatabaseIfc db) : base(db) { }
 		protected IfcExternalInformation(DatabaseIfc db, IfcExternalInformation i) : base(db, i) { }
+		protected override void initialize()
+		{
+			base.initialize();
 
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	//ENTITY IfcExternallyDefinedHatchStyle
@@ -960,47 +986,84 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		private string mLocation = "$";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
 		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
 		private string mName = "";//  : OPTIONAL IfcLabel;
-		//INVERSE  
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
+								  //INVERSE  
+		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcExternalReferenceRelationship> mExternalReferenceForResources = new List<IfcExternalReferenceRelationship>();//	:	SET [0:?] OF IfcExternalReferenceRelationship FOR RelatingReference;
 
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name { get { return mName; } set { mName = value; } } 
-		public ReadOnlyCollection<IfcExternalReferenceRelationship> HasExternalReferences { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mHasExternalReferences); } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 		public ReadOnlyCollection<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mExternalReferenceForResources); } }
 
 		protected IfcExternalReference() : base() { }
 		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) : base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
 		protected IfcExternalReference(DatabaseIfc db) : base(db) { }
-		
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+		}
+		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.NewItems)
+				{
+					if (!r.RelatedResourceObjects.Contains(this))
+						r.RelatedResourceObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcExternalReferenceRelationship r in e.OldItems)
+					r.RelatedResourceObjects.Remove(this);
+			}
+		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	[Serializable]
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4
 	{
 		private int mRelatingReference;// :	IfcExternalReference;
-		private List<int> mRelatedResourceObjects = new List<int>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
+		private SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
 		public IfcExternalReference RelatingReference { get { return mDatabase[mRelatingReference] as IfcExternalReference; } set { mRelatingReference = value.mIndex; value.mExternalReferenceForResources.Add(this); } }
-		public ReadOnlyCollection<IfcResourceObjectSelect> RelatedResourceObjects { get { return new ReadOnlyCollection<IfcResourceObjectSelect>( mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect)); } }
+		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects.Clear(); if (value != null) { mRelatedResourceObjects.CollectionChanged -= mRelatedResourceObjects_CollectionChanged; mRelatedResourceObjects = value; mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged; } } } 
 
 		//INVERSE
 		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
 		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
-		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; r.mRelatedResourceObjects.ToList().ForEach(x=>addRelated( db.Factory.Duplicate(r.mDatabase[x]) as IfcResourceObjectSelect)); }
+		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect)); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, List<IfcResourceObjectSelect> related)
-			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; related.ForEach(x=>addRelated(x)); }
-		
-		internal void addRelated(IfcResourceObjectSelect r)
+			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; RelatedResourceObjects.AddRange(related); }
+
+		protected override void initialize()
 		{
-			mRelatedResourceObjects.Add(r.Index);
-			r.AddExternalReferenceRelationship(this);
+			base.initialize();
+
+			mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged;
+		}
+		private void mRelatedResourceObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcResourceObjectSelect r in e.NewItems)
+				{
+					if (!r.HasExternalReferences.Contains(this))
+						r.HasExternalReferences.Add(this);
+				} 
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcResourceObjectSelect r in e.OldItems)
+					r.HasExternalReferences.Remove(this);
+			}
 		}
 	}
 	[Serializable]

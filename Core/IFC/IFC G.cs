@@ -79,8 +79,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcGeneralProfileProperties() : base() { }
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p) : base(db, p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
-		public IfcGeneralProfileProperties(string name, IfcProfileDef p) : base(name, p) { }
-		internal IfcGeneralProfileProperties(string name, List<IfcProperty> props, IfcProfileDef p) : base(name, props, p) { }
+		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
+		internal IfcGeneralProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props, p) { }
 	}
 	[Serializable]
 	public partial class IfcGeographicElement : IfcElement  //IFC4

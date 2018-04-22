@@ -106,6 +106,11 @@ namespace GeometryGym.Ifc
 			result["href"] = mGlobalId;
 				return result;
 		}
+			//if (pset != null)
+				//{
+				//	if (pset.DefinesType.Count > 1)
+				//		return true;
+				//	IfcRelDefinesByProperties rdp = pset.DefinesOccurrence;
 		internal bool isCommon
 		{
 			get
@@ -120,12 +125,7 @@ namespace GeometryGym.Ifc
 					return true;
 
 				//IfcPropertySet pset = this as IfcPropertySet;
-				//if (pset != null)
-				//{
-				//	if (pset.DefinesType.Count > 1)
-				//		return true;
-				//	IfcRelDefinesByProperties rdp = pset.DefinesOccurrence;
-				//	if (rdp != null && rdp.RelatedObjects.Count > 0)
+					//	if (rdp != null && rdp.RelatedObjects.Count > 0)
 				//		return true;
 				//}
 				return false;	
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 					options.Encountered.Add(mGlobalId);
 			}
 			obj["type"] = KeyWord;
-			if (isCommon || this is IfcGeometricRepresentationSubContext)
+			if (common || this is IfcGeometricRepresentationSubContext || this is NamedObjectIfc)
 			{
 				if (string.IsNullOrEmpty(mGlobalId))
 				{
@@ -160,7 +160,7 @@ namespace GeometryGym.Ifc
 			setJSON(obj, host, options);
 			if (options.Style == SetJsonOptions.JsonStyle.Repository)
 			{
-				if (isCommon)
+				if (common)
 					return writeRepositoryCommon(obj, options, "");
 				else
 				{

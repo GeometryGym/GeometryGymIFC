@@ -270,6 +270,32 @@ namespace GeometryGym.Ifc
 		internal IfcDiscreteAccessoryType(DatabaseIfc m, string name, IfcDiscreteAccessoryTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
+	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
+	{
+		internal double mDistanceAlong;// : IfcLengthMeasure;
+		internal double mOffsetLateral = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		internal double mOffsetVertical = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		internal double mOffsetLongitudinal = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		internal bool mAlongHorizontal = false; // IfcBoolean
+
+		public double DistanceAlong { get { return mDistanceAlong; } set { mDistanceAlong = value; } }
+		public double OffsetLateral { get { return mOffsetLateral; } set { mOffsetLateral = value; } }
+		public double OffsetVertical { get { return mOffsetVertical; } set { mOffsetVertical = value; } }
+		public double OffsetLongitudinal { get { return mOffsetLongitudinal; } set { mOffsetLongitudinal = value; } }
+		public bool AlongHorizontal { get { return mAlongHorizontal; } set { mAlongHorizontal = value; } } 
+
+		internal IfcDistanceExpression() : base() { }
+		internal IfcDistanceExpression(DatabaseIfc db, IfcDistanceExpression e) : base(db, e)
+		{
+			DistanceAlong = e.DistanceAlong;
+			OffsetLateral = e.OffsetLateral;
+			OffsetVertical = e.OffsetVertical;
+			OffsetLongitudinal = e.OffsetLongitudinal;
+			AlongHorizontal = e.AlongHorizontal;
+		}
+		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = distanceAlong; }
+	}
+	[Serializable]
 	public partial class IfcDistributionChamberElement : IfcDistributionFlowElement
 	{
 		internal IfcDistributionChamberElementTypeEnum mPredefinedType = IfcDistributionChamberElementTypeEnum.NOTDEFINED;//	:	OPTIONAL IfcDistributionChamberElementTypeEnum;

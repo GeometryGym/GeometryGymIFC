@@ -42,5 +42,9 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public abstract Transform Transform { get; }
-	} 
+	}
+	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
+	{
+		public override Curve Curve { get { return BasisCurve.Curve; } }
+	}
 }

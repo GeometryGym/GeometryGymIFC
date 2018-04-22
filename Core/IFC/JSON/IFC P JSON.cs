@@ -407,12 +407,35 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ProfileName", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				ProfileName = token.Value<string>();
+			
+			HasExternalReferences.AddRange(mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			HasProperties.AddRange(mDatabase.extractJArray<IfcProfileProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["ProfileType"] = mProfileType.ToString();
 			setAttribute(obj, "ProfileName", ProfileName);
+
+			if (mDatabase == null || mDatabase.Release >= ReleaseVersion.IFC2x3)
+			{
+				JArray jArray = new JArray();
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				{
+					if (r == host)
+						continue;
+					jArray.Add(r.getJson(this, options));
+				}
+				if (jArray.Count > 0)
+					obj["HasExternalReferences"] = jArray;
+
+
+				jArray = new JArray();
+				foreach (IfcProfileProperties p in mHasProperties)
+					jArray.Add(p.getJson(this, options));
+				if (jArray.Count > 0)
+					obj["HasProperties"] = jArray;
+			}
 		}
 	}
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
@@ -476,7 +499,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				r.addRelated(this);
+				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.addRelated(this);
 		}

@@ -68,14 +68,14 @@ namespace GeometryGym.Ifc
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
 				List<double[]> coords = new List<double[]>(fields.Length / 2);
 				for (int icounter = 0; icounter < fields.Length; icounter += 2)
-					coords.Add( new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1])});
+					coords.Add(new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]) });
 				CoordList = coords.ToArray();
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("CoordList", string.Join(" ", CoordList.Select(x=> x[0] + " " + x[1])));
+			xml.SetAttribute("CoordList", string.Join(" ", CoordList.Select(x => x[0] + " " + x[1])));
 		}
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
@@ -88,14 +88,14 @@ namespace GeometryGym.Ifc
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
 				List<double[]> points = new List<double[]>(fields.Length / 3);
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					points.Add( new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]) });
+					points.Add(new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]) });
 				mCoordList = points.ToArray();
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("CoordList", string.Join(" ", mCoordList.Select(x=> x[0] + " " + x[1] + " " + x[2])));
+			xml.SetAttribute("CoordList", string.Join(" ", mCoordList.Select(x => x[0] + " " + x[1] + " " + x[2])));
 		}
 	}
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -203,7 +203,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -218,7 +218,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+				Enum.TryParse<IfcChimneyTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -267,6 +267,35 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Radius", mRadius.ToString());
+		}
+	}
+	public partial class IfcClassificationReference : IfcExternalReference, IfcClassificationReferenceSelect, IfcClassificationSelect, IfcClassificationNotationSelect
+	{
+		//internal int mReferencedSource;// : OPTIONAL IfcClassificationReferenceSelect; //IFC2x3 : 	OPTIONAL IfcClassification;
+		//internal string mDescription = "$";// :	OPTIONAL IfcText; IFC4
+		//internal string mSort = "$";//	 :	OPTIONAL IfcIdentifier;
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+			if (xml.HasAttribute("Sort"))
+				Sort = xml.Attributes["Sort"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ReferencedSource") == 0)
+					ReferencedSource = mDatabase.ParseXml<IfcClassificationReferenceSelect>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			IfcClassificationReferenceSelect referenced = ReferencedSource;
+			if (referenced != null && referenced != host)
+				xml.AppendChild(mDatabase[referenced.Index].GetXML(xml.OwnerDocument, "ReferencedSource", this, processed));
+			xml.SetAttribute("Description", Description);
+			xml.SetAttribute("Sort", Sort);
 		}
 	}
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
@@ -591,7 +620,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				} 
 				else if (string.Compare(name, "PropertiesForConstraint") == 0)

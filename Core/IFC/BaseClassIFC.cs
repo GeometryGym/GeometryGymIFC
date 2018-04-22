@@ -187,6 +187,7 @@ namespace GeometryGym.Ifc
 					File.SetLastWriteTime(filePath, modified);
 			}
 			catch (Exception) { }
+			
 		}
 	}
 	public partial interface IBaseClassIfc { int Index { get; }  DatabaseIfc Database { get; } }

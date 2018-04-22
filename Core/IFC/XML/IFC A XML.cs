@@ -164,7 +164,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 				else if (string.Compare(name, "HasConstraintRelationships") == 0)

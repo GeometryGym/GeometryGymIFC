@@ -163,6 +163,44 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("SemiAxis2", mSemiAxis2.ToString());
 		}
 	}
+	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
+	{
+		//protected string mName = "$"; //: OPTIONAL IfcLabel;
+		//private string mDescription = "$"; //: OPTIONAL IfcText;
+		//internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
+		//private List<int> mPropertyIndices = new List<int>();
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Location"].Value;
+			if (xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Properties") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcProperty p = mDatabase.ParseXml<IfcProperty>(cn as XmlElement);
+						if (p != null)
+							mProperties[p.Name] = p;
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Name", Name);
+			setAttribute(xml, "Description", Description);
+			XmlElement element = xml.OwnerDocument.CreateElement("Properties");
+			xml.AppendChild(element);
+			foreach (IfcProperty p in Properties.Values)
+				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+	}
 	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcResourceObjectSelect//ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle
 	{ //,IfcExternallyDefinedSurfaceStyle ,IfcExternallyDefinedSymbol ,IfcExternallyDefinedTextFont ,IfcLibraryReference)); 
 		internal override void ParseXml(XmlElement xml)
@@ -179,14 +217,12 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "HasExternalReferences") == 0)
 				{
-					List<IfcExternalReferenceRelationship> references = new List<IfcExternalReferenceRelationship>(child.ChildNodes.Count);
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							references.Add(r);
+							mHasExternalReferences.Add(r);
 					}
-					mHasExternalReferences = references;
 				}
 				else if (string.Compare(name, "HasConstraintRelationships") == 0)
 				{
@@ -203,7 +239,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 			}
@@ -214,35 +250,26 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
-			if (mHasExternalReferences.Count > 0)
+			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences");
+			xml.AppendChild(element);
+			foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
+			element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
+			foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences");
-				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				if (host.mIndex != r.mIndex)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
-			if (mHasConstraintRelationships.Count > 0)
+			if (element.HasChildNodes)
+				xml.AppendChild(element);
+			element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources");
+			foreach (IfcExternalReferenceRelationship r in ExternalReferenceForResources)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
-				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
-				{
-					if (host.mIndex != r.mIndex)
-						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
-				}
-				if (element.HasChildNodes)
-					xml.AppendChild(element);
+				if (host.mIndex != r.mIndex)
+					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
-			if (mExternalReferenceForResources.Count > 0)
-			{
-				XmlElement element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources");
-				foreach (IfcExternalReferenceRelationship r in ExternalReferenceForResources)
-				{
-					if (host.mIndex != r.mIndex)
-						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
-				}
-				if (element.HasChildNodes)
-					xml.AppendChild(element);
-			}
+			if (element.HasChildNodes)
+				xml.AppendChild(element);
 		}
 	}
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4
@@ -261,7 +288,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcResourceObjectSelect o = mDatabase.ParseXml<IfcResourceObjectSelect>(cn as XmlElement);
 						if (o != null)
-							addRelated(o);
+							RelatedResourceObjects.Add(o);
 					}
 				}
 			}

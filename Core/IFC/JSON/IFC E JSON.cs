@@ -193,11 +193,11 @@ namespace GeometryGym.Ifc
 			Identification = extractString(obj.GetValue("Identification", StringComparison.InvariantCultureIgnoreCase));
 			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
 			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				r.addRelated(this);
+				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.addRelated(this);
-			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("ExternalReferenceForResources", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				r.addRelated(this);
+			//foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("ExternalReferenceForResources", StringComparison.InvariantCultureIgnoreCase) as JArray))
+			//	r.addRelated(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -217,7 +217,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			RelatingReference = mDatabase.parseJObject<IfcExternalReference>(obj.GetValue("RelatingReference", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
+			RelatedResourceObjects.AddRange(mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

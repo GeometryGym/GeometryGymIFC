@@ -211,8 +211,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcIShapeProfileDef() : base() { }
 		internal IfcIShapeProfileDef(DatabaseIfc db, IfcIShapeProfileDef p) : base(db,p) { mOverallWidth = p.mOverallWidth; mOverallDepth = p.mOverallDepth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mFlangeEdgeRadius = p.mFlangeEdgeRadius; mFlangeSlope = p.mFlangeSlope; }
-		public IfcIShapeProfileDef(DatabaseIfc m, string name, double overallDepth, double overalWidth, double webThickness, double flangeThickness, double filletRadius)
-			: base(m,name) { mOverallDepth = overallDepth; mOverallWidth = overalWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; mFilletRadius = filletRadius; }
+		public IfcIShapeProfileDef(DatabaseIfc db, string name, double overallWidth, double overallDepth, double webThickness, double flangeThickness)
+			: base(db,name) {  mOverallWidth = overallWidth; mOverallDepth = overallDepth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; }
 
 		internal override double ProfileDepth { get { return OverallDepth; } }
 		internal override double ProfileWidth { get { return OverallWidth; } }
