@@ -34,6 +34,7 @@ namespace GeometryGym.STEP
 	{
 		//private SortedDictionary<int,T> mObjects = new SortedDictionary<int, T>() {  };
 		//public int LastKey { get { return mObjects.Keys.Last(); } }
+		public DatabaseSTEP() { }
 		private List<T> mObjects = new List<T>() { null };
 		protected void setSize(int i) { mObjects.Capacity = i; }
 		public int LastKey { get { return mObjects.Count; } }

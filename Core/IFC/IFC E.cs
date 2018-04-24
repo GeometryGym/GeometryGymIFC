@@ -391,11 +391,8 @@ namespace GeometryGym.Ifc
 			reps.Add(new IfcShapeRepresentation(new IfcRevolvedAreaSolid(pd, translation, axis, arcAngle * angMultipler)));
 			Representation = new IfcProductDefinitionShape(reps);
 		}
-		public IfcMaterialSelect MaterialSelect
-		{
-			get { return GetMaterialSelect(); }
-			set { this.setMaterial(value); }
-		}
+		public IfcMaterialSelect MaterialSelect() { return GetMaterialSelect(); }
+		public void SetMaterial(IfcMaterialSelect material) { this.setMaterial(material); }
 		protected override IfcMaterialSelect GetMaterialSelect()
 		{
 			IfcMaterialSelect m = base.GetMaterialSelect();
@@ -403,7 +400,7 @@ namespace GeometryGym.Ifc
 				return m;
 			if (IsTypedBy != null)
 			{
-				IfcElementType t = RelatingType as IfcElementType;
+				IfcElementType t = RelatingType() as IfcElementType;
 				if (t != null)
 					return t.MaterialSelect;
 			}
@@ -698,7 +695,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			typename = typename.Substring(0, typename.Length - 4);
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], transform)));
 			IfcElement element = IfcElement.ConstructElement(typename, container,null, pds);
-			element.RelatingType = this;
+			element.setRelatingType(this);
 			return element;
 		}
 

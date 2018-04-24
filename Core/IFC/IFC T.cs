@@ -1060,7 +1060,7 @@ namespace GeometryGym.Ifc
 			IfcShapeRepresentation sr = new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], t));
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
 			IfcElement element = IfcElement.ConstructElement(typename, container, null, pds);
-			element.RelatingType = this;
+			element.setRelatingType(this);
 			foreach (IfcRelNests nests in IsNestedBy)
 			{
 				foreach (IfcObjectDefinition od in nests.RelatedObjects)

@@ -409,7 +409,7 @@ namespace GeometryGym.Ifc
 			{
 				if (!double.IsNaN(mNominalDiameter))
 					return mNominalDiameter;
-				IfcReinforcingBarType t = RelatingType as IfcReinforcingBarType;
+				IfcReinforcingBarType t = RelatingType() as IfcReinforcingBarType;
 				return (t != null ? t.NominalDiameter : double.NaN);
 			}
 			set { mNominalDiameter = value; }
@@ -1419,7 +1419,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcRelDefines : IfcRelationship // 	ABSTRACT SUPERTYPE OF(ONEOF(IfcRelDefinesByObject, IfcRelDefinesByProperties, IfcRelDefinesByTemplate, IfcRelDefinesByType))
 	{
-		public abstract IfcRoot Relating { get; }
+		public abstract IfcRoot Relating();
 
 		protected IfcRelDefines() : base() { }
 		protected IfcRelDefines(DatabaseIfc db) : base(db) { }
@@ -1434,7 +1434,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcObject> RelatedObjects { get { return new ReadOnlyCollection<IfcObject>(mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject)); } }
 		public IfcObject RelatingObject { get { return mDatabase[mRelatingObject] as IfcObject; } set { mRelatingObject = value.mIndex; } }
 
-		public override IfcRoot Relating { get { return RelatingObject; } }
+		public override IfcRoot Relating() { return RelatingObject; } 
 
 		internal IfcRelDefinesByObject() : base() { }
 		internal IfcRelDefinesByObject(DatabaseIfc db, IfcRelDefinesByObject r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { r.RelatedObjects.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, ownerHistory, downStream) as IfcObject)); RelatingObject = db.Factory.Duplicate(r.RelatingObject, ownerHistory, downStream) as IfcObject; }
@@ -1451,7 +1451,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcObjectDefinition> RelatedObjects { get { return new ReadOnlyCollection<IfcObjectDefinition>(mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObjectDefinition)); } }
 		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mDatabase[mRelatingPropertyDefinition] as IfcPropertySetDefinition; } set { mRelatingPropertyDefinition = value.mIndex; } }
 
-		public override IfcRoot Relating { get { return RelatingPropertyDefinition; } }
+		public override IfcRoot Relating() { return RelatingPropertyDefinition; } 
 
 		internal IfcRelDefinesByProperties() : base() { }
 		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) { Name = "NameRelDefinesByProperties"; Description = "DescriptionRelDefinesByProperties"; }
@@ -1519,7 +1519,7 @@ namespace GeometryGym.Ifc
 			set { mRelatingTemplate = value.mIndex; }
 		}
 
-		public override IfcRoot Relating { get { return RelatingTemplate; } }
+		public override IfcRoot Relating() { return RelatingTemplate; } 
 
 		internal IfcRelDefinesByTemplate() : base() { }
 		internal IfcRelDefinesByTemplate(DatabaseIfc db, IfcRelDefinesByTemplate r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { r.RelatedPropertySets.ToList().ForEach(x => AddRelated(db.Factory.Duplicate(x, ownerHistory, downStream) as IfcPropertySetDefinition)); RelatingTemplate = db.Factory.Duplicate(r.RelatingTemplate, ownerHistory, downStream) as IfcPropertySetTemplate; }
@@ -1536,10 +1536,10 @@ namespace GeometryGym.Ifc
 		internal SET<IfcObject> mRelatedObjects = new SET<IfcObject>();// : SET [1:?] OF IfcObject;
 		private IfcTypeObject mRelatingType = null;// : IfcTypeObject  
 
-		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } private set { } }
+		internal SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } set { mRelatedObjects.Clear(); if (value != null) { mRelatedObjects.CollectionChanged -= mRelatedObjects_CollectionChanged; mRelatedObjects = value; mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged; } } }
 		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; value.mObjectTypeOf = this; } }
 
-		public override IfcRoot Relating { get { return RelatingType; } }
+		public override IfcRoot Relating() { return RelatingType; } 
 
 		internal IfcRelDefinesByType() : base() { }
 		internal IfcRelDefinesByType(IfcTypeObject relType) : base(relType.mDatabase) { RelatingType = relType; }
@@ -1548,12 +1548,11 @@ namespace GeometryGym.Ifc
 			//mRelatedObjects = new List<int>(d.mRelatedObjects.ToArray()); 
 			RelatingType = db.Factory.Duplicate(r.RelatingType, ownerHistory, downStream) as IfcTypeObject;
 		}
-		public IfcRelDefinesByType(IfcObject related, IfcTypeObject relating) : this(relating) { mRelatedObjects.Add(related); }
+		public IfcRelDefinesByType(IfcObject related, IfcTypeObject relating) : this(relating) { RelatedObjects.Add(related); }
 		public IfcRelDefinesByType(List<IfcObject> related, IfcTypeObject relating) : this(relating) { RelatedObjects.AddRange(related); }
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged;
 		}
 		private void mRelatedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -47,32 +47,30 @@ namespace GeometryGym.Ifc
 			{
 				if (mIsTypedBy != null)
 					mIsTypedBy.mRelatedObjects.Remove(this);
+				mIsTypedBy = value;
 				if (value != null && !value.RelatedObjects.Contains(this))
 					value.RelatedObjects.Add(this);
 			}
 		}
 		public ReadOnlyCollection<IfcRelDefinesByProperties> IsDefinedBy { get { return new ReadOnlyCollection<IfcRelDefinesByProperties>(mIsDefinedBy); } }
 
-		public IfcTypeObject RelatingType 
-		{ 
-			get { return (mIsTypedBy == null ? null : mIsTypedBy.RelatingType); }
-			set
+		public IfcTypeObject RelatingType() { return (mIsTypedBy == null ? null : mIsTypedBy.RelatingType); }
+		public void setRelatingType(IfcTypeObject typeObject)
+		{
+			if (mIsTypedBy != null)
 			{
-				if (mIsTypedBy != null)
-				{
-					if (mIsTypedBy.RelatingType == value)
-						return;
-					mIsTypedBy.mRelatedObjects.Remove(this);
-				}
-				if (value == null)
-					mIsTypedBy = null;
-				else //TODO CHECK CLASS NAME MATCHES INSTANCE
-				{
-					if (value.mObjectTypeOf == null)
-						value.mObjectTypeOf = new IfcRelDefinesByType(this,value);
-					else if (!value.mObjectTypeOf.RelatedObjects.Contains(this))
-						value.mObjectTypeOf.RelatedObjects.Add(this);
-				}
+				if (mIsTypedBy.RelatingType == typeObject)
+					return;
+				mIsTypedBy.mRelatedObjects.Remove(this);
+			}
+			if (typeObject == null)
+				mIsTypedBy = null;
+			else //TODO CHECK CLASS NAME MATCHES INSTANCE
+			{
+				if (typeObject.mObjectTypeOf == null)
+					typeObject.mObjectTypeOf = new IfcRelDefinesByType(this, typeObject);
+				else if (!typeObject.mObjectTypeOf.RelatedObjects.Contains(this))
+					typeObject.mObjectTypeOf.RelatedObjects.Add(this);
 			}
 		}
 		
