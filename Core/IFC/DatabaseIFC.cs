@@ -32,7 +32,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {  IFC2x3, IFC4, IFC4A1, IFC4A2 };
+	public enum ReleaseVersion {  IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1 };
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
@@ -99,6 +99,15 @@ namespace GeometryGym.Ifc
 				base[index] = value;
 				if(value != null)
 					value.mDatabase = this;
+			}
+		}
+		public virtual BaseClassIfc this[string globalID]
+		{
+			get
+			{
+				BaseClassIfc result = null;
+				mDictionary.TryGetValue(globalID, out result);
+				return result;
 			}
 		}
 		internal ModelView mModelView = ModelView.Ifc2x3NotAssigned;
@@ -496,7 +505,10 @@ namespace GeometryGym.Ifc
 			if (ts.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
 					ts.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
 			{
-				mRelease = ReleaseVersion.IFC4;
+				if(ts.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
+					mRelease = ReleaseVersion.IFC4X1;
+				else
+					mRelease = ReleaseVersion.IFC4;
 				if (mModelView == ModelView.Ifc2x3Coordination || mModelView == ModelView.Ifc2x3NotAssigned)
 					mModelView = ModelView.Ifc4NotAssigned;
 				return true;
@@ -730,7 +742,7 @@ namespace GeometryGym.Ifc
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
 					return constructor.Invoke(new object[] { this.mDatabase, entity, null, downStream }) as BaseClassIfc;
-				return Duplicate(entity, downStream);
+				//return Duplicate(entity, downStream);
 			}
 			return null;
 		}

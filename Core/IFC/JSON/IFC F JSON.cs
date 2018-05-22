@@ -34,12 +34,25 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcFaceBound>(obj.GetValue("Bounds", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addBound(x));
+			Bounds.AddRange(mDatabase.extractJArray<IfcFaceBound>(obj.GetValue("Bounds", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Bounds"] = new JArray(mBounds.ConvertAll(x => mDatabase[x].getJson(this, options)));
+			obj["Bounds"] = new JArray(Bounds.ConvertAll(x=> x.getJson(this, options)));
+		}
+	}
+	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			mDatabase.extractJArray<IfcConnectedFaceSet>(obj.GetValue("FbsmFaces", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addFace(x));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["FbsmFaces"] = new JArray(mFbsmFaces.ConvertAll(x => mDatabase[x].getJson(this, options)));
 		}
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))

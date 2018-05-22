@@ -136,7 +136,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcConnectionPointEccentricity
 	{
-		internal Vector3d Eccentricity { get { return new Vector3d(mEccentricityInX, mEccentricityInY, mEccentricityInZ); } }
+		internal Vector3d Eccentricity { get { return new Vector3d(double.IsNaN(mEccentricityInX) ? 0 : mEccentricityInX, double.IsNaN(mEccentricityInY) ? 0 : mEccentricityInY, double.IsNaN(mEccentricityInZ) ? 0 : mEccentricityInZ); } }
 
 		internal IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, Vector3d ecc) : base(v) { mEccentricityInX = ecc.X; mEccentricityInY = ecc.Y; mEccentricityInZ = ecc.Z; }
 	}

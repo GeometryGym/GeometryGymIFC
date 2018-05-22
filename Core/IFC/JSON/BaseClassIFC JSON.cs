@@ -41,7 +41,10 @@ namespace GeometryGym.Ifc
 			public string ProjectFolder = "";
 			public HashSet<string> Encountered = new HashSet<string>();
 			public JsonStyle Style = JsonStyle.Default;
+			public int LengthDigitCount = 4;
 			internal RepositoryAttributes RepositoryAttributes = new RepositoryAttributes();
+			internal ReleaseVersion Version = ReleaseVersion.IFC4A2;
+
 			public SetJsonOptions() { }
 
 			internal SetJsonOptions(SetJsonOptions options)
@@ -50,6 +53,8 @@ namespace GeometryGym.Ifc
 				Encountered = options.Encountered;
 				Style = options.Style;
 				RepositoryAttributes = options.RepositoryAttributes;
+				LengthDigitCount = options.LengthDigitCount;
+				Version = options.Version;
 			}
 			internal SetJsonOptions(BaseClassIfc obj) { adopt(obj); }
 			internal SetJsonOptions(SetJsonOptions options, BaseClassIfc obj) : this(options) { adopt(obj); }

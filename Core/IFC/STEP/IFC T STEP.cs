@@ -692,6 +692,18 @@ namespace GeometryGym.Ifc
 			catch (Exception) { }
 		}
 	}
+	public partial class IfcTriangulatedIrregularNetwork : IfcTriangulatedFaceSet
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mFlags.ConvertAll(x=>x.ToString())) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mPnIndex = ParserSTEP.StripListInt(str, ref pos, len);
+		}
+	}
 	public partial class IfcTrimmedCurve : IfcBoundedCurve
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve.Index + "," + mTrim1.ToString() + "," + mTrim2.ToString() + "," + ParserSTEP.BoolToString(mSenseAgreement) + ",." + mMasterRepresentation.ToString() + "."; }

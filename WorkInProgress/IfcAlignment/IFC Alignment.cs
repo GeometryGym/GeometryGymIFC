@@ -26,7 +26,8 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-using Newtonsoft.Json.Linq;
+
+using System.Xml;
 
 namespace GeometryGym.Ifc
 {
@@ -38,10 +39,14 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcAlignment() : base() { }
 		public IfcAlignment(IfcSite host, IfcCurve axis) : base(host, axis) { }
+		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, IfcOwnerHistory ownerHistory, bool downStream) : base(db, alignment, ownerHistory, downStream)
+		{
+			PredefinedType = alignment.PredefinedType;
+		}
 
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + (mPredefinedType == IfcAlignmentTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType.ToString() + ".");
+			return base.BuildStringSTEP() + (mPredefinedType == IfcAlignmentTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -51,18 +56,17 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
 		}
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcAlignmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcAlignmentTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
+			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcAlignmentTypeEnum.NOTDEFINED)
-				obj["PredefinedType"] = mPredefinedType.ToString();
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 	[Serializable]
@@ -77,7 +81,11 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlignment2DHorizontal() : base() { }
 		internal IfcAlignment2DHorizontal(IEnumerable<IfcAlignment2DHorizontalSegment> segments) : base(segments.First().Database) { mSegments.AddRange(segments); }
-
+		internal IfcAlignment2DHorizontal(DatabaseIfc db, IfcAlignment2DHorizontal a) : base(db,a)
+		{
+			mStartDistAlong = a.mStartDistAlong;
+			Segments.AddRange(a.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcAlignment2DHorizontalSegment));
+		}
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.Index)) + ")";
@@ -88,20 +96,35 @@ namespace GeometryGym.Ifc
 			mSegments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAlignment2DHorizontalSegment));
 		}
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("StartDistAlong", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				StartDistAlong = token.Value<double>();
-			Segments.AddRange(mDatabase.extractJArray<IfcAlignment2DHorizontalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartDistAlong"))
+				double.TryParse( xml.Attributes["StartDistAlong"].Value, out mStartDistAlong);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcAlignment2DHorizontalSegment s = mDatabase.ParseXml<IfcAlignment2DHorizontalSegment>(cn as XmlElement);
+						if (s != null)
+							Segments.Add(s);
+					}
+				}
+			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			if ((mDatabase != null && mStartDistAlong > mDatabase.Tolerance) || mStartDistAlong > 1e-5)
-				obj["StartDistAlong"] = StartDistAlong;
-			obj["Segments"] = new JArray(Segments.ConvertAll(x => x.getJson(this, options)));
+			base.SetXML(xml, host, processed);
+
+			if(!double.IsNaN(mStartDistAlong))
+				setAttribute(xml, "StartDistAlong", mStartDistAlong.ToString());
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments");
+			xml.AppendChild(element);
+			foreach (IfcAlignment2DHorizontalSegment s in Segments)
+				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	[Serializable]
@@ -112,6 +135,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlignment2DHorizontalSegment() : base() { }
 		internal IfcAlignment2DHorizontalSegment(IfcCurveSegment2D seg) : base(seg.mDatabase) { CurveGeometry = seg; }
+		internal IfcAlignment2DHorizontalSegment(DatabaseIfc db, IfcAlignment2DHorizontalSegment s) : base(db,s) { CurveGeometry = db.Factory.Duplicate(s.CurveGeometry) as IfcCurveSegment2D; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mCurveGeometry.Index; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -119,21 +143,25 @@ namespace GeometryGym.Ifc
 			mCurveGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurveSegment2D;
 		}
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("CurveGeometry", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				CurveGeometry = mDatabase.parseJObject<IfcCurveSegment2D>(token as JObject);
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "CurveGeometry") == 0)
+					CurveGeometry = mDatabase.ParseXml<IfcCurveSegment2D>(child as XmlElement);
+			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			obj["CurveGeometry"] = CurveGeometry.getJson(this, options);
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(CurveGeometry.GetXML(xml.OwnerDocument, "CurveGeometry", this, processed));
 		}
+
 	}
 	[Serializable]
-	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1
+	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
 		private IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
 		private string mStartTag = "$";// : OPTIONAL IfcLabel;
@@ -145,6 +173,12 @@ namespace GeometryGym.Ifc
 
 		protected IfcAlignment2DSegment() : base() { }
 		protected IfcAlignment2DSegment(DatabaseIfc db) : base(db) { }
+		protected IfcAlignment2DSegment(DatabaseIfc db, IfcAlignment2DSegment s) : base(db, s)
+		{
+			TangentialContinuity = s.TangentialContinuity;
+			StartTag = s.StartTag;
+			EndTag = s.EndTag;
+		}
 
 		protected override string BuildStringSTEP()
 		{
@@ -156,6 +190,26 @@ namespace GeometryGym.Ifc
 			mTangentialContinuity = ParserIfc.StripLogical(str, ref pos, len);
 			mStartTag = ParserSTEP.StripString(str, ref pos, len);
 			mEndTag = ParserSTEP.StripString(str, ref pos, len);
+		}
+
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("TangentialContinuity"))
+				TangentialContinuity = Convert.ToBoolean(xml.Attributes["TangentialContinuity"].Value);
+			if (xml.HasAttribute("StartTag"))
+				StartTag = xml.Attributes["StartTag"].Value;
+			if (xml.HasAttribute("StartTag"))
+				StartTag = xml.Attributes["StartTag"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			if (mTangentialContinuity != IfcLogicalEnum.UNKNOWN)
+				setAttribute(xml, "TangentialContinuity", mTangentialContinuity == IfcLogicalEnum.TRUE ? "true" : "false");
+			setAttribute(xml, "StartTag", StartTag);
+			setAttribute(xml, "EndTag", EndTag);
 		}
 	}
 	[Serializable]
@@ -275,7 +329,14 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentCurve(IfcAlignment2DHorizontal horizontal) : base(horizontal.Database) { Horizontal = horizontal; }
 		public IfcAlignmentCurve(IfcAlignment2DVertical vertical) : base(vertical.Database) { Vertical = vertical; }
 		public IfcAlignmentCurve(IfcAlignment2DHorizontal horizontal, IfcAlignment2DVertical vertical) : this(horizontal) { Vertical = vertical; }
-
+		internal IfcAlignmentCurve(DatabaseIfc db, IfcAlignmentCurve c) : base(db,c)
+		{
+			if (c.mHorizontal != null)
+				Horizontal = db.Factory.Duplicate(c.Horizontal) as IfcAlignment2DHorizontal;
+			if (c.mVertical != null)
+				Vertical = db.Factory.Duplicate(c.Vertical) as IfcAlignment2DVertical;
+			Tag = c.Tag;
+		}
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.ObjToLinkString(mHorizontal) + "," + ParserSTEP.ObjToLinkString(mVertical) + "," + (mTag == "$" ? "$" : "'" + mTag + "'");
@@ -287,27 +348,28 @@ namespace GeometryGym.Ifc
 			mTag = ParserSTEP.StripString(str, ref pos, len);
 		}
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("Horizontal", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Horizontal = mDatabase.parseJObject<IfcAlignment2DHorizontal>(token as JObject);
-			token = obj.GetValue("Vertical", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Vertical = mDatabase.parseJObject<IfcAlignment2DVertical>(token as JObject);
-			token = obj.GetValue("Tag", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Tag = token.Value<string>();
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Tag"))
+				Tag = xml.Attributes["Tag"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Horizontal") == 0)
+					Horizontal = mDatabase.ParseXml<IfcAlignment2DHorizontal>(child as XmlElement);
+				else if (string.Compare(name, "Vertical") == 0)
+					Vertical = mDatabase.ParseXml<IfcAlignment2DVertical>(child as XmlElement);
+			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			if(mHorizontal != null)
-				obj["Horizontal"] = Horizontal.getJson(this, options);
-			if(mVertical != null)
-				obj["Vertical"] = Vertical.getJson(this, options);
-			setAttribute(obj, "Tag", Tag);
+			base.SetXML(xml, host, processed);
+			if (mHorizontal != null)
+				xml.AppendChild(Horizontal.GetXML(xml.OwnerDocument, "Horizontal", this, processed));
+			if (mVertical != null)
+				xml.AppendChild(Vertical.GetXML(xml.OwnerDocument, "Vertical", this, processed));
+			setAttribute(xml, "Tag", Tag);
 		}
 	}
 	[Serializable]
@@ -335,21 +397,19 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("Radius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Radius = token.Value<double>();
-			token = obj.GetValue("IsCCW", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				IsCCW = token.Value<bool>();
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Radius"))
+				double.TryParse(xml.Attributes["Radius"].Value, out mRadius);
+			if (xml.HasAttribute("IsCCW"))
+				bool.TryParse(xml.Attributes["IsCCW"].Value, out mIsCCW);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			obj["Radius"] = Radius;
-			obj["IsCCW"] = IsCCW;
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Radius", Radius.ToString());
+			setAttribute(xml, "IsCCW", IsCCW.ToString());
 		}
 	}
 	[Serializable]
@@ -380,25 +440,26 @@ namespace GeometryGym.Ifc
 			mStartDirection = ParserSTEP.StripDouble(str, ref pos, len);
 			mSegmentLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
-		internal override void parseJObject(JObject obj)
+
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("StartPoint", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				StartPoint = mDatabase.parseJObject<IfcCartesianPoint>(token as JObject);
-			token = obj.GetValue("StartDirection", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				StartDirection = token.Value<double>();
-			token = obj.GetValue("SegmentLength", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				SegmentLength = token.Value<double>();
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartDirection"))
+				double.TryParse(xml.Attributes["StartDirection"].Value, out mStartDirection);
+			if (xml.HasAttribute("SegmentLength"))
+				double.TryParse(xml.Attributes["SegmentLength"].Value, out mSegmentLength);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				if (string.Compare(child.Name, "StartPoint") == 0)
+					StartPoint = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
+			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			obj["StartPoint"] = StartPoint.getJson(this, options);
-			obj["StartDirection"] = StartDirection;
-			obj["SegmentLength"] = SegmentLength;
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(StartPoint.GetXML(xml.OwnerDocument, "StartPoint", this, processed));
+			setAttribute(xml, "StartDirection", StartDirection.ToString());
+			setAttribute(xml, "SegmentLength", SegmentLength.ToString());
 		}
 	}
 	[Serializable]
@@ -410,23 +471,28 @@ namespace GeometryGym.Ifc
 
 		protected IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSite host, IfcCurve axis) : base(host) { Axis = axis; }
+		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mAxis.Index; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
-		internal override void parseJObject(JObject obj)
+
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Axis = mDatabase.parseJObject<IfcCurve>(token as JObject);
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Axis") == 0)
+					Axis = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			obj["Axis"] = Axis.getJson(this, options);
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
 	[Serializable]
@@ -440,8 +506,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{
+		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
+		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
+		{
+			if (e.mContainedInStructure != null)
+				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).addRelated(this);
+		}
 	}
 	[Serializable]
 	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
@@ -452,12 +525,12 @@ namespace GeometryGym.Ifc
 		private bool mIsEndRadiusCCW;// : IfcBoolean;
 		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.BIQUADRATICPARABOLA;
 
-		public double StartRadius { get { return mStartRadius; } set { mStartRadius = value; } }
-		public double EndRadius { get { return mEndRadius; } set { mEndRadius = value; } }
+		public double StartRadius { get { return double.IsNaN(mStartRadius) ? double.PositiveInfinity : mStartRadius; } set { mStartRadius = value; } }
+		public double EndRadius { get { return double.IsNaN( mEndRadius) ? double.PositiveInfinity : mEndRadius; } set { mEndRadius = value; } }
 		public bool IsStartRadiusCCW { get { return mIsStartRadiusCCW; } set { mIsStartRadiusCCW = value; } }
 		public bool IsEndRadiusCCW { get { return mIsEndRadiusCCW; } set { mIsEndRadiusCCW = value; } }
 		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
-
+			
 		internal IfcTransitionCurveSegment2D() : base() { }
 		internal IfcTransitionCurveSegment2D(IfcCartesianPoint start, double startDirection, double length, double startRadius, double endRadius, bool isStartCCW, bool isEndCCW, IfcTransitionCurveType curveType)
 			: base(start, startDirection, length)
@@ -468,7 +541,7 @@ namespace GeometryGym.Ifc
 			mIsEndRadiusCCW = isEndCCW;
 			mTransitionCurveType = curveType;
 		}
-
+		internal IfcTransitionCurveSegment2D(DatabaseIfc db, IfcTransitionCurveSegment2D s) : base(db, s) { mStartRadius = s.mStartRadius; mEndRadius = s.mEndRadius; mIsStartRadiusCCW = s.mIsStartRadiusCCW; mIsEndRadiusCCW = s.mIsEndRadiusCCW; mTransitionCurveType = s.mTransitionCurveType; }
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartRadius) + "," + ParserSTEP.DoubleOptionalToString(mEndRadius) + "," +
@@ -483,34 +556,29 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcTransitionCurveType>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mTransitionCurveType);
 		}
 
-		internal override void parseJObject(JObject obj)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("StartRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				StartRadius = token.Value<double>();
-			token = obj.GetValue("EndRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				EndRadius = token.Value<double>();
-			token = obj.GetValue("IsStartRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				IsStartRadiusCCW = token.Value<bool>();
-			token = obj.GetValue("IsEndRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				IsEndRadiusCCW = token.Value<bool>();
-			token = obj.GetValue("TransitionCurveType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcTransitionCurveType>(token.Value<string>(), true, out mTransitionCurveType);
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartRadius"))
+				double.TryParse(xml.Attributes["StartRadius"].Value, out mStartRadius);
+			if (xml.HasAttribute("EndRadius"))
+				double.TryParse(xml.Attributes["EndRadius"].Value, out mEndRadius);
+			if (xml.HasAttribute("IsStartRadiusCCW"))
+				bool.TryParse(xml.Attributes["IsStartRadiusCCW"].Value, out mIsStartRadiusCCW);
+			if (xml.HasAttribute("IsEndRadiusCCW"))
+				bool.TryParse(xml.Attributes["IsEndRadiusCCW"].Value, out mIsEndRadiusCCW);
+			if (xml.HasAttribute("TransitionCurveType"))
+				Enum.TryParse<IfcTransitionCurveType>(xml.Attributes["TransitionCurveType"].Value, out mTransitionCurveType);
+
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.setJSON(obj, host, options);
-			obj["StartRadius"] = StartRadius;
-			obj["EndRadius"] = EndRadius;
-			obj["IsStartRadiusCCW"] = IsStartRadiusCCW;
-			obj["IsEndRadiusCCW"] = IsEndRadiusCCW;
-			obj["TransitionCurveType"] = mTransitionCurveType.ToString();
-			
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "StartRadius", StartRadius.ToString());
+			setAttribute(xml, "EndRadius", EndRadius.ToString());
+			setAttribute(xml, "IsStartRadiusCCW", IsStartRadiusCCW.ToString());
+			setAttribute(xml, "IsEndRadiusCCW", IsEndRadiusCCW.ToString());
+			setAttribute(xml, "TransitionCurveType", TransitionCurveType.ToString());
 		}
 	}
 }

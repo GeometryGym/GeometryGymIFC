@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCompositeCurve;
+			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
 		}
 	}
@@ -946,6 +946,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			Enum.TryParse<IfcStructuralSurfaceMemberTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mPredefinedType);
+			mThickness = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcStructuralSurfaceMemberVarying : IfcStructuralSurfaceMember

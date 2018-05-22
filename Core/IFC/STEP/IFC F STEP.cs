@@ -33,16 +33,11 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(";
-			if (mBounds.Count > 0)
-				str += ParserSTEP.LinkToString(mBounds[0]);
-			for (int icounter = 1; icounter < mBounds.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mBounds[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + (mBounds.Count == 0 ? ",()" : ",(#" + string.Join(",#", Bounds.ConvertAll(x=>x.mIndex)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mBounds = ParserSTEP.StripListLink(str, ref pos, str.Length);
+			Bounds.AddRange(ParserSTEP.StripListLink(str, ref pos, str.Length).ConvertAll(x=> dictionary[x] as IfcFaceBound));
 		}
 	}
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface

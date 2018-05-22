@@ -492,10 +492,12 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(placement);
 			if (mRepresentation != null)
 				xml.AppendChild(mRepresentation.GetXML(xml.OwnerDocument, "Representation", this, processed));
+
 			XmlElement element = xml.OwnerDocument.CreateElement("ReferencedBy");
-			xml.AppendChild(element);
 			foreach (IfcRelAssignsToProduct rap in mReferencedBy)
 				element.AppendChild(rap.GetXML(xml.OwnerDocument, "", this, processed));
+			if(element.ChildNodes.Count > 0)	
+				xml.AppendChild(element);
 		}
 	}
 	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect

@@ -254,7 +254,7 @@ namespace GeometryGym.Ifc
 
 			JArray data = new JArray();
 			IfcContext context = this.mContext;
-			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions();
+			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions() { LengthDigitCount = mLengthDigits, Version = this.Release };
 			if (context != null)
 			{
 				JObject jcontext = context.getJson(null, options); //null);//

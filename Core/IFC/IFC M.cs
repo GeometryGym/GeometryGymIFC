@@ -797,6 +797,7 @@ namespace GeometryGym.Ifc
 		internal IfcMechanicalFastenerType() : base() { }
 		internal IfcShapeRepresentation mProfileRep = null;
 		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; mPredefinedType = t.mPredefinedType; }
+		public IfcMechanicalFastenerType(DatabaseIfc db, string name, IfcMechanicalFastenerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]

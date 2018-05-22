@@ -369,7 +369,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCircleHollowProfileDef : IfcCircleProfileDef
 	{
-		internal override string KeyWord { get { return (mWallThickness < mDatabase.Tolerance ? "IfcCircleProfileDef" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mWallThickness < (mDatabase == null ? 1e-6 : mDatabase.Tolerance) ? "IfcCircleProfileDef" : base.KeyWord); } }
 
 		internal double mWallThickness;// : IfcPositiveLengthMeasure;
 		public double WallThickness { get { return mWallThickness; } set { mWallThickness = value; } }
@@ -465,6 +465,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { if (!string.IsNullOrEmpty(value)) mName = ParserIfc.Encode(value); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserIfc.Decode(x)); } }
 		public ReadOnlyCollection<IfcRelAssociatesClassification> ClassificationForObjects { get { return new ReadOnlyCollection<IfcRelAssociatesClassification>(mClassificationForObjects); } }
 		public ReadOnlyCollection<IfcClassificationReference> HasReferences { get { return new ReadOnlyCollection<IfcClassificationReference>(mHasReferences); } }
 
@@ -845,7 +846,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcFace> CfsFaces { get { return new ReadOnlyCollection<IfcFace>(mCfsFaces.ConvertAll(x => mDatabase[x] as IfcFace)); } }
 
 		internal IfcConnectedFaceSet() : base() { }
-		internal IfcConnectedFaceSet(List<IfcFace> faces) : base(faces[0].mDatabase) { mCfsFaces = faces.ConvertAll(x => x.mIndex); }
+		public IfcConnectedFaceSet(List<IfcFace> faces) : base(faces[0].mDatabase) { mCfsFaces = faces.ConvertAll(x => x.mIndex); }
 		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c) : base(db,c) { c.CfsFaces.ToList().ForEach(x=>AddFace(db.Factory.Duplicate(x) as IfcFace)); }
 
 		public void AddFace(IfcFace face) { mCfsFaces.Add(face.mIndex); }

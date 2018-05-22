@@ -206,6 +206,63 @@ namespace GeometryGym.Ifc
 			obj["Radius"] = Radius;
 		}
 	}
+	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect, NamedObjectIfc //	SUBTYPE OF IfcExternalInformation;
+	{
+		//internal string mSource = "$"; //  : OPTIONAL IfcLabel;
+		//internal string mEdition = "$"; //  : OPTIONAL IfcLabel;
+		//internal DateTime mEditionDate = DateTime.MinValue; // : OPTIONAL IfcDate IFC4 change 
+		//private int mEditionDateSS = 0; // : OPTIONAL IfcCalendarDate;
+		//internal string mName;//  : IfcLabel;
+		//internal string mDescription = "$";//	 :	OPTIONAL IfcText; IFC4 Addition
+		//internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; IFC4 Addtion
+		//internal List<string> mReferenceTokens = new List<string>();//	 :	OPTIONAL LIST [1:?] OF IfcIdentifier; IFC4 Addition
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			//Radius = obj.GetValue("Radius", StringComparison.InvariantCultureIgnoreCase).Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			setAttribute(obj, "Source", Source);
+			setAttribute(obj, "Edition", Edition);
+			if(mEditionDate != DateTime.MinValue)
+				setAttribute(obj, "EditionDate", IfcDate.FormatSTEP(EditionDate));
+			setAttribute(obj, "Name", Name);
+			setAttribute(obj, "Description", Description);
+			setAttribute(obj, "Location", Location);
+			if (mReferenceTokens.Count > 0)
+				obj["ReferenceTokens"] = new JArray(ReferenceTokens);
+		}
+	}
+	public partial class IfcClassificationReference : IfcExternalReference, IfcClassificationReferenceSelect, IfcClassificationSelect, IfcClassificationNotationSelect
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("ReferencedSource", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+			{
+				JObject jobj = token as JObject;
+				if (jobj != null)
+					ReferencedSource = mDatabase.parseJObject<IfcClassificationReferenceSelect>(jobj);
+			}
+			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Description = token.Value<string>();
+			token = obj.GetValue("Sort", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Sort = token.Value<string>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mReferencedSource > 0)
+				obj["ReferencedSource"] = ReferencedSource.getJson(this, options);
+			setAttribute(obj, "Description", Description);
+			setAttribute(obj, "Sort", Sort);
+		}
+	}
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{
 		internal override void parseJObject(JObject obj)
@@ -342,7 +399,13 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				JObject jobj = getJson(null, new SetJsonOptions());
+				SetJsonOptions options = new SetJsonOptions();
+				if(mDatabase != null)
+				{
+					options.LengthDigitCount = mDatabase.mLengthDigits;
+					options.Version = mDatabase.Release;
+				}
+				JObject jobj = getJson(null, options);
 				return jobj.ToString();
 			}
 		}

@@ -485,7 +485,7 @@ namespace GeometryGym.Ifc
 			mPointParameterV = p.mPointParameterV;
 		}
 	}
-	public interface IfcPointOrVertexPoint : IBaseClassIfc { }  // = SELECT ( IfcPoint, IfcVertexPoint);
+	public partial interface IfcPointOrVertexPoint : IBaseClassIfc { }  // = SELECT ( IfcPoint, IfcVertexPoint);
 	[Serializable]
 	public partial class IfcPolygonalBoundedHalfSpace : IfcHalfSpaceSolid
 	{
@@ -1052,13 +1052,26 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcShapeModel r in e.NewItems)
-					base.Representations.Add(r);
+				{
+					if(!base.Representations.Contains(r))
+						base.Representations.Add(r);
+				}
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcShapeModel r in e.OldItems)
 					base.Representations.Remove(r);
 			}
+		}
+		protected override void addRepresentation(IfcRepresentation r)
+		{
+			if (r is IfcShapeModel sm && !mShapeRepresentations.Contains(sm))
+				mShapeRepresentations.Add(sm);
+		}
+		protected override void removeRepresentation(IfcRepresentation r)
+		{
+			if(r is IfcShapeModel sm)
+				mShapeRepresentations.Remove(sm);
 		}
 		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 	}
@@ -1103,8 +1116,11 @@ namespace GeometryGym.Ifc
 			{
 				foreach (IfcRepresentation r in e.NewItems)
 				{
-					if(r != null)
+					if (r != null)
+					{
 						r.mOfProductRepresentation.Add(this);
+						addRepresentation(r);
+					}
 				}
 			}
 			if (e.OldItems != null)
@@ -1112,11 +1128,15 @@ namespace GeometryGym.Ifc
 				foreach (IfcRepresentation r in e.OldItems)
 				{
 					if(r != null)
+					{
 						r.mOfProductRepresentation.Remove(this);
+						removeRepresentation(r);
+					}
 				}
 			}
 		}
-
+		protected virtual void addRepresentation(IfcRepresentation r) { } 
+		protected virtual void removeRepresentation(IfcRepresentation r) { } 
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);

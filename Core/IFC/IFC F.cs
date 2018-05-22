@@ -31,16 +31,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
-		internal List<int> mBounds = new List<int>();// : SET [1:?] OF IfcFaceBound;
-		public ReadOnlyCollection<IfcFaceBound> Bounds { get { return new ReadOnlyCollection<IfcFaceBound>( mBounds.ConvertAll(x =>mDatabase[x] as IfcFaceBound)); } }
+		internal SET<IfcFaceBound> mBounds = new SET<IfcFaceBound>();// : SET [1:?] OF IfcFaceBound;
+		public SET<IfcFaceBound> Bounds { get { return mBounds; } set { mBounds.Clear(); if (value != null) mBounds = value; } }
 
 		internal IfcFace() : base() { }
-		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { f.Bounds.ToList().ForEach(x=>addBound( db.Factory.Duplicate(x) as IfcFaceBound)); }
-		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer.mIndex); }
-		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner.mIndex); }
-		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds = bounds.ConvertAll(x => x.mIndex); }
+		internal IfcFace(DatabaseIfc db, IfcFace f) : base(db,f) { Bounds.AddRange(f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound)); }
+		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer); }
+		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner); }
+		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds.AddRange(bounds); }
 
-		internal void addBound(IfcFaceBound bound) { mBounds.Add(bound.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface

@@ -927,7 +927,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRelConnectsStructuralMember : IfcRelConnects
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingStructuralMember) + "," + ParserSTEP.LinkToString(mRelatedStructuralConnection) + "," + ParserSTEP.LinkToString(mAppliedCondition) + "," + ParserSTEP.LinkToString(mAdditionalConditions) + "," + ParserSTEP.DoubleToString(mSupportedLength) + "," + ParserSTEP.LinkToString(mConditionCoordinateSystem); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingStructuralMember) + "," + 
+				ParserSTEP.LinkToString(mRelatedStructuralConnection) + "," + ParserSTEP.LinkToString(mAppliedCondition) + "," + 
+				ParserSTEP.LinkToString(mAdditionalConditions) + "," + ParserSTEP.DoubleOptionalToString(mSupportedLength) + "," + 
+				ParserSTEP.LinkToString(mConditionCoordinateSystem);
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

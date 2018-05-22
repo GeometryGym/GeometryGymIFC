@@ -424,7 +424,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mAssignedItems.Count < 1)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",'" + mName + (mDescription == "$" ? "',$,(" : "'," + mDescription + ",(") + ParserSTEP.LinkToString(mAssignedItems[0]);
+			string str = base.BuildStringSTEP(release) + ",'" + mName + (mDescription == "$" ? "',$,(" : "','" + mDescription + "',(") + ParserSTEP.LinkToString(mAssignedItems[0]);
 			if (mAssignedItems.Count > 100)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -550,7 +550,7 @@ namespace GeometryGym.Ifc
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			mRepresentations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcRepresentation));
+			Representations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcRepresentation));
 		}
 	}
 	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef

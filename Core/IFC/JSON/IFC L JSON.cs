@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
+			int digits = options.LengthDigitCount;
 			base.setJSON(obj, host, options);
 			obj["Depth"] = Math.Round(mDepth, digits);
 			obj["Width"] = Math.Round(mWidth, digits);
@@ -146,7 +146,7 @@ namespace GeometryGym.Ifc
 				obj["EdgeRadius"] = Math.Round(mEdgeRadius, digits);
 			if (!double.IsNaN(mLegSlope) && mLegSlope > 0)
 				obj["LegSlope"] = mLegSlope;
-			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
+			if (options.Version <= ReleaseVersion.IFC2x3)
 			{
 				if (!double.IsNaN(mCentreOfGravityInX) && mCentreOfGravityInX > 0)
 					obj["CentreOfGravityInX"] = mCentreOfGravityInX;

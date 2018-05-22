@@ -415,16 +415,7 @@ namespace GeometryGym.Ifc
 		}
 		public abstract IfcProperty FindProperty(string name);
 		
-		internal virtual IfcPropertySetDefinition findPropertySet(string name)
-		{
-			List<IfcPropertySetDefinition> psds = Extract<IfcPropertySetDefinition>();
-			foreach (IfcPropertySetDefinition psd in psds)
-			{
-				if (psd != null && string.Compare(psd.Name, name, true) == 0)
-					return psd;
-			}
-			return null;
-		}
+		public virtual IfcPropertySetDefinition FindPropertySet(string name) { return Extract<IfcPropertySetDefinition>().FirstOrDefault(x=>string.Compare(x.Name,name,true) == 0); }
 		protected override List<T> Extract<T>(Type type)
 		{
 			// Early implementation, should search for typed objects such as products and type products.  Contact Jon

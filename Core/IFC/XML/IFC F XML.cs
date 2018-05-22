@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcFaceBound f = mDatabase.ParseXml<IfcFaceBound>(cn as XmlElement);
 						if (f != null)
-							addBound(f);
+							Bounds.Add(f);
 					}
 				}
 			}

@@ -1028,11 +1028,13 @@ namespace GeometryGym.STEP
 			while (s[icounter] != ')')
 			{
 				string str = "";
-				while (char.IsDigit(s[icounter]))
+				char c = s[icounter];
+				while (c == '-' || char.IsDigit(c))
 				{
-					str += s[icounter++];
-					if (icounter == len)
+					str += c;
+					if (++icounter == len)
 						break;
+					c = s[icounter];
 				}
 				result.Add(int.Parse(str));
 				if (icounter == len)
@@ -1273,7 +1275,7 @@ namespace GeometryGym.STEP
 				if (icounter == len)
 					break;
 			}
-			if (s[icounter] == '$')
+			if (s[icounter] == '$' || s[icounter] == '*')
 			{
 				if (++icounter < len)
 				{
