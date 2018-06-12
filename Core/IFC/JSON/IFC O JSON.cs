@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			ObjectType = extractString(obj.GetValue("ObjectType", StringComparison.InvariantCultureIgnoreCase));
 			foreach (IfcRelDefinesByProperties rdp in mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				rdp.AddRelated(this);
+				rdp.RelatedObjects.Add(this);
 			JObject jobj = obj.GetValue("IsTypedBy", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				IsTypedBy = mDatabase.parseJObject<IfcRelDefinesByType>(jobj);

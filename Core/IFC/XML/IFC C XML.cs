@@ -526,7 +526,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelDefinesByProperties rd = mDatabase.ParseXml<IfcRelDefinesByProperties>(cn as XmlElement);
 						if (rd != null)
-							rd.AddRelated(this);
+							rd.RelatedObjects.Add(this);
 					}
 				}
 				else if (string.Compare(name, "Declares") == 0)

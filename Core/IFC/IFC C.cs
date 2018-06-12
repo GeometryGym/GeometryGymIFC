@@ -1144,7 +1144,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelDefinesByProperties rdp in c.mIsDefinedBy)
 			{
 				IfcRelDefinesByProperties drdp = db.Factory.Duplicate(rdp) as IfcRelDefinesByProperties;
-				drdp.AddRelated(this);
+				drdp.RelatedObjects.Add(this);
 			}
 		}
 		protected IfcContext(string name, IfcUnitAssignment units) : this(units.Database, name)

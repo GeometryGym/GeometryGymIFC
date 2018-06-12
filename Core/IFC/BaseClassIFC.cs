@@ -39,9 +39,9 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc Database { get { return mDatabase; } private set { mDatabase = value; } }
 
 #if (NOIFCJSON)
-		public BaseClassIfc() : this(new DatabaseIfc(ModelView.Ifc4NotAssigned)) { }
+		public BaseClassIfc() : base() { }// this(new DatabaseIfc(false, ModelView.Ifc4NotAssigned)) { }
 #else
-		public BaseClassIfc() : this(new DatabaseIfc(ModelView.Ifc4NotAssigned) { Format = FormatIfcSerialization.JSON }) { }
+		public BaseClassIfc() : base() { } // this(new DatabaseIfc(false, ModelView.Ifc4NotAssigned) { Format = FormatIfcSerialization.JSON }) { }
 #endif
 		protected BaseClassIfc(BaseClassIfc basis) : base()
 		{
@@ -115,6 +115,8 @@ namespace GeometryGym.Ifc
 				{
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
 						return Construct("IfcProfileDef");
+					if (string.Compare(className, "IfcBuildingElement", true) == 0)
+						return Construct("IfcBuildingElementProxy");
 				}
 				mConstructors.TryAdd(className, constructor);
 			}

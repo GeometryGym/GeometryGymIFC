@@ -32,12 +32,10 @@ namespace GeometryGym.STEP
 {
 	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
-		//private SortedDictionary<int,T> mObjects = new SortedDictionary<int, T>() {  };
-		//public int LastKey { get { return mObjects.Keys.Last(); } }
 		public DatabaseSTEP() { }
-		private List<T> mObjects = new List<T>() { null };
-		protected void setSize(int i) { mObjects.Capacity = i; }
-		public int LastKey { get { return mObjects.Count; } }
+
+		private SortedDictionary<int, T> mObjects = new SortedDictionary<int, T>();
+		public int LastKey { get { return mObjects.Count == 0 ? 0 : mObjects.Last().Key; } }
 
 		public int NextObjectRecord { set { mNextBlank = value; } }
 		public virtual T this[int index]
@@ -45,29 +43,20 @@ namespace GeometryGym.STEP
 			get
 			{
 				T result = null;
-				//mObjects.TryGetValue(index, out result);
-				if (index > 0 && index < mObjects.Count)
-					result = mObjects[index];
-
+				mObjects.TryGetValue(index, out result);
 				return result;
 			}
 			set
 			{
 				if (value == null)
 				{
-					if (index > 0 && mObjects.Count > index)
-						mObjects[index] = null;
-					//	mObjects.Remove(index);
+					if (mObjects.ContainsKey(index))
+						mObjects.Remove(index);
 					if (index < mNextBlank && index > 0)
 						mNextBlank = index;
 					return;
 				}
-				//mObjects.Add(index,value);
-				if (mObjects.Count <= index)
-				{
-					for (int ncounter = mObjects.Count; ncounter <= index; ncounter++)
-						mObjects.Add(null);
-				}
+				
 				mObjects[index] = value;
 				if (index == mNextBlank)
 					mNextBlank = mNextBlank + 1;
@@ -84,36 +73,19 @@ namespace GeometryGym.STEP
 		{
 			get
 			{
-				//int blank = mNextBlank;
-				//while (mObjects.ContainsKey(blank))
-				//	blank++;
-				//return blank;
-				if (this[mNextBlank] == null)
-					return mNextBlank;
-				for (int icounter = mNextBlank; icounter < mObjects.Count; icounter++)
-				{
-					if (this[icounter] == null)
-					{
-						mNextBlank = icounter;
-						return mNextBlank;
-					}
-				}
-				return mNextBlank = mObjects.Count;
+				while (mObjects.ContainsKey(mNextBlank))
+					mNextBlank++;
+				return mNextBlank;
 			}
 		}
 		IEnumerator<T> IEnumerable<T>.GetEnumerator()
 		{
-			for(int icounter = 0; icounter < mObjects.Count; icounter++)
-			{
-				T result = mObjects[icounter] as T;
-				if (result != null)
-					yield return result;
-			}
+			return mObjects.Values.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return mObjects.GetEnumerator();
+			return mObjects.Values.GetEnumerator();
 		}
 		partial void printError(string str);
 		internal void logError(string str) { printError(str); }

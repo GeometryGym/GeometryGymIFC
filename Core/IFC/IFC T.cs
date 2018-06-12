@@ -1086,7 +1086,7 @@ namespace GeometryGym.Ifc
 						if (placement != null)
 							newPort.Placement = new IfcLocalPlacement(newPort.Placement, placement.RelativePlacement);
 						for (int dcounter = 0; dcounter < port.mIsDefinedBy.Count; dcounter++)
-							port.mIsDefinedBy[dcounter].AddRelated(newPort);
+							port.mIsDefinedBy[dcounter].RelatedObjects.Add(newPort);
 					}
 				}
 			}

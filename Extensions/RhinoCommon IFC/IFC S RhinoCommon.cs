@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSurfaceCurve : IfcCurve //IFC4 Add2
 	{
-		public override Curve Curve { get { throw new NotImplementedException(); } }
+		public override Curve Curve { get {  throw new NotImplementedException(); } }
 	}
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
 	{

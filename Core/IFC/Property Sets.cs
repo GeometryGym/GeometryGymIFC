@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class Pset_ActuatorPHistory : IfcPropertySet
 	{
-		public Pset_ActuatorPHistory(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorPHistory") { Description = instance.Name; DefinesOccurrence.AddRelated(instance); }
+		public Pset_ActuatorPHistory(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorPHistory") { Description = instance.Name; DefinesOccurrence.RelatedObjects.Add(instance); }
 	}
 	public partial class Pset_ActuatorTypeCommon : IfcPropertySet
 	{
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 	{
 		public double ActuatorInputPower { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ActuatorInputPower", new IfcPowerMeasure(value))); } }
 		public PEnum_ElectricActuatorType ElectricActuatorType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "ElectricActuatorType", new IfcLabel(value.ToString()))); } }
-		public Pset_ActuatorTypeElectricActuator(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorTypeElectricActuator") { Description = instance.Name; DefinesOccurrence.AddRelated(instance); }
+		public Pset_ActuatorTypeElectricActuator(IfcActuator instance) : base(instance.mDatabase, "Pset_ActuatorTypeElectricActuator") { Description = instance.Name; DefinesOccurrence.RelatedObjects.Add(instance); }
 		public Pset_ActuatorTypeElectricActuator(IfcActuatorType type) : base(type) { }
 	}
 	public partial class Pset_ActuatorTypeHydraulicActuator : IfcPropertySet

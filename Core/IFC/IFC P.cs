@@ -740,12 +740,12 @@ namespace GeometryGym.Ifc
 	{
 		private string mName = "$";// : IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
-		internal List<int> mAssignedItems = new List<int>();// : SET [1:?] OF IfcLayeredItem; 
+		internal SET<IfcLayeredItem> mAssignedItems = new SET<IfcLayeredItem>();// : SET [1:?] OF IfcLayeredItem; 
 		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier; 
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "Default Layer" : mName = ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcLayeredItem> AssignedItems { get { return new ReadOnlyCollection<IfcLayeredItem>(mAssignedItems.ConvertAll(x => mDatabase[x] as IfcLayeredItem)); } }
+		public SET<IfcLayeredItem> AssignedItems { get { return mAssignedItems; } set { mAssignedItems.Clear(); if (value != null) { mAssignedItems.CollectionChanged -= mAssignedItems_CollectionChanged; mAssignedItems = value; value.CollectionChanged += mAssignedItems_CollectionChanged; } } }
 		public string Identifier { get { return (mIdentifier == "$" ? "" : ParserIfc.Decode(mIdentifier)); } set { mIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcPresentationLayerAssignment() : base() { }
@@ -753,18 +753,41 @@ namespace GeometryGym.Ifc
 		{
 			mName = a.mName;
 			mDescription = a.mDescription;
-			if(downstream)
-				a.mAssignedItems.ToList().ForEach(x => addItem(db.Factory.Duplicate(a.mDatabase[x]) as IfcLayeredItem));
+			if (downstream)
+				mAssignedItems.AddRange(a.AssignedItems.ConvertAll(x => db.Factory.Duplicate(x as BaseClassIfc, true) as IfcLayeredItem));
 			mIdentifier = a.mIdentifier;
 		}
 		public IfcPresentationLayerAssignment(DatabaseIfc db, string name) : base(db) { Name = name; }
-		public IfcPresentationLayerAssignment(string name, IfcLayeredItem item) : this(item.Database, name) { addItem(item); }
-		public IfcPresentationLayerAssignment(string name, List<IfcLayeredItem> items) : this(items[0].Database, name) { foreach (IfcLayeredItem item in items) addItem(item); }
-		
-		internal void addItem(IfcLayeredItem item)
+		public IfcPresentationLayerAssignment(string name, IfcLayeredItem item) : this(item.Database, name) { mAssignedItems.Add(item); }
+		public IfcPresentationLayerAssignment(string name, List<IfcLayeredItem> items) : this(items[0].Database, name) { mAssignedItems.AddRange(items); }
+
+		protected override void initialize()
 		{
-			mAssignedItems.Add(item.Index);
-			item.AssignLayer(this);
+			base.initialize();
+			mAssignedItems.CollectionChanged += mAssignedItems_CollectionChanged;
+		}
+
+		protected virtual void mAssignedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcLayeredItem i in e.NewItems)
+				{
+					if (i != null)
+					{
+						if(!i.LayerAssignments.Contains(this))
+							i.LayerAssignments.Add(this);
+					}
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcLayeredItem i in e.OldItems)
+				{
+					if (i != null)
+						i.LayerAssignments.Remove(this);
+				}
+			}
 		}
 	}
 	[Serializable]
@@ -1689,7 +1712,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcPropertySet() : base() { }
-		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.AddRelated(obj); }
+		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.RelatedObjects.Add(obj); }
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { s.mPropertyIndices.ForEach(x => addProperty( db.Factory.Duplicate(s.mDatabase[x]) as IfcProperty)); }
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
@@ -1836,7 +1859,7 @@ namespace GeometryGym.Ifc
 				if (mDefinesOccurrence == null)
 					mDefinesOccurrence = new IfcRelDefinesByProperties(od, this);
 				else
-					mDefinesOccurrence.AddRelated(od);
+					mDefinesOccurrence.RelatedObjects.Add(od);
 			}
 
 		}

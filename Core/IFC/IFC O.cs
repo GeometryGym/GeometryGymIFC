@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
 			{
 				IfcRelDefinesByProperties drdp = db.Factory.Duplicate(rdp, ownerHistory,false) as IfcRelDefinesByProperties;
-				drdp.AddRelated(this);
+				drdp.RelatedObjects.Add(this);
 			}
 			if(o.mIsTypedBy != null)
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, ownerHistory,false) as IfcRelDefinesByType;

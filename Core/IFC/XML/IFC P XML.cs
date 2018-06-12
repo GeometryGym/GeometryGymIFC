@@ -368,7 +368,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcLayeredItem i = mDatabase.ParseXml<IfcLayeredItem>(cn as XmlElement);
 						if (i != null)
-							addItem(i);
+							AssignedItems.Add(i);
 					}
 				}
 			}

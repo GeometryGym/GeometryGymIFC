@@ -521,7 +521,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcObjectDefinition od = mDatabase.ParseXml<IfcObjectDefinition>(cn as XmlElement);
 						if (od != null)
-							AddRelated(od);
+							RelatedObjects.Add(od);
 					}
 				}
 				else if (string.Compare(name, "RelatingPropertyDefinition") == 0)
@@ -660,7 +660,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcPresentationLayerAssignment a = mDatabase.ParseXml<IfcPresentationLayerAssignment>(cn as XmlElement);
 						if (a != null)
-							a.addItem(this);
+							a.AssignedItems.Add(this);
 					}
 				}
 			}
@@ -717,7 +717,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcPresentationLayerAssignment a = mDatabase.ParseXml<IfcPresentationLayerAssignment>(cn as XmlElement);
 						if (a != null)
-							a.addItem(this);
+							a.AssignedItems.Add(this);
 					}
 				}
 				else if (string.Compare(name, "StyledByItem") == 0)

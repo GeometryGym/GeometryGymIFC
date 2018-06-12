@@ -81,8 +81,7 @@ namespace GeometryGym.Ifc
 	}
 	public interface IfcLayeredItem : IBaseClassIfc // = SELECT(IfcRepresentationItem, IfcRepresentation);
 	{
-		ReadOnlyCollection<IfcPresentationLayerAssignment> LayerAssignments { get; }
-		void AssignLayer(IfcPresentationLayerAssignment layer);
+		SET<IfcPresentationLayerAssignment> LayerAssignments { get; }
 	}
 	[Serializable]
 	public partial class IfcLibraryInformation : IfcExternalInformation, NamedObjectIfc

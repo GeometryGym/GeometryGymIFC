@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelDefinesByProperties rd = mDatabase.ParseXml<IfcRelDefinesByProperties>(node as XmlElement);
 						if (rd != null)
-							rd.AddRelated(this);
+							rd.RelatedObjects.Add(this);
 					}
 				}
 			}

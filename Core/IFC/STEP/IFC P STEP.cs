@@ -424,34 +424,17 @@ namespace GeometryGym.Ifc
 		{
 			if (mAssignedItems.Count < 1)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",'" + mName + (mDescription == "$" ? "',$,(" : "','" + mDescription + "',(") + ParserSTEP.LinkToString(mAssignedItems[0]);
-			if (mAssignedItems.Count > 100)
-			{
-				StringBuilder sb = new StringBuilder();
-				for (int icounter = 1; icounter < mAssignedItems.Count; icounter++)
-					sb.Append(",#" + mAssignedItems[icounter]);
-				str += sb.ToString();
-			}
-			else
-			{
-				for (int icounter = 1; icounter < mAssignedItems.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mAssignedItems[icounter]);
-			}
-			return str + (mIdentifier == "$" ? "),$" : "),'" + mIdentifier + "'");
+			return base.BuildStringSTEP(release) + ",'" + mName + (mDescription == "$" ? "',$,(#" : "','" + mDescription + "',(#") + 
+				string.Join(",#", mAssignedItems.ConvertAll(x=>x.Index)) + (mIdentifier == "$" ? "),$" : "),'" + mIdentifier + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			mAssignedItems = ParserSTEP.StripListLink(str, ref pos, len);
+			AssignedItems.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcLayeredItem));
 			mIdentifier = ParserSTEP.StripString(str, ref pos, len);
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (IfcLayeredItem item in AssignedItems)
-				item.AssignLayer(this);
-		}
+		
 	}
 	public partial class IfcPresentationLayerWithStyle : IfcPresentationLayerAssignment
 	{

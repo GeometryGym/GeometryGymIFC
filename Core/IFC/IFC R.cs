@@ -1438,11 +1438,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
 	{
-		private List<int> mRelatedObjects = new List<int>();// IFC4 change	SET [1:1] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
-		private int mRelatingPropertyDefinition;// : IfcPropertySetDefinition; 
+		private SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// IFC4 change	SET [1:1] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
+		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinition; 
 
-		public ReadOnlyCollection<IfcObjectDefinition> RelatedObjects { get { return new ReadOnlyCollection<IfcObjectDefinition>(mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObjectDefinition)); } }
-		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mDatabase[mRelatingPropertyDefinition] as IfcPropertySetDefinition; } set { mRelatingPropertyDefinition = value.mIndex; } }
+		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
+		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } set { mRelatingPropertyDefinition = value; } }
 
 		public override IfcRoot Relating() { return RelatingPropertyDefinition; } 
 
@@ -1453,39 +1453,52 @@ namespace GeometryGym.Ifc
 			//RelatedObjects = d.RelatedObjects.ConvertAll(x=>db.Factory.Duplicate(x) as IfcObjectDefinition);
 			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition, ownerHistory, downStream) as IfcPropertySetDefinition;
 		}
-		internal IfcRelDefinesByProperties(IfcPropertySetDefinition ifcproperty) : base(ifcproperty.mDatabase) { mRelatingPropertyDefinition = ifcproperty.mIndex; }
-		public IfcRelDefinesByProperties(IfcObjectDefinition od, IfcPropertySetDefinition ifcproperty) : this(new List<IfcObjectDefinition>() { od }, ifcproperty) { }
-		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> objs, IfcPropertySetDefinition ifcproperty) : this(ifcproperty) { foreach (IfcObjectDefinition od in objs) AddRelated(od); }
+		internal IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.mDatabase) { mRelatingPropertyDefinition = propertySet; }
+		public IfcRelDefinesByProperties(IfcObjectDefinition od, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.Add(od); }
+		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> objs, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.AddRange(objs); }
 
-		public void AddRelated(IfcObjectDefinition od)
+		protected override void initialize()
 		{
-			mRelatedObjects.Add(od.Index);
-			IfcContext context = od as IfcContext;
-			if (context != null)
+			base.initialize();
+			mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged;
+		}
+
+		protected virtual void mRelatedObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
 			{
-				if (!context.mIsDefinedBy.Contains(this))
-					context.mIsDefinedBy.Add(this);
+				foreach (IfcObjectDefinition o in e.NewItems)
+				{
+					if (o != null)
+					{
+						if (o is IfcContext context)
+						{
+							if (!context.mIsDefinedBy.Contains(this))
+								context.mIsDefinedBy.Add(this);
+						}
+						else if (o is IfcObject obj)
+						{
+							if (!obj.mIsDefinedBy.Contains(this))
+								obj.mIsDefinedBy.Add(this);
+						}
+					}
+				}
 			}
-			else
+			if (e.OldItems != null)
 			{
-				IfcObject obj = od as IfcObject;
-				if (obj != null && !obj.mIsDefinedBy.Contains(this))
-					obj.mIsDefinedBy.Add(this);
+				foreach (IfcObjectDefinition o in e.OldItems)
+				{
+					if (o != null)
+					{
+						if (o is IfcContext context)
+							context.mIsDefinedBy.Remove(this);
+						else if (o is IfcObject obj)
+							obj.mIsDefinedBy.Remove(this);
+					}	
+				}
 			}
 		}
-		internal void RemoveRelated(IfcObjectDefinition od)
-		{
-			mRelatedObjects.Remove(od.Index);
-			IfcContext context = od as IfcContext;
-			if (context != null)
-				context.mIsDefinedBy.Remove(this);
-			else
-			{
-				IfcObject obj = od as IfcObject;
-				if (obj != null)
-					obj.mIsDefinedBy.Remove(this);
-			}
-		}
+		
 
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -1953,9 +1966,9 @@ namespace GeometryGym.Ifc
 		internal string mRepresentationIdentifier = "$";//  : OPTIONAL IfcLabel; //RepresentationIdentifier: Name of the representation, e.g. 'Body' for 3D shape, 'FootPrint' for 2D ground view, 'Axis' for reference axis, 		
 		private string mRepresentationType = "$";//  : OPTIONAL IfcLabel;
 		private SET<IfcRepresentationItem> mItems = new SET<IfcRepresentationItem>();//  : SET [1:?] OF IfcRepresentationItem; 
-																					 //INVERSE 
+		//INVERSE 
 		internal IfcRepresentationMap mRepresentationMap = null;//	 : 	SET [0:1] OF IfcRepresentationMap FOR MappedRepresentation;
-		internal List<IfcPresentationLayerAssignment> mLayerAssignments = new List<IfcPresentationLayerAssignment>();// new List<>();//	IFC4 change : 	SET OF IfcPresentationLayerAssignment FOR AssignedItems;
+		internal SET<IfcPresentationLayerAssignment> mLayerAssignments = new SET<IfcPresentationLayerAssignment>();// new List<>();//	IFC4 change : 	SET OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal List<IfcProductRepresentation> mOfProductRepresentation = new List<IfcProductRepresentation>();/// IFC4 change	 : 	SET [0:n] OF IfcProductRepresentation FOR Representations;
 
 		public IfcRepresentationContext ContextOfItems
@@ -1976,7 +1989,7 @@ namespace GeometryGym.Ifc
 		public string RepresentationType { get { return mRepresentationType == "$" ? "" : mRepresentationType; } set { mRepresentationType = string.IsNullOrEmpty(value) ? "$" : value; } }
 		public SET<IfcRepresentationItem> Items { get { return mItems; } set { mItems.Clear(); if (value != null) { mItems.CollectionChanged -= mItems_CollectionChanged; mItems = value; mItems.CollectionChanged += mItems_CollectionChanged; } } }
 
-		public ReadOnlyCollection<IfcPresentationLayerAssignment> LayerAssignments { get { return new ReadOnlyCollection<IfcPresentationLayerAssignment>(mLayerAssignments); } }
+		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
 		public ReadOnlyCollection<IfcProductRepresentation> OfProductRepresentation { get { return new ReadOnlyCollection<IfcProductRepresentation>(mOfProductRepresentation); } }
 
 		protected IfcRepresentation() : base() { }
@@ -1991,7 +2004,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcPresentationLayerAssignment layerAssignment in r.mLayerAssignments)
 			{
 				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, false) as IfcPresentationLayerAssignment;
-				la.addItem(this);
+				la.AssignedItems.Add(this);
 			}
 		}
 		protected IfcRepresentation(IfcRepresentationContext context) : base(context.mDatabase) { ContextOfItems = context; RepresentationIdentifier = context.ContextIdentifier; }
@@ -2051,12 +2064,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/
 	{ //INVERSE
-		internal List<IfcPresentationLayerAssignment> mLayerAssignments = new List<IfcPresentationLayerAssignment>();// null;
+		internal SET<IfcPresentationLayerAssignment> mLayerAssignments = new SET<IfcPresentationLayerAssignment>();// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal IfcStyledItem mStyledByItem = null;// : SET [0:1] OF IfcStyledItem FOR Item; 
 
 		internal List<IfcRepresentation> mRepresents = new List<IfcRepresentation>();
 
-		public ReadOnlyCollection<IfcPresentationLayerAssignment> LayerAssignments { get { return new ReadOnlyCollection<IfcPresentationLayerAssignment>(mLayerAssignments); } }
+		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
 		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
 
 
@@ -2066,7 +2079,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcPresentationLayerAssignment layerAssignment in i.mLayerAssignments)
 			{
 				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, false) as IfcPresentationLayerAssignment;
-				la.addItem(this);
+				la.AssignedItems.Add(this);
 			}
 
 			if (i.mStyledByItem != null)

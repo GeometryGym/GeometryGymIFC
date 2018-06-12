@@ -843,8 +843,8 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatingElement == 0 || mRelatedElement == 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mRelatingPriorities.ToString()) + "),(" +
-				string.Join(",", mRelatedPriorities.ToString()) + "),." + mRelatedConnectionType.ToString() + ".,." + mRelatingConnectionType.ToString() + ".";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mRelatingPriorities.ConvertAll(x=> ParserSTEP.DoubleToString(x))) + "),(" +
+				string.Join(",", mRelatedPriorities.ConvertAll(x=>ParserSTEP.DoubleToString(x))) + "),." + mRelatedConnectionType.ToString() + ".,." + mRelatingConnectionType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -997,46 +997,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedElements.Count <= 0)
 				return "";
-			string list = "";
-			int icounter;
-			if (mRelatedElements.Count > 100)
-			{
-				StringBuilder sb = new StringBuilder();
-				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-					{
-						sb.Append(",(#" + mRelatedElements[0]);
-						break;
-					}
-				}
-				for (icounter++; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-						sb.Append(",#" + mRelatedElements[icounter]);
-				}
-				list = sb.ToString();
-			}
-			else
-			{
-				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-					{
-						list = ",(#" + mRelatedElements[0];
-						break;
-					}
-
-				}
-				for (icounter++; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-						list += ",#" + mRelatedElements[icounter];
-				}
-			}
-			if (string.IsNullOrEmpty(list))
-				return "";
-			return base.BuildStringSTEP(release) + list + "),#" + mRelatingStructure.mIndex;
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.ConvertAll(x => x.ToString())) + "),#" + mRelatingStructure.mIndex;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -1179,35 +1140,15 @@ namespace GeometryGym.Ifc
 			IfcPropertySetDefinition pset = RelatingPropertyDefinition;
 			if (mRelatedObjects.Count == 0 || pset == null || pset.isEmpty)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mRelatedObjects[0]);
-			for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mRelatedObjects[icounter]);
-			return str + ")," + ParserSTEP.LinkToString(mRelatingPropertyDefinition);
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedObjects.ConvertAll(X=>X.mIndex)) + "),#" + mRelatingPropertyDefinition.Index;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos, len);
-			mRelatingPropertyDefinition = ParserSTEP.StripLink(str, ref pos, len);
+			RelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=> dictionary[x] as IfcObjectDefinition));
+			mRelatingPropertyDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPropertySetDefinition;
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			RelatingPropertyDefinition.DefinesOccurrence = this;
-			ReadOnlyCollection<IfcObjectDefinition> related = RelatedObjects;
-			for (int icounter = 0; icounter < related.Count; icounter++)
-			{
-				IfcObject o = related[icounter] as IfcObject;
-				if (o != null)
-					o.mIsDefinedBy.Add(this);
-				else
-				{
-					IfcContext context = related[icounter] as IfcContext;
-					if (context != null)
-						context.mIsDefinedBy.Add(this);
-				}
-			}
-		}
+		
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines //IFC4
 	{
