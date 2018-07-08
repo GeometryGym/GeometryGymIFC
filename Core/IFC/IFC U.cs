@@ -103,11 +103,11 @@ namespace GeometryGym.Ifc
 		public static double FeetToMetre = 0.3048;
 		internal void SetUnits()
 		{
-			if (Find(IfcUnitEnum.AREAUNIT) == null)
+			if (this[IfcUnitEnum.AREAUNIT] == null)
 				Units.Add(mDatabase.Factory.SIArea);
-			if (Find(IfcUnitEnum.VOLUMEUNIT) == null)
+			if (this[IfcUnitEnum.VOLUMEUNIT] == null)
 				Units.Add(mDatabase.Factory.SIVolume);
-			if (Find(IfcUnitEnum.PLANEANGLEUNIT) == null)
+			if (this[IfcUnitEnum.PLANEANGLEUNIT] == null)
 			{
 				IfcSIUnit radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
 				if (mDatabase.Factory.Options.AngleUnitsInRadians)
@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 				else
 					Units.Add(new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)));
 			}
-			if (Find(IfcUnitEnum.TIMEUNIT) == null)
+			if (this[IfcUnitEnum.TIMEUNIT] == null)
 			{
 				IfcSIUnit seconds = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND);
 				if (mDatabase.mTimeInDays)
@@ -135,81 +135,88 @@ namespace GeometryGym.Ifc
 			mStructuralSet = true;
 			DatabaseIfc m = mDatabase;
 			
-			IfcNamedUnit fu = Find(IfcUnitEnum.FORCEUNIT);
+			IfcNamedUnit fu = this[IfcUnitEnum.FORCEUNIT];
 			if (fu == null)
 			{
 				fu = new IfcSIUnit(m, IfcUnitEnum.FORCEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.NEWTON);
 				Units.Add(fu);
 			}
 			IfcSIUnit lengthSI = m.Factory.SILength, volumeSI = m.Factory.SIVolume;
-			if (Find(IfcDerivedUnitEnum.TORQUEUNIT) == null)
+			if (this[IfcDerivedUnitEnum.TORQUEUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), IfcDerivedUnitEnum.TORQUEUNIT));
-			if (Find(IfcDerivedUnitEnum.LINEARFORCEUNIT) == null)
+			if (this[IfcDerivedUnitEnum.LINEARFORCEUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARFORCEUNIT));
-			if (Find(IfcDerivedUnitEnum.LINEARMOMENTUNIT) == null)
+			if (this[IfcDerivedUnitEnum.LINEARMOMENTUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), IfcDerivedUnitEnum.LINEARMOMENTUNIT));
-			if (Find(IfcDerivedUnitEnum.PLANARFORCEUNIT) == null)
+			if (this[IfcDerivedUnitEnum.PLANARFORCEUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.PLANARFORCEUNIT));
-			if (Find(IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT) == null)
+			if (this[IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT));
 
-			IfcNamedUnit time = Find(IfcUnitEnum.TIMEUNIT);
+			IfcNamedUnit time = this[IfcUnitEnum.TIMEUNIT];
 			if (time == null || Math.Abs(time.SIFactor - 1) < mDatabase.Tolerance)
 				time = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND);
-			if(Find(IfcDerivedUnitEnum.ACCELERATIONUNIT) == null)
+			if(this[IfcDerivedUnitEnum.ACCELERATIONUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT));
-			if(Find(IfcUnitEnum.PRESSUREUNIT) == null)
+			if(this[IfcUnitEnum.PRESSUREUNIT] == null)
 				Units.Add(new IfcSIUnit(m, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL));
-			if (Find(IfcDerivedUnitEnum.SECTIONMODULUSUNIT) == null)
+			if (this[IfcDerivedUnitEnum.SECTIONMODULUSUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 3), IfcDerivedUnitEnum.SECTIONMODULUSUNIT));
-			if(Find(IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT) == null)
+			if(this[IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 4), IfcDerivedUnitEnum.MOMENTOFINERTIAUNIT));
-			IfcSIUnit massu = Find(IfcUnitEnum.MASSUNIT) as IfcSIUnit;
+			IfcSIUnit massu = this[IfcUnitEnum.MASSUNIT] as IfcSIUnit;
 			if (massu == null)
 			{
 				massu = new IfcSIUnit(m, IfcUnitEnum.MASSUNIT, IfcSIPrefix.KILO, IfcSIUnitName.GRAM);
 				Units.Add(massu);
 			}
-			if (Find(IfcDerivedUnitEnum.MASSDENSITYUNIT) == null)
+			if (this[IfcDerivedUnitEnum.MASSDENSITYUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(massu, 1), new IfcDerivedUnitElement(volumeSI, -1), IfcDerivedUnitEnum.MASSDENSITYUNIT));
-			IfcSIUnit kelvin = Find(IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT) as IfcSIUnit;
+			IfcSIUnit kelvin = this[IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT] as IfcSIUnit;
 			if (kelvin == null)
 			{
 				kelvin = new IfcSIUnit(m, IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.KELVIN);
 				Units.Add(kelvin);
 			}
-			if (Find(IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT) == null)
+			if (this[IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(kelvin, -1), IfcDerivedUnitEnum.THERMALEXPANSIONCOEFFICIENTUNIT));
-			if(Find(IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT) == null)
+			if(this[IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT));
 
-			IfcNamedUnit radians = Find(IfcUnitEnum.PLANEANGLEUNIT);
+			IfcNamedUnit radians = this[IfcUnitEnum.PLANEANGLEUNIT];
 			if (radians == null || Math.Abs(radians.SIFactor - 1) < mDatabase.Tolerance)
 				radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
-			if(Find(IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT) == null)
+			if(this[IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT));
 		}
+
+		public IfcNamedUnit this[IfcUnitEnum unit]
+		{
+			get
+			{
+				foreach (IfcUnit u in Units)
+				{
+					IfcNamedUnit nu = u as IfcNamedUnit;
+					if (nu != null && nu.UnitType == unit)
+						return nu;
+				}
+				return null;
+			}
+		}
+		public IfcDerivedUnit this[IfcDerivedUnitEnum unit]
+		{
+			get
+			{
+				foreach (IfcUnit u in Units)
+				{
+					IfcDerivedUnit du = u as IfcDerivedUnit;
+					if (du != null && du.UnitType == unit)
+						return du;
+				}
+				return null;
+			}
+		}
 		
-		internal IfcNamedUnit Find(IfcUnitEnum unit)
-		{
-			foreach (IfcUnit u in Units)
-			{
-				IfcNamedUnit nu = u as IfcNamedUnit;
-				if (nu != null && nu.UnitType == unit)
-					return nu;
-			}
-			return null;
-		}
-		internal IfcDerivedUnit Find(IfcDerivedUnitEnum unit)
-		{
-			foreach (IfcUnit u in Units)
-			{
-				IfcDerivedUnit du = u as IfcDerivedUnit;
-				if (du != null && du.UnitType == unit)
-					return du;
-			}
-			return null;
-		}
 		internal void Replace(IfcConversionBasedUnit cbu)
 		{
 			for (int icounter = 0; icounter < mUnits.Count; icounter++)

@@ -526,8 +526,7 @@ additional types	some additional representation types are given:
 	}
 	public partial interface IfcShell : IBaseClassIfc  // SELECT(IfcClosedShell, IfcOpenShell);
 	{
-		ReadOnlyCollection<IfcFace> CfsFaces { get; }
-		void AddFace(IfcFace face);
+		SET<IfcFace> CfsFaces { get; }
 	}
 	[Serializable]
 	public partial class IfcShellBasedSurfaceModel : IfcGeometricRepresentationItem
@@ -627,7 +626,18 @@ additional types	some additional representation types are given:
 		internal IfcSIUnit() : base() { }
 		internal IfcSIUnit(DatabaseIfc db, IfcSIUnit u) : base(db, u) { mPrefix = u.mPrefix; mName = u.mName; }
 		public IfcSIUnit(DatabaseIfc m, IfcUnitEnum unitEnum, IfcSIPrefix pref, IfcSIUnitName name) : base(m, unitEnum, false) { mPrefix = pref; mName = name; }
-		internal override double SIFactor { get { return mFactors[(int)mPrefix]; } }
+		public override double SIFactor
+		{
+			get
+			{
+				int pow = 1;
+				if (UnitType == IfcUnitEnum.AREAUNIT)
+					pow = 2;
+				else if (UnitType == IfcUnitEnum.VOLUMEUNIT)
+					pow = 3;
+				return Math.Pow( mFactors[(int)mPrefix], pow);
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcSlab : IfcBuildingElement
@@ -1548,17 +1558,17 @@ additional types	some additional representation types are given:
 					double factor = (factors.Count > icounter ? factors[icounter] : prevfactor);
 					if (Math.Abs(factor - prevfactor) > mDatabase.Tolerance)
 					{
-						new IfcRelAssignsToGroupByFactor(this, ods, prevfactor);
+						new IfcRelAssignsToGroupByFactor(ods, this, prevfactor);
 						ods = new List<IfcObjectDefinition>();
 						prevfactor = factor;
 					}
 					ods.Add(cases[icounter]);
 				}
-				new IfcRelAssignsToGroupByFactor(this, ods, prevfactor);
+				new IfcRelAssignsToGroupByFactor(ods, this, prevfactor);
 			}
 			else
 			{
-				new IfcRelAssignsToGroupByFactor(this, cases.ConvertAll(x => x as IfcObjectDefinition), 1);
+				new IfcRelAssignsToGroupByFactor(cases.ConvertAll(x => x as IfcObjectDefinition), this, 1);
 			}
 		}
 	}
@@ -1943,11 +1953,10 @@ additional types	some additional representation types are given:
 		{
 			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
 			{
-				IfcPresentationStyle ps = style as IfcPresentationStyle;
-				if (ps != null)
+				if(style is IfcPresentationStyleAssignment assignment)
+					mStyles.Add(assignment.mIndex);
+				else if (style is IfcPresentationStyle ps)
 					mStyles.Add(new IfcPresentationStyleAssignment(ps).mIndex);
-				else
-					throw new Exception("XX Invalid style for schema " + mDatabase.mRelease.ToString());
 			}
 			else
 				mStyles.Add(style.Index);

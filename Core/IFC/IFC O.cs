@@ -100,6 +100,7 @@ namespace GeometryGym.Ifc
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
 			IfcSpatialElement spatial = this as IfcSpatialElement;
 			IfcElementAssembly eas = this as IfcElementAssembly;
+			db.Factory.mDuplicateMapping.Clear();
 			db.Factory.Duplicate(this, true);
          IfcProject project = db.Project;
          if (project != null)

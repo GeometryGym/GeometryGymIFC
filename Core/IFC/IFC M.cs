@@ -86,7 +86,6 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal IfcMaterialDefinitionRepresentation mHasRepresentation = null;//	 : 	SET [0:1] OF IfcMaterialDefinitionRepresentation FOR RepresentedMaterial;
 		//internal IfcMaterialclassificationRelationship mClassifiedAs = null;//	 : 	SET [0:1] OF IfcMaterialClassificationRelationship FOR classifiedMaterial;
-		internal List<IfcMaterialPropertiesSuperseded> mHasPropertiesSS = new List<IfcMaterialPropertiesSuperseded>();
 		internal List<IfcMaterialRelationship> mIsRelatedWith = new List<IfcMaterialRelationship>();//	:	SET OF IfcMaterialRelationship FOR RelatedMaterials;
 		internal IfcMaterialRelationship mRelatesTo = null;//	:	SET [0:1] OF IfcMaterialRelationship FOR RelatingMaterial;
 
@@ -634,19 +633,9 @@ namespace GeometryGym.Ifc
 		public IfcMaterialProfileWithOffsets(string name, IfcMaterial mat, IfcProfileDef p, double startOffset,double endOffset)
 			: base(name, mat, p) { mOffsetValues = new double[] { startOffset,endOffset }; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	
 	[Serializable]
-	public abstract partial class IfcMaterialPropertiesSuperseded : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
-	{
-		internal int mMaterial;// : IfcMaterial;  
-		public IfcMaterial Material { get { return mDatabase[mMaterial] as IfcMaterial; } set { mMaterial = value.mIndex; } }
-
-		protected IfcMaterialPropertiesSuperseded() : base() { }
-		protected IfcMaterialPropertiesSuperseded(IfcMaterial mat) : base(mat.mDatabase) { if (mat.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " Depreceated IFC4!"); mMaterial = mat.mIndex; }
-		protected IfcMaterialPropertiesSuperseded(DatabaseIfc db, IfcMaterialPropertiesSuperseded m) : base(db,m) { Material = db.Factory.Duplicate(m.Material) as IfcMaterial; }
-	}
-	[Serializable]
-	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4
+	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4, IFC2x3 ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
 	{
 		internal override string KeyWord { get { return "IfcMaterialProperties"; } }
 		private int mMaterial;// : IfcMaterialDefinition; 
@@ -785,6 +774,7 @@ namespace GeometryGym.Ifc
 		internal IfcMechanicalFastener() : base() { }
 		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
 		public IfcMechanicalFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMechanicalFastener(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
 	public partial class IfcMechanicalFastenerType : IfcElementComponentType //IFC4 change
@@ -801,7 +791,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcMechanicalMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		internal double mDynamicViscosity = double.NaN;// : OPTIONAL IfcDynamicViscosityMeasure;
 		internal double mYoungModulus = double.NaN;// : OPTIONAL IfcModulusOfElasticityMeasure;

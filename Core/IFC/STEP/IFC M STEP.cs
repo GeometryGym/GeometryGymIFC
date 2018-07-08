@@ -184,8 +184,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mForLayerSet = ParserSTEP.StripLink(str, ref pos, len);
-			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mLayerSetDirection);
-			Enum.TryParse<IfcDirectionSenseEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mDirectionSense);
+			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mLayerSetDirection);
+			Enum.TryParse<IfcDirectionSenseEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mDirectionSense);
 			mOffsetFromReferenceLine = ParserSTEP.StripDouble(str, ref pos, len);
 			try
 			{
@@ -201,7 +201,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mOffsetDirection);
+			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mOffsetDirection);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			string[] ss = s.Substring(1, s.Length - 2).Split(",".ToCharArray());
 			mOffsetValues[0] = ParserSTEP.ParseDouble(ss[0]);
@@ -215,7 +215,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mOffsetDirection);
+			Enum.TryParse<IfcLayerSetDirectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mOffsetDirection);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
 			mOffsetValues = arrNodes.ConvertAll(x => ParserSTEP.ParseDouble(x)).ToArray();
@@ -295,23 +295,11 @@ namespace GeometryGym.Ifc
 			mOffsetValues = arrNodes.ConvertAll(x => ParserSTEP.ParseDouble(x)).ToArray();
 		}
 	}
-	public abstract partial class IfcMaterialPropertiesSuperseded : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
-	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mMaterial); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mMaterial = ParserSTEP.StripLink(str, ref pos, len); }
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			Material.mHasPropertiesSS.Add(this);
-		}
-	}
 	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (release == ReleaseVersion.IFC2x3)
-				return "";
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mMaterial);
+			return (release >= ReleaseVersion.IFC4  ? base.BuildStringSTEP(release) : "" ) + "," + ParserSTEP.LinkToString(mMaterial);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -382,7 +370,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcMechanicalFastenerTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcMechanicalFastenerTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -394,13 +382,13 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			if (release != ReleaseVersion.IFC2x3)
 			{
-				Enum.TryParse<IfcMechanicalFastenerTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".",""), out mPredefinedType);
+				Enum.TryParse<IfcMechanicalFastenerTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 				mNominalDiameter = ParserSTEP.StripDouble(str, ref pos, len);
 				mNominalLength = ParserSTEP.StripDouble(str, ref pos, len);
 			}
 		}
 	}
-	public partial class IfcMechanicalMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mDynamicViscosity) + "," + ParserSTEP.DoubleOptionalToString(mYoungModulus) + "," + ParserSTEP.DoubleOptionalToString(mShearModulus) + "," + ParserSTEP.DoubleOptionalToString(mPoissonRatio) + "," + ParserSTEP.DoubleOptionalToString(mThermalExpansionCoefficient); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -446,7 +434,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcMedicalDeviceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcMedicalDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcMedicalDeviceType : IfcFlowTerminalType
@@ -457,7 +445,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcMedicalDeviceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcMedicalDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcMember : IfcBuildingElement
@@ -470,7 +458,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcMemberTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcMemberTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -482,7 +470,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcMemberTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcMemberTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcMetric : IfcConstraint
@@ -491,7 +479,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcBenchmarkEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mBenchMark);
+			Enum.TryParse<IfcBenchmarkEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mBenchMark);
 			mValueSource = ParserSTEP.StripString(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			mDataValueValue = ParserIfc.parseValue(s);
@@ -516,7 +504,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcMotorConnectionTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcMotorConnectionTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcMotorConnectionType : IfcEnergyConversionDeviceType
@@ -527,7 +515,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcMotorConnectionTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcMotorConnectionTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	//ENTITY IfcMove // DEPRECEATED IFC4

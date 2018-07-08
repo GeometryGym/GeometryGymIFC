@@ -174,7 +174,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcInterceptorType : IfcFlowTreatmentDeviceType
@@ -185,7 +185,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcInventory : IfcGroup
@@ -200,7 +200,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcInventoryTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mInventoryType);
+			Enum.TryParse<IfcInventoryTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mInventoryType);
 			mJurisdiction = ParserSTEP.StripLink(str, ref pos, len);
 			mResponsiblePersons = ParserSTEP.StripListLink(str, ref pos, len);
 			mLastUpdateDate = ParserSTEP.StripLink(str, ref pos, len);

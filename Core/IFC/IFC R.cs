@@ -690,7 +690,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroup() : base() { }
 		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, ownerHistory, false) as IfcGroup; }
 		internal IfcRelAssignsToGroup(IfcGroup relgroup) : base(relgroup.mDatabase) { RelatingGroup = relgroup; }
-		internal IfcRelAssignsToGroup(IfcGroup relgroup, List<IfcObjectDefinition> relObjects) : base(relObjects) { mRelatingGroup = relgroup.mIndex; }
+		internal IfcRelAssignsToGroup(List<IfcObjectDefinition> relObjects, IfcGroup relgroup) : base(relObjects) { mRelatingGroup = relgroup.mIndex; }
 	}
 	[Serializable]
 	public partial class IfcRelAssignsToGroupByFactor : IfcRelAssignsToGroup //IFC4
@@ -702,7 +702,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroupByFactor() : base() { }
 		internal IfcRelAssignsToGroupByFactor(DatabaseIfc db, IfcRelAssignsToGroupByFactor a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mFactor = a.mFactor; }
 		internal IfcRelAssignsToGroupByFactor(IfcGroup relgroup, double factor) : base(relgroup) { mFactor = factor; }
-		internal IfcRelAssignsToGroupByFactor(IfcGroup relgroup, List<IfcObjectDefinition> relObjects, double factor) : base(relgroup, relObjects) { mFactor = factor; }
+		internal IfcRelAssignsToGroupByFactor(List<IfcObjectDefinition> relObjects, IfcGroup relgroup, double factor) : base(relObjects, relgroup) { mFactor = factor; }
 	}
 	[Serializable]
 	public partial class IfcRelAssignsToProcess : IfcRelAssigns
@@ -909,7 +909,10 @@ namespace GeometryGym.Ifc
 
 		internal IfcRelAssociatesMaterial() : base() { }
 		internal IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { RelatingMaterial = material; }
-		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], ownerHistory, downStream) as IfcMaterialSelect; }
+		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		{
+			RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], ownerHistory, downStream) as IfcMaterialSelect;
+		}
 
 	}
 	[Serializable]
@@ -1979,7 +1982,8 @@ namespace GeometryGym.Ifc
 				mContextOfItems = value;
 				if (value != null)
 				{
-					if (!value.RepresentationsInContext.Contains(this))
+					IfcRepresentation existing = value.RepresentationsInContext.Where(x => x.Index == mIndex).FirstOrDefault();
+					if(existing == null)
 						value.RepresentationsInContext.Add(this);
 					mRepresentationIdentifier = value.ContextIdentifier;
 				}

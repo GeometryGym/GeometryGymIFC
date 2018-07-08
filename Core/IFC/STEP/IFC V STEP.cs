@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcValveType : IfcFlowControllerType
@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcVector : IfcGeometricRepresentationItem
@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcVibrationIsolatorType : IfcElementComponentType
@@ -111,7 +111,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcVirtualGridIntersection : BaseClassIfc
@@ -143,7 +143,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcVoidingFeatureTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcVoidingFeatureTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}

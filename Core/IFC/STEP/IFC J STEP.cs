@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcJunctionBoxTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcJunctionBoxTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcJunctionBoxType : IfcFlowFittingType
@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcJunctionBoxTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcJunctionBoxTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 }

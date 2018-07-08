@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcUnitaryControlElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcUnitaryControlElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcUnitaryControlElementType : IfcDistributionControlElementType
@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcUnitaryControlElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcUnitaryControlElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcUnitaryEquipment : IfcEnergyConversionDevice //IFC4
@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType
@@ -70,7 +70,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcUnitAssignment : BaseClassIfc

@@ -60,8 +60,8 @@ namespace GeometryGym.Ifc
 			mBenchmarkValues = ParserSTEP.StripListLink(str, ref pos, len);
 			string s = ParserSTEP.StripString(str, ref pos, len);
 			if (s[0] == '.')
-				Enum.TryParse<IfcLogicalOperatorEnum>(s.Replace(".", ""), out mLogicalAggregator);
-			Enum.TryParse<IfcObjectiveEnum>(ParserSTEP.StripField( str, ref pos, len).Replace(".",""), out mObjectiveQualifier);
+				Enum.TryParse<IfcLogicalOperatorEnum>(s.Replace(".", ""), true, out mLogicalAggregator);
+			Enum.TryParse<IfcObjectiveEnum>(ParserSTEP.StripField( str, ref pos, len).Replace(".", ""), true, out mObjectiveQualifier);
 			mUserDefinedQualifier = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
@@ -71,7 +71,9 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mTheActor = ParserSTEP.StripLink(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcOccupantTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcOffsetCurve : IfcCurve
@@ -116,7 +118,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcOpeningElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcOpeningElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -166,7 +168,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcOutletTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcOutletTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcOutletType : IfcFlowTerminalType
@@ -177,7 +179,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcOutletTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcOutletTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcOwnerHistory : BaseClassIfc
@@ -197,7 +199,7 @@ namespace GeometryGym.Ifc
 			OwningUser = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPersonAndOrganization;
 			OwningApplication = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApplication;
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if(!Enum.TryParse<IfcStateEnum>(s.Replace(".",""), out mState))
+			if(!Enum.TryParse<IfcStateEnum>(s.Replace(".", ""), true, out mState))
 				mState = IfcStateEnum.NOTDEFINED;
 			s = ParserSTEP.StripField(str, ref pos, len).Replace(".", "");
 			if (s.EndsWith("ADDED"))
@@ -205,7 +207,7 @@ namespace GeometryGym.Ifc
 			if (s.EndsWith("DELETED"))
 				mChangeAction = IfcChangeActionEnum.DELETED;
 			else
-				Enum.TryParse<IfcChangeActionEnum>(s, out mChangeAction);
+				Enum.TryParse<IfcChangeActionEnum>(s.Replace(".", ""), true, out mChangeAction);
 			mLastModifiedDate = ParserSTEP.StripInt(str, ref pos, len);
 			LastModifyingUser = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPersonAndOrganization;
 			LastModifyingApplication = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApplication;

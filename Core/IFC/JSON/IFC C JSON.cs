@@ -322,12 +322,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcFace>(obj.GetValue("CfsFaces", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddFace(x));
+			CfsFaces.AddRange(mDatabase.extractJArray<IfcFace>(obj.GetValue("CfsFaces", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["CfsFaces"] = new JArray(mCfsFaces.ConvertAll(x => mDatabase[x].getJson(this, options)));
+			obj["CfsFaces"] = new JArray(mCfsFaces.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public abstract partial class IfcConstraint : BaseClassIfc, IfcResourceObjectSelect //IFC4Change ABSTRACT SUPERTYPE OF(ONEOF(IfcMetric, IfcObjective));

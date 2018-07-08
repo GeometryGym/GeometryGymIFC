@@ -613,7 +613,7 @@ namespace GeometryGym.Ifc
 			get { return mValue; }
 			set
 			{
-				if(!Enum.TryParse<IfcLogicalEnum>(value.ToString(),out mValue))
+				if(!Enum.TryParse<IfcLogicalEnum>(value.ToString(), true, out mValue))
 				{
 					bool boolean = Convert.ToBoolean(value);
 					mValue = (boolean ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE);

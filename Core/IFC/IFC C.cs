@@ -842,14 +842,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcConnectedFaceSet : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcClosedShell ,IfcOpenShell))
 	{
-		internal List<int> mCfsFaces = new List<int>();// : SET [1:?] OF IfcFace;
-		public ReadOnlyCollection<IfcFace> CfsFaces { get { return new ReadOnlyCollection<IfcFace>(mCfsFaces.ConvertAll(x => mDatabase[x] as IfcFace)); } }
+		internal SET<IfcFace> mCfsFaces = new SET<IfcFace>();// : SET [1:?] OF IfcFace;
+		public SET<IfcFace> CfsFaces { get { return mCfsFaces; } set { if (value == null) mCfsFaces.Clear(); else mCfsFaces = value; } }
 
 		internal IfcConnectedFaceSet() : base() { }
-		public IfcConnectedFaceSet(List<IfcFace> faces) : base(faces[0].mDatabase) { mCfsFaces = faces.ConvertAll(x => x.mIndex); }
-		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c) : base(db,c) { c.CfsFaces.ToList().ForEach(x=>AddFace(db.Factory.Duplicate(x) as IfcFace)); }
+		public IfcConnectedFaceSet(IEnumerable<IfcFace> faces) : base(faces.First().mDatabase) { mCfsFaces.AddRange(faces); }
+		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c) : base(db,c) { CfsFaces.AddRange(c.CfsFaces.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFace)); }
 
-		public void AddFace(IfcFace face) { mCfsFaces.Add(face.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcConnectionCurveGeometry : IfcConnectionGeometry
@@ -1334,7 +1333,7 @@ namespace GeometryGym.Ifc
 					r.RelatedResourceObjects.Remove(this);
 			}
 		}
-		internal override double SIFactor { get { return ConversionFactor.getSIFactor(); } }
+		public override double SIFactor { get { return ConversionFactor.getSIFactor(); } }
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}

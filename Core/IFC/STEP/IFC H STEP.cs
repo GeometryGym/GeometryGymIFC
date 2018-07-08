@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcHeatExchangerTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcHeatExchangerTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcHeatExchangerType : IfcEnergyConversionDeviceType
@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcHeatExchangerTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcHeatExchangerTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcHumidifier : IfcEnergyConversionDevice //IFC4
@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcHumidifierTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcHumidifierTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcHumidifierType : IfcEnergyConversionDeviceType
@@ -78,10 +78,10 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcHumidifierTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcHumidifierTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcHygroscopicMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 

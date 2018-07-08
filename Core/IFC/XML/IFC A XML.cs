@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcClosedShell s = mDatabase.ParseXml<IfcClosedShell>(cn as XmlElement);
 						if (s != null)
-							addVoid(s);
+							mVoids.Add(s);
 					}
 				}
 			}
@@ -247,7 +247,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcCurve c = mDatabase.ParseXml<IfcCurve>(cn as XmlElement);
 						if (c != null)
-							AddInner(c);
+							InnerBoundaries.Add(c);
 					}
 				}
 			}
@@ -473,7 +473,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mRefDirection > 0)
+			if (mRefDirection != null)
 				xml.AppendChild(RefDirection.GetXML(xml.OwnerDocument, "RefDirection", this, processed));
 		}
 	}

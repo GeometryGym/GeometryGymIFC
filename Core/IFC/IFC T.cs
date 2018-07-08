@@ -412,7 +412,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcThermalMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcThermalMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		internal double mSpecificHeatCapacity = double.NaN;// : OPTIONAL IfcSpecificHeatCapacityMeasure;
 		internal double mBoilingPoint = double.NaN;// : OPTIONAL IfcThermodynamicTemperatureMeasure;

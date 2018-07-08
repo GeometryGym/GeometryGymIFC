@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitEnum type) : base(due1.mDatabase) { mElements.Add(due1.mIndex); mElements.Add(due2.mIndex); mUnitType = type;  }
 		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitElement due3, IfcDerivedUnitEnum type) : base(due1.mDatabase) { mElements.Add(due1.mIndex); mElements.Add(due2.mIndex); mElements.Add(due3.mIndex); mUnitType = type;  }
 		
-		internal double SIFactor
+		public double SIFactor
 		{
 			get
 			{
@@ -258,6 +258,7 @@ namespace GeometryGym.Ifc
 		internal IfcDiscreteAccessory() : base() { }
 		internal IfcDiscreteAccessory(DatabaseIfc db, IfcDiscreteAccessory a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
 		public IfcDiscreteAccessory(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcDiscreteAccessory(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
 	public partial class IfcDiscreteAccessoryType : IfcElementComponentType

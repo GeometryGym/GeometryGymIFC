@@ -818,7 +818,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect, NamedObjectIfc  //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));
 	{
 		private string mName = "$";// : OPTIONAL IfcLabel;		
-								   //INVERSE
+		//INVERSE
 		internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -843,8 +843,8 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcStyledItem> StyledItems { get { return new ReadOnlyCollection<IfcStyledItem>(mStyledItems); } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
-		internal IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
-		internal IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
+		public IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
+		public IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
 		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { s.mStyles.ToList().ForEach(x => addStyle(db.Factory.Duplicate(s.mDatabase[x]) as IfcPresentationStyleSelect)); }
 		
 		internal void addStyle(IfcPresentationStyleSelect style) { mStyles.Add(style.Index); }
@@ -1293,11 +1293,14 @@ namespace GeometryGym.Ifc
 
 		internal IfcProfileProperties() : base() { }
 		internal IfcProfileProperties(DatabaseIfc db, IfcProfileProperties p) : base(db, p) { ProfileDefinition = db.Factory.Duplicate(p.ProfileDefinition) as IfcProfileDef; }
-		internal IfcProfileProperties(IfcProfileDef p) : base(p.mDatabase)
+		internal IfcProfileProperties(IfcProfileDef p) : base(p == null ? null : p.mDatabase)
 		{
-			ProfileDefinition = p;
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
-				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
+			if (p != null)
+			{
+				ProfileDefinition = p;
+				if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+					mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
+			}
 		}
 		internal IfcProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props)
 		{

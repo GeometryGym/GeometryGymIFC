@@ -39,16 +39,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcActor : IfcObject // SUPERTYPE OF(IfcOccupant)
 	{
-		internal int mTheActor;//	 :	IfcActorSelect; 
+		internal IfcActorSelect mTheActor = null;//	 :	IfcActorSelect; 
 		//INVERSE
-		internal List<IfcRelAssignsToActor> mIsActingUpon = new List<IfcRelAssignsToActor>();// : SET [0:?] OF IfcRelAssignsToActor FOR RelatingActor;
+		internal SET<IfcRelAssignsToActor> mIsActingUpon = new SET<IfcRelAssignsToActor>();// : SET [0:?] OF IfcRelAssignsToActor FOR RelatingActor;
 
-		public IfcActorSelect TheActor { get { return mDatabase[mTheActor] as IfcActorSelect; } set { mTheActor = value.Index; } }
-		public ReadOnlyCollection<IfcRelAssignsToActor> IsActingUpon { get { return new ReadOnlyCollection<IfcRelAssignsToActor>( mIsActingUpon); } }
+		public IfcActorSelect TheActor { get { return mTheActor; } set { mTheActor = value; } }
+		public SET<IfcRelAssignsToActor> IsActingUpon { get { return mIsActingUpon; } }
 
 		internal IfcActor() : base() { }
-		internal IfcActor(DatabaseIfc db, IfcActor a, IfcOwnerHistory ownerHistory, bool downStream) : base(db,a, ownerHistory, downStream) { TheActor = db.Factory.Duplicate(a.mDatabase[ a.mTheActor]) as IfcActorSelect; }
-		public IfcActor(IfcActorSelect a) : base(a.Database) { mTheActor = a.Index; }
+		internal IfcActor(DatabaseIfc db, IfcActor actor, IfcOwnerHistory ownerHistory, bool downStream) : base(db, actor, ownerHistory, downStream) { TheActor = db.Factory.Duplicate(actor.TheActor as BaseClassIfc) as IfcActorSelect; }
+		public IfcActor(IfcActorSelect actor) : base(actor.Database) { mTheActor = actor; }
 	}
 	[Serializable]
 	public partial class IfcActorRole : BaseClassIfc, IfcResourceObjectSelect
@@ -147,13 +147,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAdvancedBrepWithVoids : IfcAdvancedBrep
 	{
-		private List<int> mVoids = new List<int>();// : SET [1:?] OF IfcClosedShell
-		public ReadOnlyCollection<IfcClosedShell> Voids { get { return new ReadOnlyCollection<IfcClosedShell>( mVoids.ConvertAll(x => mDatabase[x] as IfcClosedShell)); } }
+		private SET<IfcClosedShell> mVoids = new SET<IfcClosedShell>();// : SET [1:?] OF IfcClosedShell
+		public SET<IfcClosedShell> Voids { get { return mVoids; } }
 
 		internal IfcAdvancedBrepWithVoids() : base() { }
-		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { mVoids = b.Voids.ToList().ConvertAll(x=> db.Factory.Duplicate(x).mIndex); }
-	
-		internal void addVoid(IfcClosedShell shell) { mVoids.Add(shell.mIndex); }
+		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { mVoids.AddRange(b.Voids.ConvertAll(x=> db.Factory.Duplicate(x) as IfcClosedShell)); }
 	}
 	[Serializable]
 	public partial class IfcAdvancedFace : IfcFaceSurface
@@ -279,24 +277,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem  
 	{
-		internal int mOuterBoundary;// : IfcCurve;
-		internal List<int> mInnerBoundaries = new List<int>();// OPTIONAL SET [1:?] OF IfcCurve; 
+		internal IfcCurve mOuterBoundary;// : IfcCurve;
+		internal SET<IfcCurve> mInnerBoundaries = new SET<IfcCurve>();// OPTIONAL SET [1:?] OF IfcCurve; 
 
-		public IfcCurve OuterBoundary { get { return mDatabase[mOuterBoundary] as IfcCurve; } set { mOuterBoundary = value.mIndex; } }
-		public ReadOnlyCollection<IfcCurve> InnerBoundaries { get { return new ReadOnlyCollection<IfcCurve>( mInnerBoundaries.ConvertAll(x => mDatabase[x] as IfcCurve)); } }
+		public IfcCurve OuterBoundary { get { return mOuterBoundary; } set { mOuterBoundary = value; } }
+		public SET<IfcCurve> InnerBoundaries { get { return mInnerBoundaries; } }
 
 		internal IfcAnnotationFillArea() : base() { }
-		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Factory.Duplicate(a.OuterBoundary) as IfcCurve; a.InnerBoundaries.ToList().ForEach(x=> AddInner( db.Factory.Duplicate(x) as IfcCurve)); }
+		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Factory.Duplicate(a.OuterBoundary) as IfcCurve; InnerBoundaries.AddRange(a.InnerBoundaries.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCurve)); }
 		public IfcAnnotationFillArea(IfcCurve outerBoundary) : base(outerBoundary.mDatabase) { OuterBoundary = outerBoundary; }
-		public IfcAnnotationFillArea(IfcCurve outerBoundary, List<IfcCurve> innerBoundaries) : this(outerBoundary) { innerBoundaries.ForEach(x=>AddInner(x)); }
-		
-		internal void AddInner(IfcCurve boundary) { mInnerBoundaries.Add(boundary.mIndex); }
+		public IfcAnnotationFillArea(IfcCurve outerBoundary, List<IfcCurve> innerBoundaries) : this(outerBoundary) { InnerBoundaries.AddRange(innerBoundaries); }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
 	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
 	{
-		internal int mFillStyleTarget;// : OPTIONAL IfcPoint;
+		internal IfcPoint mFillStyleTarget;// : OPTIONAL IfcPoint;
 		internal IfcGlobalOrLocalEnum  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
 		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f) : base(db,f) { }
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
@@ -312,14 +308,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECEATED IFC4
 	{
-		internal int mItem;// : IfcGeometricRepresentationItem;
-		internal int mTextureCoordinates;// OPTIONAL IfcTextureCoordinate;
+		internal IfcGeometricRepresentationItem mItem;// : IfcGeometricRepresentationItem;
+		internal IfcTextureCoordinate mTextureCoordinates;// OPTIONAL IfcTextureCoordinate;
 
-		public IfcGeometricRepresentationItem Item { get { return mDatabase[mItem] as IfcGeometricRepresentationItem; } set { mItem = value.mIndex; } }
-		public IfcTextureCoordinate TextureCoordinates { get { return mDatabase[mTextureCoordinates] as IfcTextureCoordinate; } set { mTextureCoordinates = value.mIndex; } }
+		public IfcGeometricRepresentationItem Item { get { return mItem; } set { mItem = value; } }
+		public IfcTextureCoordinate TextureCoordinates { get { return mTextureCoordinates; } set { mTextureCoordinates = value; } }
 
 		internal IfcAnnotationSurface() : base() { } 
-		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Factory.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates > 0) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
+		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Factory.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates != null) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -396,7 +392,7 @@ namespace GeometryGym.Ifc
 		internal string mCondition = "$";// : OPTIONAL IfcLabel; IFC4
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
 		internal List<int> mComponents = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
-														 //INVERSE
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcAppliedValue> mComponentFor = new List<IfcAppliedValue>(); //gg
@@ -475,7 +471,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECEATED IFC4
 	{
 		internal int mComponentOfTotal;// : IfcAppliedValue;
-		internal List< int> mComponents = new List<int>();// : SET [1:?] OF IfcAppliedValue;
+		internal List<int> mComponents = new List<int>();// : SET [1:?] OF IfcAppliedValue;
 		internal IfcArithmeticOperatorEnum mArithmeticOperator;// : IfcArithmeticOperatorEnum;
 		internal string mName;// : OPTIONAL IfcLabel;
 		internal string mDescription;// : OPTIONAL IfcText 
@@ -734,19 +730,19 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{ 
-		private int mRefDirection;// : OPTIONAL IfcDirection;
-		public IfcDirection RefDirection { get { return mDatabase[mRefDirection] as IfcDirection; } set { mRefDirection = (value == null ? 0 : value.mIndex); } }
+		private IfcDirection mRefDirection;// : OPTIONAL IfcDirection;
+		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
 		
 		internal IfcAxis2Placement2D() : base() { }
 		internal IfcAxis2Placement2D(DatabaseIfc db, IfcAxis2Placement2D p) : base(db, p)
 		{
-			if (p.mRefDirection > 0)
+			if (p.mRefDirection != null)
 				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
 		}
 		public IfcAxis2Placement2D(DatabaseIfc db) : base(db.Factory.Origin2d) { }
 		public IfcAxis2Placement2D(IfcCartesianPoint location) : base(location) { }
 		
-		public override bool IsXYPlane { get { return base.IsXYPlane && (mRefDirection == 0 || RefDirection.isXAxis); } }
+		public override bool IsXYPlane { get { return base.IsXYPlane && (mRefDirection == null || RefDirection.isXAxis); } }
 	}
 	[Serializable]
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement

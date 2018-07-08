@@ -579,6 +579,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcElementComponent() : base() { }
 		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
 		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
+		protected IfcElementComponent(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
 	public abstract partial class IfcElementComponentType : IfcElementType // ABSTRACT SUPERTYPE OF (ONEOF	((IfcBuildingElementPartType, IfcDiscreteAccessoryType, IfcFastenerType, IfcMechanicalFastenerType, IfcReinforcingElementType, IfcVibrationIsolatorType)))
@@ -858,15 +859,11 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcExtendedMaterialProperties : IfcMaterialPropertiesSuperseded, NamedObjectIfc   // DEPRECEATED IFC4
+	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties   // DEPRECEATED IFC4
 	{
 		internal List<int> mExtendedProperties = new List<int>(); //: SET [1:?] OF IfcProperty
-		internal string mDescription = "$"; //: OPTIONAL IfcText;
-		internal string mName; //: IfcLabel;
 
 		public ReadOnlyCollection<IfcProperty> ExtendedProperties { get { return new ReadOnlyCollection<IfcProperty>( mExtendedProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
 
 		internal IfcExtendedMaterialProperties() : base() { }
 		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p) : base(db,p) { p.ExtendedProperties.ToList().ForEach(x=>addProperty( db.Factory.Duplicate(x) as IfcProperty)); mDescription = p.mDescription; mName = p.mName; }
@@ -877,7 +874,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
 		protected string mName = "$"; //: OPTIONAL IfcLabel;
-		private string mDescription = "$"; //: OPTIONAL IfcText;
+		protected string mDescription = "$"; //: OPTIONAL IfcText;
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
 		private List<int> mPropertyIndices = new List<int>();
 
@@ -917,11 +914,16 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				mPropertyIndices.Remove(property.mIndex);
 			}
 		}
-		public IfcProperty FindProperty(string name)
+		public IfcProperty this[string name]
 		{
-			if (string.IsNullOrEmpty(name))
-				return null;
-			return (mProperties.ContainsKey(name) ? mProperties[name] : null);
+			get
+			{
+				if (string.IsNullOrEmpty(name))
+					return null;
+				IfcProperty result = null;
+				mProperties.TryGetValue(name, out result);
+				return result;
+			}
 		}
 	}
 	[Serializable]

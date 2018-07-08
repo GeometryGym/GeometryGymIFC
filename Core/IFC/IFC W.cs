@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcWaterProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcWaterProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		internal bool mIsPotable = false;// : 	OPTIONAL BOOLEAN;
 		internal double mHardness = double.NaN, mAlkalinityConcentration = double.NaN, mAcidityConcentration = double.NaN;// : : 	OPTIONAL IfcIonConcentrationMeasure

@@ -39,7 +39,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcLaborResourceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcLaborResourceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcLaborResourceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcLaborResourceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcLagTime : IfcSchedulingTime //IFC4
@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 				mLagValue = ParserIfc.parseValue(s) as IfcTimeOrRatioSelect;
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcTaskDurationEnum>(s.Replace(".", ""), out mDurationType);
+					Enum.TryParse<IfcTaskDurationEnum>(s.Replace(".", ""), true, out mDurationType);
 			}
 		}
 	}
@@ -78,7 +78,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcLampTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcLampTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcLampType : IfcFlowTerminalType
@@ -89,7 +89,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcLampTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcLampTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcLibraryInformation : IfcExternalInformation
@@ -169,7 +169,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcLightFixtureTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcLightFixtureTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcLightFixtureType : IfcFlowTerminalType
@@ -180,7 +180,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcLightFixtureTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcLightFixtureTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	//ENTITY IfcLightIntensityDistribution ,IfcLightDistributionDataSourceSelect

@@ -752,7 +752,7 @@ namespace GeometryGym.Ifc
 				return null;
 			int index = mDuplicateMapping.FindExisting(entity);
 			if (index > 0)
-				return mDatabase[index] as IfcRoot;
+				return mDatabase[index];
 			if(!string.IsNullOrEmpty(entity.mGlobalId))
 			{
 				BaseClassIfc result = null;

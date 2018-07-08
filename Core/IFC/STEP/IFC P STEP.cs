@@ -189,7 +189,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPileTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPileTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPipeFitting : IfcFlowFitting //IFC4
@@ -200,7 +200,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPipeFittingTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPipeFittingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPipeFittingType : IfcFlowFittingType
@@ -211,7 +211,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPipeFittingTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPipeFittingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPipeSegment : IfcFlowSegment //IFC4
@@ -222,7 +222,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPipeSegmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPipeSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPipeSegmentType : IfcFlowSegmentType
@@ -233,7 +233,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPipeSegmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPipeSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPixelTexture : IfcSurfaceTexture
@@ -281,7 +281,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcPlateTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcPlateTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -293,7 +293,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPlateTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPlateTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPointOnCurve : IfcPoint
@@ -482,7 +482,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			mProcedureID = ParserSTEP.StripString(str, ref pos, len);
 
-			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mProcedureType);
+			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mProcedureType);
 			mUserDefinedProcedureType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
@@ -492,7 +492,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mPredefinedType);
+			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public abstract partial class IfcProcess : IfcObject // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
@@ -543,7 +543,7 @@ namespace GeometryGym.Ifc
 		{
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProfileTypeEnum>(s.Replace(".",""), out mProfileType);
+				Enum.TryParse<IfcProfileTypeEnum>(s.Replace(".", ""), true, out mProfileType);
 			mProfileName = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
@@ -595,7 +595,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcProjectionElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcProjectionElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}
@@ -609,7 +609,7 @@ namespace GeometryGym.Ifc
 				mIdentification = ParserSTEP.StripString(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProjectOrderTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcProjectOrderTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			mStatus = ParserSTEP.StripString(str, ref pos, len);
 			if (release != ReleaseVersion.IFC2x3)
 				mLongDescription = ParserSTEP.StripString(str, ref pos, len);
@@ -628,7 +628,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRecords = ParserSTEP.StripListLink(str, ref pos, len);
-			Enum.TryParse<IfcProjectOrderRecordTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mPredefinedType);
+			Enum.TryParse<IfcProjectOrderRecordTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public abstract partial class IfcProperty : IfcPropertyAbstraction  //ABSTRACT SUPERTYPE OF (ONEOF(IfcComplexProperty,IfcSimpleProperty));
@@ -817,7 +817,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string field = ParserSTEP.StripField(str, ref pos, len);
 			if (field.StartsWith("."))
-				Enum.TryParse<IfcPropertySetTemplateTypeEnum>(field.Replace(".", ""), out mTemplateType);
+				Enum.TryParse<IfcPropertySetTemplateTypeEnum>(field.Replace(".", ""), true, out mTemplateType);
 			mApplicableEntity = ParserSTEP.StripField(str, ref pos, len).Replace("'", "");
 			mHasPropertyTemplateIndices = ParserSTEP.StripListLink(str, ref pos, len);
 		}
@@ -902,7 +902,7 @@ namespace GeometryGym.Ifc
 			mDefinedUnit = ParserSTEP.StripLink(str, ref pos, len);
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] != '$')
-				Enum.TryParse<IfcCurveInterpolationEnum>(s.Replace(".",""), out mCurveInterpolation);
+				Enum.TryParse<IfcCurveInterpolationEnum>(s.Replace(".", ""), true, out mCurveInterpolation);
 		}
 	}
 	public partial class IfcProtectiveDevice : IfcFlowController //IFC4
@@ -913,7 +913,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProtectiveDeviceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcProtectiveDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcProtectiveDeviceTrippingUnit : IfcDistributionControlElement //IFC4  
@@ -924,7 +924,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProtectiveDeviceTrippingUnitTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcProtectiveDeviceTrippingUnitTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcProtectiveDeviceTrippingUnitType : IfcDistributionControlElementType
@@ -935,7 +935,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProtectiveDeviceTrippingUnitTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcProtectiveDeviceTrippingUnitTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcProtectiveDeviceType : IfcFlowControllerType
@@ -946,7 +946,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcProtectiveDeviceTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcProtectiveDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcProxy : IfcProduct
@@ -955,7 +955,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcObjectTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mProxyType);
+			Enum.TryParse<IfcObjectTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mProxyType);
 			mTag = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
@@ -967,7 +967,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPumpTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPumpTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcPumpType : IfcFlowMovingDeviceType
@@ -978,7 +978,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcPumpTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcPumpTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 }

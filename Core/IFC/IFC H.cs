@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcHygroscopicMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		internal double mUpperVaporResistanceFactor = double.NaN, mLowerVaporResistanceFactor = double.NaN; //: OPTIONAL IfcPositiveRatioMeasure;
 		internal double mIsothermalMoistureCapacity = double.NaN; //: : OPTIONAL IfcIsothermalMoistureCapacityMeasure;

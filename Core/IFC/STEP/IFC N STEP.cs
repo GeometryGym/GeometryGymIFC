@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mDimensions = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDimensionalExponents;
-			Enum.TryParse<IfcUnitEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mUnitType);
+			Enum.TryParse<IfcUnitEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mUnitType);
 		}
 	}
 }

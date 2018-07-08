@@ -35,6 +35,8 @@ namespace GeometryGym.Ifc
 	{
 		public static string Encode(string str)
 		{
+			if (string.IsNullOrEmpty(str))
+				return "";
 			string result = "";
 			int length = str.Length;
 			for (int icounter = 0; icounter < length; icounter++)

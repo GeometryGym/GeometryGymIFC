@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcGeneralMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		internal double mMolecularWeight = double.NaN; //: OPTIONAL IfcMolecularWeightMeasure;
 		internal double mPorosity = double.NaN; //: OPTIONAL IfcNormalisedRatioMeasure;
@@ -454,7 +454,7 @@ namespace GeometryGym.Ifc
 		internal IfcGroup() : base() { }
 		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { }
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; new IfcRelAssignsToGroup(this); }
-		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(this, ods)); }
+		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
 		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].AddRelated(o); }
 

@@ -683,7 +683,15 @@ namespace GeometryGym.Ifc
 	//Pset_ElectricMotorTypeCommon
 	//Pset_ElectricTimeControlTypeCommon
 	//Pset_ElementAssemblyCommon
-	//Pset_ElementComponentCommon
+	public partial class Pset_ElementComponentCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public PEnum_ElementComponentDeliveryType DeliveryType { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "DeliveryType", new IfcLabel(value.ToString()))); } }
+		public PEnum_ElementComponentCorrosionTreatment IfcElementComponent { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "DeliveryType", new IfcLabel(value.ToString()))); } }
+		public Pset_ElementComponentCommon(IfcElementComponent instance) : base(instance) { }
+		public Pset_ElementComponentCommon(IfcElementComponentType type) : base(type) { }
+	}
 	//Pset_EngineTypeCommon
 	public partial class Pset_EnvironmentalImpactIndicators : IfcPropertySet
 	{
@@ -886,7 +894,6 @@ namespace GeometryGym.Ifc
 	//Pset_MechanicalFastenerAnchorBolt
 	//Pset_MechanicalFastenerBolt
 	//Pset_MedicalDeviceTypeCommon
-	//Pset_MemberCommon
 	public partial class Pset_MemberCommon : IfcPropertySet
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
@@ -1076,7 +1083,7 @@ namespace GeometryGym.Ifc
 		public double ShearAreaY { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ShearAreaY", new IfcAreaMeasure(value))); } }
 		public double PlasticShapeFactorY { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlasticShapeFactorY", new IfcPositiveRatioMeasure(value))); } }
 		public double PlasticShapeFactorZ { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlasticShapeFactorZ", new IfcPositiveRatioMeasure(value))); } }
-		public Pset_ProfileMechanical(IfcProfileDef profileDef) : base(profileDef) { Description = profileDef.Name; }
+		public Pset_ProfileMechanical(IfcProfileDef profileDef) : base(profileDef) { Name = this.GetType().Name; Description = profileDef.Name; }
 	}
 	//Pset_ProjectOrderChangeOrder
 	//Pset_ProjectOrderMaintenanceWorkOrder

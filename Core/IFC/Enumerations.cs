@@ -329,6 +329,8 @@ namespace GeometryGym.Ifc
 	public enum PEnum_DistributionPortGender { MALE, FEMALE, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_ElectricActuatorType { MOTORDRIVE, MAGNETIC, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_Status { NEW, EXISTING, DEMOLISH, TEMPORARY, OTHER, NOTKNOWN, UNSET };
+	public enum PEnum_ElementComponentDeliveryType { CAST_IN_PLACE, WELDED_TO_STRUCTURE, LOOSE, ATTACHED_FOR_DELIVERY, PRECAST, NOTDEFINED };
+	public enum PEnum_ElementComponentCorrosionTreatment { PAINTED, EPOXYCOATED, GALVANISED, STAINLESS, NONE, NOTDEFINED };
 	public enum PEnum_EnergySource { COAL, COAL_PULVERIZED, ELECTRICITY, GAS, OIL, PROPANE, WOOD, WOOD_CHIP, WOOD_PELLET, WOOD_PULVERIZED, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_FailPosition { FAILOPEN, FAILCLOSED, OTHER, NOTKNOWN, UNSET };
 	public enum PEnum_HeatTransferType { SENSIBLE, LATENT, OTHER, NOTKNOWN, UNSET };

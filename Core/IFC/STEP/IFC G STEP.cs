@@ -37,10 +37,10 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcGasTerminalTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcGasTerminalTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcGeneralMaterialProperties : IfcMaterialPropertiesSuperseded // DEPRECEATED IFC4
+	public partial class IfcGeneralMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mMolecularWeight) + "," + ParserSTEP.DoubleOptionalToString(mPorosity) + "," + ParserSTEP.DoubleOptionalToString(mMassDensity); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcGeographicElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcGeographicElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
@@ -83,7 +83,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcGeographicElementTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcGeographicElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcGeometricRepresentationContext : IfcRepresentationContext, IfcCoordinateReferenceSystemSelect
@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			mContainerContext = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcGeometricRepresentationContext;
 			mTargetScale = ParserSTEP.StripDouble(str, ref pos, len);
-			Enum.TryParse<IfcGeometricProjectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mTargetView);
+			Enum.TryParse<IfcGeometricProjectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mTargetView);
 			mUserDefinedTargetView = ParserSTEP.StripString(str, ref pos, len);
 		}
 		internal override void postParseRelate()
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
-					Enum.TryParse<IfcGridTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+					Enum.TryParse<IfcGridTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
 		}
 	}

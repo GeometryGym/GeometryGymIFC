@@ -54,6 +54,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal abstract double SIFactor { get; }
+		public abstract double SIFactor { get; }
 	}
 }

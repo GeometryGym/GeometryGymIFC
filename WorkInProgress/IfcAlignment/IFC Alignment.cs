@@ -53,7 +53,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcAlignmentTypeEnum>(s.Replace(".", ""), out mPredefinedType);
+				Enum.TryParse<IfcAlignmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 
 		internal override void ParseXml(XmlElement xml)
@@ -553,7 +553,7 @@ namespace GeometryGym.Ifc
 			mEndRadius = ParserSTEP.StripDouble(str, ref pos, len);
 			mIsStartRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
 			mIsEndRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
-			Enum.TryParse<IfcTransitionCurveType>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), out mTransitionCurveType);
+			Enum.TryParse<IfcTransitionCurveType>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mTransitionCurveType);
 		}
 
 		internal override void ParseXml(XmlElement xml)

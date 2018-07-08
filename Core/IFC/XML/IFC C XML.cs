@@ -481,7 +481,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcFace f = mDatabase.ParseXml<IfcFace>(cn as XmlElement);
 						if (f != null)
-							AddFace(f);
+							CfsFaces.Add(f);
 					}
 				}
 			}
