@@ -32,7 +32,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {  IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1 };
+	public enum ReleaseVersion {  IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 };
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
@@ -111,7 +111,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 		internal ModelView mModelView = ModelView.Ifc2x3NotAssigned;
-		internal bool mAccuratePreview = false;
 		internal string mFileName = "";
 		public string FileName { get { return mFileName; } set { mFileName = value; FolderPath = Path.GetDirectoryName(value); } }
 		internal bool mTimeInDays = false;
@@ -182,7 +181,14 @@ namespace GeometryGym.Ifc
 			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
 			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
 			hdr += "/* authorization */ 'None');\r\n\r\n";
-			hdr += "FILE_SCHEMA (('" + (mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4") + "'));\r\n";
+			string version = "IFC4";
+			if (mRelease == ReleaseVersion.IFC2x3)
+				version = "IFC2x3";
+			else if (mRelease == ReleaseVersion.IFC4X1)
+				version = "IFC4X1";
+			else if (mRelease == ReleaseVersion.IFC4X2)
+				version = "IFC4X2";
+			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";
 			return hdr;

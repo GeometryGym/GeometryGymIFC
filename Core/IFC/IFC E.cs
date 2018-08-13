@@ -249,15 +249,15 @@ namespace GeometryGym.Ifc
 
 		//INVERSE  
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
-		internal List<IfcRelConnectsElements> mConnectedTo = new List<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
+		internal SET<IfcRelConnectsElements> mConnectedTo = new SET<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
 		internal List<IfcRelInterferesElements> mIsInterferedByElements = new List<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
 		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
-		internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
+		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		internal List<IfcRelVoidsElement> mHasOpenings = new List<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
-		internal List<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new List<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
+		internal SET<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new SET<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
 		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
-		internal List<IfcRelConnectsElements> mConnectedFrom = new List<IfcRelConnectsElements>();//	 : 	SET OF IfcRelConnectsElements FOR RelatedElement;
+		internal SET<IfcRelConnectsElements> mConnectedFrom = new SET<IfcRelConnectsElements>();//	 : 	SET OF IfcRelConnectsElements FOR RelatedElement;
 		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
@@ -268,16 +268,16 @@ namespace GeometryGym.Ifc
 
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 		public ReadOnlyCollection<IfcRelFillsElement> FillsVoids { get { return new ReadOnlyCollection<IfcRelFillsElement>(mFillsVoids); } }
-		public ReadOnlyCollection<IfcRelConnectsElements> ConnectedTo { get { return new ReadOnlyCollection<IfcRelConnectsElements>(mConnectedTo); } }
+		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
 		public ReadOnlyCollection<IfcRelInterferesElements> IsInterferedByElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mIsInterferedByElements); } }
 		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
 		public ReadOnlyCollection<IfcRelVoidsElement> HasOpenings { get { return new ReadOnlyCollection<IfcRelVoidsElement>(mHasOpenings); } }
-		public ReadOnlyCollection<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return new ReadOnlyCollection<IfcRelConnectsWithRealizingElements>(mIsConnectionRealization); } }
+		public SET<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
 		public ReadOnlyCollection<IfcRelSpaceBoundary> ProvidesBoundaries { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>(mProvidesBoundaries); } }
-		public ReadOnlyCollection<IfcRelConnectsElements> ConnectedFrom { get { return new ReadOnlyCollection<IfcRelConnectsElements>(mConnectedFrom); } }
-		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
+		public SET<IfcRelConnectsElements> ConnectedFrom { get { return mConnectedFrom; } }
+		public IfcRelContainedInSpatialStructure ContainedInStructure { get { return mContainedInStructure; } }
 		public ReadOnlyCollection<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return new ReadOnlyCollection<IfcRelConnectsStructuralActivity>(mAssignedStructuralActivity); } }
 
 		public ReadOnlyCollection<IfcRelCoversBldgElements> HasCoverings { get { return new ReadOnlyCollection<IfcRelCoversBldgElements>(mHasCoverings); } }
@@ -326,7 +326,7 @@ namespace GeometryGym.Ifc
 				rv.RelatingBuildingElement = this;
 			}
 			if (e.mContainedInStructure != null)
-				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).addRelated(this);
+				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).RelatedElements.Add(this);
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
 			{
 				IfcRelConnectsStructuralActivity rc = db.Factory.Duplicate(rcss) as IfcRelConnectsStructuralActivity;
@@ -391,6 +391,62 @@ namespace GeometryGym.Ifc
 			reps.Add(new IfcShapeRepresentation(new IfcRevolvedAreaSolid(pd, translation, axis, arcAngle * angMultipler)));
 			Representation = new IfcProductDefinitionShape(reps);
 		}
+
+		protected override void initialize()
+		{
+			base.initialize();
+			mConnectedTo.CollectionChanged += mConnectedTo_CollectionChanged;
+			mIsConnectionRealization.CollectionChanged += mIsConnectionRealization_CollectionChanged;
+			mConnectedFrom.CollectionChanged += mConnectedFrom_CollectionChanged;
+		}
+		private void mConnectedTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRelConnectsElements r in e.NewItems)
+				{
+					if (r.RelatingElement != this)
+						r.RelatingElement = this;
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRelConnectsElements r in e.NewItems)
+					r.RelatingElement = null;
+			}
+		}
+		private void mIsConnectionRealization_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRelConnectsWithRealizingElements r in e.NewItems)
+				{
+					if (!r.RealizingElements.Contains(this))
+						r.RealizingElements.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRelConnectsWithRealizingElements r in e.NewItems)
+					r.RealizingElements.Remove(this);
+			}
+		}
+		private void mConnectedFrom_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRelConnectsElements r in e.NewItems)
+				{
+					if (r.RelatedElement != this)
+						r.RelatedElement = this;
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRelConnectsElements r in e.NewItems)
+					r.RelatedElement = null;
+			}
+		}
 		public IfcMaterialSelect MaterialSelect() { return GetMaterialSelect(); }
 		public void SetMaterial(IfcMaterialSelect material) { this.setMaterial(material); }
 		protected override IfcMaterialSelect GetMaterialSelect()
@@ -417,7 +473,7 @@ namespace GeometryGym.Ifc
 		{
 			base.detachFromHost();
 			if (mContainedInStructure != null)
-				mContainedInStructure.mRelatedElements.Remove(mIndex);
+				mContainedInStructure.RelatedElements.Remove(this);
 				//mContainedInStructure.RelatedElements.Remove(this);
 		}
 		internal static IfcElement ConstructElement(string className, IfcObjectDefinition container, IfcObjectPlacement pl, IfcProductRepresentation r) { return ConstructElement(className, container, pl, r, null); }
@@ -902,8 +958,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		{
 			if (property != null && !mProperties.ContainsKey(property.Name))
 			{
-				mProperties.Add(property.Name, property);
-				mPropertyIndices.Add(property.mIndex);
+				mProperties[property.Name] = property;
+				if(!mPropertyIndices.Contains(property.Index))
+					mPropertyIndices.Add(property.mIndex);
 			}
 		}
 		public void RemoveProperty(IfcProperty property)

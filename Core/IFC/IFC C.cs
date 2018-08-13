@@ -482,7 +482,7 @@ namespace GeometryGym.Ifc
 			if (mClassificationForObjects.Count == 0)
 				new IfcRelAssociatesClassification(this, related);
 			else
-				mClassificationForObjects[0].addRelated(related);
+				mClassificationForObjects[0].RelatedObjects.Add(related);
 		}
 		public void AddReference(IfcClassificationReference reference) { mHasReferences.Add(reference); }
 		public void RemoveReference(IfcClassificationReference reference) { mHasReferences.Remove(reference); }
@@ -545,8 +545,33 @@ namespace GeometryGym.Ifc
 		internal List<IfcClassificationReference> mHasReferences = new List<IfcClassificationReference>();//	 :	SET [0:?] OF IfcClassificationReference FOR ReferencedSource;
 		//internal List<IfcRelAssociatesClassification> mClassificationForObjects { get { return mClassificationRefForObjects; } }
 
-		public IfcClassificationReferenceSelect ReferencedSource { get { return mDatabase[mReferencedSource] as IfcClassificationReferenceSelect; } set { mReferencedSource = (value == null ? 0 : value.Index); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public IfcClassificationReferenceSelect ReferencedSource
+		{
+			get { return mDatabase[mReferencedSource] as IfcClassificationReferenceSelect; }
+			set
+			{
+				mReferencedSource = (value == null ? 0 : value.Index);
+				if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4)
+				{
+					if (value != null && value is IfcClassificationReference classificationReference)
+					{
+						IfcClassification classification = classificationReference.ReferencedSource as IfcClassification;
+						if(classification != null)
+							mReferencedSource = classification.mIndex;
+					}
+				}
+			}
+		}
+		public string Description
+		{
+			get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); }
+			set
+			{
+				mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value));
+				if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 && string.IsNullOrEmpty(Name))
+					Name = value;
+			}
+		}
 		public string Sort { get { return (mSort == "$" ? "" : ParserIfc.Decode(mSort)); } set { mSort = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public ReadOnlyCollection<IfcClassificationReference> HasReferences { get { return new ReadOnlyCollection<IfcClassificationReference>( mHasReferences); } }
 
@@ -564,8 +589,8 @@ namespace GeometryGym.Ifc
 		{
 			if (mClassificationRefForObjects.Count == 0)
 				new IfcRelAssociatesClassification(this, related);
-			else
-				mClassificationRefForObjects[0].addRelated(related);
+			else if (!mClassificationRefForObjects[0].RelatedObjects.Contains(related))
+				mClassificationRefForObjects[0].RelatedObjects.Add(related);
 		}
 		public void AddReference(IfcClassificationReference reference) { mHasReferences.Add(reference); }
 		public void RemoveReference(IfcClassificationReference reference) { mHasReferences.Remove(reference); }
@@ -578,7 +603,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcClosedShell : IfcConnectedFaceSet, IfcShell
 	{
 		internal IfcClosedShell() : base() { }
-		public IfcClosedShell(List<IfcFace> faces) : base(faces) { }
+		public IfcClosedShell(IEnumerable<IfcFace> faces) : base(faces) { }
 		internal IfcClosedShell(DatabaseIfc db, IfcClosedShell c) : base(db,c) { }
 	}
 	[Serializable]
@@ -638,7 +663,7 @@ namespace GeometryGym.Ifc
 		internal IfcColumn() : base()  { }
 		internal IfcColumn(DatabaseIfc db, IfcColumn c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
 		public IfcColumn(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		protected IfcColumn(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement,height) { }
+		public IfcColumn(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
 	}
 	[Serializable]
 	public partial class IfcColumnStandardCase : IfcColumn
@@ -673,17 +698,56 @@ namespace GeometryGym.Ifc
 	{
 		internal override string KeyWord { get { return "IfcComplexProperty"; } }
 		internal string mUsageName;// : IfcIdentifier;
-		internal List<int> mHasProperties = new List<int>();// : SET [1:?] OF IfcProperty;
+		private Dictionary<string, IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
+		private List<int> mPropertyIndices = new List<int>();
 
-		public string UsageName { get { return ParserIfc.Decode(mUsageName); } set { mUsageName = string.IsNullOrEmpty(value) ? "Unknown" : ParserIfc.Encode(value); } }
-		public ReadOnlyCollection<IfcProperty> HasProperties { get { return new ReadOnlyCollection<IfcProperty>( mHasProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
+		public string UsageName { get { return mUsageName; } set { mUsageName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
+		public ReadOnlyDictionary<string, IfcProperty> HasProperties { get { return new ReadOnlyDictionary<string, IfcProperty>(mHasProperties); } }
 
 		internal IfcComplexProperty() : base() { }
-		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p) : base(db, p) { mUsageName = p.mUsageName;  p.HasProperties.ToList().ForEach(x => addProperty( db.Factory.Duplicate(x) as IfcProperty)); }
+		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p) : base(db, p) { mUsageName = p.mUsageName; foreach(IfcProperty prop in p.HasProperties.Values) addProperty( db.Factory.Duplicate(prop) as IfcProperty); }
 		public IfcComplexProperty(DatabaseIfc m, string name, string usageName) : base(m, name) { UsageName = usageName; }
 		public IfcComplexProperty(DatabaseIfc m, string name, string usageName, IEnumerable<IfcProperty> properties) : this(m, name, usageName) { foreach (IfcProperty p in properties) addProperty(p); }
 		
-		internal void addProperty(IfcProperty property) { mHasProperties.Add(property.mIndex); property.mPartOfComplex.Add(this); }
+		public IfcPropertyBoundedValue AddProperty(IfcPropertyBoundedValue property) { addProperty(property); return property; }
+		public IfcPropertyEnumeratedValue AddProperty(IfcPropertyEnumeratedValue property) { addProperty(property); return property; }
+		public IfcPropertyReferenceValue AddProperty(IfcPropertyReferenceValue property) { addProperty(property); return property; }
+		public IfcPropertySingleValue AddProperty(IfcPropertySingleValue property) { addProperty(property); return property; }
+		public IfcPropertyTableValue AddProperty(IfcPropertyTableValue property) { addProperty(property); return property; }
+		public IfcComplexProperty AddProperty(IfcComplexProperty property) { addProperty(property); return property; }
+		internal void addProperty(IfcProperty property)
+		{
+			IfcProperty existing = null;
+			if (mHasProperties.TryGetValue(property.Name, out existing))
+				RemoveProperty(existing);
+			if (property != null)
+			{
+				mHasProperties[property.Name] = property;
+				property.mPartOfComplex.Add(this);
+				if(!mPropertyIndices.Contains(property.Index))
+					mPropertyIndices.Add(property.mIndex);
+			}
+		}
+		public void RemoveProperty(IfcProperty property)
+		{
+			if (property != null)
+			{
+				mHasProperties.Remove(property.Name);
+				mPropertyIndices.Remove(property.mIndex);
+				property.mPartOfComplex.Remove(this);
+			}
+		}
+		public IfcProperty this[string name]
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(name))
+					return null;
+				IfcProperty result = null;
+				mHasProperties.TryGetValue(name, out result);
+				return result;
+			}
+		}
 	}
 	//IfcComplexPropertyTemplate
 	[Serializable]
@@ -1225,7 +1289,15 @@ namespace GeometryGym.Ifc
 				return mDatabase.OfType<IfcTypeObject>().ToList();
 			}
 		}
-
+		public override IfcPropertySetDefinition FindPropertySet(string name)
+		{
+			foreach (IfcPropertySetDefinition pset in mIsDefinedBy.Select(x => x.RelatingPropertyDefinition))
+			{
+				if (string.Compare(pset.Name, name) == 0)
+					return pset;
+			}
+			return null;
+		}
 		public override IfcProperty FindProperty(string name)
 		{
 			foreach(IfcPropertySet pset in mIsDefinedBy.ConvertAll(x=>x.RelatingPropertyDefinition).OfType<IfcPropertySet>())

@@ -249,6 +249,29 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcRelAssignsToActor : IfcRelAssigns
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingActor") == 0)
+					RelatingActor = mDatabase.ParseXml<IfcActor>(child as XmlElement);
+				if (string.Compare(name, "ActingRole") == 0)
+					ActingRole = mDatabase.ParseXml<IfcActorRole>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (host != mRelatingActor)
+				xml.AppendChild(RelatingActor.GetXML(xml.OwnerDocument, "RelatingActor", this, processed));
+			if (mActingRole != null && host != mActingRole)
+				xml.AppendChild(ActingRole.GetXML(xml.OwnerDocument, "ActingRole", this, processed));
+		}
+	}
 	public partial class IfcRelAssignsToProduct : IfcRelAssigns
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -283,7 +306,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcDefinitionSelect o = mDatabase.ParseXml<IfcDefinitionSelect>(cn as XmlElement);
 						if (o != null)
-							addRelated(o);
+							RelatedObjects.Add(o);
 					}
 				}
 			}
@@ -364,7 +387,7 @@ namespace GeometryGym.Ifc
 				if(string.Compare(name, "RelatedObjects")== 0)
 				{
 					foreach (XmlNode n in child.ChildNodes)
-						addRelated(mDatabase.ParseXml<IfcDefinitionSelect>(n as XmlElement));
+						RelatedObjects.Add(mDatabase.ParseXml<IfcDefinitionSelect>(n as XmlElement));
 				}
 			}
 		}
@@ -407,7 +430,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcProduct p = mDatabase.ParseXml<IfcProduct>(cn as XmlElement);
 						if (p != null)
-							addRelated(p);
+							RelatedElements.Add(p);
 					}
 				}
 				else if (string.Compare(name, "RelatingStructure") == 0)
@@ -582,6 +605,33 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(element);
 			foreach (IfcObjectDefinition od in RelatedObjects)
 				element.AppendChild(od.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+	}
+	public partial class IfcRelReferencedInSpatialStructure : IfcRelConnects
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingStructure") == 0)
+					RelatingStructure = mDatabase.ParseXml<IfcSpatialElement>(child as XmlElement);
+				else if (string.Compare(name, "RelatedElements") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcProduct p = mDatabase.ParseXml<IfcProduct>(cn as XmlElement);
+						if (p != null)
+							RelatedElements.Add(p);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(RelatingStructure.GetXML(xml.OwnerDocument, "RelatingStructure", this, processed));
 		}
 	}
 	public partial class IfcRelServicesBuildings : IfcRelConnects

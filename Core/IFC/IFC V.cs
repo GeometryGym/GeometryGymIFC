@@ -333,6 +333,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcRotationalFrequencyMeasure : IfcDerivedMeasureValue { public IfcRotationalFrequencyMeasure(double value) : base(value) { } }
 	[Serializable]
+	public class IfcRotationalMassMeasure : IfcDerivedMeasureValue { public IfcRotationalMassMeasure(double value) : base(value) { } }
+	[Serializable]
 	public class IfcRotationalStiffnessMeasure : IfcDerivedMeasureValue { public IfcRotationalStiffnessMeasure(double value) : base(value) { } }
 	[Serializable]
 	public class IfcSectionalAreaIntegralMeasure : IfcDerivedMeasureValue { public IfcSectionalAreaIntegralMeasure(double value) : base(value) { } }

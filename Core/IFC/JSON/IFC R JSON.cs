@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
 				JArray array = new JArray();
-				if (!mRelatedObjects.Contains(host.mIndex))
+				if (host == null || !mRelatedObjects.Contains(host.mIndex))
 				{
 					foreach (IfcObjectDefinition od in RelatedObjects)
 						array.Add(od.getJson(this, options));
@@ -197,16 +197,17 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addRelated(x));
+			RelatedObjects.AddRange(mDatabase.extractJArray<IfcDefinitionSelect>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			JArray array = new JArray();
-			if (!mRelatedObjects.Contains(host.mIndex))
+			IfcDefinitionSelect d = host as IfcDefinitionSelect;
+			if (d == null || !mRelatedObjects.Contains(d))
 			{
-				foreach (int i in mRelatedObjects)
-					array.Add(mDatabase[i].getJson(this, options));
+				foreach (IfcDefinitionSelect ds in mRelatedObjects)
+					array.Add((ds as BaseClassIfc).getJson(this, options));
 				obj["RelatedObjects"] = array;
 			}
 		}
@@ -384,7 +385,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcProduct>(obj.GetValue("RelatedElements", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
+			RelatedElements.AddRange(mDatabase.extractJArray<IfcProduct>(obj.GetValue("RelatedElements", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

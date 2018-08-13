@@ -367,17 +367,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + (mInternalLocation == "$" ? ",$," : ",'" + mInternalLocation + "',");
-			if (mAddressLines.Count == 0)
-				str += "$";
-			else
-			{
-				str += "('" + mAddressLines[0];
-				for (int icounter = 1; icounter < mAddressLines.Count; icounter++)
-					str += "','" + mAddressLines[icounter];
-				str += "')";
-			}
-			return str + (mPostalBox == "$" ? ",$" : ",'" + mPostalBox + "'") + (mTown == "$" ? ",$" : ",'" + mTown + "'") + (mRegion == "$" ? ",$" : ",'" + mRegion + "'") + (mPostalCode == "$" ? ",$" : ",'" + mPostalCode + "'") + (mCountry == "$" ? ",$" : ",'" + mCountry + "'");
+			return base.BuildStringSTEP(release) + (mInternalLocation == "$" ? ",$" : ",'" + mInternalLocation + "'") +
+				(mAddressLines.Count == 0 ? ",$" : ",('" + string.Join("','", mAddressLines.Select(x => ParserIfc.Encode(x))) + "')")
+				+ (mPostalBox == "$" ? ",$" : ",'" + mPostalBox + "'") + (mTown == "$" ? ",$" : ",'" + mTown + "'") + (mRegion == "$" ? ",$" : ",'" + mRegion + "'") + (mPostalCode == "$" ? ",$" : ",'" + mPostalCode + "'") + (mCountry == "$" ? ",$" : ",'" + mCountry + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -393,7 +385,7 @@ namespace GeometryGym.Ifc
 				{
 					string field = lst[icounter];
 					if (field.Length > 2)
-						mAddressLines.Add(field.Substring(1, field.Length - 2));
+						mAddressLines.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
 				}
 			}
 			mPostalBox = ParserSTEP.StripString(str, ref pos, len);
@@ -792,11 +784,8 @@ namespace GeometryGym.Ifc
 			foreach(int i in mPropertyIndices)
 			{
 				IfcProperty p = mDatabase[i] as IfcProperty;
-				if (p != null && !mHasProperties.ContainsKey(p.Name))
-				{
-					mHasProperties[p.Name] = p;
-					p.mPartOfPset.Add(this);
-				}	
+				if (p != null)
+					addProperty(p);
 			}
 		}
 	}

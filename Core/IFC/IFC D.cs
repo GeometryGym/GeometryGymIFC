@@ -74,8 +74,7 @@ namespace GeometryGym.Ifc
 	public interface IfcDefinitionSelect : IBaseClassIfc // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
 	{
 		IfcRelDeclares HasContext { get; set; }
-		void Associate(IfcRelAssociates associates);
-		void Remove(IfcRelAssociates associates);
+		SET<IfcRelAssociates> HasAssociations { get; }
 		List<T> Extract<T>() where T : IBaseClassIfc;
 	}
 	[Serializable]
@@ -268,7 +267,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDiscreteAccessoryType() : base() { }
 		internal IfcDiscreteAccessoryType(DatabaseIfc db, IfcDiscreteAccessoryType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcDiscreteAccessoryType(DatabaseIfc m, string name, IfcDiscreteAccessoryTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcDiscreteAccessoryType(DatabaseIfc m, string name, IfcDiscreteAccessoryTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
@@ -348,7 +347,7 @@ namespace GeometryGym.Ifc
 		protected IfcDistributionElement(IfcDistributionElement basis) : base(basis) { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.assign(this); }
+		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.Assign(this); }
 		
 		internal IfcDistributionSystem getSystem()
 		{
@@ -537,7 +536,7 @@ namespace GeometryGym.Ifc
 		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; if(r.mReferencedDocument > 0) ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 
-		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects[0].addRelated(d); }
+		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects[0].RelatedObjects.Add(d); }
 		public void Associate(IfcRelAssociatesDocument associates) { mDocumentRefForObjects.Add(associates); }
 	}
 	public interface IfcDocumentSelect : NamedObjectIfc //IFC4 SELECT (	IfcDocumentReference, IfcDocumentInformation);

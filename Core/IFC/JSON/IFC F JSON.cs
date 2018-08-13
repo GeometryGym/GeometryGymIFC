@@ -74,4 +74,25 @@ namespace GeometryGym.Ifc
 			obj["Orientation"] = Orientation;
 		}
 	}
+	public partial class IfcFacility : IfcSpatialStructureElement
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("ElevationOfRefHeight", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfRefHeight = token.Value<double>();
+			token = obj.GetValue("ElevationOfTerrain", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfTerrain = token.Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mElevationOfRefHeight))
+				obj["ElevationOfRefHeight"] = ElevationOfRefHeight.ToString();
+			if (!double.IsNaN(mElevationOfTerrain))
+				obj["ElevationOfTerrain"] = ElevationOfTerrain.ToString();
+		}
+	}
 }

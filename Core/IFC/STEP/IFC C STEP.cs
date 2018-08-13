@@ -530,23 +530,23 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + "," + mUsageName + ",(" + ParserSTEP.LinkToString(mHasProperties[0]);
-			for (int icounter = 1; icounter < mHasProperties.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mHasProperties[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode( mUsageName) + "',(#" + string.Join(",#", mPropertyIndices) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mUsageName = ParserSTEP.StripString(str, ref pos, len);
-			mHasProperties = ParserSTEP.StripListLink(str, ref pos, len);
+			mPropertyIndices.AddRange(ParserSTEP.StripListLink(str, ref pos, len));
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
-			ReadOnlyCollection<IfcProperty> props = HasProperties;
-			for (int icounter = 0; icounter < props.Count; icounter++)
-				props[icounter].mPartOfComplex.Add(this);
+			foreach (int i in mPropertyIndices)
+			{
+				IfcProperty p = mDatabase[i] as IfcProperty;
+				if (p != null)
+					addProperty(p);
+			}
 		}
 	}
 	//IfcComplexPropertyTemplate

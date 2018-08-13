@@ -89,6 +89,14 @@ namespace GeometryGym.Ifc
 				if (element.HasChildNodes)
 					xml.AppendChild(element);
 			}
+			XmlElement referencedBy = xml.OwnerDocument.CreateElement("ReferencedInStructures");
+			foreach(IfcRelReferencedInSpatialStructure rss in mReferencedInStructures)
+			{
+				if (rss != host)
+					referencedBy.AppendChild(rss.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+			if (referencedBy.HasChildNodes)
+				xml.AppendChild(referencedBy);
 		}
 	}
 

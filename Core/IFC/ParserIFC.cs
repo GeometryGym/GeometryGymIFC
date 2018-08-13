@@ -80,7 +80,7 @@ namespace GeometryGym.Ifc
 				char c = str[icounter];
 				if(c == '\'')
 				{
-					if (icounter + 1 < ilast && str[icounter] == '\'')
+					if (icounter + 1 < ilast && str[icounter+1] == '\'')
 						icounter++;
 				}
 				if (c == '\\')

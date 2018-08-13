@@ -214,12 +214,12 @@ namespace GeometryGym.Ifc
 		//INVERSE  
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		private List<IfcMaterialProperties> mHasProperties = new List<IfcMaterialProperties>();
+		private SET<IfcMaterialProperties> mHasProperties = new SET<IfcMaterialProperties>();
 		[NonSerialized] internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } set { mAssociatedTo.Clear(); if (value != null) { mAssociatedTo.CollectionChanged -= mAssociatedTo_CollectionChanged; mAssociatedTo =value; mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged; } } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
-		public ReadOnlyCollection<IfcMaterialProperties> HasProperties { get { return new ReadOnlyCollection<IfcMaterialProperties>( mHasProperties); } }
+		public SET<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		public abstract string Name { get; set; }
@@ -275,14 +275,22 @@ namespace GeometryGym.Ifc
 		public void Associate(IfcDefinitionSelect obj)
 		{
 			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
-			associates.addRelated(obj);
+			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 
-		internal void AddProperties(IfcMaterialProperties mp) { if(!mHasProperties.Contains(mp)) mHasProperties.Add(mp); }
-
 		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
+
+		public IfcProperty FindProperty(string name)
+		{
+			foreach (IfcProperty property in mHasProperties.SelectMany(x => x.Properties.Values))
+			{
+				if (property != null && string.Compare(property.Name, name,true) == 0)
+					return property;
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation
@@ -480,7 +488,7 @@ namespace GeometryGym.Ifc
 		public void Associate(IfcDefinitionSelect obj)
 		{
 			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
-			associates.addRelated(obj);
+			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 
@@ -638,14 +646,14 @@ namespace GeometryGym.Ifc
 	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4, IFC2x3 ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
 	{
 		internal override string KeyWord { get { return "IfcMaterialProperties"; } }
-		private int mMaterial;// : IfcMaterialDefinition; 
-		public IfcMaterialDefinition Material { get { return mDatabase[mMaterial] as IfcMaterialDefinition; } set { mMaterial = value.mIndex; value.AddProperties(this); } }
+		private IfcMaterialDefinition mMaterial;// : IfcMaterialDefinition; 
+		public IfcMaterialDefinition Material { get { return mMaterial; } set { mMaterial = value; value.HasProperties.Add(this); } }
 
 		internal IfcMaterialProperties() : base() { }
 		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p) : base(db, p) { Material = db.Factory.Duplicate(p.Material) as IfcMaterialDefinition; }
-		protected IfcMaterialProperties(IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = this.GetType().Name; mMaterial = mat.mIndex; mat.AddProperties(this); }
-		public IfcMaterialProperties(string name, IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = name; mMaterial = mat.mIndex; mat.AddProperties(this); }
-		internal IfcMaterialProperties(string name, List<IfcProperty> props, IfcMaterialDefinition mat) : base(props) { Name = name; mMaterial = mat.mIndex; mat.AddProperties(this); }
+		protected IfcMaterialProperties(IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = this.GetType().Name; Material = mat; }
+		public IfcMaterialProperties(string name, IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = name; Material = mat; }
+		internal IfcMaterialProperties(string name, List<IfcProperty> props, IfcMaterialDefinition mat) : base(props) { Name = name; Material = mat; }
 	}
 	[Serializable]
 	public partial class IfcMaterialRelationship : IfcResourceLevelRelationship //IFC4
@@ -711,7 +719,7 @@ namespace GeometryGym.Ifc
 		public void Associate(IfcDefinitionSelect obj)
 		{
 			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
-			associates.addRelated(obj);
+			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if (!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 	}

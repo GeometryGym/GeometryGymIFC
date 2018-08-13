@@ -102,20 +102,20 @@ namespace GeometryGym.Ifc
 			IfcElementAssembly eas = this as IfcElementAssembly;
 			db.Factory.mDuplicateMapping.Clear();
 			db.Factory.Duplicate(this, true);
-         IfcProject project = db.Project;
-         if (project != null)
-         {
-            IfcSite site = project.RootElement as IfcSite;
-            if (site != null)
-            {
-               IfcProductRepresentation pr = site.Representation;
-               if (pr != null)
-               {
-                  site.Representation = null;
-                  pr.Destruct(true);
-               }
-            }
-         }
+			IfcProject project = db.Project;
+			if (project != null)
+			{
+				IfcSite site = project.RootElement as IfcSite;
+				if (site != null)
+				{
+					IfcProductRepresentation pr = site.Representation;
+					if (pr != null)
+					{
+						site.Representation = null;
+						pr.Destruct(true);
+					}
+				}
+			}
 			db.WriteFile(filename);
 		}
 
@@ -137,6 +137,15 @@ namespace GeometryGym.Ifc
 			}
 			return (mIsTypedBy != null ? mIsTypedBy.RelatingType.FindProperty(name) : null);
 		}
+		public override IfcPropertySetDefinition FindPropertySet(string name)
+		{
+			foreach(IfcPropertySetDefinition pset in mIsDefinedBy.Select(x=>x.RelatingPropertyDefinition))
+			{
+				if (string.Compare(pset.Name, name) == 0)
+					return pset;
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
@@ -147,7 +156,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelDeclares mHasContext = null;// :	SET [0:1] OF IfcRelDeclares FOR RelatedDefinitions; 
 		internal List<IfcRelAggregates> mIsDecomposedBy = new List<IfcRelAggregates>();//	 : 	SET OF IfcRelDecomposes FOR RelatingObject;
 		[NonSerialized] internal IfcRelAggregates mDecomposes = null;//	 : 	SET [0:1] OF IfcRelDecomposes FOR RelatedObjects; IFC4  IfcRelAggregates
-		internal List<IfcRelAssociates> mHasAssociations = new List<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
+		internal SET<IfcRelAssociates> mHasAssociations = new SET<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
 
 		public SET<IfcRelAssigns> HasAssignments { get { return mHasAssignments; } set { mHasAssignments.Clear(); if (value != null) { mHasAssignments.CollectionChanged -= mHasAssignments_CollectionChanged; mHasAssignments = value; mHasAssignments.CollectionChanged += mHasAssignments_CollectionChanged; } } }
 		public IfcRelNests Nests { get { return mNests; } set { if (mNests != null) mNests.mRelatedObjects.Remove(mIndex); mNests = value; if (value != null && !value.mRelatedObjects.Contains(mIndex)) value.mRelatedObjects.Add(mIndex); } }
@@ -155,7 +164,7 @@ namespace GeometryGym.Ifc
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
 		public ReadOnlyCollection<IfcRelAggregates> IsDecomposedBy { get { return new ReadOnlyCollection<IfcRelAggregates>(mIsDecomposedBy); } }
 		public IfcRelAggregates Decomposes { get { return mDecomposes; } set { if (mDecomposes != null) mDecomposes.mRelatedObjects.Remove(mIndex); mDecomposes = value; if (value != null && !value.mRelatedObjects.Contains(mIndex)) value.mRelatedObjects.Add(mIndex); } }
-		public ReadOnlyCollection<IfcRelAssociates> HasAssociations { get { return new ReadOnlyCollection<IfcRelAssociates>(mHasAssociations); } }
+		public SET<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
 
 		internal IfcRelAssociatesMaterial RelatedMaterialAssociation
 		{
@@ -195,7 +204,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelAssociates associates in o.mHasAssociations)
 			{
 				IfcRelAssociates dup = db.Factory.Duplicate(associates, ownerHistory, downStream) as IfcRelAssociates;
-				dup.addRelated(this);
+				dup.RelatedObjects.Add(this);
 			}
 			if (mHasContext != null)
 				(db.Factory.Duplicate(mHasContext, ownerHistory, false) as IfcRelDeclares).RelatedDefinitions.Add(this);	
@@ -213,6 +222,7 @@ namespace GeometryGym.Ifc
 
 			mHasAssignments.CollectionChanged += mHasAssignments_CollectionChanged;
 			mIsNestedBy.CollectionChanged += mIsNestedBy_CollectionChanged;
+			mHasAssociations.CollectionChanged += mHasAssociations_CollectionChanged;
 		}
 		private void mHasAssignments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -249,8 +259,24 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		public void Associate(IfcRelAssociates associates) { mHasAssociations.Add(associates); }
-		public void Remove(IfcRelAssociates associates) { mHasAssociations.Remove(associates); }
+		private void mHasAssociations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.NewItems != null)
+			{
+				foreach (IfcRelAssociates r in e.NewItems)
+				{
+					if (!r.RelatedObjects.Contains(this))
+						r.RelatedObjects.Add(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcRelAssociates r in e.OldItems)
+				{
+					r.RelatedObjects.Remove(this);	
+				}
+			}
+		}
 
 		public void AddNested(IfcObjectDefinition o)
 		{
@@ -272,7 +298,8 @@ namespace GeometryGym.Ifc
 				return true;
 			}
 			else
-				return mIsDecomposedBy[0].addObject(o); }
+				return mIsDecomposedBy[0].addObject(o);
+		}
 		
 		internal virtual void relateNested(IfcRelNests n) { mIsNestedBy.Add(n); }
 		
@@ -303,10 +330,10 @@ namespace GeometryGym.Ifc
 						if (pd.mHasProperties.Count == 0)
 						{
 							IfcProfileProperties pp = new IfcProfileProperties(pd);
-							pp.mAssociates.addRelated(this);
+							pp.mAssociates.RelatedObjects.Add(this);
 						}
 						else
-							pd.mHasProperties[0].mAssociates.addRelated(this);
+							pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
 					}
 				}
 				else
@@ -331,7 +358,7 @@ namespace GeometryGym.Ifc
 								{
 									IfcProfileProperties pp = new IfcProfileProperties(pd);
 								}
-								pd.mHasProperties[0].mAssociates.addRelated(this);
+								pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
 							}
 						}
 					}
@@ -340,19 +367,16 @@ namespace GeometryGym.Ifc
 						//constituentset....
 					}
 				}
-
-
 			}
 			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
 			{
 				IfcRelAssociatesMaterial rm = mHasAssociations[icounter] as IfcRelAssociatesMaterial;
 				if (rm != null)
-					rm.unassign(this);
+					rm.RelatedObjects.Remove(this);
 			}
 			if (m != null)
 			{
 				m.Associate(this);
-				
 			}
 		}
 
@@ -415,8 +439,8 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 		public abstract IfcProperty FindProperty(string name);
-		
-		public virtual IfcPropertySetDefinition FindPropertySet(string name) { return Extract<IfcPropertySetDefinition>().FirstOrDefault(x=>string.Compare(x.Name,name,true) == 0); }
+
+		public abstract IfcPropertySetDefinition FindPropertySet(string name);
 		protected override List<T> Extract<T>(Type type)
 		{
 			// Early implementation, should search for typed objects such as products and type products.  Contact Jon
@@ -619,8 +643,8 @@ namespace GeometryGym.Ifc
 		internal string mIdentification = "$";// : OPTIONAL IfcIdentifier;
 		private string mName = "";// : IfcLabel;
 		private string mDescription = "$";// : OPTIONAL IfcText;
-		private List<int> mRoles = new List<int>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
-		private List<int> mAddresses = new List<int>();// : OPTIONAL LIST [1:?] OF IfcAddress; 
+		private LIST<IfcActorRole> mRoles = new LIST<IfcActorRole>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
+		private LIST<IfcAddress> mAddresses = new LIST<IfcAddress>();//: OPTIONAL LIST [1:?] OF IfcAddress; 
 													   //INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
@@ -632,8 +656,8 @@ namespace GeometryGym.Ifc
 			set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); }
 		}
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcActorRole> Roles { get { return new ReadOnlyCollection<IfcActorRole>( mRoles.ConvertAll(x => mDatabase[x] as IfcActorRole)); } }
-		public ReadOnlyCollection<IfcAddress> Addresses { get { return new ReadOnlyCollection<IfcAddress>( mAddresses.ConvertAll(x => mDatabase[x] as IfcAddress)); } }
+		public LIST<IfcActorRole> Roles { get { return mRoles; } }
+		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
@@ -661,8 +685,8 @@ namespace GeometryGym.Ifc
 			mIdentification = o.mIdentification;
 			mName = o.mName;
 			mDescription = o.mDescription;
-			o.Roles.ToList().ForEach(x => AddRole( db.Factory.Duplicate(x) as IfcActorRole));
-			o.Addresses.ToList().ForEach(x => AddAddress( db.Factory.Duplicate(x) as IfcAddress));
+			Roles.AddRange(o.Roles.Select(x => db.Factory.Duplicate(x) as IfcActorRole));
+			Addresses.AddRange(o.Addresses.Select(x => db.Factory.Duplicate(x) as IfcAddress));
 		}
 		public IfcOrganization(DatabaseIfc m, string name) : base(m) { Name = name; }
 		protected override void initialize()
@@ -688,8 +712,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
-		public void AddRole(IfcActorRole role) { if(role != null) mRoles.Add(role.mIndex); }
-		public void AddAddress(IfcAddress address) { if(address != null) mAddresses.Add(address.mIndex); }
 	}
 	//ENTITY IfcOrganizationRelationship; //optional name
 	[Serializable]

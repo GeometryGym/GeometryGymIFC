@@ -475,38 +475,32 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcBuilding : IfcSpatialStructureElement
+	public partial class IfcBuilding : IfcFacility
 	{
-		internal double mElevationOfRefHeight = double.NaN;// : OPTIONAL IfcLengthMeasure;
-		internal double mElevationOfTerrain = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal int mBuildingAddress;// : OPTIONAL IfcPostalAddress; 
-
-		public double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set {mElevationOfRefHeight = value; } }
-		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set {mElevationOfTerrain = value; } }
 		public IfcPostalAddress BuildingAddress { get { return mDatabase[mBuildingAddress] as IfcPostalAddress; } set { mBuildingAddress = value.mIndex; } }
 
 		internal IfcBuilding() : base() { }
 		internal IfcBuilding(DatabaseIfc db, IfcBuilding b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream)
 		{
-			mElevationOfRefHeight = b.mElevationOfRefHeight;
-			mElevationOfTerrain = b.mElevationOfTerrain;
 			if (b.mBuildingAddress > 0)
 				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress) as IfcPostalAddress;
 		}
-		public IfcBuilding(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; setDefaultAddress();  }
-		public IfcBuilding(IfcBuilding host, string name) : base(host, name) { }
+		public IfcBuilding(DatabaseIfc db, string name) : base(db, name) { setDefaultAddress();  }
+		public IfcBuilding(IfcFacility host, string name) : base(host, name) { }
 		public IfcBuilding(IfcSite host, string name) : base(host, name) { setDefaultAddress(); }
 		public IfcBuilding(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { setDefaultAddress(); }
 		
 
 		private void setDefaultAddress()  //Implementers Agreement requires address
 		{
-			BuildingAddress = new IfcPostalAddress(mDatabase) {  mAddressLines = new List<string>() { "Unknown" }, Town = "Unknown", Country = "Unknown", PostalCode = "Unknown" };
+			BuildingAddress = new IfcPostalAddress(mDatabase) {  Town = "Unknown", Country = "Unknown", PostalCode = "Unknown" };
+			BuildingAddress.AddressLines.Add("Unknown");
 		}
 		private void init(IfcSpatialElement container)
 		{
 			if (container != null) 
-				container.addBuilding(this);
+				container.AddAggregated(this);
 		}
 
 		internal bool addStorey(IfcBuildingStorey s) { return base.AddAggregated(s); }
@@ -559,6 +553,7 @@ namespace GeometryGym.Ifc
 		internal IfcBuildingElementProxy() : base() { }
 		internal IfcBuildingElementProxy(DatabaseIfc db, IfcBuildingElementProxy p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
 		public IfcBuildingElementProxy(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = "NOTDEFINED"; }
+		public IfcBuildingElementProxy(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
 	public partial class IfcBuildingElementProxyType : IfcBuildingElementType

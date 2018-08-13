@@ -27,6 +27,7 @@ using System.Linq;
 
 using Newtonsoft.Json.Linq;
 
+using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
@@ -77,7 +78,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelAggregates ra in mDatabase.extractJArray<IfcRelAggregates>(obj.GetValue("IsDecomposedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				ra.RelatingObject = this;
 			foreach (IfcRelAssociates ra in mDatabase.extractJArray<IfcRelAssociates>(obj.GetValue("HasAssociations", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				ra.addRelated(this);
+				ra.RelatedObjects.Add(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -203,8 +204,8 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Description = token.Value<string>();
-			mDatabase.extractJArray<IfcActorRole>(obj.GetValue("Roles", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddRole(x));
-			mDatabase.extractJArray<IfcAddress>(obj.GetValue("Addresses", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddAddress(x));
+			Roles.AddRange(mDatabase.extractJArray<IfcActorRole>(obj.GetValue("Roles", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Addresses.AddRange(mDatabase.extractJArray<IfcAddress>(obj.GetValue("Addresses", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -216,7 +217,7 @@ namespace GeometryGym.Ifc
 			string description = Description;
 			if (!string.IsNullOrEmpty(description))
 				obj["Description"] = description;
-			ReadOnlyCollection<IfcActorRole> roles = Roles;
+			LIST<IfcActorRole> roles = Roles;
 			if (roles.Count > 0)
 			{
 				JArray array = new JArray();
@@ -224,7 +225,7 @@ namespace GeometryGym.Ifc
 					array.Add(role.getJson(this, options));
 				obj["Roles"] = array;
 			}
-			ReadOnlyCollection<IfcAddress> addresses = Addresses;
+			LIST<IfcAddress> addresses = Addresses;
 			if(addresses.Count > 0)
 			{
 				JArray array = new JArray();

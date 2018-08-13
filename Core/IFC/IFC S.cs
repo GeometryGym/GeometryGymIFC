@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -233,7 +234,7 @@ namespace GeometryGym.Ifc
 				mCrossSectionReinforcementDefinitions.Add(definition.mIndex);
 		}
 	}
-	public interface IfcSegmentIndexSelect { } //SELECT ( IfcLineIndex, IfcArcIndex);
+	public partial interface IfcSegmentIndexSelect { } //SELECT ( IfcLineIndex, IfcArcIndex);
 	[Serializable]
 	public partial class IfcSensor : IfcDistributionControlElement //IFC4  
 	{
@@ -358,9 +359,9 @@ additional types	some additional representation types are given:
 	MappedRepresentation*/
 		internal IfcShapeRepresentation() : base() { }
 		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r) : base(db, r) { }
-		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { setIdentifiers(representation); }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation) : base(context, representation) { setIdentifiers(representation); }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> items) : base(context, items) { setIdentifiers(items[0]); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation) : base(context, representation) { }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> items) : base(context, items) { }
 		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = "AdvancedBrep"; }
 		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) 
 		{
@@ -473,56 +474,7 @@ additional types	some additional representation types are given:
 			return null;
 		}
 
-		private bool setIdentifiers(IfcRepresentationItem ri)
-		{
-			IfcGeometricRepresentationItem gri = ri as IfcGeometricRepresentationItem;
-			if (ri != null)
-			{
-				RepresentationType = "MappedRepresentation";
-				IfcMappedItem mi = ri as IfcMappedItem;
-				if (mi != null)
-					return true;
-				RepresentationType = "SolidModel";
-				IfcSolidModel sm = ri as IfcSolidModel; //IfcCsgSolid ,IfcManifoldSolidBrep,IfcSweptAreaSolid,IfcSweptDiskSolid
-				if (sm != null)
-					return true;
-
-				RepresentationType = "CSG";
-				IfcBooleanResult br = ri as IfcBooleanResult;
-				if (br != null)
-					return true;
-				IfcCsgPrimitive3D csg = ri as IfcCsgPrimitive3D;
-				if (csg != null)
-					return true;
-				RepresentationType = "SectionedSpine";
-				IfcSectionedSpine ss = ri as IfcSectionedSpine;
-				if (ss != null)
-					return true;
-				RepresentationType = "SurfaceModel";
-				IfcFaceBasedSurfaceModel fbs = ri as IfcFaceBasedSurfaceModel;
-				if (fbs != null)
-					return true;
-				IfcShellBasedSurfaceModel sbs = ri as IfcShellBasedSurfaceModel;
-				if (sbs != null)
-					return true;
-				RepresentationType = "Tessellation";
-				IfcTessellatedItem ti = ri as IfcTessellatedItem;
-				if (ti != null)
-					return true;
-				RepresentationType = "Surface3D";
-				IfcSurface s = ri as IfcSurface;
-				if (s != null)
-					return true;
-				RepresentationType = "Curve3D";
-				IfcCurve c = ri as IfcCurve;
-				if (c != null)
-					return true;
-			}
-			RepresentationType = "";
-			return false;
-		}
-
-		
+				
 	}
 	public partial interface IfcShell : IBaseClassIfc  // SELECT(IfcClosedShell, IfcOpenShell);
 	{
@@ -780,7 +732,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSpace() : base() { }
 		internal IfcSpace(DatabaseIfc db, IfcSpace s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
-		internal IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
+		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
 		public IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		protected override bool addProduct(IfcProduct product)
 		{
@@ -879,18 +831,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, 0))))
 		{
 			Name = name;
-			IfcBuilding building = this as IfcBuilding;
-			if (building != null)
-				host.addBuilding(building);
-			else
-			{
-				building = host as IfcBuilding;
-				IfcBuildingStorey bs = this as IfcBuildingStorey;
-				if (building != null && bs != null)
-					building.addStorey(bs);
-				else
-					host.AddAggregated(this);
-			}
+			host.AddAggregated(this);
 		}
 		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement)
 		{
@@ -909,7 +850,7 @@ additional types	some additional representation types are given:
 			if (mContainsElements.Count == 0)
 				new IfcRelContainedInSpatialStructure(product,this);
 			else
-				mContainsElements[0].addRelated(product);
+				mContainsElements[0].RelatedElements.Add(product);
 				
 			return true;
 		}
@@ -938,42 +879,14 @@ additional types	some additional representation types are given:
 			}
 		}
 
-		internal bool addBuilding(IfcBuilding s)
-		{
-			for (int icounter = 0; icounter < mIsDecomposedBy.Count; icounter++)
-			{
-				IfcRelAggregates rd = mIsDecomposedBy[icounter];
-				if (rd.Description.EndsWith("Buildings", true, System.Globalization.CultureInfo.CurrentCulture))
-				{
-					rd.addObject(s);
-					return true;
-				}
-				if (rd.mRelatedObjects.Count > 0)
-				{
-					IfcBuilding b = mDatabase[rd.mRelatedObjects[0]] as IfcBuilding;
-					if (b != null)
-					{
-						rd.addObject(s);
-						return true;
-					}
-				}
-			}
-			if (mIsDecomposedBy.Count > 0)
-				mIsDecomposedBy[0].addObject(s);
-			else
-			{
-				new IfcRelAggregates(this, s);
-			}
-			return true;
-		}
+		
 		internal bool addGrid(IfcGrid g)
 		{
 			if (mContainsElements.Count == 0)
 				new IfcRelContainedInSpatialStructure(this);
-			if (mContainsElements[0].mRelatedElements.Contains(g.mIndex))
+			if (mContainsElements[0].RelatedElements.Contains(g))
 				return false;
-			g.mContainedInStructure = mContainsElements[0];
-			mContainsElements[0].mRelatedElements.Add(g.mIndex);
+			ContainsElements[0].RelatedElements.Add(g);
 			return true;
 		}
 		internal List<IfcBuilding> getBuildings()
@@ -1933,6 +1846,9 @@ additional types	some additional representation types are given:
 					mItem = 0;
 				else
 				{
+					IfcRepresentationItem item = Item;
+					if (item != null)
+						item.mStyledByItem = null;
 					mItem = value.mIndex;
 					value.mStyledByItem = this;
 				}
@@ -1961,7 +1877,11 @@ additional types	some additional representation types are given:
 			else
 				mStyles.Add(style.Index);
 		}
-	
+		public IfcStyledItem(IfcRepresentationItem item, IEnumerable<IfcStyleAssignmentSelect> styles) : base(item.mDatabase)
+		{
+			Item = item;
+			mStyles.AddRange(styles.Select(x => x.Index));
+		}
 		internal void addStyle(IfcStyleAssignmentSelect style) { mStyles.Add(style.Index); }
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -2457,7 +2377,7 @@ additional types	some additional representation types are given:
 			}
 		}
 		internal IfcSystem(DatabaseIfc m, string name) : base(m, name) { }
-		internal IfcSystem(IfcSpatialElement e, string name) : base(e.mDatabase, name)
+		public IfcSystem(IfcSpatialElement e, string name) : base(e.mDatabase, name)
 		{
 			if(!(this is IfcZone && e.mDatabase.Release <= ReleaseVersion.IFC2x3))
 				mServicesBuildings = new IfcRelServicesBuildings(this, e) { Name = name };

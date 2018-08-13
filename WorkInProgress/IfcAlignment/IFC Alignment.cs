@@ -513,7 +513,7 @@ namespace GeometryGym.Ifc
 		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
 		{
 			if (e.mContainedInStructure != null)
-				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).addRelated(this);
+				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).RelatedElements.Add(this);
 		}
 	}
 	[Serializable]

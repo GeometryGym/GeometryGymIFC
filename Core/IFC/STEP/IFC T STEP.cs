@@ -199,50 +199,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release);
-			if (mTelephoneNumbers.Count == 0)
-				str += ",$,";
-			else
-			{
-				str += ",('" + mTelephoneNumbers[0];
-				for (int icounter = 1; icounter < mTelephoneNumbers.Count; icounter++)
-					str += "','" + mTelephoneNumbers[icounter];
-				str += "'),";
-			}
-			if (mFacsimileNumbers.Count == 0)
-				str += "$,";
-			else
-			{
-				str += "('" + mFacsimileNumbers[0];
-				for (int icounter = 1; icounter < mFacsimileNumbers.Count; icounter++)
-					str += "','" + mFacsimileNumbers[icounter];
-				str += "'),";
-			}
-
-			str += mPagerNumber;
-			if (mElectronicMailAddresses.Count == 0)
-				str += ",$,";
-			else
-			{
-				str += ",('" + mElectronicMailAddresses[0];
-				for (int icounter = 1; icounter < mElectronicMailAddresses.Count; icounter++)
-					str += "','" + mElectronicMailAddresses[icounter];
-				str += "'),";
-			}
-			str += (mWWWHomePageURL == "$" ? "$" : "'" + mWWWHomePageURL + "'");
-			if (release != ReleaseVersion.IFC2x3)
-			{
-				if (mMessagingIDs.Count == 0)
-					str += ",$";
-				else
-				{
-					str += ",('" + mMessagingIDs[0];
-					for (int icounter = 1; icounter < mMessagingIDs.Count; icounter++)
-						str += "','" + mMessagingIDs[icounter];
-					str += "')";
-				}
-			}
-			return str;
+			return base.BuildStringSTEP(release) + (mTelephoneNumbers.Count == 0 ? ",$" : ",('" + string.Join("','", mTelephoneNumbers.Select(x=> ParserIfc.Encode(x))) + "')") +
+				(mFacsimileNumbers.Count == 0 ? ",$" : ",('" + string.Join("','", mFacsimileNumbers.Select(x => ParserIfc.Encode(x))) + "')") +
+				(string.IsNullOrEmpty(mPagerNumber) ? ",$" : ",'" + ParserIfc.Encode(mPagerNumber) + "'") +
+				(mElectronicMailAddresses.Count == 0 ? ",$" : ",('" + string.Join("','", mElectronicMailAddresses.Select(x => ParserIfc.Encode(x))) + "')") +
+				(string.IsNullOrEmpty(mWWWHomePageURL) ? ",$" : ",'" + ParserIfc.Encode(mWWWHomePageURL) + "'") +
+				(release <= ReleaseVersion.IFC4 ? "" : (mMessagingIDs.Count == 0 ? ",$" : ",('" + string.Join("','", mMessagingIDs.Select(x => ParserIfc.Encode(x))) + "')")); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -255,7 +217,7 @@ namespace GeometryGym.Ifc
 				{
 					string field = lst[icounter];
 					if (field.Length > 2)
-						mTelephoneNumbers.Add(field.Substring(1, field.Length - 2));
+						mTelephoneNumbers.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
 				}
 			}
 			s = ParserSTEP.StripField(str, ref pos, len);
@@ -266,10 +228,10 @@ namespace GeometryGym.Ifc
 				{
 					string field = lst[icounter];
 					if (field.Length > 2)
-						mFacsimileNumbers.Add(field.Substring(1, field.Length - 2));
+						mFacsimileNumbers.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
 				}
 			}
-			mPagerNumber = ParserSTEP.StripString(str, ref pos, len);
+			mPagerNumber = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
 			{
@@ -278,10 +240,10 @@ namespace GeometryGym.Ifc
 				{
 					string field = lst[icounter];
 					if(field.Length> 2)
-						mElectronicMailAddresses.Add(field.Substring(1, field.Length-2));
+						mElectronicMailAddresses.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
 				}
 			}
-			mWWWHomePageURL = ParserSTEP.StripString(str, ref pos, len);
+			mWWWHomePageURL = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			if (release > ReleaseVersion.IFC2x3)
 			{
 				s = ParserSTEP.StripField(str, ref pos, len);
@@ -292,7 +254,7 @@ namespace GeometryGym.Ifc
 					{
 						string field = lst[icounter];
 						if (field.Length > 2)
-							mMessagingIDs.Add(field.Substring(1, field.Length - 2));
+							mMessagingIDs.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
 					}
 				}
 			}

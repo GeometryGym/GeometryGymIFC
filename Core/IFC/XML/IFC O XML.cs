@@ -108,7 +108,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelAssociates ra = mDatabase.ParseXml<IfcRelAssociates>(node as XmlElement);
 						if (ra != null)
-							ra.addRelated(this);
+							ra.RelatedObjects.Add(this);
 					}
 				}
 			}
@@ -254,7 +254,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcActorRole role = mDatabase.ParseXml<IfcActorRole>(cn as XmlElement);
 						if (role != null)
-							AddRole(role);
+							Roles.Add(role);
 					}
 				}
 				else if (string.Compare(name, "Addresses") == 0)
@@ -263,7 +263,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcAddress address = mDatabase.ParseXml<IfcAddress>(cn as XmlElement);
 						if (address != null)
-							AddAddress(address);
+							Addresses.Add(address);
 					}
 				}
 			}

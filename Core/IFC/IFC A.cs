@@ -263,7 +263,7 @@ namespace GeometryGym.Ifc
 			base.detachFromHost();
 			if (mContainedInStructure != null)
 			{
-				mContainedInStructure.mRelatedElements.Remove(mIndex);
+				mContainedInStructure.RelatedElements.Remove(this);
 				mContainedInStructure = null;
 			}
 		}
@@ -623,18 +623,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAsset : IfcGroup
 	{
-		internal string mAssetID;// : IfcIdentifier;
-		internal int mOriginalValue;// : IfcCostValue;
-		internal int mCurrentValue;// : IfcCostValue;
-		internal int mTotalReplacementCost;// : IfcCostValue;
+		internal string mIdentification = "";// ifc2x3 AssetID; : OPTIONAL IfcIdentifier;
+		internal int mOriginalValue;// : OPTIONAL IfcCostValue;
+		internal int mCurrentValue;// : OPTIONAL IfcCostValue;
+		internal int mTotalReplacementCost;// : OPTIONAL IfcCostValue;
 		internal int mOwner;// : IfcActorSelect;
 		internal int mUser;// : IfcActorSelect;
 		internal int mResponsiblePerson;// : IfcPerson;
-		internal string mIncorporationDate = ""; // : IfcDate 
+		internal DateTime mIncorporationDate = DateTime.MinValue; // : IfcDate 
 		internal int mIncorporationDateSS;// : IfcDate Ifc2x3 IfcCalendarDate;
 		internal int mDepreciatedValue;// : IfcCostValue; 
 
-		public string AssetID { get { return (mAssetID == "$" ? "" : ParserIfc.Decode(mAssetID)); } set { mAssetID = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public IfcCostValue OriginalValue { get { return mDatabase[mOriginalValue] as IfcCostValue; } set { mOriginalValue = value.mIndex; } } 
 		public IfcCostValue CurrentValue { get { return mDatabase[mCurrentValue] as IfcCostValue; } set { mCurrentValue = value.mIndex; } } 
 		public IfcCostValue TotalReplacementCost { get { return mDatabase[mTotalReplacementCost] as IfcCostValue; } set { mTotalReplacementCost = value.mIndex; } } 
@@ -648,7 +648,7 @@ namespace GeometryGym.Ifc
 		internal IfcAsset() : base() { }
 		internal IfcAsset(DatabaseIfc db, IfcAsset a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream)
 		{
-			mAssetID = a.mAssetID;
+			mIdentification = a.mIdentification;
 			OriginalValue = db.Factory.Duplicate(a.OriginalValue) as IfcCostValue;
 			CurrentValue = db.Factory.Duplicate(a.CurrentValue) as IfcCostValue;
 			TotalReplacementCost = db.Factory.Duplicate(a.TotalReplacementCost) as IfcCostValue;
@@ -661,7 +661,7 @@ namespace GeometryGym.Ifc
 
 			DepreciatedValue =  db.Factory.Duplicate(a.DepreciatedValue) as IfcCostValue;
 		}
-		internal IfcAsset(DatabaseIfc m, string name) : base(m,name) { }
+		public IfcAsset(DatabaseIfc m, string name) : base(m,name) { }
 	}
 	[Serializable]
 	public partial class IfcAsymmetricIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 IfcIShapeProfileDef 

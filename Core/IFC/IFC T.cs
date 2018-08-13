@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 		//internal string mTaskId; //  : 	IfcIdentifier; IFC4 midentification
 		private string mStatus = "$";// : OPTIONAL IfcLabel;
 		internal string mWorkMethod = "$";// : OPTIONAL IfcLabel;
-		internal bool mIsMilestone;// : BOOLEAN
+		internal bool mIsMilestone = false;// : BOOLEAN
 		internal int mPriority;// : OPTIONAL INTEGER IFC4
 		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum
@@ -125,6 +125,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTask() : base() { }
 		internal IfcTask(DatabaseIfc db, IfcTask t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mStatus = t.mStatus; mWorkMethod = t.mWorkMethod; mIsMilestone = t.mIsMilestone; mPriority = t.mPriority; if (t.mTaskTime > 0) TaskTime = db.Factory.Duplicate(t.TaskTime) as IfcTaskTime; mPredefinedType = t.mPredefinedType; }
+		public IfcTask(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcTaskTime : IfcSchedulingTime //IFC4
@@ -184,28 +185,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTelecomAddress : IfcAddress
 	{
-		internal List<string> mTelephoneNumbers = new List<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
-		internal List<string> mFacsimileNumbers = new List<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
-		internal string mPagerNumber = "$";// :OPTIONAL IfcLabel;
-		internal List<string> mElectronicMailAddresses = new List<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
-		internal string mWWWHomePageURL = "$";// : OPTIONAL IfcLabel;
-		internal List<string> mMessagingIDs = new List<string>();// : OPTIONAL LIST [1:?] OF IfcURIReference //IFC4
+		internal LIST<string> mTelephoneNumbers = new LIST<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
+		internal LIST<string> mFacsimileNumbers = new LIST<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
+		internal string mPagerNumber = "";// :OPTIONAL IfcLabel;
+		internal LIST<string> mElectronicMailAddresses = new LIST<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
+		internal string mWWWHomePageURL = "";// : OPTIONAL IfcLabel;
+		internal LIST<string> mMessagingIDs = new LIST<string>();// : OPTIONAL LIST [1:?] OF IfcURIReference //IFC4
 
-		public ReadOnlyCollection<string> TelephoneNumbers { get { return new ReadOnlyCollection<string>(mTelephoneNumbers.ConvertAll(x => ParserIfc.Decode(x))); } }
-		public ReadOnlyCollection<string> FacsimileNumbers { get { return new ReadOnlyCollection<string>(mFacsimileNumbers.ConvertAll(x => ParserIfc.Decode(x))); } }
-		public string PagerNumber { get { return ParserIfc.Decode(mPagerNumber); } set { mPagerNumber = (value == null ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<string> ElectronicMailAddresses { get { return new ReadOnlyCollection<string>(mElectronicMailAddresses.ConvertAll(x => ParserIfc.Decode(x))); } }
-		public string WWWHomePageURL { get { return ParserIfc.Decode(mWWWHomePageURL); } set { mWWWHomePageURL = (value == null ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<string> MessagingIDs { get { return new ReadOnlyCollection<string>(mMessagingIDs.ConvertAll(x => ParserIfc.Decode(x))); } }
+		public LIST<string> TelephoneNumbers { get { return mTelephoneNumbers; } }
+		public LIST<string> FacsimileNumbers { get { return mFacsimileNumbers; } }
+		public string PagerNumber { get { return mPagerNumber; } set { mPagerNumber = value; } }
+		public LIST<string> ElectronicMailAddresses { get { return mElectronicMailAddresses; } }
+		public string WWWHomePageURL { get { return mWWWHomePageURL; } set { mWWWHomePageURL = value; } }
+		public LIST<string> MessagingIDs { get { return mMessagingIDs; } }
 
 		internal IfcTelecomAddress() : base() { }
 		public IfcTelecomAddress(DatabaseIfc db) : base(db) { }
-		internal IfcTelecomAddress(DatabaseIfc db, IfcTelecomAddress a) : base(db, a) { mTelephoneNumbers = new List<string>(a.mTelephoneNumbers.ToArray()); mFacsimileNumbers = new List<string>(a.mFacsimileNumbers.ToArray()); mPagerNumber = a.mPagerNumber; mElectronicMailAddresses = new List<string>(a.mElectronicMailAddresses.ToArray()); mWWWHomePageURL = a.mWWWHomePageURL; mMessagingIDs.AddRange(a.mMessagingIDs); }
-
-		public void AddTelephoneNumber(string number) { if (!string.IsNullOrEmpty(number)) mTelephoneNumbers.Add(ParserIfc.Encode(number)); }
-		public void AddFacsimileNumber(string number) { if (!string.IsNullOrEmpty(number)) mFacsimileNumbers.Add(ParserIfc.Encode(number)); }
-		public void AddElectronicMailAddress(string address) { if (!string.IsNullOrEmpty(address)) mElectronicMailAddresses.Add(ParserIfc.Encode(address)); }
-		public void AddMessagingID(string id) { if (!string.IsNullOrEmpty(id)) mMessagingIDs.Add(ParserIfc.Encode(id)); }
+		internal IfcTelecomAddress(DatabaseIfc db, IfcTelecomAddress a) : base(db, a) { mTelephoneNumbers.AddRange(a.mTelephoneNumbers); mFacsimileNumbers.AddRange(a.mFacsimileNumbers); mPagerNumber = a.mPagerNumber; mElectronicMailAddresses.AddRange(a.mElectronicMailAddresses); mWWWHomePageURL = a.mWWWHomePageURL; mMessagingIDs.AddRange(a.mMessagingIDs); }
 	}
 	[Serializable]
 	public partial class IfcTendon : IfcReinforcingElement
@@ -900,7 +896,7 @@ namespace GeometryGym.Ifc
 			IfcPropertySetDefinition pset = HasPropertySets.FirstOrDefault(x => string.Compare(x.Name, name, true) == 0);
 			if (pset != null)
 				return pset;
-			return base.FindPropertySet(name);
+			return null;
 		}
 		public IfcProfileProperties ProfileProperties
 		{

@@ -131,22 +131,19 @@ namespace GeometryGym.Ifc
 			string name = mName;
 			if(string.IsNullOrEmpty(name))
 				name = mDatabase.Factory.ApplicationDeveloper;
-			string str = base.BuildStringSTEP(release) + (mIdentification == "$" ? ",$,'" : ",'" + mIdentification + "','") + name + (mDescription == "$" ? "',$," : "','" + mDescription + "',") + (mRoles.Count == 0 ? "$" : "(#" + mRoles[0]);
+			return base.BuildStringSTEP(release) + (mIdentification == "$" ? ",$,'" : ",'" + mIdentification + "','") + name 
+				+ (mDescription == "$" ? "',$," : "','" + mDescription + "',") 
+				+ (mRoles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.Select(x=>x.Index)) + "),")
+				+ (mAddresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.Select(x=>x.Index)) + ")");
 
-			for (int icounter = 1; icounter < mRoles.Count; icounter++)
-				str += ",#" + mRoles;
-			str += (mRoles.Count == 0 ? "" : ")") + (mAddresses.Count == 0 ? ",$" : ",(#" + mAddresses[0]);
-			for (int icounter = 1; icounter < mAddresses.Count; icounter++)
-				str += ",#" + mAddresses[icounter];
-			return str + (mAddresses.Count > 0 ? ")" : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mIdentification = ParserSTEP.StripString(str, ref pos, len);
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			mRoles = ParserSTEP.StripListLink(str, ref pos, len);
-			mAddresses = ParserSTEP.StripListLink(str, ref pos, len);
+			Roles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcActorRole));
+			mAddresses.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAddress));
 		}
 	}
 	//ENTITY IfcOrganizationRelationship; //optional name

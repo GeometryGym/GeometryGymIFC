@@ -130,15 +130,11 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ZDim", mZDim.ToString());
 		}
 	}
-	public partial class IfcBuilding : IfcSpatialStructureElement
+	public partial class IfcBuilding : IfcFacility
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			if (xml.HasAttribute("ElevationOfRefHeight"))
-				ElevationOfRefHeight = double.Parse(xml.Attributes["ElevationOfRefHeight"].Value);
-			if (xml.HasAttribute("ElevationOfTerrain"))
-				ElevationOfTerrain = double.Parse(xml.Attributes["ElevationOfTerrain"].Value);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -149,10 +145,6 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (!double.IsNaN(mElevationOfRefHeight))
-				xml.SetAttribute("ElevationOfRefHeight", mElevationOfRefHeight.ToString());
-			if (!double.IsNaN(mElevationOfTerrain))
-				xml.SetAttribute("ElevationOfTerrain", mElevationOfTerrain.ToString());
 			if (mBuildingAddress > 0)
 				xml.AppendChild(BuildingAddress.GetXML(xml.OwnerDocument, "BuildingAddress", this, processed));
 		}

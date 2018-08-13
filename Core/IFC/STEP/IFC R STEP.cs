@@ -565,19 +565,14 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRelAssignsToActor : IfcRelAssigns
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mRelatedObjects.Count == 0 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingActor)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (mRelatedObjects.Count == 0 ? "" : base.BuildStringSTEP(release) + ",#" + RelatingActor.Index + "," + ParserSTEP.ObjToLinkString(mRelatingActor)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatingActor = ParserSTEP.StripLink(str, ref pos, len); mActingRole = ParserSTEP.StripLink(str, ref pos, len);
+			RelatingActor = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcActor;
+			ActingRole = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcActorRole;
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			IfcActor c = RelatingActor;
-			if (c != null)
-				c.mIsActingUpon.Add(this);
-		}
+		
 	}
 	public partial class IfcRelAssignsToControl : IfcRelAssigns
 	{
@@ -669,38 +664,12 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedObjects.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",(#" + mRelatedObjects[0];
-			if (mRelatedObjects.Count > 200)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.Append(str);
-				for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
-					sb.Append(",#" + mRelatedObjects[icounter]);
-				sb.Append(")");
-				return sb.ToString();
-			}
-			else
-			{
-				for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
-					str += ",#" + mRelatedObjects[icounter];
-				return str + ")";
-			}
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedObjects.ConvertAll(x=>x.Index)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			ReadOnlyCollection<IfcDefinitionSelect> objects = RelatedObjects;
-			for (int icounter = 0; icounter < objects.Count; icounter++)
-			{
-				IfcDefinitionSelect r = objects[icounter];
-				if (r != null)
-					r.Associate(this);
-			}
+			mRelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcDefinitionSelect));
 		}
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -819,29 +788,20 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRelConnectsElements : IfcRelConnects //	SUPERTYPE OF(ONEOF(IfcRelConnectsPathElements, IfcRelConnectsWithRealizingElements))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mRelatingElement == 0 || mRelatedElement == 0 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mConnectionGeometry) + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedElement)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (mRelatingElement == null || mRelatedElement == null ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mConnectionGeometry) + ",#" + mRelatingElement.Index + ",#" + mRelatedElement.Index); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mConnectionGeometry = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatingElement = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedElement = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			IfcElement relating = RelatingElement, related = RelatedElement;
-			if (relating != null)
-				relating.mConnectedTo.Add(this);
-			if (related != null)
-				related.mConnectedFrom.Add(this);
+			ConnectionGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConnectionGeometry;
+			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
+			mRelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
 		}
 	}
 	public partial class IfcRelConnectsPathElements : IfcRelConnectsElements
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mRelatingElement == 0 || mRelatedElement == 0)
+			if (RelatingElement == null || RelatedElement == null)
 				return "";
 			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mRelatingPriorities.ConvertAll(x=> ParserSTEP.DoubleToString(x))) + "),(" +
 				string.Join(",", mRelatedPriorities.ConvertAll(x=>ParserSTEP.DoubleToString(x))) + "),." + mRelatedConnectionType.ToString() + ".,." + mRelatingConnectionType.ToString() + ".";
@@ -970,25 +930,13 @@ namespace GeometryGym.Ifc
 		{
 			if (mRealizingElements.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mRealizingElements[0]);
-			for (int icounter = 1; icounter < mRealizingElements.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mRealizingElements[icounter]);
-			return str + (mConnectionType == "$" ? "),$" : "),'" + mConnectionType + "'");
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRealizingElements.Select(x=>x.Index)) + (mConnectionType == "$" ? "),$" : "),'" + mConnectionType + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRealizingElements = ParserSTEP.StripListLink(str, ref pos, len);
-			mConnectionType = ParserSTEP.StripString(str, ref pos, len); }
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			for (int icounter = 0; icounter < mRealizingElements.Count; icounter++)
-			{
-				IfcElement e = mDatabase[mRealizingElements[icounter]] as IfcElement;
-				if (e != null)
-					e.mIsConnectionRealization.Add(this);
-			}
+			RealizingElements.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcElement));
+			mConnectionType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcRelContainedInSpatialStructure : IfcRelConnects
@@ -997,12 +945,12 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedElements.Count <= 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.ConvertAll(x => x.ToString())) + "),#" + mRelatingStructure.mIndex;
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.ConvertAll(x => x.Index.ToString())) + "),#" + mRelatingStructure.mIndex;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatedElements = ParserSTEP.StripListLink(str, ref pos, len);
+			RelatedElements.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcProduct));
 			mRelatingStructure = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialElement;
 		}
 		internal override void postParseRelate()
@@ -1342,60 +1290,13 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedElements.Count <= 0)
 				return "";
-			string list = "";
-			int icounter;
-			if (mRelatedElements.Count > 100)
-			{
-				StringBuilder sb = new StringBuilder();
-				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-					{
-						sb.Append(",(#" + mRelatedElements[0]);
-						break;
-					}
-				}
-				for (icounter++; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-						sb.Append(",#" + mRelatedElements[icounter]);
-				}
-				list = sb.ToString();
-			}
-			else
-			{
-				for (icounter = 0; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-					{
-						list = ",(#" + mRelatedElements[0];
-						break;
-					}
-
-				}
-				for (icounter++; icounter < mRelatedElements.Count; icounter++)
-				{
-					if (!string.IsNullOrEmpty(mDatabase[mRelatedElements[icounter]].ToString()))
-						list += ",#" + mRelatedElements[icounter];
-				}
-			}
-			return base.BuildStringSTEP(release) + list + "),#" + mRelatingStructure;
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.Select(x => x.Index)) + "),#" + mRelatingStructure;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatedElements = ParserSTEP.StripListLink(str, ref pos, len);
+			RelatedElements.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcProduct));
 			mRelatingStructure = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			IfcSpatialElement se = RelatingStructure;
-			if (se != null)
-				se.mReferencesElements.Add(this);
-			ReadOnlyCollection<IfcProduct> products = RelatedElements;
-			for (int icounter = 0; icounter < products.Count; icounter++)
-				relate(products[icounter] as IfcProduct);
 		}
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]

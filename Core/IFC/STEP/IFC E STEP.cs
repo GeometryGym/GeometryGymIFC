@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse< IfcElectricApplianceTypeEnum >(s.Replace(".", ""), true, out mPredefinedType);
+				Enum.TryParse<IfcElectricApplianceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcElectricApplianceType : IfcFlowTerminalType
@@ -498,7 +498,7 @@ namespace GeometryGym.Ifc
 			{
 				IfcProperty p = mDatabase[i] as IfcProperty;
 				if (p != null)
-					mProperties.Add(p.Name, p);
+					AddProperty(p);	
 			}
 		}
 	}

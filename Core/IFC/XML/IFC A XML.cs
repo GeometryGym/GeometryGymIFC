@@ -29,6 +29,25 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcActor : IfcObject // SUPERTYPE OF(IfcOccupant)
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "TheActor") == 0)
+					TheActor = mDatabase.ParseXml<IfcActorSelect>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (host != mTheActor)
+				xml.AppendChild((TheActor as BaseClassIfc).GetXML(xml.OwnerDocument, "TheActor", this, processed));
+		}
+	}
 	public partial class IfcActorRole : BaseClassIfc, IfcResourceObjectSelect
 	{
 		internal override void ParseXml(XmlElement xml)

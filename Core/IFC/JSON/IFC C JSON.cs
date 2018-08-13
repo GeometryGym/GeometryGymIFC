@@ -305,7 +305,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			base.setAttribute(obj, "UsageName", UsageName);
-			obj["HasProperties"] = new JArray(mHasProperties.ConvertAll(x => mDatabase[x].getJson(this, options)));
+			obj["HasProperties"] = new JArray(mPropertyIndices.Select(x => mDatabase[x].getJson(this, options)));
 		}
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve

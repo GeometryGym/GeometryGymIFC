@@ -107,6 +107,27 @@ namespace GeometryGym.Ifc
 		
 		internal void addVoid(IfcClosedShell shell) { mVoids.Add(shell.mIndex); }
 	}
+	[Serializable]
+	public partial class IfcFacility : IfcSpatialStructureElement
+	{
+		internal override string KeyWord { get { if(mDatabase != null && mDatabase.Release >= ReleaseVersion.IFC4X2) return base.KeyWord; return "IfcBuilding"; } }
+		internal double mElevationOfRefHeight = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		internal double mElevationOfTerrain = double.NaN;// : OPTIONAL IfcLengthMeasure;
+
+		public double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set { mElevationOfRefHeight = value; } }
+		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set { mElevationOfTerrain = value; } }
+
+		internal IfcFacility() : base() { }
+		internal IfcFacility(DatabaseIfc db, IfcFacility f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream)
+		{
+			mElevationOfRefHeight = f.mElevationOfRefHeight;
+			mElevationOfTerrain = f.mElevationOfTerrain;
+		}
+		public IfcFacility(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
+		internal IfcFacility(IfcSpatialStructureElement host, string name) { }
+		public IfcFacility(IfcFacility host, string name) : base(host, name) {  }
+		public IfcFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
 	//ENTITY IfcFailureConnectionCondition
 	[Serializable]
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
@@ -492,6 +513,7 @@ namespace GeometryGym.Ifc
 		internal IfcFootingType() : base() { }
 		internal IfcFootingType(DatabaseIfc db, IfcFootingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db,t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcFootingType(DatabaseIfc m, string name, IfcFootingTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcFootingType(string name, IfcMaterialProfileSet mps, IfcFootingTypeEnum type) : base(mps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mps; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcFuelProperties
@@ -516,7 +538,7 @@ namespace GeometryGym.Ifc
 		internal IfcFurnitureTypeEnum mPredefinedType = IfcFurnitureTypeEnum.NOTDEFINED;//: OPTIONAL IfcFurnitureTypeEnum;
 		internal IfcFurniture() : base() { }
 		internal IfcFurniture(DatabaseIfc db, IfcFurniture f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
-		internal IfcFurniture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcFurniture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]

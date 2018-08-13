@@ -342,7 +342,12 @@ namespace GeometryGym.Ifc
 							IfcGeometricCurveSet curveSet = gri as IfcGeometricCurveSet;
 							if (curveSet != null)
 							{
-								axis.ForEach(x => curveSet.Elements.Add(x.AxisCurve));
+								foreach(IfcGridAxis a in axis)
+								{
+									IfcCurve c = a.AxisCurve;
+									if (c != null && !curveSet.Elements.Contains(c))
+										curveSet.Elements.Add(c);	
+								}
 								return;
 							}
 						}
@@ -401,7 +406,7 @@ namespace GeometryGym.Ifc
 			base.detachFromHost();
 			if (mContainedInStructure != null)
 			{
-				mContainedInStructure.mRelatedElements.Remove(mIndex);
+				mContainedInStructure.RelatedElements.Remove(this);
 				mContainedInStructure = null;
 			}
 		}
@@ -456,7 +461,15 @@ namespace GeometryGym.Ifc
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; new IfcRelAssignsToGroup(this); }
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
-		internal void assign(IfcObjectDefinition o) { mIsGroupedBy[0].AddRelated(o); }
+		public void Assign(IfcObjectDefinition related)
+		{
+			if (mIsGroupedBy.Count == 0)
+			{
+				new IfcRelAssignsToGroup(related, this);
+			}
+			else
+				mIsGroupedBy[0].AddRelated(related);
+		}
 
 		protected override List<T> Extract<T>(Type type)
 		{

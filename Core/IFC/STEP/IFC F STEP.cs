@@ -92,6 +92,16 @@ namespace GeometryGym.Ifc
 			mVoids = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
+	public partial class IfcFacility : IfcSpatialStructureElement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfRefHeight) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfTerrain); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mElevationOfRefHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mElevationOfTerrain = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	//ENTITY IfcFailureConnectionCondition
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
 	{

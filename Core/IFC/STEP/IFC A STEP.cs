@@ -428,15 +428,15 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) +",'" + mAssetID + "'," + ParserSTEP.LinkToString(mOriginalValue) + "," +ParserSTEP.LinkToString(mCurrentValue) + "," + 
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mIdentification) ? ",$," : ",'" + ParserIfc.Encode(mIdentification) + "',") + ParserSTEP.LinkToString(mOriginalValue) + "," +ParserSTEP.LinkToString(mCurrentValue) + "," + 
 				ParserSTEP.LinkToString(mTotalReplacementCost) + "," +ParserSTEP.LinkToString(mOwner) + "," +
 				ParserSTEP.LinkToString(mUser) + "," +ParserSTEP.LinkToString(mResponsiblePerson) + "," +
-				(mDatabase.Release == ReleaseVersion.IFC2x3 ? ParserSTEP.LinkToString(mIncorporationDateSS) : mIncorporationDate ) + "," +ParserSTEP.LinkToString(mDepreciatedValue);
+				(mDatabase.Release == ReleaseVersion.IFC2x3 ? ParserSTEP.LinkToString(mIncorporationDateSS) : IfcDate.STEPAttribute(mIncorporationDate)) + "," +ParserSTEP.LinkToString(mDepreciatedValue);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mAssetID = ParserSTEP.StripString(str, ref pos, len);
+			mIdentification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mOriginalValue = ParserSTEP.StripLink(str, ref pos, len);
 			mCurrentValue = ParserSTEP.StripLink(str, ref pos, len);
 			mTotalReplacementCost = ParserSTEP.StripLink(str, ref pos, len);
@@ -446,7 +446,7 @@ namespace GeometryGym.Ifc
 			if (release == ReleaseVersion.IFC2x3)
 				mIncorporationDateSS = ParserSTEP.StripLink(str, ref pos, len);
 			else
-				mIncorporationDate = ParserSTEP.StripString(str, ref pos, len);
+				mIncorporationDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
 			mDepreciatedValue = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}

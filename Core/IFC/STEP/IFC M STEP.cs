@@ -299,17 +299,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return (release >= ReleaseVersion.IFC4  ? base.BuildStringSTEP(release) : "" ) + "," + ParserSTEP.LinkToString(mMaterial);
+			return (release >= ReleaseVersion.IFC4  ? base.BuildStringSTEP(release) : "" ) + ",#" + mMaterial.Index;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mMaterial = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			Material.AddProperties(this);
+			Material = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterialDefinition;
 		}
 	}
 	public partial class IfcMaterialRelationship : IfcResourceLevelRelationship //IFC4

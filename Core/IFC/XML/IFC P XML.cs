@@ -313,7 +313,7 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "AddressLines") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
-						AddAddressLine(cn.InnerText);
+						AddressLines.Add(cn.InnerText);
 				}
 			}
 			if (xml.HasAttribute("PostalBox"))
@@ -707,7 +707,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelAssociates ra = mDatabase.ParseXml<IfcRelAssociates>(node as XmlElement);
                         if (ra != null)
-                            Associate(ra);
+							HasAssociations.Add(ra);
 					}
 				}
 			}

@@ -111,7 +111,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcMaterialProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddProperties(x));
+			HasProperties.AddRange(mDatabase.extractJArray<IfcMaterialProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
