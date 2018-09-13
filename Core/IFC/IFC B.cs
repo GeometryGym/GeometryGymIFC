@@ -477,18 +477,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBuilding : IfcFacility
 	{
-		internal int mBuildingAddress;// : OPTIONAL IfcPostalAddress; 
-		public IfcPostalAddress BuildingAddress { get { return mDatabase[mBuildingAddress] as IfcPostalAddress; } set { mBuildingAddress = value.mIndex; } }
+		internal IfcPostalAddress mBuildingAddress = null;// : OPTIONAL IfcPostalAddress; 
+		public IfcPostalAddress BuildingAddress { get { return mBuildingAddress; } set { mBuildingAddress = value; } }
 
 		internal IfcBuilding() : base() { }
 		internal IfcBuilding(DatabaseIfc db, IfcBuilding b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream)
 		{
-			if (b.mBuildingAddress > 0)
+			if (b.mBuildingAddress != null)
 				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress) as IfcPostalAddress;
 		}
 		public IfcBuilding(DatabaseIfc db, string name) : base(db, name) { setDefaultAddress();  }
-		public IfcBuilding(IfcFacility host, string name) : base(host, name) { }
-		public IfcBuilding(IfcSite host, string name) : base(host, name) { setDefaultAddress(); }
+		public IfcBuilding(IfcSpatialStructureElement host, string name) : base(host, name) { }
 		public IfcBuilding(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { setDefaultAddress(); }
 		
 
@@ -587,40 +586,13 @@ namespace GeometryGym.Ifc
 		protected IfcBuildingElementType(DatabaseIfc db, IfcBuildingElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 	}
 	[Serializable]
-	public partial class IfcBuildingStorey : IfcSpatialStructureElement
+	public partial class IfcBuildingStorey : IfcFacilityPart
 	{ 
-		internal double mElevation = double.NaN;// : OPTIONAL IfcLengthMeasure; 
-		public double Elevation
-		{
-			get { return mElevation; }
-			set
-			{
-				mElevation = Math.Abs(value) < mDatabase.Tolerance ? 0 : value;
-#if(RHINO)
-				try
-				{
-					int i = Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Find(Name);
-					if (i >= 0)
-						Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Delete(i);
-					Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Add(Name, new Rhino.Geometry.Plane(new Rhino.Geometry.Point3d(0, 0, mElevation), Rhino.Geometry.Vector3d.XAxis, Rhino.Geometry.Vector3d.YAxis));
-				}
-				catch (Exception) { }
-#endif
-			}
-		}
-
 		public IfcBuildingStorey() : base() { }
-		internal IfcBuildingStorey(DatabaseIfc db, IfcBuildingStorey s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mElevation = s.mElevation; }
-		public IfcBuildingStorey(IfcBuilding host, string name, double elevation) : this(host, elevation, name) { host.addStorey(this); }
-		public IfcBuildingStorey(IfcBuildingStorey host, string name, double elevation) : this(host, elevation, name) { host.addStorey(this); }
-		private IfcBuildingStorey(IfcSpatialElement host, double elevation, string name)
-			: base(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
-		{
-			Name = name;
-			Elevation = elevation;
-		}
-		public IfcBuildingStorey(IfcSpatialStructureElement host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = name; }
-		internal bool addStorey(IfcBuildingStorey s) { return base.AddAggregated(s); }
+		internal IfcBuildingStorey(DatabaseIfc db, IfcBuildingStorey s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
+		public IfcBuildingStorey(IfcFacility host, string name, double elevation) : base(host, name, elevation) {  }
+		public IfcBuildingStorey(IfcFacilityPart host, string name, double elevation) : base(host, name, elevation) {  }
+		public IfcBuildingStorey(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, name, p, r) { }
 	}
 	[Serializable]
 	public partial class IfcBuildingSystem : IfcSystem //IFC4

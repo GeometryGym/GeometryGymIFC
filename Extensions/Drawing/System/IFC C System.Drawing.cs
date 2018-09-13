@@ -6,10 +6,10 @@ using System.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial interface IfcColour : IBaseClassIfc { Color Colour { get; } }// = SELECT (IfcColourSpecification ,IfcPreDefinedColour); 
+	public partial interface IfcColour : IBaseClassIfc { Color Color(); }// = SELECT (IfcColourSpecification ,IfcPreDefinedColour); 
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{
-		public override Color Colour { get { return Color.FromArgb((int)(mRed * 255), (int)(mGreen * 255), (int)(mBlue * 255)); } }
+		public override Color Color() { return System.Drawing.Color.FromArgb((int)(mRed * 255), (int)(mGreen * 255), (int)(mBlue * 255)); }
 
 		public IfcColourRgb(DatabaseIfc db, Color col) : base(db) { Name = col.Name; mRed = col.R / 255.0; mGreen = col.G / 255.0; mBlue = col.B / 255.0; }
 	}
@@ -24,6 +24,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcColourSpecification : IfcPresentationItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcColourRgb)
 	{
-		public abstract Color Colour { get; }
+		public abstract Color Color();
 	}
+
 }

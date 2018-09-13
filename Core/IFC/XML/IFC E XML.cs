@@ -259,9 +259,10 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
 			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences");
-			xml.AppendChild(element);
 			foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
 				element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
+			if(element.HasChildNodes)
+				xml.AppendChild(element);
 			element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
 			foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 			{

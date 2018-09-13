@@ -468,11 +468,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcProcedure : IfcProcess
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mProcedureID + "',." + mProcedureType.ToString() + (mUserDefinedProcedureType == "$" ? ".,$" : ".,'" + mUserDefinedProcedureType + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mDatabase.Release < ReleaseVersion.IFC4 ? ",'" + ParserIfc.Encode(mIdentification) + "'" : "") + ",." + mProcedureType.ToString() + (mUserDefinedProcedureType == "$" ? ".,$" : ".,'" + mUserDefinedProcedureType + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mProcedureID = ParserSTEP.StripString(str, ref pos, len);
+			if(release < ReleaseVersion.IFC4)
+				mIdentification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 
 			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mProcedureType);
 			mUserDefinedProcedureType = ParserSTEP.StripString(str, ref pos, len);
@@ -489,14 +490,14 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcProcess : IfcObject // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release != ReleaseVersion.IFC2x3 ? (mIdentification == "$" ? ",$," : ",'" + mIdentification + "',") + (mLongDescription == "$" ? "$" : "'" + mLongDescription + "'") : ""); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release > ReleaseVersion.IFC2x3 ? (string.IsNullOrEmpty(mIdentification) ? ",$," : ",'" + ParserIfc.Encode(mIdentification) + "',") + (string.IsNullOrEmpty(mLongDescription) ? "$" : "'" + ParserIfc.Encode(mLongDescription) + "'") : ""); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release != ReleaseVersion.IFC2x3)
+			if (release > ReleaseVersion.IFC2x3)
 			{
-				mIdentification = ParserSTEP.StripString(str, ref pos, len);
-				mLongDescription = ParserSTEP.StripString(str, ref pos, len);
+				mIdentification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mLongDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			}
 		}
 	}
@@ -813,10 +814,15 @@ namespace GeometryGym.Ifc
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
-			foreach (IfcPropertyTemplate template in HasPropertyTemplates.Values)
+			foreach (int i in mHasPropertyTemplateIndices)
 			{
-				mHasPropertyTemplates[template.Name] = template;
-				template.mPartOfPsetTemplate.Add(this);
+				try
+				{
+					IfcPropertyTemplate template = mDatabase[i] as IfcPropertyTemplate;
+					mHasPropertyTemplates[template.Name] = template;
+					template.mPartOfPsetTemplate.Add(this);
+				}
+				catch(Exception) { }
 			}
 		}
 	}

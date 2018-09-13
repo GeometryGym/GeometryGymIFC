@@ -57,7 +57,25 @@ namespace GeometryGym.Ifc
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
 		internal virtual void postParseRelate() { }
 
-		public List<T> Extract<T>() where T : IBaseClassIfc { return Extract<T>(typeof(T)); }
+		public List<T> Extract<T>() where T : IBaseClassIfc
+		{
+			List<T> extracted = Extract<T>(typeof(T));
+			HashSet<string> rootIds = new HashSet<string>();
+			List<T> result = new List<T>(extracted.Count);
+			foreach(T t in extracted)
+			{
+				if(t is IfcRoot)
+				{
+					IfcRoot root = (IfcRoot)(IBaseClassIfc)t;
+					string globalId = root.GlobalId;
+					if (rootIds.Contains(globalId))
+						continue;
+					rootIds.Add(globalId);
+				}
+				result.Add(t);
+			}
+			return result;
+		}
 		protected virtual List<T> Extract<T>(Type type) where T : IBaseClassIfc
 		{
 			List<T> result = new List<T>();
@@ -87,7 +105,7 @@ namespace GeometryGym.Ifc
 			revised.mIndex = mIndex;
 			mDatabase[mIndex] = revised;
 		}
-		public virtual bool Destruct(bool children)
+		public virtual bool Dispose(bool children)
 		{
 			if (mDatabase == null)
 				return true;
@@ -96,18 +114,27 @@ namespace GeometryGym.Ifc
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 
+		internal static Type GetType(string className)
+		{
+			Type type = null;
+			string name = className;
+			string[] fields = className.Split(".".ToCharArray());
+			if (fields != null && fields.Length > 0)
+				name = fields[0];
+			if (!mTypes.TryGetValue(name, out type))
+			{
+				type = Type.GetType("GeometryGym.Ifc." + name, false, true);
+				if (type != null)
+					mTypes.TryAdd(name, type);
+			}
+			return type;	
+		}
 		public static BaseClassIfc Construct(string className)
 		{
 			ConstructorInfo constructor = null;
 			if (!mConstructors.TryGetValue(className, out constructor))
 			{
-				Type type = null;
-				if (!mTypes.TryGetValue(className, out type))
-				{
-					type = Type.GetType("GeometryGym.Ifc." + className, false, true);
-					if (type != null)
-						mTypes.TryAdd(className, type);
-				}
+				Type type = GetType(className);
 				if (type == null)
 					return null;
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
@@ -192,6 +219,6 @@ namespace GeometryGym.Ifc
 			
 		}
 	}
-	public partial interface IBaseClassIfc { int Index { get; }  DatabaseIfc Database { get; } }
+	public partial interface IBaseClassIfc : ISTEPEntity { DatabaseIfc Database { get; } }
 	public interface NamedObjectIfc : IBaseClassIfc { string Name { get; } } // GG interface
 }

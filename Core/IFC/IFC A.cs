@@ -386,8 +386,8 @@ namespace GeometryGym.Ifc
 		internal int mUnitBasis;// : OPTIONAL IfcMeasureWithUnit;
 		internal DateTime mApplicableDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
 		internal DateTime mFixedUntilDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
-		private int mSSApplicableDate = 0;
-		private int mSSFixedUntilDate = 0;
+		private IfcDateTimeSelect mSSApplicableDate = null;
+		private IfcDateTimeSelect mSSFixedUntilDate = null;
 		internal string mCategory = "$";// : OPTIONAL IfcLabel; IFC4
 		internal string mCondition = "$";// : OPTIONAL IfcLabel; IFC4
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
@@ -447,20 +447,20 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		public override bool Destruct(bool children)
+		public override bool Dispose(bool children)
 		{
 			if (children)
 			{
 				if (mAppliedValueIndex > 0)
-					mDatabase[mAppliedValueIndex].Destruct(children);
+					mDatabase[mAppliedValueIndex].Dispose(children);
 				for (int icounter = 0; icounter < mComponents.Count; icounter++)
 				{
 					BaseClassIfc bc = mDatabase[mComponents[icounter]];
 					if (bc != null)
-						bc.Destruct(true);
+						bc.Dispose(true);
 				}
 			}
-			return base.Destruct(children);
+			return base.Dispose(children);
 		}
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
@@ -470,11 +470,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECEATED IFC4
 	{
-		internal int mComponentOfTotal;// : IfcAppliedValue;
-		internal List<int> mComponents = new List<int>();// : SET [1:?] OF IfcAppliedValue;
+		internal IfcAppliedValue mComponentOfTotal;// : IfcAppliedValue;
+		internal SET<IfcAppliedValue> mComponents = new SET<IfcAppliedValue>();// : SET [1:?] OF IfcAppliedValue;
 		internal IfcArithmeticOperatorEnum mArithmeticOperator;// : IfcArithmeticOperatorEnum;
 		internal string mName;// : OPTIONAL IfcLabel;
 		internal string mDescription;// : OPTIONAL IfcText 
+
+		public IfcAppliedValue ComponentOfTotal { get { return mComponentOfTotal; } set { mComponentOfTotal = value; } }
+		public SET<IfcAppliedValue> Components { get { return mComponents; } set{ mComponents = value; } } 
+
 		internal IfcAppliedValueRelationship() : base() { }
 		//internal IfcAppliedValueRelationship(IfcAppliedValueRelationship o) : base()
 		//{

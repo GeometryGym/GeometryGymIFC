@@ -7,7 +7,7 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
 	{
-		public Color Colour { get { return Color.Empty; } }
+		public Color Color() { return System.Drawing.Color.Empty; }
 	}
 	public partial class IfcPresentationLayerAssignment : BaseClassIfc //SUPERTYPE OF	(IfcPresentationLayerWithStyle);
 	{
@@ -27,7 +27,7 @@ namespace GeometryGym.Ifc
 					{
 						List<IfcSurfaceStyleShading> sss = ss.Extract<IfcSurfaceStyleShading>();
 						if (sss.Count > 0)
-							return sss[0].SurfaceColour.Colour;
+							return sss[0].SurfaceColour.Color();
 					}
 				}
 				foreach (IfcPresentationStyle ps in styles)
@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcColour col = cs.CurveColour;
 						if (col != null)
-							return col.Colour;
+							return col.Color();
 					}
 				}
 				return base.LayerColour;

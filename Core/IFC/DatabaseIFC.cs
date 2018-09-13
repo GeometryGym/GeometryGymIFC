@@ -147,7 +147,12 @@ namespace GeometryGym.Ifc
 					{
 						IfcUnitAssignment units = context.UnitsInContext;
 						if (units != null)
-							mModelSIScale = units.ScaleSI(IfcUnitEnum.LENGTHUNIT); 
+						{
+
+							IfcNamedUnit namedUnit = units[IfcUnitEnum.LENGTHUNIT];
+							if(namedUnit != null)
+								mModelSIScale = namedUnit.SIFactor;
+						}
 					}
 					if (double.IsNaN(mModelSIScale))
 						return 1;
@@ -183,7 +188,7 @@ namespace GeometryGym.Ifc
 			hdr += "/* authorization */ 'None');\r\n\r\n";
 			string version = "IFC4";
 			if (mRelease == ReleaseVersion.IFC2x3)
-				version = "IFC2x3";
+				version = "IFC2X3";
 			else if (mRelease == ReleaseVersion.IFC4X1)
 				version = "IFC4X1";
 			else if (mRelease == ReleaseVersion.IFC4X2)
@@ -454,7 +459,11 @@ namespace GeometryGym.Ifc
 
 			ConcurrentDictionary<int, BaseClassIfc> dictionary = new ConcurrentDictionary<int, BaseClassIfc>();
 			dictionary[0] = null;
+#if (MULTITHREAD)
 			ConcurrentBag<ConstructorClass> bag = new ConcurrentBag<ConstructorClass>();
+#else
+			List<ConstructorClass> bag = new List<ConstructorClass>();
+#endif
 			foreach(string str in revised)
 			{
 				int ifcID = 0;
@@ -471,9 +480,8 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-
 			ReleaseVersion release = Release;
-#if (qMULTITHREAD)
+#if (qsMULTITHREAD)
 			ConcurrentBag<string> errors = new ConcurrentBag<string>();
 			Parallel.ForEach(bag, new ParallelOptions { MaxDegreeOfParallelism = 4 }, obj =>
 			{
@@ -513,6 +521,8 @@ namespace GeometryGym.Ifc
 			{
 				if(ts.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
 					mRelease = ReleaseVersion.IFC4X1;
+				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
+					mRelease = ReleaseVersion.IFC4X2;
 				else
 					mRelease = ReleaseVersion.IFC4;
 				if (mModelView == ModelView.Ifc2x3Coordination || mModelView == ModelView.Ifc2x3NotAssigned)
@@ -712,7 +722,7 @@ namespace GeometryGym.Ifc
 			return result; 
 		}
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping(); 
-		internal BaseClassIfc Duplicate(BaseClassIfc entity) { return Duplicate(entity, true); }
+		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, true); }
 		
 		internal BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
 		{
@@ -808,6 +818,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement3D mRootPlacementPlane = null;
 		internal IfcAxis2Placement3D mPlacementPlaneXY;
 		internal IfcAxis2Placement2D m2DPlaceOrigin;
+		internal IfcCartesianTransformationOperator3D mTransformationPlaneXY;
 
 		public IfcUnit LengthUnit(IfcUnitAssignment.Length length)
 		{
@@ -833,6 +844,28 @@ namespace GeometryGym.Ifc
 		public IfcSIUnit SIVolume { get { if(mSIVolume == null) mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE); return mSIVolume; } }
 
 		internal IfcDirection mXAxis, mYAxis, mZAxis, mNegXAxis, mNegYAxis, mNegZAxis;
+
+		public IfcDirection Direction(double x, double y, double z)
+		{
+			if (double.IsNaN(z))
+				return new IfcDirection(mDatabase, x, y);
+			double length = Math.Sqrt(x * x + y * y + z * z), tol = mDatabase.Tolerance;
+			double dx = x / length, dy = y / length, dz = z / length;
+			if (Math.Abs(dx - 1) < tol)
+				return XAxis;
+			if (Math.Abs(dy - 1) < tol)
+				return YAxis;
+			if (Math.Abs(dz - 1) < tol)
+				return ZAxis;
+			if (Math.Abs(dx + 1) < tol)
+				return XAxisNegative;
+			if (Math.Abs(dy + 1) < tol)
+				return YAxisNegative;
+			if (Math.Abs(dz + 1) < tol)
+				return ZAxisNegative;
+			return new IfcDirection(mDatabase, x, y);
+
+		}
 
 		public IfcDirection XAxis { get { if (mXAxis == null) mXAxis = new IfcDirection(mDatabase, 1, 0, 0); return mXAxis; } }
 		public IfcDirection YAxis { get { if (mYAxis == null) mYAxis = new IfcDirection(mDatabase, 0, 1, 0); return mYAxis; } }
@@ -994,7 +1027,7 @@ namespace GeometryGym.Ifc
 			{
 				if (oh.isDuplicate(ownerHistory))
 				{
-					ownerHistory.Destruct(false);
+					ownerHistory.Dispose(false);
 					return oh;
 				}
 			}
@@ -1145,6 +1178,15 @@ namespace GeometryGym.Ifc
 				if (mPlacementPlaneXY == null)
 					mPlacementPlaneXY = new IfcAxis2Placement3D(Origin);
 				return mPlacementPlaneXY;
+			}
+		}
+		public IfcCartesianTransformationOperator3D XYPlaneTransformation
+		{
+			get
+			{
+				if (mTransformationPlaneXY == null)
+					mTransformationPlaneXY = new IfcCartesianTransformationOperator3D(mDatabase);
+				return mTransformationPlaneXY;
 			}
 		}
 		public IfcAxis2Placement2D Origin2dPlace

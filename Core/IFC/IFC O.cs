@@ -95,30 +95,6 @@ namespace GeometryGym.Ifc
 				result.AddRange(rdp.Extract<T>());
 			return result;
 		}
-		internal void IsolateObject(string filename)
-		{
-			DatabaseIfc db = new DatabaseIfc(mDatabase);
-			IfcSpatialElement spatial = this as IfcSpatialElement;
-			IfcElementAssembly eas = this as IfcElementAssembly;
-			db.Factory.mDuplicateMapping.Clear();
-			db.Factory.Duplicate(this, true);
-			IfcProject project = db.Project;
-			if (project != null)
-			{
-				IfcSite site = project.RootElement as IfcSite;
-				if (site != null)
-				{
-					IfcProductRepresentation pr = site.Representation;
-					if (pr != null)
-					{
-						site.Representation = null;
-						pr.Destruct(true);
-					}
-				}
-			}
-			db.WriteFile(filename);
-		}
-
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			for (int icounter = 0; icounter < mIsDefinedBy.Count; icounter++)
@@ -136,6 +112,10 @@ namespace GeometryGym.Ifc
 					return property;
 			}
 			return (mIsTypedBy != null ? mIsTypedBy.RelatingType.FindProperty(name) : null);
+		}
+		public override void RemoveProperty(IfcProperty property)
+		{
+			removeProperty(property, IsDefinedBy);	
 		}
 		public override IfcPropertySetDefinition FindPropertySet(string name)
 		{
@@ -197,7 +177,7 @@ namespace GeometryGym.Ifc
 			foreach(IfcRelAssigns assigns in o.mHasAssignments)
 			{
 				IfcRelAssigns dup = db.Factory.Duplicate(assigns, ownerHistory, false) as IfcRelAssigns;
-				dup.AddRelated(this);
+				dup.RelatedObjects.Add(this);
 			}
 			if (o.mDecomposes != null)
 				(db.Factory.Duplicate(o.mDecomposes, ownerHistory, false) as IfcRelAggregates).addObject(this);
@@ -230,14 +210,14 @@ namespace GeometryGym.Ifc
 			{
 				foreach (IfcRelAssigns r in e.NewItems)
 				{
-					if (!r.mRelatedObjects.Contains(this.mIndex))
-						r.mRelatedObjects.Add(this.mIndex);
+					if (!r.mRelatedObjects.Contains(this))
+						r.RelatedObjects.Add(this);
 				}
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcRelAssigns r in e.OldItems)
-					r.mRelatedObjects.Remove(this.mIndex);
+					r.RelatedObjects.Remove(this);
 			}
 		}
 		private void mIsNestedBy_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -439,7 +419,36 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 		public abstract IfcProperty FindProperty(string name);
-
+		public abstract void RemoveProperty(IfcProperty property);
+		protected void removeProperty(IfcProperty property, IEnumerable<IfcRelDefinesByProperties> definesByProperties)
+		{
+			Dictionary<string, IfcPropertySet> propertySets = new Dictionary<string, IfcPropertySet>();
+			foreach (IfcPropertySet pset in property.PartOfPset.OfType<IfcPropertySet>())
+				propertySets.Add(pset.GlobalId, pset);
+			IfcPropertySet ps = null;
+			foreach (IfcRelDefinesByProperties rdp in definesByProperties.ToList())
+			{
+				IfcPropertySet propertySet = rdp.RelatingPropertyDefinition as IfcPropertySet;
+				if (propertySet == null)
+					continue;
+				if (propertySets.TryGetValue(propertySet.GlobalId, out ps))
+				{
+					if (rdp.RelatedObjects.Count == 1 && propertySet.DefinesType.Count == 0)
+					{
+						if (propertySet.HasProperties.Count == 1)
+							rdp.Dispose(true);
+						else
+							property.Dispose(true);
+					}
+					else
+					{
+						rdp.RelatedObjects.Remove(this);
+						new IfcPropertySet(this, propertySet.Name, propertySet.HasProperties.Values.Where(x => x != property));
+					}
+					return;
+				}
+			}
+		}
 		public abstract IfcPropertySetDefinition FindPropertySet(string name);
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -523,7 +532,7 @@ namespace GeometryGym.Ifc
 		public IfcObjective(DatabaseIfc db, string name, IfcConstraintEnum constraint, IfcObjectiveEnum qualifier)
 		 	: base(db, name, constraint) { mObjectiveQualifier = qualifier; }
 
-		public override bool Destruct(bool children)
+		public override bool Dispose(bool children)
 		{
 			if (children)
 			{
@@ -531,10 +540,10 @@ namespace GeometryGym.Ifc
 				{
 					BaseClassIfc bc = mDatabase[mBenchmarkValues[icounter]];
 					if (bc != null)
-						bc.Destruct(true);
+						bc.Dispose(true);
 				}
 			}
-			return base.Destruct(children);
+			return base.Dispose(children);
 		}
 
 		public void AddBenchmark(IfcConstraint benchmark) { mBenchmarkValues.Add(benchmark.mIndex); }

@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace GeometryGym.STEP
 {
 	[Serializable]
-	public class SET<T> : ObservableCollection<T>
+	public class SET<T> : ObservableCollection<T> where T : ISTEPEntity
 	{
 		public SET() : base() { }
 		public SET(T item) : base() { Add(item); }

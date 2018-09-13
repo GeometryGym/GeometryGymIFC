@@ -127,8 +127,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddRelated(x));
-			JToken token = obj.GetValue("RelatedObjectsType", StringComparison.InvariantCultureIgnoreCase);
+			RelatedObjects.AddRange(mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));			JToken token = obj.GetValue("RelatedObjectsType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 			{
 				if (!Enum.TryParse<IfcObjectTypeEnum>(token.Value<string>(), true, out mRelatedObjectsType))
@@ -139,7 +138,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			JArray array = new JArray();
-			if (!mRelatedObjects.Contains(host.mIndex))
+			if (!RelatedObjects.Contains(host))
 			{
 				foreach (IfcObjectDefinition od in RelatedObjects)
 					array.Add(od.getJson(this, options));
@@ -159,8 +158,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingGroup)
-				obj["RelatingGroup"] = mDatabase[mRelatingGroup].getJson(this, options);
+			if (host != mRelatingGroup)
+				obj["RelatingGroup"] = mRelatingGroup.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssignsToGroupByFactor : IfcRelAssignsToGroup //IFC4
@@ -224,8 +223,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingClassification)
-				obj["RelatingClassification"] = mDatabase[mRelatingClassification].getJson(this, options);
+			if (host != mRelatingClassification)
+				obj["RelatingClassification"] = mRelatingClassification.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates
@@ -510,7 +509,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mRelatingObject != host.mIndex)
+			if (mRelatingObject != host)
 				obj["RelatingObject"] = RelatingObject.getJson(this, options);
 			ReadOnlyCollection<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			JArray array = new JArray();

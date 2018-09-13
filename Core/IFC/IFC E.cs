@@ -254,7 +254,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
 		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
-		internal List<IfcRelVoidsElement> mHasOpenings = new List<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
+		internal SET<IfcRelVoidsElement> mHasOpenings = new SET<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
 		internal SET<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new SET<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
 		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedFrom = new SET<IfcRelConnectsElements>();//	 : 	SET OF IfcRelConnectsElements FOR RelatedElement;
@@ -262,7 +262,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		internal List<IfcRelCoversBldgElements> mHasCoverings = new List<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
-		internal List<IfcRelConnectsPortToElement> mHasPorts = new List<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; DEL IFC4
+		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
 
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMember = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
@@ -273,7 +273,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
-		public ReadOnlyCollection<IfcRelVoidsElement> HasOpenings { get { return new ReadOnlyCollection<IfcRelVoidsElement>(mHasOpenings); } }
+		public SET<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
 		public SET<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
 		public ReadOnlyCollection<IfcRelSpaceBoundary> ProvidesBoundaries { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>(mProvidesBoundaries); } }
 		public SET<IfcRelConnectsElements> ConnectedFrom { get { return mConnectedFrom; } }
@@ -326,7 +326,10 @@ namespace GeometryGym.Ifc
 				rv.RelatingBuildingElement = this;
 			}
 			if (e.mContainedInStructure != null)
-				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).RelatedElements.Add(this);
+			{
+				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure;
+				rcss.RelatedElements.Add(this);
+			}
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
 			{
 				IfcRelConnectsStructuralActivity rc = db.Factory.Duplicate(rcss) as IfcRelConnectsStructuralActivity;
@@ -564,17 +567,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			else
 			{
-				string s = "Analytic Elements";
-				foreach (IfcRelAssignsToProduct ra in mReferencedBy)
+				if (mReferencedBy.Count > 0)
+					mReferencedBy[0].RelatedObjects.Add(m);
+				else
 				{
-					if (string.Compare(ra.Name, s, true) == 0)
-					{
-						if (!ra.mRelatedObjects.Contains(m.mIndex))
-							ra.mRelatedObjects.Add(m.mIndex);
-						return;
-					}
+					new IfcRelAssignsToProduct(m, this);
 				}
-				IfcRelAssignsToProduct rap = new IfcRelAssignsToProduct(m, this) { Name = s };
 			}
 		}
 		public void AssignStructuralActivity(IfcRelConnectsStructuralActivity connects) { mAssignedStructuralActivity.Add(connects); }
@@ -1019,7 +1017,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	//ENTITY IfcExternallyDefinedHatchStyle
+	//ENTITY IfcExternallyDefinedHatchStyle : , IfcFillStyleSelect 
 	[Serializable]
 	public partial class IfcExternallyDefinedSurfaceStyle : IfcExternalReference, IfcSurfaceStyleElementSelect
 	{

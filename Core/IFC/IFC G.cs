@@ -458,17 +458,17 @@ namespace GeometryGym.Ifc
 
 		internal IfcGroup() : base() { }
 		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { }
-		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; new IfcRelAssignsToGroup(this); }
+		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; }
 		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
-		public void Assign(IfcObjectDefinition related)
+		public void AddRelated(IfcObjectDefinition related)
 		{
 			if (mIsGroupedBy.Count == 0)
 			{
 				new IfcRelAssignsToGroup(related, this);
 			}
 			else
-				mIsGroupedBy[0].AddRelated(related);
+				mIsGroupedBy[0].RelatedObjects.Add(related);
 		}
 
 		protected override List<T> Extract<T>(Type type)

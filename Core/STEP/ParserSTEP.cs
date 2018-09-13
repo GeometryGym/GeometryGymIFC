@@ -136,8 +136,8 @@ namespace GeometryGym.STEP
 		}
 
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
-		public static string DoubleToString(double d) { return String.Format("{0:0.0################}", d); }
-		public static string DoubleOptionalToString(double i) { return (double.IsNaN(i) || double.IsInfinity(i) ? "$" : String.Format("{0:0.0################}", i)); }
+		public static string DoubleToString(double d) { if (double.IsNaN(d) || double.IsInfinity(d)) return "0.0"; return String.Format("{0:0.0################}", d); }
+		public static string DoubleOptionalToString(double d) { return (double.IsNaN(d) || double.IsInfinity(d) ? "$" : String.Format("{0:0.0################}", d)); }
 		public static string IntToString(int i)
 		{
 			if (i == 0)
@@ -146,7 +146,7 @@ namespace GeometryGym.STEP
 		}
 		public static string IntOptionalToString(int i)
 		{
-			if (i == 0 || i == int.MinValue)
+			if (i == int.MinValue)
 				return "$";
 			return i.ToString();
 		}
@@ -157,7 +157,7 @@ namespace GeometryGym.STEP
 			else
 				return "#" + link;
 		}
-		public static string ObjToLinkString(STEPEntity obj) { return obj == null ? "$" : "#" + obj.mIndex; }
+		public static string ObjToLinkString(ISTEPEntity obj) { return obj == null ? "$" : "#" + obj.Index; }
 		public static string ListLinksToString(List<int> links)
 		{
 			if (links.Count == 0)

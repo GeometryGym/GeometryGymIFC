@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mReferencedSource > 0)
+			if (mReferencedSource != null)
 				obj["ReferencedSource"] = ReferencedSource.getJson(this, options);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Sort", Sort);

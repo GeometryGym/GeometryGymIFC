@@ -223,7 +223,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",#" + mOuterBoundary + (mInnerBoundaries.Count == 0 ? ",$" : ",(#" + string.Join(",#", mInnerBoundaries.ConvertAll(x=>x.mIndex)) + ")");
+			return base.BuildStringSTEP(release) + ",#" + mOuterBoundary.Index + (mInnerBoundaries.Count == 0 ? ",$" : ",(#" + string.Join(",#", mInnerBoundaries.ConvertAll(x=>x.mIndex)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -273,12 +273,12 @@ namespace GeometryGym.Ifc
 		{
 			string result = base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',");
 			result += (mAppliedValueValue != null ? mAppliedValueValue.ToString() : ParserSTEP.LinkToString(mAppliedValueIndex)) + "," + ParserSTEP.LinkToString(mUnitBasis) + ",";
-			result += IfcDate.STEPAttribute(mApplicableDate) + "," + IfcDate.STEPAttribute(mFixedUntilDate);
 			if (release < ReleaseVersion.IFC4)
-				return result;
+				return result +  (mSSApplicableDate == null ? ",$" : ",#" + mSSApplicableDate.Index) + (mSSFixedUntilDate == null ? ",$" : ",#" + mSSFixedUntilDate.Index);
 			string str = "$";
 			if (mComponents.Count > 0)
 			{
+				result += IfcDate.STEPAttribute(mApplicableDate) + "," + IfcDate.STEPAttribute(mFixedUntilDate);
 				str = "(" + ParserSTEP.LinkToString(mComponents[0]);
 				for (int icounter = 1; icounter < mComponents.Count; icounter++)
 					str += "," + ParserSTEP.LinkToString(mComponents[icounter]);
@@ -296,10 +296,15 @@ namespace GeometryGym.Ifc
 			if (mAppliedValueValue == null)
 				mAppliedValueIndex = ParserSTEP.ParseLink(s);
 			mUnitBasis = ParserSTEP.StripLink(str, ref pos, len);
-			mApplicableDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
-			mFixedUntilDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
-			if (release != ReleaseVersion.IFC2x3)
+			if(release < ReleaseVersion.IFC4)
 			{
+				mSSApplicableDate = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDateTimeSelect;
+				mSSFixedUntilDate = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDateTimeSelect;
+			}
+			else
+			{
+				mApplicableDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
+				mFixedUntilDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
 				mCategory = ParserSTEP.StripString(str, ref pos, len);
 				mCondition = ParserSTEP.StripString(str, ref pos, len);
 				s = ParserSTEP.StripField(str, ref pos, len);
@@ -319,16 +324,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mComponentOfTotal) + ",(" +
-				ParserSTEP.LinkToString(mComponents[0]);
-			for (int icounter = 1; icounter < mComponents.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mComponents[icounter]);
-			return str + "),." + mArithmeticOperator.ToString() + ".," + mName + "," + mDescription;
+			return base.BuildStringSTEP(release) + ",#" + mComponentOfTotal.Index + ",(#" + 
+				string.Join(",#", mComponents.Select(x=>x.Index))+ "),." + mArithmeticOperator.ToString() + ".," + mName + "," + mDescription;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mComponentOfTotal = ParserSTEP.StripLink(str, ref pos, len);
-			mComponents = ParserSTEP.StripListLink(str, ref pos, len);
+			ComponentOfTotal = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAppliedValue;
+			Components.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAppliedValue));
 			Enum.TryParse<IfcArithmeticOperatorEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mArithmeticOperator);
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);

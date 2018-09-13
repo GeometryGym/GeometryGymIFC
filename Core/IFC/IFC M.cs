@@ -38,6 +38,13 @@ namespace GeometryGym.Ifc
 		protected IfcManifoldSolidBrep() : base() { }
 		protected IfcManifoldSolidBrep(IfcClosedShell s) : base(s.mDatabase) { Outer = s; }
 		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b) : base(db,b) { Outer = db.Factory.Duplicate( b.Outer) as IfcClosedShell; }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			result.AddRange(Outer.Extract<T>());
+			return result;
+		}
 	} 
 	[Serializable]
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
@@ -298,8 +305,8 @@ namespace GeometryGym.Ifc
 		internal int mRepresentedMaterial;// : IfcMaterial;
 		private LIST<IfcStyledRepresentation> mStyledRepresentations = new LIST<IfcStyledRepresentation>(); 
 
-		public new LIST<IfcStyledRepresentation> Representations { get { return mStyledRepresentations; } set { base.Representations.Clear(); mStyledRepresentations.Clear(); if (value != null) { mStyledRepresentations.CollectionChanged -= mStyledRepresentations_CollectionChanged;  mStyledRepresentations = value; base.Representations.AddRange(value); mStyledRepresentations.CollectionChanged += mStyledRepresentations_CollectionChanged;  } } }
 		public IfcMaterial RepresentedMaterial { get { return mDatabase[mRepresentedMaterial] as IfcMaterial; } set { mRepresentedMaterial = value.mIndex; if (value.mHasRepresentation != this) value.HasRepresentation = this; } }
+		public new LIST<IfcStyledRepresentation> Representations { get { return mStyledRepresentations; } set { base.Representations.Clear(); mStyledRepresentations.Clear(); if (value != null) { mStyledRepresentations.CollectionChanged -= mStyledRepresentations_CollectionChanged;  mStyledRepresentations = value; base.Representations.AddRange(value); mStyledRepresentations.CollectionChanged += mStyledRepresentations_CollectionChanged;  } } }
 
 		internal IfcMaterialDefinitionRepresentation() : base() { }
 		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r) : base(db, r)
@@ -596,11 +603,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProfileSetUsage : IfcMaterialUsageDefinition //IFC4
 	{
-		internal int mForProfileSet;// : IfcMaterialProfileSet;
+		internal IfcMaterialProfileSet mForProfileSet;// : IfcMaterialProfileSet;
 		internal IfcCardinalPointReference mCardinalPoint = IfcCardinalPointReference.MID;// 	:	OPTIONAL IfcCardinalPointReference;
 		internal double mReferenceExtent = double.NaN;// 	:	OPTIONAL IfcPositiveLengthMeasure;  
 
-		public IfcMaterialProfileSet ForProfileSet { get { return mDatabase[mForProfileSet] as IfcMaterialProfileSet; } set { mForProfileSet = value.mIndex; } }
+		public IfcMaterialProfileSet ForProfileSet { get { return mForProfileSet; } set { mForProfileSet = value; } }
 		public IfcCardinalPointReference CardinalPoint { get { return mCardinalPoint; } set { mCardinalPoint = value; } }
 		public double ReferenceExtent { get { return mReferenceExtent; } set { mReferenceExtent = value; } }
 
@@ -618,16 +625,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProfileSetUsageTapering : IfcMaterialProfileSetUsage //IFC4
 	{
-		internal int mForProfileEndSet;// : IfcMaterialProfileSet;
+		internal IfcMaterialProfileSet mForProfileEndSet;// : IfcMaterialProfileSet;
 		internal IfcCardinalPointReference mCardinalEndPoint = IfcCardinalPointReference.MID;// : IfcCardinalPointReference 
 		 
-		public IfcMaterialProfileSet ForProfileEndSet { get { return mDatabase[mForProfileEndSet] as IfcMaterialProfileSet; } set { mForProfileEndSet = value.mIndex; } }
+		public IfcMaterialProfileSet ForProfileEndSet { get { return ForProfileEndSet; } set { mForProfileEndSet = value; } }
 		public IfcCardinalPointReference CardinalEndPoint { get { return mCardinalEndPoint; } set { mCardinalEndPoint = value; } }
 
 		internal IfcMaterialProfileSetUsageTapering() : base() { }
 		internal IfcMaterialProfileSetUsageTapering(DatabaseIfc db, IfcMaterialProfileSetUsageTapering m) : base(db,m) { ForProfileEndSet = db.Factory.Duplicate(m.ForProfileEndSet) as IfcMaterialProfileSet; }
 		public IfcMaterialProfileSetUsageTapering(IfcMaterialProfileSet ps, IfcCardinalPointReference ip, IfcMaterialProfileSet eps, IfcCardinalPointReference eip)
-			: base(ps, ip) { mForProfileEndSet = eps.mIndex; mCardinalEndPoint = eip; }
+			: base(ps, ip) { mForProfileEndSet = eps; mCardinalEndPoint = eip; }
 	}
 	[Serializable]
 	public partial class IfcMaterialProfileWithOffsets : IfcMaterialProfile //IFC4
@@ -730,24 +737,31 @@ namespace GeometryGym.Ifc
 		private string mVal;
 		private int mUnitComponent;// : IfcUnit; 
 
+		public IfcValue ValueComponent { get { return mValueComponent; } set { mValueComponent = value; } }
 		public IfcUnit UnitComponent { get { return mDatabase[mUnitComponent] as IfcUnit; } set { mUnitComponent = value.Index; } }
 
 		internal IfcMeasureWithUnit() : base() { }
 		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m) : base(db) { mValueComponent = m.mValueComponent; mVal = m.mVal;  UnitComponent = db.Factory.Duplicate(m.mDatabase[ m.mUnitComponent]) as IfcUnit; }
 		public IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u.Index; }
 		internal IfcMeasureWithUnit(double value, IfcUnit u) : base(u.Database) { mValueComponent = new IfcReal(value); mUnitComponent = u.Index;  }
-		internal double getSIFactor()
+		public double SIFactor()
 		{
 			IfcUnit u = UnitComponent;
 			IfcSIUnit si = u as IfcSIUnit;
-			double sif = (si == null ? 1 : si.SIFactor);
-			IfcMeasureValue m = mValueComponent as IfcMeasureValue;
-
-			if (m != null)
-				return m.Measure * sif;
-			IfcDerivedMeasureValue dm = mValueComponent as IfcDerivedMeasureValue;
-			if (dm != null)
-				return dm.Measure * sif;
+			double sif = (si == null ? 1 : si.SIFactor), d = 1;
+			if (mValueComponent != null)
+			{
+				IfcMeasureValue m = mValueComponent as IfcMeasureValue;
+				if (m != null)
+					return m.Measure * sif;
+				IfcDerivedMeasureValue dm = mValueComponent as IfcDerivedMeasureValue;
+				if (dm != null)
+					return dm.Measure * sif;
+				if (double.TryParse(mValueComponent.ValueString, out d))
+					return d * sif;
+			}
+			if (double.TryParse(mVal, out d))
+				return d * sif;
 			return sif;
 		}
 	}

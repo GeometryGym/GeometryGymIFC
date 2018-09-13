@@ -94,7 +94,14 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFacility : IfcSpatialStructureElement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfRefHeight) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfTerrain); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfRefHeight) + "," + 
+				ParserSTEP.DoubleOptionalToString(mElevationOfTerrain);
+			if (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 && this as IfcBuilding == null)
+				result += ",$";
+			return result;
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -102,6 +109,16 @@ namespace GeometryGym.Ifc
 			mElevationOfTerrain = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcFacilityPart : IfcSpatialStructureElement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevation); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mElevation = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
+	
 	//ENTITY IfcFailureConnectionCondition
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
 	{
@@ -187,15 +204,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mFillStyles[0]);
-			for (int icounter = 1; icounter < mFillStyles.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mFillStyles[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mFillStyles.ConvertAll(x=>x.Index)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mFillStyles = ParserSTEP.StripListLink(str, ref pos, len);
+			FillStyles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=> dictionary[x] as IfcFillStyleSelect));
 		}
 	}
 	public partial class IfcFireSuppressionTerminal : IfcFlowTerminal //IFC4

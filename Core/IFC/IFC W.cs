@@ -330,7 +330,7 @@ namespace GeometryGym.Ifc
 		}
 	
 		internal DateTime getStart() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
-		
+
 	}
 	[Serializable]
 	public partial class IfcWorkPlan : IfcWorkControl

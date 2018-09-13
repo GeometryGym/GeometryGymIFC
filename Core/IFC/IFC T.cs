@@ -112,15 +112,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTask : IfcProcess //SUPERTYPE OF (ONEOF(IfcMove,IfcOrderAction) both depreceated IFC4) 
 	{
-		//internal string mTaskId; //  : 	IfcIdentifier; IFC4 midentification
-		private string mStatus = "$";// : OPTIONAL IfcLabel;
-		internal string mWorkMethod = "$";// : OPTIONAL IfcLabel;
+		//internal string mTaskId; //  : 	IfcIdentifier; IFC4 midentification at IfcProcess
+		private string mStatus = "";// : OPTIONAL IfcLabel;
+		internal string mWorkMethod = "";// : OPTIONAL IfcLabel;
 		internal bool mIsMilestone = false;// : BOOLEAN
 		internal int mPriority;// : OPTIONAL INTEGER IFC4
 		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum
 
-		internal string Status { get { return mStatus; } }
+		public string Status { get { return mStatus; } set { mStatus = value; } }
+		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
+		public bool IsMilestone { get { return mIsMilestone; } set { mIsMilestone = value; } }
+		public int Priority { get { return mPriority; } set { mPriority = value; } }
 		internal IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
 
 		internal IfcTask() : base() { }
@@ -315,7 +318,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTextLiteral : IfcGeometricRepresentationItem //SUPERTYPE OF	(IfcTextLiteralWithExtent)
 	{
-		internal string mLiteral;// : IfcPresentableText;
+		internal string mLiteral = "";// : IfcPresentableText;
 		internal int mPlacement;// : IfcAxis2Placement;
 		internal IfcTextPath mPath;// : IfcTextPath;
 
@@ -891,6 +894,31 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
+		public override void RemoveProperty(IfcProperty property)
+		{
+			foreach(IfcPropertySet pset in HasPropertySets.OfType<IfcPropertySet>().ToList())
+			{
+				foreach(IfcProperty p in pset.HasProperties.Values)
+				{
+					if(p == property)
+					{
+						if(pset.DefinesType.Count == 1 && pset.DefinesOccurrence == null)
+						{
+							if (pset.HasProperties.Count == 1)
+								pset.Dispose(true);
+							else
+								property.Dispose(true);
+						}
+						else
+						{
+							HasPropertySets.Remove(pset);
+							HasPropertySets.Add(new IfcPropertySet(pset.Name, pset.HasProperties.Values.Where(x => x != property)));
+						}
+						return;
+					}
+				}
+			}
+		}
 		public override IfcPropertySetDefinition FindPropertySet(string name)
 		{
 			IfcPropertySetDefinition pset = HasPropertySets.FirstOrDefault(x => string.Compare(x.Name, name, true) == 0);
@@ -967,7 +995,7 @@ namespace GeometryGym.Ifc
 				if (pr != null)
 				{
 					site.Representation = null;
-					pr.Destruct(true);
+					pr.Dispose(true);
 				}
 			}
 			db.WriteFile(filename);
@@ -989,7 +1017,7 @@ namespace GeometryGym.Ifc
 		protected IfcTypeProcess(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
-	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
+	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
 	{ 
 		internal LIST<IfcRepresentationMap> mRepresentationMaps = new LIST<IfcRepresentationMap>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcRepresentationMap;
 		private string mTag = "$";// : OPTIONAL IfcLabel 
@@ -1007,7 +1035,7 @@ namespace GeometryGym.Ifc
 			mTag = basis.mTag;
 		}
 		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
-		protected IfcTypeProduct(DatabaseIfc db) : base(db) {  }
+		public IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 
 		protected override void initialize()
 		{
@@ -1061,13 +1089,13 @@ namespace GeometryGym.Ifc
 			base.changeSchema(schema);
 		}
 
-		internal IfcElement genMappedItemElement(IfcProduct container, IfcCartesianTransformationOperator3D t)
+		internal IfcElement genMappedItemElement(IfcProduct host, IfcAxis2Placement3D relativePlacement)
 		{
+			DatabaseIfc db = host.Database;
 			string typename = this.GetType().Name;
 			typename = typename.Substring(0, typename.Length - 4);
-			IfcShapeRepresentation sr = new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], t));
-			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
-			IfcElement element = IfcElement.ConstructElement(typename, container, null, pds);
+			IfcProductRepresentation pr = IfcProductRepresentation.convertRep(new IfcMappedItem(RepresentationMaps[0], db.Factory.XYPlaneTransformation), new List<int>());
+			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.Placement, relativePlacement), pr);
 			element.setRelatingType(this);
 			foreach (IfcRelNests nests in IsNestedBy)
 			{
@@ -1077,10 +1105,7 @@ namespace GeometryGym.Ifc
 					if (port != null)
 					{
 						IfcDistributionPort newPort = new IfcDistributionPort(element) { FlowDirection = port.FlowDirection, PredefinedType = port.PredefinedType, SystemType = port.SystemType };
-						newPort.Placement = new IfcLocalPlacement(element.Placement, t.generate());
-						IfcLocalPlacement placement = port.Placement as IfcLocalPlacement;
-						if (placement != null)
-							newPort.Placement = new IfcLocalPlacement(newPort.Placement, placement.RelativePlacement);
+						newPort.Placement = new IfcLocalPlacement(element.Placement, (port.Placement as IfcLocalPlacement).RelativePlacement);
 						for (int dcounter = 0; dcounter < port.mIsDefinedBy.Count; dcounter++)
 							port.mIsDefinedBy[dcounter].RelatedObjects.Add(newPort);
 					}
@@ -1089,7 +1114,7 @@ namespace GeometryGym.Ifc
 			foreach(IfcPropertySetDefinition pset in HasPropertySets)
 			{
 				if (pset.IsInstancePropertySet)
-					pset.AssignObjectDefinition(element);
+					pset.RelateObjectDefinition(element);
 			}
 			return element;
 		}

@@ -28,6 +28,8 @@ using System.Threading.Tasks;
 
 namespace GeometryGym.STEP
 {
+
+	public partial interface ISTEPEntity { int Index { get; } }
 	[Serializable]
 	public partial class STEPEntity
 	{

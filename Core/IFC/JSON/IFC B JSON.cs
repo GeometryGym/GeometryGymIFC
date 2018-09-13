@@ -262,11 +262,11 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mBuildingAddress > 0)
+			if (mBuildingAddress != null) 
 				obj["BuildingAddress"] = BuildingAddress.getJson(this, options);
 		}
 	}
-	public partial class IfcBuildingStorey : IfcSpatialStructureElement
+	public partial class IfcBuildingStorey : IfcFacilityPart
 	{
 		internal override void parseJObject(JObject obj)
 		{

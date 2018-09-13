@@ -399,7 +399,7 @@ namespace GeometryGym.Ifc
 				if (str.Length <= 12)
 					return new IfcLabel("");
 				string s = str.Substring(10, str.Length - 12);
-				return new IfcLabel((s == "$" || s == null ? "" : ParserIfc.Decode(s)));
+				return new IfcLabel((str[10] == '$' || s == null ? "" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCLOGICAL("))
 			{
@@ -416,10 +416,12 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCTEXT("))
 			{
 				string s = str.Substring(9, str.Length - 11);
-				return new IfcText((s == "$" || s == null ? "" : ParserIfc.Decode(s)));
+				return new IfcText((str[9] == '$' || s == null ? "" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCURIREFERENCE("))
-				return new IfcURIReference(ParserIfc.Decode(str.Substring(15, str.Length - 17)));
+			{
+				return new IfcURIReference(str[16] == '$' ? "" : ParserIfc.Decode(str.Substring(17, str.Length - 18)));
+			}
 			int i = 0;
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);

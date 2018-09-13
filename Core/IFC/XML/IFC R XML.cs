@@ -227,7 +227,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcObjectDefinition od = mDatabase.ParseXml<IfcObjectDefinition>(node as XmlElement);
 						if (od != null)
-							AddRelated(od);
+							 RelatedObjects.Add(od);
 					}
 				}
 			}
@@ -240,7 +240,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (!mRelatedObjects.Contains(host.mIndex))
+			if (!mRelatedObjects.Contains(host))
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("RelatedObjects");
 				xml.AppendChild(element);
@@ -327,7 +327,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mRelatingClassification].GetXML(xml.OwnerDocument, "RelatingClassification", this, processed));
+			xml.AppendChild((RelatingClassification as BaseClassIfc) .GetXML(xml.OwnerDocument, "RelatingClassification", this, processed));
 		}
 	}
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates

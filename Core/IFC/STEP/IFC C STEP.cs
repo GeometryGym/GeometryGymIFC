@@ -357,7 +357,7 @@ namespace GeometryGym.Ifc
 			}
 			bool older = mDatabase.Release <= ReleaseVersion.IFC2x3;
 			string result = base.BuildStringSTEP(release) + (mSource == "$" ? (older ? ",'Unknown'," : ",$,") : ",'" + mSource + "',") +
-				(mEdition == "$" ? (older ? "'Unknown'," : "$,") : "'" + mEdition + "',") + (older ? ParserSTEP.LinkToString(mEditionDateSS) : IfcDateTime.STEPAttribute(mEditionDate)) +
+				(mEdition == "$" ? (older ? "'Unknown'," : "$,") : "'" + mEdition + "',") + (older ? ParserSTEP.LinkToString(mEditionDateSS) : IfcDate.STEPAttribute(mEditionDate)) +
 				",'" + mName + (older ? "'" : (mDescription == "$" ? "',$," : "','" + mDescription + "',") + (mLocation == "$" ? "$," : "'" + mLocation + "',") + tokens);
 			return result;
 		}
@@ -423,22 +423,16 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcClassificationReference : IfcExternalReference, IfcClassificationReferenceSelect, IfcClassificationSelect, IfcClassificationNotationSelect
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mReferencedSource) + (release == ReleaseVersion.IFC2x3 ? "" : (mDescription == "$" ? ",$" : ",'" + mDescription + "'") + (mSort == "$" ? ",$" : ",'" + mSort + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(ReferencedSource) + (release == ReleaseVersion.IFC2x3 ? "" : (mDescription == "$" ? ",$" : ",'" + mDescription + "'") + (mSort == "$" ? ",$" : ",'" + mSort + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mReferencedSource = ParserSTEP.StripLink(str, ref pos, len);
-			if (release != ReleaseVersion.IFC2x3)
+			ReferencedSource = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcClassificationReferenceSelect;
+			if (release > ReleaseVersion.IFC2x3)
 			{
 				mDescription = ParserSTEP.StripString(str, ref pos, len);
 				mSort = ParserSTEP.StripString(str, ref pos, len);
 			}
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			if(mReferencedSource > 0)
-				ReferencedSource.AddReference(this);
 		}
 	}
 	public partial class IfcCoil : IfcEnergyConversionDevice //IFC4
@@ -892,7 +886,8 @@ namespace GeometryGym.Ifc
 		}
 		internal override void postParseRelate()
 		{
-			mDatabase.mContext = this;
+			if(mDatabase.mContext == null || !(this is IfcProjectLibrary))
+				mDatabase.mContext = this;
 			base.postParseRelate();
 		}
 	}

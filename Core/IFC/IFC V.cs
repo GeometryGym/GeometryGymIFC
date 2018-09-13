@@ -359,12 +359,6 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcThermalTransmittanceMeasure : IfcDerivedMeasureValue { public IfcThermalTransmittanceMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcTimeStamp : IfcDerivedMeasureValue
-	{
-		public IfcTimeStamp(double value) : base((int)value) { }
-		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + (int)mValue + ")"; }
-	}
-	[Serializable]
 	public class IfcTorqueMeasure : IfcDerivedMeasureValue { public IfcTorqueMeasure(double value) : base(value) { } }
 	[Serializable]
 	public class IfcVaporPermeabilityMeasure : IfcDerivedMeasureValue { public IfcVaporPermeabilityMeasure(double value) : base(value) { } }// IfcMeasureValue
@@ -680,15 +674,55 @@ namespace GeometryGym.Ifc
 		}
 		internal static string convert(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? "-0" : "-") + date.Minute + (date.Second < 10 ? "-0" : "-") + date.Second; }
 	}
-	//IfcTimeStamp
+	[Serializable]
+	public class IfcTimeStamp : IfcSimpleValue
+	{
+		internal int mTimeStamp { get; set; }
+		public override object Value { get => mTimeStamp; set => mTimeStamp = Convert.ToInt32(value); }
+		public override Type ValueType => typeof(int);
+		public IfcTimeStamp(int value) { mTimeStamp = value; }
+		public override string ToString() { return "IFCTIMESTAMP" + "(" + mTimeStamp + ")"; }
+	}
 	[Serializable]
 	public partial class IfcURIReference : IfcSimpleValue
 	{
-		public string URI { get; set; }
-		public override object Value { get => URI; set => URI = value.ToString(); }
-		public override Type ValueType => typeof(string);
-		public IfcURIReference(string value) { URI = value; }
-		public override string ToString() { return "IFCURIREFERENCE('" + ParserIfc.Encode(URI) + "')"; }
+		internal string mValue = "";
+		public Uri URI
+		{
+			get
+			{
+				if (Uri.IsWellFormedUriString(mValue, UriKind.RelativeOrAbsolute))
+				{
+					try { return new Uri(mValue); } catch (Exception) { }
+				}
+				return null;
+			}
+			set
+			{
+				mValue = value.OriginalString;
+			}
+		}
+		public override object Value
+		{
+			get
+			{
+				Uri uri = URI;
+				if (uri == null)
+					return mValue;
+				return uri;
+			}
+			set
+			{
+				Uri uri = value as Uri;
+				if (uri != null)
+					URI = uri;
+				else
+					mValue = value.ToString();
+			}
+		}
+		public override Type ValueType => typeof(Uri);
+		public IfcURIReference(string value) { mValue = value; }
+		public override string ToString() { return "IFCURIREFERENCE('" + ParserIfc.Encode(mValue) + "')"; }
 	}
 
 	[Serializable]

@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			foreach (IfcRelAssigns ra in mDatabase.extractJArray<IfcRelAssigns>(obj.GetValue("HasAssignments", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				ra.AddRelated(this);
+				ra.RelatedObjects.Add(this);
 			foreach (IfcRelNests rn in mDatabase.extractJArray<IfcRelNests>(obj.GetValue("IsNestedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				rn.RelatingObject = this;
 			foreach (IfcRelAggregates ra in mDatabase.extractJArray<IfcRelAggregates>(obj.GetValue("IsDecomposedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))

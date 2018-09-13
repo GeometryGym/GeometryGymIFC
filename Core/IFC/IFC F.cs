@@ -40,6 +40,14 @@ namespace GeometryGym.Ifc
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner); }
 		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds.AddRange(bounds); }
 
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			foreach(IfcFaceBound b in Bounds)
+				result.AddRange(b.Extract<T>());
+			return result;
+		}
+
 	}
 	[Serializable]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
@@ -66,6 +74,12 @@ namespace GeometryGym.Ifc
 		internal IfcFaceBound() : base() { }
 		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b) : base(db,b) { Bound = db.Factory.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
 		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { mBound = l.mIndex; mOrientation = orientation; }
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			result.AddRange(Bound.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public partial class IfcFaceOuterBound : IfcFaceBound
@@ -108,9 +122,9 @@ namespace GeometryGym.Ifc
 		internal void addVoid(IfcClosedShell shell) { mVoids.Add(shell.mIndex); }
 	}
 	[Serializable]
-	public partial class IfcFacility : IfcSpatialStructureElement
+	public partial class IfcFacility : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBridge, IfcBuilding)
 	{
-		internal override string KeyWord { get { if(mDatabase != null && mDatabase.Release >= ReleaseVersion.IFC4X2) return base.KeyWord; return "IfcBuilding"; } }
+		internal override string KeyWord { get { if(mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X2) return "IfcBuilding"; return base.KeyWord;  } }
 		internal double mElevationOfRefHeight = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mElevationOfTerrain = double.NaN;// : OPTIONAL IfcLengthMeasure;
 
@@ -124,9 +138,49 @@ namespace GeometryGym.Ifc
 			mElevationOfTerrain = f.mElevationOfTerrain;
 		}
 		public IfcFacility(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
-		internal IfcFacility(IfcSpatialStructureElement host, string name) { }
-		public IfcFacility(IfcFacility host, string name) : base(host, name) {  }
+		public IfcFacility(IfcSpatialStructureElement host, string name) : base(host, name) { }
 		public IfcFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcFacilityPart : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBuildingStorey)
+	{
+		internal override string KeyWord { get { if(mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X2) return "IfcBuildingStorey"; return base.KeyWord;  } }
+		internal double mElevation = double.NaN;// : OPTIONAL IfcLengthMeasure; 
+		public double Elevation
+		{
+			get { return mElevation; }
+			set
+			{
+				mElevation = Math.Abs(value) < mDatabase.Tolerance ? 0 : value;
+#if (RHINO)
+				try
+				{
+					int i = Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Find(Name);
+					if (i >= 0)
+						Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Delete(i);
+					Rhino.RhinoDoc.ActiveDoc.NamedConstructionPlanes.Add(Name, new Rhino.Geometry.Plane(new Rhino.Geometry.Point3d(0, 0, mElevation), Rhino.Geometry.Vector3d.XAxis, Rhino.Geometry.Vector3d.YAxis));
+				}
+				catch (Exception) { }
+#endif
+			}
+		}
+
+		public IfcFacilityPart() : base() { }
+		internal IfcFacilityPart(DatabaseIfc db, IfcFacilityPart f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mElevation = f.mElevation; }
+		public IfcFacilityPart(IfcFacility host, string name) : base(host, name) { }
+		public IfcFacilityPart(IfcFacilityPart host, string name) : base(host, name) { }
+		public IfcFacilityPart(IfcFacility host, string name, double elevation) 
+			: base(host, name, new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
+		{
+			Elevation = elevation;
+		}
+		public IfcFacilityPart(IfcFacilityPart host, string name, double elevation)
+			: base(host, name, new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
+		{
+			Elevation = elevation;
+		}
+		public IfcFacilityPart(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = name; }
+		internal bool addStorey(IfcBuildingStorey s) { return base.AddAggregated(s); }
 	}
 	//ENTITY IfcFailureConnectionCondition
 	[Serializable]
@@ -202,7 +256,18 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem
+	public partial class IfcFillAreaStyle : IfcPresentationStyle
+	{
+		internal SET<IfcFillStyleSelect> mFillStyles = new SET<IfcFillStyleSelect>();// : SET [1:?] OF IfcFillStyleSelect;
+	
+		public SET<IfcFillStyleSelect> FillStyles { get { return mFillStyles; } }// : SET [1:?] OF IfcFillStyleSelect;
+		internal IfcFillAreaStyle() : base() { }
+		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
+		public IfcFillAreaStyle(IfcFillStyleSelect style) : base(style.Database) { mFillStyles.Add(style); }
+		public IfcFillAreaStyle(IEnumerable<IfcFillStyleSelect> styles) : base(styles.First().Database) { mFillStyles.AddRange(styles); }
+	}
+	[Serializable]
+	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem, IfcFillStyleSelect
 	{
 		internal int mHatchLineAppearance;// : IfcCurveStyle;
 		internal string mStartOfNextHatchLine;// : IfcHatchLineDistanceSelect; IfcOneDirectionRepeatFactor,IfcPositiveLengthMeasure
@@ -212,22 +277,23 @@ namespace GeometryGym.Ifc
 
 		public IfcCurveStyle HatchLineAppearance { get { return mDatabase[mHatchLineAppearance] as IfcCurveStyle; } set { mHatchLineAppearance = value.mIndex; } }
 		public IfcCartesianPoint PatternStart { get { return mDatabase[mPatternStart] as IfcCartesianPoint; } set { mPatternStart = (value == null ? 0 : value.mIndex); } }
-			
+
 		internal IfcFillAreaStyleHatching() : base() { }
-		internal IfcFillAreaStyleHatching(DatabaseIfc db, IfcFillAreaStyleHatching h) : base(db,h)
+		internal IfcFillAreaStyleHatching(DatabaseIfc db, IfcFillAreaStyleHatching h) : base(db, h)
 		{
-			mHatchLineAppearance = db.Factory.Duplicate( h.HatchLineAppearance).mIndex;
+			mHatchLineAppearance = db.Factory.Duplicate(h.HatchLineAppearance).mIndex;
 			mStartOfNextHatchLine = h.mStartOfNextHatchLine;
-			if(h.mPointOfReferenceHatchLine > 0)
-				mPointOfReferenceHatchLine = db.Factory.Duplicate( h.mDatabase[h.mPointOfReferenceHatchLine]).mIndex;
-			if(h.mPatternStart > 0)
-				PatternStart = db.Factory.Duplicate( h.PatternStart) as IfcCartesianPoint;
+			if (h.mPointOfReferenceHatchLine > 0)
+				mPointOfReferenceHatchLine = db.Factory.Duplicate(h.mDatabase[h.mPointOfReferenceHatchLine]).mIndex;
+			if (h.mPatternStart > 0)
+				PatternStart = db.Factory.Duplicate(h.PatternStart) as IfcCartesianPoint;
 			mHatchLineAngle = h.mHatchLineAngle;
 		}
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
-	//ENTITY IfcFillAreaStyleTiles
+	//ENTITY IfcFillAreaStyleTiles : , IfcFillStyleSelect 
+	public interface IfcFillStyleSelect : IBaseClassIfc { } // SELECT ( IfcFillAreaStyleHatching, IfcFillAreaStyleTiles, IfcExternallyDefinedHatchStyle, IfcColour);
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
 	public partial class IfcFilter : IfcFlowTreatmentDevice //IFC4  
@@ -236,7 +302,7 @@ namespace GeometryGym.Ifc
 		public IfcFilterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcFilter() : base() { }
-		internal IfcFilter(DatabaseIfc db, IfcFilter f, IfcOwnerHistory ownerHistory, bool downStream) : base(db,f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
+		internal IfcFilter(DatabaseIfc db, IfcFilter f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
 		internal IfcFilter(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -248,15 +314,6 @@ namespace GeometryGym.Ifc
 		internal IfcFilterType() : base() { }
 		internal IfcFilterType(DatabaseIfc db, IfcFilterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 	}
-	[Serializable]
-	public partial class IfcFillAreaStyle : IfcPresentationStyle
-	{
-		internal List<int> mFillStyles = new List<int>();// : SET [1:?] OF IfcFillStyleSelect;
-		internal IfcFillAreaStyle() : base() { }
-		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
-		internal IfcFillAreaStyle(DatabaseIfc db) : base(db) { }
-	}
-	public interface IfcFillStyleSelect { } // SELECT ( IfcFillAreaStyleHatching, IfcFillAreaStyleTiles, IfcExternallyDefinedHatchStyle, IfcColour);
 	[Serializable]
 	public partial class IfcFireSuppressionTerminal : IfcFlowTerminal //IFC4
 	{
@@ -554,9 +611,8 @@ namespace GeometryGym.Ifc
 		internal IfcFurnitureTypeEnum mPredefinedType = IfcFurnitureTypeEnum.NOTDEFINED; // IFC4 OPTIONAL
 		internal IfcFurnitureType() : base() { }
 		internal IfcFurnitureType(DatabaseIfc db, IfcFurnitureType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mAssemblyPlace = t.mAssemblyPlace; mPredefinedType = t.mPredefinedType; }
-		internal IfcFurnitureType(DatabaseIfc m, string name, IfcAssemblyPlaceEnum a, IfcFurnitureTypeEnum type) : base(m,name)
+		public IfcFurnitureType(DatabaseIfc db, string name, IfcFurnitureTypeEnum type) : base(db, name)
 		{
-			mAssemblyPlace = a;
 			mPredefinedType = type;
 			if (mDatabase.mRelease == ReleaseVersion.IFC2x3 && string.IsNullOrEmpty(ElementType) && type != IfcFurnitureTypeEnum.NOTDEFINED)
 				ElementType = type.ToString();

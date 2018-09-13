@@ -54,6 +54,9 @@ namespace GeometryGym.Ifc
 	{
 		internal int mDateComponent;// : IfcCalendarDate;
 		internal int mTimeComponent;// : IfcLocalTime;
+		public IfcCalendarDate DateComponent { get { return mDatabase[mDateComponent] as IfcCalendarDate; } set { mDateComponent = value.Index; } }
+		public IfcLocalTime TimeComponent { get { return mDatabase[mTimeComponent] as IfcLocalTime; } set { mTimeComponent = value.Index; } }
+
 		internal IfcDateAndTime(IfcDateAndTime v) : base() { mDateComponent = v.mDateComponent; mTimeComponent = v.mTimeComponent; }
 		internal IfcDateAndTime() : base() { }
 		internal IfcDateAndTime(IfcCalendarDate d, IfcLocalTime t) : base(d.mDatabase) { mDateComponent = d.mIndex; mTimeComponent = t.mIndex; }
@@ -313,6 +316,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDistributionChamberElementType() : base() { }
 		internal IfcDistributionChamberElementType(DatabaseIfc db, IfcDistributionChamberElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcDistributionChamberElementType(DatabaseIfc db, string name, IfcDistributionChamberElementTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcDistributionCircuit : IfcDistributionSystem
@@ -347,17 +351,10 @@ namespace GeometryGym.Ifc
 		protected IfcDistributionElement(IfcDistributionElement basis) : base(basis) { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.Assign(this); }
+		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.AddRelated(this); }
 		
-		internal IfcDistributionSystem getSystem()
-		{
-			foreach (IfcRelAssignsToGroup assigns in HasAssignments.OfType<IfcRelAssignsToGroup>())
-			{
-				if(assigns.RelatingGroup is IfcDistributionSystem ds)
-					return ds;
-			}
-			return null;
-		}
+		public SET<IfcRelConnectsPortToElement> HasPorts { get { return mHasPorts; } }
+		
 	}
 	[Serializable]
 	public partial class IfcDistributionElementType : IfcElementType //SUPERTYPE OF(ONEOF(IfcDistributionControlElementType, IfcDistributionFlowElementType))
@@ -417,7 +414,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDistributionSystem() : base() { }
 		internal IfcDistributionSystem(DatabaseIfc db, IfcDistributionSystem s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mLongName = s.mLongName; mPredefinedType = s.mPredefinedType; }
-		internal IfcDistributionSystem(IfcSpatialElement bldg, string name, IfcDistributionSystemEnum type) : base(bldg, name) { mPredefinedType = type; }
+		public IfcDistributionSystem(IfcSpatialElement bldg, string name, IfcDistributionSystemEnum type) : base(bldg, name) { mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]

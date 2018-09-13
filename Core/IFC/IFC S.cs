@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 		internal bool mIsCritical;//	 :	OPTIONAL BOOLEAN;
 		internal int mStatusTime;//	: 	OPTIONAL IfcDateTimeSelect
 		internal double mStartFloat, mFinishFloat;//	 OPTIONAL IfcTimeMeasure; 
-		internal double mCompletion;//	 :	OPTIONAL IfcPositiveRatioMeasure; 
+		internal double mCompletion = double.NaN;//	 :	OPTIONAL IfcPositiveRatioMeasure; 
 		//INVERSE
 		internal IfcRelAssignsTasks mScheduleTimeControlAssigned = null;//	 : 	IfcRelAssignsTasks FOR TimeForTask;
 
@@ -739,7 +739,7 @@ additional types	some additional representation types are given:
 			IfcCovering covering = product as IfcCovering;
 			if (covering != null)
 			{
-				mHasCoverings[0].addCovering(covering);
+				mHasCoverings[0].RelatedCoverings.Add(covering);
 				return true;
 			}
 			return base.addProduct(product);
@@ -906,16 +906,17 @@ additional types	some additional representation types are given:
 		}
 		protected override List<T> Extract<T>(Type type) 
 		{
-			List<T> result = base.Extract<T>(type);
 			if (typeof(IfcSpatialElement).IsAssignableFrom(type))
-				return result;
+				return base.Extract<T>(type);
+			List<T> result = new List<T>(); 
+			foreach(IfcRelServicesBuildings rsbs in mServicedBySystems)
+				result.AddRange(rsbs.RelatingSystem.Extract<T>());
+			result.AddRange(base.Extract<T>(type));
 			foreach (IfcRelContainedInSpatialStructure rcss in mContainsElements)
 			{
 				foreach (IfcProduct p in rcss.RelatedElements)
 					result.AddRange(p.Extract<T>());
 			}
-			foreach(IfcRelServicesBuildings rsbs in mServicedBySystems)
-				result.AddRange(rsbs.RelatingSystem.Extract<T>());
 			return result;
 		}
 
@@ -958,6 +959,16 @@ additional types	some additional representation types are given:
 			}
 			return null;
 		}
+		public void ReferenceElement(IfcProduct element)
+		{
+			if (mReferencesElements.Count > 0)
+				mReferencesElements[0].RelatedElements.Add(element);
+			else
+			{
+				new IfcRelReferencedInSpatialStructure(element, this);
+			}
+
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcSpatialElementType : IfcTypeProduct //IFC4 ABSTRACT SUPERTYPE OF(IfcSpatialStructureElementType)
@@ -977,8 +988,9 @@ additional types	some additional representation types are given:
 
 		protected IfcSpatialStructureElement() : base() { }
 		protected IfcSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
+		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mCompositionType = e.mCompositionType; }
-		protected IfcSpatialStructureElement(IfcSpatialStructureElement host,string name) : base(host,name) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
+		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1144,7 +1156,7 @@ additional types	some additional representation types are given:
 				mAssignedToStructuralItem = new IfcRelConnectsStructuralActivity(item, this);
 			mAppliedLoad = load.mIndex;
 			mGlobalOrLocal = global ? IfcGlobalOrLocalEnum.GLOBAL_COORDS : IfcGlobalOrLocalEnum.LOCAL_COORDS;
-			loadcase.AddRelated(this);
+			loadcase.RelatedObjects.Add(this);
 		}
 	}
 	public interface IfcStructuralActivityAssignmentSelect : IBaseClassIfc { void AssignStructuralActivity(IfcRelConnectsStructuralActivity connects); } //SELECT(IfcStructuralItem,IfcElement);
@@ -1320,7 +1332,7 @@ additional types	some additional representation types are given:
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase.mRelease == ReleaseVersion.IFC2x3 ? new IfcLocalPlacement(sm.SharedPlacement,sm.mDatabase.Factory.XYPlanePlacement) : sm.SharedPlacement ,null)
 		{
-			sm.mIsGroupedBy[0].AddRelated(this);
+			sm.AddRelated(this);
 			mDatabase.mContext.setStructuralUnits();
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
@@ -1877,6 +1889,7 @@ additional types	some additional representation types are given:
 			else
 				mStyles.Add(style.Index);
 		}
+		public IfcStyledItem(IfcRepresentationItem item, IfcStyleAssignmentSelect style) : this(style) { Item = item; }
 		public IfcStyledItem(IfcRepresentationItem item, IEnumerable<IfcStyleAssignmentSelect> styles) : base(item.mDatabase)
 		{
 			Item = item;
@@ -2266,7 +2279,7 @@ additional types	some additional representation types are given:
 				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
 		}
 		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release == ReleaseVersion.IFC2x3) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
-		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase,0,0,0)) : position); }
+		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
 
 		internal override void changeSchema(ReleaseVersion schema)
 		{
@@ -2363,6 +2376,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
+		internal override string KeyWord { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.KeyWord); } }
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
@@ -2376,11 +2390,15 @@ additional types	some additional representation types are given:
 				rsb.RelatingSystem = this;
 			}
 		}
-		internal IfcSystem(DatabaseIfc m, string name) : base(m, name) { }
+		public IfcSystem(DatabaseIfc m, string name) : base(m, name) { }
 		public IfcSystem(IfcSpatialElement e, string name) : base(e.mDatabase, name)
 		{
 			if(!(this is IfcZone && e.mDatabase.Release <= ReleaseVersion.IFC2x3))
 				mServicesBuildings = new IfcRelServicesBuildings(this, e) { Name = name };
+		}
+		public IfcSystem(IfcSystem system, string name) : base(system.Database, name)
+		{
+			system.AddAggregated(this);
 		}
 	}
 	[Serializable]

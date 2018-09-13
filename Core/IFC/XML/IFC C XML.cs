@@ -269,11 +269,61 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Radius", mRadius.ToString());
 		}
 	}
+	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect //	SUBTYPE OF IfcExternalInformation;
+	{
+		//internal string mSource = "$"; //  : OPTIONAL IfcLabel;
+		//internal string mEdition = "$"; //  : OPTIONAL IfcLabel;
+		//internal DateTime mEditionDate = DateTime.MinValue; // : OPTIONAL IfcDate IFC4 change 
+		//private int mEditionDateSS = 0; // : OPTIONAL IfcCalendarDate;
+		//internal string mName;//  : IfcLabel;
+		//internal string mDescription = "$";//	 :	OPTIONAL IfcText; IFC4 Addition
+		//internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; IFC4 Addtion
+		//internal List<string> mReferenceTokens = new List<string>();//	 :	OPTIONAL LIST [1:?] OF IfcIdentifier; IFC4 Addition
+
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Source"))
+				Source = xml.Attributes["Source"].Value;
+			if (xml.HasAttribute("Edition"))
+				Edition = xml.Attributes["Edition"].Value;
+			if (xml.HasAttribute("EditionDate"))
+				EditionDate = IfcDate.ParseSTEP(xml.Attributes["EditionDate"].Value);
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
+			if (xml.HasAttribute("Description"))
+				Description = xml.Attributes["Description"].Value;
+			if (xml.HasAttribute("Location"))
+				Location = xml.Attributes["Location"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "HasReferences") == 0)
+					HasReferences.AddRange(mDatabase.ParseXMLList<IfcClassificationReference>(child as XmlElement));
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			
+			setAttribute(xml, "Source", Source);
+			setAttribute(xml, "Edition", Edition);
+			if (EditionDate != DateTime.MinValue)
+				xml.SetAttribute("EditionDate", IfcDate.FormatSTEP(EditionDate));
+			setAttribute(xml, "Name", Name);
+			setAttribute(xml, "Description", Description);
+			setAttribute(xml, "Location", Location);
+			// tokens
+
+			XmlElement element = xml.OwnerDocument.CreateElement("HasReferences");
+			foreach (IfcClassificationReference cr in HasReferences)
+				element.AppendChild(cr.GetXML(xml.OwnerDocument, "", this, processed));
+			if(element.ChildNodes.Count > 0)
+				xml.AppendChild(element);
+		}
+	}
 	public partial class IfcClassificationReference : IfcExternalReference, IfcClassificationReferenceSelect, IfcClassificationSelect, IfcClassificationNotationSelect
 	{
-		//internal int mReferencedSource;// : OPTIONAL IfcClassificationReferenceSelect; //IFC2x3 : 	OPTIONAL IfcClassification;
-		//internal string mDescription = "$";// :	OPTIONAL IfcText; IFC4
-		//internal string mSort = "$";//	 :	OPTIONAL IfcIdentifier;
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -286,6 +336,8 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "ReferencedSource") == 0)
 					ReferencedSource = mDatabase.ParseXml<IfcClassificationReferenceSelect>(child as XmlElement);
+				else if (string.Compare(name, "HasReferences") == 0)
+					HasReferences.AddRange(mDatabase.ParseXMLList<IfcClassificationReference>(child as XmlElement));
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -294,8 +346,14 @@ namespace GeometryGym.Ifc
 			IfcClassificationReferenceSelect referenced = ReferencedSource;
 			if (referenced != null && referenced != host)
 				xml.AppendChild(mDatabase[referenced.Index].GetXML(xml.OwnerDocument, "ReferencedSource", this, processed));
-			xml.SetAttribute("Description", Description);
-			xml.SetAttribute("Sort", Sort);
+			setAttribute(xml, "Description", Description);
+			setAttribute(xml, "Sort", Sort);
+
+			XmlElement element = xml.OwnerDocument.CreateElement("HasReferences");
+			foreach (IfcClassificationReference cr in HasReferences)
+				element.AppendChild(cr.GetXML(xml.OwnerDocument, "", this, processed));
+			if (element.ChildNodes.Count > 0)
+				xml.AppendChild(element);
 		}
 	}
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor

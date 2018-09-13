@@ -571,6 +571,14 @@ namespace GeometryGym.Ifc
 		internal IfcPolyloop(DatabaseIfc db, IfcPolyloop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
 		public IfcPolyloop(List<IfcCartesianPoint> polygon) : base(polygon[0].mDatabase) { mPolygon.AddRange(polygon); }
 		public IfcPolyloop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			foreach (IfcCartesianPoint p in Polygon)
+				result.AddRange(p.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcPort : IfcProduct
@@ -853,11 +861,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProcedure : IfcProcess
 	{
-		internal string mProcedureID;// : IfcIdentifier;
 		internal IfcProcedureTypeEnum mProcedureType;// : IfcProcedureTypeEnum;
 		internal string mUserDefinedProcedureType = "$";// : OPTIONAL IfcLabel;
 		internal IfcProcedure() : base() { }
-		internal IfcProcedure(DatabaseIfc db, IfcProcedure p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mProcedureID = p.mProcedureID; mProcedureType = p.mProcedureType; mUserDefinedProcedureType = p.mUserDefinedProcedureType; }
+		internal IfcProcedure(DatabaseIfc db, IfcProcedure p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mProcedureType = p.mProcedureType; mUserDefinedProcedureType = p.mUserDefinedProcedureType; }
 	}
 	[Serializable]
 	public partial class IfcProcedureType : IfcTypeProcess //IFC4
@@ -872,11 +879,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcProcess : IfcObject // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
 	{
-		internal string mIdentification = "$";// :OPTIONAL IfcIdentifier;
-		internal string mLongDescription = "$";//: OPTIONAL IfcText; 
+		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
+		internal string mLongDescription = "";//: OPTIONAL IfcText; 
 											   //INVERSE
-		internal List<IfcRelSequence> mIsSuccessorFrom = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
 		internal List<IfcRelSequence> mIsPredecessorTo = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatingProcess; 
+		internal List<IfcRelSequence> mIsSuccessorFrom = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
 		internal List<IfcRelAssignsToProcess> mOperatesOn = new List<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -889,13 +896,12 @@ namespace GeometryGym.Ifc
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
 				throw new Exception("Invalid Model View for IfcProcess : " + db.ModelView.ToString());
 		}
-
 		public bool AddOperatesOn(IfcObjectDefinition related)
 		{
 			if (mOperatesOn.Count == 0)
 				new IfcRelAssignsToProcess(this, related);
-			else if (!mOperatesOn[0].mRelatedObjects.Contains(related.mIndex))
-				mOperatesOn[0].mRelatedObjects.Add(related.mIndex);
+			else if (!mOperatesOn[0].mRelatedObjects.Contains(related))
+				mOperatesOn[0].RelatedObjects.Add(related);
 			else
 				return false;
 			return true;
@@ -981,10 +987,7 @@ namespace GeometryGym.Ifc
 			{
 				IfcRelAssignsToProduct rp = db.Factory.Duplicate(rap, ownerHistory, false) as IfcRelAssignsToProduct;
 				foreach (IfcObjectDefinition od in rap.RelatedObjects)
-				{
-					IfcObjectDefinition dup = db.Factory.Duplicate(od, ownerHistory, false) as IfcObjectDefinition;
-					rp.AddRelated(dup);
-				}
+					rp.RelatedObjects.Add(db.Factory.Duplicate(od, ownerHistory, false) as IfcObjectDefinition);
 				rp.RelatingProduct = this;
 			}
 		}
@@ -1436,7 +1439,7 @@ namespace GeometryGym.Ifc
 					if (typeP != null)
 					{
 						if (typeP.mRepresentationMaps.Count > 0)
-							typeP.genMappedItemElement(building, new IfcCartesianTransformationOperator3D(mDatabase));
+							typeP.genMappedItemElement(building, new IfcAxis2Placement3D(mDatabase.Factory.Origin));
 					}
 
 					tp.changeSchema(schema);
@@ -1490,6 +1493,23 @@ namespace GeometryGym.Ifc
 		protected IfcProperty() : base() { }
 		protected IfcProperty(DatabaseIfc db, IfcProperty p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; }
 		protected IfcProperty(DatabaseIfc db, string name) : base(db) { Name = name; }
+
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcProperty p = e as IfcProperty;
+			if (p == null || string.Compare(mName, p.mName) != 0 || string.Compare(mDescription, p.mDescription) != 0)
+				return false;
+			return base.isDuplicate(e);
+		}
+
+		public override bool Dispose(bool children)
+		{
+			if (mPartOfPset.Count > 0)
+				return false;
+			if (mPartOfComplex.Count > 0)
+				return false;
+			return base.Dispose(children);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
@@ -1755,10 +1775,11 @@ namespace GeometryGym.Ifc
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { s.mPropertyIndices.ForEach(x => addProperty( db.Factory.Duplicate(s.mDatabase[x]) as IfcProperty)); }
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
 		public IfcPropertySet(string name, IfcProperty prop) : base(prop.mDatabase, name) { addProperty(prop); }
 		public IfcPropertySet(string name, IEnumerable<IfcProperty> props) : base(props.First().mDatabase, name) { foreach(IfcProperty p in props) addProperty(p);  }
-		public IfcPropertySet(IfcObjectDefinition objectDefinition, string name, IfcProperty prop) : base(objectDefinition, name) { addProperty(prop); }
-		public IfcPropertySet(IfcObjectDefinition objectDefinition, string name, IEnumerable<IfcProperty> props) : base(objectDefinition, name) { foreach(IfcProperty p in props) addProperty(p);  }
+		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IfcProperty prop) : base(relatedObject, name) { addProperty(prop); }
+		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IEnumerable<IfcProperty> props) : base(relatedObject, name) { foreach(IfcProperty p in props) addProperty(p);  }
 		
 
 		protected override List<T> Extract<T>(Type type)
@@ -1776,16 +1797,18 @@ namespace GeometryGym.Ifc
 		public IfcPropertyTableValue AddProperty(IfcPropertyTableValue property) { addProperty(property); return property; }
 		internal void addProperty(IfcProperty property)
 		{
+			if (property == null)
+				return;
 			IfcProperty existing = null;
 			if (mHasProperties.TryGetValue(property.Name, out existing))
-				RemoveProperty(existing);
-			if (property != null)
 			{
-				mHasProperties[property.Name] = property;
-				property.mPartOfPset.Add(this);
-				if (!mPropertyIndices.Contains(property.Index))
-					mPropertyIndices.Add(property.mIndex);
+				if (property.isDuplicate(existing))
+					return;
 			}
+			mHasProperties[property.Name] = property;
+			property.mPartOfPset.Add(this);
+			if(!mPropertyIndices.Contains(property.mIndex))
+				mPropertyIndices.Add(property.mIndex);
 		}
 		public void RemoveProperty(IfcProperty property)
 		{
@@ -1806,6 +1829,16 @@ namespace GeometryGym.Ifc
 				mHasProperties.TryGetValue(name, out result);
 				return result;
 			}
+			set
+			{
+				if (string.IsNullOrEmpty(name))
+					return;
+				IfcProperty existing = this[name];
+				if (existing != null)
+					mPropertyIndices.Remove(existing.Index);
+				mHasProperties[name] = value;
+				mPropertyIndices.Add(value.Index);
+			}
 		}
 		public void SetProperties(IEnumerable<IfcProperty> properties)
 		{
@@ -1813,6 +1846,19 @@ namespace GeometryGym.Ifc
 			mPropertyIndices.Clear();
 			foreach (IfcProperty property in properties)
 				addProperty(property);
+		}
+		public override bool Dispose(bool children)
+		{
+			if (children)
+			{
+				foreach (IfcProperty p in HasProperties.Values)
+				{
+					p.mPartOfPset.Remove(this);
+					if (children)
+						p.Dispose(true);
+				}
+			}
+			return base.Dispose(children);
 		}
 		internal override void changeSchema(ReleaseVersion schema)
 		{
@@ -1890,19 +1936,19 @@ namespace GeometryGym.Ifc
 		protected IfcPropertySetDefinition() : base() { }
 		protected IfcPropertySetDefinition(DatabaseIfc db, IfcPropertySetDefinition s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 		protected IfcPropertySetDefinition(DatabaseIfc m, string name) : base(m) { Name = name; }
-		protected IfcPropertySetDefinition(IfcObjectDefinition objectDefinition, string name) : base(objectDefinition.mDatabase) { AssignObjectDefinition(objectDefinition); Name = name; }
+		protected IfcPropertySetDefinition(IfcObjectDefinition relatedObject, string name) : base(relatedObject.mDatabase) { RelateObjectDefinition(relatedObject); Name = name; }
 
-		public void AssignObjectDefinition(IfcObjectDefinition objectDefinition)
+		public void RelateObjectDefinition(IfcObjectDefinition relatedObject)
 		{
-			IfcTypeObject to = objectDefinition as IfcTypeObject;
+			IfcTypeObject to = relatedObject as IfcTypeObject;
 			if (to != null)
 				to.HasPropertySets.Add(this);
 			else
 			{
 				if (mDefinesOccurrence == null)
-					mDefinesOccurrence = new IfcRelDefinesByProperties(objectDefinition, this);
+					mDefinesOccurrence = new IfcRelDefinesByProperties(relatedObject, this);
 				else
-					mDefinesOccurrence.RelatedObjects.Add(objectDefinition);
+					mDefinesOccurrence.RelatedObjects.Add(relatedObject);
 			}
 
 		}
@@ -2003,13 +2049,12 @@ namespace GeometryGym.Ifc
 				return result;
 			}
 		}
-		public bool IsApplicable(IfcObjectDefinition obj)
+		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.Particular); }
+		public bool IsApplicable(Type type,string predefined)
 		{
 			if (mApplicableTypes == null)
 				fillApplicableTypes();
-			Type type = obj.GetType();
-			string predefined = obj.Particular;
-			foreach(ApplicableType t in mApplicableTypes)
+			foreach (ApplicableType t in mApplicableTypes)
 			{
 				if (t.isApplicable(type, predefined))
 					return true;
@@ -2066,12 +2111,35 @@ namespace GeometryGym.Ifc
 				IfcValue value = NominalValue;
 				IfcURIReference uri = value as IfcURIReference;
 				if (uri != null)
-					NominalValue = new IfcLabel(uri.URI);
+					NominalValue = new IfcLabel(uri.URI.ToString());
 				else
 				{
 					
 				}
 			}
+		}
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcPropertySingleValue psv = e as IfcPropertySingleValue;
+			if (psv == null || psv.mUnit != mUnit)
+				return false;
+			if (base.isDuplicate(e))
+			{
+				if (mNominalValue != null)
+				{
+					if (psv.mNominalValue != null)
+					{
+						if (mNominalValue.GetType() != psv.mNominalValue.GetType() || string.Compare(mNominalValue.Value.ToString(), psv.mNominalValue.Value.ToString()) != 0)
+							return false;
+					}
+					else
+						return false;
+				}
+				else if (string.Compare(mVal, psv.mVal) != 0)
+					return false;
+				return true;
+			}
+			return false;
 		}
 	}
 	[Serializable]

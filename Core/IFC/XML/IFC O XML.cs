@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcRelAssigns ra = mDatabase.ParseXml<IfcRelAssigns>(node as XmlElement);
 						if (ra != null)
-							ra.AddRelated(this);
+							ra.RelatedObjects.Add(this);
 					}
 				}
 				else if (string.Compare(name, "IsNestedBy") == 0)
