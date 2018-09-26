@@ -1953,7 +1953,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSubContractResource() : base() { }
 		internal IfcSubContractResource(DatabaseIfc db, IfcSubContractResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcSubContractResource(DatabaseIfc db) : base(db) { }
+		public IfcSubContractResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcSubContractResourceType : IfcConstructionResourceType //IFC4
@@ -1963,7 +1963,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSubContractResourceType() : base() { }
 		internal IfcSubContractResourceType(DatabaseIfc db, IfcSubContractResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcSubContractResourceType(DatabaseIfc m, string name, IfcSubContractResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcSubContractResourceType(DatabaseIfc db, string name, IfcSubContractResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcSubedge : IfcEdge

@@ -162,7 +162,6 @@ namespace GeometryGym.Ifc
 							IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
 							if (index == 0)
 							{
-								
 								if (point != null)
 								{
 									point.parseJObject(obj);

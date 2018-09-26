@@ -240,6 +240,7 @@ namespace GeometryGym.Ifc
 		internal string mDescription = "$"; // : OPTIONAL IfcText;
 											//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		//PartOfComplex : SET[0:1] OF IfcPhysicalComplexQuantity FOR HasQuantities;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public string Name
@@ -288,7 +289,7 @@ namespace GeometryGym.Ifc
 		protected IfcPhysicalSimpleQuantity(DatabaseIfc db, IfcPhysicalSimpleQuantity q) : base(db, q) { if (q.mUnit > 0) Unit = db.Factory.Duplicate(q.Unit) as IfcNamedUnit; }
 		protected IfcPhysicalSimpleQuantity(DatabaseIfc db, string name) : base(db, name) { }
 
-		internal abstract IfcMeasureValue MeasureValue { get; }
+		public abstract IfcMeasureValue MeasureValue { get; }
 	}
 	[Serializable]
 	public partial class IfcPile : IfcBuildingElement
@@ -881,13 +882,13 @@ namespace GeometryGym.Ifc
 	{
 		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "";//: OPTIONAL IfcText; 
-											   //INVERSE
+		//INVERSE
 		internal List<IfcRelSequence> mIsPredecessorTo = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatingProcess; 
 		internal List<IfcRelSequence> mIsSuccessorFrom = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
 		internal List<IfcRelAssignsToProcess> mOperatesOn = new List<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
-		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string LongDescription { get { return (mLongDescription == "$" ? "" : ParserIfc.Decode(mLongDescription)); } set { mLongDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
+		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
 
 		protected IfcProcess() : base() { }
 		protected IfcProcess(DatabaseIfc db, IfcProcess p, IfcOwnerHistory ownerHistory, bool downStream ) : base(db, p, ownerHistory, downStream) { mIdentification = p.mIdentification; mLongDescription = p.mLongDescription; }
@@ -1670,10 +1671,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPropertyEnumeratedValue : IfcSimpleProperty
 	{
-		internal List<IfcValue> mEnumerationValues = new List<IfcValue>();// : LIST [1:?] OF IfcValue;
+		internal LIST<IfcValue> mEnumerationValues = new LIST<IfcValue>();// : LIST [1:?] OF IfcValue;
 		internal int mEnumerationReference;// : OPTIONAL IfcPropertyEnumeration;   
 
-		public ReadOnlyCollection<IfcValue> EnumerationValues { get { return new ReadOnlyCollection<IfcValue>(mEnumerationValues); } }
+		public LIST<IfcValue> EnumerationValues { get { return mEnumerationValues; } set { mEnumerationValues = value; } }
 		public IfcPropertyEnumeration EnumerationReference { get { return mDatabase[mEnumerationReference] as IfcPropertyEnumeration; } set { mEnumerationReference = value == null ? 0 : value.mIndex; } }
 
 		internal IfcPropertyEnumeratedValue() : base() { }
@@ -2049,6 +2050,7 @@ namespace GeometryGym.Ifc
 				return result;
 			}
 		}
+		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfPsetTemplate.Remove(this); mHasPropertyTemplateIndices.Remove(template.Index); mHasPropertyTemplates.Remove(templateName); } }
 		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.Particular); }
 		public bool IsApplicable(Type type,string predefined)
 		{
@@ -2183,9 +2185,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPropertyTemplate : IfcPropertyTemplateDefinition    //ABSTRACT SUPERTYPE OF(ONEOF(IfcComplexPropertyTemplate, IfcSimplePropertyTemplate))
 	{   //INVERSE
-		//PartOfComplexTemplate	:	SET OF IfcComplexPropertyTemplate FOR HasPropertyTemplates;
-		internal List<IfcPropertySetTemplate> mPartOfPsetTemplate = new List<IfcPropertySetTemplate>();//	:	SET OF IfcPropertySetTemplate FOR HasPropertyTemplates;
-		public ReadOnlyCollection<IfcPropertySetTemplate> PartOfPsetTemplate => new ReadOnlyCollection<IfcPropertySetTemplate>(mPartOfPsetTemplate); 
+		internal SET<IfcComplexPropertyTemplate> mPartOfComplexTemplate = new SET<IfcComplexPropertyTemplate>();//	:	SET OF IfcComplexPropertyTemplate FOR HasPropertyTemplates;
+		internal SET<IfcPropertySetTemplate> mPartOfPsetTemplate = new SET<IfcPropertySetTemplate>();//	:	SET OF IfcPropertySetTemplate FOR HasPropertyTemplates;
+		public SET<IfcComplexPropertyTemplate> PartOfComplexTemplate { get { return mPartOfComplexTemplate; } } 
+		public SET<IfcPropertySetTemplate> PartOfPsetTemplate { get { return mPartOfPsetTemplate; } } 
 
 		protected IfcPropertyTemplate() : base() { }
 		protected IfcPropertyTemplate(DatabaseIfc db, IfcPropertyTemplate t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }

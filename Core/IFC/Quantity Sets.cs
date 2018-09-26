@@ -29,92 +29,92 @@ namespace GeometryGym.Ifc
 {
 	public partial class Qto_AirTerminalBaseQuantities : IfcElementQuantity
 	{
-		public double GrossWeight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "GrossWeight", value).mIndex); } }
-		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
-		public double TotalSurfaceArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "TotalSurfaceArea", value).mIndex); } }
+		public double GrossWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "GrossWeight", value)); } }
+		public double Perimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "Perimeter", value)); } }
+		public double TotalSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "TotalSurfaceArea", value)); } }
 		public Qto_AirTerminalBaseQuantities(IfcAirTerminal instance) : base(instance) { }
 		public Qto_AirTerminalBaseQuantities(IfcAirTerminalType type) : base(type) { }
 	}
 	public partial class Qto_BuildingStoreyBaseQuantities : IfcElementQuantity
 	{
-		public double GrossHeight { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "GrossHeight", value).mIndex); } }
-		public double NetHeight { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "NetHeight", value).mIndex); } }
-		public double GrossPerimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "GrossPerimeter", value).mIndex); } }
-		public double GrossFloorArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossFloorArea", value).mIndex); } }
-		public double NetFloorArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "NetFloorArea", value).mIndex); } }
-		public double GrossVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "GrossVolume", value).mIndex); } }
-		public double NetVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "NetVolume", value).mIndex); } }
+		public double GrossHeight { set { addQuantity(new IfcQuantityLength(mDatabase, "GrossHeight", value)); } }
+		public double NetHeight { set { addQuantity(new IfcQuantityLength(mDatabase, "NetHeight", value)); } }
+		public double GrossPerimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "GrossPerimeter", value)); } }
+		public double GrossFloorArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossFloorArea", value)); } }
+		public double NetFloorArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetFloorArea", value)); } }
+		public double GrossVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "GrossVolume", value)); } }
+		public double NetVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "NetVolume", value)); } }
 		public Qto_BuildingStoreyBaseQuantities(IfcBuildingStorey instance) : base(instance) { }
 	}
 	public partial class Qto_CoveringBaseQuantities : IfcElementQuantity
 	{
-		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
-		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "Area", value).mIndex); } }
-		public double NetArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "NetArea", value).mIndex); } }
+		public double Width { set { addQuantity(new IfcQuantityLength(mDatabase, "Width", value)); } }
+		public double Area { set { addQuantity(new IfcQuantityArea(mDatabase, "Area", value)); } }
+		public double NetArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
 		public Qto_CoveringBaseQuantities(IfcCovering instance) : base(instance) { }
 		public Qto_CoveringBaseQuantities(IfcCoveringType type) : base(type) { }
 	}
 	public partial class Qto_DoorBaseQuantities : IfcElementQuantity
 	{
-		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
-		public double GrossArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossArea", value).mIndex); } }
-		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
-		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "Area", value).mIndex); } }
+		public double Width { set { addQuantity(new IfcQuantityLength(mDatabase, "Width", value)); } }
+		public double GrossArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossArea", value)); } }
+		public double Perimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "Perimeter", value)); } }
+		public double Area { set { addQuantity(new IfcQuantityArea(mDatabase, "Area", value)); } }
 		public Qto_DoorBaseQuantities(IfcDoor instance) : base(instance) { }
 		public Qto_DoorBaseQuantities(IfcDoorType type) : base(type) { }
 	}
 	public partial class Qto_FootingBaseQuantities : IfcElementQuantity
 	{
-		public double Length { set { mQuantities.Add(new IfcQuantityLength(mDatabase,"Length",value).mIndex); } }
-		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
-		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
-		public double CrossSectionArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "CrossSectionArea", value).mIndex); } }
-		public double OuterSurfaceArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "OuterSurfaceArea", value).mIndex); } }
-		public double GrossSurfaceArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossSurfaceArea", value).mIndex); } }
-		public double GrossVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "GrossVolume", value).mIndex); } }
-		public double NetVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "NetVolume", value).mIndex); } }
-		public double GrossWeight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "GrossWeight", value).mIndex); } }
-		public double NetWeight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "NetWeight", value).mIndex); } }
+		public double Length { set { addQuantity(new IfcQuantityLength(mDatabase,"Length",value)); } }
+		public double Width { set { addQuantity(new IfcQuantityLength(mDatabase, "Width", value)); } }
+		public double Height { set { addQuantity(new IfcQuantityLength(mDatabase, "Height", value)); } }
+		public double CrossSectionArea { set { addQuantity(new IfcQuantityArea(mDatabase, "CrossSectionArea", value)); } }
+		public double OuterSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "OuterSurfaceArea", value)); } }
+		public double GrossSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossSurfaceArea", value)); } }
+		public double GrossVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "GrossVolume", value)); } }
+		public double NetVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "NetVolume", value)); } }
+		public double GrossWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "GrossWeight", value)); } }
+		public double NetWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "NetWeight", value)); } }
 		public Qto_FootingBaseQuantities(IfcFooting instance) : base(instance) { }
 		public Qto_FootingBaseQuantities(IfcFootingType type) : base(type) { }
 	}
 	public partial class Qto_ReinforcingElementBaseQuantities : IfcElementQuantity
 	{
-		public double Count { set { mQuantities.Add(new IfcQuantityCount(mDatabase, "Count", value).mIndex); } }
-		public double Length { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Length", value).mIndex); } }
-		public double Weight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "Weight", value).mIndex); } }
+		public double Count { set { addQuantity(new IfcQuantityCount(mDatabase, "Count", value)); } }
+		public double Length { set { addQuantity(new IfcQuantityLength(mDatabase, "Length", value)); } }
+		public double Weight { set { addQuantity(new IfcQuantityWeight(mDatabase, "Weight", value)); } }
 		public Qto_ReinforcingElementBaseQuantities(IfcReinforcingElement instance) : base(instance) { }
 	}
 	public partial class Qto_SpaceBaseQuantities : IfcElementQuantity
 	{
-		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
-		public double FinishCeilingHeight { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "FinishCeilingHeight", value).mIndex); } }
-		public double FinishFloorHeight { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "FinishFloorHeight", value).mIndex); } }
-		public double GrossPerimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "GrossPerimeter", value).mIndex); } }
-		public double NetPerimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "NetPerimeter", value).mIndex); } }
-		public double GrossFloorArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossFloorArea", value).mIndex); } }
-		public double NetFloorArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "NetFloorArea", value).mIndex); } }
-		public double GrossWallArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossWallArea", value).mIndex); } }
-		public double NetWallArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "NetWallArea", value).mIndex); } }
-		public double GrossCeilingArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "GrossCeilingArea", value).mIndex); } }
-		public double NetCeilingArea { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "NetCeilingArea", value).mIndex); } }
-		public double GrossVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "GrossVolume", value).mIndex); } }
-		public double NetVolume { set { mQuantities.Add(new IfcQuantityVolume(mDatabase, "NetVolume", value).mIndex); } }
+		public double Height { set { addQuantity(new IfcQuantityLength(mDatabase, "Height", value)); } }
+		public double FinishCeilingHeight { set { addQuantity(new IfcQuantityLength(mDatabase, "FinishCeilingHeight", value)); } }
+		public double FinishFloorHeight { set { addQuantity(new IfcQuantityLength(mDatabase, "FinishFloorHeight", value)); } }
+		public double GrossPerimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "GrossPerimeter", value)); } }
+		public double NetPerimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "NetPerimeter", value)); } }
+		public double GrossFloorArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossFloorArea", value)); } }
+		public double NetFloorArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetFloorArea", value)); } }
+		public double GrossWallArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossWallArea", value)); } }
+		public double NetWallArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetWallArea", value)); } }
+		public double GrossCeilingArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossCeilingArea", value)); } }
+		public double NetCeilingArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetCeilingArea", value)); } }
+		public double GrossVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "GrossVolume", value)); } }
+		public double NetVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "NetVolume", value)); } }
 		public Qto_SpaceBaseQuantities(IfcSpace instance) : base(instance) { }
 		public Qto_SpaceBaseQuantities(IfcSpaceType type) : base(type) { }
 	}
 	public partial class Qto_UnitaryEquipmentBaseQuantities : IfcElementQuantity
 	{
-		public double GrossWeight { set { mQuantities.Add(new IfcQuantityWeight(mDatabase, "GrossWeight", value).mIndex); } }
+		public double GrossWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "GrossWeight", value)); } }
 		public Qto_UnitaryEquipmentBaseQuantities(IfcUnitaryEquipment instance) : base(instance) { }
 		public Qto_UnitaryEquipmentBaseQuantities(IfcUnitaryEquipmentType type) : base(type) { }
 	}
 	public partial class Qto_WindowBaseQuantities : IfcElementQuantity
 	{
-		public double Width { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Width", value).mIndex); } }
-		public double Height { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Height", value).mIndex); } }
-		public double Perimeter { set { mQuantities.Add(new IfcQuantityLength(mDatabase, "Perimeter", value).mIndex); } }
-		public double Area { set { mQuantities.Add(new IfcQuantityArea(mDatabase, "Area", value).mIndex); } }
+		public double Width { set { addQuantity(new IfcQuantityLength(mDatabase, "Width", value)); } }
+		public double Height { set { addQuantity(new IfcQuantityLength(mDatabase, "Height", value)); } }
+		public double Perimeter { set { addQuantity(new IfcQuantityLength(mDatabase, "Perimeter", value)); } }
+		public double Area { set { addQuantity(new IfcQuantityArea(mDatabase, "Area", value)); } }
 		public Qto_WindowBaseQuantities(IfcWindow instance) : base(instance) { }
 		public Qto_WindowBaseQuantities(IfcWindowType type) : base(type) { }
 	}

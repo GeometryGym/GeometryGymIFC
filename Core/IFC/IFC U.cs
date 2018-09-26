@@ -86,7 +86,7 @@ namespace GeometryGym.Ifc
 
 		public IfcUnitAssignment SetUnits(Length length)
 		{
-			Units.Add( mDatabase.Factory.LengthUnit(length));
+			Units.Add(mDatabase.Factory.LengthUnit(length));
 			if (length == Length.Millimetre)
 				mDatabase.ScaleSI = 0.001;
 			else if (length == Length.Centimetre)
@@ -109,11 +109,10 @@ namespace GeometryGym.Ifc
 				Units.Add(mDatabase.Factory.SIVolume);
 			if (this[IfcUnitEnum.PLANEANGLEUNIT] == null)
 			{
-				IfcSIUnit radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
 				if (mDatabase.Factory.Options.AngleUnitsInRadians)
-					Units.Add(radians);
+					Units.Add(new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN));
 				else
-					Units.Add(new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, "DEGREE", new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(Math.PI / 180.0), radians)));
+					Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.degree));
 			}
 			if (this[IfcUnitEnum.TIMEUNIT] == null)
 			{
@@ -217,17 +216,18 @@ namespace GeometryGym.Ifc
 			}
 		}
 		
-		internal void Replace(IfcConversionBasedUnit cbu)
+		internal void Replace(IfcNamedUnit unit)
 		{
 			for (int icounter = 0; icounter < mUnits.Count; icounter++)
 			{
 				IfcNamedUnit u = mUnits[icounter] as IfcNamedUnit;
-				if (u != null && u.UnitType == cbu.UnitType)
+				if (u != null && u.UnitType == unit.UnitType)
 				{
-					mUnits[icounter] = cbu;
+					mUnits[icounter] = unit;
 					return;
 				}
 			}
+			Units.Add(unit);
 		}
 		
 		internal double ScaleSI(IfcUnitEnum unitType)

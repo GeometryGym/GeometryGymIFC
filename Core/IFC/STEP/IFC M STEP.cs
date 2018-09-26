@@ -485,10 +485,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcMonetaryUnit : BaseClassIfc, IfcUnit
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release == ReleaseVersion.IFC2x3 ? ",." + mCurrency + "." : ",'" + mCurrency + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release == ReleaseVersion.IFC2x3 ? ",." + mCurrency + "." : ",'" + ParserIfc.Encode(mCurrency) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mCurrency = ParserSTEP.StripField(str, ref pos, len).Replace(release == ReleaseVersion.IFC2x3 ? "." : "'", "");
+			mCurrency = ParserIfc.Decode( ParserSTEP.StripField(str, ref pos, len).Replace(release == ReleaseVersion.IFC2x3 ? "." : "'", ""));
 		}
 	}
 	public partial class IfcMotorConnection : IfcEnergyConversionDevice //IFC4

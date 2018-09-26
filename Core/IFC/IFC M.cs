@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema) { MappingSource.changeSchema(schema); }
 	}
 	[Serializable]
-	public partial class IfcMaterial : IfcMaterialDefinition
+	public partial class IfcMaterial : IfcMaterialDefinition, NamedObjectIfc
 	{
 		private string mName = "";// : IfcLabel; 
 		private string mDescription = "$";// : IFC4 OPTIONAL IfcText;
@@ -997,6 +997,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcMonetaryUnit : BaseClassIfc, IfcUnit
 	{
 		internal string mCurrency = "USD";   //: IFC4 change	Ifc2x3 IfcCurrencyEnum 
+		public string Currency { get { return mCurrency; } set { mCurrency = value; } }
 		
 		internal IfcMonetaryUnit() : base() { }
 		internal IfcMonetaryUnit(DatabaseIfc db, IfcMonetaryUnit m) : base(db, m) { mCurrency = m.mCurrency; }

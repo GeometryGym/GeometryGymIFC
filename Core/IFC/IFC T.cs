@@ -1094,8 +1094,9 @@ namespace GeometryGym.Ifc
 			DatabaseIfc db = host.Database;
 			string typename = this.GetType().Name;
 			typename = typename.Substring(0, typename.Length - 4);
-			IfcProductRepresentation pr = IfcProductRepresentation.convertRep(new IfcMappedItem(RepresentationMaps[0], db.Factory.XYPlaneTransformation), new List<int>());
-			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.Placement, relativePlacement), pr);
+			IfcShapeRepresentation sr = new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], db.Factory.XYPlaneTransformation));
+			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
+			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.Placement, relativePlacement), pds);
 			element.setRelatingType(this);
 			foreach (IfcRelNests nests in IsNestedBy)
 			{

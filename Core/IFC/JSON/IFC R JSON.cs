@@ -627,13 +627,6 @@ namespace GeometryGym.Ifc
 			if (reps.Count > 0)
 				obj["RepresentationsInContext"] = reps;
 
-			DatabaseIfc db = new DatabaseIfc(ModelView.Ifc4NotAssigned);
-			db.Factory.Options.GenerateOwnerHistory = false;
-			IfcProject project = new IfcProject(db, "MyProjectNumber");
-			project.UnitsInContext = new IfcUnitAssignment(db).SetUnits(IfcUnitAssignment.Length.Inch);
-			IfcPolyline line = new IfcPolyline(new IfcCartesianPoint(db, 0, 0, 0), new IfcCartesianPoint(db, 10, 0, 0));
-			new IfcPresentationLayerAssignment("Default", line) { };
-			IfcShapeRepresentation sr = new IfcShapeRepresentation(line);
 		}
 	}
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/

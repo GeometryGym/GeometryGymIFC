@@ -291,16 +291,23 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + (mMethodOfMeasurement == "$" ? ",$,(" : ",'" + mMethodOfMeasurement + "',(") + (mQuantities.Count > 0 ? "#" + mQuantities[0] : "");
-			for (int icounter = 1; icounter < mQuantities.Count; icounter++)
-				str += ",#" + mQuantities[icounter];
-			return str + ")";
+			return base.BuildStringSTEP(release) + (mMethodOfMeasurement == "$" ? ",$,(#" : ",'" + mMethodOfMeasurement + "',(#") + string.Join(",#", mQuantityIndices) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mMethodOfMeasurement = ParserSTEP.StripString(str, ref pos, len);
-			mQuantities = ParserSTEP.StripListLink(str, ref pos, len);
+			mQuantityIndices = ParserSTEP.StripListLink(str, ref pos, len);
+		}
+		internal override void postParseRelate()
+		{
+			base.postParseRelate();
+			foreach (int i in mQuantityIndices)
+			{
+				IfcPhysicalQuantity q = mDatabase[i] as IfcPhysicalQuantity;
+				if (q != null)
+					addQuantity(q);
+			}
 		}
 	}
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))

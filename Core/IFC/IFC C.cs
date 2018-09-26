@@ -172,7 +172,7 @@ namespace GeometryGym.Ifc
 			get
 			{
 				double tol = (mDatabase == null ? 1e-6 : mDatabase.Tolerance / 100);
-				int digits = (mDatabase == null ? 4 : mDatabase.mLengthDigits);
+				int digits = (mDatabase == null ? 5 : mDatabase.mLengthDigits);
 				double x = Math.Round(mCoordinateX, digits), y = Math.Round(double.IsNaN(mCoordinateY) ? 0 : mCoordinateY, digits);
 
 				if (Math.Abs(x) < tol)
@@ -823,7 +823,42 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	//IfcComplexPropertyTemplate
+	[Serializable]
+	public partial class IfcComplexPropertyTemplate : IfcPropertyTemplate
+	{
+		private string mUsageName = "";// : OPTIONAL IfcLabel;
+		private IfcComplexPropertyTemplateTypeEnum mTemplateType = IfcComplexPropertyTemplateTypeEnum.NOTDEFINED;// : OPTIONAL IfcComplexPropertyTemplateTypeEnum;
+		private List<int> mHasPropertyTemplateIndices = new List<int>(1);//
+		private Dictionary<string, IfcPropertyTemplate> mHasPropertyTemplates = new Dictionary<string, IfcPropertyTemplate>();//  : SET [1:?] OF IfcPropertyTemplate;
+
+		public string UsageName { get { return mUsageName; } set { mUsageName = value; } }
+		public IfcComplexPropertyTemplateTypeEnum TemplateType { get { return mTemplateType; } set { mTemplateType = value; } }
+		public ReadOnlyDictionary<string,IfcPropertyTemplate> HasPropertyTemplates { get { return new ReadOnlyDictionary<string, IfcPropertyTemplate>(mHasPropertyTemplates); } }
+
+		internal IfcComplexPropertyTemplate() : base() { }
+		public IfcComplexPropertyTemplate(DatabaseIfc db, IfcComplexPropertyTemplate t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		{
+			mUsageName = t.mUsageName;
+			mTemplateType = t.mTemplateType;
+			if(downStream)
+				t.HasPropertyTemplates.Values.ToList().ForEach(x => AddPropertyTemplate(db.Factory.Duplicate(x) as IfcPropertyTemplate));
+		}
+		public IfcComplexPropertyTemplate(DatabaseIfc db, string name) : base(db, name) { }
+
+		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplateIndices.Add(template.mIndex); mHasPropertyTemplates.Add(template.Name, template); template.mPartOfComplexTemplate.Add(this); }
+		public IfcPropertyTemplate this[string name]
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(name))
+					return null;
+				IfcPropertyTemplate result = null;
+				mHasPropertyTemplates.TryGetValue(name, out result);
+				return result;
+			}
+		}
+		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfComplexTemplate.Remove(this); mHasPropertyTemplateIndices.Remove(template.Index); mHasPropertyTemplates.Remove(templateName); } }
+	}
 	[Serializable]
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
@@ -1136,7 +1171,6 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcConstraintclassificationRelationship; // DEPRECEATED IFC4
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcConstraintRelationship; // DEPRECEATED IFC4
-	//ENTITY IfcConstructionResource
 	[Serializable]
 	public partial class IfcConstructionEquipmentResource : IfcConstructionResource
 	{
@@ -1145,7 +1179,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcConstructionEquipmentResource() : base() { }
 		internal IfcConstructionEquipmentResource(DatabaseIfc db, IfcConstructionEquipmentResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcConstructionEquipmentResource(DatabaseIfc db) : base(db) { }
+		public IfcConstructionEquipmentResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcConstructionEquipmentResourceType : IfcConstructionResourceType //IFC4
@@ -1155,7 +1189,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcConstructionEquipmentResourceType() : base() { }
 		internal IfcConstructionEquipmentResourceType(DatabaseIfc db, IfcConstructionEquipmentResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcConstructionEquipmentResourceType(DatabaseIfc m, string name, IfcConstructionEquipmentResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcConstructionEquipmentResourceType(DatabaseIfc db, string name, IfcConstructionEquipmentResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcConstructionMaterialResource : IfcConstructionResource
@@ -1166,7 +1200,7 @@ namespace GeometryGym.Ifc
 		//UsageRatio	 : 	OPTIONAL IfcRatioMeasure; ifc2x3
 		internal IfcConstructionMaterialResource() : base() { }
 		internal IfcConstructionMaterialResource(DatabaseIfc db, IfcConstructionMaterialResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcConstructionMaterialResource(DatabaseIfc db) : base(db) { }
+		public IfcConstructionMaterialResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcConstructionMaterialResourceType : IfcConstructionResourceType //IFC4
@@ -1176,7 +1210,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcConstructionMaterialResourceType() : base() { }
 		internal IfcConstructionMaterialResourceType(DatabaseIfc db, IfcConstructionMaterialResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcConstructionMaterialResourceType(DatabaseIfc m, string name, IfcConstructionMaterialResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcConstructionMaterialResourceType(DatabaseIfc db, string name, IfcConstructionMaterialResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcConstructionProductResource : IfcConstructionResource
@@ -1186,7 +1220,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcConstructionProductResource() : base() { }
 		internal IfcConstructionProductResource(DatabaseIfc db, IfcConstructionProductResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcConstructionProductResource(DatabaseIfc db) : base(db) { }
+		public IfcConstructionProductResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcConstructionProductResourceType : IfcConstructionResourceType //IFC4
@@ -1196,18 +1230,22 @@ namespace GeometryGym.Ifc
 
 		internal IfcConstructionProductResourceType() : base() { }
 		internal IfcConstructionProductResourceType(DatabaseIfc db, IfcConstructionProductResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcConstructionProductResourceType(DatabaseIfc m, string name, IfcConstructionProductResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcConstructionProductResourceType(DatabaseIfc db, string name, IfcConstructionProductResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public abstract partial class IfcConstructionResource : IfcResource //ABSTRACT SUPERTYPE OF (ONEOF(IfcConstructionEquipmentResource, IfcConstructionMaterialResource, IfcConstructionProductResource, IfcCrewResource, IfcLaborResource, IfcSubContractResource))
 	{
 		internal int mUsage; //:	OPTIONAL IfcResourceTime; IFC4
 		internal List<int> mBaseCosts = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
-		internal int mBaseQuantity;//	 :	OPTIONAL IfcPhysicalQuantity; IFC4 
+		internal IfcPhysicalQuantity mBaseQuantity = null;//	 :	OPTIONAL IfcPhysicalQuantity; IFC4 
+
+		internal string mResourceGroup = "";// : 	OPTIONAL IfcLabel;
+		internal IfcResourceConsumptionEnum mResourceConsumption = IfcResourceConsumptionEnum.NOTDEFINED;//	 : 	OPTIONAL IfcResourceConsumptionEnum;
+		internal IfcMeasureWithUnit mBaseQuantitySS = null;//	 : 	OPTIONAL IfcMeasureWithUnit;
 
 		public IfcResourceTime Usage { get { return mDatabase[mUsage] as IfcResourceTime; } set { mUsage = (value == null  ? 0 : value.mIndex); } }
 		public ReadOnlyCollection<IfcAppliedValue> BaseCosts { get { return new ReadOnlyCollection<IfcAppliedValue>( mBaseCosts.ConvertAll(x => mDatabase[x] as IfcAppliedValue)); } }
-		public IfcPhysicalQuantity BaseQuantity { get { return mDatabase[mBaseQuantity] as IfcPhysicalQuantity; } set { mBaseQuantity = value == null ? 0 : value.mIndex; } }
+		public IfcPhysicalQuantity BaseQuantity { get { return mBaseQuantity; } set { mBaseQuantity = value; } }
 		protected IfcConstructionResource() : base() { }
 		protected IfcConstructionResource(DatabaseIfc db, IfcConstructionResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream)
 		{
@@ -1215,12 +1253,10 @@ namespace GeometryGym.Ifc
 				Usage = db.Factory.Duplicate(r.Usage) as IfcResourceTime;
 			if(r.mBaseCosts.Count > 0)
 				r.BaseCosts.ToList().ForEach(x=>addCost( db.Factory.Duplicate(x) as IfcAppliedValue));
-			if(r.mBaseQuantity > 0)
+			if(r.mBaseQuantity != null)
 				BaseQuantity = db.Factory.Duplicate(r.BaseQuantity) as IfcPhysicalQuantity;
 		}
 		protected IfcConstructionResource(DatabaseIfc db) : base(db) { }
-		protected IfcConstructionResource(DatabaseIfc m, IfcResourceTime usage, List<IfcAppliedValue> baseCosts, IfcPhysicalQuantity baseQuantity)
-			: base(m) { if (usage != null) mUsage = usage.mIndex; if (baseCosts != null && baseCosts.Count > 0) mBaseCosts = baseCosts.ConvertAll(x => x.mIndex); if (baseQuantity != null) mBaseQuantity = baseQuantity.mIndex; }
 		
 		internal void addCost(IfcAppliedValue cost) { mBaseCosts.Add(cost.mIndex); }
 	}
@@ -1458,6 +1494,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcConversionBasedUnit : IfcNamedUnit, IfcResourceObjectSelect, NamedObjectIfc //	SUPERTYPE OF(IfcConversionBasedUnitWithOffset)
 	{
+		public enum Common
+		{
+			inch, foot, yard, mile, square_inch, square_foot, square_yard, acre, square_mile, cubic_inch, cubic_foot, cubic_yard, litre, fluid_ounce_UK,
+			fluid_ounce_US, pint_UK, pint_US, gallon_UK, gallon_US, degree, ounce, pound, ton_UK, ton_US, lbf, kip, psi, ksi, minute, hour, day, btu
+		};
+		
 		private string mName = "";// : IfcLabel;
 		private int mConversionFactor;// : IfcMeasureWithUnit; 
 									  //INVERSE
@@ -1752,7 +1794,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcCrewResource() : base() { }
 		internal IfcCrewResource(DatabaseIfc db, IfcCrewResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcCrewResource(DatabaseIfc db) : base(db) { }
+		public IfcCrewResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcCrewResourceType : IfcConstructionResourceType //IFC4
@@ -1762,7 +1804,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcCrewResourceType() : base() { }
 		internal IfcCrewResourceType(DatabaseIfc db, IfcCrewResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcCrewResourceType(DatabaseIfc m, string name, IfcCrewResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcCrewResourceType(DatabaseIfc m, string name, IfcCrewResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public abstract partial class IfcCsgPrimitive3D : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBlock ,IfcRectangularPyramid ,IfcRightCircularCone ,IfcRightCircularCylinder ,IfcSphere))*/

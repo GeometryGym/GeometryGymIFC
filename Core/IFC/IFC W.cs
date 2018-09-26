@@ -304,7 +304,7 @@ namespace GeometryGym.Ifc
 	{
 		//internal string mIdentifier	 : 	IfcIdentifier; IFC4 moved to control
 		internal DateTime mCreationDate;// : IfcDateTime;
-		internal List<int> mCreators = new List<int>();// : OPTIONAL SET [1:?] OF IfcPerson;
+		internal SET<IfcPerson> mCreators = new SET<IfcPerson>();// : OPTIONAL SET [1:?] OF IfcPerson;
 		internal string mPurpose = "$";// : OPTIONAL IfcLabel;
 		internal string mDuration = "$", mTotalFloat = "$";// : OPTIONAL IfcDuration; IFC4
 		internal DateTime mStartTime;// : IfcDateTime;
@@ -315,14 +315,14 @@ namespace GeometryGym.Ifc
 		internal IfcWorkControlTypeEnum mWorkControlType = IfcWorkControlTypeEnum.NOTDEFINED;//	 : 	OPTIONAL IfcWorkControlTypeEnum; IFC2x3
 		internal string mUserDefinedControlType = "$";//	 : 	OPTIONAL IfcLabel;
 
+		public SET<IfcPerson> Creators { get { return mCreators; } } 
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcWorkControl() : base() { }
 		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream)
 		{
 			mCreationDate = c.mCreationDate;
-			if(c.mCreators.Count > 0)
-				mCreators = c.mCreators.ConvertAll(x=>db.Factory.Duplicate(c.mDatabase[x]).mIndex);
+			Creators.AddRange(c.mCreators.ConvertAll(x=>db.Factory.Duplicate(x) as IfcPerson));
 			mDuration = c.mDuration;
 			mTotalFloat = c.mTotalFloat;
 			mStartTime = c.mStartTime;

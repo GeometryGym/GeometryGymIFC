@@ -289,39 +289,27 @@ namespace GeometryGym.Ifc
 			{
 				return "";//to be implemented
 			}
-			string str = base.BuildStringSTEP(release) + "," + mIdentification + "," + mName + "," + mDescription;
-			if (mDocumentReferences.Count == 0)
-				str += ",$,";
-			else
-			{
-				str += ",(" + ParserSTEP.LinkToString(mDocumentReferences[0]);
-				for (int icounter = 1; icounter < mDocumentReferences.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mDocumentReferences[0]);
-				str += "),";
-			}
-			str += mPurpose + "," + mIntendedUse + "," + mScope + "," + mRevision + "," + ParserSTEP.LinkToString(mDocumentOwner);
-			if (mEditors.Count == 0)
-				str += ",$,";
-			else
-			{
-				str += ",(" + ParserSTEP.LinkToString(mEditors[0]);
-				for (int icounter = 1; icounter < mEditors.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mEditors[0]);
-				str += "),";
-			}
-			str += mCreationTime + "," + mLastRevisionTime + "," + (release == ReleaseVersion.IFC2x3 ? ParserSTEP.LinkToString(mSSElectronicFormat) : (mElectronicFormat == "$" ? "$" : "'" + mElectronicFormat + "'"));
-			str += (mDatabase.Release == ReleaseVersion.IFC2x3 ? ",$,$" : "," + IfcDate.STEPAttribute(mValidFrom) + IfcDate.STEPAttribute(mValidUntil));
-			return str + (mConfidentiality == IfcDocumentConfidentialityEnum.NOTDEFINED ? ",$," : ",." + mConfidentiality.ToString() + ".,") + (mStatus == IfcDocumentStatusEnum.NOTDEFINED ? "$" : "." + mStatus.ToString() + ".");
+			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mIdentification) + "','" + ParserIfc.Encode(mName) +
+				(string.IsNullOrEmpty(mDescription) ? "',$," :  "','" + ParserIfc.Encode(mDescription) + "',") + 
+				(release < ReleaseVersion.IFC4 ? (mDocumentReferences.Count == 0 ? "$," : "(#" + string.Join(",#", mDocumentReferences) + "),") : 
+				(string.IsNullOrEmpty(mLocation) ? "$," : "'" + ParserIfc.Encode(mLocation) + "',")) +
+				(string.IsNullOrEmpty(mPurpose) ? "$," : "'" + ParserIfc.Encode(mPurpose) + "',") + (string.IsNullOrEmpty(mIntendedUse) ? "$," : "'" + ParserIfc.Encode(mIntendedUse) + "',") + 
+				(string.IsNullOrEmpty(mScope) ? "$," : "'" + ParserIfc.Encode(mScope) + "',") +  
+				(string.IsNullOrEmpty(mRevision) ? "$," : "'" + ParserIfc.Encode(mRevision) + "',") + ParserSTEP.LinkToString(mDocumentOwner) + 
+				(mEditors.Count == 0 ? ",$," : ",(#" + string.Join(",#", mEditors) + "),") + IfcDateTime.STEPAttribute(mCreationTime) + "," + IfcDateTime.STEPAttribute(mLastRevisionTime) + "," + 
+				(release < ReleaseVersion.IFC4 ? ParserSTEP.LinkToString(mSSElectronicFormat) : (string.IsNullOrEmpty(mElectronicFormat) ? "$" : "'" + ParserIfc.Encode(mElectronicFormat) + "'")) +
+				(release < ReleaseVersion.IFC4 ? ",$,$" : "," + IfcDate.STEPAttribute(mValidFrom) + "," + IfcDate.STEPAttribute(mValidUntil)) +
+				(mConfidentiality == IfcDocumentConfidentialityEnum.NOTDEFINED ? ",$," : ",." + mConfidentiality.ToString() + ".,") + (mStatus == IfcDocumentStatusEnum.NOTDEFINED ? "$" : "." + mStatus.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mIdentification = ParserSTEP.StripString(str, ref pos, len);
-			mName = ParserSTEP.StripString(str, ref pos, len);
-			mDescription = ParserSTEP.StripString(str, ref pos, len);
+			mIdentification = ParserIfc.Decode( ParserSTEP.StripString(str, ref pos, len));
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			if (release == ReleaseVersion.IFC2x3)
 				mDocumentReferences = ParserSTEP.StripListLink(str, ref pos, len);
 			else
-				mLocation = ParserSTEP.StripString(str, ref pos, len);
+				mLocation = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mPurpose = ParserSTEP.StripString(str, ref pos, len);
 			mIntendedUse = ParserSTEP.StripString(str, ref pos, len);
 			mScope = ParserSTEP.StripString(str, ref pos, len);

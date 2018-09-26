@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLaborResource() : base() { }
 		internal IfcLaborResource(DatabaseIfc db, IfcLaborResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
-		internal IfcLaborResource(DatabaseIfc db) : base(db) { }
+		public IfcLaborResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcLaborResourceType : IfcConstructionResourceType //IFC4
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLaborResourceType() : base() { }
 		internal IfcLaborResourceType(DatabaseIfc db, IfcLaborResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcLaborResourceType(DatabaseIfc m, string name, IfcLaborResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcLaborResourceType(DatabaseIfc db, string name, IfcLaborResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcLagTime : IfcSchedulingTime //IFC4

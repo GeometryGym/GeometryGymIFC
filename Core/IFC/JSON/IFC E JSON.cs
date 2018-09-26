@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			base.setAttribute(obj, "MethodOfMeasurement", MethodOfMeasurement);
-			obj["Quantities"] = new JArray(Quantities.ToList().ConvertAll(x => x.getJson(this, options)));
+			obj["Quantities"] = new JArray(Quantities.Values.Select(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcElementAssembly : IfcElement

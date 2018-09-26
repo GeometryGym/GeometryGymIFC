@@ -113,6 +113,16 @@ namespace GeometryGym.Ifc
 			}
 			return (mIsTypedBy != null ? mIsTypedBy.RelatingType.FindProperty(name) : null);
 		}
+		public IfcPhysicalQuantity FindQuantity(string name)
+		{
+			foreach(IfcElementQuantity qset in mIsDefinedBy.ConvertAll(x=>x.RelatingPropertyDefinition).OfType<IfcElementQuantity>())
+			{
+				IfcPhysicalQuantity quantity = qset[name];
+				if (quantity != null)
+					return quantity;
+			}
+			return null; 
+		}
 		public override void RemoveProperty(IfcProperty property)
 		{
 			removeProperty(property, IsDefinedBy);	

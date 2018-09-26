@@ -2177,7 +2177,6 @@ namespace GeometryGym.Ifc
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mItems.CollectionChanged += mItems_CollectionChanged;
 		}
 		private void mItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -2294,8 +2293,15 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcResource : IfcObject //ABSTRACT SUPERTYPE OF (ONEOF (IfcConstructionResource))
-	{   //INVERSE 
+	{
+		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
+		internal string mLongDescription = "";//: OPTIONAL IfcText; 
+		//INVERSE 
 		internal List<IfcRelAssignsToResource> mResourceOf = new List<IfcRelAssignsToResource>();// : SET [0:?] OF IfcRelAssignsToResource FOR RelatingResource; 
+
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
+		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+
 		protected IfcResource() : base() { }
 		protected IfcResource(DatabaseIfc db, IfcResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { }
 		protected IfcResource(DatabaseIfc db) : base(db) { }

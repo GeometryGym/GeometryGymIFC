@@ -125,7 +125,7 @@ namespace GeometryGym.Ifc
 			{
 				type = Type.GetType("GeometryGym.Ifc." + name, false, true);
 				if (type != null)
-					mTypes.TryAdd(name, type);
+					mTypes[name] = type;
 			}
 			return type;	
 		}

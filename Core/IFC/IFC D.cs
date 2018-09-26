@@ -266,7 +266,17 @@ namespace GeometryGym.Ifc
 	public partial class IfcDiscreteAccessoryType : IfcElementComponentType
 	{
 		internal IfcDiscreteAccessoryTypeEnum mPredefinedType = IfcDiscreteAccessoryTypeEnum.NOTDEFINED;//:	OPTIONAL IfcDiscreteAccessoryTypeEnum; IFC4	
-		public IfcDiscreteAccessoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcDiscreteAccessoryTypeEnum PredefinedType
+		{
+			get { return mPredefinedType; }
+			set
+			{
+				mPredefinedType = value;
+				if (mDatabase.Release < ReleaseVersion.IFC4 && string.IsNullOrEmpty(ElementType))
+					ElementType = value.ToString();
+
+			}
+		}
 
 		internal IfcDiscreteAccessoryType() : base() { }
 		internal IfcDiscreteAccessoryType(DatabaseIfc db, IfcDiscreteAccessoryType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
@@ -429,17 +439,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDocumentInformation : IfcExternalInformation, IfcDocumentSelect, NamedObjectIfc
 	{
-		internal string mIdentification = "";// : IfcIdentifier;
+		internal string mIdentification;// : IfcIdentifier;
 		internal string mName;// :  IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText;
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal List<int> mDocumentReferences = new List<int>(); // ifc2x3 : OPTIONAL SET [1:?] OF IfcDocumentReference;
-		internal string mLocation = "$";// : IFC4	OPTIONAL IfcURIReference;
-		internal string mPurpose = "$", mIntendedUse = "$", mScope = "$";// : OPTIONAL IfcText;
-		internal string mRevision = "$";// : OPTIONAL IfcLabel;
+		internal string mLocation = "";// : IFC4	OPTIONAL IfcURIReference;
+		internal string mPurpose = "", mIntendedUse = "", mScope = "";// : OPTIONAL IfcText;
+		internal string mRevision = "";// : OPTIONAL IfcLabel;
 		internal int mDocumentOwner;// : OPTIONAL IfcActorSelect;
 		internal List<int> mEditors = new List<int>();// : OPTIONAL SET [1:?] OF IfcActorSelect;
 		internal DateTime mCreationTime = DateTime.MinValue, mLastRevisionTime = DateTime.MinValue;// : OPTIONAL IFC4 IfcDateTime;
-		internal string mElectronicFormat = "$";// IFC4	 :	OPTIONAL IfcIdentifier; IFC4
+		internal string mElectronicFormat = "";// IFC4	 :	OPTIONAL IfcIdentifier; IFC4
 		internal int mSSElectronicFormat;// IFC2x3 : OPTIONAL IfcDocumentElectronicFormat;
 		internal DateTime mValidFrom = DateTime.MinValue, mValidUntil = DateTime.MinValue;// : OPTIONAL Ifc2x3 IfcCalendarDate; IFC4 IfcDate
 		internal int mSSValidFrom = 0, mSSVAlidUntil = 0;
@@ -499,7 +509,7 @@ namespace GeometryGym.Ifc
 			mConfidentiality = i.mConfidentiality;
 			mStatus = i.mStatus;
 		}
-		public IfcDocumentInformation(DatabaseIfc db, string identification, string name)
+		public IfcDocumentInformation(DatabaseIfc db, string identification, string name) : base(db)
 		{
 			Identification = identification;
 			Name = name;

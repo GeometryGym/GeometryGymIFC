@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityArea(DatabaseIfc db, IfcQuantityArea q) : base(db,q) { mAreaValue = q.mAreaValue; mFormula = q.mFormula; }
 		public IfcQuantityArea(DatabaseIfc db,string name, double area) : base(db,name) { mAreaValue = area;  }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcAreaMeasure(mAreaValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcAreaMeasure(mAreaValue); } }
 	}
 	[Serializable]
 	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityCount(DatabaseIfc db, IfcQuantityCount q) : base(db,q) { mCountValue = q.mCountValue; mFormula = q.mFormula; }
 		public IfcQuantityCount(DatabaseIfc db, string name, double count) : base(db, name) { mCountValue = count; }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcCountMeasure(mCountValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcCountMeasure(mCountValue); } }
 	}
 	[Serializable]
 	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityLength(DatabaseIfc db, IfcQuantityLength q) : base(db,q) { mLengthValue = q.mLengthValue; mFormula = q.mFormula; }
 		public IfcQuantityLength(DatabaseIfc db, string name, double length) : base(db, name) { mLengthValue = length; }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcLengthMeasure(mLengthValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcLengthMeasure(mLengthValue); } }
 	}
 	[Serializable]
 	public abstract partial class IfcQuantitySet : IfcPropertySetDefinition // IFC4  ABSTRACT SUPERTYPE OF(IfcElementQuantity)
@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityTime(DatabaseIfc db, IfcQuantityTime q) : base(db,q) { mTimeValue = q.mTimeValue; mFormula = q.mFormula; }
 		public IfcQuantityTime(DatabaseIfc db, string name, int ifctimemeasure) : base(db, name) { mTimeValue = ifctimemeasure; }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcTimeMeasure(mTimeValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcTimeMeasure(mTimeValue); } }
 	}
 	[Serializable]
 	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
@@ -108,7 +108,7 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityVolume(DatabaseIfc db, IfcQuantityVolume q) : base(db,q) { mVolumeValue = q.mVolumeValue; mFormula = q.mFormula; }
 		public IfcQuantityVolume(DatabaseIfc db, string name, double volume) : base(db, name) { mVolumeValue = volume; }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcVolumeMeasure(mVolumeValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcVolumeMeasure(mVolumeValue); } }
 	}
 	[Serializable]
 	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
@@ -123,6 +123,6 @@ namespace GeometryGym.Ifc
 		internal IfcQuantityWeight(DatabaseIfc db, IfcQuantityWeight q) : base(db,q) { mWeightValue = q.mWeightValue; mFormula = q.mFormula; }
 		public IfcQuantityWeight(DatabaseIfc db, string name, double weight) : base(db, name) { mWeightValue = weight; }
 		
-		internal override IfcMeasureValue MeasureValue { get { return new IfcMassMeasure(mWeightValue); } }
+		public override IfcMeasureValue MeasureValue { get { return new IfcMassMeasure(mWeightValue); } }
 	}
 }

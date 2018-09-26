@@ -563,7 +563,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JArray array = obj.GetValue("EnumerationValues", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				mEnumerationValues = array.ToList().ConvertAll(x => DatabaseIfc.ParseValue(x as JObject));
+				mEnumerationValues.AddRange(array.Select(x => DatabaseIfc.ParseValue(x as JObject)));
 			JObject jobj = obj.GetValue("EnumerationReference", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				EnumerationReference = mDatabase.parseJObject<IfcPropertyEnumeration>(jobj);

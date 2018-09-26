@@ -685,7 +685,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			List<string> fields = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-			mEnumerationValues = fields.ConvertAll(x => ParserIfc.parseValue(x));
+			mEnumerationValues.AddRange(fields.Select(x => ParserIfc.parseValue(x)));
 			mEnumerationReference = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
@@ -769,10 +769,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mHasProperties.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",(#" + mPropertyIndices[0];
-			for (int icounter = 1; icounter < mPropertyIndices.Count; icounter++)
-				str += ",#" + mPropertyIndices[icounter];
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mPropertyIndices) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -794,7 +791,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mDatabase.Release == ReleaseVersion.IFC2x3 || mHasPropertyTemplates.Count == 0)
+			if (release < ReleaseVersion.IFC4 || mHasPropertyTemplates.Count == 0)
 				return "";
 			string str = base.BuildStringSTEP(release) + (mTemplateType == IfcPropertySetTemplateTypeEnum.NOTDEFINED ? ",$," : ",." + mTemplateType + ".,") +
 				(mApplicableEntity == "$" ? "$,(" : "'" + mApplicableEntity + "',(") + ParserSTEP.LinkToString(mHasPropertyTemplateIndices[0]);
@@ -808,7 +805,7 @@ namespace GeometryGym.Ifc
 			string field = ParserSTEP.StripField(str, ref pos, len);
 			if (field.StartsWith("."))
 				Enum.TryParse<IfcPropertySetTemplateTypeEnum>(field.Replace(".", ""), true, out mTemplateType);
-			mApplicableEntity = ParserSTEP.StripField(str, ref pos, len).Replace("'", "");
+			mApplicableEntity = ParserSTEP.StripString(str, ref pos, len);
 			mHasPropertyTemplateIndices = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 		internal override void postParseRelate()

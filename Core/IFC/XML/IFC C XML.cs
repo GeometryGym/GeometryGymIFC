@@ -420,6 +420,31 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
+	public partial class IfcComplexPropertyTemplate : IfcPropertyTemplate
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("UsageName"))
+				UsageName = xml.Attributes["UsageName"].Value;
+			if (xml.HasAttribute("TemplateType"))
+				Enum.TryParse<IfcComplexPropertyTemplateTypeEnum>(xml.Attributes["TemplateType"].Value, true, out mTemplateType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "HasPropertyTemplates") == 0)
+					mDatabase.ParseXMLList<IfcPropertyTemplate>(child).ForEach(x => AddPropertyTemplate(x));
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "UsageName", UsageName);
+			if (mTemplateType != IfcComplexPropertyTemplateTypeEnum.NOTDEFINED)
+				xml.SetAttribute("TemplateType", mTemplateType.ToString().ToLower());
+			setChild(xml, "HasPropertyTemplates", HasPropertyTemplates.Values, processed);
+		}
+	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
 		internal override void ParseXml(XmlElement xml)

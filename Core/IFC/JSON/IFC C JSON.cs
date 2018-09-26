@@ -317,6 +317,29 @@ namespace GeometryGym.Ifc
 			obj["SelfIntersect"] = mSelfIntersect.ToString();
 		}
 	}
+	public partial class IfcComplexPropertyTemplate : IfcPropertyTemplate
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("UsageName", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				UsageName = token.Value<string>();
+			token = obj.GetValue("TemplateType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcComplexPropertyTemplateTypeEnum>(token.Value<string>(), true, out mTemplateType);
+			mDatabase.extractJArray<IfcPropertyTemplate>(obj.GetValue("HasPropertyTemplates", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddPropertyTemplate(x));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			setAttribute(obj, "UsageName", UsageName);
+			if (mTemplateType != IfcComplexPropertyTemplateTypeEnum.NOTDEFINED)
+				obj["TemplateType"] = mTemplateType.ToString();
+			if(mHasPropertyTemplates.Count > 0)
+				obj["HasPropertyTemplates"] = new JArray(HasPropertyTemplates.Values.ToList().ConvertAll(x => x.getJson(this, options)));
+		}
+	}
 	public partial class IfcConnectedFaceSet : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcClosedShell ,IfcOpenShell))
 	{
 		internal override void parseJObject(JObject obj)

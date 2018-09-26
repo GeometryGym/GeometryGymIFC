@@ -226,31 +226,14 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcWorkControl : IfcControl //ABSTRACT SUPERTYPE OF(ONEOF(IfcWorkPlan, IfcWorkSchedule))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release)
-		{
-			string str = base.BuildStringSTEP(release) + "," + (release == ReleaseVersion.IFC2x3 ? "'" + mIdentification + "'," + ParserSTEP.LinkToString(mSSCreationDate) : IfcDateTime.STEPAttribute(mCreationDate));
-			if (mCreators.Count > 0)
-			{
-				str += ",(" + ParserSTEP.LinkToString(mCreators[0]);
-				for (int icounter = 1; icounter < mCreators.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mCreators[icounter]);
-				str += "),";
-			}
-			else
-				str += ",$,";
-			if (release == ReleaseVersion.IFC2x3)
-				return str + (mPurpose == "$" ? "$," : "'" + mPurpose + "',") + ParserSTEP.DoubleOptionalToString(mSSDuration) + "," + ParserSTEP.DoubleOptionalToString(mSSTotalFloat) + "," +
-					ParserSTEP.LinkToString(mSSStartTime) + "," + ParserSTEP.LinkToString(mSSFinishTime) + ",." + mWorkControlType.ToString() + (mUserDefinedControlType == "$" ? ".,$" : ".,'" + mUserDefinedControlType + "'");
-			return str + (mPurpose == "$" ? "$," : "'" + mPurpose + "',") + mDuration + "," + mTotalFloat + "," + IfcDateTime.STEPAttribute(mStartTime) + "," + IfcDateTime.STEPAttribute(mFinishTime);
-		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release == ReleaseVersion.IFC2x3)
+			if (release < ReleaseVersion.IFC4)
 			{
 				mIdentification = ParserSTEP.StripString(str, ref pos, len);
 				mSSCreationDate = ParserSTEP.StripLink(str, ref pos, len);
-				mCreators = ParserSTEP.StripListLink(str, ref pos, len);
+				Creators.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcPerson));
 				mPurpose = ParserSTEP.StripString(str, ref pos, len);
 				mSSDuration = ParserSTEP.StripDouble(str, ref pos, len);
 				mSSTotalFloat = ParserSTEP.StripDouble(str, ref pos, len);
@@ -264,7 +247,7 @@ namespace GeometryGym.Ifc
 			else
 			{
 				mCreationDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
-				mCreators = ParserSTEP.StripListLink(str, ref pos, len);
+				Creators.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPerson));
 				mPurpose = ParserSTEP.StripString(str, ref pos, len);
 				mDuration = ParserSTEP.StripString(str, ref pos, len);
 				mTotalFloat = ParserSTEP.StripString(str, ref pos, len);
@@ -272,7 +255,14 @@ namespace GeometryGym.Ifc
 				mFinishTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 			}
 		}
-		
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4 ? "'" + mIdentification + "'," + ParserSTEP.LinkToString(mSSCreationDate) : IfcDateTime.STEPAttribute(mCreationDate)) +
+				(mCreators.Count > 0 ? ",(#" + string.Join(",#", Creators.ConvertAll(x=>x.Index)) + ")," : ",$,") +
+				(release < ReleaseVersion.IFC4 ? (mPurpose == "$" ? "$," : "'" + mPurpose + "',") + ParserSTEP.DoubleOptionalToString(mSSDuration) + "," + ParserSTEP.DoubleOptionalToString(mSSTotalFloat) + "," +
+					ParserSTEP.LinkToString(mSSStartTime) + "," + ParserSTEP.LinkToString(mSSFinishTime) + ",." + mWorkControlType.ToString() + (mUserDefinedControlType == "$" ? ".,$" : ".,'" + mUserDefinedControlType + "'") :
+				(mPurpose == "$" ? "$," : "'" + mPurpose + "',") + mDuration + "," + mTotalFloat + "," + IfcDateTime.STEPAttribute(mStartTime) + "," + IfcDateTime.STEPAttribute(mFinishTime));
+		}
 	}
 	public partial class IfcWorkPlan : IfcWorkControl
 	{

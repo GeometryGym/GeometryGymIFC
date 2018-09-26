@@ -118,7 +118,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			base.setAttribute(xml, "MethodOfMeasurement", MethodOfMeasurement);
-			setChild(xml, "Quantities", Quantities, processed);
+			setChild(xml, "Quantities", Quantities.Values, processed);
 		}
 	}
 	public abstract partial class IfcElementarySurface : IfcSurface //	ABSTRACT SUPERTYPE OF(ONEOF(IfcCylindricalSurface, IfcPlane))

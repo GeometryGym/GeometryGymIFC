@@ -343,8 +343,20 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
-		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) 
+			: base(host, null, null)
 		{
+			IfcObjectPlacement hostplacement = host.Placement;
+			if (hostplacement == null)
+			{
+				if (host.Decomposes != null)
+				{
+					IfcProduct product = host.Decomposes.RelatingObject as IfcProduct;
+					if (product != null)
+						host.Placement = hostplacement = new IfcLocalPlacement(product.Placement, mDatabase.Factory.XYPlanePlacement);
+				}
+			}
+			Placement = new IfcLocalPlacement(hostplacement, placement);
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			IfcCartesianPoint cp = new IfcCartesianPoint(mDatabase, 0, 0, length);
 			IfcPolyline ipl = new IfcPolyline(mDatabase.Factory.Origin, cp);
@@ -647,13 +659,21 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	{
 		internal override string KeyWord { get { return "IfcElementQuantity"; } }
 		internal string mMethodOfMeasurement = "$";// : OPTIONAL IfcLabel;
-		internal List<int> mQuantities = new List<int>();// : SET [1:?] OF IfcPhysicalQuantity; 
+		private Dictionary<string, IfcPhysicalQuantity> mQuantities = new Dictionary<string, IfcPhysicalQuantity>();// : SET [1:?] OF IfcPhysicalQuantity;
+		private List<int> mQuantityIndices = new List<int>();
 
 		public string MethodOfMeasurement { get { return (mMethodOfMeasurement == "$" ? "" : ParserIfc.Decode(mMethodOfMeasurement)); } set { mMethodOfMeasurement = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcPhysicalQuantity> Quantities { get { return new ReadOnlyCollection<IfcPhysicalQuantity>(mQuantities.ConvertAll(x => mDatabase[x] as IfcPhysicalQuantity)); } }
+		public ReadOnlyDictionary<string, IfcPhysicalQuantity> Quantities { get { return new ReadOnlyDictionary<string, IfcPhysicalQuantity>(mQuantities); } }
+
+		protected override void initialize()
+		{
+			base.initialize();
+			mQuantities = new Dictionary<string, IfcPhysicalQuantity>();
+			mQuantityIndices = new List<int>();
+		}
 
 		internal IfcElementQuantity() : base() { }
-		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, IfcOwnerHistory ownerHistory, bool downStream) : base(db, q, ownerHistory, downStream) { mMethodOfMeasurement = q.mMethodOfMeasurement;  q.Quantities.ToList().ForEach(x => addQuantity( db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
+		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, IfcOwnerHistory ownerHistory, bool downStream) : base(db, q, ownerHistory, downStream) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
 		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.RelatedObjects.Add(obj); }
 		protected IfcElementQuantity(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
@@ -668,26 +688,25 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			{
 				if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
 				{
-					ReadOnlyCollection<IfcPhysicalQuantity> quants = Quantities;
 					if (reference.mListPositions.Count == 0)
 					{
 						string name = reference.InstanceName;
 						if (!string.IsNullOrEmpty(name))
 						{
-							foreach (IfcPhysicalQuantity q in quants)
+							foreach (IfcPhysicalQuantity q in mQuantities.Values)
 							{
 								if (string.Compare(q.Name, name) == 0)
 									result.Add(q);
 							}
 						}
 						else
-							result.AddRange(quants);
+							result.AddRange(mQuantities.Values);
 					}
 					else
 					{
 						foreach (int i in reference.mListPositions)
 						{
-							result.Add(quants[i - 1]);
+							result.Add(mDatabase[mQuantityIndices[i - 1]]);
 						}
 					}
 					return result;
@@ -695,19 +714,18 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			if (string.Compare(reference.mAttributeIdentifier, "Quantities", true) == 0)
 			{
-				ReadOnlyCollection<IfcPhysicalQuantity> quants = Quantities;
 				if (reference.mListPositions.Count == 0)
 				{
 					string name = reference.InstanceName;
 
 					if (string.IsNullOrEmpty(name))
 					{
-						foreach (IfcPhysicalQuantity q in quants)
+						foreach (IfcPhysicalQuantity q in mQuantities.Values)
 							result.AddRange(q.retrieveReference(reference.InnerReference));
 					}
 					else
 					{
-						foreach (IfcPhysicalQuantity q in quants)
+						foreach (IfcPhysicalQuantity q in mQuantities.Values)
 						{
 							if (string.Compare(name, q.Name) == 0)
 								result.AddRange(q.retrieveReference(reference.InnerReference));
@@ -717,7 +735,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				else
 				{
 					foreach (int i in reference.mListPositions)
-						result.AddRange(quants[i - 1].retrieveReference(ir));
+						result.AddRange(mDatabase[mQuantityIndices[i - 1]].retrieveReference(ir));
 				}
 				return result;
 			}
@@ -725,7 +743,49 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		internal override bool isEmpty { get { return mQuantities.Count == 0; } }
 
-		internal void addQuantity(IfcPhysicalQuantity quantity) { mQuantities.Add(quantity.mIndex); }
+		internal void addQuantity(IfcPhysicalQuantity quantity)
+		{
+			if(quantity == null)
+				return;
+			IfcPhysicalQuantity existing = null;
+			if (mQuantities.TryGetValue(quantity.Name, out existing))
+			{
+				if (quantity.isDuplicate(existing))
+					return;
+			}
+			mQuantities[quantity.Name] = quantity;
+			if (!mQuantityIndices.Contains(quantity.mIndex))
+				mQuantityIndices.Add(quantity.mIndex);
+		}
+
+		public IfcPhysicalQuantity this[string name]
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(name))
+					return null;
+				IfcPhysicalQuantity result = null;
+				mQuantities.TryGetValue(name, out result);
+				return result;
+			}
+			set
+			{
+				if (string.IsNullOrEmpty(name))
+					return;
+				IfcPhysicalQuantity existing = this[name];
+				if (existing != null)
+					mQuantityIndices.Remove(existing.Index);
+				mQuantities[name] = value;
+				mQuantityIndices.Add(value.Index);
+			}
+		}
+		public void SetQuantities(IEnumerable<IfcPhysicalQuantity> quantities)
+		{
+			mQuantities.Clear();
+			mQuantityIndices.Clear();
+			foreach (IfcPhysicalQuantity quantity in quantities)
+				addQuantity(quantity);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))
