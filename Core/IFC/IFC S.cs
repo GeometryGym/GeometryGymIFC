@@ -1881,10 +1881,15 @@ additional types	some additional representation types are given:
 		{
 			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
 			{
-				if(style is IfcPresentationStyleAssignment assignment)
-					mStyles.Add(assignment.mIndex);
-				else if (style is IfcPresentationStyle ps)
-					mStyles.Add(new IfcPresentationStyleAssignment(ps).mIndex);
+				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
+				if (presentationStyleAssignment != null)
+					mStyles.Add(presentationStyleAssignment.mIndex);
+				else
+				{
+					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
+					if (presentationStyle != null)
+						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle).mIndex);
+				}
 			}
 			else
 				mStyles.Add(style.Index);

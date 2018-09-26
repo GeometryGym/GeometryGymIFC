@@ -1458,7 +1458,7 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcRelAssignsToControl> mControls = new List<IfcRelAssignsToControl>();/// : SET OF IfcRelAssignsToControl FOR RelatingControl;
 
-		public string Identification { get => mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); set => mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); }
+		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public ReadOnlyCollection<IfcRelAssignsToControl> Controls => new ReadOnlyCollection<IfcRelAssignsToControl>(mControls);
 		protected IfcControl() : base() { }
 		protected IfcControl(DatabaseIfc db, IfcControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mIdentification = c.mIdentification; }

@@ -829,32 +829,48 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, nameString, new IfcMeasureWithUnit(new IfcLengthMeasure(unit.SIFactor * 0.0254), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.foot)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, nameString, new IfcMeasureWithUnit(new IfcLengthMeasure(unit.SIFactor * IfcUnitAssignment.FeetToMetre), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.yard)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, nameString, new IfcMeasureWithUnit(new IfcLengthMeasure(unit.SIFactor * 0.914), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.mile)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.LENGTHUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.LENGTHUNIT, nameString, new IfcMeasureWithUnit(new IfcLengthMeasure(unit.SIFactor * 1609), unit));
 			}
 
@@ -863,40 +879,60 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.AREAUNIT, nameString, new IfcMeasureWithUnit(new IfcAreaMeasure(unit.SIFactor * 0.0006452), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.square_foot)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.AREAUNIT, nameString, new IfcMeasureWithUnit(new IfcAreaMeasure(unit.SIFactor * 0.09290), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.square_yard)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.AREAUNIT, nameString, new IfcMeasureWithUnit(new IfcAreaMeasure(unit.SIFactor * 0.83612736), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.acre)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.AREAUNIT, nameString, new IfcMeasureWithUnit(new IfcAreaMeasure(unit.SIFactor * 4046.86), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.square_mile)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.AREAUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.AREAUNIT, nameString, new IfcMeasureWithUnit(new IfcAreaMeasure(unit.SIFactor * 2588881), unit));
 			}
 
@@ -905,80 +941,120 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.00001639), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.cubic_foot)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.02832), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.cubic_yard)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.7636), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.litre)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.001), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.fluid_ounce_UK)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.0000284130625), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.fluid_ounce_US)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.00002957353), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.pint_UK)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.000568), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.pint_US)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.000473), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.gallon_UK)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.004546), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.gallon_UK)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.METRE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.VOLUMEUNIT, nameString, new IfcMeasureWithUnit(new IfcVolumeMeasure(unit.SIFactor * 0.003785), unit));
 			}
 
@@ -987,8 +1063,12 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.PLANEANGLEUNIT, nameString, new IfcMeasureWithUnit(new IfcPlaneAngleMeasure(unit.SIFactor * Math.PI / 180.0), unit));
 			}
 
@@ -997,32 +1077,48 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.MASSUNIT, IfcSIPrefix.NONE, IfcSIUnitName.GRAM));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.MASSUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 28.35), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.pound)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.MASSUNIT, IfcSIPrefix.NONE, IfcSIUnitName.GRAM));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.MASSUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 454), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.ton_UK)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.MASSUNIT, IfcSIPrefix.NONE, IfcSIUnitName.GRAM));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.MASSUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 1016046.9088), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.ton_US)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.MASSUNIT, IfcSIPrefix.NONE, IfcSIUnitName.GRAM));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.MASSUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 907184.74), unit));
 			}
 
@@ -1031,16 +1127,24 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.FORCEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.NEWTON));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.FORCEUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 4.4482216153), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.kip)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.FORCEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.NEWTON));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.FORCEUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 4448.2216153), unit));
 			}
 
@@ -1049,16 +1153,24 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.FORCEUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 6894.7572932), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.ksi)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.PRESSUREUNIT, IfcSIPrefix.NONE, IfcSIUnitName.PASCAL));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.FORCEUNIT, nameString, new IfcMeasureWithUnit(new IfcMassMeasure(unit.SIFactor * 6894757.2932), unit));
 			}
 			//			 ounce, pound, ton_UK, ton_US, lbf, kip, psi, ksi, minute, hour, day, btu
@@ -1067,24 +1179,36 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.TIMEUNIT, nameString, new IfcMeasureWithUnit(new IfcTimeMeasure(unit.SIFactor*60), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.hour)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.TIMEUNIT, nameString, new IfcMeasureWithUnit(new IfcTimeMeasure(unit.SIFactor * 3600), unit));
 			}
 			if (name == IfcConversionBasedUnit.Common.day)
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.TIMEUNIT, nameString, new IfcMeasureWithUnit(new IfcTimeMeasure(unit.SIFactor * 86400), unit));
 			}
 
@@ -1093,8 +1217,12 @@ namespace GeometryGym.Ifc
 			{
 				if (unit == null)
 					assignment.Units.Add(unit = new IfcSIUnit(mDatabase, IfcUnitEnum.ENERGYUNIT, IfcSIPrefix.NONE, IfcSIUnitName.JOULE));
-				else if (unit is IfcConversionBasedUnit cbu && string.Compare(cbu.Name, nameString, true) == 0)
-					return cbu;
+				else
+				{
+					IfcConversionBasedUnit conversionBasedUnit = unit as IfcConversionBasedUnit;
+					if (conversionBasedUnit != null && string.Compare(conversionBasedUnit.Name, nameString, true) == 0)
+						return conversionBasedUnit;
+				}
 				return new IfcConversionBasedUnit(IfcUnitEnum.ENERGYUNIT, nameString, new IfcMeasureWithUnit(new IfcTimeMeasure(unit.SIFactor * 1055.056), unit));
 			}
 			return null;

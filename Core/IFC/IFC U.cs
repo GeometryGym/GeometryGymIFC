@@ -236,10 +236,12 @@ namespace GeometryGym.Ifc
 			{
 				if (namedUnit.UnitType == unitType)
 				{
-					if(namedUnit is IfcSIUnit si)
-						return si.SIFactor;
-					if(namedUnit is IfcConversionBasedUnit cbu)
-						return cbu.SIFactor;
+					IfcSIUnit siUnit = namedUnit as IfcSIUnit;
+					if(siUnit != null)
+						return siUnit.SIFactor;
+					IfcConversionBasedUnit conversionBasedUnit = namedUnit as IfcConversionBasedUnit;
+					if(conversionBasedUnit != null)
+						return conversionBasedUnit.SIFactor;
 				}
 			}
 			return 1;

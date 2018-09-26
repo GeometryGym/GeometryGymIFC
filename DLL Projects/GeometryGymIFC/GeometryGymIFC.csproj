@@ -420,6 +420,12 @@
     <Compile Include="..\..\Extensions\Drawing\System\IFC S System.Drawing.cs">
       <Link>IFC\Drawing\IFC S System.Drawing.cs</Link>
     </Compile>
+    <Compile Include="..\..\WorkInProgress\IfcAlignment\IFC Alignment JSON.cs">
+      <Link>IFC\JSON\IFC Alignment JSON.cs</Link>
+    </Compile>
+    <Compile Include="..\..\WorkInProgress\IfcAlignment\IFC Alignment.cs">
+      <Link>IFC\Core\IFC Alignment.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

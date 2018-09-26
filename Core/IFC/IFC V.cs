@@ -154,7 +154,7 @@ namespace GeometryGym.Ifc
 	public abstract class IfcDerivedMeasureValue : IfcValue
 	{
 		internal double mValue;
-		public override object Value { get => mValue; set => mValue = Convert.ToDouble(value); }
+		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
 		public override Type ValueType => typeof(double);
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcDerivedMeasureValue(double value) { mValue = value; }
@@ -374,7 +374,7 @@ namespace GeometryGym.Ifc
 	{ //,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
       //IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
 		internal double mValue;
-		public override object Value { get => mValue; set => mValue = Convert.ToDouble(value); }
+		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
 		public override Type ValueType => typeof(double);
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcMeasureValue(double value) { mValue = value; }
@@ -478,15 +478,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract class IfcSimpleValue : IfcValue // = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
 	{
-		public override string ValueString => Value.ToString();
+		public override string ValueString { get { return Value.ToString(); } }
 	}
 	//IfcBinary
 	[Serializable]
 	public partial class IfcBoolean : IfcSimpleValue
 	{
 		public bool Boolean { get; set; }
-		public override object Value { get => Boolean; set => Boolean = Convert.ToBoolean(value); }
-		public override Type ValueType => typeof(bool);
+		public override object Value { get { return Boolean; } set { Boolean = Convert.ToBoolean(value); } }
+		public override Type ValueType { get { return typeof(bool); } }
 		public IfcBoolean(bool value) { Boolean = value; }
 		public override string ToString() { return "IFCBOOLEAN(" + ParserSTEP.BoolToString(Boolean) + ")"; }
 	}
@@ -494,8 +494,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcDate : IfcSimpleValue
 	{
 		private DateTime mDate = DateTime.MinValue;
-		public override object Value { get => mDate; set => mDate = Convert.ToDateTime(value); }
-		public override Type ValueType => typeof(DateTime);
+		public override object Value { get { return mDate; } set { mDate = Convert.ToDateTime(value); } }
+		public override Type ValueType { get { return typeof(DateTime); } }
 		public IfcDate(DateTime date) { mDate = date; }
 		public override string ToString() { return "IFCDATE(" + (mDate == DateTime.MinValue ? "$)" : "'" + FormatSTEP(mDate) + "')"); }
 		internal static string FormatSTEP(DateTime date) { return date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day; }
@@ -514,8 +514,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcDateTime : IfcSimpleValue
 	{
 		private DateTime mDateTime = DateTime.MinValue;
-		public override object Value { get => mDateTime; set => mDateTime = Convert.ToDateTime(value); }
-		public override Type ValueType => typeof(DateTime);
+		public override object Value { get { return mDateTime; } set { mDateTime = Convert.ToDateTime(value); } }
+		public override Type ValueType { get { return typeof(DateTime); } }
 		public IfcDateTime(DateTime datetime) { mDateTime = datetime; }
 		public override string ToString() { return "IFCDATETIME(" + (mDateTime == DateTime.MinValue ? "$)" : "'" + FormatSTEP(mDateTime) + "')"); }
 		public static string FormatSTEP(DateTime dateTime) { return dateTime.Year + (dateTime.Month < 10 ? "-0" : "-") + dateTime.Month + (dateTime.Day < 10 ? "-0" : "-") + dateTime.Day + (dateTime.Hour < 10 ? "T0" : "T") + dateTime.Hour + (dateTime.Minute < 10 ? ":0" : ":") + dateTime.Minute + (dateTime.Second < 10 ? ":0" : ":") + dateTime.Second; }
@@ -561,8 +561,8 @@ namespace GeometryGym.Ifc
 		public int Minutes { get { return mMinutes; } set { mMinutes = value; } }
 		public double Seconds { get { return mSeconds; } set { mSeconds = value; } }
 
-		public override object Value { get => ToSeconds(); set => fromSeconds(System.Convert.ToDouble(value)); }
-		public override Type ValueType => typeof(double);
+		public override object Value { get { return ToSeconds(); } set { fromSeconds(System.Convert.ToDouble(value)); } }
+		public override Type ValueType { get { return typeof(double); } }
 
 		public IfcDuration() { }
 		public static string Convert(IfcDuration d) { return (d == null ? "$" : d.ToString()); }
@@ -577,8 +577,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcIdentifier : IfcSimpleValue
 	{
 		public string Identifier { get; set; }
-		public override object Value { get => Identifier; set => Identifier = value.ToString(); }
-		public override Type ValueType => typeof(string);
+		public override object Value { get { return Identifier; } set { Identifier = value.ToString(); } }
+		public override Type ValueType { get { return typeof(string); } }
 		public IfcIdentifier(string value) { Identifier = value; }
 		public override string ToString() { return "IFCIDENTIFIER('" + ParserIfc.Encode( Identifier) + "')"; }
 	}
@@ -586,8 +586,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcInteger : IfcSimpleValue
 	{
 		public int Magnitude { get; set; } = 0;
-		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(int);
+		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(int); } }
 		public IfcInteger(int value) { Magnitude = value; }
 		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
 	}
@@ -595,7 +595,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcLabel : IfcSimpleValue
 	{
 		public string Label { get; set; }
-		public override object Value { get => Label; set => Label = value.ToString(); }
+		public override object Value { get { return Label; } set { Label = value.ToString(); } }
 		public override Type ValueType => typeof(string);
 		public IfcLabel(string value) { Label = value; }
 		public override string ToString() { return "IFCLABEL('" + ParserIfc.Encode(Label) + "')"; }
@@ -609,14 +609,14 @@ namespace GeometryGym.Ifc
 			get { return mValue; }
 			set
 			{
-				if(!Enum.TryParse<IfcLogicalEnum>(value.ToString(), true, out mValue))
+				if (!Enum.TryParse<IfcLogicalEnum>(value.ToString(), true, out mValue))
 				{
 					bool boolean = Convert.ToBoolean(value);
 					mValue = (boolean ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE);
 				}
 			}
 		}
-		public override Type ValueType => typeof(IfcLogicalEnum);
+		public override Type ValueType { get { return typeof(IfcLogicalEnum); } }
 		public IfcLogical(IfcLogicalEnum value) { mValue = value; }
 		public IfcLogical(bool value) { mValue = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; }
 		public override string ToString() { return "IFCLOGICAL(" + ParserIfc.LogicalToString(mValue) + ")"; }
@@ -625,8 +625,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcPositiveInteger : IfcSimpleValue
 	{
 		public int Magnitude { get; set; } = 0;
-		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(int);
+		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(int); } }
 		public IfcPositiveInteger(int value) { Magnitude = value; }
 		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
 	}
@@ -634,8 +634,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcReal : IfcSimpleValue
 	{
 		public double Magnitude { get; set; }
-		public override object Value { get => Magnitude; set => Magnitude = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(double);
+		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(double); } }
 		public IfcReal(double value) { Magnitude = value; }
 		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(Magnitude) + ")"; }
 	}
@@ -643,8 +643,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcText : IfcSimpleValue
 	{
 		public string Text { get; set; }
-		public override object Value { get => Text; set => Text = value.ToString(); }
-		public override Type ValueType => typeof(string);
+		public override object Value { get { return Text; } set { Text = value.ToString(); } }
+		public override Type ValueType { get { return typeof(string); } }
 		public IfcText(string value) { Text = value; }
 		public override string ToString() { return "IFCTEXT('" + ParserIfc.Encode(Text) + "')"; }
 	}
@@ -653,8 +653,8 @@ namespace GeometryGym.Ifc
 	{
 		internal string mTime = "$";
 		public override string ToString() { return mTime; }
-		public override object Value { get => parseSTEP(mTime); set => mTime = formatSTEP(Convert.ToDateTime(value)); }
-		public override Type ValueType => typeof(DateTime);
+		public override object Value { get { return parseSTEP(mTime); } set { mTime = formatSTEP(Convert.ToDateTime(value)); } }
+		public override Type ValueType { get { return typeof(DateTime); } }
 		internal static string formatSTEP(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? ":0" : ":") + date.Minute + (date.Second < 10 ? ":0" : ":") + date.Second + "'"; }
 		internal static DateTime parseSTEP(string str)
 		{
@@ -678,8 +678,8 @@ namespace GeometryGym.Ifc
 	public class IfcTimeStamp : IfcSimpleValue
 	{
 		internal int mTimeStamp { get; set; }
-		public override object Value { get => mTimeStamp; set => mTimeStamp = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(int);
+		public override object Value { get { return mTimeStamp; } set { mTimeStamp = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(int); } }
 		public IfcTimeStamp(int value) { mTimeStamp = value; }
 		public override string ToString() { return "IFCTIMESTAMP" + "(" + mTimeStamp + ")"; }
 	}
@@ -729,8 +729,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcSpecularExponent : IfcValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
-		public override object Value { get => mValue; set => mValue = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(double);
+		public override object Value { get { return mValue; } set { mValue = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(double); } }
 		public IfcSpecularExponent(double value) { mValue = value; }
 		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public override string ValueString => Value.ToString();
@@ -739,8 +739,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcSpecularRoughness : IfcValue, IfcSpecularHighlightSelect
 	{
 		internal double mValue;
-		public override object Value { get => mValue; set => mValue = Convert.ToInt32(value); }
-		public override Type ValueType => typeof(double);
+		public override object Value { get { return mValue; } set { mValue = Convert.ToInt32(value); } }
+		public override Type ValueType { get { return typeof(double); } }
 		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
 		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public override string ValueString => Value.ToString();

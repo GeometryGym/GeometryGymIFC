@@ -400,7 +400,8 @@ namespace GeometryGym.Ifc
 			IfcRelAssociatesMaterial associates = RelatedMaterialAssociation;
 			if (associates == null)
 			{
-				if(this is IfcTypeProduct typeProduct && typeProduct.ObjectTypeOf != null)
+				IfcTypeProduct typeProduct = this as IfcTypeProduct;
+				if(typeProduct != null && typeProduct.ObjectTypeOf != null)
 				{
 					SET<IfcObject> related = typeProduct.ObjectTypeOf.RelatedObjects;
 					IfcMaterialLayerSet layerSet = related[0].detectMaterialLayerSet();

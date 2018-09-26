@@ -353,9 +353,9 @@ namespace GeometryGym.Ifc
 		internal DateTime mStart = DateTime.MinValue;//	 :	OPTIONAL IfcDate;
 		internal DateTime mFinish = DateTime.MinValue;//	 :	OPTIONAL IfcDate; 
 
-		internal IfcRecurrencePattern RecurrencePattern { get => mDatabase[mRecurrencePattern] as IfcRecurrencePattern; set => mRecurrencePattern = (value == null ? 0 : value.mIndex); }
-		public DateTime Start { get => mStart; set => mStart = value; }
-		public DateTime Finish { get => mFinish; set => mFinish = value; }
+		internal IfcRecurrencePattern RecurrencePattern { get { return mDatabase[mRecurrencePattern] as IfcRecurrencePattern; } set { mRecurrencePattern = (value == null ? 0 : value.mIndex); } }
+		public DateTime Start { get { return mStart; } set { mStart = value; } }
+		public DateTime Finish { get { return mFinish; } set { mFinish = value; } }
 
 		internal IfcWorkTime() : base() { }
 		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t) : base(db,t) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
