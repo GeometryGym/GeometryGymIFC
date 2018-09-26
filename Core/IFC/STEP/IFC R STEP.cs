@@ -1170,15 +1170,16 @@ namespace GeometryGym.Ifc
 				if (od == null)
 					continue;
 				od.Nests = this;
-				if(od is IfcDistributionPort dp)
+				IfcDistributionPort distributionPort = od as IfcDistributionPort;
+				if(distributionPort != null)
 				{
 					IfcFlowSegment fs = relating as IfcFlowSegment;
 					if (fs != null)
 					{
-						if (dp.mFlowDirection == IfcFlowDirectionEnum.SOURCE)
-							fs.mSourcePort = dp;
-						else if (dp.mFlowDirection == IfcFlowDirectionEnum.SINK)
-							fs.mSinkPort = dp;
+						if (distributionPort.mFlowDirection == IfcFlowDirectionEnum.SOURCE)
+							fs.mSourcePort = distributionPort;
+						else if (distributionPort.mFlowDirection == IfcFlowDirectionEnum.SINK)
+							fs.mSinkPort = distributionPort;
 					}
 				}
 			}

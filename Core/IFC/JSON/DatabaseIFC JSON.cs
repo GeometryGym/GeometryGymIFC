@@ -269,11 +269,14 @@ namespace GeometryGym.Ifc
 						if (!options.Encountered.Contains(e.mGlobalId))
 							data.Add(e.getJson(null, options));
 					}
-					else if (e is NamedObjectIfc named)
+					else
 					{
-						data.Add(e.getJson(null, options));
+						NamedObjectIfc named = e as NamedObjectIfc;
+						if (named != null)
+						{
+							data.Add(named.getJson(null, options));
+						}
 					}
-
 				}
 			}
 			ifcFile["DATA"] = data;

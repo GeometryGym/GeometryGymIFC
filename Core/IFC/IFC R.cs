@@ -1364,7 +1364,8 @@ namespace GeometryGym.Ifc
 		}
 		private void relate(IfcProduct product)
 		{
-			if (product is IfcElement element)
+			IfcElement element = product as IfcElement;
+			if (element != null)
 			{
 				if (element.mContainedInStructure != this)
 				{
@@ -1373,57 +1374,76 @@ namespace GeometryGym.Ifc
 					element.mContainedInStructure = this;
 				}
 			}
-			else if (product is IfcGrid grid)
+			else
 			{
-				if(grid.mContainedInStructure != this)
+				IfcGrid grid = product as IfcGrid;
+				if (grid != null)
 				{
-					if (grid.mContainedInStructure != null)
-						grid.mContainedInStructure.removeObject(grid);
-					grid.mContainedInStructure = this;
+					if (grid.mContainedInStructure != this)
+					{
+						if (grid.mContainedInStructure != null)
+							grid.mContainedInStructure.removeObject(grid);
+						grid.mContainedInStructure = this;
+					}
 				}
-
-			}
-			else if (product is IfcAnnotation annotation)
-			{
-				if(annotation.mContainedInStructure != this)
+				else
 				{
-					if (annotation.mContainedInStructure != null)
-						annotation.mContainedInStructure.removeObject(annotation);
-					annotation.mContainedInStructure = this;
-				}
+					IfcAnnotation annotation = product as IfcAnnotation;
+					if (annotation != null)
+					{
+						if (annotation.mContainedInStructure != this)
+						{
+							if (annotation.mContainedInStructure != null)
+								annotation.mContainedInStructure.removeObject(annotation);
+							annotation.mContainedInStructure = this;
+						}
 
-			}
-			else if (product is IfcPositioningElement p)
-			{
-				if(p.mContainedInStructure != this)
-				{
-					if (p.mContainedInStructure != null)
-						p.mContainedInStructure.removeObject(p);
-					p.mContainedInStructure = this;
+					}
+					else
+					{
+						IfcPositioningElement positioningElement = product as IfcPositioningElement;
+						if(positioningElement  != null)
+						{
+							if (positioningElement.mContainedInStructure != this)
+							{
+								if (positioningElement.mContainedInStructure != null)
+									positioningElement.mContainedInStructure.removeObject(positioningElement);
+								positioningElement.mContainedInStructure = this;
+							}
+						}
+					}
 				}
 			}
 		}
 		private void removeObject(IfcProduct product)
 		{
-			if(product is IfcElement element)
+			IfcElement element = product as IfcElement;
+			if(element != null)
 			{
 				if (element.mContainedInStructure == this)
 					element.mContainedInStructure = null;
+				return;
 			}
-			else if (product is IfcGrid grid)
+			IfcGrid grid = product as IfcGrid;
+			if (grid != null)
 			{
 				if (grid.mContainedInStructure == this)
 					grid.mContainedInStructure = null;
+				return;
 			}
-			else if(product is IfcAnnotation annotation)
+			IfcAnnotation annotation = product as IfcAnnotation;
+			if(annotation != null)
 			{
 				if (annotation.mContainedInStructure == this)
 					annotation.mContainedInStructure = null;
+				return;
 			}
-			else if (product is IfcPositioningElement p)
+			IfcPositioningElement positioningElement = product as IfcPositioningElement;
+			if (positioningElement != null)
 			{
-				if (p.mContainedInStructure == this)
-					p.mContainedInStructure = null;
+				if (positioningElement.mContainedInStructure == this)
+					positioningElement.mContainedInStructure = null;
+				return;
 			}
 		}
 	}
@@ -1621,15 +1641,20 @@ namespace GeometryGym.Ifc
 				{
 					if (o != null)
 					{
-						if (o is IfcContext context)
+						IfcContext context = o as IfcContext;
+						if (context != null)
 						{
 							if (!context.mIsDefinedBy.Contains(this))
 								context.mIsDefinedBy.Add(this);
 						}
-						else if (o is IfcObject obj)
+						else
 						{
-							if (!obj.mIsDefinedBy.Contains(this))
-								obj.mIsDefinedBy.Add(this);
+							IfcObject obj = o as IfcObject;
+							if (obj != null)
+							{
+								if (!obj.mIsDefinedBy.Contains(this))
+									obj.mIsDefinedBy.Add(this);
+							}
 						}
 					}
 				}
@@ -1640,10 +1665,15 @@ namespace GeometryGym.Ifc
 				{
 					if (o != null)
 					{
-						if (o is IfcContext context)
+						IfcContext context = o as IfcContext;
+						if (context != null)
 							context.mIsDefinedBy.Remove(this);
-						else if (o is IfcObject obj)
-							obj.mIsDefinedBy.Remove(this);
+						else
+						{
+							IfcObject obj = o as IfcObject;
+							if (obj != null)
+								obj.mIsDefinedBy.Remove(this);
+						}
 					}	
 				}
 			}

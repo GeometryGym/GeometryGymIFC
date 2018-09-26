@@ -1104,13 +1104,15 @@ namespace GeometryGym.Ifc
 		}
 		protected override void addRepresentation(IfcRepresentation r)
 		{
-			if (r is IfcShapeModel sm && !mShapeRepresentations.Contains(sm))
-				mShapeRepresentations.Add(sm);
+			IfcShapeModel shapeModel = r as IfcShapeModel;
+			if (shapeModel != null && !mShapeRepresentations.Contains(shapeModel))
+				mShapeRepresentations.Add(shapeModel);
 		}
 		protected override void removeRepresentation(IfcRepresentation r)
 		{
-			if(r is IfcShapeModel sm)
-				mShapeRepresentations.Remove(sm);
+			IfcShapeModel shapeModel = r as IfcShapeModel;
+			if(shapeModel != null)
+				mShapeRepresentations.Remove(shapeModel);
 		}
 		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 	}
