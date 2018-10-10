@@ -111,9 +111,8 @@ namespace GeometryGym.STEP
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
-		{
 			return mObjects.GetEnumerator();
-		}
+		
 		partial void printError(string str);
 		internal void logError(string str) { printError(str); }
 
