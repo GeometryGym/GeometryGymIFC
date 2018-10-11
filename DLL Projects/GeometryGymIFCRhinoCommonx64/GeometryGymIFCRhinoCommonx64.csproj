@@ -479,9 +479,6 @@
     <Compile Include="..\..\Extensions\RhinoCommon IFC\IFC Z RhinoCommon.cs">
       <Link>IFC\RhinoCommon\IFC Z RhinoCommon.cs</Link>
     </Compile>
-    <Compile Include="..\..\WorkInProgress\IfcAlignment\IFC Alignment.cs">
-      <Link>IFC\Core\IFC Alignment.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

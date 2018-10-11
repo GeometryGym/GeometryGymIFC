@@ -27,7 +27,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
-		internal Vector3D DirectionVector { get { return (mRefDirection > 0 ? RefDirection.Vector : new Vector3D(1,0,0)); } }
+		internal Vector3D DirectionVector { get { return (mRefDirection != null ? RefDirection.Vector : new Vector3D(1,0,0)); } }
 
 		internal IfcAxis2Placement2D(DatabaseIfc db, Point2D position, Vector2D dir) : base(db, position)
 		{
