@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 				obj["EdgeRadius"] = Math.Round(mEdgeRadius, digits);
 			if (!double.IsNaN(mFlangeSlope))
 				obj["FlangeSlope"] = mFlangeSlope;
-			if(mDatabase.Release == ReleaseVersion.IFC2x3 && !double.IsNaN(mCentreOfGravityInX))
+			if(mDatabase.Release < ReleaseVersion.IFC4 && !double.IsNaN(mCentreOfGravityInX))
 				obj["mCentreOfGravityInX"] = mCentreOfGravityInX;
 		}
 	}

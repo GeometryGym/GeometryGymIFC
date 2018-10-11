@@ -453,7 +453,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mDatabase.Release == ReleaseVersion.IFC2x3 && mName != "$")
+			if (mDatabase.Release < ReleaseVersion.IFC4 && mName != "$")
 				obj["ProfileName"] = Name;
 			obj["ProfileDefinition"] = ProfileDefinition.getJson(this, options);
 		}

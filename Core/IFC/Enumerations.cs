@@ -21,8 +21,21 @@ using System.Reflection;
  
 namespace GeometryGym.Ifc
 {
+	public enum ShapeRepresentationType
+	{
+		Curve2D, Annotation2D, GeometricSet, GeometricCurveSet, SurfaceModel, SolidModel, SweptSolid, CSG, Clipping, AdvancedSweptSolid, Brep, BoundingBox, SectionedSpine, MappedRepresentation,
+		[VersionAdded(ReleaseVersion.IFC4)] Point, [VersionAdded(ReleaseVersion.IFC4)] PointCloud, [VersionAdded(ReleaseVersion.IFC4)] Curve, [VersionAdded(ReleaseVersion.IFC4)] Curve3D,
+		[VersionAdded(ReleaseVersion.IFC4)] Surface, [VersionAdded(ReleaseVersion.IFC4)] Surface2D, [VersionAdded(ReleaseVersion.IFC4)] Surface3D, [VersionAdded(ReleaseVersion.IFC4)] FillArea,
+		[VersionAdded(ReleaseVersion.IFC4)] Text, [VersionAdded(ReleaseVersion.IFC4)] Tessellation, [VersionAdded(ReleaseVersion.IFC4)] AdvancedBrep, [VersionAdded(ReleaseVersion.IFC4)] LightSource
+	};
+
+	[VersionAdded(ReleaseVersion.IFC4)]
+	public enum IfcActionRequestTypeEnum { EMAIL, FAX, PHONE, POST, VERBAL, USERDEFINED, NOTDEFINED };
+	[VersionAdded(ReleaseVersion.IFC2x2)]
 	public enum IfcActionSourceTypeEnum { DEAD_LOAD_G, COMPLETION_G1, LIVE_LOAD_Q, SNOW_S, WIND_W, PRESTRESSING_P, SETTLEMENT_U, TEMPERATURE_T, EARTHQUAKE_E, FIRE, IMPULSE, IMPACT, TRANSPORT, ERECTION, PROPPING, SYSTEM_IMPERFECTION, SHRINKAGE, CREEP, LACK_OF_FIT, BUOYANCY, ICE, CURRENT, WAVE, RAIN, BRAKES, USERDEFINED, NOTDEFINED };
+	[VersionAdded(ReleaseVersion.IFC2x2)]
 	public enum IfcActionTypeEnum { PERMANENT_G, VARIABLE_Q, EXTRAORDINARY_A, USERDEFINED, NOTDEFINED };
+	[VersionAdded(ReleaseVersion.IFC2_0)]
 	public enum IfcActuatorTypeEnum { ELECTRICACTUATOR, HANDOPERATEDACTUATOR, HYDRAULICACTUATOR, PNEUMATICACTUATOR, THERMOSTATICACTUATOR, USERDEFINED, NOTDEFINED };
 	public enum IfcAddressTypeEnum { OFFICE, SITE, HOME, DISTRIBUTIONPOINT, USERDEFINED, NOTDEFINED };
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -67,6 +80,7 @@ namespace GeometryGym.Ifc
 	public enum IfcCoilTypeEnum { DXCOOLINGCOIL, WATERCOOLINGCOIL, STEAMHEATINGCOIL, WATERHEATINGCOIL, ELECTRICHEATINGCOIL, GASHEATINGCOIL, USERDEFINED, NOTDEFINED };
 	public enum IfcColumnTypeEnum { COLUMN, USERDEFINED, NOTDEFINED };
 	public enum IfcCommunicationsApplianceTypeEnum { ANTENNA, COMPUTER, FAX, GATEWAY, MODEM, NETWORKAPPLIANCE, NETWORKBRIDGE, NETWORKHUB, PRINTER, REPEATER, ROUTER, SCANNER, USERDEFINED, NOTDEFINED };
+
 	public enum IfcComplexPropertyTemplateTypeEnum { P_COMPLEX, Q_COMPLEX, NOTDEFINED };
 	public enum IfcCompressorTypeEnum { DYNAMIC, RECIPROCATING, ROTARY, SCROLL, TROCHOIDAL, SINGLESTAGE, BOOSTER, OPENTYPE, HERMETIC, SEMIHERMETIC, WELDEDSHELLHERMETIC, ROLLINGPISTON, ROTARYVANE, SINGLESCREW, TWINSCREW, USERDEFINED, NOTDEFINED };
 	public enum IfcCondenserTypeEnum { WATERCOOLEDSHELLTUBE, WATERCOOLEDSHELLCOIL, WATERCOOLEDTUBEINTUBE, WATERCOOLEDBRAZEDPLATE, AIRCOOLED, EVAPORATIVECOOLED, USERDEFINED, NOTDEFINED };

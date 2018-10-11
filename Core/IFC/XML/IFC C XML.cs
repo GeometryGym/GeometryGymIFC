@@ -269,6 +269,23 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Radius", mRadius.ToString());
 		}
 	}
+	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Radius"))
+				double.TryParse(xml.Attributes["Radius"].Value, out mRadius);
+			if (xml.HasAttribute("IsCCW"))
+				bool.TryParse(xml.Attributes["IsCCW"].Value, out mIsCCW);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Radius", Radius.ToString());
+			setAttribute(xml, "IsCCW", IsCCW.ToString());
+		}
+	}
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect //	SUBTYPE OF IfcExternalInformation;
 	{
 		//internal string mSource = "$"; //  : OPTIONAL IfcLabel;
@@ -973,6 +990,29 @@ namespace GeometryGym.Ifc
 				foreach (IfcCurve c in InnerBoundaries)
 					element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
 			}
+		}
+	}
+	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartDirection"))
+				double.TryParse(xml.Attributes["StartDirection"].Value, out mStartDirection);
+			if (xml.HasAttribute("SegmentLength"))
+				double.TryParse(xml.Attributes["SegmentLength"].Value, out mSegmentLength);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				if (string.Compare(child.Name, "StartPoint") == 0)
+					StartPoint = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(StartPoint.GetXML(xml.OwnerDocument, "StartPoint", this, processed));
+			setAttribute(xml, "StartDirection", StartDirection.ToString());
+			setAttribute(xml, "SegmentLength", SegmentLength.ToString());
 		}
 	}
 	public partial class IfcCylindricalSurface : IfcElementarySurface //IFC4

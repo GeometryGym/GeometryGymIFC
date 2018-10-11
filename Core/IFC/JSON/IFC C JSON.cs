@@ -206,6 +206,25 @@ namespace GeometryGym.Ifc
 			obj["Radius"] = Radius;
 		}
 	}
+	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Radius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Radius = token.Value<double>();
+			token = obj.GetValue("IsCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				IsCCW = token.Value<bool>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Radius"] = Radius;
+			obj["IsCCW"] = IsCCW;
+		}
+	}
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect, NamedObjectIfc //	SUBTYPE OF IfcExternalInformation;
 	{
 		//internal string mSource = "$"; //  : OPTIONAL IfcLabel;
@@ -634,6 +653,29 @@ namespace GeometryGym.Ifc
 			obj["OuterBoundary"] = OuterBoundary.getJson(this, options);
 			if (mInnerBoundaries.Count > 0)
 				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, options)));
+		}
+	}
+	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("StartPoint", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				StartPoint = mDatabase.parseJObject<IfcCartesianPoint>(token as JObject);
+			token = obj.GetValue("StartDirection", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				StartDirection = token.Value<double>();
+			token = obj.GetValue("SegmentLength", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				SegmentLength = token.Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartPoint"] = StartPoint.getJson(this, options);
+			obj["StartDirection"] = StartDirection;
+			obj["SegmentLength"] = SegmentLength;
 		}
 	}
 }

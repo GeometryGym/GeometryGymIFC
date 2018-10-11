@@ -248,6 +248,17 @@ namespace GeometryGym.Ifc
 		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
 	}
 	[Serializable]
+	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	{
+		private IfcCurve mAxis;// : IfcCurve;
+
+		public IfcCurve Axis { get { return mAxis; } set { mAxis = value; } }
+
+		protected IfcLinearPositioningElement() : base() { }
+		protected IfcLinearPositioningElement(IfcSite host, IfcCurve axis) : base(host) { Axis = axis; }
+		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
+	}
+	[Serializable]
 	public partial class IfcLineIndex : IfcSegmentIndexSelect
 	{
 		internal List<int> mIndices = new List<int>();
@@ -260,6 +271,14 @@ namespace GeometryGym.Ifc
 				indices += "," + mIndices[icounter];
 			return "IFCLINEINDEX((" + mIndices[0] + indices + "))";
 		}
+	}
+	[Serializable]
+	public partial class IfcLineSegment2D : IfcCurveSegment2D  //IFC4x1
+	{
+		internal IfcLineSegment2D() : base() { }
+		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s) : base(db, s) { }
+		internal IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
+			: base(start, startDirection, length) { }
 	}
 	[Serializable]
 	public partial class IfcLocalPlacement : IfcObjectPlacement

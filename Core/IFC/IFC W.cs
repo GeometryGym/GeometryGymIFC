@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWallStandardCase : IfcWall
 	{
-		internal override string KeyWord { get { return "IfcWall" + (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "StandardCase" : ""); } }
+		internal override string KeyWord { get { return "IfcWall" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 			double tol = mDatabase.Tolerance;
 			setMaterial(layerSetUsage);
 
-			IfcShapeRepresentation asr = new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcPolyline(new IfcCartesianPoint(db,0,0,0),new IfcCartesianPoint(db,length,0,0)));
+			IfcShapeRepresentation asr = new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcPolyline(new IfcCartesianPoint(db,0,0,0),new IfcCartesianPoint(db,length,0,0)), ShapeRepresentationType.Curve2D);
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			reps.Add(asr);
 			double t = layerSetUsage.ForLayerSet.MaterialLayers.ToList().ConvertAll(x=>x.LayerThickness).Sum();
@@ -241,7 +241,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcWindowStyle" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcWindowStyle" : base.KeyWord); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
 		internal bool mParameterTakesPrecedence;// : BOOLEAN; 
@@ -329,7 +329,7 @@ namespace GeometryGym.Ifc
 			mFinishTime = c.mFinishTime;
 		}
 	
-		internal DateTime getStart() { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
+		internal DateTime getStart() { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
 
 	}
 	[Serializable]

@@ -360,7 +360,7 @@ namespace GeometryGym.Ifc
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			IfcCartesianPoint cp = new IfcCartesianPoint(mDatabase, 0, 0, length);
 			IfcPolyline ipl = new IfcPolyline(mDatabase.Factory.Origin, cp);
-			reps.Add(new IfcShapeRepresentation( mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis),ipl));
+			reps.Add(new IfcShapeRepresentation( mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), ipl, ShapeRepresentationType.Curve2D));
 
 			profile.Associate(this);
 
@@ -399,7 +399,7 @@ namespace GeometryGym.Ifc
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			double length = Math.Sqrt(Math.Pow(arcOrigin.Item1, 2) + Math.Pow(arcOrigin.Item2, 2)), angMultipler = 1 / mDatabase.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			Tuple<double, double> normal = new Tuple<double, double>(-arcOrigin.Item2 / length, arcOrigin.Item1 / length);
-			reps.Add(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db, arcOrigin.Item1, arcOrigin.Item2, 0), new IfcDirection(db, normal.Item1, normal.Item2, 0), new IfcDirection(db, -arcOrigin.Item1, -arcOrigin.Item2, 0)), length), new IfcTrimmingSelect(0), new IfcTrimmingSelect(arcAngle * angMultipler), true, IfcTrimmingPreference.PARAMETER)));
+			reps.Add(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db, arcOrigin.Item1, arcOrigin.Item2, 0), new IfcDirection(db, normal.Item1, normal.Item2, 0), new IfcDirection(db, -arcOrigin.Item1, -arcOrigin.Item2, 0)), length), new IfcTrimmingSelect(0), new IfcTrimmingSelect(arcAngle * angMultipler), true, IfcTrimmingPreference.PARAMETER), ShapeRepresentationType.Curve2D));
 			IfcAxis2Placement3D translation = pd.CalculateTransform(profile.CardinalPoint);
 			LIST<double> pt = translation.Location.Coordinates;
 			IfcAxis1Placement axis = new IfcAxis1Placement(new IfcCartesianPoint(db, arcOrigin.Item1 - pt[0], arcOrigin.Item2 - (pt.Count > 1 ? pt[1] : 0)), new IfcDirection(db, normal.Item1, normal.Item2));
@@ -495,12 +495,14 @@ namespace GeometryGym.Ifc
 		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement pl, IfcProductRepresentation r, IfcDistributionSystem system)
 		{
 			string str = className, definedType = "", lower = str.ToLower();
-			if (host.mDatabase.Release == ReleaseVersion.IFC2x3)
+			if (host.mDatabase.Release < ReleaseVersion.IFC4)
 			{
 				if (lower.StartsWith("ifcshadingdevice"))
-					str = "IfcBuildingElementProxy.IfcShadingDevice";
+					str = "IfcBuildingElementProxy.ShadingDevice";
 				if (lower.StartsWith("ifcgeographicelement"))
-					str = "IfcBuildingElementProxy.IfcGeographicElement";
+					str = "IfcBuildingElementProxy.GeographicElement";
+				if (lower.StartsWith("ifccivilelement"))
+					str = "IfcBuildingElementProxy.CivilElement";
 			}
 			if (!string.IsNullOrEmpty(str))
 			{
@@ -534,7 +536,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 			if (!string.IsNullOrEmpty(definedType))
 			{
-				if (host.mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				if (host.mDatabase.mRelease < ReleaseVersion.IFC4)
 					element.ObjectType = definedType;
 				else
 				{
@@ -573,7 +575,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		{
 			if (m == null)
 				return;
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				mHasStructuralMember.Add(new IfcRelConnectsStructuralElement(this, m));
 			}
@@ -637,7 +639,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcElementAssemblyType() : base() { }
 		internal IfcElementAssemblyType(DatabaseIfc db, IfcElementAssemblyType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
@@ -846,7 +848,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	{  //	SUPERTYPE OF(ONEOF(IfcAirToAirHeatRecovery, IfcBoiler, IfcBurner, IfcChiller, IfcCoil, IfcCondenser, IfcCooledBeam, 
 		//IfcCoolingTower, IfcElectricGenerator, IfcElectricMotor, IfcEngine, IfcEvaporativeCooler, IfcEvaporator, IfcHeatExchanger,
 		//IfcHumidifier, IfcMotorConnection, IfcSolarDevice, IfcTransformer, IfcTubeBundle, IfcUnitaryEquipment))
-		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcEnergyConversionDevice" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcEnergyConversionDevice" : base.KeyWord; } }
 
 		internal IfcEnergyConversionDevice() : base() { }
 		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }

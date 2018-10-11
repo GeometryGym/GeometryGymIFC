@@ -209,7 +209,7 @@ namespace GeometryGym.Ifc
 		public IfcBoundaryNodeCondition(DatabaseIfc db, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz) : base(db)
 		{
 			Name = name;
-			if (db.mRelease == ReleaseVersion.IFC2x3)
+			if (db.mRelease < ReleaseVersion.IFC4)
 			{
 				if (x != null)
 				{
@@ -283,7 +283,7 @@ namespace GeometryGym.Ifc
 
 		public static IfcBoundedCurve Generate(DatabaseIfc db, IEnumerable<Tuple<double,double>> points, List<IfcSegmentIndexSelect> segments)
 		{
-			if(db.Release == ReleaseVersion.IFC2x3)
+			if(db.Release < ReleaseVersion.IFC4)
 			{
 				if(segments == null || segments.Count == 0)
 					return new IfcPolyline(db, points);
@@ -538,7 +538,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingElementPartType() : base() { }
 		internal IfcBuildingElementPartType(DatabaseIfc db, IfcBuildingElementPartType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcBuildingElementPartType(DatabaseIfc m, string name, IfcBuildingElementPartTypeEnum type) : base(m) { Name = name; if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception("XXX Only valid in IFC4 or newer!"); mPredefinedType = type; }
+		internal IfcBuildingElementPartType(DatabaseIfc m, string name, IfcBuildingElementPartTypeEnum type) : base(m) { Name = name; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("XXX Only valid in IFC4 or newer!"); mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcBuildingElementProxy : IfcBuildingElement
@@ -566,7 +566,7 @@ namespace GeometryGym.Ifc
 		{
 			Name = name;
 			mPredefinedType = type;
-			if (m.mRelease == ReleaseVersion.IFC2x3)
+			if (m.mRelease < ReleaseVersion.IFC4)
 			{
 				if (type != IfcBuildingElementProxyTypeEnum.USERDEFINED && type != IfcBuildingElementProxyTypeEnum.NOTDEFINED)
 				{
@@ -629,7 +629,7 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcSpaceHeaterType spaceHeaterType = new IfcSpaceHeaterType(this);
 			}

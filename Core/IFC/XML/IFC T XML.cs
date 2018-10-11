@@ -154,6 +154,33 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Coordinates.GetXML(xml.OwnerDocument, "Coordinates", this, processed));
 		}
 	}
+	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartRadius"))
+				double.TryParse(xml.Attributes["StartRadius"].Value, out mStartRadius);
+			if (xml.HasAttribute("EndRadius"))
+				double.TryParse(xml.Attributes["EndRadius"].Value, out mEndRadius);
+			if (xml.HasAttribute("IsStartRadiusCCW"))
+				bool.TryParse(xml.Attributes["IsStartRadiusCCW"].Value, out mIsStartRadiusCCW);
+			if (xml.HasAttribute("IsEndRadiusCCW"))
+				bool.TryParse(xml.Attributes["IsEndRadiusCCW"].Value, out mIsEndRadiusCCW);
+			if (xml.HasAttribute("TransitionCurveType"))
+				Enum.TryParse<IfcTransitionCurveType>(xml.Attributes["TransitionCurveType"].Value, out mTransitionCurveType);
+
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "StartRadius", StartRadius.ToString());
+			setAttribute(xml, "EndRadius", EndRadius.ToString());
+			setAttribute(xml, "IsStartRadiusCCW", IsStartRadiusCCW.ToString());
+			setAttribute(xml, "IsEndRadiusCCW", IsEndRadiusCCW.ToString());
+			setAttribute(xml, "TransitionCurveType", TransitionCurveType.ToString());
+		}
+	}
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -345,7 +372,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("WebSlope", mWebSlope.ToString());
 			if (!double.IsNaN(mFlangeSlope))
 				xml.SetAttribute("FlangeSlope", mFlangeSlope.ToString());
-			if (mDatabase.Release == ReleaseVersion.IFC2x3 && !double.IsNaN(mCentreOfGravityInX))
+			if (mDatabase.Release < ReleaseVersion.IFC4 && !double.IsNaN(mCentreOfGravityInX))
 				xml.SetAttribute("CentreOfGravityInX", mCentreOfGravityInX.ToString());
 		}
 	}

@@ -78,6 +78,21 @@ namespace GeometryGym.Ifc
 				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, options);
 		}
 	}
+	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Axis = mDatabase.parseJObject<IfcCurve>(token as JObject);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Axis"] = Axis.getJson(this, options);
+		}
+	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
 	{
 		internal override void parseJObject(JObject obj)

@@ -362,7 +362,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowController : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcAirTerminalBox, IfcDamper
 	{ //, IfcElectricDistributionBoard, IfcElectricTimeControl, IfcFlowMeter, IfcProtectiveDevice, IfcSwitchingDevice, IfcValve))
-		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 && this as IfcElectricDistributionPoint == null ? "IfcFlowController" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 && this as IfcElectricDistributionPoint == null ? "IfcFlowController" : base.KeyWord; } }
 
 		internal IfcFlowController() : base() { }
 		internal IfcFlowController(DatabaseIfc db, IfcFlowController c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream) { }
@@ -378,7 +378,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowFitting : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcCableCarrierFitting, IfcCableFitting, IfcDuctFitting, IfcJunctionBox, IfcPipeFitting))
 	{
-		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowFitting" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowFitting" : base.KeyWord; } }
 
 		internal IfcFlowFitting() : base() { }
 		internal IfcFlowFitting(DatabaseIfc db, IfcFlowFitting f, IfcOwnerHistory ownerHistory, bool downStream) : base(db,f, ownerHistory, downStream) { }
@@ -434,7 +434,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowMovingDevice : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCompressor, IfcFan, IfcPump))
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowMovingDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowMovingDevice" : base.KeyWord); } }
 
 		internal IfcFlowMovingDevice() : base() { }
 		internal IfcFlowMovingDevice(DatabaseIfc db, IfcFlowMovingDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory ,downStream) { }
@@ -450,7 +450,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowSegment : IfcDistributionFlowElement //	SUPERTYPE OF(ONEOF(IfcCableCarrierSegment, IfcCableSegment, IfcDuctSegment, IfcPipeSegment))
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowSegment" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowSegment" : base.KeyWord); } }
 
 		internal IfcFlowSegment() : base() { }
 		internal IfcFlowSegment(DatabaseIfc db, IfcFlowSegment s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
@@ -466,7 +466,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowStorageDevice : IfcDistributionFlowElement //SUPERTYPE OF(ONEOF(IfcElectricFlowStorageDevice, IfcTank))
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowStorageDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowStorageDevice" : base.KeyWord); } }
 
 		internal IfcFlowStorageDevice() : base() { }
 		internal IfcFlowStorageDevice(DatabaseIfc db, IfcFlowStorageDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db,d, ownerHistory, downStream) { }
@@ -481,7 +481,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowTerminal : IfcDistributionFlowElement 	//SUPERTYPE OF(ONEOF(IfcAirTerminal, IfcAudioVisualAppliance, IfcCommunicationsAppliance, IfcElectricAppliance, IfcFireSuppressionTerminal, IfcLamp, IfcLightFixture, IfcMedicalDevice, IfcOutlet, IfcSanitaryTerminal, IfcSpaceHeater, IfcStackTerminal, IfcWasteTerminal))
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTerminal" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowTerminal" : base.KeyWord); } }
 
 		internal IfcFlowTerminal() : base() { }
 		protected IfcFlowTerminal(IfcFlowTerminal basis) : base(basis) { }
@@ -500,7 +500,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFlowTreatmentDevice : IfcDistributionFlowElement // 	SUPERTYPE OF(ONEOF(IfcDuctSilencer, IfcFilter, IfcInterceptor))
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFlowTreatmentDevice" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowTreatmentDevice" : base.KeyWord); } }
 
 		internal IfcFlowTreatmentDevice() : base() { }
 		internal IfcFlowTreatmentDevice(DatabaseIfc db, IfcFlowTreatmentDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }
@@ -591,7 +591,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFurniture : IfcFurnishingElement
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcFurnishingElement" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFurnishingElement" : base.KeyWord); } }
 		internal IfcFurnitureTypeEnum mPredefinedType = IfcFurnitureTypeEnum.NOTDEFINED;//: OPTIONAL IfcFurnitureTypeEnum;
 		internal IfcFurniture() : base() { }
 		internal IfcFurniture(DatabaseIfc db, IfcFurniture f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
@@ -614,7 +614,7 @@ namespace GeometryGym.Ifc
 		public IfcFurnitureType(DatabaseIfc db, string name, IfcFurnitureTypeEnum type) : base(db, name)
 		{
 			mPredefinedType = type;
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3 && string.IsNullOrEmpty(ElementType) && type != IfcFurnitureTypeEnum.NOTDEFINED)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4 && string.IsNullOrEmpty(ElementType) && type != IfcFurnitureTypeEnum.NOTDEFINED)
 				ElementType = type.ToString();
 		}
 	}

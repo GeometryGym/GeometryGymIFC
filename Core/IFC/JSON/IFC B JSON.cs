@@ -187,7 +187,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mDatabase.Release == ReleaseVersion.IFC2x3)
+			if (mDatabase.Release < ReleaseVersion.IFC4)
 			{
 				if (mTranslationalStiffnessX != null)
 					obj["LinearStiffnessX"] = (mTranslationalStiffnessX.mStiffness == null ? (mTranslationalStiffnessX.Rigid ? -1 : 0) : mTranslationalStiffnessX.mStiffness.Measure);

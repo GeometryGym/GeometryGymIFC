@@ -45,6 +45,37 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("StartRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				StartRadius = token.Value<double>();
+			token = obj.GetValue("EndRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				EndRadius = token.Value<double>();
+			token = obj.GetValue("IsStartRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				IsStartRadiusCCW = token.Value<bool>();
+			token = obj.GetValue("IsEndRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				IsEndRadiusCCW = token.Value<bool>();
+			token = obj.GetValue("TransitionCurveType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTransitionCurveType>(token.Value<string>(), true, out mTransitionCurveType);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartRadius"] = StartRadius;
+			obj["EndRadius"] = EndRadius;
+			obj["IsStartRadiusCCW"] = IsStartRadiusCCW;
+			obj["IsEndRadiusCCW"] = IsEndRadiusCCW;
+			obj["TransitionCurveType"] = mTransitionCurveType.ToString();
+		}
+	}
 	public partial class IfcTranslationalStiffnessSelect //SELECT ( IfcBoolean, IfcLinearStiffnessMeasure); 
 	{
 		internal static IfcTranslationalStiffnessSelect parseJObject(JObject obj)

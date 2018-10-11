@@ -307,7 +307,7 @@ namespace GeometryGym.Ifc
 		internal void setMaterial(IfcMaterialSelect material)
 		{
 			IfcMaterialSelect m = material;
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				IfcMaterialProfile profile = material as IfcMaterialProfile;
 				if (profile != null)
@@ -641,7 +641,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOpeningStandardCase : IfcOpeningElement //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcOpeningElement" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcOpeningElement" : base.KeyWord); } }
 		internal IfcOpeningStandardCase() : base() { }
 		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }

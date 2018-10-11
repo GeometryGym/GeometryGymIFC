@@ -557,6 +557,33 @@ namespace GeometryGym.Ifc
 		internal IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
+	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
+	{
+		private double mStartRadius = double.PositiveInfinity;// OPTIONAL IfcPositiveLengthMeasure;
+		private double mEndRadius = double.PositiveInfinity;// OPTIONAL IfcPositiveLengthMeasure;
+		private bool mIsStartRadiusCCW;// : IfcBoolean;
+		private bool mIsEndRadiusCCW;// : IfcBoolean;
+		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.BIQUADRATICPARABOLA;
+
+		public double StartRadius { get { return double.IsNaN(mStartRadius) ? double.PositiveInfinity : mStartRadius; } set { mStartRadius = value; } }
+		public double EndRadius { get { return double.IsNaN(mEndRadius) ? double.PositiveInfinity : mEndRadius; } set { mEndRadius = value; } }
+		public bool IsStartRadiusCCW { get { return mIsStartRadiusCCW; } set { mIsStartRadiusCCW = value; } }
+		public bool IsEndRadiusCCW { get { return mIsEndRadiusCCW; } set { mIsEndRadiusCCW = value; } }
+		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
+
+		internal IfcTransitionCurveSegment2D() : base() { }
+		internal IfcTransitionCurveSegment2D(IfcCartesianPoint start, double startDirection, double length, double startRadius, double endRadius, bool isStartCCW, bool isEndCCW, IfcTransitionCurveType curveType)
+			: base(start, startDirection, length)
+		{
+			mStartRadius = startRadius;
+			mEndRadius = endRadius;
+			mIsStartRadiusCCW = isStartCCW;
+			mIsEndRadiusCCW = isEndCCW;
+			mTransitionCurveType = curveType;
+		}
+		internal IfcTransitionCurveSegment2D(DatabaseIfc db, IfcTransitionCurveSegment2D s) : base(db, s) { mStartRadius = s.mStartRadius; mEndRadius = s.mEndRadius; mIsStartRadiusCCW = s.mIsStartRadiusCCW; mIsEndRadiusCCW = s.mIsEndRadiusCCW; mTransitionCurveType = s.mTransitionCurveType; }
+	}
+	[Serializable]
 	public partial class IfcTranslationalStiffnessSelect
 	{
 		internal bool mRigid = false;

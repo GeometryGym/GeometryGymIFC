@@ -338,7 +338,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
 	{ // IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement)) //"IFCDISTRIBUTIONCONTROLELEMENT"
-		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDistributionControlElement" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionControlElement" : base.KeyWord; } }
 
 		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
 		public string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -377,7 +377,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionFlowElement : IfcDistributionElement //SUPERTYPE OF (ONEOF (IfcDistributionChamberElement ,IfcEnergyConversionDevice ,
 	{ 	//IfcFlowController ,IfcFlowFitting ,IfcFlowMovingDevice,IfcFlowSegment ,IfcFlowStorageDevice ,IfcFlowTerminal ,IfcFlowTreatmentDevice))
-		internal override string KeyWord { get { return mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDistributionFlowElement" : base.KeyWord; } }
+		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionFlowElement" : base.KeyWord; } }
 
 		//INVERSE 	HasControlElements : SET [0:1] OF IfcRelFlowControlElements FOR RelatingFlowElement;
 		//GG
@@ -648,7 +648,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDoorStyle" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDoorStyle" : base.KeyWord); } }
 
 		internal IfcDoorTypeEnum mPredefinedType = IfcDoorTypeEnum.NOTDEFINED;
 		internal IfcDoorTypeOperationEnum mOperationType;// : IfcDoorStyleOperationEnum; 

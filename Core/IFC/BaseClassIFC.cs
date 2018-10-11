@@ -27,8 +27,18 @@ using System.ComponentModel;
 
 using GeometryGym.STEP;
 
+
 namespace GeometryGym.Ifc
 {
+	public class VersionAddedAttribute : Attribute
+	{
+		public ReleaseVersion Release { get; set; }
+		public VersionAddedAttribute(ReleaseVersion release)
+		{
+			Release = release;
+		}
+	}
+
 	[Serializable()]
 	public abstract partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
@@ -219,6 +229,9 @@ namespace GeometryGym.Ifc
 			
 		}
 	}
-	public partial interface IBaseClassIfc : ISTEPEntity { DatabaseIfc Database { get; } }
+	public partial interface IBaseClassIfc : ISTEPEntity
+	{
+		DatabaseIfc Database { get; }
+	}
 	public interface NamedObjectIfc : IBaseClassIfc { string Name { get; } } // GG interface
 }

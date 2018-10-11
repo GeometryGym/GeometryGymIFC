@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcCartesianPointList cpl = Points;
 				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;

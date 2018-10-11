@@ -388,11 +388,29 @@ namespace GeometryGym.Ifc
 		public IfcCircleProfileDef(DatabaseIfc db, string name, double radius) : base(db,name) { mRadius = radius; }
 	}
 	[Serializable]
+	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
+	{
+		private double mRadius;// : IfcPositiveLengthMeasure;
+		private bool mIsCCW;// : IfcBoolean;
+
+		public double Radius { get { return mRadius; } set { mRadius = value; } }
+		public bool IsCCW { get { return mIsCCW; } set { mIsCCW = value; } }
+
+		internal IfcCircularArcSegment2D() : base() { }
+		internal IfcCircularArcSegment2D(DatabaseIfc db, IfcCircularArcSegment2D s) : base(db, s) { mRadius = s.mRadius; mIsCCW = s.mIsCCW; }
+		internal IfcCircularArcSegment2D(IfcCartesianPoint start, double startDirection, double length, double radius, bool isCCW)
+			: base(start, startDirection, length)
+		{
+			mRadius = radius;
+			mIsCCW = isCCW;
+		}
+	}
+	[Serializable]
 	public partial class IfcCivilElement : IfcElement  //IFC4
 	{
 		internal IfcCivilElement() : base() { }
 		internal IfcCivilElement(DatabaseIfc db, IfcCivilElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
-		public IfcCivilElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcCivilElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public abstract partial class IfcCivilElementPart : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBridgeSegmentPart , IfcBridgeContactElement , IfcCivilSheath , IfcCivilVoid))
@@ -408,7 +426,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcCivilElementType() : base() { }
 		internal IfcCivilElementType(DatabaseIfc db, IfcCivilElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
-		internal IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		internal IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public partial class IfcCivilSheath : IfcCivilElementPart //IFC5
@@ -1333,7 +1351,8 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcContext(DatabaseIfc db, string name, IfcUnitAssignment.Length length) : this(db,name)
 		{
-			UnitsInContext = new IfcUnitAssignment(db).SetUnits(length);
+			UnitsInContext = new IfcUnitAssignment(db);
+			UnitsInContext.SetUnits(length);
 		}
 		protected IfcContext(DatabaseIfc db, string name) : base(db)
 		{
@@ -1437,14 +1456,19 @@ namespace GeometryGym.Ifc
 		public void ChangeSchemaWIP(ReleaseVersion release) { changeSchema(release); }
 		internal override void changeSchema(ReleaseVersion schema)
 		{
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 
 			}
-			else
+			else if (schema > ReleaseVersion.IFC2x3)
 			{
 				if (mDatabase.mModelView == ModelView.Ifc2x3NotAssigned)
 					mDatabase.mModelView = ModelView.Ifc4NotAssigned;
+				
+			}
+			else
+			{
+				throw new Exception("Early releases of IFC not supported yet!");
 			}
 			mDatabase.mRelease = schema;
 			base.changeSchema(schema);
@@ -1928,6 +1952,27 @@ namespace GeometryGym.Ifc
 		internal void addBoundary(IfcBoundaryCurve boundary) { mBoundaries.Add(boundary.mIndex); }
 	}
 	public interface IfcCurveOrEdgeCurve : IBaseClassIfc { }  // = SELECT (	IfcBoundedCurve, IfcEdgeCurve);
+	[Serializable]
+	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
+	{
+		private IfcCartesianPoint mStartPoint;// : IfcCartesianPoint;
+		private double mStartDirection;// : IfcPlaneAngleMeasure;
+		private double mSegmentLength;// : IfcPositiveLengthMeasure;
+
+		public IfcCartesianPoint StartPoint { get { return mStartPoint; } set { mStartPoint = value; } }
+		public double StartDirection { get { return mStartDirection; } set { mStartDirection = value; } }
+		public double SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
+
+		protected IfcCurveSegment2D() : base() { }
+		protected IfcCurveSegment2D(DatabaseIfc db, IfcCurveSegment2D p) : base(db, p) { StartPoint = db.Factory.Duplicate(p.StartPoint) as IfcCartesianPoint; mStartDirection = p.mStartDirection; mSegmentLength = p.mSegmentLength; }
+		protected IfcCurveSegment2D(IfcCartesianPoint start, double startDirection, double length)
+			: base(start.mDatabase)
+		{
+			mStartPoint = start;
+			mStartDirection = startDirection;
+			mSegmentLength = length;
+		}
+	}
 	[Serializable]
 	public partial class IfcCurveStyle : IfcPresentationStyle, IfcPresentationStyleSelect
 	{

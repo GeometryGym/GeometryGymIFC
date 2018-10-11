@@ -173,7 +173,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				obj["InteriorOrExteriorSpace"] = mPredefinedType == IfcSpaceTypeEnum.INTERNAL || mPredefinedType == IfcSpaceTypeEnum.EXTERNAL ? mPredefinedType.ToString() : "NOTDEFINED";
 			else if (mPredefinedType != IfcSpaceTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
@@ -286,7 +286,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			if (mDestabilizingLoad == IfcLogicalEnum.UNKNOWN)
 			{
-				if (mDatabase.Release == ReleaseVersion.IFC2x3)
+				if (mDatabase.Release < ReleaseVersion.IFC4)
 					obj["DestabilizingLoad"] = false;
 			}
 			else

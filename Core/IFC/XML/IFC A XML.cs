@@ -123,8 +123,8 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			if (xml.HasAttribute("PredefinedType")) 
-				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -139,13 +139,193 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcAirTerminalTypeEnum.NOTDEFINED)
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
+	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcAlignmentTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcAlignmentTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
+	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartDistAlong"))
+				double.TryParse(xml.Attributes["StartDistAlong"].Value, out mStartDistAlong);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcAlignment2DHorizontalSegment s = mDatabase.ParseXml<IfcAlignment2DHorizontalSegment>(cn as XmlElement);
+						if (s != null)
+							Segments.Add(s);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			if (!double.IsNaN(mStartDistAlong))
+				setAttribute(xml, "StartDistAlong", mStartDistAlong.ToString());
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments");
+			xml.AppendChild(element);
+			foreach (IfcAlignment2DHorizontalSegment s in Segments)
+				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+	}
+	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "CurveGeometry") == 0)
+					CurveGeometry = mDatabase.ParseXml<IfcCurveSegment2D>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(CurveGeometry.GetXML(xml.OwnerDocument, "CurveGeometry", this, processed));
+		}
+	}
+	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("TangentialContinuity"))
+				TangentialContinuity = Convert.ToBoolean(xml.Attributes["TangentialContinuity"].Value);
+			if (xml.HasAttribute("StartTag"))
+				StartTag = xml.Attributes["StartTag"].Value;
+			if (xml.HasAttribute("StartTag"))
+				StartTag = xml.Attributes["StartTag"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			if (mTangentialContinuity != IfcLogicalEnum.UNKNOWN)
+				setAttribute(xml, "TangentialContinuity", mTangentialContinuity == IfcLogicalEnum.TRUE ? "true" : "false");
+			setAttribute(xml, "StartTag", StartTag);
+			setAttribute(xml, "EndTag", EndTag);
+		}
+	}
+	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	{
+
+	}
+	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Tag"))
+				Tag = xml.Attributes["Tag"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Horizontal") == 0)
+					Horizontal = mDatabase.ParseXml<IfcAlignment2DHorizontal>(child as XmlElement);
+				else if (string.Compare(name, "Vertical") == 0)
+					Vertical = mDatabase.ParseXml<IfcAlignment2DVertical>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mHorizontal != null)
+				xml.AppendChild(Horizontal.GetXML(xml.OwnerDocument, "Horizontal", this, processed));
+			if (mVertical != null)
+				xml.AppendChild(Vertical.GetXML(xml.OwnerDocument, "Vertical", this, processed));
+			setAttribute(xml, "Tag", Tag);
+		}
+	}
+	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "OuterBoundary") == 0)
+					OuterBoundary = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+				else if (string.Compare(name, "InnerBoundaries") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcCurve c = mDatabase.ParseXml<IfcCurve>(cn as XmlElement);
+						if (c != null)
+							InnerBoundaries.Add(c);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(OuterBoundary.GetXML(xml.OwnerDocument, "OuterBoundary", this, processed));
+			if (mInnerBoundaries.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("InnerBoundaries");
+				xml.AppendChild(element);
+				foreach (IfcCurve c in InnerBoundaries)
+					element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+		}
+	}
+	public partial class IfcApplication : BaseClassIfc
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Version"))
+				Version = xml.Attributes["Version"].Value;
+			if (xml.HasAttribute("ApplicationFullName"))
+				ApplicationFullName = xml.Attributes["ApplicationFullName"].Value;
+			if (xml.HasAttribute("ApplicationIdentifier"))
+				ApplicationIdentifier = xml.Attributes["ApplicationIdentifier"].Value;
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ApplicationDeveloper") == 0)
+					ApplicationDeveloper = mDatabase.ParseXml<IfcOrganization>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(ApplicationDeveloper.GetXML(xml.OwnerDocument, "ApplicationDeveloper", this, processed));
+			xml.SetAttribute("Version", Version);
+			xml.SetAttribute("ApplicationFullName", ApplicationFullName);
+			xml.SetAttribute("ApplicationIdentifier", ApplicationIdentifier);
 		}
 	}
 	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect, IfcResourceObjectSelect //SUPERTYPE OF(IfcCostValue);
@@ -248,68 +428,6 @@ namespace GeometryGym.Ifc
 				if (element.HasChildNodes)
 					xml.AppendChild(element);
 			}
-		}
-	}
-	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
-	{
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "OuterBoundary") == 0)
-					OuterBoundary = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
-				else if (string.Compare(name, "InnerBoundaries") == 0)
-				{
-					foreach (XmlNode cn in child.ChildNodes)
-					{
-						IfcCurve c = mDatabase.ParseXml<IfcCurve>(cn as XmlElement);
-						if (c != null)
-							InnerBoundaries.Add(c);
-					}
-				}
-			}
-		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.AppendChild(OuterBoundary.GetXML(xml.OwnerDocument, "OuterBoundary", this, processed));
-			if (mInnerBoundaries.Count > 0)
-			{
-				XmlElement element = xml.OwnerDocument.CreateElement("InnerBoundaries");
-				xml.AppendChild(element);
-				foreach (IfcCurve c in InnerBoundaries)
-					element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
-			}
-		}
-	}
-	public partial class IfcApplication : BaseClassIfc
-	{
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			if (xml.HasAttribute("Version"))
-				Version = xml.Attributes["Version"].Value;
-			if (xml.HasAttribute("ApplicationFullName"))
-				ApplicationFullName = xml.Attributes["ApplicationFullName"].Value;
-			if (xml.HasAttribute("ApplicationIdentifier"))
-				ApplicationIdentifier = xml.Attributes["ApplicationIdentifier"].Value;
-
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "ApplicationDeveloper") == 0)
-					ApplicationDeveloper = mDatabase.ParseXml<IfcOrganization>(child as XmlElement);
-			}
-		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.AppendChild(ApplicationDeveloper.GetXML(xml.OwnerDocument, "ApplicationDeveloper", this, processed));
-			xml.SetAttribute("Version", Version);
-			xml.SetAttribute("ApplicationFullName", ApplicationFullName);
-			xml.SetAttribute("ApplicationIdentifier", ApplicationIdentifier);
 		}
 	}
 	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef //SUPERTYPE OF(IfcArbitraryProfileDefWithVoids)
@@ -423,7 +541,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if(mDatabase.Release == ReleaseVersion.IFC2x3)
+			if(mDatabase.Release < ReleaseVersion.IFC4)
 			{
 				xml.SetAttribute("OverallWidth", mBottomFlangeWidth.ToString());
 				xml.SetAttribute("OverallDepth", mOverallDepth.ToString());

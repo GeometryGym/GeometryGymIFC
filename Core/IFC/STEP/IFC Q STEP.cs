@@ -31,7 +31,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcQuantityArea : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mAreaValue) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mAreaValue) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -50,7 +50,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mCountValue) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mCountValue) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Max(0, mLengthValue)) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Max(0, mLengthValue)) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -89,7 +89,7 @@ namespace GeometryGym.Ifc
 	
 	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString( mTimeValue) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString( mTimeValue) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mVolumeValue) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mVolumeValue) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mWeightValue) + (release == ReleaseVersion.IFC2x3 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mWeightValue) + (release < ReleaseVersion.IFC4 ? "" : (mFormula == "$" ? ",$" : ",'" + mFormula + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

@@ -111,6 +111,24 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Dir.GetXML(xml.OwnerDocument, "Dir", this, processed));
 		}
 	}
+	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Axis") == 0)
+					Axis = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
+		}
+	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
 	{
 		internal override void ParseXml(XmlElement xml)

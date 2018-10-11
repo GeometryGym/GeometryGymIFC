@@ -175,7 +175,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcBuildingElementProxyTypeEnum.NOTDEFINED)
 			{
-				if(mDatabase.Release == ReleaseVersion.IFC2x3)
+				if(mDatabase.Release < ReleaseVersion.IFC4)
 				{
 					if (mPredefinedType == IfcBuildingElementProxyTypeEnum.COMPLEX || mPredefinedType == IfcBuildingElementProxyTypeEnum.ELEMENT || mPredefinedType == IfcBuildingElementProxyTypeEnum.PARTIAL)
 						xml.SetAttribute("CompositionType", mPredefinedType.ToString().ToLower());

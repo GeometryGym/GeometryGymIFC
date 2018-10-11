@@ -57,14 +57,14 @@ namespace GeometryGym.Ifc
 			{
 				if (mDatabase.mModelView == ModelView.Ifc4Reference)
 					throw new Exception("Invalid Model View for IfcParameterizedProfileDef : " + m.ModelView.ToString());
-				if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				if (mDatabase.mRelease < ReleaseVersion.IFC4)
 					Position = mDatabase.Factory.Origin2dPlace;
 			}
 		}
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			IfcAxis2Placement2D position = Position;
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				if (position == null)
 					Position = mDatabase.Factory.Origin2dPlace;
@@ -570,7 +570,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPolyloop() : base() { }
 		internal IfcPolyloop(DatabaseIfc db, IfcPolyloop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
-		public IfcPolyloop(List<IfcCartesianPoint> polygon) : base(polygon[0].mDatabase) { mPolygon.AddRange(polygon); }
+		public IfcPolyloop(IEnumerable<IfcCartesianPoint> polygon) : base(polygon.First().mDatabase) { mPolygon.AddRange(polygon); }
 		public IfcPolyloop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
 
 		protected override List<T> Extract<T>(Type type)
@@ -597,7 +597,7 @@ namespace GeometryGym.Ifc
 		protected IfcPort(DatabaseIfc db) : base(db) { }
 		protected IfcPort(IfcElement e) : base(e.mDatabase)
 		{
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				new IfcRelConnectsPortToElement(this, e);
 			}
@@ -611,7 +611,7 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcPort(IfcElementType t) : base(t.mDatabase)
 		{
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				t.AddAggregated(this);
 			}
@@ -665,6 +665,19 @@ namespace GeometryGym.Ifc
 		{
 			mInternalLocation = a.mInternalLocation; mAddressLines = a.mAddressLines; mPostalBox = a.mPostalBox;
 			mTown = a.mTown; mRegion = a.mRegion; mPostalCode = a.mPostalCode; mCountry = a.mCountry;
+		}
+	}
+	[Serializable]
+	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
+	{
+		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
+		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
+		protected IfcPositioningElement() : base() { }
+		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
+		{
+			if (e.mContainedInStructure != null)
+				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).RelatedElements.Add(this);
 		}
 	}
 	[Serializable]
@@ -1229,7 +1242,7 @@ namespace GeometryGym.Ifc
 		public IfcProfileDef(DatabaseIfc db, string name) : base(db)
 		{
 			ProfileName = name;
-			if (db != null && db.mRelease == ReleaseVersion.IFC2x3)
+			if (db != null && db.mRelease < ReleaseVersion.IFC4)
 			{
 				new IfcGeneralProfileProperties(this);
 			}
@@ -1289,7 +1302,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
-		internal override string KeyWord { get { return mDatabase.Release == ReleaseVersion.IFC2x3 ? base.KeyWord : "IfcProfileProperties"; } }
+		internal override string KeyWord { get { return mDatabase.Release < ReleaseVersion.IFC4 ? base.KeyWord : "IfcProfileProperties"; } }
 		//[Obsolete("DEPRECEATED IFC4", false)]
 		//internal string mProfileName = "$";// : OPTIONAL IfcLabel; DELETED IFC4
 		private int mProfileDefinition;// : OPTIONAL IfcProfileDef; 
@@ -1317,7 +1330,7 @@ namespace GeometryGym.Ifc
 			if (p != null)
 			{
 				ProfileDefinition = p;
-				if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				if (mDatabase.mRelease < ReleaseVersion.IFC4)
 					mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
 			}
 		}
@@ -1325,7 +1338,7 @@ namespace GeometryGym.Ifc
 		{
 			mProfileDefinition = p.mIndex;
 			p.mHasProperties.Add(this);
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
 		}
 	}
@@ -1430,7 +1443,7 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcBuilding building = new IfcBuilding(mDatabase, Name);
 				IfcProject project = new IfcProject(building, Name) { UnitsInContext = UnitsInContext };

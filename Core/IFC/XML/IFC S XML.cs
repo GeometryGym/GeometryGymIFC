@@ -275,7 +275,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				xml.SetAttribute("InteriorOrExteriorSpace", mPredefinedType == IfcSpaceTypeEnum.INTERNAL || mPredefinedType == IfcSpaceTypeEnum.EXTERNAL ? mPredefinedType.ToString().ToLower() : "notdefined");
 			else if (mPredefinedType != IfcSpaceTypeEnum.NOTDEFINED)
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
@@ -382,7 +382,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mDestabilizingLoad == IfcLogicalEnum.UNKNOWN)
 			{
-				if (mDatabase.Release == ReleaseVersion.IFC2x3)
+				if (mDatabase.Release < ReleaseVersion.IFC4)
 					xml.SetAttribute("DestabilizingLoad", "false");
 			}
 			else

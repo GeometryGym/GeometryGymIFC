@@ -805,7 +805,6 @@ namespace GeometryGym.Ifc
 	{
 		public IfcDate AcquisitionDate { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AcquisitionDate", value)); } }
 		public string BarCode { set { AddProperty(new IfcPropertySingleValue(mDatabase, "BarCode", new IfcIdentifier(value))); } }
-		public string ModelReference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ModelReference", new IfcIdentifier(value))); } }
 		public string SerialNumber { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SerialNumber", new IfcIdentifier(value))); } }
 		public string BatchReference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "BatchReference", new IfcIdentifier(value))); } }
 		public PEnum_AssemblyPlace AssemblyPlace { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "AssemblyPlace", new IfcLabel(value.ToString()))); } }

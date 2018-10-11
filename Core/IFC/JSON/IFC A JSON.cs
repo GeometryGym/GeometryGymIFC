@@ -59,6 +59,144 @@ namespace GeometryGym.Ifc
 			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
+	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcAlignmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcAlignmentTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
+	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("StartDistAlong", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				StartDistAlong = token.Value<double>();
+			Segments.AddRange(mDatabase.extractJArray<IfcAlignment2DHorizontalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if ((mDatabase != null && mStartDistAlong > mDatabase.Tolerance) || mStartDistAlong > 1e-5)
+				obj["StartDistAlong"] = StartDistAlong;
+			obj["Segments"] = new JArray(Segments.ConvertAll(x => x.getJson(this, options)));
+		}
+	}
+	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("CurveGeometry", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				CurveGeometry = mDatabase.parseJObject<IfcCurveSegment2D>(token as JObject);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["CurveGeometry"] = CurveGeometry.getJson(this, options);
+		}
+	}
+	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("TangentialContinuity", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				TangentialContinuity = token.Value<bool>();
+			token = obj.GetValue("StartTag", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				StartTag = token.Value<string>();
+			token = obj.GetValue("EndTag", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				EndTag = token.Value<string>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mTangentialContinuity != IfcLogicalEnum.UNKNOWN)
+				obj["TangentialContinuity"] = TangentialContinuity;
+			setAttribute(obj, "StartTag", StartTag);
+			setAttribute(obj, "EndTag", EndTag);
+		}
+	}
+	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Radius"] = Radius;
+			obj["IsConvex"] = IsConvex;
+		}
+	}
+	public partial class IfcAlignment2DVerSegParabolicArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["ParabolaConstant"] = ParabolaConstant;
+			obj["IsConvex"] = IsConvex;
+		}
+	}
+	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem //IFC4.1
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			JArray array = new JArray();
+			foreach (IfcAlignment2DVerticalSegment seg in Segments)
+				array.Add(seg.getJson(this, options));
+			obj["Segments"] = array;
+		}
+	}
+	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment //IFC4.1
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartDistAlong"] = StartDistAlong;
+			obj["HorizontalLength"] = HorizontalLength;
+			obj["StartHeight"] = StartHeight;
+			obj["StartGradient"] = StartGradient;
+		}
+	}
+	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Horizontal", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Horizontal = mDatabase.parseJObject<IfcAlignment2DHorizontal>(token as JObject);
+			token = obj.GetValue("Vertical", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Vertical = mDatabase.parseJObject<IfcAlignment2DVertical>(token as JObject);
+			token = obj.GetValue("Tag", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Tag = token.Value<string>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mHorizontal != null)
+				obj["Horizontal"] = Horizontal.getJson(this, options);
+			if (mVertical != null)
+				obj["Vertical"] = Vertical.getJson(this, options);
+			setAttribute(obj, "Tag", Tag);
+		}
+	}
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
 	{
 		internal override void parseJObject(JObject obj)

@@ -788,8 +788,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMechanicalFastener : IfcElementComponent //IFC4 change
 	{
-		internal double mNominalDiameter;// : OPTIONAL IfcPositiveLengthMeasure; IFC4 depreceated
-		internal double mNominalLength;// : OPTIONAL IfcPositiveLengthMeasure;  IFC4 depreceated
+		internal double mNominalDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; IFC4 depreceated
+		internal double mNominalLength = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;  IFC4 depreceated
 		internal IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : OPTIONAL IfcMechanicalFastenerTypeEnum;
 		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
@@ -988,7 +988,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMirroredProfileDef : IfcDerivedProfileDef //SUPERTYPE OF(IfcMirroredProfileDef)
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcDerivedProfileDef" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDerivedProfileDef" : base.KeyWord); } }
 		internal IfcMirroredProfileDef() : base() { }
 		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p) : base(db,p) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, new IfcCartesianTransformationOperator2D(p.mDatabase) { Axis1 = new IfcDirection(p.mDatabase, -1, 0) },name) { }

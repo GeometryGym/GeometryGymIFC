@@ -729,7 +729,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssignsToGroupByFactor : IfcRelAssignsToGroup //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcRelAssignsToGroup" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcRelAssignsToGroup" : base.KeyWord); } }
 		internal double mFactor = 1;//	 :	IfcRatioMeasure;
 		public double Factor { get { return mFactor; } set { mFactor = value; } }
 
@@ -772,7 +772,7 @@ namespace GeometryGym.Ifc
 		{
 			base.changeSchema(schema);
 			mDatabase[mRelatingProduct.Index].changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcProduct product = RelatingProduct as IfcProduct;
 				if (product == null)
@@ -894,7 +894,7 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcConstraint constraint = RelatingConstraint;
 				if (constraint != null)
@@ -1862,7 +1862,7 @@ namespace GeometryGym.Ifc
 			ReadOnlyCollection<IfcObjectDefinition> ods = RelatedObjects;
 			for (int icounter = 0; icounter < ods.Count; icounter++)
 				ods[icounter].changeSchema(schema);
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				string obj = RelatingObject.KeyWord;
 				bool valid = true;
@@ -2021,7 +2021,7 @@ namespace GeometryGym.Ifc
 			mRelatingProcess = rg.mIndex;
 			mRelatedProcess = rd.mIndex;
 			if (lag != null)
-				mTimeLag = (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? (int)lag.getSecondsDuration() : lag.mIndex);
+				mTimeLag = (mDatabase.mRelease < ReleaseVersion.IFC4 ? (int)lag.getSecondsDuration() : lag.mIndex);
 			mSequenceType = st;
 			if (!string.IsNullOrEmpty(userSeqType))
 				mUserDefinedSequenceType = userSeqType.Replace("'", "");
@@ -2031,7 +2031,7 @@ namespace GeometryGym.Ifc
 		internal IfcProcess getSuccessor() { return mDatabase[mRelatedProcess] as IfcProcess; }
 		internal TimeSpan getLag()
 		{
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3) return new TimeSpan(0, 0, (int)mTimeLag);
+			if (mDatabase.mRelease < ReleaseVersion.IFC4) return new TimeSpan(0, 0, (int)mTimeLag);
 			IfcLagTime lt = mDatabase[(int)mTimeLag] as IfcLagTime;
 			return (lt == null ? new TimeSpan(0, 0, 0) : lt.getLag());
 		}
@@ -2156,8 +2156,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
 	{
 		private IfcRepresentationContext mContextOfItems = null;// : IfcRepresentationContext;
-		internal string mRepresentationIdentifier = "$";//  : OPTIONAL IfcLabel; //RepresentationIdentifier: Name of the representation, e.g. 'Body' for 3D shape, 'FootPrint' for 2D ground view, 'Axis' for reference axis, 		
-		private string mRepresentationType = "$";//  : OPTIONAL IfcLabel;
+		internal string mRepresentationIdentifier = "";//  : OPTIONAL IfcLabel; //RepresentationIdentifier: Name of the representation, e.g. 'Body' for 3D shape, 'FootPrint' for 2D ground view, 'Axis' for reference axis, 		
+		private string mRepresentationType = "";//  : OPTIONAL IfcLabel;
 		private SET<IfcRepresentationItem> mItems = new SET<IfcRepresentationItem>();//  : SET [1:?] OF IfcRepresentationItem; 
 		//INVERSE 
 		internal IfcRepresentationMap mRepresentationMap = null;//	 : 	SET [0:1] OF IfcRepresentationMap FOR MappedRepresentation;
@@ -2179,8 +2179,8 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		public string RepresentationIdentifier { get { return mRepresentationIdentifier == "$" ? "" : mRepresentationIdentifier; } set { mRepresentationIdentifier = value; } }
-		public string RepresentationType { get { return mRepresentationType == "$" ? "" : mRepresentationType; } set { mRepresentationType = string.IsNullOrEmpty(value) ? "$" : value; } }
+		public string RepresentationIdentifier { get { return mRepresentationIdentifier; } set { mRepresentationIdentifier = value; } }
+		public string RepresentationType { get { return mRepresentationType; } set { mRepresentationType = value; } }
 		public SET<IfcRepresentationItem> Items { get { return mItems; } set { mItems.Clear(); if (value != null) { mItems.CollectionChanged -= mItems_CollectionChanged; mItems = value; mItems.CollectionChanged += mItems_CollectionChanged; } } }
 
 		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
@@ -2557,7 +2557,7 @@ namespace GeometryGym.Ifc
 		{
 			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 			//m.mGlobalIDs.Add(mGlobalId);
-			if (db.Release == ReleaseVersion.IFC2x3 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
+			if (db.Release < ReleaseVersion.IFC4 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
 				OwnerHistory = db.Factory.OwnerHistoryAdded;
 		}
 		protected IfcRoot(DatabaseIfc db, IfcRoot r, IfcOwnerHistory ownerHistory) : base(db, r)

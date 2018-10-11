@@ -359,18 +359,15 @@ additional types	some additional representation types are given:
 	MappedRepresentation*/
 		internal IfcShapeRepresentation() : base() { }
 		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r) : base(db, r) { }
-		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation) : base(context, representation) { }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> items) : base(context, items) { }
+		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = "AdvancedBrep"; }
-		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) 
-		{
-			RepresentationType = boolean is IfcBooleanClippingResult ? "Clipping" : "CSG";
-		}
-
+		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? "Clipping" : "CSG"; }
 		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = "BoundingBox"; }
 		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = "CSG"; }
 		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) { RepresentationType = "CSG"; }
+		public IfcShapeRepresentation(IfcCurve curve) : base(curve) { RepresentationType = "Curve"; }
 		//should remove above as in 3d?? hierarchy test
 		public IfcShapeRepresentation(IfcFacetedBrep brep) : base(brep) { RepresentationType = "Brep"; }
 		public IfcShapeRepresentation(IfcFaceBasedSurfaceModel surface) : base(surface) { RepresentationType = "SurfaceModel"; }
@@ -413,7 +410,9 @@ additional types	some additional representation types are given:
 		}
 		public IfcShapeRepresentation(IfcTessellatedItem item) : base(item) { RepresentationType = "Tessellation"; }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcMappedItem> reps) : base(context, reps.ConvertAll(x => (IfcRepresentationItem)x)) { RepresentationType = "MappedRepresentation"; }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcTopologicalRepresentationItem rep) : base(context, rep) { }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcVertexPoint point) : base(context, point) { RepresentationType = "Point"; }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcEdgeCurve edge) : base(context, edge) { RepresentationType = "Curve"; }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcFaceSurface surface) : base(context, surface) { RepresentationType = "Surface"; }
 		internal static IfcShapeRepresentation CreateRepresentation(IfcRepresentationItem ri)
 		{
 			if (ri == null)
@@ -423,7 +422,7 @@ additional types	some additional representation types are given:
 				return new IfcShapeRepresentation(br);
 			IfcCurve c = ri as IfcCurve;
 			if (c != null)
-				return new IfcShapeRepresentation(c);
+				return new IfcShapeRepresentation(c, ShapeRepresentationType.Curve);
 			IfcCsgPrimitive3D csg = ri as IfcCsgPrimitive3D;
 			if (csg != null)
 				return new IfcShapeRepresentation(csg);
@@ -469,12 +468,10 @@ additional types	some additional representation types are given:
 			IfcMappedItem mi = ri as IfcMappedItem;
 			if (mi != null)
 				return new IfcShapeRepresentation(mi);
-			
+
 			ri.mDatabase.logError("XXX Error in identiying " + ri.ToString() + " as shape representation, please contact Jon!");
 			return null;
 		}
-
-				
 	}
 	public partial interface IfcShell : IBaseClassIfc  // SELECT(IfcClosedShell, IfcOpenShell);
 	{
@@ -604,14 +601,14 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSlabElementedCase : IfcSlab
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
 		internal IfcSlabElementedCase() : base() { }
 		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 	}
 	[Serializable]
 	public partial class IfcSlabStandardCase : IfcSlab
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
 		internal IfcSlabStandardCase() : base() { }
 		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
@@ -715,7 +712,7 @@ additional types	some additional representation types are given:
 			set
 			{
 				mPredefinedType = value;
-				if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+				if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				{
 					if (value != IfcSpaceTypeEnum.INTERNAL && value != IfcSpaceTypeEnum.EXTERNAL && value != IfcSpaceTypeEnum.NOTDEFINED)
 					{
@@ -990,7 +987,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mCompositionType = e.mCompositionType; }
-		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
+		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1008,7 +1005,7 @@ additional types	some additional representation types are given:
 
 		protected IfcSpatialZone() : base() { }
 		public IfcSpatialZone(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
-		internal IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
+		internal IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
 		protected IfcSpatialZone(DatabaseIfc db, IfcSpatialZone p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
 	}
 	[Serializable]
@@ -1019,7 +1016,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSpatialZoneType() : base() { }
 		internal IfcSpatialZoneType(DatabaseIfc db, IfcSpatialZoneType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcSpatialZoneType(DatabaseIfc m, string name) : base(m) { Name = name; if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
+		internal IfcSpatialZoneType(DatabaseIfc m, string name) : base(m) { Name = name; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
 	}
 	public interface IfcSpecularHighlightSelect { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
 	[Serializable]
@@ -1330,7 +1327,7 @@ additional types	some additional representation types are given:
 				rc.RelatingElement = this;
 			}
 		}
-		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase.mRelease == ReleaseVersion.IFC2x3 ? new IfcLocalPlacement(sm.SharedPlacement,sm.mDatabase.Factory.XYPlanePlacement) : sm.SharedPlacement ,null)
+		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase.mRelease < ReleaseVersion.IFC4 ? new IfcLocalPlacement(sm.SharedPlacement,sm.mDatabase.Factory.XYPlanePlacement) : sm.SharedPlacement ,null)
 		{
 			sm.AddRelated(this);
 			mDatabase.mContext.setStructuralUnits();
@@ -1357,7 +1354,7 @@ additional types	some additional representation types are given:
 		protected IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoadStatic load, bool global, bool projected, IfcStructuralCurveActivityTypeEnum activity) 
 			: base(lc, member, load, global, projected, activity)
 		{
-			if(mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if(mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				Representation = new IfcProductRepresentation(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), member.EdgeCurve));
 			}
@@ -1436,7 +1433,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadCase : IfcStructuralLoadGroup //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease == ReleaseVersion.IFC2x3 ? "IfcStructuralLoadGroup" : base.KeyWord); } }
+		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcStructuralLoadGroup" : base.KeyWord); } }
 
 		internal Tuple<double,double,double> mSelfWeightCoefficients = null;// : OPTIONAL LIST [3:3] OF IfcRatioMeasure; 
 		public Tuple<double,double,double> SelfWeightCoefficients { get { return mSelfWeightCoefficients; } set { mSelfWeightCoefficients = value; } }
@@ -1773,11 +1770,11 @@ additional types	some additional representation types are given:
 		internal IfcStructuralSurfaceAction() : base() { }
 		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
-			: base(lc, item, load,null, global) { if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc,null,load,new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				throw new Exception(KeyWord + "added in IFC4");
 			mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH;
 			mPredefinedType = type;
@@ -1785,7 +1782,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc, item, load, new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{ 
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3) throw new Exception(KeyWord + "added in IFC4"); 
+			if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + "added in IFC4"); 
 			mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; 
 			mPredefinedType = type; 
 		}
@@ -1879,7 +1876,7 @@ additional types	some additional representation types are given:
 		}
 		public IfcStyledItem(IfcStyleAssignmentSelect style) : base(style.Database)
 		{
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
 				if (presentationStyleAssignment != null)
@@ -2283,15 +2280,15 @@ additional types	some additional representation types are given:
 			if (s.mPosition > 0)
 				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
 		}
-		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release == ReleaseVersion.IFC2x3) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
-		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
+		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release < ReleaseVersion.IFC4) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
+		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release < ReleaseVersion.IFC4 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
 
 		internal override void changeSchema(ReleaseVersion schema)
 		{
 			base.changeSchema(schema);
 			SweptArea.changeSchema(schema);
 			IfcAxis2Placement3D position = Position;
-			if (schema == ReleaseVersion.IFC2x3)
+			if (schema < ReleaseVersion.IFC4)
 			{
 				if (position == null)
 					Position = mDatabase.Factory.XYPlanePlacement;
@@ -2353,8 +2350,8 @@ additional types	some additional representation types are given:
 			if(s.mPosition > 0)
 				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
 		}
-		protected IfcSweptSurface(IfcProfileDef sweptCurve) : base(sweptCurve.mDatabase) { SweptCurve = sweptCurve; if (sweptCurve.mDatabase.Release == ReleaseVersion.IFC2x3) Position = sweptCurve.mDatabase.Factory.XYPlanePlacement; }
-		protected IfcSweptSurface(IfcProfileDef sweptCurve, IfcAxis2Placement3D position) : this(sweptCurve) { Position = (position == null && mDatabase.Release == ReleaseVersion.IFC2x3 ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase,0,0,0)) : position); }
+		protected IfcSweptSurface(IfcProfileDef sweptCurve) : base(sweptCurve.mDatabase) { SweptCurve = sweptCurve; if (sweptCurve.mDatabase.Release < ReleaseVersion.IFC4) Position = sweptCurve.mDatabase.Factory.XYPlanePlacement; }
+		protected IfcSweptSurface(IfcProfileDef sweptCurve, IfcAxis2Placement3D position) : this(sweptCurve) { Position = (position == null && mDatabase.Release < ReleaseVersion.IFC4 ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase,0,0,0)) : position); }
 	}
 	[Serializable]
 	public partial class IfcSwitchingDevice : IfcFlowController //IFC4
@@ -2427,7 +2424,7 @@ additional types	some additional representation types are given:
 		public IfcSystemFurnitureElementType(DatabaseIfc db, string name, IfcSystemFurnitureElementTypeEnum type) : base(db,name)
 		{
 			mPredefinedType = type;
-			if (mDatabase.mRelease == ReleaseVersion.IFC2x3 && string.IsNullOrEmpty(ElementType) && type != IfcSystemFurnitureElementTypeEnum.NOTDEFINED)
+			if (mDatabase.mRelease < ReleaseVersion.IFC4 && string.IsNullOrEmpty(ElementType) && type != IfcSystemFurnitureElementTypeEnum.NOTDEFINED)
 				ElementType = type.ToString();
 		}
 	}
