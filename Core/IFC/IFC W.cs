@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWasteTerminalType() : base() { }
 		internal IfcWasteTerminalType(DatabaseIfc db, IfcWasteTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -252,9 +252,9 @@ namespace GeometryGym.Ifc
 		internal IfcWindowType() : base() { }
 		internal IfcWindowType(DatabaseIfc db, IfcWindowType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mPartitioningType = t.mPartitioningType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedPartitioningType = t.mUserDefinedPartitioningType; }
 		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		internal IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type, IfcWindowTypePartitioningEnum partition, bool parameterTakesPrecendence)
+		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type, IfcWindowTypePartitioningEnum partition, bool parameterTakesPrecendence)
 			: base(m) { Name = name; mPredefinedType = type; mPartitioningType = partition; mParameterTakesPrecedence = parameterTakesPrecendence; }
-		internal IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type, IfcWindowTypePartitioningEnum partition, string userDefinedPartionType, IfcWindowLiningProperties wlp, List<IfcWindowPanelProperties> pps)
+		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type, IfcWindowTypePartitioningEnum partition, string userDefinedPartionType, IfcWindowLiningProperties wlp, List<IfcWindowPanelProperties> pps)
 			: base(m)
 		{
 			Name = name;
@@ -284,17 +284,7 @@ namespace GeometryGym.Ifc
 			c.ExceptionTimes.ToList().ForEach(x=>addExceptionTimes( db.Factory.Duplicate(x) as IfcWorkTime));
 			mPredefinedType = c.mPredefinedType;
 		}
-		internal IfcWorkCalendar(DatabaseIfc m, List<IfcWorkTime> working, List<IfcWorkTime> exception, IfcWorkCalendarTypeEnum type, IfcProject prj)
-			: base(m)
-		{
-			if (working != null)
-				mWorkingTimes = working.ConvertAll(x => x.mIndex);
-			if (exception != null)
-				mExceptionTimes = exception.ConvertAll(x => x.mIndex);
-			mPredefinedType = type;
-			if (prj != null)
-				prj.AddDeclared(this);
-		}
+		internal IfcWorkCalendar(DatabaseIfc db, string name, IfcWorkCalendarTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 		
 		internal void addWorkingTime(IfcWorkTime time) { mWorkingTimes.Add(time.mIndex); }
 		internal void addExceptionTimes(IfcWorkTime time) { mExceptionTimes.Add(time.mIndex); }
@@ -330,7 +320,6 @@ namespace GeometryGym.Ifc
 		}
 	
 		internal DateTime getStart() { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
-
 	}
 	[Serializable]
 	public partial class IfcWorkPlan : IfcWorkControl

@@ -80,9 +80,9 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcOrientedEdge> EdgeList { get { return new ReadOnlyCollection<IfcOrientedEdge>(mEdgeList.ConvertAll(x => mDatabase[x] as IfcOrientedEdge)); } }
 
 		internal IfcPath() : base() { }
-		internal IfcPath(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
-		internal IfcPath(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { edges.ForEach(x => addEdge(x)); }
 		internal IfcPath(DatabaseIfc db, IfcPath p) : base(db, p) { p.EdgeList.ToList().ForEach(x => addEdge(db.Factory.Duplicate(x) as IfcOrientedEdge)); }
+		public IfcPath(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
+		public IfcPath(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { edges.ForEach(x => addEdge(x)); }
 		
 		internal void addEdge(IfcOrientedEdge edge) { mEdgeList.Add(edge.mIndex); }
 	}
@@ -166,6 +166,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -216,6 +218,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -263,6 +267,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -314,7 +320,7 @@ namespace GeometryGym.Ifc
 		internal IfcPileType() : base() { }
 		internal IfcPileType(DatabaseIfc db, IfcPileType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcPileType(DatabaseIfc m, string name, IfcPileTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		internal IfcPileType(string name, IfcMaterialProfileSet mps, IfcPileTypeEnum type) : base(mps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mps; }
+		public IfcPileType(string name, IfcMaterialProfileSet mps, IfcPileTypeEnum type) : base(mps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mps; }
 	}
 	[Serializable]
 	public partial class IfcPipeFitting : IfcFlowFitting //IFC4
@@ -360,7 +366,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPipeSegmentType() : base() { }
 		internal IfcPipeSegmentType(DatabaseIfc db, IfcPipeSegmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcPipeSegmentType(DatabaseIfc m, string name, IfcPipeSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcPipeSegmentType(DatabaseIfc m, string name, IfcPipeSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcPixelTexture : IfcSurfaceTexture
@@ -445,7 +451,7 @@ namespace GeometryGym.Ifc
 		internal IfcPlateType() : base() { }
 		internal IfcPlateType(DatabaseIfc db, IfcPlateType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t,ownerHistory,downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcPlateType(DatabaseIfc m, string name, IfcPlateTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		internal IfcPlateType(string name, IfcMaterialLayerSet mls, IfcPlateTypeEnum type) : this(mls.mDatabase, name, type) { MaterialSelect = mls; }
+		public IfcPlateType(string name, IfcMaterialLayerSet mls, IfcPlateTypeEnum type) : this(mls.mDatabase, name, type) { MaterialSelect = mls; }
 	}
 	[Serializable]
 	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
@@ -469,7 +475,7 @@ namespace GeometryGym.Ifc
 			BasisCurve = db.Factory.Duplicate(p.BasisCurve) as IfcCurve;
 			mPointParameter = p.mPointParameter;
 		}
-		internal IfcPointOnCurve(DatabaseIfc m, IfcCurve c, double p) : base(m) { mBasisCurve = c.mIndex; mPointParameter = p; }
+		public IfcPointOnCurve(DatabaseIfc m, IfcCurve c, double p) : base(m) { mBasisCurve = c.mIndex; mPointParameter = p; }
 	}
 	[Serializable]
 	public partial class IfcPointOnSurface : IfcPoint
@@ -762,7 +768,7 @@ namespace GeometryGym.Ifc
 		private string mName = "$";// : IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
 		internal SET<IfcLayeredItem> mAssignedItems = new SET<IfcLayeredItem>();// : SET [1:?] OF IfcLayeredItem; 
-		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier; 
+		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier;
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "Default Layer" : mName = ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -790,6 +796,8 @@ namespace GeometryGym.Ifc
 
 		protected virtual void mAssignedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcLayeredItem i in e.NewItems)
@@ -864,9 +872,9 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcStyledItem> StyledItems { get { return new ReadOnlyCollection<IfcStyledItem>(mStyledItems); } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
+		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { s.mStyles.ToList().ForEach(x => addStyle(db.Factory.Duplicate(s.mDatabase[x]) as IfcPresentationStyleSelect)); }
 		public IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
 		public IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
-		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { s.mStyles.ToList().ForEach(x => addStyle(db.Factory.Duplicate(s.mDatabase[x]) as IfcPresentationStyleSelect)); }
 		
 		internal void addStyle(IfcPresentationStyleSelect style) { mStyles.Add(style.Index); }
 		public void associateItem(IfcStyledItem item) { mStyledItems.Add(item); }
@@ -888,7 +896,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcProcedureType() : base() { }
 		internal IfcProcedureType(DatabaseIfc db, IfcProcedureType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcProcedureType(DatabaseIfc m, string name, IfcProcedureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcProcedureType(DatabaseIfc m, string name, IfcProcedureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public abstract partial class IfcProcess : IfcObject // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
@@ -1025,6 +1033,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mReferencedBy_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssignsToProduct r in e.NewItems)
@@ -1102,6 +1112,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mShapeRepresentations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcShapeModel r in e.NewItems)
@@ -1167,6 +1179,8 @@ namespace GeometryGym.Ifc
 
 		protected virtual void mRepresentations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRepresentation r in e.NewItems)
@@ -1256,6 +1270,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -1546,6 +1562,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -1584,14 +1602,7 @@ namespace GeometryGym.Ifc
 				Unit = mDatabase.Factory.Duplicate(p.mDatabase[p.mUnit]) as IfcUnit;
 			mSetPointValue = p.mSetPointValue;
 		}
-		internal IfcPropertyBoundedValue(DatabaseIfc db, string name, IfcValue upper, IfcValue lower, IfcUnit unit, IfcValue set)
-			: base(db, name)
-		{
-			mUpperBoundValue = upper;
-			mLowerBoundValue = lower;
-			mSetPointValue = set;
-			Unit = unit;
-		}
+		public IfcPropertyBoundedValue(DatabaseIfc db, string name) : base(db, name) {  }
 	}
 	[Serializable]
 	public partial class IfcPropertyBoundedValue<T> : IfcSimpleProperty where T : IfcValue
@@ -1609,14 +1620,6 @@ namespace GeometryGym.Ifc
 
 		internal IfcPropertyBoundedValue() : base() { }
 		public IfcPropertyBoundedValue(DatabaseIfc db, string name) : base(db, name) { }
-		internal IfcPropertyBoundedValue(DatabaseIfc db, string name, T upper, T lower, IfcUnit unit, T set)
-			: base(db, name)
-		{
-			mUpperBoundValue = upper;
-			mLowerBoundValue = lower;
-			mSetPointValue = set;
-			Unit = unit;
-		}
 	}
 	[Serializable]
 	public abstract partial class IfcPropertyDefinition : IfcRoot, IfcDefinitionSelect //(IfcPropertySetDefinition, IfcPropertyTemplateDefinition)
@@ -1645,6 +1648,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasAssociations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssociates r in e.NewItems)
@@ -2176,7 +2181,7 @@ namespace GeometryGym.Ifc
 			//			mDefiningValues.AddRange(p.DefiningValues);
 			//		DefinedValues.AddRange(p.DefinedValues);//.ToArray()); mExpression = p.mExpression; mDefiningUnit = p.mDefiningUnit; mDefinedUnit = p.mDefinedUnit; mCurveInterpolation = p.mCurveInterpolation; 
 		}
-		internal IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }
 	}
 	[Serializable]
 	public partial class IfcPropertyTableValue : IfcSimpleProperty
@@ -2195,7 +2200,7 @@ namespace GeometryGym.Ifc
 			//			mDefiningValues.AddRange(p.DefiningValues);
 			//		DefinedValues.AddRange(p.DefinedValues);//.ToArray()); mExpression = p.mExpression; mDefiningUnit = p.mDefiningUnit; mDefinedUnit = p.mDefinedUnit; mCurveInterpolation = p.mCurveInterpolation; 
 		}
-		internal IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPropertyTemplate : IfcPropertyTemplateDefinition    //ABSTRACT SUPERTYPE OF(ONEOF(IfcComplexPropertyTemplate, IfcSimplePropertyTemplate))
@@ -2244,7 +2249,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcProtectiveDeviceTrippingUnitType() : base() { }
 		internal IfcProtectiveDeviceTrippingUnitType(DatabaseIfc db, IfcProtectiveDeviceTrippingUnitType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcProtectiveDeviceTrippingUnitType(DatabaseIfc m, string name, IfcProtectiveDeviceTrippingUnitTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcProtectiveDeviceTrippingUnitType(DatabaseIfc m, string name, IfcProtectiveDeviceTrippingUnitTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcProtectiveDeviceType : IfcFlowControllerType
@@ -2254,7 +2259,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcProtectiveDeviceType() : base() { }
 		internal IfcProtectiveDeviceType(DatabaseIfc db, IfcProtectiveDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcProtectiveDeviceType(DatabaseIfc m, string name, IfcProtectiveDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcProtectiveDeviceType(DatabaseIfc m, string name, IfcProtectiveDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcProxy : IfcProduct

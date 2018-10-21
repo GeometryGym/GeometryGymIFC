@@ -77,7 +77,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLampType() : base() { }
 		internal IfcLampType(DatabaseIfc db, IfcLampType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcLampType(DatabaseIfc m, string name, IfcLampTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcLampType(DatabaseIfc m, string name, IfcLampTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	public interface IfcLayeredItem : IBaseClassIfc // = SELECT(IfcRepresentationItem, IfcRepresentation);
 	{

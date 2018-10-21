@@ -1398,15 +1398,6 @@ namespace GeometryGym.Ifc
 			mRepresentationType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			Items.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcRepresentationItem));
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (IfcRepresentationItem item in Items)
-			{
-				if (item != null)
-					item.mRepresents.Add(this);
-			}
-		}
 	}
 	public abstract partial class IfcRepresentationContext : BaseClassIfc //ABSTRACT SUPERTYPE OF(IfcGeometricRepresentationContext);
 	{

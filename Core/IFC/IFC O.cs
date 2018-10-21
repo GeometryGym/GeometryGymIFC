@@ -216,6 +216,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasAssignments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssigns r in e.NewItems)
@@ -232,6 +234,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mIsNestedBy_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelNests r in e.NewItems)
@@ -251,6 +255,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasAssociations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssociates r in e.NewItems)
@@ -717,6 +723,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -746,14 +754,14 @@ namespace GeometryGym.Ifc
 		internal IfcOrientedEdge() : base() { }
 		internal IfcOrientedEdge(DatabaseIfc db, IfcOrientedEdge e) : base(db,e) { EdgeElement = db.Factory.Duplicate( e.EdgeElement) as IfcEdge; mOrientation = e.mOrientation; }
 		public IfcOrientedEdge(IfcEdge e, bool sense) : base(e.mDatabase) { mEdgeElement = e.mIndex; mOrientation = sense; }
-		internal IfcOrientedEdge(IfcVertexPoint a, IfcVertexPoint b) : base(a.mDatabase) { mEdgeElement = new IfcEdge(a, b).mIndex; }
+		public IfcOrientedEdge(IfcVertexPoint a, IfcVertexPoint b) : base(a.mDatabase) { mEdgeElement = new IfcEdge(a, b).mIndex; }
 	}
 	[Serializable]
 	public partial class IfcOuterBoundaryCurve : IfcBoundaryCurve
 	{
 		internal IfcOuterBoundaryCurve() : base() { }
 		internal IfcOuterBoundaryCurve(DatabaseIfc db, IfcOuterBoundaryCurve c) : base(db,c) { }
-		internal IfcOuterBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface ) : base(segs,surface) { }
+		public IfcOuterBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface ) : base(segs,surface) { }
 	}
 	[Serializable]
 	public partial class IfcOutlet : IfcFlowTerminal //IFC4
@@ -773,7 +781,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcOutletType() : base() { }
 		internal IfcOutletType(DatabaseIfc db, IfcOutletType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcOutletType(DatabaseIfc m, string name, IfcOutletTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcOutletType(DatabaseIfc m, string name, IfcOutletTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcOwnerHistory : BaseClassIfc

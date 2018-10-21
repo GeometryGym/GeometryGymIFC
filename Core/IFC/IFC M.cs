@@ -244,6 +244,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mAssociatedTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssociatesMaterial r in e.NewItems)
@@ -264,6 +266,8 @@ namespace GeometryGym.Ifc
 		
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -324,6 +328,8 @@ namespace GeometryGym.Ifc
 
 		private void mStyledRepresentations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcStyledRepresentation r in e.NewItems)
@@ -474,6 +480,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mAssociatedTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssociatesMaterial r in e.NewItems)
@@ -706,6 +714,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mAssociatedTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssociatesMaterial r in e.NewItems)
@@ -882,6 +892,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMedicalDevice() : base() { }
 		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		public IfcMedicalDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMedicalDeviceType : IfcFlowTerminalType
@@ -891,7 +902,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMedicalDeviceType() : base() { }
 		internal IfcMedicalDeviceType(DatabaseIfc db, IfcMedicalDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcMedicalDeviceType(DatabaseIfc m, string name, IfcMedicalDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcMedicalDeviceType(DatabaseIfc m, string name, IfcMedicalDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcMember : IfcBuildingElement
@@ -921,7 +932,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMemberType() : base() { }
 		internal IfcMemberType(DatabaseIfc db, IfcMemberType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase)
+		public IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase)
 		{
 			Name = name;
 			mPredefinedType = type;
@@ -1021,7 +1032,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMotorConnectionType() : base() { }
 		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcMotorConnectionType(DatabaseIfc m, string name, IfcMotorConnectionTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcMotorConnectionType(DatabaseIfc m, string name, IfcMotorConnectionTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcMove // DEPRECEATED IFC4

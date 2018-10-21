@@ -118,7 +118,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcSeamCurve() : base() { }
 		internal IfcSeamCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
-		internal IfcSeamCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
+		public IfcSeamCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
 	public partial class IfcSectionedSolid : IfcSolidModel
@@ -518,7 +518,7 @@ additional types	some additional representation types are given:
 		public IfcStateEnum AccessState { get { return mAccessState; } set { mAccessState = value; } }
 
 		internal IfcSimplePropertyTemplate() : base() { }
-		public IfcSimplePropertyTemplate(DatabaseIfc db, IfcSimplePropertyTemplate s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
+		internal IfcSimplePropertyTemplate(DatabaseIfc db, IfcSimplePropertyTemplate s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
 		{
 			mTemplateType = s.mTemplateType;
 			mPrimaryMeasureType = s.mPrimaryMeasureType;
@@ -648,7 +648,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSolarDeviceType() : base() { }
 		internal IfcSolarDeviceType(DatabaseIfc db, IfcSolarDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcSolarDeviceType(DatabaseIfc m, string name, IfcSolarDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcSolarDeviceType(DatabaseIfc m, string name, IfcSolarDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public abstract partial class IfcSolidModel : IfcGeometricRepresentationItem, IfcBooleanOperand /* ABSTRACT SUPERTYPE OF (ONEOF(IfcCsgSolid ,IfcManifoldSolidBrep,IfcSweptAreaSolid,IfcSweptDiskSolid))*/
@@ -861,6 +861,8 @@ additional types	some additional representation types are given:
 
 		private void mContainsElements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelContainedInSpatialStructure r in e.NewItems)
@@ -875,7 +877,6 @@ additional types	some additional representation types are given:
 					r.RelatingStructure = null;
 			}
 		}
-
 		
 		internal bool addGrid(IfcGrid g)
 		{
@@ -1004,9 +1005,9 @@ additional types	some additional representation types are given:
 		public IfcSpatialZoneTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		protected IfcSpatialZone() : base() { }
-		public IfcSpatialZone(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
-		internal IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
 		protected IfcSpatialZone(DatabaseIfc db, IfcSpatialZone p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
+		public IfcSpatialZone(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
+		public IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
 	}
 	[Serializable]
 	public partial class IfcSpatialZoneType : IfcSpatialElementType  //IFC4
@@ -1016,7 +1017,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSpatialZoneType() : base() { }
 		internal IfcSpatialZoneType(DatabaseIfc db, IfcSpatialZoneType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcSpatialZoneType(DatabaseIfc m, string name) : base(m) { Name = name; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
+		public IfcSpatialZoneType(DatabaseIfc m, string name, IfcSpatialZoneTypeEnum t) : base(m) { Name = name; PredefinedType = t; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
 	}
 	public interface IfcSpecularHighlightSelect { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
 	[Serializable]
@@ -1027,6 +1028,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSphere() : base() { }
 		internal IfcSphere(DatabaseIfc db, IfcSphere s) : base(db,s) { mRadius = s.mRadius; }
+		public IfcSphere(IfcAxis2Placement3D position, double radius) : base(position) { Radius = radius; }
 	}
 	[Serializable]
 	public partial class IfcSphericalSurface : IfcElementarySurface //IFC4.2
@@ -1055,7 +1057,7 @@ additional types	some additional representation types are given:
 
 		internal IfcStackTerminalType() : base() { }
 		internal IfcStackTerminalType(DatabaseIfc db, IfcStackTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcStackTerminalType(DatabaseIfc m, string name, IfcStackTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcStackTerminalType(DatabaseIfc m, string name, IfcStackTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcStair : IfcBuildingElement
@@ -1493,6 +1495,12 @@ additional types	some additional representation types are given:
 				new IfcRelAssignsToGroupByFactor(cases.ConvertAll(x => x as IfcObjectDefinition), this, 1);
 			}
 		}
+		public override bool Dispose(bool children)
+		{
+			foreach (IfcStructuralAnalysisModel structuralAnalysisModel in mLoadGroupFor.ToList())
+				structuralAnalysisModel.mLoadedBy.Remove(this.Index);
+			return base.Dispose(children);
+		}
 	}
 	[Serializable]
 	public partial class IfcStructuralLoadLinearForce : IfcStructuralLoadStatic
@@ -1508,8 +1516,8 @@ additional types	some additional representation types are given:
 		public double LinearMomentZ { get { return mLinearMomentZ; } set { mLinearMomentZ = value; } }
 
 		internal IfcStructuralLoadLinearForce() : base() { }
-		public IfcStructuralLoadLinearForce(DatabaseIfc db) : base(db) { }
 		internal IfcStructuralLoadLinearForce(DatabaseIfc db, IfcStructuralLoadLinearForce f) : base(db,f) { mLinearForceX = f.mLinearForceX; mLinearForceY = f.mLinearForceY; mLinearForceZ = f.mLinearForceZ; mLinearMomentX = f.mLinearMomentX; mLinearMomentY = f.mLinearMomentY; mLinearMomentZ = f.mLinearMomentZ; }
+		public IfcStructuralLoadLinearForce(DatabaseIfc db) : base(db) { }
 		public IfcStructuralLoadLinearForce(DatabaseIfc db, double forceX, double forceY, double forceZ, double momentX, double momentY, double momentZ) : base(db) { mLinearForceX = forceX; mLinearForceY = forceY; mLinearForceZ = forceZ; mLinearMomentX = momentX; mLinearMomentY = momentY; mLinearMomentZ = momentZ; }
 	}
 	[Serializable]
@@ -1517,8 +1525,8 @@ additional types	some additional representation types are given:
 	{
 		internal double mPlanarForceX = 0, mPlanarForceY = 0, mPlanarForceZ = 0;// : OPTIONAL IfcPlanarForceMeasure; 
 		internal IfcStructuralLoadPlanarForce() : base() { }
-		internal IfcStructuralLoadPlanarForce(DatabaseIfc db) : base(db) { }
 		internal IfcStructuralLoadPlanarForce(DatabaseIfc db, IfcStructuralLoadPlanarForce f) : base(db,f) { mPlanarForceX = f.mPlanarForceX; mPlanarForceY = f.mPlanarForceY; mPlanarForceZ = f.mPlanarForceZ; }
+		public IfcStructuralLoadPlanarForce(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralLoadSingleDisplacement : IfcStructuralLoadStatic
@@ -1526,8 +1534,8 @@ additional types	some additional representation types are given:
 		internal double mDisplacementX = 0, mDisplacementY = 0, mDisplacementZ = 0;// : OPTIONAL IfcLengthMeasure;
 		internal double mRotationalDisplacementRX = 0, mRotationalDisplacementRY = 0, mRotationalDisplacementRZ = 0;// : OPTIONAL IfcPlaneAngleMeasure; 
 		internal IfcStructuralLoadSingleDisplacement() : base() { }
-		public IfcStructuralLoadSingleDisplacement(DatabaseIfc db) : base(db) { }
 		internal IfcStructuralLoadSingleDisplacement(DatabaseIfc db, IfcStructuralLoadSingleDisplacement d) : base(db,d) { mDisplacementX = d.mDisplacementX; mDisplacementY = d.mDisplacementY; mDisplacementZ = d.mDisplacementZ; mRotationalDisplacementRX = d.mRotationalDisplacementRX; mRotationalDisplacementRY = d.mRotationalDisplacementRY; mRotationalDisplacementRZ = d.mRotationalDisplacementRZ; }
+		public IfcStructuralLoadSingleDisplacement(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralLoadSingleDisplacementDistortion : IfcStructuralLoadSingleDisplacement
@@ -1550,8 +1558,8 @@ additional types	some additional representation types are given:
 		public double MomentZ { get { return double.IsNaN(mMomentZ) ? 0 : mMomentZ; } set { mMomentZ = value; } }
 
 		internal IfcStructuralLoadSingleForce() : base() { }
-		public IfcStructuralLoadSingleForce(DatabaseIfc db) : base(db) { }
 		internal IfcStructuralLoadSingleForce(DatabaseIfc db, IfcStructuralLoadSingleForce f) : base(db,f) { mForceX = f.mForceX; mForceY = f.mForceY; mForceZ = f.mForceZ; mMomentX = f.mMomentX; mMomentY = f.mMomentY; mMomentZ = f.mMomentZ; }
+		public IfcStructuralLoadSingleForce(DatabaseIfc db) : base(db) { }
 		public IfcStructuralLoadSingleForce(DatabaseIfc db, double forceX, double forceY,double forceZ) : base(db) { mForceX = forceX; mForceY = forceY; mForceZ = forceZ; }
 	}
 	[Serializable]
@@ -1639,7 +1647,7 @@ additional types	some additional representation types are given:
 			set { base.AppliedCondition = value; }
 		}
 
-		public IfcStructuralPointConnection() : base() { }
+		internal IfcStructuralPointConnection() : base() { }
 		internal IfcStructuralPointConnection(DatabaseIfc db, IfcStructuralPointConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
 		public IfcStructuralPointConnection(IfcStructuralAnalysisModel sm, IfcVertexPoint point)
 			: base(sm) { Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), point)); }
@@ -1739,7 +1747,7 @@ additional types	some additional representation types are given:
 				ResultForLoadGroup = db.Factory.Duplicate( g.ResultForLoadGroup) as IfcStructuralLoadGroup;
 			mIsLinear = g.mIsLinear;
 		}
-		internal IfcStructuralResultGroup(DatabaseIfc m, string name) : base(m, name) { }
+		public IfcStructuralResultGroup(DatabaseIfc db, string name) : base(db, name) { }
 	}
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
@@ -1927,6 +1935,8 @@ additional types	some additional representation types are given:
 
 		private void mStyledItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcStyledItem r in e.NewItems)
@@ -2242,7 +2252,7 @@ additional types	some additional representation types are given:
 		internal List<int> mTextures = new List<int>();//: LIST [1:?] OF IfcSurfaceTexture; 
 		internal IfcSurfaceStyleWithTextures() : base() { }
 		public IfcSurfaceStyleWithTextures(IfcSurfaceTexture texture) : base(texture.mDatabase) { mTextures.Add(texture.mIndex); }
-		internal IfcSurfaceStyleWithTextures(List<IfcSurfaceTexture> textures) : base(textures[0].mDatabase) { mTextures = textures.ConvertAll(x => x.mIndex);  }
+		public IfcSurfaceStyleWithTextures(List<IfcSurfaceTexture> textures) : base(textures[0].mDatabase) { mTextures = textures.ConvertAll(x => x.mIndex);  }
 	}
 	[Serializable]
 	public abstract partial class IfcSurfaceTexture : IfcPresentationItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcBlobTexture ,IfcImageTexture ,IfcPixelTexture));
@@ -2371,7 +2381,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSwitchingDeviceType() : base() { }
 		internal IfcSwitchingDeviceType(DatabaseIfc db, IfcSwitchingDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcSwitchingDeviceType(DatabaseIfc m, string name, IfcSwitchingDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcSwitchingDeviceType(DatabaseIfc m, string name, IfcSwitchingDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcSymbolStyle // DEPRECEATED IFC4

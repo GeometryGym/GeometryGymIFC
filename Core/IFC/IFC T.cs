@@ -108,6 +108,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTankType() : base() { }
 		internal IfcTankType(DatabaseIfc db, IfcTankType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcTankType(DatabaseIfc db, string name, IfcTankTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcTask : IfcProcess //SUPERTYPE OF (ONEOF(IfcMove,IfcOrderAction) both depreceated IFC4) 
@@ -170,7 +171,7 @@ namespace GeometryGym.Ifc
 			mIsCritical = t.mIsCritical; mStatusTime = t.mStatusTime; mActualDuration = t.mActualDuration; mActualStart = t.mActualStart; mActualFinish = t.mActualFinish;
 			mRemainingTime = t.mRemainingTime; mCompletion = t.mCompletion;
 		}
-		internal IfcTaskTime(DatabaseIfc db) : base(db) { }
+		public IfcTaskTime(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcTaskType : IfcTypeProcess //IFC4
@@ -183,7 +184,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTaskType() : base() { }
 		internal IfcTaskType(DatabaseIfc db, IfcTaskType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
-		internal IfcTaskType(DatabaseIfc m, string name, IfcTaskTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcTaskType(DatabaseIfc m, string name, IfcTaskTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcTelecomAddress : IfcAddress
@@ -203,8 +204,8 @@ namespace GeometryGym.Ifc
 		public LIST<string> MessagingIDs { get { return mMessagingIDs; } }
 
 		internal IfcTelecomAddress() : base() { }
-		public IfcTelecomAddress(DatabaseIfc db) : base(db) { }
 		internal IfcTelecomAddress(DatabaseIfc db, IfcTelecomAddress a) : base(db, a) { mTelephoneNumbers.AddRange(a.mTelephoneNumbers); mFacsimileNumbers.AddRange(a.mFacsimileNumbers); mPagerNumber = a.mPagerNumber; mElectronicMailAddresses.AddRange(a.mElectronicMailAddresses); mWWWHomePageURL = a.mWWWHomePageURL; mMessagingIDs.AddRange(a.mMessagingIDs); }
+		public IfcTelecomAddress(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcTendon : IfcReinforcingElement
@@ -273,15 +274,7 @@ namespace GeometryGym.Ifc
 			mSheathDiameter = t.mSheathDiameter;
 		}
 
-		public IfcTendonType(DatabaseIfc m, string name, IfcTendonTypeEnum type, double diameter, double area, double sheathDiameter)
-			: base(m)
-		{
-			Name = name;
-			mPredefinedType = type;
-			mNominalDiameter = diameter;
-			mCrossSectionArea = area;
-			mSheathDiameter = sheathDiameter;
-		}
+		public IfcTendonType(DatabaseIfc m, string name, IfcTendonTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -428,7 +421,7 @@ namespace GeometryGym.Ifc
 		internal string mFinish; //:	IfcTime;
 		internal IfcTimePeriod() : base() { }
 		internal IfcTimePeriod(IfcTimePeriod m) : base() { mStart = m.mStart; mFinish = m.mFinish; }
-		internal IfcTimePeriod(DatabaseIfc m, DateTime start, DateTime finish) : base(m) { mStart = IfcTime.convert(start); mFinish = IfcTime.convert(finish); }
+		public IfcTimePeriod(DatabaseIfc m, DateTime start, DateTime finish) : base(m) { mStart = IfcTime.convert(start); mFinish = IfcTime.convert(finish); }
 	}
 	[Serializable]
 	public abstract partial class IfcTimeSeries : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
@@ -471,6 +464,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -504,10 +499,10 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTopologyRepresentation() : base() { }
 		internal IfcTopologyRepresentation(DatabaseIfc db, IfcTopologyRepresentation r) : base(db, r) { }
-		internal IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcConnectedFaceSet fs) : base(context, fs) { RepresentationType = "FaceSet"; }
-		internal IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcEdge e) : base(context, e) { RepresentationType = "Edge"; }
-		internal IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcFace fs) : base(context, fs) { RepresentationType = "Face"; }
-		internal IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcVertex v) : base(context, v) { RepresentationType = "Vertex"; }
+		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcConnectedFaceSet fs) : base(context, fs) { RepresentationType = "FaceSet"; }
+		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcEdge e) : base(context, e) { RepresentationType = "Edge"; }
+		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcFace fs) : base(context, fs) { RepresentationType = "Face"; }
+		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcVertex v) : base(context, v) { RepresentationType = "Vertex"; }
 		internal static IfcTopologyRepresentation getRepresentation(IfcGeometricRepresentationContext context, IfcTopologicalRepresentationItem item)
 		{
 			IfcConnectedFaceSet cfs = item as IfcConnectedFaceSet;
@@ -554,7 +549,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTransformerType() : base() { }
 		internal IfcTransformerType(DatabaseIfc db, IfcTransformerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
@@ -572,7 +567,7 @@ namespace GeometryGym.Ifc
 		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
 
 		internal IfcTransitionCurveSegment2D() : base() { }
-		internal IfcTransitionCurveSegment2D(IfcCartesianPoint start, double startDirection, double length, double startRadius, double endRadius, bool isStartCCW, bool isEndCCW, IfcTransitionCurveType curveType)
+		public IfcTransitionCurveSegment2D(IfcCartesianPoint start, double startDirection, double length, double startRadius, double endRadius, bool isStartCCW, bool isEndCCW, IfcTransitionCurveType curveType)
 			: base(start, startDirection, length)
 		{
 			mStartRadius = startRadius;
@@ -846,7 +841,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTubeBundleType() : base() { }
 		internal IfcTubeBundleType(DatabaseIfc db, IfcTubeBundleType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcTubeBundleType(DatabaseIfc m, string name, IfcTubeBundleTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
+		public IfcTubeBundleType(DatabaseIfc m, string name, IfcTubeBundleTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -877,7 +872,8 @@ namespace GeometryGym.Ifc
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
 		protected IfcTypeObject(IfcTypeObject basis) : base(basis) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
 		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
-		internal IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
+		[Obsolete("DEPRECEATED IFC4", false)]
+		public IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
 
 		protected override void initialize()
 		{
@@ -887,6 +883,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mHasPropertySets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcPropertySetDefinition s in e.NewItems)
@@ -1073,6 +1071,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mRepresentationMaps_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRepresentationMap m in e.NewItems)
@@ -1089,6 +1089,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mReferencedBy_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelAssignsToProduct r in e.NewItems)
@@ -1164,12 +1166,10 @@ namespace GeometryGym.Ifc
 			if (type != null)
 			{
 				Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "Enum");
-				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(DatabaseIfc), typeof(string) }, null);
+				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(DatabaseIfc), typeof(string) }, null);
 				if (ctor == null)
 				{
-					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(DatabaseIfc), typeof(string), enumType }, null);
+					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(DatabaseIfc), typeof(string), enumType }, null);
 					if (ctor == null)
 						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 					else

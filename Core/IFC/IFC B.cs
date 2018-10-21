@@ -169,7 +169,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcBoundaryCurve() : base() { }
 		internal IfcBoundaryCurve(DatabaseIfc db, IfcBoundaryCurve c) : base(db,c) { }
-		internal IfcBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface) : base(segs,surface) { }
+		public IfcBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface) : base(segs, surface) { }
 	}
 	[Serializable]
 	public partial class IfcBoundaryEdgeCondition : IfcBoundaryCondition
@@ -270,8 +270,8 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWarpingStiffnessSelect mWarpingStiffness;// : OPTIONAL IfcWarpingStiffnessSelect; 
 		internal IfcBoundaryNodeConditionWarping() : base() { }
-		internal IfcBoundaryNodeConditionWarping( DatabaseIfc db, IfcBoundaryNodeConditionWarping b) : base(db,b) { mWarpingStiffness = b.mWarpingStiffness; }
-		internal IfcBoundaryNodeConditionWarping(DatabaseIfc m, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz, IfcWarpingStiffnessSelect w)
+		internal IfcBoundaryNodeConditionWarping(DatabaseIfc db, IfcBoundaryNodeConditionWarping b) : base(db, b) { mWarpingStiffness = b.mWarpingStiffness; }
+		public IfcBoundaryNodeConditionWarping(DatabaseIfc m, string name, IfcTranslationalStiffnessSelect x, IfcTranslationalStiffnessSelect y, IfcTranslationalStiffnessSelect z, IfcRotationalStiffnessSelect xx, IfcRotationalStiffnessSelect yy, IfcRotationalStiffnessSelect zz, IfcWarpingStiffnessSelect w)
 			: base(m, name, x, y, z, xx, yy, zz) { mWarpingStiffness = w; }
 	}
 	[Serializable]
@@ -538,7 +538,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingElementPartType() : base() { }
 		internal IfcBuildingElementPartType(DatabaseIfc db, IfcBuildingElementPartType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcBuildingElementPartType(DatabaseIfc m, string name, IfcBuildingElementPartTypeEnum type) : base(m) { Name = name; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("XXX Only valid in IFC4 or newer!"); mPredefinedType = type; }
+		public IfcBuildingElementPartType(DatabaseIfc m, string name, IfcBuildingElementPartTypeEnum type) : base(m) { Name = name; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("XXX Only valid in IFC4 or newer!"); mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcBuildingElementProxy : IfcBuildingElement
@@ -605,7 +605,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBuildingSystem() : base() { }
 		internal IfcBuildingSystem(DatabaseIfc db, IfcBuildingSystem s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mLongName = s.mLongName; mPredefinedType = s.mPredefinedType; }
-		internal IfcBuildingSystem(IfcSpatialElement bldg, string name,  IfcBuildingSystemTypeEnum type) : base(bldg, name) { mPredefinedType = type; }
+		public IfcBuildingSystem(IfcSpatialElement bldg, string name,  IfcBuildingSystemTypeEnum type) : base(bldg, name) { mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcBurner : IfcEnergyConversionDevice //IFC4
@@ -624,7 +624,7 @@ namespace GeometryGym.Ifc
 		public IfcBurnerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcBurnerType() : base() { }
 		internal IfcBurnerType(DatabaseIfc db, IfcBurnerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcBurnerType(DatabaseIfc m, string name, IfcBurnerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcBurnerType(DatabaseIfc m, string name, IfcBurnerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 
 		internal override void changeSchema(ReleaseVersion schema)
 		{

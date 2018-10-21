@@ -58,7 +58,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcHeatExchangerType() : base() { }
 		internal IfcHeatExchangerType(DatabaseIfc db, IfcHeatExchangerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcHumidifier : IfcEnergyConversionDevice //IFC4
@@ -77,7 +77,7 @@ namespace GeometryGym.Ifc
 		public IfcHumidifierTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcHumidifierType() : base() { }
 		internal IfcHumidifierType(DatabaseIfc db, IfcHumidifierType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcHumidifierType(DatabaseIfc m, string name, IfcHumidifierTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcHumidifierType(DatabaseIfc m, string name, IfcHumidifierTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]

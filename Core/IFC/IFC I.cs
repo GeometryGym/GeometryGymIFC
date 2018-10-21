@@ -161,6 +161,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcInterceptorType() : base() { }
 		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcInterceptorType(DatabaseIfc db, string name, IfcInterceptorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2

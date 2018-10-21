@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcGasTerminalType() : base() { }
 		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -54,12 +54,6 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralMaterialProperties() : base() { }
 		internal IfcGeneralMaterialProperties(DatabaseIfc db, IfcGeneralMaterialProperties p) : base(db,p) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
 		public IfcGeneralMaterialProperties(IfcMaterial material) : base(material) { }
-		internal IfcGeneralMaterialProperties(IfcMaterial mat, double molecularWeight, double porosity, double massDensity) : base(mat)
-		{
-			mMolecularWeight = molecularWeight;
-			mPorosity = porosity;
-			mMassDensity = massDensity;
-		}
 	}
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
@@ -80,7 +74,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties() : base() { }
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p) : base(db, p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
-		internal IfcGeneralProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props, p) { }
+		public IfcGeneralProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props, p) { }
 	}
 	[Serializable]
 	public partial class IfcGeographicElement : IfcElement  //IFC4
@@ -99,7 +93,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcGeographicElementType() : base() { }
 		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public partial class IfcGeometricCurveSet : IfcGeometricSet
@@ -267,6 +261,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mUAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcGridAxis a in e.NewItems)
@@ -286,6 +282,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mVAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcGridAxis a in e.NewItems)
@@ -305,6 +303,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mWAxes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcGridAxis a in e.NewItems)
@@ -459,7 +459,7 @@ namespace GeometryGym.Ifc
 		internal IfcGroup() : base() { }
 		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { }
 		public IfcGroup(DatabaseIfc m, string name) : base(m) { Name = name; }
-		internal IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
+		public IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
 		public void AddRelated(IfcObjectDefinition related)
 		{

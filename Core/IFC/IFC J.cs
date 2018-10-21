@@ -45,6 +45,6 @@ namespace GeometryGym.Ifc
 
 		internal IfcJunctionBoxType() : base() { }
 		internal IfcJunctionBoxType(DatabaseIfc db, IfcJunctionBoxType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcJunctionBoxType(DatabaseIfc m, string name, IfcJunctionBoxTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcJunctionBoxType(DatabaseIfc m, string name, IfcJunctionBoxTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 }

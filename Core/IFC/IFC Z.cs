@@ -39,8 +39,10 @@ namespace GeometryGym.Ifc
 		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
 		public IfcZone(IfcSpatialElement e, string name, List<IfcSpace> spaces) : base(e, name)
 		{
-			if (spaces != null)
-				mIsGroupedBy[0].mRelatedObjects.AddRange(spaces);
+			if (spaces != null && spaces.Count > 0)
+			{
+				new IfcRelAssignsToGroup(spaces, this);
+			}
 		}
 	}
 	[Serializable]

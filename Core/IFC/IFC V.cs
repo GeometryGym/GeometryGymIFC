@@ -72,8 +72,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
 		internal IfcVertex() : base() { }
-		public IfcVertex(DatabaseIfc db) : base(db) { }
 		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
+		public IfcVertex(DatabaseIfc db) : base(db) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -122,6 +122,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcVibrationIsolatorType() : base() { }
 		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcVibrationIsolatorType(DatabaseIfc m, string name, IfcVibrationIsolatorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVirtualElement : IfcElement

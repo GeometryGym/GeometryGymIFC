@@ -32,7 +32,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion { IFC1_0, IFC1_5, IFC1_5_1, IFC2_0, IFC2X, IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 };
+	public enum ReleaseVersion {[Obsolete("DEPRECEATED IFC4", false)] IFC2X, [Obsolete("DEPRECEATED IFC4", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
@@ -53,7 +53,11 @@ namespace GeometryGym.Ifc
 	public partial class DatabaseIfc : DatabaseSTEP<BaseClassIfc>
 	{
 		internal string id = ParserIfc.EncodeGuid(Guid.NewGuid());
-		
+
+		private bool mIsDisposed = false;
+		internal bool IsDisposed() { return mIsDisposed; }
+		public void Dispose() { mIsDisposed = true; }
+
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
 		public FormatIfcSerialization Format { get; set; } = FormatIfcSerialization.STEP;
 		
@@ -165,7 +169,6 @@ namespace GeometryGym.Ifc
 		internal int mLengthDigits = 5;
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }
-		
 		
 		internal IfcContext mContext = null;
 		

@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDamperType() : base() { }
 		internal IfcDamperType(DatabaseIfc db, IfcDamperType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcDamperType(DatabaseIfc m, string name, IfcDamperTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcDamperType(DatabaseIfc m, string name, IfcDamperTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDateAndTime(IfcDateAndTime v) : base() { mDateComponent = v.mDateComponent; mTimeComponent = v.mTimeComponent; }
 		internal IfcDateAndTime() : base() { }
-		internal IfcDateAndTime(IfcCalendarDate d, IfcLocalTime t) : base(d.mDatabase) { mDateComponent = d.mIndex; mTimeComponent = t.mIndex; }
+		public IfcDateAndTime(IfcCalendarDate d, IfcLocalTime t) : base(d.mDatabase) { mDateComponent = d.mIndex; mTimeComponent = t.mIndex; }
 		public DateTime DateTime
 		{
 			get
@@ -280,7 +280,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDiscreteAccessoryType() : base() { }
 		internal IfcDiscreteAccessoryType(DatabaseIfc db, IfcDiscreteAccessoryType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		public IfcDiscreteAccessoryType(DatabaseIfc m, string name, IfcDiscreteAccessoryTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcDiscreteAccessoryType(DatabaseIfc db, string name, IfcDiscreteAccessoryTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
@@ -333,7 +333,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDistributionCircuit() : base() { }
 		internal IfcDistributionCircuit(DatabaseIfc db, IfcDistributionCircuit c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
-		internal IfcDistributionCircuit(IfcSpatialElement bldg, string name,IfcDistributionSystemEnum type) : base(bldg, name, type) { }
+		public IfcDistributionCircuit(IfcSpatialElement bldg, string name,IfcDistributionSystemEnum type) : base(bldg, name, type) { }
 	} 
 	[Serializable]
 	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
@@ -736,7 +736,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDuctFittingType() : base() { }
 		internal IfcDuctFittingType(DatabaseIfc db, IfcDuctFittingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcDuctFittingType(DatabaseIfc m, string name, IfcDuctFittingTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
+		public IfcDuctFittingType(DatabaseIfc m, string name, IfcDuctFittingTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcDuctSegment : IfcFlowSegment //IFC4
@@ -756,7 +756,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcDuctSegmentType() : base() { }
 		internal IfcDuctSegmentType(DatabaseIfc db, IfcDuctSegmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcDuctSegmentType(DatabaseIfc m, string name, IfcDuctSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcDuctSegmentType(DatabaseIfc db, string name, IfcDuctSegmentTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcDuctSilencer : IfcFlowTreatmentDevice //IFC4  
@@ -776,5 +776,6 @@ namespace GeometryGym.Ifc
 		
 		internal IfcDuctSilencerType() : base() { }
 		internal IfcDuctSilencerType(DatabaseIfc db, IfcDuctSilencerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcDuctSilencerType(DatabaseIfc db, string name, IfcDuctSilencerTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 }

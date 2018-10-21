@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 			if(e.mEdgeEnd > 0)
 				EdgeEnd = db.Factory.Duplicate( e.EdgeEnd) as IfcVertex;
 		}
-		internal IfcEdge(IfcVertex start, IfcVertex end) : base(start.mDatabase) { EdgeStart = start; EdgeEnd = end; }
+		public IfcEdge(IfcVertex start, IfcVertex end) : base(start.mDatabase) { EdgeStart = start; EdgeEnd = end; }
 	}
 	[Serializable]
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 		public IfcEdgeLoop(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
 		public IfcEdgeLoop(IfcOrientedEdge edge1, IfcOrientedEdge edge2) : base(edge1.mDatabase) { mEdgeList.Add(edge1.mIndex); mEdgeList.Add(edge2.mIndex); }
 		public IfcEdgeLoop(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { mEdgeList = edges.ConvertAll(x => x.mIndex); }
-		internal IfcEdgeLoop(List<IfcVertexPoint> vertex)
+		public IfcEdgeLoop(List<IfcVertexPoint> vertex)
 			: base(vertex[0].mDatabase)
 		{
 			for (int icounter = 1; icounter < vertex.Count; icounter++)
@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricApplianceType() : base() { }
 		internal IfcElectricApplianceType(DatabaseIfc db, IfcElectricApplianceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcElectricApplianceType(DatabaseIfc m, string name, IfcElectricApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcElectricApplianceType(DatabaseIfc m, string name, IfcElectricApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcElectricDistributionBoard : IfcFlowController //IFC4
@@ -127,7 +127,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricDistributionBoardType() : base() { }
 		internal IfcElectricDistributionBoardType(DatabaseIfc db, IfcElectricDistributionBoardType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcElectricDistributionBoardType(DatabaseIfc m, string name, IfcElectricDistributionBoardTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcElectricDistributionBoardType(DatabaseIfc m, string name, IfcElectricDistributionBoardTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -161,6 +161,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricFlowStorageDeviceType() : base() { }
 		internal IfcElectricFlowStorageDeviceType(DatabaseIfc db, IfcElectricFlowStorageDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcElectricFlowStorageDeviceType(DatabaseIfc db, string name, IfcElectricFlowStorageDeviceTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcElectricGenerator : IfcEnergyConversionDevice //IFC4
@@ -180,6 +181,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricGeneratorType() : base() { }
 		internal IfcElectricGeneratorType(DatabaseIfc db, IfcElectricGeneratorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcElectricGeneratorType(DatabaseIfc db, string name, IfcElectricGeneratorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -190,6 +192,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricHeaterType() : base() { }
 		internal IfcElectricHeaterType(DatabaseIfc db, IfcElectricHeaterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcElectricHeaterType(DatabaseIfc db, string name, IfcElectricHeaterTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcElectricMotor : IfcEnergyConversionDevice //IFC4
@@ -209,6 +212,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricMotorType() : base() { }
 		internal IfcElectricMotorType(DatabaseIfc db, IfcElectricMotorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcElectricMotorType(DatabaseIfc db, string name, IfcElectricMotorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcElectricTimeControl : IfcFlowController //IFC4
@@ -228,7 +232,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricTimeControlType() : base() { }
 		internal IfcElectricTimeControlType(DatabaseIfc db, IfcElectricTimeControlType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		internal IfcElectricTimeControlType(DatabaseIfc m, string name, IfcElectricTimeControlTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcElectricTimeControlType(DatabaseIfc m, string name, IfcElectricTimeControlTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcElectricalBaseProperties // DEPRECEATED IFC4
@@ -416,6 +420,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mConnectedTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelConnectsElements r in e.NewItems)
@@ -432,6 +438,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mIsConnectionRealization_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelConnectsWithRealizingElements r in e.NewItems)
@@ -448,6 +456,8 @@ namespace GeometryGym.Ifc
 		}
 		private void mConnectedFrom_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcRelConnectsElements r in e.NewItems)
@@ -883,6 +893,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEngineType() : base() { }
 		internal IfcEngineType(DatabaseIfc db, IfcEngineType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcEngineType(DatabaseIfc db, string name, IfcEngineTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -894,7 +905,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEnvironmentalImpactValue() : base() { }
 		internal IfcEnvironmentalImpactValue(DatabaseIfc db, IfcEnvironmentalImpactValue v) : base(db,v) { mImpactType = v.mImpactType; mEnvCategory = v.mEnvCategory; mUserDefinedCategory = v.mUserDefinedCategory; }
 	}
-	
 	[Obsolete("DEPRECEATED IFC2x2", false)]
 	[Serializable]
 	public partial class IfcEquipmentElement : IfcElement  
@@ -927,6 +937,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEvaporativeCoolerType() : base() { }
 		internal IfcEvaporativeCoolerType(DatabaseIfc db, IfcEvaporativeCoolerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcEvaporativeCoolerType(DatabaseIfc db, string name, IfcEvaporativeCoolerTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcEvaporator : IfcEnergyConversionDevice //IFC4
@@ -946,6 +957,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEvaporatorType() : base() { }
 		internal IfcEvaporatorType(DatabaseIfc db, IfcEvaporatorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcEvaporatorType(DatabaseIfc db, string name, IfcEvaporatorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcEvent : IfcProcess //IFC4
@@ -970,7 +982,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEventType() : base() { }
 		internal IfcEventType(DatabaseIfc db, IfcEventType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mEventTriggerType = t.mEventTriggerType; mUserDefinedEventTriggerType = t.mUserDefinedEventTriggerType; }
-		internal IfcEventType(DatabaseIfc m, string name, IfcEventTypeEnum t, IfcEventTriggerTypeEnum trigger)
+		public IfcEventType(DatabaseIfc m, string name, IfcEventTypeEnum t, IfcEventTriggerTypeEnum trigger)
 			: base(m) { Name = name; mPredefinedType = t; mEventTriggerType = trigger; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -1008,7 +1020,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(DatabaseIfc db) : base(db) {  }
 		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
-		internal IfcExtendedProperties(List<IfcProperty> props) : base(props[0].mDatabase)
+		public IfcExtendedProperties(List<IfcProperty> props) : base(props[0].mDatabase)
 		{
 			if (props != null)
 				props.ForEach(x => AddProperty(x));
@@ -1063,6 +1075,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -1085,7 +1099,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	{
 		internal IfcExternallyDefinedSurfaceStyle() : base() { }
 		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db, IfcExternallyDefinedSurfaceStyle s) : base(db, s) { }
-		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db) : base(db) { }
+		public IfcExternallyDefinedSurfaceStyle(DatabaseIfc db) : base(db) { }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcExternallyDefinedSymbol // DEPRECEATED IFC4
@@ -1094,7 +1108,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	{
 		internal IfcExternallyDefinedTextFont() : base() { }
 		internal IfcExternallyDefinedTextFont(DatabaseIfc db, IfcExternallyDefinedTextFont f) : base(db, f) { }
-		internal IfcExternallyDefinedTextFont(DatabaseIfc db) : base(db) { }
+		public IfcExternallyDefinedTextFont(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
@@ -1125,6 +1139,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
@@ -1167,6 +1183,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		private void mRelatedResourceObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
 			if (e.NewItems != null)
 			{
 				foreach (IfcResourceObjectSelect r in e.NewItems)
@@ -1194,7 +1212,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcExternalSpatialElement() : base() { }
 		internal IfcExternalSpatialElement(DatabaseIfc db, IfcExternalSpatialElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
-		internal IfcExternalSpatialElement(IfcSite host, string name, IfcExternalSpatialElementTypeEnum te)
+		public IfcExternalSpatialElement(IfcSite host, string name, IfcExternalSpatialElementTypeEnum te)
 			: base(host, name) { mPredefinedType = te; }
 		
 		public void AddBoundary(IfcRelSpaceBoundary boundary) { mBoundedBy.Add(boundary); }
