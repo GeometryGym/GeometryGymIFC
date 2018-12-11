@@ -300,11 +300,7 @@ namespace GeometryGym.Ifc
 			mTag = e.mTag;
 #warning todo finish inverse
 
-			foreach (IfcRelVoidsElement ve in e.mHasOpenings)
-			{
-				IfcRelVoidsElement dve = db.Factory.Duplicate(ve, downStream) as IfcRelVoidsElement;
-				dve.RelatingBuildingElement = this;
-			}
+			
 			List<IfcRelConnectsElements> rces = e.ConnectedTo.ToList();
 			rces.AddRange(e.ConnectedFrom);
 			foreach (IfcRelConnectsElements ce in rces)
@@ -324,10 +320,13 @@ namespace GeometryGym.Ifc
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
 			}
-			foreach (IfcRelVoidsElement ve in e.mHasOpenings)
+			if (downStream)
 			{
-				IfcRelVoidsElement rv = db.Factory.Duplicate(ve) as IfcRelVoidsElement;
-				rv.RelatingBuildingElement = this;
+				foreach (IfcRelVoidsElement ve in e.mHasOpenings)
+				{
+					IfcRelVoidsElement rv = db.Factory.Duplicate(ve) as IfcRelVoidsElement;
+					rv.RelatingBuildingElement = this;
+				}
 			}
 			if (e.mContainedInStructure != null)
 			{
@@ -965,7 +964,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEventTypeEnum mPredefinedType = IfcEventTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal IfcEventTriggerTypeEnum mEventTriggerType = IfcEventTriggerTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
-		internal int mEventOccurenceTime;//	:	OPTIONAL IfcEventTime;
+		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
 		internal IfcEvent() : base() { }
 		internal IfcEvent(DatabaseIfc db, IfcEvent e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
 	}

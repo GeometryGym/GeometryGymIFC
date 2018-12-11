@@ -542,18 +542,23 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (ProfileDefinition == null ? "" : base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mName == "$" ? ",$," : ",'" + mName + "',") : ",") + ParserSTEP.LinkToString(mProfileDefinition)); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			IfcProfileDef profileDefinition = ProfileDefinition;
+			if (profileDefinition == null)
+				return "";
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mName == "$" ? ",$," : ",'" + mName + "',#") : ",#") + profileDefinition.Index; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			if (release < ReleaseVersion.IFC4)
 			{
 				mName = ParserSTEP.StripString(str, ref pos, len);
-				mProfileDefinition = ParserSTEP.StripLink(str, ref pos, len);
+				mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 			}
 			else
 			{
 				base.parse(str, ref pos, release, len, dictionary);
-				mProfileDefinition = ParserSTEP.StripLink(str, ref pos, len);
+				mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 			}
 		}
 		internal override void postParseRelate()
@@ -825,7 +830,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPropertySingleValue : IfcSimpleProperty
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + (mNominalValue == null ? (string.IsNullOrEmpty(mVal) ? "$" :  mVal) : mNominalValue.ToString()) + "," + ParserSTEP.LinkToString(mUnit); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + (mNominalValue == null ? (string.IsNullOrEmpty(mVal) ? "$" :  mVal) : mNominalValue.ToString()) + "," + ParserSTEP.ObjToLinkString(mUnit); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -836,7 +841,7 @@ namespace GeometryGym.Ifc
 				if (mNominalValue == null)
 					mVal = s;
 			}
-			mUnit = ParserSTEP.StripLink(str, ref pos, len);
+			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 		}
 	}
 	public partial class IfcPropertyTableValue<T,U> : IfcSimpleProperty where T : IfcValue where U :IfcValue

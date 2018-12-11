@@ -818,6 +818,13 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcPresentationLayerAssignment a = e as IfcPresentationLayerAssignment;
+			if (a == null || string.Compare(Name, a.Name) != 0 || string.Compare(Description, a.Description) != 0 || string.Compare(Identifier, a.Identifier) != 0)
+				return false;
+			return base.isDuplicate(e);
+		}
 	}
 	[Serializable]
 	public partial class IfcPresentationLayerWithStyle : IfcPresentationLayerAssignment
@@ -842,6 +849,31 @@ namespace GeometryGym.Ifc
 		public IfcPresentationLayerWithStyle(string name, List<IfcLayeredItem> items, IfcPresentationStyle style) : base(name, items) { mLayerStyles.Add(style.mIndex); }
 	
 		internal void addLayerStyle(IfcPresentationStyle style) { mLayerStyles.Add(style.mIndex); }
+
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcPresentationLayerWithStyle a = e as IfcPresentationLayerWithStyle;
+			if (a == null || mLayerOn != a.mLayerOn || mLayerFrozen != a.mLayerFrozen || mLayerBlocked != a.mLayerBlocked)
+				return false;
+			if (mLayerStyles.Count != a.mLayerStyles.Count)
+				return false;
+			List<IfcPresentationStyle> styles = a.LayerStyles.ToList();
+			foreach (IfcPresentationStyle style in LayerStyles)
+			{
+				bool duplicated = false;
+				foreach (IfcPresentationStyle s in styles)
+				{
+					if (style.isDuplicate(s))
+					{
+						duplicated = true;
+						styles.Remove(style);
+					}
+				}
+				if (!duplicated)
+					return false;
+			}
+			return base.isDuplicate(e);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect, NamedObjectIfc  //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));
@@ -865,7 +897,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
 	{
 		internal List<int> mStyles = new List<int>();// : SET [1:?] OF IfcPresentationStyleSelect; 
-													 //INVERSE
+		//INVERSE
 		internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
 
 		public ReadOnlyCollection<IfcPresentationStyleSelect> Styles { get { return new ReadOnlyCollection<IfcPresentationStyleSelect>(mStyles.ConvertAll(x => mDatabase[x] as IfcPresentationStyleSelect)); } }
@@ -1318,22 +1350,20 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
-		internal override string KeyWord { get { return mDatabase.Release < ReleaseVersion.IFC4 ? base.KeyWord : "IfcProfileProperties"; } }
+		internal override string KeyWord { get { return (mDatabase == null || mDatabase.Release > ReleaseVersion.IFC2x3 ? "IfcProfileProperties" : base.KeyWord); } }
 		//[Obsolete("DEPRECEATED IFC4", false)]
 		//internal string mProfileName = "$";// : OPTIONAL IfcLabel; DELETED IFC4
-		private int mProfileDefinition;// : OPTIONAL IfcProfileDef; 
+		private IfcProfileDef mProfileDefinition = null;// : OPTIONAL IfcProfileDef; 
 		public IfcProfileDef ProfileDefinition
 		{
-			get { return mDatabase[mProfileDefinition] as IfcProfileDef; }
+			get { return mProfileDefinition; }
 			set
 			{
-				if (value == null)
-					mProfileDefinition = 0;
-				else
-				{
-					mProfileDefinition = value.mIndex;
+				if (mProfileDefinition != null)
+					mProfileDefinition.mHasProperties.Remove(this);
+				mProfileDefinition = value;
+				if(mProfileDefinition != null)
 					value.mHasProperties.Add(this);
-				}
 			}
 		}
 
@@ -1346,13 +1376,13 @@ namespace GeometryGym.Ifc
 			if (p != null)
 			{
 				ProfileDefinition = p;
-				if (mDatabase.mRelease < ReleaseVersion.IFC4)
+				if (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4)
 					mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
 			}
 		}
 		internal IfcProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props)
 		{
-			mProfileDefinition = p.mIndex;
+			ProfileDefinition = p;
 			p.mHasProperties.Add(this);
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
@@ -2105,18 +2135,18 @@ namespace GeometryGym.Ifc
 	public partial class IfcPropertySingleValue : IfcSimpleProperty
 	{
 		private IfcValue mNominalValue;// : OPTIONAL IfcValue; 
-		private int mUnit;// : OPTIONAL IfcUnit; 
+		private IfcUnit mUnit;// : OPTIONAL IfcUnit; 
 
 		public IfcValue NominalValue { get { return mNominalValue; } set { mNominalValue = value; } }
-		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
+		public IfcUnit Unit { get { return mUnit as IfcUnit; } set { mUnit = value; } }
 
 		internal string mVal;
 		internal IfcPropertySingleValue() : base() { }
 		internal IfcPropertySingleValue(DatabaseIfc db, IfcPropertySingleValue s) : base(db, s)
 		{
 			mNominalValue = s.mNominalValue;
-			if (s.mUnit > 0)
-				Unit = db.Factory.Duplicate( s.mDatabase[s.mUnit]) as IfcUnit;
+			if (s.mUnit != null)
+				Unit = db.Factory.Duplicate(s.mUnit) as IfcUnit;
 		}
 		public IfcPropertySingleValue(DatabaseIfc m, string name, IfcValue value) : base(m, name) { mNominalValue = value; }
 		public IfcPropertySingleValue(DatabaseIfc m, string name, bool value) : this(m, name, new IfcBoolean(value)) { }

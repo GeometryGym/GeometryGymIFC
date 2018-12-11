@@ -1360,7 +1360,33 @@ namespace GeometryGym.Ifc
 	//Pset_SpaceThermalLoad
 	//Pset_SpaceThermalLoadPHistory
 	//Pset_SpaceThermalPHistory
-	//Pset_SpaceThermalRequirements
+	//
+	public partial class Pset_SpaceThermalRequirements : IfcPropertySet
+	{
+		public double SpaceTemperature { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperature", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureMax { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureMax", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureMin { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureMin", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureSummerMax { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureSummerMax", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureSummerMin { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureSummerMin", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureWinterMax { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureWinterMax", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceTemperatureWinterMin { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperatureWinterMin", new IfcThermodynamicTemperatureMeasure(value))); } }
+		public double SpaceHumidity { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceHumidity", new IfcRatioMeasure(value))); } }
+		public double SpaceHumidityMax { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceHumidityMax", new IfcRatioMeasure(value))); } }
+		public double SpaceHumidityMin { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceHumidityMin", new IfcRatioMeasure(value))); } }
+		public double SpaceHumiditySummer { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceHumiditySummer", new IfcRatioMeasure(value))); } }
+		public double SpaceHumidityWinter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceHumidityWinter", new IfcRatioMeasure(value))); } }
+		public bool DiscontinuedHeating { set { AddProperty(new IfcPropertySingleValue(mDatabase, "DiscontinuedHeating", new IfcBoolean(value))); } }
+		public bool NaturalVentilation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NaturalVentilation", new IfcBoolean(value))); } }
+		public double NaturalVentilationRate { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NaturalVentilationRate", new IfcCountMeasure(value))); } }
+		public double MechanicalVentilationRate { set { AddProperty(new IfcPropertySingleValue(mDatabase, "MechanicalVentilationRate", new IfcCountMeasure(value))); } }
+		public bool AirConditioning { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AirConditioning", new IfcBoolean(value))); } }
+		public bool AirConditioningCentral { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AirConditioningCentral", new IfcBoolean(value))); } }
+		public Pset_SpaceThermalRequirements(IfcSpace instance) : base(instance) { }
+		public Pset_SpaceThermalRequirements(IfcSpaceType type) : base(type) { }
+		public Pset_SpaceThermalRequirements(IfcSpatialZone instance) : base(instance) { }
+		public Pset_SpaceThermalRequirements(IfcSpatialZoneType type) : base(type) { }
+		public Pset_SpaceThermalRequirements(IfcZone instance) : base(instance) { }
+	}
 	//Pset_SpatialZoneCommon
 	//Pset_StackTerminalTypeCommon
 	//Pset_StairCommon

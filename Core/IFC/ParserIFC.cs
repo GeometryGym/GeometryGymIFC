@@ -189,24 +189,22 @@ namespace GeometryGym.Ifc
 				return ".F.";
 			return ".U.";
 		}
-
 		
 		internal static BaseClassIfc ParseLine(string line, ReleaseVersion schema, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			string kw = "", str = "";
-			int ifcID = 0;
+			int stepID = 0;
 			
-			ParserSTEP.GetKeyWord(line, out ifcID, out kw, out str);
+			ParserSTEP.GetKeyWord(line, out stepID, out kw, out str);
 			if (string.IsNullOrEmpty(kw) || !kw.ToUpper().StartsWith("IFC"))
 				return null;
 			str = str.Trim();
 			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dictionary);
 			if (result == null)
 				return null;
-			result.mIndex = ifcID;
+			result.mIndex = stepID;
 			return result;
 		}
-		
 
 		internal static IfcColour parseColour(string str)
 		{
@@ -420,7 +418,7 @@ namespace GeometryGym.Ifc
 			}
 			if (str.StartsWith("IFCURIREFERENCE("))
 			{
-				return new IfcURIReference(str[16] == '$' ? "" : ParserIfc.Decode(str.Substring(17, str.Length - 18)));
+				return new IfcURIReference(str[16] == '$' ? "" : ParserIfc.Decode(str.Substring(17, str.Length - 19)));
 			}
 			int i = 0;
 			if (int.TryParse(str, out i))

@@ -1755,14 +1755,13 @@ namespace GeometryGym.Ifc
 				foreach (IfcObject o in e.NewItems)
 				{
 					if (o.mIsTypedBy != this)
-						o.IsTypedBy = this;
+						o.mIsTypedBy = this;
 				}
-					
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcObject o in e.OldItems)
-					o.IsTypedBy = null;
+					o.mIsTypedBy = null;
 			}
 		}
 	}
@@ -2137,7 +2136,8 @@ namespace GeometryGym.Ifc
 		internal IfcRelVoidsElement() : base() { }
 		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory)
 		{
-			RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, ownerHistory, downStream) as IfcFeatureElementSubtraction;
+			if(downStream)
+				RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, ownerHistory, downStream) as IfcFeatureElementSubtraction;
 		}
 		public IfcRelVoidsElement(IfcElement host, IfcFeatureElementSubtraction fes)
 			: base(host.mDatabase) { mRelatingBuildingElement = host.mIndex; host.mHasOpenings.Add(this); mRelatedOpeningElement = fes.mIndex; fes.mVoidsElement = this; }
@@ -2287,6 +2287,26 @@ namespace GeometryGym.Ifc
 		protected IfcRepresentationItem(DatabaseIfc db) : base(db) { }
 
 		public void AssignLayer(IfcPresentationLayerAssignment layer) { mLayerAssignments.Add(layer); }
+
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcRepresentationItem ri = e as IfcRepresentationItem;
+			if (ri == null)
+				return false;
+			if (mStyledByItem != null)
+			{
+				if (ri.mStyledByItem != null)
+				{
+					if (!mStyledByItem.isDuplicate(ri.mStyledByItem))
+						return false;
+				}
+				else
+					return false;
+			}
+			else if (ri.mStyledByItem != null)
+				return false;
+			return base.isDuplicate(e);
+		}
 	}
 	[Serializable]
 	public partial class IfcRepresentationMap : BaseClassIfc, IfcProductRepresentationSelect

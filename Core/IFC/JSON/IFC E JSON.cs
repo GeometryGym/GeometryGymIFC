@@ -172,14 +172,14 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if(mDatabase.Release != ReleaseVersion.IFC2x3)
+			if(mDatabase == null || mDatabase.Release > ReleaseVersion.IFC2x3)
 				base.setAttribute(obj, "Name", Name);
 			base.setAttribute(obj, "Description", Description);
 			if(mProperties.Count > 0)
 			{
 				JArray array = new JArray();
-				foreach (int i in mPropertyIndices)
-					array.Add(mDatabase[i].getJson(this, options));
+				foreach (IfcProperty p in mProperties.Values)
+					array.Add(p.getJson(this, options));
 				obj["Properties"] = array;
 			}
 		}

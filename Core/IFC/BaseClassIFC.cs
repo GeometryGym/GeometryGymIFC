@@ -124,20 +124,9 @@ namespace GeometryGym.Ifc
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 
-		internal static Type GetType(string className)
+		internal static Type GetType(string classNameIfc)
 		{
-			Type type = null;
-			string name = className;
-			string[] fields = className.Split(".".ToCharArray());
-			if (fields != null && fields.Length > 0)
-				name = fields[0];
-			if (!mTypes.TryGetValue(name, out type))
-			{
-				type = Type.GetType("GeometryGym.Ifc." + name, false, true);
-				if (type != null)
-					mTypes[name] = type;
-			}
-			return type;	
+			return STEPEntity.GetType(classNameIfc, "Ifc");	
 		}
 		public static BaseClassIfc Construct(string className)
 		{
@@ -148,7 +137,7 @@ namespace GeometryGym.Ifc
 				if (type == null)
 					return null;
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
-				if (constructor == null)
+				if (type.IsAbstract)
 				{
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
 						return Construct("IfcProfileDef");
@@ -158,6 +147,15 @@ namespace GeometryGym.Ifc
 				mConstructors.TryAdd(className, constructor);
 			}
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;
+		}
+		internal string formatLength(double length)
+		{
+			if (double.IsNaN(length))
+				return "$";
+			double tol = (mDatabase == null ? 1e-6 : mDatabase.Tolerance / 100);
+			int digits = (mDatabase == null ? 5 : mDatabase.mLengthDigits);
+			double result = Math.Round(length, digits);
+			return ParserSTEP.DoubleToString(Math.Abs(result) < tol ? 0 : result);
 		}
 		internal static BaseClassIfc LineParser(string className, string str, ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

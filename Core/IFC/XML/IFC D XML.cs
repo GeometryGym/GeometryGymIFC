@@ -170,6 +170,53 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("SystemType", mSystemType.ToString().ToLower());
 		}
 	}
+	public partial class IfcDocumentInformation : IfcExternalInformation, IfcDocumentSelect, NamedObjectIfc
+	{
+		//internal override void ParseXml(XmlElement xml)
+		//{
+		//	base.ParseXml(xml);
+		//	if (xml.HasAttribute("Description"))
+		//		Description = xml.Attributes["Description"].Value;
+		//	foreach (XmlNode child in xml.ChildNodes)
+		//	{
+		//		string name = child.Name;
+		//		if (string.Compare(name, "ReferencedDocument") == 0)
+		//			ReferencedDocument = mDatabase.ParseXml<IfcDocumentInformation>(child as XmlElement);
+		//	}
+		//}
+		//internal string mIdentification;// : IfcIdentifier;
+		//internal string mName;// :  IfcLabel;
+		//internal string mDescription = "";// : OPTIONAL IfcText;
+		//internal List<int> mDocumentReferences = new List<int>(); // ifc2x3 : OPTIONAL SET [1:?] OF IfcDocumentReference;
+		//internal string mLocation = "";// : IFC4	OPTIONAL IfcURIReference;
+		//internal string mPurpose = "", mIntendedUse = "", mScope = "";// : OPTIONAL IfcText;
+		//internal string mRevision = "";// : OPTIONAL IfcLabel;
+		//internal int mDocumentOwner;// : OPTIONAL IfcActorSelect;
+		//internal List<int> mEditors = new List<int>();// : OPTIONAL SET [1:?] OF IfcActorSelect;
+		//internal DateTime mCreationTime = DateTime.MinValue, mLastRevisionTime = DateTime.MinValue;// : OPTIONAL IFC4 IfcDateTime;
+		//internal string mElectronicFormat = "";// IFC4	 :	OPTIONAL IfcIdentifier; IFC4
+		//internal int mSSElectronicFormat;// IFC2x3 : OPTIONAL IfcDocumentElectronicFormat;
+		//internal DateTime mValidFrom = DateTime.MinValue, mValidUntil = DateTime.MinValue;// : OPTIONAL Ifc2x3 IfcCalendarDate; IFC4 IfcDate
+		//internal int mSSValidFrom = 0, mSSVAlidUntil = 0;
+		//internal IfcDocumentConfidentialityEnum mConfidentiality = IfcDocumentConfidentialityEnum.NOTDEFINED;// : OPTIONAL IfcDocumentConfidentialityEnum;
+		//internal IfcDocumentStatusEnum mStatus = IfcDocumentStatusEnum.NOTDEFINED
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "Identification", Identification);
+			setAttribute(xml, "Name", Name);
+			setAttribute(xml, "Description", Description);
+			//documentreferences ifc2x3
+			setAttribute(xml, "Location", Location);
+			setAttribute(xml, "Purpose", Purpose);
+			setAttribute(xml, "IntendedUse", IntendedUse);
+			setAttribute(xml, "Scope", Scope);
+			setAttribute(xml, "Revision", Revision);
+			//todo
+		//	if (mReferencedDocument > 0)
+		//		xml.AppendChild(ReferencedDocument.GetXML(xml.OwnerDocument, "ReferencedDocument", this, processed));
+		}
+	}
 	public partial class IfcDocumentReference : IfcExternalReference, IfcDocumentSelect
 	{
 		internal override void ParseXml(XmlElement xml)

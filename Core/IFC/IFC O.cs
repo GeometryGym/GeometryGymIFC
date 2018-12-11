@@ -47,9 +47,17 @@ namespace GeometryGym.Ifc
 			{
 				if (mIsTypedBy != null)
 					mIsTypedBy.mRelatedObjects.Remove(this);
+				if(mIsTypedBy != null)
+				{
+					if (mIsTypedBy == value)
+						return;
+					mIsTypedBy.RelatedObjects.Remove(this);
+				}
 				mIsTypedBy = value;
-				if (value != null && !value.RelatedObjects.Contains(this))
+				if (value != null)
+				{
 					value.RelatedObjects.Add(this);
+				}
 			}
 		}
 		public ReadOnlyCollection<IfcRelDefinesByProperties> IsDefinedBy { get { return new ReadOnlyCollection<IfcRelDefinesByProperties>(mIsDefinedBy); } }
@@ -799,12 +807,12 @@ namespace GeometryGym.Ifc
 		public IfcApplication OwningApplication { get { return mOwningApplication; } set { mOwningApplication = value; } }
 		public IfcStateEnum State { get { return mState; } set { mState = value; } }
 		public IfcChangeActionEnum ChangeAction { get { return mChangeAction; } set { mChangeAction = value; } }
-		public DateTime LastModifiedDate { get { return (mLastModifiedDate == int.MinValue ? DateTime.MinValue : DateTime.SpecifyKind(zeroTime.AddSeconds(mLastModifiedDate), DateTimeKind.Utc)); } set { mLastModifiedDate = (value == DateTime.MinValue ? int.MinValue : (int)(value.ToUniversalTime() - zeroTime).TotalSeconds); } }
+		public DateTime LastModifiedDate { get { return (mLastModifiedDate == int.MinValue ? DateTime.MinValue : DateTime.SpecifyKind(zeroTime().AddSeconds(mLastModifiedDate), DateTimeKind.Utc)); } set { mLastModifiedDate = (value == DateTime.MinValue ? int.MinValue : (int)(value.ToUniversalTime() - zeroTime()).TotalSeconds); } }
 		public IfcPersonAndOrganization LastModifyingUser { get { return mLastModifyingUser; } set { mLastModifyingUser = value; } }
 		public IfcApplication LastModifyingApplication { get { return mLastModifyingApplication; } set { mLastModifyingApplication = value; } }
-		public DateTime CreationDate { get { return DateTime.SpecifyKind( zeroTime.AddSeconds(mCreationDate), DateTimeKind.Utc); } set { mCreationDate = (int)(value.ToUniversalTime() - zeroTime).TotalSeconds; } } 
+		public DateTime CreationDate { get { return DateTime.SpecifyKind( zeroTime().AddSeconds(mCreationDate), DateTimeKind.Utc); } set { mCreationDate = (int)(value.ToUniversalTime() - zeroTime()).TotalSeconds; } }
 
-		private DateTime zeroTime = new DateTime(1970, 1, 1, 0, 0, 0);
+		private DateTime zeroTime() { return new DateTime(1970, 1, 1, 0, 0, 0); } 
 		internal IfcOwnerHistory() : base() { }
 		internal IfcOwnerHistory(DatabaseIfc db, IfcOwnerHistory o) : base(db, o)
 		{

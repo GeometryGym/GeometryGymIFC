@@ -65,5 +65,21 @@ namespace GeometryGym.STEP
 		protected virtual string BuildStringSTEP() { return ""; } 
 		public void  AddComment(string comment) { mComments.Add(comment); }
 
+		
+		internal static Type GetType(string classNameIfc, string nameSpace)
+		{
+			Type type = null;
+			string name = classNameIfc;
+			string[] fields = classNameIfc.Split(".".ToCharArray());
+			if (fields != null && fields.Length > 0)
+				name = fields[0];
+			if (!mTypes.TryGetValue(name, out type))
+			{
+				type = Type.GetType("GeometryGym." + nameSpace + "." + name, false, true);
+				if (type != null)
+					mTypes[name] = type;
+			}
+			return type;
+		}
 	}
 }

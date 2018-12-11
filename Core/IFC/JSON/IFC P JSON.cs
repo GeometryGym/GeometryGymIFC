@@ -453,8 +453,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mDatabase.Release < ReleaseVersion.IFC4 && mName != "$")
-				obj["ProfileName"] = Name;
+			if (options.Version > ReleaseVersion.IFC2x3)
+				setAttribute(obj, "Name", Name);
 			obj["ProfileDefinition"] = ProfileDefinition.getJson(this, options);
 		}
 	}
@@ -662,7 +662,7 @@ namespace GeometryGym.Ifc
 				obj["NominalValue"] = DatabaseIfc.extract(value);
 			IfcUnit unit = Unit;
 			if (unit != null)
-				obj["Unit"] = mDatabase[mUnit].getJson(this, options);
+				obj["Unit"] = unit.getJson(this, options);
 		}
 	}
 	public partial class IfcPumpType : IfcFlowMovingDeviceType

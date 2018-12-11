@@ -200,7 +200,7 @@ namespace GeometryGym.Ifc
 			mAxis1 = ParserSTEP.StripLink(str, ref pos, len);
 			mAxis2 = ParserSTEP.StripLink(str, ref pos, len);
 			mLocalOrigin = ParserSTEP.StripLink(str, ref pos, len);
-			mScale = ParserSTEP.StripDouble(str, ref pos, len);
+			Scale = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcCartesianTransformationOperator2DnonUniform : IfcCartesianTransformationOperator2D
@@ -209,7 +209,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mScale2 = ParserSTEP.StripDouble(str, ref pos, len);
+			Scale2 = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcCartesianTransformationOperator3D : IfcCartesianTransformationOperator //SUPERTYPE OF(IfcCartesianTransformationOperator3DnonUniform)
@@ -227,8 +227,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mScale2 = ParserSTEP.StripDouble(str, ref pos, len);
-			mScale3 = ParserSTEP.StripDouble(str, ref pos, len);
+			Scale2 = ParserSTEP.StripDouble(str, ref pos, len);
+			Scale3 = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcCenterLineProfileDef : IfcArbitraryOpenProfileDef

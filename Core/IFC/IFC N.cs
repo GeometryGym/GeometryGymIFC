@@ -49,6 +49,18 @@ namespace GeometryGym.Ifc
 					Dimensions = new IfcDimensionalExponents(m, 2, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.VOLUMEUNIT)
 					Dimensions = new IfcDimensionalExponents(m, 3, 0, 0, 0, 0, 0, 0);
+				else if (unitEnum == IfcUnitEnum.MASSUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 1, 0, 0, 0, 0, 0);
+				else if (unitEnum == IfcUnitEnum.TIMEUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 1, 0, 0, 0, 0);
+				else if (unitEnum == IfcUnitEnum.ELECTRICCURRENTUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 1, 0, 0, 0);
+				else if (unitEnum == IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 1, 0, 0);
+				else if (unitEnum == IfcUnitEnum.AMOUNTOFSUBSTANCEUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 1, 0);
+				else if (unitEnum == IfcUnitEnum.LUMINOUSINTENSITYUNIT)
+					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 1);
 				else if (unitEnum == IfcUnitEnum.PLANEANGLEUNIT)
 					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0);
 			}

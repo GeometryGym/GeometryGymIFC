@@ -936,8 +936,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mNominalValue != null)
 				xml.AppendChild(convert(xml.OwnerDocument, mNominalValue, "NominalValue"));
-			if (mUnit > 0)
-				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mUnit != null)
+				xml.AppendChild((mUnit as BaseClassIfc).GetXML(xml.OwnerDocument, "Unit", this, processed));
 			//if(mAppliedValueFor.Count > 0)
 			//{
 			//	XmlElement element = xml.OwnerDocument.CreateElement("AppliedValueFor");

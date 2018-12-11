@@ -172,6 +172,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
+				//Also adjust similar method for length in baseclass
 				double tol = (mDatabase == null ? 1e-6 : mDatabase.Tolerance / 100);
 				int digits = (mDatabase == null ? 5 : mDatabase.mLengthDigits);
 				double x = Math.Round(mCoordinateX, digits), y = Math.Round(double.IsNaN(mCoordinateY) ? 0 : mCoordinateY, digits);
@@ -236,7 +237,7 @@ namespace GeometryGym.Ifc
 			get { return mDatabase[mLocalOrigin] as IfcCartesianPoint; }
 			set { mLocalOrigin = value.mIndex; }
 		}
-		public double Scale { get { return mScale; } set { mScale = double.IsNaN( value) || Math.Abs(value) < 1e-6 ? 1 : value; } }
+		public double Scale { get { return mScale; } set { mScale = double.IsNaN( value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
 
 		protected IfcCartesianTransformationOperator() { }
 		protected IfcCartesianTransformationOperator(IfcCartesianPoint p) : base(p.mDatabase) { LocalOrigin = p; }
@@ -261,7 +262,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianTransformationOperator2DnonUniform : IfcCartesianTransformationOperator2D
 	{
 		private double mScale2 = double.NaN; //OPTIONAL REAL;
-		public double Scale2 { get { return mScale2; } set { mScale2 = value; } }
+		public double Scale2 { get { return mScale2; } set { mScale2 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
 
 		internal IfcCartesianTransformationOperator2DnonUniform() : base() { }
 		internal IfcCartesianTransformationOperator2DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator2DnonUniform o) : base(db,o) { mScale2 = o.mScale2; }
@@ -290,8 +291,8 @@ namespace GeometryGym.Ifc
 		private double mScale2 = 1;// : OPTIONAL REAL;
 		private double mScale3 = 1;// : OPTIONAL REAL; 
 
-		public double Scale2 { get { return mScale2; } set { mScale2 = value; } }
-		public double Scale3 { get { return mScale3; } set { mScale3 = value; } }
+		public double Scale2 { get { return mScale2; } set { mScale2 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
+		public double Scale3 { get { return mScale3; } set { mScale3 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
 
 		internal IfcCartesianTransformationOperator3DnonUniform() { }
 		internal IfcCartesianTransformationOperator3DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator3DnonUniform o) : base(db,o) { mScale2 = o.mScale2; mScale3 = o.mScale3; }

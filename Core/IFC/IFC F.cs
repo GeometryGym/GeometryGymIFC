@@ -245,10 +245,18 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcFeatureElementSubtraction : IfcFeatureElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcOpeningElement ,IfcVoidingFeature)) 
 	{ //INVERSE
 		internal IfcRelVoidsElement mVoidsElement = null;
-		public IfcRelVoidsElement VoidsElement { get { return mVoidsElement; } }
+		public IfcRelVoidsElement VoidsElement { get { return mVoidsElement; } set { mVoidsElement = value; } }
 
 		protected IfcFeatureElementSubtraction() : base() { }
-		protected IfcFeatureElementSubtraction(DatabaseIfc db, IfcFeatureElementSubtraction e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream){ }
+		protected IfcFeatureElementSubtraction(DatabaseIfc db, IfcFeatureElementSubtraction e, IfcOwnerHistory ownerHistory, bool downStream) 
+			: base(db, e, ownerHistory, downStream)
+		{
+			IfcRelVoidsElement relVoidsElement = e.VoidsElement;
+			
+			VoidsElement = db.Factory.Duplicate(relVoidsElement, false) as IfcRelVoidsElement;
+			VoidsElement.RelatingBuildingElement = db.Factory.Duplicate(relVoidsElement.RelatingBuildingElement, false) as IfcElement;
+			VoidsElement.RelatedOpeningElement = this;
+		}
 		protected IfcFeatureElementSubtraction(DatabaseIfc db) : base(db) {  }
 		protected IfcFeatureElementSubtraction(IfcElement host, IfcProductRepresentation rep) : base(host.mDatabase)
 		{

@@ -388,6 +388,7 @@ additional types	some additional representation types are given:
 		public IfcShapeRepresentation(IfcShellBasedSurfaceModel surface) : base(surface) { RepresentationType = "SurfaceModel"; }
 		public IfcShapeRepresentation(IfcSurface surface) : base(surface) { RepresentationType = "Surface3D"; }
 		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = "SweptSolid"; }
+		public IfcShapeRepresentation(IfcFixedReferenceSweptAreaSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
 		public IfcShapeRepresentation(IfcSweptDiskSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
 		public IfcShapeRepresentation(IfcSolidModel solid) : base(solid)
 		{
@@ -438,6 +439,9 @@ additional types	some additional representation types are given:
 			IfcFaceBasedSurfaceModel fbs = ri as IfcFaceBasedSurfaceModel;
 			if (fbs != null)
 				return new IfcShapeRepresentation(fbs);
+			IfcFixedReferenceSweptAreaSolid fsas = ri as IfcFixedReferenceSweptAreaSolid;
+			if (fsas != null)
+				return new IfcShapeRepresentation(fsas);
 			IfcGeometricSet gs = ri as IfcGeometricSet;
 			if (gs != null)
 				return new IfcShapeRepresentation(gs);
@@ -489,6 +493,13 @@ additional types	some additional representation types are given:
 		public IfcShellBasedSurfaceModel(List<IfcShell> shells) : base(shells[0].Database) { mSbsmBoundary = shells.ConvertAll(x => x.Index); }
 		
 		internal void addBoundary(IfcShell boundary) { mSbsmBoundary.Add(boundary.Index); }
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			foreach(BaseClassIfc shell in SbsmBoundary)
+				result.AddRange(shell.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcSimpleProperty : IfcProperty //ABSTRACT SUPERTYPE OF (ONEOF (IfcPropertyBoundedValue ,IfcPropertyEnumeratedValue ,
@@ -1647,7 +1658,7 @@ additional types	some additional representation types are given:
 			set { base.AppliedCondition = value; }
 		}
 
-		internal IfcStructuralPointConnection() : base() { }
+		public IfcStructuralPointConnection() : base() { }
 		internal IfcStructuralPointConnection(DatabaseIfc db, IfcStructuralPointConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
 		public IfcStructuralPointConnection(IfcStructuralAnalysisModel sm, IfcVertexPoint point)
 			: base(sm) { Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), point)); }
@@ -1842,7 +1853,7 @@ additional types	some additional representation types are given:
 		internal IfcStructuredDimensionCallout() : base() { }
 		//internal IfcStructuredDimensionCallout(IfcStructuredDimensionCallout i) : base(i) { }
 	}
-	public partial interface IfcStyleAssignmentSelect : IBaseClassIfc //(IfcPresentationStyle ,IfcPresentationStyleAssignment); 
+	public partial interface IfcStyleAssignmentSelect : IBaseClassIfc //(IfcPresentationStyle, IfcPresentationStyleAssignment); 
 	{
 		ReadOnlyCollection<IfcStyledItem> StyledItems { get; }
 		void associateItem(IfcStyledItem item);
@@ -1912,6 +1923,32 @@ additional types	some additional representation types are given:
 			foreach (int i in mStyles)
 				result.AddRange(mDatabase[i].Extract<T>());
 			return result;
+		}
+
+		internal override bool isDuplicate(BaseClassIfc e)
+		{
+			IfcStyledItem s = e as IfcStyledItem;
+			if (s == null || string.Compare(Name, s.Name,false) != 0 || mStyles.Count != s.mStyles.Count)
+				return false;
+
+			List<BaseClassIfc> styles = s.Styles.Select(x=>x as BaseClassIfc).ToList();
+			foreach(IfcStyleAssignmentSelect style in Styles)
+			{
+				BaseClassIfc baseClass = style as BaseClassIfc;
+				bool duplicate = false;
+				for (int icounter = 0; icounter <styles.Count; icounter++)
+				{
+					if(baseClass.isDuplicate(styles[icounter]))
+					{
+						duplicate = true;
+						styles.RemoveAt(icounter);
+						break;
+					}
+				}
+				if (!duplicate)
+					return false;
+			}
+			return base.isDuplicate(e);
 		}
 	}
 	[Serializable]
@@ -2046,6 +2083,11 @@ additional types	some additional representation types are given:
 			mStartParam = s.mStartParam; 
 			mEndParam = s.mEndParam; 
 			ReferenceSurface = db.Factory.Duplicate(s.ReferenceSurface) as IfcSurface; 
+		}
+		public IfcSurfaceCurveSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcSurface referenceSurface) : base(sweptArea)
+		{
+			Directrix = directrix;
+			ReferenceSurface = referenceSurface;
 		}
 	}
 	[Serializable]

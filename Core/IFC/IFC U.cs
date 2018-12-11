@@ -92,9 +92,19 @@ namespace GeometryGym.Ifc
 			else if (length == Length.Centimetre)
 				mDatabase.ScaleSI = 0.01;
 			else if (length == Length.Inch)
+			{
 				mDatabase.ScaleSI = 0.0254;
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.square_foot));
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.cubic_foot));
+				//farenheit
+			}
 			else if (length == Length.Foot)
+			{
 				mDatabase.ScaleSI = FeetToMetre;
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.square_foot));
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.cubic_foot));
+				//farenheit
+			}
 			else
 				mDatabase.ScaleSI = 1;
 			SetUnits();
