@@ -370,7 +370,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCircleHollowProfileDef : IfcCircleProfileDef
 	{
-		internal override string KeyWord { get { return (mWallThickness < (mDatabase == null ? 1e-6 : mDatabase.Tolerance) ? "IfcCircleProfileDef" : base.KeyWord); } }
+		public override string StepClassName { get { return (mWallThickness < (mDatabase == null ? 1e-6 : mDatabase.Tolerance) ? "IfcCircleProfileDef" : base.StepClassName); } }
 
 		internal double mWallThickness;// : IfcPositiveLengthMeasure;
 		public double WallThickness { get { return mWallThickness; } set { mWallThickness = value; } }
@@ -411,7 +411,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcCivilElement() : base() { }
 		internal IfcCivilElement(DatabaseIfc db, IfcCivilElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
-		public IfcCivilElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcCivilElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public abstract partial class IfcCivilElementPart : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBridgeSegmentPart , IfcBridgeContactElement , IfcCivilSheath , IfcCivilVoid))
@@ -427,7 +427,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcCivilElementType() : base() { }
 		internal IfcCivilElementType(DatabaseIfc db, IfcCivilElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
-		public IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public partial class IfcCivilSheath : IfcCivilElementPart //IFC5
@@ -728,7 +728,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{
-		internal double mRed, mGreen, mBlue;// : IfcNormalisedRatioMeasure; 
+		internal double mRed, mGreen, mBlue;// : IfcNormalisedRatioMeasure;
+
+		public double Red { get { return mRed; } set { mRed = value; } }
+		public double Green { get { return mGreen; } set { mGreen = value; } }
+		public double Blue { get { return mBlue; } set { mBlue = value; } }
 		
 		internal IfcColourRgb() : base() { }
 		internal IfcColourRgb(DatabaseIfc db, IfcColourRgb c) : base(db, c) { mRed = c.mRed; mGreen = c.mGreen; mBlue = c.mBlue; }
@@ -765,7 +769,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcColumnStandardCase : IfcColumn
 	{
-		internal override string KeyWord { get { return "IfcColumn"; } }
+		public override string StepClassName { get { return "IfcColumn"; } }
 		internal IfcColumnStandardCase() : base() { }
 		internal IfcColumnStandardCase(DatabaseIfc db, IfcColumnStandardCase c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
 		public IfcColumnStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
@@ -793,7 +797,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcComplexProperty : IfcProperty
 	{
-		internal override string KeyWord { get { return "IfcComplexProperty"; } }
+		public override string StepClassName { get { return "IfcComplexProperty"; } }
 		internal string mUsageName;// : IfcIdentifier;
 		private Dictionary<string, IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
 		private List<int> mPropertyIndices = new List<int>();
@@ -885,18 +889,19 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
-		private List<int> mSegments = new List<int>();// : LIST [1:?] OF IfcCompositeCurveSegment;
+		private LIST<IfcCompositeCurveSegment> mSegments = new LIST<IfcCompositeCurveSegment>();// : LIST [1:?] OF IfcCompositeCurveSegment;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 
-		public ReadOnlyCollection<IfcCompositeCurveSegment> Segments { get { return new ReadOnlyCollection<IfcCompositeCurveSegment>(mSegments.ConvertAll(x => mDatabase[x] as IfcCompositeCurveSegment)); } }
+		public LIST<IfcCompositeCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		internal IfcCompositeCurve() : base() { }
-		internal IfcCompositeCurve(DatabaseIfc db, IfcCompositeCurve c) : base(db,c) { c.Segments.ToList().ForEach(x=>addSegment( db.Factory.Duplicate(x) as IfcCompositeCurveSegment)); mSelfIntersect = c.mSelfIntersect; }
-		public IfcCompositeCurve(List<IfcCompositeCurveSegment> segs) : base(segs[0].mDatabase) { mSegments = segs.ConvertAll(x => x.mIndex); }
-		
-		internal void addSegment(IfcCompositeCurveSegment segment) { mSegments.Add(segment.mIndex); }
-		internal void setSegments(IEnumerable<IfcCompositeCurveSegment> segments) { mSegments.Clear(); foreach (IfcCompositeCurveSegment segment in segments) addSegment(segment); }
+		internal IfcCompositeCurve(DatabaseIfc db, IfcCompositeCurve c) : base(db,c)
+		{
+			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCompositeCurveSegment));
+			mSelfIntersect = c.mSelfIntersect;
+		}
+		public IfcCompositeCurve(List<IfcCompositeCurveSegment> segs) : base(segs[0].mDatabase) { mSegments.AddRange(segs); }
 	}
 	[Serializable]
 	public partial class Ifc2dCompositeCurve : IfcCompositeCurve

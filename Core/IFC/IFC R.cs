@@ -108,13 +108,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcRationalBSplineCurveWithKnots : IfcBSplineCurveWithKnots
 	{
 		internal List<double> mWeightsData = new List<double>();// : LIST [2:?] OF REAL;	
+		public ReadOnlyCollection<double> WeightsData { get { return new ReadOnlyCollection<double>(mWeightsData); } }
 		internal IfcRationalBSplineCurveWithKnots() : base() { }
 		internal IfcRationalBSplineCurveWithKnots(DatabaseIfc db, IfcRationalBSplineCurveWithKnots c) : base(db, c) { mWeightsData.AddRange(c.mWeightsData); }
 	}
 	[Serializable]
 	public partial class IfcRationalBSplineSurfaceWithKnots : IfcBSplineSurfaceWithKnots
 	{
-		internal List<List<double>> mWeightsData = new List<List<double>>();// : LIST [2:?] OF REAL;	
+		internal List<List<double>> mWeightsData = new List<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
+		public ReadOnlyCollection<List<double>> WeightsData { get { return new ReadOnlyCollection<List<double>>(mWeightsData); } }
 		internal IfcRationalBSplineSurfaceWithKnots() : base() { }
 		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s) : base(db, s)
 		{
@@ -729,7 +731,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssignsToGroupByFactor : IfcRelAssignsToGroup //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcRelAssignsToGroup" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcRelAssignsToGroup" : base.StepClassName); } }
 		internal double mFactor = 1;//	 :	IfcRatioMeasure;
 		public double Factor { get { return mFactor; } set { mFactor = value; } }
 
@@ -1013,7 +1015,7 @@ namespace GeometryGym.Ifc
 			else
 				mProfileOrientationValue = r.mProfileOrientationValue;
 		}
-		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(KeyWord + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
+		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
 	}
 	[Serializable]
 	public abstract partial class IfcRelationship : IfcRoot  //ABSTRACT SUPERTYPE OF (ONEOF (IfcRelAssigns ,IfcRelAssociates ,IfcRelConnects ,IfcRelDecomposes ,IfcRelDefines))
@@ -1105,16 +1107,16 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRelConnectsPorts(IfcPort relatingPort, IfcPort relatedPort) : base(relatingPort.mDatabase) { RelatingPort = relatingPort; RelatedPort = relatedPort; }
 
-		internal IfcPort getOtherPort(IfcPort p) { return (mRelatedPort == p.mIndex ? mDatabase[mRelatingPort] as IfcPort : mDatabase[mRelatedPort] as IfcPort); }
+		public IfcPort ConnectedPort(IfcPort p) { return (mRelatedPort == p.mIndex ? mDatabase[mRelatingPort] as IfcPort : mDatabase[mRelatedPort] as IfcPort); }
 	}
 	[Serializable]
 	public partial class IfcRelConnectsPortToElement : IfcRelConnects
 	{
 		internal int mRelatingPort;// : IfcPort;
-		internal int mRelatedElement;// : IfcElement; 
+		internal int mRelatedElement;// : IfcElement; IFC4 IfcDistributionElement
 
-		public IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } set { mRelatingPort = value.mIndex; } }
-		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
+		public IfcPort RelatingPort { get { return mDatabase[mRelatingPort] as IfcPort; } set { mRelatingPort = value.mIndex; value.mContainedIn = this; } }
+		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; value.HasPortsSS.Add(this); } }
 
 		internal IfcRelConnectsPortToElement() : base() { }
 		internal IfcRelConnectsPortToElement(DatabaseIfc db, IfcRelConnectsPortToElement r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { RelatingPort = db.Factory.Duplicate(r.RelatingPort, ownerHistory, downStream) as IfcPort; RelatedElement = db.Factory.Duplicate(r.RelatedElement, ownerHistory, downStream) as IfcElement; }
@@ -1163,7 +1165,7 @@ namespace GeometryGym.Ifc
 		public IfcRelConnectsStructuralElement(IfcElement elem, IfcStructuralMember memb) : base(elem.mDatabase)
 		{
 			if (elem.mDatabase.mRelease != ReleaseVersion.IFC2x3)
-				throw new Exception(KeyWord + " Deleted IFC4!");
+				throw new Exception(StepClassName + " Deleted IFC4!");
 			RelatingElement = elem;
 			RelatedStructuralMember = memb;
 		}
@@ -1611,7 +1613,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
 	{
-		private SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// IFC4 change	SET [1:1] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
+		private SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// IFC4 change SET [1:?] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
 		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinition; 
 
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
@@ -1727,7 +1729,7 @@ namespace GeometryGym.Ifc
 		internal SET<IfcObject> mRelatedObjects = new SET<IfcObject>();// : SET [1:?] OF IfcObject;
 		private IfcTypeObject mRelatingType = null;// : IfcTypeObject  
 
-		internal SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } set { mRelatedObjects.Clear(); if (value != null) { mRelatedObjects.CollectionChanged -= mRelatedObjects_CollectionChanged; mRelatedObjects = value; mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged; } } }
+		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } set { mRelatedObjects.Clear(); if (value != null) { mRelatedObjects.CollectionChanged -= mRelatedObjects_CollectionChanged; mRelatedObjects = value; mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged; } } }
 		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; value.mObjectTypeOf = this; } }
 
 		public override IfcRoot Relating() { return RelatingType; } 
@@ -1870,11 +1872,11 @@ namespace GeometryGym.Ifc
 				ods[icounter].changeSchema(schema);
 			if (schema < ReleaseVersion.IFC4)
 			{
-				string obj = RelatingObject.KeyWord;
+				string obj = RelatingObject.StepClassName;
 				bool valid = true;
 				foreach (IfcObjectDefinition od in RelatedObjects)
 				{
-					if (string.Compare(obj, od.KeyWord, true) != 0)
+					if (string.Compare(obj, od.StepClassName, true) != 0)
 					{
 						valid = false;
 						break;
@@ -1911,7 +1913,7 @@ namespace GeometryGym.Ifc
 	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcRelOverridesProperties : IfcRelDefinesByProperties // DEPRECEATED IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease <= ReleaseVersion.IFC2x3 ? base.KeyWord : "IFCRELOVERRIDESPROPERTIES"); } }
+		public override string StepClassName { get { return (mDatabase.mRelease <= ReleaseVersion.IFC2x3 ? base.StepClassName : "IFCRELOVERRIDESPROPERTIES"); } }
 		private List<int> mOverridingProperties = new List<int>();// : 	SET [1:?] OF IfcProperty;
 
 		public ReadOnlyCollection<IfcProperty> OverridingProperties { get { return new ReadOnlyCollection<IfcProperty>(mOverridingProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
@@ -2265,6 +2267,8 @@ namespace GeometryGym.Ifc
 
 		internal List<IfcRepresentation> mRepresents = new List<IfcRepresentation>();
 
+		public SET<IfcPresentationLayerAssignment> LayerAssignment { get { return mLayerAssignments; } }
+		[Obsolete("REPLACED IFC4", false)]
 		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
 		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
 
@@ -2323,6 +2327,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcMappedItem> MapUsage { get { return new ReadOnlyCollection<IfcMappedItem>(mMapUsage); } }
 
 		internal List<IfcTypeProduct> mRepresents = new List<IfcTypeProduct>();// GG
+		public ReadOnlyCollection<IfcTypeProduct> Represents { get { return new ReadOnlyCollection<IfcTypeProduct>(mRepresents); } }
 
 		internal IfcRepresentationMap() : base() { }
 		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m) : base(db, m) { MappingOrigin = db.Factory.Duplicate(m.mDatabase[m.mMappingOrigin]) as IfcAxis2Placement; MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation) as IfcShapeModel; }

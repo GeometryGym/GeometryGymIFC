@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 		internal virtual void ParseXml(XmlElement xml) { }
 		internal XmlElement GetXML(XmlDocument doc, string name, BaseClassIfc host, Dictionary<int,XmlElement> processed)
 		{
-			string type = KeyWord;
+			string type = StepClassName;
 			if (string.IsNullOrEmpty(name))
 				name = type;
 
@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 				att.Value = type;
 				element.SetAttributeNode(att);
 			}
-			processed.Add(mIndex, element);
+			processed[mIndex] = element;
 			return element;
 		}
 		internal virtual void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

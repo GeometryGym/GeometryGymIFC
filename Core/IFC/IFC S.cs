@@ -20,12 +20,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
 using System.ComponentModel;
-using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -473,7 +473,7 @@ additional types	some additional representation types are given:
 			if (mi != null)
 				return new IfcShapeRepresentation(mi);
 
-			ri.mDatabase.logError("XXX Error in identiying " + ri.ToString() + " as shape representation, please contact Jon!");
+			Trace.WriteLine("XX Error Can't identify " + ri.ToString() + " as shape representation!");
 			return null;
 		}
 	}
@@ -612,14 +612,14 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSlabElementedCase : IfcSlab
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
 		internal IfcSlabElementedCase() : base() { }
 		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 	}
 	[Serializable]
 	public partial class IfcSlabStandardCase : IfcSlab
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
 		internal IfcSlabStandardCase() : base() { }
 		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
@@ -1392,7 +1392,7 @@ additional types	some additional representation types are given:
 			: base(lc, member, start, global, projected, IfcStructuralCurveActivityTypeEnum.LINEAR)
 		{
 			if (mDatabase.mRelease != ReleaseVersion.IFC2x3)
-				throw new Exception(this.KeyWord + " deleted in IFC4");
+				throw new Exception(this.StepClassName + " deleted in IFC4");
 			IfcCurve curve = member.EdgeCurve.EdgeGeometry;
 			List<IfcShapeModel> aspects = new List<IfcShapeModel>();
 			aspects.Add( new IfcShapeRepresentation(new IfcPointOnCurve(mDatabase,curve, 0)));
@@ -1446,7 +1446,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadCase : IfcStructuralLoadGroup //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcStructuralLoadGroup" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcStructuralLoadGroup" : base.StepClassName); } }
 
 		internal Tuple<double,double,double> mSelfWeightCoefficients = null;// : OPTIONAL LIST [3:3] OF IfcRatioMeasure; 
 		public Tuple<double,double,double> SelfWeightCoefficients { get { return mSelfWeightCoefficients; } set { mSelfWeightCoefficients = value; } }
@@ -1789,19 +1789,19 @@ additional types	some additional representation types are given:
 		internal IfcStructuralSurfaceAction() : base() { }
 		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
-			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc,null,load,new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
-				throw new Exception(KeyWord + "added in IFC4");
+				throw new Exception(StepClassName + "added in IFC4");
 			mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH;
 			mPredefinedType = type;
 		}
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc, item, load, new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{ 
-			if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + "added in IFC4"); 
+			if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + "added in IFC4"); 
 			mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; 
 			mPredefinedType = type; 
 		}
@@ -2075,6 +2075,8 @@ additional types	some additional representation types are given:
 
 		public IfcCurve Directrix { get { return mDatabase[mDirectrix] as IfcCurve; } set { mDirectrix = value.mIndex; } }
 		public IfcSurface ReferenceSurface { get { return mDatabase[mReferenceSurface] as IfcSurface; } set { mReferenceSurface = value.mIndex; } }
+		public double StartParam { get { return mStartParam; } set { mStartParam = value; } }
+		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
 
 		internal IfcSurfaceCurveSweptAreaSolid() : base() { }
 		internal IfcSurfaceCurveSweptAreaSolid(DatabaseIfc db, IfcSurfaceCurveSweptAreaSolid s) : base(db, s) 
@@ -2097,6 +2099,7 @@ additional types	some additional representation types are given:
 		internal double mDepth;// : IfcLengthMeasure;
 
 		public IfcDirection ExtrudedDirection { get { return mDatabase[mExtrudedDirection] as IfcDirection; } set { mExtrudedDirection = value.mIndex; } }
+		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcSurfaceOfLinearExtrusion() : base() { }
 		internal IfcSurfaceOfLinearExtrusion(DatabaseIfc db, IfcSurfaceOfLinearExtrusion s) : base(db,s) { ExtrudedDirection = db.Factory.Duplicate(s.ExtrudedDirection) as IfcDirection; mDepth = s.mDepth; }
@@ -2430,7 +2433,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
-		internal override string KeyWord { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.StepClassName); } }
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }

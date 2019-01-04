@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBeamStandardCase : IfcBeam
 	{
-		internal override string KeyWord { get { return "IfcBeam"; } }
+		public override string StepClassName { get { return "IfcBeam"; } }
 
 		internal IfcBeamStandardCase() : base() { }
 		internal IfcBeamStandardCase(DatabaseIfc db, IfcBeamStandardCase b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream) { }
@@ -381,25 +381,25 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBSplineCurveWithKnots : IfcBSplineCurve
 	{
-		private List<int> mMultiplicities = new List<int>();// : LIST [2:?] OF INTEGER;
-		private List<double> mKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
+		private LIST<int> mKnotMultiplicities = new LIST<int>();// : LIST [2:?] OF INTEGER;
+		private LIST<double> mKnots = new LIST<double>();// : LIST [2:?] OF IfcParameterValue;
 		private IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType;
 
-		public ReadOnlyCollection<int> Multiplicities { get { return new ReadOnlyCollection<int>( mMultiplicities); } }
+		public LIST<int> KnotMultiplicities { get { return mKnotMultiplicities; } }
 		public ReadOnlyCollection<double> Knots { get { return new ReadOnlyCollection<double>( mKnots); } }
 		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineCurveWithKnots() : base() { }
 		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c) : base(db, c)
 		{
-			mMultiplicities.AddRange(c.Multiplicities);
+			mKnotMultiplicities.AddRange(c.KnotMultiplicities);
 			mKnots.AddRange(c.Knots);
 			mKnotSpec = c.mKnotSpec;
 		}
 		public IfcBSplineCurveWithKnots(int degree, List<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
 			base(degree, controlPoints, form)
 		{
-			mMultiplicities.AddRange(multiplicities);
+			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
 	}
@@ -455,6 +455,12 @@ namespace GeometryGym.Ifc
 		internal List<double> mUKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
 		internal List<double> mVKnots = new List<double>();// : LIST [2:?] OF IfcParameterValue;
 		internal IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType; 
+
+		public ReadOnlyCollection<int> UMultiplicities { get { return new ReadOnlyCollection<int>(mUMultiplicities); } }
+		public ReadOnlyCollection<int> VMultiplicities { get { return new ReadOnlyCollection<int>(mUMultiplicities); } }
+		public ReadOnlyCollection<double> UKnots { get { return new ReadOnlyCollection<double>(mUKnots); } }
+		public ReadOnlyCollection<double> VKnots { get { return new ReadOnlyCollection<double>(mVKnots); } }
+		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineSurfaceWithKnots() : base() { }
 		internal IfcBSplineSurfaceWithKnots(DatabaseIfc db, IfcBSplineSurfaceWithKnots s) : base(db,s)

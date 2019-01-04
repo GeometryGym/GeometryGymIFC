@@ -55,6 +55,13 @@ namespace GeometryGym.Ifc
 		internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
 
+		public double Depth { get { return mDepth; } set { mDepth = value; } }
+		public double FlangeWidth { get { return mFlangeWidth; } set { mFlangeWidth = value; } }
+		public double WebThickness { get { return mWebThickness; } set { mWebThickness = value; } }
+		public double FlangeThickness { get { return mFlangeThickness; } set { mFlangeThickness = value; } }
+		public double FilletRadius { get { return mFilletRadius; } set { mFilletRadius = (value < mDatabase.Tolerance ? double.NaN : value); } }
+		public double EdgeRadius { get { return mEdgeRadius; } set { mEdgeRadius = (value < mDatabase.Tolerance ? double.NaN : value); } }
+
 		internal IfcZShapeProfileDef() : base() { }
 		internal IfcZShapeProfileDef(DatabaseIfc db, IfcZShapeProfileDef p) : base(db, p) { mDepth = p.mDepth; mFlangeWidth = p.mFlangeWidth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mEdgeRadius = p.mEdgeRadius; }
 		public IfcZShapeProfileDef(DatabaseIfc db, string name, double depth, double flangeWidth, double webThickness, double flangeThickness) : base(db, name) { mDepth = depth; mFlangeWidth = flangeWidth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; }

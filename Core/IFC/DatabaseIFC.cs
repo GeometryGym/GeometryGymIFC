@@ -115,8 +115,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		internal ModelView mModelView = ModelView.Ifc2x3NotAssigned;
-		internal string mFileName = "";
-		public string FileName { get { return mFileName; } set { mFileName = value; FolderPath = Path.GetDirectoryName(value); } }
+		
 		internal bool mTimeInDays = false;
 		public ReleaseVersion Release
 		{ 
@@ -508,7 +507,7 @@ namespace GeometryGym.Ifc
 					string def = obj.DefinitionString;
 					obj.Object.parse(def, ref pos, release, def.Length, dictionary);
 				}
-				catch (Exception x) { logError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.KeyWord + " " + x.Message); }
+				catch (Exception x) { logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
 			}
 #endif
 			Thread.CurrentThread.CurrentCulture = current;
@@ -1571,6 +1570,46 @@ namespace GeometryGym.Ifc
 			mBoundaryNodeConditions.Add(name, result);
 			return result;
 		}
+	}
+
+
+	internal class ApplicableType
+	{
+		private Type mType = null;
+		private string mPredefined = "";
+
+		private HashSet<Type> mApplicable = new HashSet<Type>();
+		private HashSet<Type> mNotApplicableTo = new HashSet<Type>();
+
+		internal ApplicableType(Type type) { mType = type; mApplicable.Add(type); }
+		internal ApplicableType(Type type, string predefined) : this(type) { mPredefined = predefined; }
+
+		internal bool isApplicable(Type type)
+		{
+			if (mApplicable.Contains(type))
+				return true;
+			if (mNotApplicableTo.Contains(type))
+				return false;
+			if(type.IsSubclassOf(mType))
+			{
+				mApplicable.Add(type);
+				return true;
+			}
+			mNotApplicableTo.Add(type);
+			return false;
+		}
+		internal bool isApplicable(Type type, string predefined)
+		{
+			if (mApplicable.Contains(type))
+				return (string.IsNullOrEmpty(mPredefined) || string.Compare(predefined, mPredefined, true) == 0);
+			if (type.IsSubclassOf(mType))
+			{
+				mApplicable.Add(type);
+				return (string.IsNullOrEmpty(mPredefined) || string.Compare(predefined, mPredefined, true) == 0);
+			}
+			return false;
+		}
+
 	}
 }
 

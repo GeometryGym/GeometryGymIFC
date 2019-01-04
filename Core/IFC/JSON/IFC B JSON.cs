@@ -240,9 +240,9 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			JArray array = new JArray();
-			foreach (int i in mMultiplicities)
+			foreach (int i in mKnotMultiplicities)
 				array.Add(i);
-			obj["Multiplicities"] = array;
+			obj["KnotMultiplicities"] = array;
 			array = new JArray();
 			foreach (int i in mKnots)
 				array.Add(i);

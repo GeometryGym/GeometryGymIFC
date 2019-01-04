@@ -144,6 +144,18 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
+
+		public string GetPredefinedType(bool checkRelatingType)
+		{
+			string result = base.GetPredefinedType();
+			if(result == null)
+			{
+				IfcTypeObject typeObject = RelatingType();
+				if (typeObject != null)
+					result = typeObject.GetPredefinedType();
+			}
+			return result;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
@@ -164,20 +176,6 @@ namespace GeometryGym.Ifc
 		public IfcRelAggregates Decomposes { get { return mDecomposes; } set { if (mDecomposes != null) mDecomposes.mRelatedObjects.Remove(mIndex); mDecomposes = value; if (value != null && !value.mRelatedObjects.Contains(mIndex)) value.mRelatedObjects.Add(mIndex); } }
 		public SET<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
 
-		internal IfcRelAssociatesMaterial RelatedMaterialAssociation
-		{
-			get
-			{
-				for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
-				{
-					IfcRelAssociatesMaterial rm = mHasAssociations[icounter] as IfcRelAssociatesMaterial;
-					if (rm != null)
-						return rm;
-				}
-				return null;
-			}
-		}
-		
 		protected IfcObjectDefinition() : base() { }
 		protected IfcObjectDefinition(DatabaseIfc db) : base(db) {  }
 		protected IfcObjectDefinition(IfcObjectDefinition basis) : base(basis)
@@ -384,34 +382,35 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal string Particular
+		public string GetPredefinedType()
 		{
-			get
+			Type type = GetType();
+			PropertyInfo pi = type.GetProperty("PredefinedType");
+			if (pi != null)
+				return pi.GetValue(this).ToString();
+			return "";
+		}
+		public string GetObjectDefinitionType() 
+		{
+			string result = GetPredefinedType();
+			if(string.IsNullOrEmpty(result) || string.Compare("USERDEFINED", result, true) == 0 || string.Compare("NOTDEFINED", result, true) == 0)
 			{
-				string result = "";
-				Type type = GetType();
-				PropertyInfo pi = type.GetProperty("PredefinedType");
-				if(pi != null)
-					result = pi.GetValue(this).ToString();	
-				if(string.IsNullOrEmpty(result) || string.Compare("USERDEFINED", result, true) == 0 || string.Compare("NOTDEFINED", result, true) == 0)
+				IfcObject obj = this as IfcObject;
+				if (obj != null)
+					result = obj.ObjectType;
+				else
 				{
-					IfcObject obj = this as IfcObject;
-					if (obj != null)
-						result = obj.ObjectType;
-					else
-					{
-						IfcElementType elementType = this as IfcElementType;
-						if (elementType != null)
-							result = elementType.ElementType; 
-					}
+					IfcElementType elementType = this as IfcElementType;
+					if (elementType != null)
+						result = elementType.ElementType; 
 				}
-				return result;
 			}
+			return result;
 		}
 
 		internal IfcMaterialLayerSet detectMaterialLayerSet()
 		{
-			IfcRelAssociatesMaterial associates = RelatedMaterialAssociation;
+			IfcRelAssociatesMaterial associates = HasAssociations.OfType<IfcRelAssociatesMaterial>().FirstOrDefault();
 			if (associates == null)
 			{
 				IfcTypeProduct typeProduct = this as IfcTypeProduct;
@@ -588,31 +587,39 @@ namespace GeometryGym.Ifc
 		public IfcOccupant(IfcActorSelect a, IfcOccupantTypeEnum type) : base(a) { mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcOffsetCurve : IfcCurve
+	public abstract partial class IfcOffsetCurve2D : IfcCurve
 	{
 		private IfcCurve mBasisCurve;//: IfcCurve;
+		private double mDistance;// : IfcLengthMeasure;
+		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : IfcLogical;
 
 		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
+		public double Distance {  get { return mDistance; } set { mDistance = value; } }
+		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
-		internal IfcOffsetCurve() : base() { }
-		internal IfcOffsetCurve(DatabaseIfc db, IfcOffsetCurve c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; }
-		public IfcOffsetCurve(IfcCurve basis) : base(basis.Database) { BasisCurve = basis; }
+		internal IfcOffsetCurve2D() : base() { }
+		internal IfcOffsetCurve2D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
+		public IfcOffsetCurve2D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect) : base(basis.Database) { BasisCurve = basis; Distance = distance; SelfIntersect = selfIntersect; }
 	}
-	//ENTITY IfcOffsetCurve2D
-	//ENTITY IfcOffsetCurve3D
 	[Serializable]
-	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
+	public abstract partial class IfcOffsetCurve3D : IfcCurve
 	{
-		private LIST<IfcDistanceExpression> mOffsetValues = new LIST<IfcDistanceExpression>();// : LIST[1:?] OF IfcDistanceExpression;>
-		private string mTag = "$";// : OPTIONAL IfcLabel;
+		private IfcCurve mBasisCurve;//: IfcCurve;
+		private double mDistance;// : IfcLengthMeasure;
+		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : IfcLogical;
+		private IfcDirection mRefDirection;// : IfcDirection;
 
-		public LIST<IfcDistanceExpression> OffsetValues { get { return mOffsetValues; } set { mOffsetValues.Clear(); if (value != null) mOffsetValues = value; } }
-		public string Tag { get { return mTag; } set { mTag = value; } }
+		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
+		public double Distance { get { return mDistance; } set { mDistance = value; } }
+		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
+		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
 
-		internal IfcOffsetCurveByDistances() : base() { }
-		internal IfcOffsetCurveByDistances(DatabaseIfc db, IfcOffsetCurveByDistances c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; }
-		public IfcOffsetCurveByDistances(IfcCurve basis) : base(basis) { BasisCurve = basis; }
+		internal IfcOffsetCurve3D() : base() { }
+		internal IfcOffsetCurve3D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
+		public IfcOffsetCurve3D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect, IfcDirection refDirection) : base(basis.Database) { BasisCurve = basis; Distance = distance; SelfIntersect = selfIntersect; RefDirection = RefDirection; }
+
 	}
+
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
 	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
@@ -655,7 +662,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOpeningStandardCase : IfcOpeningElement //IFC4
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcOpeningElement" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcOpeningElement" : base.StepClassName); } }
 		internal IfcOpeningStandardCase() : base() { }
 		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }

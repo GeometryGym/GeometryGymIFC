@@ -18,20 +18,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
+using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using GeometryGym.STEP;
 using System.Collections;
+
 
 namespace GeometryGym.STEP
 {
 	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
+		internal string mFileName = "";
+		public string FileName { get { return mFileName; } set { mFileName = value; FolderPath = Path.GetDirectoryName(value); } }
+
 		public DatabaseSTEP() { }
 
 		private SortedDictionary<int, T> mObjects = new SortedDictionary<int, T>();
@@ -87,8 +93,10 @@ namespace GeometryGym.STEP
 		{
 			return mObjects.Values.GetEnumerator();
 		}
-		partial void printError(string str);
-		internal void logError(string str) { printError(str); }
+		private SortedSet<string> mParsingErrors = new SortedSet<string>();
+		private SortedSet<string> mParsingWarnings = new SortedSet<string>();
+		internal void logParseError(string str) { string error = "XX Error " + str;  if (!mParsingErrors.Contains(error)) mParsingErrors.Add(error); }
+		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
 		
 

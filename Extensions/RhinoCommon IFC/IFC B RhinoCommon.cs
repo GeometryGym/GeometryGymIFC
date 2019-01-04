@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 		public IfcBSplineCurveWithKnots(DatabaseIfc db, int degree, List<Point3d> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
 			base(degree, controlPoints.ConvertAll(x=>new IfcCartesianPoint(db, x)), form)
 		{
-			mMultiplicities.AddRange(multiplicities);
+			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
 		internal IfcBSplineCurveWithKnots(DatabaseIfc m, NurbsCurve nc, bool twoD)
@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
 				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
-			mMultiplicities.AddRange(multiplicities);
+			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
 		private void adoptKnotsAndMultiplicities(NurbsCurve nc)
@@ -104,7 +104,7 @@ namespace GeometryGym.Ifc
 				else
 				{
 					mKnots.Add(nc.Knots[0] - (nc.Knots[1] - nc.Knots[0]));
-					mMultiplicities.Add(1);
+					mKnotMultiplicities.Add(1);
 				}
 				double knot = nc.Knots[0];
 				for (int icounter = 1; icounter < nc.Knots.Count; icounter++)
@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 					if ((t - knot) > tol)
 					{
 						mKnots.Add(knot);
-						mMultiplicities.Add(kc);
+						mKnotMultiplicities.Add(kc);
 						knot = t;
 						kc = 1;
 					}
@@ -122,12 +122,12 @@ namespace GeometryGym.Ifc
 				}
 				mKnots.Add(knot);
 				if (kc > 1)
-					mMultiplicities.Add(kc + 1);
+					mKnotMultiplicities.Add(kc + 1);
 				else
 				{
-					mMultiplicities.Add(1);
+					mKnotMultiplicities.Add(1);
 					mKnots.Add(knot + (knot - nc.Knots[nc.Knots.Count - 2]));
-					mMultiplicities.Add(1);
+					mKnotMultiplicities.Add(1);
 				}
 			}
 			else
@@ -140,7 +140,7 @@ namespace GeometryGym.Ifc
 					if ((t - knot) > tol)
 					{
 						mKnots.Add(knot);
-						mMultiplicities.Add(kc);
+						mKnotMultiplicities.Add(kc);
 						knot = t;
 						kc = 1;
 					}
@@ -148,7 +148,7 @@ namespace GeometryGym.Ifc
 						kc++;
 				}
 				mKnots.Add(knot);
-				mMultiplicities.Add(kc + 1);
+				mKnotMultiplicities.Add(kc + 1);
 			}
 		}
 	}

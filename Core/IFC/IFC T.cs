@@ -1013,7 +1013,7 @@ namespace GeometryGym.Ifc
 				foreach (IfcObject o in mObjectTypeOf.RelatedObjects)
 					db.Factory.Duplicate(o);
 			}
-			IfcSite site = db.Project.RootElement as IfcSite;
+			IfcSite site = db.Project.RootElement() as IfcSite;
 			if (site != null)
 			{
 				IfcProductRepresentation pr = site.Representation;

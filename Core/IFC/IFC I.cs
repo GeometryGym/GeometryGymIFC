@@ -114,7 +114,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
 	{
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
-		public ReadOnlyCollection<ReadOnlyCollection<int>> InnerCoordIndices { get { return new ReadOnlyCollection<ReadOnlyCollection<int>>( mInnerCoordIndices.ConvertAll(x=> new ReadOnlyCollection<int>(x))); }  }
+		public ReadOnlyCollection<List<int>> InnerCoordIndices { get { return new ReadOnlyCollection<List<int>>(mInnerCoordIndices); }  }
 		internal IfcIndexedPolygonalFaceWithVoids() : base() { }
 		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 

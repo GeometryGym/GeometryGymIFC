@@ -338,7 +338,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
 	{ // IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement)) //"IFCDISTRIBUTIONCONTROLELEMENT"
-		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionControlElement" : base.KeyWord; } }
+		public override string StepClassName { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionControlElement" : base.StepClassName; } }
 
 		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
 		public string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -377,7 +377,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionFlowElement : IfcDistributionElement //SUPERTYPE OF (ONEOF (IfcDistributionChamberElement ,IfcEnergyConversionDevice ,
 	{ 	//IfcFlowController ,IfcFlowFitting ,IfcFlowMovingDevice,IfcFlowSegment ,IfcFlowStorageDevice ,IfcFlowTerminal ,IfcFlowTreatmentDevice))
-		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionFlowElement" : base.KeyWord; } }
+		public override string StepClassName { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionFlowElement" : base.StepClassName; } }
 
 		//INVERSE 	HasControlElements : SET [0:1] OF IfcRelFlowControlElements FOR RelatingFlowElement;
 		//GG
@@ -630,7 +630,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDoorStandardCase : IfcDoor
 	{
-		internal override string KeyWord { get { return "IfcDoor"; } }
+		public override string StepClassName { get { return "IfcDoor"; } }
 		internal IfcDoorStandardCase() : base() { }
 		internal IfcDoorStandardCase(DatabaseIfc db, IfcDoorStandardCase d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }
 	}
@@ -642,13 +642,17 @@ namespace GeometryGym.Ifc
 		internal IfcDoorStyleConstructionEnum mConstructionType = IfcDoorStyleConstructionEnum.NOTDEFINED;// : IfcDoorStyleConstructionEnum; //IFC2x3
 		internal bool mParameterTakesPrecedence = false;// : BOOLEAN; 
 		internal bool mSizeable = false;// : BOOLEAN;  //IFC2x3
+
+		public IfcDoorTypeOperationEnum OperationType { get { return mOperationType; } set { mOperationType = value; } }
+		public IfcDoorStyleConstructionEnum ConstructionType { get { return mConstructionType; } set { mConstructionType = value; } }
+
 		internal IfcDoorStyle() : base() { }
 		internal IfcDoorStyle(DatabaseIfc db, IfcDoorStyle s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mOperationType = s.mOperationType; mConstructionType = s.mConstructionType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 	}
 	[Serializable]
 	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDoorStyle" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDoorStyle" : base.StepClassName); } }
 
 		internal IfcDoorTypeEnum mPredefinedType = IfcDoorTypeEnum.NOTDEFINED;
 		internal IfcDoorTypeOperationEnum mOperationType;// : IfcDoorStyleOperationEnum; 

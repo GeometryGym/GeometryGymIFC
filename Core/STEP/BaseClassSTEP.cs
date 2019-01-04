@@ -32,6 +32,8 @@ namespace GeometryGym.STEP
 	public partial interface ISTEPEntity
 	{
 		int Index { get; }
+		int StepId { get; }
+		string StepClassName { get; }
 	}
 	[Serializable]
 	public partial class STEPEntity
@@ -40,12 +42,13 @@ namespace GeometryGym.STEP
 		[NonSerialized] internal List<string> mComments = new List<string>();
 
 		public int Index { get { return mIndex; } private set { mIndex = value; } }
+		public int StepId { get { return mIndex; } private set { mIndex = value; } }
 
 		protected static ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
 		protected static ConcurrentDictionary<string, ConstructorInfo> mConstructors = new ConcurrentDictionary<string, ConstructorInfo>();
 
 		internal STEPEntity() { initialize(); }
-		internal virtual string KeyWord { get { return this.GetType().Name; } }
+		public virtual string StepClassName { get { return this.GetType().Name; } }
 
 		protected virtual void initialize() { }
 		public string StringSTEP()
@@ -59,7 +62,7 @@ namespace GeometryGym.STEP
 				foreach (string c in mComments)
 					comment += "/* " + c + " */\r\n";
 			}
-			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + KeyWord.ToUpper() + "(" + str.Substring(1) + ");";
+			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + StepClassName.ToUpper() + "(" + str.Substring(1) + ");";
 		}
 		public override string ToString() { return StringSTEP(); }
 		protected virtual string BuildStringSTEP() { return ""; } 

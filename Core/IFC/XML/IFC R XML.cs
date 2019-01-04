@@ -473,7 +473,7 @@ namespace GeometryGym.Ifc
 			XmlElement element = xml.OwnerDocument.CreateElement("RelatedDefinitions");
 			xml.AppendChild(element);
 			foreach (IfcDefinitionSelect d in mRelatedDefinitions)
-				element.AppendChild(mDatabase[d.Index].GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild((d as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines

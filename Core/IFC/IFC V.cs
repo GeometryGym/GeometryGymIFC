@@ -235,7 +235,7 @@ namespace GeometryGym.Ifc
 		{
 			return this.GetType().Name.ToUpper() + ToSTEP();
 		}
-		internal double computeAngle()
+		public double Angle()
 		{
 			double compound = Math.Abs(mMinutes) / 60.0 + Math.Abs(mSeconds) / 3600.0 + Math.Abs(mMicroSeconds) / 3600 * 1e-6;
 			double multiplier = (mDegrees == 0 ? (mMinutes == 0 ? (mSeconds == 0 ? (mMicroSeconds > 0 ? 1 : -1) : (mSeconds > 0 ? 1 : -1)) : (mMinutes > 0 ? 1 : -1)) : (mDegrees > 0 ? 1 : -1));
@@ -481,7 +481,16 @@ namespace GeometryGym.Ifc
 	{
 		public override string ValueString { get { return Value.ToString(); } }
 	}
-	//IfcBinary
+	[Serializable]
+	public partial class IfcBinary : IfcSimpleValue
+	{
+		public Byte[] Binary { get; set; }
+		public override object Value { get { return Binary; } set { try { Binary = (Byte[])value; } catch (Exception) { }; } }
+		public override Type ValueType { get { return typeof(long); } }
+		public IfcBinary(Byte[] value) { Binary = value; }
+		public override string ToString() { return "IFCBINARY(" + ParserSTEP.BinaryToString(Binary) + ")"; }
+		public override string ValueString { get { return ParserSTEP.BinaryToString(Binary); } }
+	}
 	[Serializable]
 	public partial class IfcBoolean : IfcSimpleValue
 	{
@@ -604,23 +613,26 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcLogical : IfcSimpleValue
 	{
-		internal IfcLogicalEnum mValue;
+		public IfcLogicalEnum Logical { get; set; } = IfcLogicalEnum.UNKNOWN;
 		public override object Value
 		{
-			get { return mValue; }
+			get { return Logical; }
 			set
 			{
-				if (!Enum.TryParse<IfcLogicalEnum>(value.ToString(), true, out mValue))
+				IfcLogicalEnum logical = IfcLogicalEnum.UNKNOWN;
+				if (!Enum.TryParse<IfcLogicalEnum>(value.ToString(), true, out logical))
 				{
 					bool boolean = Convert.ToBoolean(value);
-					mValue = (boolean ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE);
+					Logical = (boolean ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE);
 				}
+				else
+					Logical = logical;
 			}
 		}
 		public override Type ValueType { get { return typeof(IfcLogicalEnum); } }
-		public IfcLogical(IfcLogicalEnum value) { mValue = value; }
-		public IfcLogical(bool value) { mValue = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; }
-		public override string ToString() { return "IFCLOGICAL(" + ParserIfc.LogicalToString(mValue) + ")"; }
+		public IfcLogical(IfcLogicalEnum value) { Logical = value; }
+		public IfcLogical(bool value) { Logical = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; }
+		public override string ToString() { return "IFCLOGICAL(" + ParserIfc.LogicalToString(Logical) + ")"; }
 	}
 	[Serializable]
 	public partial class IfcPositiveInteger : IfcSimpleValue
@@ -735,6 +747,7 @@ namespace GeometryGym.Ifc
 		public IfcSpecularExponent(double value) { mValue = value; }
 		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public override string ValueString => Value.ToString();
+		public double SpecularExponent { get { return mValue; } }
 	}
 	[Serializable]
 	public partial class IfcSpecularRoughness : IfcValue, IfcSpecularHighlightSelect
@@ -745,6 +758,7 @@ namespace GeometryGym.Ifc
 		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
 		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public override string ValueString => Value.ToString();
+		public double SpecularRoughness { get { return mValue; } }
 	}
 	public interface IfcSizeSelect { } //TYPE IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);  
 }

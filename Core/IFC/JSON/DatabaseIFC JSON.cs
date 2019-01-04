@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 				}
 				else
 				{
-					logError("Unrecognized token");
+					logParseError("Unrecognized token");
 				}
 			}
 			return result;
@@ -224,7 +224,7 @@ namespace GeometryGym.Ifc
 		}
 
 		partial void parseBespoke(BaseClassIfc entity, JObject jObject);
-		public JObject JSON { get { return ToJSON(""); } }
+		public JObject JSON() { return ToJSON(""); }
 		public JObject ToJSON(string filename)
 		{
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;

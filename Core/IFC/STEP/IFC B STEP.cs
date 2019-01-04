@@ -224,9 +224,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.IntToString(mMultiplicities[0]);
-			for (int jcounter = 1; jcounter < mMultiplicities.Count; jcounter++)
-				str += "," + ParserSTEP.IntToString(mMultiplicities[jcounter]);
+			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.IntToString(mKnotMultiplicities[0]);
+			for (int jcounter = 1; jcounter < mKnotMultiplicities.Count; jcounter++)
+				str += "," + ParserSTEP.IntToString(mKnotMultiplicities[jcounter]);
 			str += "),(" + ParserSTEP.DoubleToString(mKnots[0]);
 			for (int jcounter = 1; jcounter < mKnots.Count; jcounter++)
 				str += "," + ParserSTEP.DoubleToString(mKnots[jcounter]);
@@ -235,8 +235,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mMultiplicities = ParserSTEP.StripListInt(str, ref pos, len);
-			mKnots = ParserSTEP.StripListDouble(str, ref pos, len);
+			mKnotMultiplicities.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
+			mKnots.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 			if (!Enum.TryParse<IfcKnotType>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mKnotSpec))
 				mKnotSpec = IfcKnotType.UNSPECIFIED;
 		}

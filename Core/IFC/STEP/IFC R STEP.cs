@@ -804,15 +804,10 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatingPort = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedElement = ParserSTEP.StripLink(str, ref pos, len);
+			RelatingPort = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPort;
+			RelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			RelatingPort.mContainedIn = this;
-			RelatedElement.mHasPorts.Add(this);
-		}
+		
 	}
 	public partial class IfcRelConnectsStructuralActivity : IfcRelConnects
 	{

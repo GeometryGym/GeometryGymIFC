@@ -258,6 +258,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
 		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
+		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
 		internal SET<IfcRelVoidsElement> mHasOpenings = new SET<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
 		internal SET<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new SET<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
 		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
@@ -266,7 +267,6 @@ namespace GeometryGym.Ifc
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		internal List<IfcRelCoversBldgElements> mHasCoverings = new List<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
-		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
 
 		internal List<IfcRelConnectsStructuralElement> mHasStructuralMember = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
@@ -277,6 +277,8 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
+		[Obsolete("DEPRECEATED IFC4", false)]
+		public SET<IfcRelConnectsPortToElement> HasPortsSS { get { return mHasPorts; } }
 		public SET<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
 		public SET<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
 		public ReadOnlyCollection<IfcRelSpaceBoundary> ProvidesBoundaries { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>(mProvidesBoundaries); } }
@@ -648,7 +650,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcElementAssemblyType() : base() { }
 		internal IfcElementAssemblyType(DatabaseIfc db, IfcElementAssemblyType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
-		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(KeyWord + " only supported in IFC4!"); }
+		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
@@ -668,7 +670,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public partial class IfcElementQuantity : IfcQuantitySet
 	{
-		internal override string KeyWord { get { return "IfcElementQuantity"; } }
+		public override string StepClassName { get { return "IfcElementQuantity"; } }
 		internal string mMethodOfMeasurement = "$";// : OPTIONAL IfcLabel;
 		private Dictionary<string, IfcPhysicalQuantity> mQuantities = new Dictionary<string, IfcPhysicalQuantity>();// : SET [1:?] OF IfcPhysicalQuantity;
 		private List<int> mQuantityIndices = new List<int>();
@@ -857,7 +859,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	{  //	SUPERTYPE OF(ONEOF(IfcAirToAirHeatRecovery, IfcBoiler, IfcBurner, IfcChiller, IfcCoil, IfcCondenser, IfcCooledBeam, 
 		//IfcCoolingTower, IfcElectricGenerator, IfcElectricMotor, IfcEngine, IfcEvaporativeCooler, IfcEvaporator, IfcHeatExchanger,
 		//IfcHumidifier, IfcMotorConnection, IfcSolarDevice, IfcTransformer, IfcTubeBundle, IfcUnitaryEquipment))
-		internal override string KeyWord { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcEnergyConversionDevice" : base.KeyWord; } }
+		public override string StepClassName { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcEnergyConversionDevice" : base.StepClassName; } }
 
 		internal IfcEnergyConversionDevice() : base() { }
 		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }

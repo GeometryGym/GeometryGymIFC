@@ -574,18 +574,11 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(";
-			if (mSegments.Count > 0)
-				str += ParserSTEP.LinkToString(mSegments[0]);
-			for (int icounter = 1; icounter < mSegments.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mSegments[icounter]);
-			str += "),";
-			str += ParserIfc.LogicalToString(mSelfIntersect);
-			return base.BuildStringSTEP(release) + str;
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", Segments.ConvertAll(x=>"#" + x.Index)) + ")," + ParserIfc.LogicalToString(mSelfIntersect);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mSegments = ParserSTEP.StripListLink(str, ref pos, len);
+			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcCompositeCurveSegment));
 			mSelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}

@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWallStandardCase : IfcWall
 	{
-		internal override string KeyWord { get { return "IfcWall" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
+		public override string StepClassName { get { return "IfcWall" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
@@ -223,7 +223,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWindowStandardCase : IfcWindow
 	{
-		internal override string KeyWord { get { return "IfcWindow"; } }
+		public override string StepClassName { get { return "IfcWindow"; } }
 		internal IfcWindowStandardCase() : base() { }
 		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 	}
@@ -241,7 +241,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcWindowStyle" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcWindowStyle" : base.StepClassName); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
 		internal bool mParameterTakesPrecedence;// : BOOLEAN; 

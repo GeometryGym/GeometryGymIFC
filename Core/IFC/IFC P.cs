@@ -438,7 +438,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPlateStandardCase : IfcPlate //IFC4
 	{
-		internal override string KeyWord { get { return "IfcPlate"; } }
+		public override string StepClassName { get { return "IfcPlate"; } }
 		internal IfcPlateStandardCase() : base() { }
 		internal IfcPlateStandardCase(DatabaseIfc db, IfcPlateStandardCase p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { }
 	}
@@ -1350,7 +1350,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
-		internal override string KeyWord { get { return (mDatabase == null || mDatabase.Release > ReleaseVersion.IFC2x3 ? "IfcProfileProperties" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase == null || mDatabase.Release > ReleaseVersion.IFC2x3 ? "IfcProfileProperties" : base.StepClassName); } }
 		//[Obsolete("DEPRECEATED IFC4", false)]
 		//internal string mProfileName = "$";// : OPTIONAL IfcLabel; DELETED IFC4
 		private IfcProfileDef mProfileDefinition = null;// : OPTIONAL IfcProfileDef; 
@@ -1421,28 +1421,25 @@ namespace GeometryGym.Ifc
 				Name = "UNKNOWN PROJECT";
 		}
 
-		public IfcSpatialElement RootElement { get { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy[0].RelatedObjects[0] as IfcSpatialElement); } }
+		public IfcSpatialElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy[0].RelatedObjects[0] as IfcSpatialElement);  }
 		internal IfcSite getSite() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy[0].RelatedObjects[0] as IfcSite); }
-		public IfcSite UppermostSite { get { return getSite(); } }
-		public IfcBuilding UppermostBuilding
+		public IfcSite UppermostSite() { return getSite(); }
+		public IfcBuilding UppermostBuilding()
 		{
-			get
-			{
-				if (mIsDecomposedBy.Count == 0)
-					return null;
-				BaseClassIfc ent = mDatabase[mIsDecomposedBy[0].mRelatedObjects[0]];
-				IfcBuilding result = ent as IfcBuilding;
-				if (result != null)
-					return result;
-				IfcSite s = ent as IfcSite;
-				if (s != null)
-				{
-					List<IfcBuilding> bs = s.getBuildings();
-					if (bs.Count > 0)
-						return bs[0];
-				}
+			if (mIsDecomposedBy.Count == 0)
 				return null;
+			BaseClassIfc ent = mDatabase[mIsDecomposedBy[0].mRelatedObjects[0]];
+			IfcBuilding result = ent as IfcBuilding;
+			if (result != null)
+				return result;
+			IfcSite s = ent as IfcSite;
+			if (s != null)
+			{
+				List<IfcBuilding> bs = s.getBuildings();
+				if (bs.Count > 0)
+					return bs[0];
 			}
+			return null;
 		}
 	}
 	[Serializable]
@@ -1637,7 +1634,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPropertyBoundedValue<T> : IfcSimpleProperty where T : IfcValue
 	{
-		internal override string KeyWord { get { return "IfcPropertyBoundedValue"; } }
+		public override string StepClassName { get { return "IfcPropertyBoundedValue"; } }
 		internal T mUpperBoundValue;// : OPTIONAL IfcValue;
 		internal T mLowerBoundValue;// : OPTIONAL IfcValue;   
 		internal int mUnit;// : OPTIONAL IfcUnit;
@@ -1808,7 +1805,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPropertySet : IfcPropertySetDefinition
 	{
-		internal override string KeyWord { get { return "IfcPropertySet"; } }
+		public override string StepClassName { get { return "IfcPropertySet"; } }
 		private Dictionary<string,IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
 		private List<int> mPropertyIndices = new List<int>();
 
@@ -2033,27 +2030,6 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcRelDefinesByTemplate> mDefines = new List<IfcRelDefinesByTemplate>();//	:	SET OF IfcRelDefinesByTemplate FOR RelatingTemplate;
 
-		private class ApplicableType
-		{
-			private Type mType = null;
-			private string mPredefined = "";
-			private HashSet<Type> mApplicable = new HashSet<Type>();
-			internal ApplicableType(Type type) { mType = type; mApplicable.Add(type); }
-			internal ApplicableType(Type type, string predefined) :this(type) { mPredefined = predefined; }
-
-			internal bool isApplicable(Type type, string predefined)
-			{
-				if (mApplicable.Contains(type))
-					return (string.IsNullOrEmpty(mPredefined) || string.Compare(predefined,mPredefined,true) == 0);
-				if(type.IsSubclassOf(mType))
-				{
-					mApplicable.Add(type);
-					return (string.IsNullOrEmpty(mPredefined) || string.Compare(predefined,mPredefined,true) == 0);
-				}
-				return false;
-			}
-			
-		}
 		private List<ApplicableType> mApplicableTypes = null;
 
 		public IfcPropertySetTemplateTypeEnum TemplateType { get { return mTemplateType; } set { mTemplateType = value; } }
@@ -2088,7 +2064,7 @@ namespace GeometryGym.Ifc
 		public IfcPropertySetTemplate(string name, IfcPropertyTemplate propertyTemplate) : this(propertyTemplate.mDatabase, name) { AddPropertyTemplate(propertyTemplate); }
 		public IfcPropertySetTemplate(string name, IEnumerable<IfcPropertyTemplate> propertyTemplates) : base(propertyTemplates.First().mDatabase, name) { foreach(IfcPropertyTemplate propertyTemplate in propertyTemplates) AddPropertyTemplate(propertyTemplate); }
 		
-		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplateIndices.Add(template.mIndex); mHasPropertyTemplates.Add(template.Name, template); template.mPartOfPsetTemplate.Add(this); }
+		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplateIndices.Add(template.mIndex); mHasPropertyTemplates[template.Name] = template; template.mPartOfPsetTemplate.Add(this); }
 		public IfcPropertyTemplate this[string name]
 		{
 			get
@@ -2101,7 +2077,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfPsetTemplate.Remove(this); mHasPropertyTemplateIndices.Remove(template.Index); mHasPropertyTemplates.Remove(templateName); } }
-		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.Particular); }
+		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.GetObjectDefinitionType()); }
 		public bool IsApplicable(Type type,string predefined)
 		{
 			if (mApplicableTypes == null)
@@ -2296,6 +2272,10 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcObjectTypeEnum mProxyType;// : IfcObjectTypeEnum;
 		internal string mTag = "$";// : OPTIONAL IfcLabel;
+
+		public IfcObjectTypeEnum ProxyType { get { return mProxyType; } set { mProxyType = value; } }
+		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+
 		internal IfcProxy() : base() { }
 		internal IfcProxy(DatabaseIfc db, IfcProxy p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mProxyType = p.mProxyType; mTag = p.mTag; }
 	}

@@ -476,7 +476,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcCompositeCurveSegment s = mDatabase.ParseXml<IfcCompositeCurveSegment>(cn as XmlElement);
 						if (s != null)
-							addSegment(s);
+							Segments.Add(s);	
 					}
 				}
 			}

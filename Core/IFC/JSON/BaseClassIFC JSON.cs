@@ -98,7 +98,7 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(mGlobalId))
 				obj["id"] = mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 			options.Encountered.Add(mGlobalId);
-			string folder = Path.Combine(options.ProjectFolder, string.IsNullOrEmpty(folderName) ?  KeyWord.Substring(3) : folderName);
+			string folder = Path.Combine(options.ProjectFolder, string.IsNullOrEmpty(folderName) ?  StepClassName.Substring(3) : folderName);
 			Directory.CreateDirectory(folder);
 			string path = Path.Combine(folder, RepositoryName + ".ifc.json");
 			StreamWriter streamWriter = new StreamWriter(path);
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 				else
 					options.Encountered.Add(mGlobalId);
 			}
-			obj["type"] = KeyWord;
+			obj["type"] = StepClassName;
 			if (common || this is IfcGeometricRepresentationSubContext || this is NamedObjectIfc)
 			{
 				if (string.IsNullOrEmpty(mGlobalId))

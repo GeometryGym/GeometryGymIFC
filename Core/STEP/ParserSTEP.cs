@@ -135,6 +135,28 @@ namespace GeometryGym.STEP
 			return int.Parse(s.Substring(1));
 		}
 
+		private static char[] HexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		public static string BinaryToString(Byte[] binary)
+		{
+			StringBuilder sb = new StringBuilder(binary.Length * 2 + 1);
+			sb.Append("\"");
+			byte b;
+			int start;
+
+			// only 8-byte multiples supported
+			sb.Append("0");
+			start = 0;
+
+			for (int i = start; i < binary.Length; i++)
+			{
+				b = binary[i];
+				sb.Append(HexChars[b / 0x10]);
+				sb.Append(HexChars[b % 0x10]);
+			}
+
+			sb.Append("\"");
+			return sb.ToString();
+		}
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
 		public static string DoubleToString(double d) { if (double.IsNaN(d) || double.IsInfinity(d)) return "0.0"; return String.Format("{0:0.0################}", d); }
 		public static string DoubleOptionalToString(double d) { return (double.IsNaN(d) || double.IsInfinity(d) ? "$" : String.Format("{0:0.0################}", d)); }
@@ -142,6 +164,8 @@ namespace GeometryGym.STEP
 		{
 			if (i == 0)
 				return "*";
+			if (i == int.MaxValue)
+				return "$";
 			return i.ToString();
 		}
 		public static string IntOptionalToString(int i)
@@ -178,7 +202,6 @@ namespace GeometryGym.STEP
 			return result + ")";
 		}
 		
-
 		public static List<string> SplitLineFields(string s)
 		{
 			//string s = str.Trim(); 

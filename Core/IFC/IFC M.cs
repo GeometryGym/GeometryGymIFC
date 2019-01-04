@@ -636,7 +636,7 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialProfileSet mForProfileEndSet;// : IfcMaterialProfileSet;
 		internal IfcCardinalPointReference mCardinalEndPoint = IfcCardinalPointReference.MID;// : IfcCardinalPointReference 
 		 
-		public IfcMaterialProfileSet ForProfileEndSet { get { return ForProfileEndSet; } set { mForProfileEndSet = value; } }
+		public IfcMaterialProfileSet ForProfileEndSet { get { return mForProfileEndSet; } set { mForProfileEndSet = value; } }
 		public IfcCardinalPointReference CardinalEndPoint { get { return mCardinalEndPoint; } set { mCardinalEndPoint = value; } }
 
 		internal IfcMaterialProfileSetUsageTapering() : base() { }
@@ -647,7 +647,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProfileWithOffsets : IfcMaterialProfile //IFC4
 	{
-		internal double[] mOffsetValues = new double[2];// ARRAY [1:2] OF IfcLengthMeasure;
+		internal double[] mOffsetValues = new double[2] { 0, 0 };// ARRAY [1:2] OF IfcLengthMeasure;
+		public double[] OffsetValues { get { return mOffsetValues; } set { mOffsetValues = value; } }
 
 		internal IfcMaterialProfileWithOffsets() : base() { }
 		internal IfcMaterialProfileWithOffsets(DatabaseIfc db, IfcMaterialProfileWithOffsets m) : base(db, m) { mOffsetValues = m.mOffsetValues.ToArray(); }
@@ -660,7 +661,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4, IFC2x3 ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
 	{
-		internal override string KeyWord { get { return "IfcMaterialProperties"; } }
+		public override string StepClassName { get { return "IfcMaterialProperties"; } }
 		private IfcMaterialDefinition mMaterial;// : IfcMaterialDefinition; 
 		public IfcMaterialDefinition Material { get { return mMaterial; } set { mMaterial = value; value.HasProperties.Add(this); } }
 
@@ -918,7 +919,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMemberStandardCase : IfcMember
 	{
-		internal override string KeyWord { get { return "IfcMember"; } }
+		public override string StepClassName { get { return "IfcMember"; } }
 
 		internal IfcMemberStandardCase() : base() { }
 		internal IfcMemberStandardCase(DatabaseIfc db, IfcMemberStandardCase m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { }
@@ -999,7 +1000,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMirroredProfileDef : IfcDerivedProfileDef //SUPERTYPE OF(IfcMirroredProfileDef)
 	{
-		internal override string KeyWord { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDerivedProfileDef" : base.KeyWord); } }
+		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDerivedProfileDef" : base.StepClassName); } }
 		internal IfcMirroredProfileDef() : base() { }
 		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p) : base(db,p) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, new IfcCartesianTransformationOperator2D(p.mDatabase) { Axis1 = new IfcDirection(p.mDatabase, -1, 0) },name) { }
