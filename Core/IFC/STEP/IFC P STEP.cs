@@ -503,11 +503,11 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mPlacement) + "," + ParserSTEP.ObjToLinkString(mRepresentation); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(ObjectPlacement) + "," + ParserSTEP.ObjToLinkString(mRepresentation); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Placement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;
+			ObjectPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;
 			Representation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProductRepresentation;
 		}
 	}

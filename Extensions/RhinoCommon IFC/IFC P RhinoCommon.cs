@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				IfcObjectPlacement p = Placement;
+				IfcObjectPlacement p = ObjectPlacement;
 				return (p == null ? Transform.Identity : p.Transform);
 			}
 		}

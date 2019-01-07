@@ -695,7 +695,7 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "ContextOfItems") == 0)
 					ContextOfItems = mDatabase.ParseXml<IfcRepresentationContext>(child as XmlElement);
-				else if (string.Compare(name, "Items") == 0)
+				else if (string.Compare(name, "Items", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -704,7 +704,7 @@ namespace GeometryGym.Ifc
 							Items.Add(ri);
 					}
 				}
-				else if (string.Compare(name, "LayerAssignments") == 0)
+				else if (string.Compare(name, "LayerAssignments", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -713,6 +713,10 @@ namespace GeometryGym.Ifc
 							a.AssignedItems.Add(this);
 					}
 				}
+				else if (string.Compare(name, "RepresentationIdentifier", true) == 0)
+					mRepresentationIdentifier = child.InnerText;
+				else if (string.Compare(name, "RepresentationType", true) == 0)
+					RepresentationType = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -744,6 +748,14 @@ namespace GeometryGym.Ifc
 				ContextIdentifier = xml.Attributes["ContextIdentifier"].Value;
 			if (xml.HasAttribute("ContextType"))
 				ContextType = xml.Attributes["ContextType"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ContextIdentifier", true) == 0)
+					mContextIdentifier = child.InnerText;
+				else if (string.Compare(name, "ContextType", true) == 0)
+					ContextType = child.InnerText;
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -939,6 +951,12 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "OwnerHistory") == 0)
 					OwnerHistory = mDatabase.ParseXml<IfcOwnerHistory>(child as XmlElement);
+				else if (string.Compare(name, "GlobalId", true) == 0)
+					GlobalId = child.InnerText;
+				else if (string.Compare(name, "Name", true) == 0)
+					Name = child.InnerText;
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

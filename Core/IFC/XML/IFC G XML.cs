@@ -53,7 +53,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcGeometricRepresentationSubContext sub = mDatabase.ParseXml<IfcGeometricRepresentationSubContext>(node as XmlElement);
 						if (sub != null)
-							sub.ContainerContext = this;
+							sub.ParentContext = this;
 					}
 				}
 				else if (string.Compare(name, "HasCoordinateOperation") == 0)
@@ -93,8 +93,8 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "ContainerContext") == 0)
-					ContainerContext = mDatabase.ParseXml<IfcGeometricRepresentationContext>(child as XmlElement);
+				if (string.Compare(name, "ParentContext", true) == 0)
+					ParentContext = mDatabase.ParseXml<IfcGeometricRepresentationContext>(child as XmlElement);
 			}
 			if (xml.HasAttribute("TargetScale"))
 				TargetScale = double.Parse(xml.Attributes["TargetScale"].Value);
@@ -106,6 +106,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
+			xml.AppendChild(ParentContext.GetXML(xml.OwnerDocument, "ParentContext", this, processed));
 			if (!double.IsNaN(mTargetScale))
 				xml.SetAttribute("TargetScale", mTargetScale.ToString());
 			xml.SetAttribute("TargetView", mTargetView.ToString().ToLower());

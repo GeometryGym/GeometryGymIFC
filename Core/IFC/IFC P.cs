@@ -964,7 +964,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
-		private IfcObjectPlacement mPlacement = null; //: OPTIONAL IfcObjectPlacement;
+		private IfcObjectPlacement mObjectPlacement = null; //: OPTIONAL IfcObjectPlacement;
 		private IfcProductRepresentation mRepresentation =  null; //: OPTIONAL IfcProductRepresentation 
 		//INVERSE
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
@@ -972,14 +972,14 @@ namespace GeometryGym.Ifc
 		//Specified on IfcElement
 		internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 
-		public IfcObjectPlacement Placement
+		public IfcObjectPlacement ObjectPlacement
 		{
-			get { return mPlacement; }
+			get { return mObjectPlacement; }
 			set
 			{
-				if (mPlacement != null)
-					mPlacement.mPlacesObject.Remove(this);
-				mPlacement = value;
+				if (mObjectPlacement != null)
+					mObjectPlacement.mPlacesObject.Remove(this);
+				mObjectPlacement = value;
 				if (value != null)
 					value.mPlacesObject.Add(this);
 			}
@@ -999,18 +999,18 @@ namespace GeometryGym.Ifc
 					if (pds != null)
 					{
 						pds.mShapeOfProduct.Add(this);
-						if (mPlacement == null)
+						if (mObjectPlacement == null)
 						{
 							IfcElement element = this as IfcElement;
 							if (element == null)
-								Placement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
+								ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
 							else
 							{
 								IfcProduct product = element.getContainer();
 								if (product == null)
-									Placement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
+									ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
 								else
-									Placement = new IfcLocalPlacement(product.Placement, mDatabase.Factory.XYPlanePlacement);
+									ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
 							}
 						}
 					}
@@ -1022,19 +1022,19 @@ namespace GeometryGym.Ifc
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
 
 		protected IfcProduct() : base() { }
-		protected IfcProduct(IfcProduct basis) : base(basis) { mPlacement = basis.mPlacement; Representation = basis.Representation; mReferencedBy = basis.mReferencedBy; }
+		protected IfcProduct(IfcProduct basis) : base(basis) { ObjectPlacement = basis.ObjectPlacement; Representation = basis.Representation; mReferencedBy = basis.mReferencedBy; }
 		protected IfcProduct(IfcProductRepresentation rep) : base(rep.mDatabase) { Representation = rep; }
-		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { Placement = placement; }
+		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { ObjectPlacement = placement; }
 		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)
 		{
-			Placement = placement;
+			ObjectPlacement = placement;
 			Representation = rep;
 		}
 		protected IfcProduct(DatabaseIfc db) : base(db) { }
 		protected IfcProduct(DatabaseIfc db, IfcProduct p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
 		{
-			if (p.mPlacement != null)
-				Placement = db.Factory.Duplicate(p.Placement) as IfcObjectPlacement;
+			if (p.mObjectPlacement != null)
+				ObjectPlacement = db.Factory.Duplicate(p.ObjectPlacement) as IfcObjectPlacement;
 			if (p.mRepresentation != null)
 				Representation = db.Factory.Duplicate(p.Representation) as IfcProductRepresentation;
 			foreach (IfcRelAssignsToProduct rap in p.mReferencedBy)
@@ -1053,7 +1053,7 @@ namespace GeometryGym.Ifc
 				product.AddElement(el);
 			else
 				host.AddAggregated(this);
-			Placement = p;
+			ObjectPlacement = p;
 			Representation = r;
 		}
 

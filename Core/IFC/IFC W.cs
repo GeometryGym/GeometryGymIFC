@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
-			:base(container,new IfcLocalPlacement(container.Placement, placement),null)
+			:base(container,new IfcLocalPlacement(container.ObjectPlacement, placement),null)
 		{
 			DatabaseIfc db = mDatabase;
 			double tol = mDatabase.Tolerance;

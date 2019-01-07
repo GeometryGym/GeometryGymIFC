@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "Position") == 0)
+				if (string.Compare(name, "Position", true) == 0)
 					Position = mDatabase.ParseXml<IfcAxis2Placement2D>(child as XmlElement);
 			}
 		}
@@ -69,16 +69,22 @@ namespace GeometryGym.Ifc
 					foreach (XmlNode cn in child.ChildNodes)
 						AddMiddleName(cn.InnerText);
 				}
-				else if (string.Compare(name, "Roles") == 0)
+				else if (string.Compare(name, "Roles", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 						Roles.Add(mDatabase.ParseXml<IfcActorRole>(cn as XmlElement));
 				}
-				else if (string.Compare(name, "Addresses") == 0)
+				else if (string.Compare(name, "Addresses", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 						Addresses.Add(mDatabase.ParseXml<IfcAddress>(cn as XmlElement));
 				}
+				else if (string.Compare(name, "Identification", true) == 0)
+					Identification = child.InnerText;
+				else if (string.Compare(name, "FamilyName", true) == 0)
+					FamilyName = child.InnerText;
+				else if (string.Compare(name, "GivenName", true) == 0)
+					GivenName = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -478,15 +484,15 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "Placement") == 0)
-					Placement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
+				if (string.Compare(name, "ObjectPlacement") == 0)
+					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 				else if (string.Compare(name, "Representation") == 0)
 					Representation = mDatabase.ParseXml<IfcProductRepresentation>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			XmlElement placement = (mPlacement != null ? mPlacement.GetXML(xml.OwnerDocument, "Placement", this, processed) : null);
+			XmlElement placement = (mObjectPlacement != null ? ObjectPlacement.GetXML(xml.OwnerDocument, "ObjectPlacement", this, processed) : null);
 			base.SetXML(xml, host, processed);
 			if (placement != null)
 				xml.AppendChild(placement);
@@ -587,6 +593,14 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcProfileTypeEnum>(xml.Attributes["ProfileType"].Value, true, out mProfileType);
 			if (xml.HasAttribute("ProfileName"))
 				ProfileName = xml.Attributes["ProfileName"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "ProfileType", true) == 0)
+					Enum.TryParse<IfcProfileTypeEnum>(child.InnerText, true, out mProfileType);
+				else if (string.Compare(name, "Depth", true) == 0)
+					ProfileName = child.InnerText;	
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -655,6 +669,14 @@ namespace GeometryGym.Ifc
 				Name = xml.Attributes["Name"].Value;
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Name", true) == 0)
+					Name = child.InnerText;
+				else if (string.Compare(name, "Description",true) == 0)
+					Description = child.InnerText;
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

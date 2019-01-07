@@ -236,6 +236,14 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSIPrefix>(xml.Attributes["Prefix"].Value, true, out mPrefix);
 			if (xml.HasAttribute("Name"))
 				Enum.TryParse<IfcSIUnitName>(xml.Attributes["Name"].Value, true, out mName);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Prefix", true) == 0)
+					Enum.TryParse<IfcSIPrefix>(child.InnerText, true, out mPrefix);
+				else if (string.Compare(name, "Name", true) == 0)
+					Enum.TryParse<IfcSIUnitName>(child.InnerText, true, out mName);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

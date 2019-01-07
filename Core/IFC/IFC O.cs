@@ -527,7 +527,7 @@ namespace GeometryGym.Ifc
 		{
 			if (p != null)
 			{
-				p.Placement = this;
+				p.ObjectPlacement = this;
 				if (!mPlacesObject.Contains(p))
 					mPlacesObject.Add(p);
 			}
@@ -652,9 +652,9 @@ namespace GeometryGym.Ifc
 		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductRepresentation rep) : base(host.mDatabase)
 		{
 			if (placement == null)
-				Placement = new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(mDatabase.Factory.Origin));
+				ObjectPlacement = new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(mDatabase.Factory.Origin));
 			else
-				Placement = placement;
+				ObjectPlacement = placement;
 			Representation = rep;
 			IfcRelVoidsElement rve = new IfcRelVoidsElement(host, this);
 		}
@@ -666,7 +666,7 @@ namespace GeometryGym.Ifc
 		internal IfcOpeningStandardCase() : base() { }
 		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }
-		public IfcOpeningStandardCase(DatabaseIfc db, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(db) { Placement = placement; Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(eas)); }
+		public IfcOpeningStandardCase(DatabaseIfc db, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(db) { ObjectPlacement = placement; Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(eas)); }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcOpticalMaterialProperties // DEPRECEATED IFC4

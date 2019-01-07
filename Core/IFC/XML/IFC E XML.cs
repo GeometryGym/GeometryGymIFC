@@ -317,8 +317,10 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "ExtrudedDirection") == 0)
+				if (string.Compare(name, "ExtrudedDirection", true) == 0)
 					ExtrudedDirection = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
+				else if (string.Compare(name, "Depth", true) == 0)
+					mDepth = double.Parse(child.InnerText);
 			}
 			if (xml.HasAttribute("Depth"))
 				mDepth = double.Parse(xml.Attributes["Depth"].Value);

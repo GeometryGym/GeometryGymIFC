@@ -50,6 +50,39 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
+			else
+			{
+				foreach (XmlNode child in xml.ChildNodes)
+				{
+					string name = child.Name;
+					if (string.Compare(name, "Coordinates") == 0)
+					{
+						List<double> coordinates = new List<double>();
+						foreach (XmlNode coordNode in child.ChildNodes)
+						{
+							int pos = coordinates.Count;
+							XmlElement coordElement = coordNode as XmlElement;
+							if (coordElement.HasAttribute("exp:pos"))
+								pos = int.Parse(coordNode.Attributes["exp:pos"].Value);
+							if (pos + 1 > coordinates.Count)
+								coordinates.AddRange(Enumerable.Repeat<double>(0, 1 + pos - coordinates.Count));
+							double d = 0;
+							if (double.TryParse(coordNode.InnerText, out d))
+								coordinates[pos] = d;
+						}
+						if (coordinates.Count > 0)
+						{
+							mCoordinateX = coordinates[0];
+							if (coordinates.Count > 1)
+							{
+								mCoordinateY = coordinates[1];
+								if (coordinates.Count > 2)
+									mCoordinateZ = coordinates[2];
+							}
+						}
+					}
+				}
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -384,6 +417,16 @@ namespace GeometryGym.Ifc
 				mGreen = double.Parse(xml.Attributes["Green"].Value);
 			if (xml.HasAttribute("Blue"))
 				mBlue = double.Parse(xml.Attributes["Blue"].Value);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Red", true) == 0)
+					mRed = double.Parse(child.InnerText);
+				else if (string.Compare(name, "Green", true) == 0)
+					mGreen = double.Parse(child.InnerText);
+				else if (string.Compare(name, "Blue", true) == 0)
+					mBlue = double.Parse(child.InnerText);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

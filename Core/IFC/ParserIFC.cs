@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 		}
 		public static string Decode(string str) //http://www.buildingsmart-tech.org/implementation/get-started/string-encoding/string-encoding-decoding-summary
 		{
-			if (str == "$")
+			if (string.IsNullOrEmpty(str) || str == "$")
 				return "";
 			int ilast = str.Length - 4, icounter = 0;
 			string result = "";

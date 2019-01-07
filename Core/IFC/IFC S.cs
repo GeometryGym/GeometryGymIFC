@@ -622,7 +622,7 @@ additional types	some additional representation types are given:
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
 		internal IfcSlabStandardCase() : base() { }
 		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
-		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
+		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)
 		{
 			SetMaterial(layerSetUsage);
 			IfcAxis2Placement3D position = (Math.Abs(layerSetUsage.OffsetFromReferenceLine) > mDatabase.Tolerance ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, 0, layerSetUsage.OffsetFromReferenceLine)) : null);
@@ -836,7 +836,7 @@ additional types	some additional representation types are given:
 					db.Factory.Duplicate(css, ownerHistory, downStream);
 			}
 		}
-		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, 0))))
+		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, 0))))
 		{
 			Name = name;
 			host.AddAggregated(this);
@@ -1137,7 +1137,7 @@ additional types	some additional representation types are given:
 			if (location != null)
 			{
 				if (lc.mLoadGroupFor.Count > 0)
-					Placement = lc.mLoadGroupFor[0].SharedPlacement;
+					ObjectPlacement = lc.mLoadGroupFor[0].SharedPlacement;
 				Representation = new IfcProductDefinitionShape(location);
 			}
 		}

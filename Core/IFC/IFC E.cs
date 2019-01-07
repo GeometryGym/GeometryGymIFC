@@ -351,17 +351,17 @@ namespace GeometryGym.Ifc
 		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) 
 			: base(host, null, null)
 		{
-			IfcObjectPlacement hostplacement = host.Placement;
+			IfcObjectPlacement hostplacement = host.ObjectPlacement;
 			if (hostplacement == null)
 			{
 				if (host.Decomposes != null)
 				{
 					IfcProduct product = host.Decomposes.RelatingObject as IfcProduct;
 					if (product != null)
-						host.Placement = hostplacement = new IfcLocalPlacement(product.Placement, mDatabase.Factory.XYPlanePlacement);
+						host.ObjectPlacement = hostplacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
 				}
 			}
-			Placement = new IfcLocalPlacement(hostplacement, placement);
+			ObjectPlacement = new IfcLocalPlacement(hostplacement, placement);
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
 			IfcCartesianPoint cp = new IfcCartesianPoint(mDatabase, 0, 0, length);
 			IfcPolyline ipl = new IfcPolyline(mDatabase.Factory.Origin, cp);
@@ -394,7 +394,7 @@ namespace GeometryGym.Ifc
 			Representation = new IfcProductDefinitionShape(reps);
 
 		}
-		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, new IfcLocalPlacement(host.Placement, placement), null)
+		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)
 		{
 			IfcMaterialProfileSet ps = profile.ForProfileSet;
 			profile.Associate(this);

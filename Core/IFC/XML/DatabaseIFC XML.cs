@@ -117,10 +117,19 @@ namespace GeometryGym.Ifc
 				return (T)(IBaseClassIfc)mParsed[id];
 
 			string keyword = xml.HasAttribute("xsi:type") ? xml.Attributes["xsi:type"].Value : xml.Name;
-			Type type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+			Type type = BaseClassIfc.GetType(keyword);
 			if (type == null)
 			{
 				type = typeof(T);
+				if(xml.Attributes.Count == 0 && xml.ChildNodes.Count == 1)
+				{
+					XmlNode node = xml.ChildNodes[0];
+					Type childType = BaseClassIfc.GetType(node.Name);
+					if (string.Compare(node.Name, type.Name, true) == 0 || (childType != null && childType.IsSubclassOf(type)))
+					{
+						return ParseXml<T>(node as XmlElement);
+					}
+				}
 			}	
 			if(type.IsAbstract)
 			{

@@ -248,7 +248,7 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "Roles") == 0)
+				if (string.Compare(name, "Roles", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 							Roles.Add(role);
 					}
 				}
-				else if (string.Compare(name, "Addresses") == 0)
+				else if (string.Compare(name, "Addresses", true) == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -266,6 +266,12 @@ namespace GeometryGym.Ifc
 							Addresses.Add(address);
 					}
 				}
+				else if (string.Compare(name, "Identification", true) == 0)
+					Identification = child.InnerText;
+				else if (string.Compare(name, "Name", true) == 0)
+					Name = child.InnerText;
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

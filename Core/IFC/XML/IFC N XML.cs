@@ -37,8 +37,10 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "Dimensions") == 0)
+				if (string.Compare(name, "Dimensions", true) == 0)
 					Dimensions = mDatabase.ParseXml<IfcDimensionalExponents>(child as XmlElement);
+				else if (string.Compare(name, "UnitType", true) == 0)
+					Enum.TryParse<IfcUnitEnum>(child.InnerText, true, out mUnitType);
 			}
 			if (xml.HasAttribute("UnitType"))
 				Enum.TryParse<IfcUnitEnum>(xml.Attributes["UnitType"].Value, true, out mUnitType);

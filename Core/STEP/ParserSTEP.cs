@@ -109,6 +109,8 @@ namespace GeometryGym.STEP
 		}
 		public static double ParseDouble(string str)
 		{
+			if (string.IsNullOrEmpty(str))
+				return double.NaN;
 			string s = str.Trim();
 			if (s == "$")
 				return double.NaN;

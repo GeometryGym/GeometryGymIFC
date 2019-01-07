@@ -177,12 +177,12 @@ namespace GeometryGym.Ifc
 	{
 		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline };// Surface };
 
-		internal IfcGeometricRepresentationContext mContainerContext;// : IfcGeometricRepresentationContext;
+		internal IfcGeometricRepresentationContext mParentContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
 		private IfcGeometricProjectionEnum mTargetView;// : IfcGeometricProjectionEnum;
 		internal string mUserDefinedTargetView = "$";// : OPTIONAL IfcLabel;
 
-		public IfcGeometricRepresentationContext ContainerContext { get { return mContainerContext; } set { mContainerContext = value; value.mHasSubContexts.Add(this); } }
+		public IfcGeometricRepresentationContext ParentContext { get { return mParentContext; } set { mParentContext = value; value.mHasSubContexts.Add(this); } }
 		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
 		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
 		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -190,7 +190,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeometricRepresentationSubContext() : base() { }
 		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s) : base(db, s)
 		{
-			ContainerContext = db.Factory.Duplicate(s.ContainerContext) as IfcGeometricRepresentationContext;
+			ParentContext = db.Factory.Duplicate(s.ParentContext) as IfcGeometricRepresentationContext;
 
 			mTargetScale = s.mTargetScale;
 			mTargetView = s.mTargetView;
@@ -199,7 +199,7 @@ namespace GeometryGym.Ifc
 		public IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, IfcGeometricProjectionEnum view)
 			: base(container.mDatabase)
 		{
-			ContainerContext = container;
+			ParentContext = container;
 			mContextType = container.mContextType;
 			mTargetView = view;
 		}
@@ -241,7 +241,7 @@ namespace GeometryGym.Ifc
 			mPredefinedType = g.mPredefinedType;
 		}
 		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes) 
-			: base(new IfcLocalPlacement(host.Placement, placement), getRepresentation(uAxes,vAxes, null))
+			: base(new IfcLocalPlacement(host.ObjectPlacement, placement), getRepresentation(uAxes,vAxes, null))
 		{
 			host.addGrid(this);
 			UAxes.AddRange(uAxes);

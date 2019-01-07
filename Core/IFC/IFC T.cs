@@ -1125,7 +1125,7 @@ namespace GeometryGym.Ifc
 			typename = typename.Substring(0, typename.Length - 4);
 			IfcShapeRepresentation sr = new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], db.Factory.XYPlaneTransformation));
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
-			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.Placement, relativePlacement), pds);
+			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.ObjectPlacement, relativePlacement), pds);
 			element.setRelatingType(this);
 			foreach (IfcRelNests nests in IsNestedBy)
 			{
@@ -1135,7 +1135,7 @@ namespace GeometryGym.Ifc
 					if (port != null)
 					{
 						IfcDistributionPort newPort = new IfcDistributionPort(element) { FlowDirection = port.FlowDirection, PredefinedType = port.PredefinedType, SystemType = port.SystemType };
-						newPort.Placement = new IfcLocalPlacement(element.Placement, (port.Placement as IfcLocalPlacement).RelativePlacement);
+						newPort.ObjectPlacement = new IfcLocalPlacement(element.ObjectPlacement, (port.ObjectPlacement as IfcLocalPlacement).RelativePlacement);
 						for (int dcounter = 0; dcounter < port.mIsDefinedBy.Count; dcounter++)
 							port.mIsDefinedBy[dcounter].RelatedObjects.Add(newPort);
 					}

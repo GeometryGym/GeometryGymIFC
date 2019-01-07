@@ -26,6 +26,8 @@ using System.Linq;
 using System.Xml;
 //using System.Xml.Linq;
 
+using GeometryGym.STEP;
+
 
 namespace GeometryGym.Ifc
 {
@@ -97,6 +99,24 @@ namespace GeometryGym.Ifc
 				mFlangeEdgeRadius = double.Parse(xml.Attributes["FlangeEdgeRadius"].Value);
 			if (xml.HasAttribute("FlangeSlope"))
 				mFlangeSlope = double.Parse(xml.Attributes["FlangeSlope"].Value);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "OverallWidth") == 0)
+					OverallWidth = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "OverallDepth") == 0)
+					OverallDepth = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "WebThickness") == 0)
+					WebThickness = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "FlangeThickness") == 0)
+					FlangeThickness = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "FlangeThickness") == 0)
+					FlangeThickness = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "FilletRadius") == 0)
+					FilletRadius = ParserSTEP.ParseDouble(child.InnerText);
+				if (string.Compare(name, "FlangeSlope") == 0)
+					FlangeSlope = ParserSTEP.ParseDouble(child.InnerText);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

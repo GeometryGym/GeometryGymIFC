@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 
 			List<IfcGeometricRepresentationSubContext> subs = mDatabase.extractJArray<IfcGeometricRepresentationSubContext>(obj.GetValue("HasSubContexts", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcGeometricRepresentationSubContext sub in subs)
-				sub.ContainerContext = this;
+				sub.ParentContext = this;
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -142,6 +142,7 @@ namespace GeometryGym.Ifc
 				options.Encountered.Add(mGlobalId);
 			}
 			base.setJSON(obj, host, options);
+			obj["ParentContext"] = ParentContext.getJson(this, options);
 			if (!double.IsNaN(mTargetScale))
 				obj["TargetScale"] = mTargetScale.ToString();
 			obj["TargetView"] = TargetView.ToString();

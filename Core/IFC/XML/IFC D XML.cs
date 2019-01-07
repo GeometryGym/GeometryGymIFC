@@ -137,6 +137,39 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
+			else
+			{
+				foreach (XmlNode child in xml.ChildNodes)
+				{
+					string name = child.Name;
+					if (string.Compare(name, "DirectionRatios", true) == 0)
+					{
+						List<double> dirctions = new List<double>();
+						foreach (XmlNode dirNode in child.ChildNodes)
+						{
+							int pos = dirctions.Count;
+							XmlElement dirElement = dirNode as XmlElement;
+							if (dirElement.HasAttribute("exp:pos"))
+								pos = int.Parse(dirNode.Attributes["exp:pos"].Value);
+							if (pos + 1 > dirctions.Count)
+								dirctions.AddRange(Enumerable.Repeat<double>(0, 1 + pos - dirctions.Count));
+							double d = 0;
+							if (double.TryParse(dirNode.InnerText, out d))
+								dirctions[pos] = d;
+						}
+						if (dirctions.Count > 0)
+						{
+							mDirectionRatioX = dirctions[0];
+							if (dirctions.Count > 1)
+							{
+								mDirectionRatioY = dirctions[1];
+								if (dirctions.Count > 2)
+									mDirectionRatioZ = dirctions[2];
+							}
+						}
+					}
+				}
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

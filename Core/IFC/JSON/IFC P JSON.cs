@@ -307,9 +307,9 @@ namespace GeometryGym.Ifc
 	{
 		internal override void parseJObject(JObject obj)
 		{
-			JObject jobj = obj.GetValue("Placement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			JObject jobj = obj.GetValue("ObjectPlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Placement = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
+				ObjectPlacement = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
 			base.parseJObject(obj);
 			jobj = obj.GetValue("Representation", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
@@ -318,7 +318,7 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			IfcObjectPlacement placement = Placement;
+			IfcObjectPlacement placement = ObjectPlacement;
 			JObject placementObj = null;	
 			if (placement != null)
 			{
@@ -329,7 +329,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 
 			if(placementObj != null)
-				obj["Placement"] = placementObj;
+				obj["ObjectPlacement"] = placementObj;
 			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
 				IfcProductRepresentation representation = Representation;

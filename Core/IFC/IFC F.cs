@@ -171,12 +171,12 @@ namespace GeometryGym.Ifc
 		public IfcFacilityPart(IfcFacility host, string name) : base(host, name) { }
 		public IfcFacilityPart(IfcFacilityPart host, string name) : base(host, name) { }
 		public IfcFacilityPart(IfcFacility host, string name, double elevation) 
-			: base(host, name, new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
+			: base(host, name, new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
 		{
 			Elevation = elevation;
 		}
 		public IfcFacilityPart(IfcFacilityPart host, string name, double elevation)
-			: base(host, name, new IfcLocalPlacement(host.Placement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
+			: base(host, name, new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, elevation))))
 		{
 			Elevation = elevation;
 		}
@@ -262,7 +262,7 @@ namespace GeometryGym.Ifc
 		{
 			new IfcRelVoidsElement(host, this);
 			Representation = rep;
-			Placement = new IfcLocalPlacement(host.Placement, mDatabase.Factory.XYPlanePlacement);	
+			ObjectPlacement = new IfcLocalPlacement(host.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);	
 		}
 	}
 	[Serializable]
