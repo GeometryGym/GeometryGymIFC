@@ -145,6 +145,95 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("IsHeading", mIsHeading.ToString().ToLower());
 		}
 	}
+	public partial class IfcTelecomAddress : IfcAddress
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "TelephoneNumbers") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+						TelephoneNumbers.Add(cn.InnerText);
+				}
+				else if (string.Compare(name, "FacsimileNumbers") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+						FacsimileNumbers.Add(cn.InnerText);
+				}
+				else if (string.Compare(name, "ElectronicMailAddresses") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+						ElectronicMailAddresses.Add(cn.InnerText);
+				}
+				else if (string.Compare(name, "MessagingIDs") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+						MessagingIDs.Add(cn.InnerText);
+				}
+				else if (string.Compare(name, "PagerNumber", true) == 0)
+					PagerNumber = child.InnerText;
+				else if (string.Compare(name, "WWWHomePageURL", true) == 0)
+					WWWHomePageURL = child.InnerText;
+			}
+			if (xml.HasAttribute("PagerNumber"))
+				PagerNumber = xml.Attributes["PagerNumber"].Value;
+			if (xml.HasAttribute("WWWHomePageURL"))
+				WWWHomePageURL = xml.Attributes["WWWHomePageURL"].Value;
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mTelephoneNumbers.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("TelephoneNumbers");
+				xml.AppendChild(element);
+				foreach (string line in TelephoneNumbers)
+				{
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					l.InnerText = line;
+					element.AppendChild(l);
+				}
+			}
+			if (mTelephoneNumbers.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("FacsimileNumbers");
+				xml.AppendChild(element);
+				foreach (string line in FacsimileNumbers)
+				{
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					l.InnerText = line;
+					element.AppendChild(l);
+				}
+			}
+			if (mElectronicMailAddresses.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("ElectronicMailAddresses");
+				xml.AppendChild(element);
+				foreach (string line in ElectronicMailAddresses)
+				{
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					l.InnerText = line;
+					element.AppendChild(l);
+				}
+			}
+			if (mMessagingIDs.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("MessagingIDs");
+				xml.AppendChild(element);
+				foreach (string line in MessagingIDs)
+				{
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcURIReference-wrapper");
+					l.InnerText = line;
+					element.AppendChild(l);
+				}
+			}
+			setAttribute(xml, "PagerNumber", PagerNumber);
+			setAttribute(xml, "WWWHomePageURL", WWWHomePageURL);
+		}
+	}
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet)
 	{
 		//internal int mCoordinates;// : 	IfcCartesianPointList;

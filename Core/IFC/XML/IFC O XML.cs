@@ -272,6 +272,8 @@ namespace GeometryGym.Ifc
 					Name = child.InnerText;
 				else if (string.Compare(name, "Description", true) == 0)
 					Description = child.InnerText;
+				else if (string.Compare(name, "Id", true) == 0)
+					Identification = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -280,20 +282,51 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if(mRoles.Count > 0)
+			if (mRoles.Count > 0)
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("Roles");
 				xml.AppendChild(element);
 				foreach (IfcActorRole role in Roles)
 					element.AppendChild(role.GetXML(xml.OwnerDocument, "", this, processed));
 			}
-			if(mAddresses.Count > 0)
+			if (mAddresses.Count > 0)
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("Addresses");
 				xml.AppendChild(element);
 				foreach (IfcAddress address in Addresses)
 					element.AppendChild(address.GetXML(xml.OwnerDocument, "", this, processed));
 			}
+		}
+	}
+	public partial class IfcOrganizationRelationship : IfcResourceLevelRelationship //IFC4
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingOrganization") == 0)
+					RelatingOrganization = mDatabase.ParseXml<IfcOrganization>(child as XmlElement);
+				else if (string.Compare(name, "RelatedOrganizations") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcOrganization o = mDatabase.ParseXml<IfcOrganization>(cn as XmlElement);
+						if (o != null)
+							RelatedOrganizations.Add(o);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(RelatingOrganization.GetXML(xml.OwnerDocument, "RelatingOrganization", this, processed));
+			XmlElement element = xml.OwnerDocument.CreateElement("RelatedOrganizations");
+			xml.AppendChild(element);
+			foreach (IfcOrganization o in RelatedOrganizations)
+				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcOwnerHistory : BaseClassIfc

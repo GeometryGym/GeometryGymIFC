@@ -59,6 +59,16 @@ namespace GeometryGym.Ifc
 				UserDefinedRole = xml.Attributes["UserDefinedRole"].Value;
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Role", true) == 0)
+					Enum.TryParse<IfcRoleEnum>(child.InnerText, true, out mRole);
+				else if (string.Compare(name, "UserDefinedRole", true) == 0)
+					UserDefinedRole = child.InnerText;
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -75,11 +85,21 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("Purpose"))
-				Purpose = (IfcAddressTypeEnum)Enum.Parse(typeof(IfcAddressTypeEnum), xml.Attributes["Purpose"].Value);
+				Enum.TryParse<IfcAddressTypeEnum>(xml.Attributes["Purpose"].Value, out mPurpose);
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
 			if (xml.HasAttribute("UserDefinedPurpose"))
 				UserDefinedPurpose = xml.Attributes["UserDefinedPurpose"].Value;
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Purpose", true) == 0)
+					Enum.TryParse<IfcAddressTypeEnum> (child.InnerText, true, out mPurpose);
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
+				else if (string.Compare(name, "UserDefinedPurpose", true) == 0)
+					UserDefinedPurpose = child.InnerText;
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -125,6 +145,12 @@ namespace GeometryGym.Ifc
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcAirTerminalTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -140,6 +166,12 @@ namespace GeometryGym.Ifc
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcAirTerminalTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcAirTerminalTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -317,6 +349,12 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "ApplicationDeveloper") == 0)
 					ApplicationDeveloper = mDatabase.ParseXml<IfcOrganization>(child as XmlElement);
+				else if (string.Compare(name, "Version", true) == 0)
+					Version = child.InnerText;
+				else if (string.Compare(name, "ApplicationFullName", true) == 0)
+					ApplicationFullName = child.InnerText;
+				else if (string.Compare(name, "ApplicationIdentifier", true) == 0)
+					ApplicationIdentifier = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -375,6 +413,16 @@ namespace GeometryGym.Ifc
 							r.addRelated(this);
 					}
 				}
+				else if (string.Compare(name, "Name", true) == 0)
+					Name = child.InnerText;
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
+				else if (string.Compare(name, "Category", true) == 0)
+					Category = child.InnerText;
+				else if (string.Compare(name, "Condition", true) == 0)
+					Condition = child.InnerText;
+				else if (string.Compare(name, "ArithmeticOperator", true) == 0)
+					Enum.TryParse<IfcArithmeticOperatorEnum>(child.InnerText, true, out mArithmeticOperator);
 			}
 			//todo
 			if (xml.HasAttribute("Category"))
@@ -383,8 +431,6 @@ namespace GeometryGym.Ifc
 				Condition = xml.Attributes["Condition"].Value;
 			if (xml.HasAttribute("ArithmeticOperator"))
 				Enum.TryParse<IfcArithmeticOperatorEnum>(xml.Attributes["ArithmeticOperator"].Value, true, out mArithmeticOperator);
-
-
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -508,10 +554,6 @@ namespace GeometryGym.Ifc
 				mOverallDepth = double.Parse(xml.Attributes["OverallDepth"].Value);
 			if (xml.HasAttribute("WebThickness"))
 				mWebThickness = double.Parse(xml.Attributes["WebThickness"].Value);
-			if (xml.HasAttribute("OverallWidth"))
-				mBottomFlangeWidth = double.Parse(xml.Attributes["OverallWidth"].Value);
-			else if (xml.HasAttribute("BottomFlangeWidth"))
-				mBottomFlangeWidth = double.Parse(xml.Attributes["BottomFlangeWidth"].Value);
 			if (xml.HasAttribute("FlangeThickness"))
 				mBottomFlangeThickness = double.Parse(xml.Attributes["FlangeThickness"].Value);
 			else if (xml.HasAttribute("BottomFlangeThickness"))
@@ -536,7 +578,40 @@ namespace GeometryGym.Ifc
 				mTopFlangeSlope = double.Parse(xml.Attributes["TopFlangeSlope"].Value);
 			if (xml.HasAttribute("CentreOfGravityInY"))
 				mCentreOfGravityInY = double.Parse(xml.Attributes["CentreOfGravityInY"].Value);
-
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "OverallWidth", true) == 0)
+					mBottomFlangeWidth = double.Parse(child.InnerText);
+				else if (string.Compare(name, "BottomFlangeWidth", true) == 0)
+					mBottomFlangeWidth = double.Parse(child.InnerText);
+				else if (string.Compare(name, "OverallDepth", true) == 0)
+					mOverallDepth = double.Parse(child.InnerText);
+				else if (string.Compare(name, "WebThickness", true) == 0)
+					mWebThickness = double.Parse(child.InnerText);
+				else if (string.Compare(name, "FlangeThickness", true) == 0)
+					mBottomFlangeThickness = double.Parse(child.InnerText);
+				else if (string.Compare(name, "FilletRadius", true) == 0)
+					mBottomFlangeFilletRadius = double.Parse(child.InnerText);
+				else if (string.Compare(name, "BottomFlangeFilletRadius", true) == 0)
+					mBottomFlangeFilletRadius = double.Parse(child.InnerText);
+				else if (string.Compare(name, "TopFlangeWidth", true) == 0)
+					mTopFlangeWidth = double.Parse(child.InnerText);
+				else if (string.Compare(name, "TopFlangeThickness", true) == 0)
+					mTopFlangeThickness = double.Parse(child.InnerText);
+				else if (string.Compare(name, "TopFlangeFilletRadius", true) == 0)
+					mTopFlangeFilletRadius = double.Parse(child.InnerText);
+				else if (string.Compare(name, "BottomFlangeEdgeRadius", true) == 0)
+					mBottomFlangeEdgeRadius = double.Parse(child.InnerText);
+				else if (string.Compare(name, "BottomFlangeSlope", true) == 0)
+					mBottomFlangeSlope = double.Parse(child.InnerText);
+				else if (string.Compare(name, "TopFlangeEdgeRadius", true) == 0)
+					mTopFlangeEdgeRadius = double.Parse(child.InnerText);
+				else if (string.Compare(name, "TopFlangeSlope", true) == 0)
+					mTopFlangeSlope = double.Parse(child.InnerText);
+				else if (string.Compare(name, "CentreOfGravityInY", true) == 0)
+					mCentreOfGravityInY = double.Parse(child.InnerText);
+			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

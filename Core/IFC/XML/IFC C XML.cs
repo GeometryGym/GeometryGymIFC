@@ -321,15 +321,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect //	SUBTYPE OF IfcExternalInformation;
 	{
-		//internal string mSource = "$"; //  : OPTIONAL IfcLabel;
-		//internal string mEdition = "$"; //  : OPTIONAL IfcLabel;
-		//internal DateTime mEditionDate = DateTime.MinValue; // : OPTIONAL IfcDate IFC4 change 
-		//private int mEditionDateSS = 0; // : OPTIONAL IfcCalendarDate;
-		//internal string mName;//  : IfcLabel;
-		//internal string mDescription = "$";//	 :	OPTIONAL IfcText; IFC4 Addition
-		//internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; IFC4 Addtion
-		//internal List<string> mReferenceTokens = new List<string>();//	 :	OPTIONAL LIST [1:?] OF IfcIdentifier; IFC4 Addition
-
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -350,12 +341,24 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "HasReferences") == 0)
 					HasReferences.AddRange(mDatabase.ParseXMLList<IfcClassificationReference>(child as XmlElement));
+				else if (string.Compare(name, "Source", true) == 0)
+					Source = child.InnerText;
+				else if (string.Compare(name, "Edition", true) == 0)
+					Edition = child.InnerText;
+				else if (string.Compare(name, "EditionDate", true) == 0)
+					mEditionDateSS = mDatabase.ParseXml<IfcCalendarDate>(child as XmlElement).StepId;
+				else if (string.Compare(name, "Name", true) == 0)
+					Name = child.InnerText;
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
+				else if (string.Compare(name, "Location", true) == 0)
+					Location = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			
+
 			setAttribute(xml, "Source", Source);
 			setAttribute(xml, "Edition", Edition);
 			if (EditionDate != DateTime.MinValue)
@@ -368,7 +371,7 @@ namespace GeometryGym.Ifc
 			XmlElement element = xml.OwnerDocument.CreateElement("HasReferences");
 			foreach (IfcClassificationReference cr in HasReferences)
 				element.AppendChild(cr.GetXML(xml.OwnerDocument, "", this, processed));
-			if(element.ChildNodes.Count > 0)
+			if (element.ChildNodes.Count > 0)
 				xml.AppendChild(element);
 		}
 	}
@@ -388,6 +391,10 @@ namespace GeometryGym.Ifc
 					ReferencedSource = mDatabase.ParseXml<IfcClassificationReferenceSelect>(child as XmlElement);
 				else if (string.Compare(name, "HasReferences") == 0)
 					HasReferences.AddRange(mDatabase.ParseXMLList<IfcClassificationReference>(child as XmlElement));
+				else if (string.Compare(name, "Description", true) == 0)
+					Description = child.InnerText;
+				else if (string.Compare(name, "Sort", true) == 0)
+					Sort = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -471,7 +478,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("PredefinedType"))
-				Enum.TryParse<IfcColumnTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
+				Enum.TryParse<IfcColumnTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
@@ -519,7 +526,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcCompositeCurveSegment s = mDatabase.ParseXml<IfcCompositeCurveSegment>(cn as XmlElement);
 						if (s != null)
-							Segments.Add(s);	
+							Segments.Add(s);
 					}
 				}
 			}
@@ -737,6 +744,28 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
 			xml.AppendChild(ConversionFactor.GetXML(xml.OwnerDocument, "ConversionFactor", this, processed));
+		}
+	}
+	public partial class IfcConnectionCurveGeometry : IfcConnectionGeometry
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "CurveOnRelatingElement") == 0)
+					CurveOnRelatingElement = mDatabase.ParseXml<IfcCurveOrEdgeCurve>(child as XmlElement);
+				else if (string.Compare(name, "CurveOnRelatedElement") == 0)
+					CurveOnRelatedElement = mDatabase.ParseXml<IfcCurveOrEdgeCurve>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((CurveOnRelatingElement as BaseClassIfc).GetXML(xml.OwnerDocument, "CurveOnRelatingElement", this, processed));
+			if(mCurveOnRelatedElement > 0)
+			xml.AppendChild((CurveOnRelatedElement as BaseClassIfc).GetXML(xml.OwnerDocument, "CurveOnRelatedElement", this, processed));
 		}
 	}
 	public abstract partial class IfcConstraint : BaseClassIfc, IfcResourceObjectSelect //IFC4Change ABSTRACT SUPERTYPE OF(ONEOF(IfcMetric, IfcObjective));

@@ -85,6 +85,8 @@ namespace GeometryGym.Ifc
 					FamilyName = child.InnerText;
 				else if (string.Compare(name, "GivenName", true) == 0)
 					GivenName = child.InnerText;
+				else if (string.Compare(name, "Id", true) == 0)
+					Identification = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
@@ -321,6 +323,18 @@ namespace GeometryGym.Ifc
 					foreach (XmlNode cn in child.ChildNodes)
 						AddressLines.Add(cn.InnerText);
 				}
+				else if (string.Compare(name, "InternalLocation", true) == 0)
+					InternalLocation = child.InnerText;
+				else if (string.Compare(name, "PostalBox", true) == 0)
+					PostalBox = child.InnerText;
+				else if (string.Compare(name, "Town", true) == 0)
+					Town = child.InnerText;
+				else if (string.Compare(name, "Region", true) == 0)
+					Region = child.InnerText;
+				else if (string.Compare(name, "PostalCode", true) == 0)
+					PostalCode = child.InnerText;
+				else if (string.Compare(name, "Country", true) == 0)
+					Country = child.InnerText;
 			}
 			if (xml.HasAttribute("PostalBox"))
 				PostalBox = xml.Attributes["PostalBox"].Value;
@@ -332,7 +346,6 @@ namespace GeometryGym.Ifc
 				PostalCode = xml.Attributes["PostalCode"].Value;
 			if (xml.HasAttribute("Country"))
 				Country = xml.Attributes["Country"].Value;
-
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{

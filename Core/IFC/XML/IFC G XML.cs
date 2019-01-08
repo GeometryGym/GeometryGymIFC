@@ -214,6 +214,10 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "AxisCurve") == 0)
 					AxisCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+				else if (string.Compare(name, "AxisTag", true) == 0)
+					AxisTag = child.InnerText;
+				else if (string.Compare(name, "SameSense", true) == 0)
+					bool.TryParse(child.InnerText, out mSameSense);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

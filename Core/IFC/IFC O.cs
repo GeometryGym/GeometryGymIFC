@@ -756,7 +756,46 @@ namespace GeometryGym.Ifc
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	//ENTITY IfcOrganizationRelationship; //optional name
+	[Serializable]
+	public partial class IfcOrganizationRelationship : IfcResourceLevelRelationship //IFC4
+	{
+		private int mRelatingOrganization;// :	IfcOrganization;
+		private SET<IfcOrganization> mRelatedOrganizations = new SET<IfcOrganization>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
+
+		public IfcOrganization RelatingOrganization { get { return mDatabase[mRelatingOrganization] as IfcOrganization; } set { mRelatingOrganization = value.mIndex; } }
+		public SET<IfcOrganization> RelatedOrganizations { get { return mRelatedOrganizations; } set { mRelatedOrganizations.Clear(); if (value != null) { mRelatedOrganizations.CollectionChanged -= mRelatedOrganizations_CollectionChanged; mRelatedOrganizations = value; mRelatedOrganizations.CollectionChanged += mRelatedOrganizations_CollectionChanged; } } }
+
+		internal IfcOrganizationRelationship() : base() { }
+		internal IfcOrganizationRelationship(DatabaseIfc db, IfcOrganizationRelationship r) : base(db, r) { RelatingOrganization = db.Factory.Duplicate(r.RelatingOrganization) as IfcOrganization; RelatedOrganizations.AddRange(r.mRelatedOrganizations.ConvertAll(x => db.Factory.Duplicate(x.Database[x.Index]) as IfcOrganization)); }
+		public IfcOrganizationRelationship(IfcOrganization relating, IfcOrganization related) : this(relating, new List<IfcOrganization>() { related }) { }
+		public IfcOrganizationRelationship(IfcOrganization relating, List<IfcOrganization> related)
+			: base(relating.mDatabase) { mRelatingOrganization = relating.mIndex; RelatedOrganizations.AddRange(related); }
+
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mRelatedOrganizations.CollectionChanged += mRelatedOrganizations_CollectionChanged;
+		}
+		private void mRelatedOrganizations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				//foreach (IfcResourceObjectSelect r in e.NewItems)
+				//{
+				//	if (!r.HasExternalReferences.Contains(this))
+				//		r.HasExternalReferences.Add(this);
+				//}
+			}
+			if (e.OldItems != null)
+			{
+				//foreach (IfcResourceObjectSelect r in e.OldItems)
+				//	r.HasExternalReferences.Remove(this);
+			}
+		}
+	}
 	[Serializable]
 	public partial class IfcOrientedEdge : IfcEdge
 	{
