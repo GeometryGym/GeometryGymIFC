@@ -840,6 +840,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEllipse() : base() { }
 		internal IfcEllipse(DatabaseIfc db, IfcEllipse e) : base(db,e) { mSemiAxis1 = e.mSemiAxis1; mSemiAxis2 = e.mSemiAxis2; }
 		public IfcEllipse(IfcAxis2Placement placement, double axis1, double axis2) : base(placement) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
+		public IfcEllipse(DatabaseIfc db, double axis1, double axis2) : base(db.Factory.Origin2dPlace) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
 	}
 	[Serializable]
 	public partial class IfcEllipseProfileDef : IfcParameterizedProfileDef
