@@ -1199,7 +1199,7 @@ namespace GeometryGym.Ifc
 				{
 					Assembly assembly = typeof(BaseClassIfc).Assembly;
 					AssemblyName name = assembly.GetName();
-					string date = String.Format("{0:s}", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToUniversalTime());
+					string date = String.Format("{0:s}", File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToUniversalTime());
 					return name.Name + " v" + name.Version.ToString() + " by Geometry Gym Pty Ltd built " + date;
 				}
 				catch (Exception)
@@ -1224,9 +1224,8 @@ namespace GeometryGym.Ifc
 								assembly = Assembly.GetCallingAssembly();
 							if (assembly != null)
 							{ 
-							AssemblyName name = assembly.GetName();
-
-							return name.Name + " v" + name.Version.ToString();
+								AssemblyName name = assembly.GetName();
+								return name.Name + " v" + name.Version.ToString();
 							}
 						}
 						catch (Exception) {  }
@@ -1271,7 +1270,14 @@ namespace GeometryGym.Ifc
 					mApplication = new IfcApplication(mDatabase);
 				return mApplication;
 			}
-			set { mApplication = value; }
+			set
+			{
+				mApplication = value;
+				if(string.IsNullOrEmpty(mApplicationFullName))
+				{
+					ApplicationFullName = mApplication.ApplicationFullName + (string.IsNullOrEmpty(mApplication.Version) ? "" : " " + mApplication.Version);
+				}
+			}
 		}
 		private IfcPersonAndOrganization mPersonOrganization = null;
 		internal IfcPersonAndOrganization PersonOrganization
