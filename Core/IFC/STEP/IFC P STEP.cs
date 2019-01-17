@@ -547,7 +547,8 @@ namespace GeometryGym.Ifc
 			IfcProfileDef profileDefinition = ProfileDefinition;
 			if (profileDefinition == null)
 				return "";
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mName == "$" ? ",$," : ",'" + mName + "',#") : ",#") + profileDefinition.Index; }
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mName == "$" ? ",$,#" : ",'" + mName + "',#") : ",#") + profileDefinition.Index;
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			if (release < ReleaseVersion.IFC4)
