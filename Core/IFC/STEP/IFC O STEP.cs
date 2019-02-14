@@ -76,25 +76,41 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcOccupantTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcOffsetCurve2D : IfcCurve
+	public partial class IfcOffsetCurve : IfcCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve.Index + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect);  }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve.Index; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			BasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+		}
+	}
+	public partial class IfcOffsetCurve2D : IfcOffsetCurve
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect);  }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);
 			SelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
-	public partial class IfcOffsetCurve3D : IfcCurve
+	public partial class IfcOffsetCurve3D : IfcOffsetCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve.Index + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			BasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);
 			SelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 			RefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+		}
+	}
+	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", OffsetValues.ConvertAll(x => x.Index)) + (string.IsNullOrEmpty(Tag) ? "),$" : "),'" + ParserIfc.Encode(Tag) + "'"); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			OffsetValues.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDistanceExpression));
+			Tag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
@@ -146,11 +162,11 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcOrganizationRelationship; //optional name
 	public partial class IfcOrientedEdge : IfcEdge
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mEdgeElement) + "," + ParserSTEP.BoolToString(mOrientation); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mEdgeElement.StepId + "," + ParserSTEP.BoolToString(mOrientation); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mEdgeElement = ParserSTEP.StripLink(str, ref pos, len);
+			EdgeElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcEdge;
 			mOrientation = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}

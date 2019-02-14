@@ -63,7 +63,7 @@ namespace GeometryGym.Ifc
 			Language = extractString(obj.GetValue("Language", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj.GetValue("ReferencedLibrary", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				ReferencedLibrary = mDatabase.parseJObject<IfcLibraryInformation>(jobj);
+				ReferencedLibrary = mDatabase.ParseJObject<IfcLibraryInformation>(jobj);
 			//				else if (string.Compare(name, "LibraryRefForObjects") == 0)
 			//			{
 			//todo
@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				Axis = mDatabase.parseJObject<IfcCurve>(token as JObject);
+				Axis = mDatabase.ParseJObject<IfcCurve>(token as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -103,11 +103,11 @@ namespace GeometryGym.Ifc
 			{
 				JObject jobj = token as JObject;
 				if (jobj != null)
-					PlacementRelTo = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
+					PlacementRelTo = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
 			}
 			JObject rp = obj.GetValue("RelativePlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				RelativePlacement = mDatabase.parseJObject<IfcAxis2Placement>(rp);
+				RelativePlacement = mDatabase.ParseJObject<IfcAxis2Placement>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

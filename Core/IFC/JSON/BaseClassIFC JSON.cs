@@ -192,7 +192,7 @@ namespace GeometryGym.Ifc
 		}
 		protected T extractObject<T>(JObject obj) where T : IBaseClassIfc
 		{
-			return (obj == null ? default(T) : mDatabase.parseJObject<T>(obj));
+			return (obj == null ? default(T) : mDatabase.ParseJObject<T>(obj));
 		}
 		protected string extractString(JToken token) { return (token == null ? "" : token.Value<string>()); }
 		protected void setAttribute(JObject obj, string attribute, string value)

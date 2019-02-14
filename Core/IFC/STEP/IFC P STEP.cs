@@ -51,13 +51,13 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mEdgeList = ParserSTEP.StripListLink(str, ref pos, len); }
 	}
-	public partial class IfcPCurve : IfcCurve
+	public partial class IfcPcurve : IfcCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mBasisSurface) + "," + ParserSTEP.LinkToString(mReferenceCurve); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisSurface.StepId + ",#" + mReferenceCurve.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mBasisSurface = ParserSTEP.StripLink(str, ref pos, len);
-			mReferenceCurve = ParserSTEP.StripLink(str, ref pos, len);
+			BasisSurface = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurface;
+			ReferenceCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
 	public partial class IfcPerformanceHistory : IfcControl

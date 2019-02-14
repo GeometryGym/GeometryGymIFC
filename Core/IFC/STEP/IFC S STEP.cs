@@ -1032,11 +1032,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSurfaceCurve : IfcCurve //IFC4 Add2
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mCurve3D) + ",(#" + mAssociatedGeometry[0] + (mAssociatedGeometry.Count == 2 ? ",#" + mAssociatedGeometry[1] : "") + "),." + mMasterRepresentation.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mCurve3D.StepId + (mAssociatedGeometry.Count==0 ? ",$,." : ",(#" + mAssociatedGeometry[0] + (mAssociatedGeometry.Count == 2 ? ",#" + mAssociatedGeometry[1] : "") + "),.") + mMasterRepresentation.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mCurve3D = ParserSTEP.StripLink(str, ref pos, len);
-			mAssociatedGeometry = ParserSTEP.StripListLink(str, ref pos, len);
+			Curve3D = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+			AssociatedGeometry.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcPcurve));
 			Enum.TryParse<IfcPreferredSurfaceCurveRepresentation>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mMasterRepresentation);
 		}
 	}

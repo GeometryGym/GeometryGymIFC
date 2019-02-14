@@ -46,8 +46,10 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mEdgeStart].GetXML(xml.OwnerDocument, "EdgeStart", this, processed));
-			xml.AppendChild(mDatabase[mEdgeEnd].GetXML(xml.OwnerDocument, "EdgeEnd", this, processed));
+			if(mEdgeStart != null)
+				xml.AppendChild(EdgeStart.GetXML(xml.OwnerDocument, "EdgeStart", this, processed));
+			if(mEdgeEnd != null)
+				xml.AppendChild(mEdgeEnd.GetXML(xml.OwnerDocument, "EdgeEnd", this, processed));
 		}
 	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement

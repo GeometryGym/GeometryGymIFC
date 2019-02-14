@@ -85,8 +85,8 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Precision", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Precision = token.Value<double>();
-			WorldCoordinateSystem = mDatabase.parseJObject<IfcAxis2Placement>(obj.GetValue("WorldCoordinateSystem", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			TrueNorth = mDatabase.parseJObject<IfcDirection>(obj.GetValue("TrueNorth", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			WorldCoordinateSystem = mDatabase.ParseJObject<IfcAxis2Placement>(obj.GetValue("WorldCoordinateSystem", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			TrueNorth = mDatabase.ParseJObject<IfcDirection>(obj.GetValue("TrueNorth", StringComparison.InvariantCultureIgnoreCase) as JObject);
 
 			List<IfcGeometricRepresentationSubContext> subs = mDatabase.extractJArray<IfcGeometricRepresentationSubContext>(obj.GetValue("HasSubContexts", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcGeometricRepresentationSubContext sub in subs)

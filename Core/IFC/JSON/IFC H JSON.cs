@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("BaseSurface", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				BaseSurface = mDatabase.parseJObject<IfcSurface>(jobj);
+				BaseSurface = mDatabase.ParseJObject<IfcSurface>(jobj);
 			JToken token = obj.GetValue("AgreementFlag", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				bool.TryParse(token.Value<string>(), out mAgreementFlag);

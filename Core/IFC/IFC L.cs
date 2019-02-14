@@ -375,7 +375,10 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcLoop : IfcTopologicalRepresentationItem /*SUPERTYPE OF (ONEOF (IfcEdgeLoop ,IfcPolyLoop ,IfcVertexLoop))*/
-	{ 
+	{
+		//INVERSE GG
+		internal IfcFaceBound mLoopOf = null;
+
 		protected IfcLoop() : base() { }
 		protected IfcLoop(DatabaseIfc db) : base(db) { }
 		protected IfcLoop(DatabaseIfc db, IfcLoop l) : base(db,l) { }

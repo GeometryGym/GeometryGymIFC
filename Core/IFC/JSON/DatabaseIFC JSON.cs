@@ -68,7 +68,7 @@ namespace GeometryGym.Ifc
 				result = extractJArray<IBaseClassIfc>(array);
 			else
 			{
-				IBaseClassIfc obj = parseJObject<IBaseClassIfc>(ifcFile);
+				IBaseClassIfc obj = ParseJObject<IBaseClassIfc>(ifcFile);
 				if (obj != null)
 					result.Add(obj);
 			}
@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 				JObject obj = token as JObject;
 				if (obj != null)
 				{
-					T entity = parseJObject<T>(obj);
+					T entity = ParseJObject<T>(obj);
 					if (entity != null)
 						result.Add(entity);
 				}
@@ -95,10 +95,11 @@ namespace GeometryGym.Ifc
 			}
 			return result;
 		}
-		internal T parseJObject<T>(JObject obj) where T : IBaseClassIfc
+		public T ParseJObject<T>(JObject obj) where T : IBaseClassIfc
 		{
 			if (obj == null)
 				return default(T);
+
 			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)
@@ -220,6 +221,7 @@ namespace GeometryGym.Ifc
 				return default(T);
 			result.parseJObject(obj);
 			parseBespoke(result, obj);
+			appendObject(result);
 			return (T)(IBaseClassIfc)result;
 		}
 
@@ -305,7 +307,6 @@ namespace GeometryGym.Ifc
 			JProperty token = (JProperty) obj.First;
 			return ParserIfc.extractValue(token.Name, token.Value.ToString());
 		}
-
 	}
 
 	public static class JsonIFCExtensions

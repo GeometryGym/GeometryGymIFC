@@ -32,20 +32,35 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
-		internal int mEdgeStart, mEdgeEnd;// : IfcVertex;
-		public IfcVertex EdgeStart { get { return mDatabase[mEdgeStart] as IfcVertex; } set { mEdgeStart = value.mIndex; } }
-		public IfcVertex EdgeEnd { get { return mDatabase[mEdgeEnd] as IfcVertex; } set { mEdgeEnd = value.mIndex; } }
+		internal IfcVertex mEdgeStart, mEdgeEnd;// : IfcVertex;
+		public IfcVertex EdgeStart { get { return mEdgeStart; } set { if (mEdgeStart != null) mEdgeStart.mAttachedEdges.Remove(this); mEdgeStart = value; if(value != null) mEdgeStart.mAttachedEdges.Add(this); } }
+		public IfcVertex EdgeEnd { get { return mEdgeEnd; } set { if (mEdgeEnd != null) mEdgeEnd.mAttachedEdges.Remove(this); mEdgeEnd = value; if (value != null) mEdgeEnd.mAttachedEdges.Add(this); } }
+
+		//INVERSE gg
+		internal List<IfcOrientedEdge> mOfEdges = new List<IfcOrientedEdge>();
 
 		internal IfcEdge() : base() { }
 		protected IfcEdge(DatabaseIfc db) : base(db) { }
 		internal IfcEdge(DatabaseIfc db, IfcEdge e) : base(db, e)
 		{
-			if(e.mEdgeStart > 0)
+			if(e.mEdgeStart != null)
 				EdgeStart = db.Factory.Duplicate( e.EdgeStart) as IfcVertex;
-			if(e.mEdgeEnd > 0)
+			if(e.mEdgeEnd != null)
 				EdgeEnd = db.Factory.Duplicate( e.EdgeEnd) as IfcVertex;
 		}
 		public IfcEdge(IfcVertex start, IfcVertex end) : base(start.mDatabase) { EdgeStart = start; EdgeEnd = end; }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			IfcVertex vertex = EdgeStart;
+			if(vertex != null)
+				result.AddRange(vertex.Extract<T>());
+			vertex = EdgeEnd;
+			if(vertex != null)
+				result.AddRange(vertex.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
@@ -59,7 +74,12 @@ namespace GeometryGym.Ifc
 		internal IfcEdgeCurve() : base() { }
 		internal IfcEdgeCurve(DatabaseIfc db, IfcEdgeCurve e) : base(db,e) { EdgeGeometry = db.Factory.Duplicate(e.EdgeGeometry) as IfcCurve; mSameSense = e.mSameSense; }
 		public IfcEdgeCurve(IfcVertexPoint start, IfcVertexPoint end, IfcCurve edge, bool sense) : base(start, end) { mEdgeGeometry = edge.mIndex; mSameSense = sense; }
-	//	internal IfcEdgeCurve(IfcBoundedCurve ec, IfcVertexPoint s, IfcVertexPoint e,bool sense) : base(s, e) { mEdgeGeometry = ec.mIndex; mSameSense = true; }
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			result.AddRange(EdgeGeometry.Extract<T>());
+			return result;
+		}
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -72,22 +92,53 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcEdgeLoop : IfcLoop
 	{
-		internal List<int> mEdgeList = new List<int>();// LIST [1:?] OF IfcOrientedEdge;
-		public ReadOnlyCollection<IfcOrientedEdge> EdgeList { get { return new ReadOnlyCollection<IfcOrientedEdge>(mEdgeList.ConvertAll(x => mDatabase[x] as IfcOrientedEdge)); } }
+		internal LIST<IfcOrientedEdge> mEdgeList = new LIST<IfcOrientedEdge>();// LIST [1:?] OF IfcOrientedEdge;
+		public LIST<IfcOrientedEdge> EdgeList { get { return mEdgeList; } }
 		internal IfcEdgeLoop() : base() { }
-		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l) : base(db,l) { l.EdgeList.ToList().ForEach(x => addEdge( db.Factory.Duplicate(x) as IfcOrientedEdge)); }
-		public IfcEdgeLoop(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
-		public IfcEdgeLoop(IfcOrientedEdge edge1, IfcOrientedEdge edge2) : base(edge1.mDatabase) { mEdgeList.Add(edge1.mIndex); mEdgeList.Add(edge2.mIndex); }
-		public IfcEdgeLoop(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { mEdgeList = edges.ConvertAll(x => x.mIndex); }
+		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l) : base(db,l) { mEdgeList.AddRange(l.EdgeList.Select(x => db.Factory.Duplicate(x) as IfcOrientedEdge)); }
+		public IfcEdgeLoop(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge); }
+		public IfcEdgeLoop(IfcOrientedEdge edge1, IfcOrientedEdge edge2) : base(edge1.mDatabase) { mEdgeList.Add(edge1); mEdgeList.Add(edge2); }
+		public IfcEdgeLoop(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { mEdgeList.AddRange(edges); }
 		public IfcEdgeLoop(List<IfcVertexPoint> vertex)
 			: base(vertex[0].mDatabase)
 		{
 			for (int icounter = 1; icounter < vertex.Count; icounter++)
-				mEdgeList.Add(new IfcOrientedEdge(vertex[icounter - 1], vertex[icounter]).mIndex);
-			mEdgeList.Add(new IfcOrientedEdge(vertex[vertex.Count - 1], vertex[0]).mIndex);
+				mEdgeList.Add(new IfcOrientedEdge(vertex[icounter - 1], vertex[icounter]));
+			mEdgeList.Add(new IfcOrientedEdge(vertex[vertex.Count - 1], vertex[0]));
 		}
 
-		internal void addEdge(IfcOrientedEdge edge) { mEdgeList.Add(edge.mIndex); }
+		protected override void initialize()
+		{
+			base.initialize();
+			mEdgeList.CollectionChanged += mEdgeList_CollectionChanged;
+		}
+		private void mEdgeList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcOrientedEdge edge in e.NewItems)
+				{
+					edge.mOfLoop = this;	
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcOrientedEdge edge in e.OldItems)
+				{
+					if (edge.mOfLoop == this)
+						edge.mOfLoop = null;
+				}
+			}
+		}
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			foreach (IfcOrientedEdge e in EdgeList)
+				result.AddRange(e.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public partial class IfcElectricAppliance : IfcFlowTerminal //IFC4

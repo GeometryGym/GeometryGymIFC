@@ -204,7 +204,7 @@ namespace GeometryGym.Ifc
 			Revision = extractString(obj.GetValue("Revision", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj["DocumentOwner"] as JObject;
 			if (jobj != null)
-				DocumentOwner = mDatabase.parseJObject<IfcActorSelect>(jobj);
+				DocumentOwner = mDatabase.ParseJObject<IfcActorSelect>(jobj);
 			mDatabase.extractJArray<IfcActorSelect>(obj.GetValue("Editors", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addEditor(x));
 			JToken token = obj.GetValue("CreationTime");
 			if(token != null)
@@ -262,7 +262,7 @@ namespace GeometryGym.Ifc
 			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj["ReferencedDocument"] as JObject;
 			if (jobj != null)
-				ReferencedDocument = mDatabase.parseJObject<IfcDocumentInformation>(jobj);
+				ReferencedDocument = mDatabase.ParseJObject<IfcDocumentInformation>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -291,7 +291,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDoorPanelPositionEnum>(token.Value<string>(), true, out mPanelPosition);
 			JObject jobj = obj.GetValue("ShapeAspectStyle", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				ShapeAspectStyle = mDatabase.parseJObject<IfcShapeAspect>(jobj);
+				ShapeAspectStyle = mDatabase.ParseJObject<IfcShapeAspect>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

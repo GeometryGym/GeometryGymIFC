@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public partial class IfcPCurve : IfcCurve
+	public partial class IfcPcurve : IfcCurve
 	{
 		public override Curve Curve
 		{

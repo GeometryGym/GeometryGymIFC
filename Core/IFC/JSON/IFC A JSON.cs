@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("CurveGeometry", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				CurveGeometry = mDatabase.parseJObject<IfcCurveSegment2D>(token as JObject);
+				CurveGeometry = mDatabase.ParseJObject<IfcCurveSegment2D>(token as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -179,10 +179,10 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("Horizontal", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				Horizontal = mDatabase.parseJObject<IfcAlignment2DHorizontal>(token as JObject);
+				Horizontal = mDatabase.ParseJObject<IfcAlignment2DHorizontal>(token as JObject);
 			token = obj.GetValue("Vertical", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				Vertical = mDatabase.parseJObject<IfcAlignment2DVertical>(token as JObject);
+				Vertical = mDatabase.ParseJObject<IfcAlignment2DVertical>(token as JObject);
 			token = obj.GetValue("Tag", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Tag = token.Value<string>();
@@ -204,7 +204,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("OuterBoundary", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				OuterBoundary = mDatabase.parseJObject<IfcCurve>(jobj);
+				OuterBoundary = mDatabase.ParseJObject<IfcCurve>(jobj);
 			InnerBoundaries.AddRange(mDatabase.extractJArray<IfcCurve>(obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -223,7 +223,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("ApplicationDeveloper", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				ApplicationDeveloper = mDatabase.parseJObject<IfcOrganization>(token as JObject);
+				ApplicationDeveloper = mDatabase.ParseJObject<IfcOrganization>(token as JObject);
 			token = obj.GetValue("Version", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Version = token.Value<string>();
@@ -259,13 +259,13 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("AppliedValue", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 			{
-				AppliedValue = mDatabase.parseJObject<IfcAppliedValueSelect>(jobj);
+				AppliedValue = mDatabase.ParseJObject<IfcAppliedValueSelect>(jobj);
 				if (mAppliedValueIndex <= 0)
 					mAppliedValueValue = DatabaseIfc.ParseValue(jobj);
 			}
 			jobj = obj.GetValue("UnitBasis", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				UnitBasis = mDatabase.parseJObject<IfcMeasureWithUnit>(jobj);
+				UnitBasis = mDatabase.ParseJObject<IfcMeasureWithUnit>(jobj);
 
 			mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addComponent(x));
 
@@ -328,7 +328,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("OuterCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if(jobj != null)
-				OuterCurve = mDatabase.parseJObject<IfcBoundedCurve>(jobj);
+				OuterCurve = mDatabase.ParseJObject<IfcBoundedCurve>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -421,7 +421,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			Axis = mDatabase.parseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			Axis = mDatabase.ParseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -438,7 +438,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if(jobj != null)
-				RefDirection = mDatabase.parseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
+				RefDirection = mDatabase.ParseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -453,8 +453,8 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			Axis = mDatabase.parseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			RefDirection = mDatabase.parseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			Axis = mDatabase.ParseJObject<IfcDirection>(obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			RefDirection = mDatabase.ParseJObject<IfcDirection>(obj.GetValue("RefDirection", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

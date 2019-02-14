@@ -30,7 +30,7 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
-	public abstract partial class IfcObject : IfcObjectDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcActor ,IfcControl ,IfcGroup ,IfcProcess ,IfcProduct ,IfcProject ,IfcResource))
+	public abstract partial class IfcObject : IfcObjectDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcActor, IfcControl, IfcGroup, IfcProcess, IfcProduct, IfcProject, IfcResource))
 	{
 		internal string mObjectType = "$"; //: OPTIONAL IfcLabel;
 		//INVERSE
@@ -586,37 +586,54 @@ namespace GeometryGym.Ifc
 		internal IfcOccupant(DatabaseIfc db, IfcOccupant o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { mPredefinedType = o.mPredefinedType; }
 		public IfcOccupant(IfcActorSelect a, IfcOccupantTypeEnum type) : base(a) { mPredefinedType = type; }
 	}
-	[Serializable]
-	public abstract partial class IfcOffsetCurve2D : IfcCurve
+	public abstract partial class IfcOffsetCurve : IfcCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcOffsetCurve2D, IfcOffsetCurve3D, IfcOffsetCurveByDistances))
 	{
 		private IfcCurve mBasisCurve;//: IfcCurve;
+		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
+
+		protected IfcOffsetCurve() : base() { }
+		protected IfcOffsetCurve(DatabaseIfc db, IfcOffsetCurve c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; }
+		protected IfcOffsetCurve(IfcCurve basis) : base(basis.Database) { BasisCurve = basis; }
+
+	}
+	[Serializable]
+	public partial class IfcOffsetCurve2D : IfcOffsetCurve
+	{
 		private double mDistance;// : IfcLengthMeasure;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : IfcLogical;
-
-		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
 		public double Distance {  get { return mDistance; } set { mDistance = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		internal IfcOffsetCurve2D() : base() { }
-		internal IfcOffsetCurve2D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
-		public IfcOffsetCurve2D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect) : base(basis.Database) { BasisCurve = basis; Distance = distance; SelfIntersect = selfIntersect; }
+		internal IfcOffsetCurve2D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
+		public IfcOffsetCurve2D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect) : base(basis) { Distance = distance; SelfIntersect = selfIntersect; }
 	}
 	[Serializable]
-	public abstract partial class IfcOffsetCurve3D : IfcCurve
+	public partial class IfcOffsetCurve3D : IfcOffsetCurve
 	{
-		private IfcCurve mBasisCurve;//: IfcCurve;
 		private double mDistance;// : IfcLengthMeasure;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : IfcLogical;
 		private IfcDirection mRefDirection;// : IfcDirection;
-
-		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
 		public double Distance { get { return mDistance; } set { mDistance = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
 
 		internal IfcOffsetCurve3D() : base() { }
-		internal IfcOffsetCurve3D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
-		public IfcOffsetCurve3D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect, IfcDirection refDirection) : base(basis.Database) { BasisCurve = basis; Distance = distance; SelfIntersect = selfIntersect; RefDirection = RefDirection; }
+		internal IfcOffsetCurve3D(DatabaseIfc db, IfcOffsetCurve2D c) : base(db, c) { Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
+		public IfcOffsetCurve3D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect, IfcDirection refDirection) : base(basis) { Distance = distance; SelfIntersect = selfIntersect; RefDirection = RefDirection; }
+	}
+	[Serializable]
+	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
+	{
+		private LIST<IfcDistanceExpression> mOffsetValues = new LIST<IfcDistanceExpression>();// : LIST[1:?] OF IfcDistanceExpression;
+		private string mTag = "";// : OPTIONAL IfcLabel;
+
+		public LIST<IfcDistanceExpression> OffsetValues { get { return mOffsetValues; } set { mOffsetValues = value; } }
+		public string Tag { get { return mTag; } set { mTag = value; } }
+
+		internal IfcOffsetCurveByDistances() : base() { }
+		internal IfcOffsetCurveByDistances(DatabaseIfc db, IfcOffsetCurveByDistances c) : base(db, c) { OffsetValues.AddRange(c.OffsetValues.Select(x => db.Factory.Duplicate(x) as IfcDistanceExpression)); Tag = c.Tag; }
+		public IfcOffsetCurveByDistances(IfcCurve basis, IEnumerable<IfcDistanceExpression> offsets) : base(basis) { OffsetValues.AddRange(offsets); }
 
 	}
 
@@ -677,6 +694,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcOpenShell() : base() { }
 		internal IfcOpenShell(DatabaseIfc db, IfcOpenShell s) : base(db,s) { }
+		public IfcOpenShell(IEnumerable<IfcFace> faces) : base(faces) { }
 	}
 	[Serializable]
 	public partial class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
@@ -799,16 +817,27 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOrientedEdge : IfcEdge
 	{
-		internal int mEdgeElement;// IfcEdge;
+		internal IfcEdge mEdgeElement;// IfcEdge;
 		internal bool mOrientation = true; // : BOOL;
+		//INVERSE gg
+		internal IfcEdgeLoop mOfLoop = null;
 
-		public IfcEdge EdgeElement { get { return mDatabase[mEdgeElement] as IfcEdge; } set { mEdgeElement = value.mIndex; } }
+		public IfcEdge EdgeElement {
+			get { return mEdgeElement; }
+			set { if (mEdgeElement != null) mEdgeElement.mOfEdges.Remove(this); mEdgeElement = value; if (value != null) mEdgeElement.mOfEdges.Add(this); } }
 		public bool Orientation { get { return mOrientation; } set { mOrientation = value; } }
 
 		internal IfcOrientedEdge() : base() { }
 		internal IfcOrientedEdge(DatabaseIfc db, IfcOrientedEdge e) : base(db,e) { EdgeElement = db.Factory.Duplicate( e.EdgeElement) as IfcEdge; mOrientation = e.mOrientation; }
-		public IfcOrientedEdge(IfcEdge e, bool sense) : base(e.mDatabase) { mEdgeElement = e.mIndex; mOrientation = sense; }
-		public IfcOrientedEdge(IfcVertexPoint a, IfcVertexPoint b) : base(a.mDatabase) { mEdgeElement = new IfcEdge(a, b).mIndex; }
+		public IfcOrientedEdge(IfcEdge e, bool sense) : base(e.mDatabase) { EdgeElement = e; mOrientation = sense; }
+		public IfcOrientedEdge(IfcVertexPoint a, IfcVertexPoint b) : base(a.mDatabase) { EdgeElement = new IfcEdge(a, b); }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			result.AddRange(EdgeElement.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public partial class IfcOuterBoundaryCurve : IfcBoundaryCurve

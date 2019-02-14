@@ -737,12 +737,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef //SUPERTYPE OF(IfcArbitraryProfileDefWithVoids)
 	{
-		private int mOuterCurve;// : IfcBoundedCurve
+		private int mOuterCurve;//: IfcCurve;
 		public IfcBoundedCurve OuterCurve { get { return mDatabase[mOuterCurve] as IfcBoundedCurve; } set { mOuterCurve = value.mIndex; } }
 
 		internal IfcArbitraryClosedProfileDef() : base() { }
 		internal IfcArbitraryClosedProfileDef(DatabaseIfc db, IfcArbitraryClosedProfileDef p) : base(db, p) { OuterCurve = db.Factory.Duplicate(p.OuterCurve) as IfcBoundedCurve; }
-		public IfcArbitraryClosedProfileDef(string name, IfcBoundedCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mOuterCurve = boundedCurve.mIndex; }//if (string.Compare(getKW, mKW) == 0) mModel.mArbProfiles.Add(this); }
+		public IfcArbitraryClosedProfileDef(string name, IfcCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mOuterCurve = boundedCurve.mIndex; }//if (string.Compare(getKW, mKW) == 0) mModel.mArbProfiles.Add(this); }
 
 		internal override void changeSchema(ReleaseVersion schema)
 		{
@@ -769,7 +769,7 @@ namespace GeometryGym.Ifc
 		internal IfcArbitraryProfileDefWithVoids() : base() { }
 		internal IfcArbitraryProfileDefWithVoids(DatabaseIfc db, IfcArbitraryProfileDefWithVoids p) : base(db, p) { p.InnerCurves.ToList().ForEach(x => addVoid( db.Factory.Duplicate(x) as IfcCurve)); }
 		public IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner.mIndex); }
-		public IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, List<IfcCurve> inner) : base(name, perim) { inner.ForEach(x => addVoid(x)); }
+		public IfcArbitraryProfileDefWithVoids(string name, IfcBoundedCurve perim, IEnumerable<IfcCurve> inner) : base(name, perim) { mInnerCurves.AddRange(inner.Select(x=>x.StepId)); }
 		
 		internal override void changeSchema(ReleaseVersion schema)
 		{

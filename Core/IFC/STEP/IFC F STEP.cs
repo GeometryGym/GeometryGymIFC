@@ -56,20 +56,20 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mBound) + "," + ParserSTEP.BoolToString(mOrientation); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBound.StepId + "," + ParserSTEP.BoolToString(mOrientation); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mBound = ParserSTEP.StripLink(str, ref pos, len);
+			Bound = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLoop;
 			mOrientation = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
 	public partial class IfcFaceSurface : IfcFace, IfcSurfaceOrFaceSurface //SUPERTYPE OF(IfcAdvancedFace)
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mFaceSurface) + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mFaceSurface.StepId + "," + ParserSTEP.BoolToString(mSameSense); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mFaceSurface = ParserSTEP.StripLink(str, ref pos, len);
+			FaceSurface = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurface;
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}

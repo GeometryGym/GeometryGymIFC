@@ -71,6 +71,8 @@ namespace GeometryGym.STEP
 				c = strLine[++jcounter];
 			//if (c != 'I')
 			//	return;
+			if (c == '(')
+				c = strLine[++jcounter];
 			for (; jcounter < jlast; jcounter++)
 			{
 				c = strLine[jcounter];
@@ -112,7 +114,7 @@ namespace GeometryGym.STEP
 			if (string.IsNullOrEmpty(str))
 				return double.NaN;
 			string s = str.Trim();
-			if (s == "$")
+			if (s[0] == '$')
 				return double.NaN;
 			if (s == "*")
 				return 0;
@@ -784,10 +786,12 @@ namespace GeometryGym.STEP
 			{
 				if (++icounter < len)
 				{
-					while (s[icounter++] != ',')
+					char c = s[icounter++];
+					while (c != ',' && c != ')') 
 					{
 						if (icounter == len)
 							break;
+						c = s[icounter++];
 					}
 				}
 				pos = icounter;
@@ -797,10 +801,12 @@ namespace GeometryGym.STEP
 			{
 				if (++icounter < len)
 				{
-					while (s[icounter++] != ',')
+					char c = s[icounter++];
+					while (c != ',' && c != ')')
 					{
 						if (icounter == len)
 							break;
+						c = s[icounter++];
 					}
 				}
 				pos = icounter;
@@ -816,10 +822,12 @@ namespace GeometryGym.STEP
 			}
 			if (icounter < len)
 			{
-				while (s[icounter++] != ',')
+				char c = s[icounter++];
+				while (c != ',' && c != ')')
 				{
 					if (icounter == len)
 						break;
+					c = s[icounter++];
 				}
 			}
 			pos = icounter;
@@ -838,10 +846,12 @@ namespace GeometryGym.STEP
 			{
 				if (++icounter < len)
 				{
-					while (s[icounter++] != ',')
+					char c = s[icounter++];
+					while (c != ',' && c != ')')
 					{
 						if (icounter == len)
 							break;
+						c = s[icounter++];
 					}
 				}
 				pos = icounter;
@@ -859,10 +869,12 @@ namespace GeometryGym.STEP
 			}
 			if (icounter < len)
 			{
-				while (s[icounter++] != ',')
+				char c = s[icounter++];
+				while (c != ',' && c != ')')
 				{
 					if (icounter == len)
 						break;
+					c = s[icounter++];
 				}
 			}
 			pos = icounter;
@@ -1277,6 +1289,8 @@ namespace GeometryGym.STEP
 					icounter++;
 				if (s[icounter++] != ')')
 						throw new Exception("Unrecognized format!");
+				if (icounter == len)
+					break;
 				while (char.IsWhiteSpace(s[icounter]))
 					icounter++;
 				if (s[icounter] != ')')

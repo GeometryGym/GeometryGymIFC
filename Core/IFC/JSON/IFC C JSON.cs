@@ -121,10 +121,10 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("Axis1", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Axis1 = mDatabase.parseJObject<IfcDirection>(jobj);
+				Axis1 = mDatabase.ParseJObject<IfcDirection>(jobj);
 			jobj = obj.GetValue("Axis2", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Axis2 = mDatabase.parseJObject<IfcDirection>(jobj);
+				Axis2 = mDatabase.ParseJObject<IfcDirection>(jobj);
 			jobj = obj.GetValue("LocalOrigin", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 			{
@@ -132,7 +132,7 @@ namespace GeometryGym.Ifc
 				if (jtoken != null)
 					mLocalOrigin = jtoken.Value<int>();
 				else
-					LocalOrigin = mDatabase.parseJObject<IfcCartesianPoint>(jobj);
+					LocalOrigin = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
 			}
 			JToken token = obj.GetValue("Scale", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
@@ -158,7 +158,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("Axis3", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Axis3 = mDatabase.parseJObject<IfcDirection>(jobj);
+				Axis3 = mDatabase.ParseJObject<IfcDirection>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -264,7 +264,7 @@ namespace GeometryGym.Ifc
 			{
 				JObject jobj = token as JObject;
 				if (jobj != null)
-					ReferencedSource = mDatabase.parseJObject<IfcClassificationReferenceSelect>(jobj);
+					ReferencedSource = mDatabase.ParseJObject<IfcClassificationReferenceSelect>(jobj);
 			}
 			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
@@ -390,7 +390,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ConstraintSource", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				ConstraintSource = token.Value<string>();
-			CreatingActor = mDatabase.parseJObject<IfcActorSelect>(obj.GetValue("CreatingActor", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			CreatingActor = mDatabase.ParseJObject<IfcActorSelect>(obj.GetValue("CreatingActor", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcExternalReferenceRelationship er in ers)
 				er.RelatedResourceObjects.Add(this);
@@ -467,7 +467,7 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				Phase = token.Value<string>();
 			RepresentationContexts.AddRange(mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray));
-			UnitsInContext = mDatabase.parseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			UnitsInContext = mDatabase.ParseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => x.RelatedObjects.Add(this));
 			mDatabase.extractJArray<IfcRelDeclares>(obj.GetValue("Declares", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => x.RelatingContext = this);
 
@@ -588,10 +588,32 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCsgPrimitive3D : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBlock ,IfcRectangularPyramid ,IfcRightCircularCone ,IfcRightCircularCylinder ,IfcSphere))*/
 	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Position = mDatabase.ParseJObject<IfcAxis2Placement3D>(jobj);
+		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Position"] = Position.getJson(this, options);
+		}
+	}
+	public partial class IfcCsgSolid : IfcSolidModel
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("TreeRootExpression", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				TreeRootExpression = mDatabase.ParseJObject<IfcCsgSelect>(jobj);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["TreeRootExpression"] = TreeRootExpression.getJson(this, options);
 		}
 	}
 	public partial class IfcCShapeProfileDef : IfcParameterizedProfileDef
@@ -662,7 +684,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("StartPoint", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				StartPoint = mDatabase.parseJObject<IfcCartesianPoint>(token as JObject);
+				StartPoint = mDatabase.ParseJObject<IfcCartesianPoint>(token as JObject);
 			token = obj.GetValue("StartDirection", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				StartDirection = token.Value<double>();

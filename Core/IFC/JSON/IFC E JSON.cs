@@ -35,16 +35,18 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("EdgeStart", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				EdgeStart = mDatabase.parseJObject<IfcVertex>(jobj);
+				EdgeStart = mDatabase.ParseJObject<IfcVertex>(jobj);
 			jobj = obj.GetValue("EdgeEnd", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				EdgeEnd = mDatabase.parseJObject<IfcVertex>(jobj);
+				EdgeEnd = mDatabase.ParseJObject<IfcVertex>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["EdgeStart"] = mDatabase[mEdgeStart].getJson(this, options);
-			obj["EdgeEnd"] = mDatabase[mEdgeEnd].getJson(this, options);
+			if(mEdgeStart != null)
+				obj["EdgeStart"] = EdgeStart.getJson(this, options);
+			if(mEdgeEnd != null)
+				obj["EdgeEnd"] = mEdgeEnd.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
@@ -216,7 +218,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			RelatingReference = mDatabase.parseJObject<IfcExternalReference>(obj.GetValue("RelatingReference", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			RelatingReference = mDatabase.ParseJObject<IfcExternalReference>(obj.GetValue("RelatingReference", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			RelatedResourceObjects.AddRange(mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -237,7 +239,7 @@ namespace GeometryGym.Ifc
 				if (jtoken != null)
 					mExtrudedDirection = jtoken.Value<int>();
 				else
-					ExtrudedDirection = mDatabase.parseJObject<IfcDirection>(jobj);
+					ExtrudedDirection = mDatabase.ParseJObject<IfcDirection>(jobj);
 			}
 			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)

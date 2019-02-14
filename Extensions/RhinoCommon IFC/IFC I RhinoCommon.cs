@@ -157,4 +157,8 @@ namespace GeometryGym.Ifc
 			return new IfcIndexedPolyCurve(cpl, segs) { };
 		}
 	}
+	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
+	{
+		public override Curve Curve { get { return Curve3D.Curve; } }
+	}
 }

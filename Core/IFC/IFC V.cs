@@ -71,12 +71,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
+		//INVERSE
+		internal List<IfcEdge> mAttachedEdges = new List<IfcEdge>(); // GG attribute
+
 		internal IfcVertex() : base() { }
 		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
 		public IfcVertex(DatabaseIfc db) : base(db) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
+	[Obsolete("DEPRECEATED IFC4", false)]
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
 	{
 		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
@@ -99,10 +102,17 @@ namespace GeometryGym.Ifc
 	{
 		internal int mVertexGeometry;// : IfcPoint; 
 		public IfcPoint VertexGeometry { get { return mDatabase[mVertexGeometry] as IfcPoint; } set { mVertexGeometry = value.mIndex; } }
-
+		
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
 		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
+
+		protected override List<T> Extract<T>(Type type)
+		{
+			List<T> result = base.Extract<T>(type);
+			result.AddRange(VertexGeometry.Extract<T>());
+			return result;
+		}
 	}
 	[Serializable]
 	public partial class IfcVibrationIsolator : IfcElementComponent

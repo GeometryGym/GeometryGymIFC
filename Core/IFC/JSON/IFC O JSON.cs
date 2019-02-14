@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 				rdp.RelatedObjects.Add(this);
 			JObject jobj = obj.GetValue("IsTypedBy", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				IsTypedBy = mDatabase.parseJObject<IfcRelDefinesByType>(jobj);
+				IsTypedBy = mDatabase.ParseJObject<IfcRelDefinesByType>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -243,10 +243,10 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("OwningUser", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				OwningUser = mDatabase.parseJObject<IfcPersonAndOrganization>(jobj);
+				OwningUser = mDatabase.ParseJObject<IfcPersonAndOrganization>(jobj);
 			jobj = obj.GetValue("OwningApplication", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				OwningApplication = mDatabase.parseJObject<IfcApplication>(jobj);
+				OwningApplication = mDatabase.ParseJObject<IfcApplication>(jobj);
 			JToken token = obj.GetValue("State", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcStateEnum>(token.Value<string>(), true, out mState);
@@ -258,10 +258,10 @@ namespace GeometryGym.Ifc
 				mLastModifiedDate = token.Value<int>();
 			jobj = obj.GetValue("LastModifyingUser", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				LastModifyingUser = mDatabase.parseJObject<IfcPersonAndOrganization>(jobj);
+				LastModifyingUser = mDatabase.ParseJObject<IfcPersonAndOrganization>(jobj);
 			jobj = obj.GetValue("LastModifyingApplication", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				LastModifyingApplication = mDatabase.parseJObject<IfcApplication>(jobj);
+				LastModifyingApplication = mDatabase.ParseJObject<IfcApplication>(jobj);
 			token = obj.GetValue("CreationDate", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				mCreationDate = token.Value<int>();

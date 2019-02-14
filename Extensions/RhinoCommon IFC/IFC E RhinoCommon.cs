@@ -29,7 +29,13 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcEllipse : IfcConic
 	{
-		public override Curve Curve { get { return Ellipse.ToNurbsCurve(); } }
-		public Ellipse Ellipse { get { return new Ellipse(base.Plane, mSemiAxis1, mSemiAxis2); } }
+		public override Curve Curve { get { return Ellipse(true).ToNurbsCurve(); } }
+		public Ellipse Ellipse(bool sameSense)
+		{
+			Plane plane = base.Plane;
+			if (!sameSense)
+				plane = new Plane(plane.Origin, plane.XAxis, -plane.YAxis);
+			return new Ellipse(plane, mSemiAxis1, mSemiAxis2);
+		}
 	} 
 }

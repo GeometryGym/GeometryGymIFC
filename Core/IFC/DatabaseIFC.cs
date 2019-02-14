@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc(TextReader stream) : this() { ReadFile(stream, 0); }
 		public DatabaseIfc(ModelView view) : this(true, view) { }
 		public DatabaseIfc(DatabaseIfc db) : this() { mRelease = db.mRelease; mModelView = db.mModelView; Tolerance = db.Tolerance; }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.Ifc2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4A1, view) { }
+		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.Ifc2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4X2, view) { }
 		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate, schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
 		private DatabaseIfc(bool generate, ReleaseVersion schema, ModelView view) : this()
 		{
@@ -201,7 +201,7 @@ namespace GeometryGym.Ifc
 			return hdr;
 		}
 		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; } 
-		public override string ToString()
+		public string ToSTEP()
 		{
 			string result = getHeaderString("") + "\r\n";
 			foreach(BaseClassIfc e in this)
@@ -305,7 +305,7 @@ namespace GeometryGym.Ifc
 					break;
 				case FormatIfcSerialization.JSON:
 #if (NOIFCJSON)
-					logError("IfcJSON not enabled!");
+					logParseError("IfcJSON not enabled!");
 					return;
 #else
 					ReadJSONFile(fs.mTextReader);

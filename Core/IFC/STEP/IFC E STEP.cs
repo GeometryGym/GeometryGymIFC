@@ -34,12 +34,12 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			IfcOrientedEdge oe = this as IfcOrientedEdge;
-			return base.BuildStringSTEP(release) + (oe == null ? "," + ParserSTEP.LinkToString(mEdgeStart) + "," + ParserSTEP.LinkToString(mEdgeEnd) : ",*,*");
+			return base.BuildStringSTEP(release) + (oe == null ? ",#" + mEdgeStart.Index + ",#" + mEdgeEnd.Index : ",*,*");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mEdgeStart = ParserSTEP.StripLink(str, ref pos, len);
-			mEdgeEnd = ParserSTEP.StripLink(str, ref pos, len);
+			EdgeStart = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVertex;
+			EdgeEnd = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVertex;
 		}
 	}
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
@@ -70,14 +70,11 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(";
-			if (mEdgeList.Count > 0)
-				str += ParserSTEP.LinkToString(mEdgeList[0]);
-			for (int icounter = 1; icounter < mEdgeList.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mEdgeList[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", EdgeList.Select(x => x.StepId.ToString())) + ")";
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mEdgeList = ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		{
+			mEdgeList.AddRange(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).Select(x=>dictionary[x] as IfcOrientedEdge)); }
 	}
 	public partial class IfcElectricAppliance : IfcFlowTerminal //IFC4
 	{
@@ -324,7 +321,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcEllipse : IfcConic
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mSemiAxis1) + "," + ParserSTEP.DoubleToString(mSemiAxis2); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mSemiAxis1, mDatabase.mLengthDigits)) + "," + ParserSTEP.DoubleToString(Math.Round(mSemiAxis2, mDatabase.mLengthDigits)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

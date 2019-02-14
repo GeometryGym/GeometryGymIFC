@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("Points", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Points = mDatabase.parseJObject<IfcCartesianPointList>(jobj);
+				Points = mDatabase.ParseJObject<IfcCartesianPointList>(jobj);
 			JArray array = obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
 			{

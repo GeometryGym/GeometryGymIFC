@@ -202,17 +202,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + "," + mDegree + ",(";
-			str += ParserSTEP.LinkToString(mControlPointsList[0]);
-			for (int icounter = 1; icounter < mControlPointsList.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mControlPointsList[icounter]);
-			return str + "),." + mCurveForm.ToString() + ".," + ParserIfc.LogicalToString(mClosedCurve) + "," +
-				ParserIfc.LogicalToString(mSelfIntersect);
+			return base.BuildStringSTEP(release) + "," + mDegree + ",(#" + string.Join(",#", mControlPointsList.Select(x=>x.StepId.ToString())) +
+				"),." + mCurveForm.ToString() + ".," + ParserIfc.LogicalToString(mClosedCurve) + "," + ParserIfc.LogicalToString(mSelfIntersect);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mDegree = int.Parse(ParserSTEP.StripField(str, ref pos, len));
-			mControlPointsList = ParserSTEP.StripListLink(str, ref pos, len);
+			ControlPointsList.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcCartesianPoint));
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcBSplineCurveForm> (s.Replace(".", ""), true, out mCurveForm);

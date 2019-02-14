@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 			JObject jobj = obj.GetValue("Dimensions", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Dimensions = mDatabase.parseJObject<IfcDimensionalExponents>(jobj);
+				Dimensions = mDatabase.ParseJObject<IfcDimensionalExponents>(jobj);
 			JToken token = obj.GetValue("UnitType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcUnitEnum>(token.Value<string>(), out mUnitType);

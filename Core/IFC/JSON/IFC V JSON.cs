@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject rp = obj.GetValue("VertexGeometry", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				VertexGeometry = mDatabase.parseJObject<IfcPoint>(rp);
+				VertexGeometry = mDatabase.ParseJObject<IfcPoint>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

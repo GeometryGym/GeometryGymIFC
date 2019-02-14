@@ -87,17 +87,17 @@ namespace GeometryGym.Ifc
 		internal void addEdge(IfcOrientedEdge edge) { mEdgeList.Add(edge.mIndex); }
 	}
 	[Serializable]
-	public partial class IfcPCurve : IfcCurve
+	public partial class IfcPcurve : IfcCurve
 	{
-		internal int mBasisSurface;// :	IfcSurface;
-		internal int mReferenceCurve;// :	IfcCurve; 
+		internal IfcSurface mBasisSurface;// :	IfcSurface;
+		internal IfcCurve mReferenceCurve;// :	IfcCurve; 
 
-		public IfcSurface BasisSurface { get { return mDatabase[mBasisSurface] as IfcSurface; } set { mBasisSurface = value.mIndex; } }
-		public IfcCurve ReferenceCurve { get { return mDatabase[mReferenceCurve] as IfcCurve; } set { mReferenceCurve = value.mIndex; } }
+		public IfcSurface BasisSurface { get { return mBasisSurface; } set { mBasisSurface = value; } }
+		public IfcCurve ReferenceCurve { get { return mReferenceCurve; } set { mReferenceCurve = value; } }
 
-		internal IfcPCurve() : base() { }
-		internal IfcPCurve(DatabaseIfc db, IfcPCurve c) : base(db, c) { BasisSurface = db.Factory.Duplicate(c.BasisSurface) as IfcSurface; ReferenceCurve = db.Factory.Duplicate(c.ReferenceCurve) as IfcCurve; }
-		public IfcPCurve(IfcSurface basisSurface, IfcCurve referenceCurve) : base(basisSurface.mDatabase) { BasisSurface = basisSurface; ReferenceCurve = referenceCurve; }
+		internal IfcPcurve() : base() { }
+		internal IfcPcurve(DatabaseIfc db, IfcPcurve c) : base(db, c) { BasisSurface = db.Factory.Duplicate(c.BasisSurface) as IfcSurface; ReferenceCurve = db.Factory.Duplicate(c.ReferenceCurve) as IfcCurve; }
+		public IfcPcurve(IfcSurface basisSurface, IfcCurve referenceCurve) : base(basisSurface.mDatabase) { BasisSurface = basisSurface; ReferenceCurve = referenceCurve; }
 	}
 	[Serializable]
 	public partial class IfcPerformanceHistory : IfcControl

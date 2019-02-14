@@ -118,7 +118,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcSeamCurve() : base() { }
 		internal IfcSeamCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
-		public IfcSeamCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
+		public IfcSeamCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
 	public partial class IfcSectionedSolid : IfcSolidModel
@@ -327,7 +327,7 @@ namespace GeometryGym.Ifc
 		protected IfcShapeModel() : base() { }
 		protected IfcShapeModel(IfcRepresentationItem item) : base(item.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), item) { }
 		protected IfcShapeModel(IfcGeometricRepresentationContext context, IfcRepresentationItem item) : base(context, item) { }
-		protected IfcShapeModel(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> reps) : base(context, reps) { }
+		protected IfcShapeModel(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> reps) : base(context, reps) { }
 		protected IfcShapeModel(DatabaseIfc db, IfcShapeModel m) : base(db, m)
 		{
 #warning todo
@@ -361,7 +361,7 @@ additional types	some additional representation types are given:
 		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r) : base(db, r) { }
 		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = "AdvancedBrep"; }
 		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? "Clipping" : "CSG"; }
 		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = "BoundingBox"; }
@@ -2030,40 +2030,41 @@ additional types	some additional representation types are given:
 		protected IfcSurface() : base() { }
 		protected IfcSurface(DatabaseIfc db, IfcSurface s) : base(db,s) { }
 		protected IfcSurface(DatabaseIfc db) : base(db) { }
+
+		//INVERSE gg
+		public List<IfcFaceSurface> OfFaces = new List<IfcFaceSurface>();
 	}
 	[Serializable]
 	public partial class IfcSurfaceCurve : IfcCurve //IFC4 Add2
 	{
-		private int mCurve3D;//: IfcCurve;
-		internal List<int> mAssociatedGeometry = new List<int>();// : SET [1:2] OF IfcTrimmingSelect;
+		private IfcCurve mCurve3D;//: IfcCurve;
+		internal SET<IfcPcurve> mAssociatedGeometry = new SET<IfcPcurve>();// : SET [1:2] OF IfcTrimmingSelect;
 		internal IfcPreferredSurfaceCurveRepresentation mMasterRepresentation = IfcPreferredSurfaceCurveRepresentation.CURVE3D;// : IfcPreferredSurfaceCurveRepresentation; 
 
-		public IfcCurve Curve3D { get { return mDatabase[mCurve3D] as IfcCurve; } set { mCurve3D = value.mIndex; } }
-		public ReadOnlyCollection<IfcPCurve> AssociatedGeometry { get { return new ReadOnlyCollection<IfcPCurve>( mAssociatedGeometry.ConvertAll(x => mDatabase[x] as IfcPCurve)); } }
+		public IfcCurve Curve3D { get { return mCurve3D; } set { mCurve3D = value; } }
+		public SET<IfcPcurve> AssociatedGeometry { get { return mAssociatedGeometry; } }
 		public IfcPreferredSurfaceCurveRepresentation MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
 
 		internal IfcSurfaceCurve() : base() { }
 		internal IfcSurfaceCurve(DatabaseIfc db, IfcSurfaceCurve c) : base(db, c)
 		{
 			Curve3D = db.Factory.Duplicate(c.Curve3D) as IfcCurve;
-			c.AssociatedGeometry.ToList().ForEach(x => addAssociatedGeometry( db.Factory.Duplicate(x) as IfcPCurve));
+			AssociatedGeometry.AddRange(c.AssociatedGeometry.Select(x => db.Factory.Duplicate(x) as IfcPcurve));
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve, IfcPCurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
+		internal IfcSurfaceCurve(IfcCurve curve, IfcPcurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
 		{
 			Curve3D = curve;
-			addAssociatedGeometry( p1);
+			AssociatedGeometry.Add(p1);
 			mMasterRepresentation = cr;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve, IfcPCurve p1, IfcPCurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
+		internal IfcSurfaceCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
 		{
 			Curve3D = curve;
-			addAssociatedGeometry(p1);
-			addAssociatedGeometry(p2);
+			AssociatedGeometry.Add(p1);
+			AssociatedGeometry.Add(p2);
 			mMasterRepresentation = cr;
 		}
-
-		internal void addAssociatedGeometry(IfcPCurve curve) { mAssociatedGeometry.Add(curve.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcSurfaceCurveSweptAreaSolid : IfcSweptAreaSolid

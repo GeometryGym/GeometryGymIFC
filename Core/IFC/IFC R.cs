@@ -123,6 +123,11 @@ namespace GeometryGym.Ifc
 			for (int icounter = 0; icounter < s.mWeightsData.Count; icounter++)
 				mWeightsData.Add(new List<double>(s.mWeightsData[icounter].ToArray()));
 		}
+		public IfcRationalBSplineSurfaceWithKnots(int uDegree, int vDegree, List<List<IfcCartesianPoint>> controlPoints, IfcBSplineSurfaceForm form, IfcLogicalEnum uClosed, IfcLogicalEnum vClosed, IfcLogicalEnum selfIntersect, List<int> uMultiplicities, List<int> vMultiplicities, List<double> uKnots, List<double> vKnots, IfcKnotType type, List<List<double>> weights)
+			: base(uDegree, vDegree, controlPoints, form, uClosed, vClosed, selfIntersect, uMultiplicities, vMultiplicities, uKnots, vKnots, type)
+		{
+			mWeightsData.AddRange(weights);
+		}
 	}
 	[Serializable]
 	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
@@ -2206,7 +2211,7 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcRepresentation(IfcRepresentationContext context) : base(context.mDatabase) { ContextOfItems = context; RepresentationIdentifier = context.ContextIdentifier; }
 		protected IfcRepresentation(IfcRepresentationContext context, IfcRepresentationItem ri) : this(context) { mItems.Add(ri); }
-		protected IfcRepresentation(IfcRepresentationContext context, List<IfcRepresentationItem> reps) : this(context) { Items.AddRange(reps); }
+		protected IfcRepresentation(IfcRepresentationContext context, IEnumerable<IfcRepresentationItem> reps) : this(context) { Items.AddRange(reps); }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -2317,7 +2322,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mMappingOrigin;// : IfcAxis2Placement;
 		internal int mMappedRepresentation;// : IfcRepresentation;
-										   //INVERSE
+		//INVERSE
 		internal List<IfcShapeAspect> mHasShapeAspects = new List<IfcShapeAspect>();//	:	SET [0:?] OF IfcShapeAspect FOR PartOfProductDefinitionShape;
 		internal List<IfcMappedItem> mMapUsage = new List<IfcMappedItem>();//: 	SET OF IfcMappedItem FOR MappingSource;
 

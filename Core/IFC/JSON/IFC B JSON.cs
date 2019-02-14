@@ -112,10 +112,10 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBooleanOperator>(token.Value<string>(), true, out mOperator);
 			JObject jobj = obj.GetValue("FirstOperand", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				FirstOperand = mDatabase.parseJObject<IfcBooleanOperand>(jobj);
+				FirstOperand = mDatabase.ParseJObject<IfcBooleanOperand>(jobj);
 			jobj = obj.GetValue("SecondOperand", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				SecondOperand = mDatabase.parseJObject<IfcBooleanOperand>(jobj);
+				SecondOperand = mDatabase.ParseJObject<IfcBooleanOperand>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("BuildingAddress", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				BuildingAddress = mDatabase.parseJObject<IfcPostalAddress>(jobj);
+				BuildingAddress = mDatabase.ParseJObject<IfcPostalAddress>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

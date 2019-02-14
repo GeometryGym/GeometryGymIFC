@@ -329,7 +329,7 @@ namespace GeometryGym.Ifc
 				return;
 			IfcProductDefinitionShape pds = Representation as IfcProductDefinitionShape;
 			if (pds == null)
-				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcGeometricCurveSet(axis.ConvertAll(x => (IfcGeometricSetSelect)x.AxisCurve))));
+				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint), new IfcGeometricCurveSet(axis.ConvertAll(x => (IfcGeometricSetSelect)x.AxisCurve)), ShapeRepresentationType.GeometricCurveSet));
 			else
 			{
 				foreach (IfcShapeModel sm in pds.Representations)

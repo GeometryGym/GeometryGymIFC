@@ -40,7 +40,7 @@ namespace GeometryGym.Ifc
 			if (jobj == null)
 				Position = mDatabase.Factory.Origin2dPlace;
 			else
-				Position = mDatabase.parseJObject<IfcAxis2Placement2D>(jobj);
+				Position = mDatabase.ParseJObject<IfcAxis2Placement2D>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -123,10 +123,10 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("ThePerson", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				ThePerson = mDatabase.parseJObject<IfcPerson>(token as JObject);
+				ThePerson = mDatabase.ParseJObject<IfcPerson>(token as JObject);
 			token = obj.GetValue("TheOrganization", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				TheOrganization = mDatabase.parseJObject<IfcOrganization>(token as JObject);
+				TheOrganization = mDatabase.ParseJObject<IfcOrganization>(token as JObject);
 			Roles.AddRange(mDatabase.extractJArray<IfcActorRole>(obj.GetValue("Roles", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -189,7 +189,7 @@ namespace GeometryGym.Ifc
 			{
 				JObject jobj = token as JObject;
 				if (jobj != null)
-					Location = mDatabase.parseJObject<IfcCartesianPoint>(jobj);
+					Location = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -309,11 +309,11 @@ namespace GeometryGym.Ifc
 		{
 			JObject jobj = obj.GetValue("ObjectPlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				ObjectPlacement = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
+				ObjectPlacement = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
 			base.parseJObject(obj);
 			jobj = obj.GetValue("Representation", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Representation = mDatabase.parseJObject<IfcProductRepresentation>(jobj);
+				Representation = mDatabase.ParseJObject<IfcProductRepresentation>(jobj);
 
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -350,7 +350,7 @@ namespace GeometryGym.Ifc
 			{
 				foreach (JObject jobj in array)
 				{
-					IfcProduct product = mDatabase.parseJObject<IfcProduct>(jobj);
+					IfcProduct product = mDatabase.ParseJObject<IfcProduct>(jobj);
 					if (product != null)
 						mShapeOfProduct.Add(product);
 				}
@@ -566,7 +566,7 @@ namespace GeometryGym.Ifc
 				mEnumerationValues.AddRange(array.Select(x => DatabaseIfc.ParseValue(x as JObject)));
 			JObject jobj = obj.GetValue("EnumerationReference", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				EnumerationReference = mDatabase.parseJObject<IfcPropertyEnumeration>(jobj);
+				EnumerationReference = mDatabase.ParseJObject<IfcPropertyEnumeration>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -652,7 +652,7 @@ namespace GeometryGym.Ifc
 				NominalValue = DatabaseIfc.ParseValue(jobj);
 			jobj = obj.GetValue("Unit", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Unit = mDatabase.parseJObject<IfcUnit>(jobj);
+				Unit = mDatabase.ParseJObject<IfcUnit>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

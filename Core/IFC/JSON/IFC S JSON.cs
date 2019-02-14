@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ProductDefinitional", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcLogicalEnum>(token.Value<string>(), true, out mProductDefinitional);
-			PartOfProductDefinitionShape = mDatabase.parseJObject<IfcProductRepresentationSelect>(obj.GetValue("PartOfProductDefinitionShape", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			PartOfProductDefinitionShape = mDatabase.ParseJObject<IfcProductRepresentationSelect>(obj.GetValue("PartOfProductDefinitionShape", StringComparison.InvariantCultureIgnoreCase) as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -279,7 +279,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLogicalEnum>(token.Value<string>(), true, out mDestabilizingLoad);
 			JObject rp = obj.GetValue("CausedBy", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				CausedBy = mDatabase.parseJObject<IfcStructuralReaction>(rp);
+				CausedBy = mDatabase.ParseJObject<IfcStructuralReaction>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -302,13 +302,13 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject rp = obj.GetValue("AppliedLoad", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				AppliedLoad = mDatabase.parseJObject<IfcStructuralLoad>(rp);
+				AppliedLoad = mDatabase.ParseJObject<IfcStructuralLoad>(rp);
 			JToken token = obj.GetValue("GlobalOrLocal", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcGlobalOrLocalEnum>(token.Value<string>(), true, out mGlobalOrLocal);
 			rp = obj.GetValue("AssignedToStructuralItem", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				AssignedToStructuralItem = mDatabase.parseJObject<IfcRelConnectsStructuralActivity>(rp);
+				AssignedToStructuralItem = mDatabase.ParseJObject<IfcRelConnectsStructuralActivity>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -329,7 +329,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAnalysisModelTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 			JObject rp = obj.GetValue("OrientationOf2DPlane", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				OrientationOf2DPlane = mDatabase.parseJObject<IfcAxis2Placement3D>(rp);
+				OrientationOf2DPlane = mDatabase.ParseJObject<IfcAxis2Placement3D>(rp);
 			mDatabase.extractJArray<IfcStructuralLoadGroup>(obj.GetValue("LoadedBy", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addLoadGroup(x));
 			mDatabase.extractJArray<IfcStructuralResultGroup>(obj.GetValue("HasResults", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addResultGroup(x));
 			token = obj.GetValue("SharedPlacement", StringComparison.InvariantCultureIgnoreCase) as JToken;
@@ -337,7 +337,7 @@ namespace GeometryGym.Ifc
 			{
 				JObject jobj = token as JObject;
 				if (jobj != null)
-					SharedPlacement = mDatabase.parseJObject<IfcObjectPlacement>(jobj);
+					SharedPlacement = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
 				else
 					mSharedPlacement = token.Value<int>();
 			}
@@ -365,7 +365,7 @@ namespace GeometryGym.Ifc
 
 			JObject rp = obj.GetValue("AppliedCondition", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				AppliedCondition = mDatabase.parseJObject<IfcBoundaryCondition>(rp);
+				AppliedCondition = mDatabase.ParseJObject<IfcBoundaryCondition>(rp);
 			mConnectsStructuralMembers.AddRange(mDatabase.extractJArray<IfcRelConnectsStructuralMember>(obj.GetValue("ConnectsStructuralMembers", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -430,7 +430,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcStructuralCurveMemberTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 			JObject rp = obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				Axis = mDatabase.parseJObject<IfcDirection>(rp);
+				Axis = mDatabase.ParseJObject<IfcDirection>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -577,7 +577,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject rp = obj.GetValue("ConditionCoordinateSystem", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (rp != null)
-				ConditionCoordinateSystem = mDatabase.parseJObject<IfcAxis2Placement3D>(rp);
+				ConditionCoordinateSystem = mDatabase.ParseJObject<IfcAxis2Placement3D>(rp);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -672,7 +672,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("SweptArea", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				SweptArea = mDatabase.parseJObject<IfcProfileDef>(jobj);
+				SweptArea = mDatabase.ParseJObject<IfcProfileDef>(jobj);
 			jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 			{
@@ -680,7 +680,7 @@ namespace GeometryGym.Ifc
 				if (token != null)
 					mPosition = token.Value<int>();
 				else
-					Position = mDatabase.parseJObject<IfcAxis2Placement3D>(jobj);
+					Position = mDatabase.ParseJObject<IfcAxis2Placement3D>(jobj);
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

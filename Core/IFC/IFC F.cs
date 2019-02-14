@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -31,7 +32,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
-		internal SET<IfcFaceBound> mBounds = new SET<IfcFaceBound>();// : SET [1:?] OF IfcFaceBound;
+		private SET<IfcFaceBound> mBounds = new SET<IfcFaceBound>();// : SET [1:?] OF IfcFaceBound;
 		public SET<IfcFaceBound> Bounds { get { return mBounds; } set { mBounds.Clear(); if (value != null) mBounds = value; } }
 
 		internal IfcFace() : base() { }
@@ -40,6 +41,32 @@ namespace GeometryGym.Ifc
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner); }
 		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds.AddRange(bounds); }
 
+		protected override void initialize()
+		{
+			base.initialize();
+			mBounds.CollectionChanged += mBounds_CollectionChanged;
+		}
+		private void mBounds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcFaceBound bound in e.NewItems)
+				{
+					bound.mBoundOf = this;
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcFaceBound bound in e.OldItems)
+				{
+					if (bound.mBoundOf == this)
+						bound.mBoundOf = null;
+				}
+			}
+		}
+
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -47,7 +74,6 @@ namespace GeometryGym.Ifc
 				result.AddRange(b.Extract<T>());
 			return result;
 		}
-
 	}
 	[Serializable]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
@@ -65,15 +91,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
-		internal int mBound;// : IfcLoop;
+		private IfcLoop mBound;// : IfcLoop;
 		internal bool mOrientation = true;// : BOOLEAN;
+		//INVERSE GG
+		internal IfcFace mBoundOf = null;
 
-		public IfcLoop Bound { get { return mDatabase[mBound] as IfcLoop; } set { mBound = value.mIndex; } }
+		public IfcLoop Bound { get { return mBound; } set { if (mBound != null) mBoundOf = null; mBound = value; if (value != null) mBound.mLoopOf = this; } }
 		public bool Orientation { get { return mOrientation; } set { mOrientation = value; } }
 
 		internal IfcFaceBound() : base() { }
 		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b) : base(db,b) { Bound = db.Factory.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
-		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { mBound = l.mIndex; mOrientation = orientation; }
+		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { Bound = l; mOrientation = orientation; }
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -91,17 +119,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFaceSurface : IfcFace, IfcSurfaceOrFaceSurface //SUPERTYPE OF(IfcAdvancedFace)
 	{
-		internal int mFaceSurface;// : IfcSurface;
+		internal IfcSurface mFaceSurface;// : IfcSurface;
 		internal bool mSameSense = true;// : BOOLEAN;
 
-		public IfcSurface FaceSurface { get { return mDatabase[mFaceSurface] as IfcSurface; } set { mFaceSurface = value.mIndex; } }
+		public IfcSurface FaceSurface { get { return mFaceSurface; } set { if (mFaceSurface != null) mFaceSurface.OfFaces.Remove(this); mFaceSurface = value; if (value != null) value.OfFaces.Add(this); } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 
 		internal IfcFaceSurface() : base() { } 
 		internal IfcFaceSurface(DatabaseIfc db, IfcFaceSurface s) : base(db,s) { FaceSurface = db.Factory.Duplicate( s.FaceSurface) as IfcSurface; mSameSense = s.mSameSense; }
-		public IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
-		public IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
-		public IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense) : base(bounds) { mFaceSurface = srf.mIndex; mSameSense = sameSense; }
+		public IfcFaceSurface(IfcFaceOuterBound bound, IfcSurface srf, bool sameSense) : base(bound) { FaceSurface = srf; mSameSense = sameSense; }
+		public IfcFaceSurface(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface srf, bool sameSense) : base(outer, inner) { FaceSurface = srf; mSameSense = sameSense; }
+		public IfcFaceSurface(List<IfcFaceBound> bounds, IfcSurface srf, bool sameSense) : base(bounds) { FaceSurface = srf; mSameSense = sameSense; }
 	}
 	[Serializable]
 	public partial class IfcFacetedBrep : IfcManifoldSolidBrep

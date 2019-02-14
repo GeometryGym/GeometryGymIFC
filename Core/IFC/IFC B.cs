@@ -352,13 +352,13 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
 	{
 		private int mDegree;// : INTEGER;
-		private List<int> mControlPointsList = new List<int>();// : LIST [2:?] OF IfcCartesianPoint;
+		private LIST<IfcCartesianPoint> mControlPointsList = new LIST<IfcCartesianPoint>();// : LIST [2:?] OF IfcCartesianPoint;
 		private IfcBSplineCurveForm mCurveForm;// : IfcBSplineCurveForm;
 		private IfcLogicalEnum mClosedCurve = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL; 
 
 		public int Degree { get { return mDegree; } }
-		public ReadOnlyCollection<IfcCartesianPoint> ControlPointsList { get { return new ReadOnlyCollection<IfcCartesianPoint>( mControlPointsList.ConvertAll(x =>mDatabase[x] as IfcCartesianPoint)); } }
+		public LIST<IfcCartesianPoint> ControlPointsList { get { return mControlPointsList; } }
 		public IfcBSplineCurveForm CurveForm { get { return mCurveForm; } }
 		public IfcLogicalEnum ClosedCurve { get { return mClosedCurve; } set { mClosedCurve = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
@@ -367,16 +367,15 @@ namespace GeometryGym.Ifc
 		protected IfcBSplineCurve(DatabaseIfc db, IfcBSplineCurve c) : base(db, c)
 		{
 			mDegree = c.mDegree;
-			c.ControlPointsList.ToList().ForEach(x => addControlPoint( db.Factory.Duplicate(x) as IfcCartesianPoint));
+			ControlPointsList.AddRange(c.ControlPointsList.Select(x=>db.Factory.Duplicate(x) as IfcCartesianPoint));
 			mCurveForm = c.mCurveForm;
 			mClosedCurve = c.mClosedCurve;
 			mSelfIntersect = c.mSelfIntersect;
 		}
 		private IfcBSplineCurve(DatabaseIfc db, int degree, IfcBSplineCurveForm form) : base(db) { mDegree = degree; mCurveForm = form; }
-		protected IfcBSplineCurve(int degree, List<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form)
-			: this(controlPoints[0].mDatabase, degree, form) { mControlPointsList = controlPoints.ConvertAll(x => x.mIndex); }
+		protected IfcBSplineCurve(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form)
+			: this(controlPoints.First().mDatabase, degree, form) { ControlPointsList.AddRange(controlPoints); }
 
-		internal void addControlPoint(IfcCartesianPoint point) { mControlPointsList.Add(point.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcBSplineCurveWithKnots : IfcBSplineCurve

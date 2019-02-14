@@ -160,6 +160,8 @@ namespace GeometryGym.Ifc
 				if (fields != null && fields.Length > 0)
 				{
 					mCoordinateX = ParserSTEP.ParseDouble(fields[0]);
+					if (double.IsNaN(mCoordinateX))
+						mCoordinateX = 0;
 					if (fields.Length > 1)
 					{
 						mCoordinateY = ParserSTEP.ParseDouble(fields[1]);

@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 				for (int icounter = 0; icounter < ilast; icounter++)
 				{
 					Point3d p3 = nonRationalCurve.Points[icounter].Location;
-					mControlPointsList.Add(new IfcCartesianPoint(m, new Point2d(p3.X, p3.Y)).mIndex);
+					mControlPointsList.Add(new IfcCartesianPoint(m, new Point2d(p3.X, p3.Y)));
 				}
 				if (nonRationalCurve.IsPeriodic)
 				{
@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 			else
 			{
 				for (int icounter = 0; icounter < ilast; icounter++)
-					mControlPointsList.Add(new IfcCartesianPoint(m, nonRationalCurve.Points[icounter].Location).mIndex);
+					mControlPointsList.Add(new IfcCartesianPoint(m, nonRationalCurve.Points[icounter].Location));
 				if (nonRationalCurve.IsPeriodic)
 				{
 					for (int icounter = 0; icounter < mDegree; icounter++)
