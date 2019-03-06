@@ -678,7 +678,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
 		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum place, IfcElementAssemblyTypeEnum type) : base(host.mDatabase) { mHost = host; AssemblyPlace = place; PredefinedType = type; }
 		 
-		protected override bool addProduct(IfcProduct product)
+		protected override void addProduct(IfcProduct product)
 		{
 			if (mIsDecomposedBy.Count == 0 || mIsDecomposedBy[0].mRelatedObjects.Count == 0)
 			{
@@ -690,7 +690,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 					new IfcRelAggregates(mHost, this);
 				}
 			}
-			return base.addProduct(product);
+			else
+				base.addProduct(product);
 		}
 	}
 	[Serializable]

@@ -457,7 +457,14 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelAssignsToGroup> IsGroupedBy { get { return new ReadOnlyCollection<IfcRelAssignsToGroup>( mIsGroupedBy); } }
 
 		internal IfcGroup() : base() { }
-		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { }
+		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream)
+		{
+			if(downStream)
+			{
+				foreach (IfcRelAssignsToGroup rags in g.mIsGroupedBy)
+					db.Factory.Duplicate(rags, ownerHistory, true);
+			}
+		}
 		public IfcGroup(DatabaseIfc db, string name) : base(db) { Name = name; }
 		public IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 

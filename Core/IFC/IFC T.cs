@@ -1007,22 +1007,29 @@ namespace GeometryGym.Ifc
 		internal void IsolateObject(string filename)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
-			db.Factory.Duplicate(this,true);
+			IfcTypeObject typeObject = db.Factory.Duplicate(this, true) as IfcTypeObject;
 			if (mObjectTypeOf != null)
 			{
 				foreach (IfcObject o in mObjectTypeOf.RelatedObjects)
 					db.Factory.Duplicate(o);
 			}
-			IfcSite site = db.Project.RootElement() as IfcSite;
-			if (site != null)
+			if (HasContext != null)
+				(db.Factory.Duplicate(mDatabase.Context) as IfcContext).AddDeclared(typeObject);
+			IfcProject project = db.Project;
+			if (project != null)
 			{
-				IfcProductRepresentation pr = site.Representation;
-				if (pr != null)
+				IfcSite site = db.Project.RootElement() as IfcSite;
+				if (site != null)
 				{
-					site.Representation = null;
-					pr.Dispose(true);
+					IfcProductRepresentation pr = site.Representation;
+					if (pr != null)
+					{
+						site.Representation = null;
+						pr.Dispose(true);
+					}
 				}
 			}
+		
 			db.WriteFile(filename);
 		}
 	}

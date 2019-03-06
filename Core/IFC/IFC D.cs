@@ -416,6 +416,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionSystem : IfcSystem //SUPERTYPE OF(IfcDistributionCircuit) IFC4
 	{
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.StepClassName); } }
 		internal string mLongName = "$"; // 	OPTIONAL IfcLabel
 		internal IfcDistributionSystemEnum mPredefinedType = IfcDistributionSystemEnum.NOTDEFINED;// : OPTIONAL IfcDistributionSystemEnum
 

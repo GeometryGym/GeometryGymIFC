@@ -353,13 +353,13 @@ namespace GeometryGym.Ifc
 	{
 		private int mDegree;// : INTEGER;
 		private LIST<IfcCartesianPoint> mControlPointsList = new LIST<IfcCartesianPoint>();// : LIST [2:?] OF IfcCartesianPoint;
-		private IfcBSplineCurveForm mCurveForm;// : IfcBSplineCurveForm;
+		private IfcBSplineCurveForm mCurveForm = IfcBSplineCurveForm.UNSPECIFIED;// : IfcBSplineCurveForm;
 		private IfcLogicalEnum mClosedCurve = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL; 
 
 		public int Degree { get { return mDegree; } }
 		public LIST<IfcCartesianPoint> ControlPointsList { get { return mControlPointsList; } }
-		public IfcBSplineCurveForm CurveForm { get { return mCurveForm; } }
+		public IfcBSplineCurveForm CurveForm { get { return mCurveForm; } set { mCurveForm = value; } }
 		public IfcLogicalEnum ClosedCurve { get { return mClosedCurve; } set { mClosedCurve = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
@@ -372,9 +372,9 @@ namespace GeometryGym.Ifc
 			mClosedCurve = c.mClosedCurve;
 			mSelfIntersect = c.mSelfIntersect;
 		}
-		private IfcBSplineCurve(DatabaseIfc db, int degree, IfcBSplineCurveForm form) : base(db) { mDegree = degree; mCurveForm = form; }
-		protected IfcBSplineCurve(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form)
-			: this(controlPoints.First().mDatabase, degree, form) { ControlPointsList.AddRange(controlPoints); }
+		private IfcBSplineCurve(DatabaseIfc db, int degree) : base(db) { mDegree = degree; }
+		protected IfcBSplineCurve(int degree, IEnumerable<IfcCartesianPoint> controlPoints)
+			: this(controlPoints.First().mDatabase, degree) { ControlPointsList.AddRange(controlPoints); }
 
 	}
 	[Serializable]
@@ -395,8 +395,8 @@ namespace GeometryGym.Ifc
 			mKnots.AddRange(c.Knots);
 			mKnotSpec = c.mKnotSpec;
 		}
-		public IfcBSplineCurveWithKnots(int degree, List<IfcCartesianPoint> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
-			base(degree, controlPoints, form)
+		public IfcBSplineCurveWithKnots(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
+			base(degree, controlPoints)
 		{
 			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
@@ -407,7 +407,7 @@ namespace GeometryGym.Ifc
 	{
 		private int mUDegree;// : INTEGER;
 		private int mVDegree;// : INTEGER;
-		private List<List<int>> mControlPointsList = new List<List<int>>();// : LIST [2:?] OF LIST [2:?] OF IfcCartesianPoint;
+		private LIST<LIST<IfcCartesianPoint>> mControlPointsList = new LIST<LIST<IfcCartesianPoint>>();// : LIST [2:?] OF LIST [2:?] OF IfcCartesianPoint;
 		private IfcBSplineSurfaceForm mSurfaceForm = IfcBSplineSurfaceForm.UNSPECIFIED;// : IfcBSplineSurfaceForm;
 		private IfcLogicalEnum mUClosed = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		private IfcLogicalEnum mVClosed = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
@@ -415,8 +415,8 @@ namespace GeometryGym.Ifc
 
 		public int UDegree { get { return mUDegree; } }
 		public int VDegree { get { return mVDegree; } }
-		public ReadOnlyCollection<ReadOnlyCollection<IfcCartesianPoint>> ControlPointsList { get { return new ReadOnlyCollection<ReadOnlyCollection<IfcCartesianPoint>>( mControlPointsList.ConvertAll(x => new ReadOnlyCollection<IfcCartesianPoint>( x.ConvertAll(y =>mDatabase[y] as IfcCartesianPoint)))); } }
-		public IfcBSplineSurfaceForm SurfaceForm { get { return mSurfaceForm; } }
+		public LIST<LIST<IfcCartesianPoint>> ControlPointsList { get { return mControlPointsList; } }
+		public IfcBSplineSurfaceForm SurfaceForm { get { return mSurfaceForm; } set { mSurfaceForm = value; } }
 		public IfcLogicalEnum UClosed { get { return mUClosed; } set { mUClosed = value; } }
 		public IfcLogicalEnum VClosed { get { return mVClosed; } set { mVClosed = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
@@ -426,24 +426,23 @@ namespace GeometryGym.Ifc
 		{
 			mUDegree = s.mUDegree;
 			mVDegree = s.mVDegree;
-			foreach(ReadOnlyCollection<IfcCartesianPoint> ps in s.ControlPointsList)
-				mControlPointsList.Add(ps.ToList().ConvertAll(x=>db.Factory.Duplicate(x).mIndex));
+			foreach(LIST<IfcCartesianPoint> ps in s.ControlPointsList)
+				mControlPointsList.Add(new LIST<IfcCartesianPoint>(ps.ConvertAll(x=>db.Factory.Duplicate(x) as IfcCartesianPoint)));
 			mSurfaceForm = s.mSurfaceForm;
 			mUClosed = s.mUClosed;
 			mVClosed = s.mVClosed;
 			mSelfIntersect = s.mSelfIntersect;
 		}
-		private IfcBSplineSurface(DatabaseIfc db, int uDegree, int vDegree, IfcBSplineSurfaceForm form) : base(db)
+		private IfcBSplineSurface(DatabaseIfc db, int uDegree, int vDegree) : base(db)
 		{
 			mUDegree = uDegree;
 			mVDegree = vDegree;
-			mSurfaceForm = form;
 		}
-		protected IfcBSplineSurface(int uDegree, int vDegree, List<List<IfcCartesianPoint>> controlPoints, IfcBSplineSurfaceForm form) :
-			this(controlPoints[0][0].mDatabase, uDegree, vDegree, form)
+		protected IfcBSplineSurface(int uDegree, int vDegree, IEnumerable<IEnumerable<IfcCartesianPoint>> controlPoints) :
+			this(controlPoints.First().First().mDatabase, uDegree, vDegree)
 		{
-			foreach (List<IfcCartesianPoint> cps in controlPoints)
-				mControlPointsList.Add(cps.ConvertAll(x => x.mIndex));
+			foreach (IEnumerable<IfcCartesianPoint> points in controlPoints)
+				ControlPointsList.Add(new LIST<IfcCartesianPoint>(points));
 		}
 	}
 	[Serializable]
@@ -456,7 +455,7 @@ namespace GeometryGym.Ifc
 		internal IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType; 
 
 		public ReadOnlyCollection<int> UMultiplicities { get { return new ReadOnlyCollection<int>(mUMultiplicities); } }
-		public ReadOnlyCollection<int> VMultiplicities { get { return new ReadOnlyCollection<int>(mUMultiplicities); } }
+		public ReadOnlyCollection<int> VMultiplicities { get { return new ReadOnlyCollection<int>(mVMultiplicities); } }
 		public ReadOnlyCollection<double> UKnots { get { return new ReadOnlyCollection<double>(mUKnots); } }
 		public ReadOnlyCollection<double> VKnots { get { return new ReadOnlyCollection<double>(mVKnots); } }
 		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
@@ -470,8 +469,8 @@ namespace GeometryGym.Ifc
 			mVKnots = new List<double>(s.mVKnots.ToArray());
 			mKnotSpec = s.mKnotSpec;
 		}
-		public IfcBSplineSurfaceWithKnots(int uDegree, int vDegree, List<List<IfcCartesianPoint>> controlPoints, IfcBSplineSurfaceForm form, IfcLogicalEnum uClosed, IfcLogicalEnum vClosed, IfcLogicalEnum selfIntersect, List<int> uMultiplicities, List<int> vMultiplicities, List<double> uKnots, List<double> vKnots, IfcKnotType type)
-			: base(uDegree, vDegree, controlPoints, form)
+		public IfcBSplineSurfaceWithKnots(int uDegree, int vDegree, IEnumerable<IEnumerable<IfcCartesianPoint>> controlPoints, IEnumerable<int> uMultiplicities, IEnumerable<int> vMultiplicities, IEnumerable<double> uKnots, IEnumerable<double> vKnots, IfcKnotType type)
+			: base(uDegree, vDegree, controlPoints)
 		{
 			mUMultiplicities.AddRange(uMultiplicities);
 			mVMultiplicities.AddRange(vMultiplicities);
@@ -506,8 +505,6 @@ namespace GeometryGym.Ifc
 			if (container != null) 
 				container.AddAggregated(this);
 		}
-
-		internal bool addStorey(IfcBuildingStorey s) { return base.AddAggregated(s); }
 	}
 	[Serializable]
 	public abstract partial class IfcBuildingElement : IfcElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcBeam,IfcBuildingElementProxy,IfcColumn,IfcCovering,IfcCurtainWall,IfcDoor,IfcFooting

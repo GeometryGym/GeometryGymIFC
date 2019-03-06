@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				Curve c = AxisCurve.Curve;
+				Curve c = AxisCurve.Curve();
 				if (c == null)
 					return null;
 				IfcGrid grid = mPartOfU;

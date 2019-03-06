@@ -161,7 +161,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
 	{	//INVERSE  
 		private SET<IfcRelAssigns> mHasAssignments = new SET<IfcRelAssigns>();//	 : 	SET OF IfcRelAssigns FOR RelatedObjects;
-		[NonSerialized] private IfcRelNests mNests = null;//	 :	SET [0:1] OF IfcRelNests FOR RelatedObjects;
+		[NonSerialized] internal IfcRelNests mNests = null;//	 :	SET [0:1] OF IfcRelNests FOR RelatedObjects;
 		private SET<IfcRelNests> mIsNestedBy = new SET<IfcRelNests>();//	 :	SET OF IfcRelNests FOR RelatingObject;
 		internal IfcRelDeclares mHasContext = null;// :	SET [0:1] OF IfcRelDeclares FOR RelatedDefinitions; 
 		internal List<IfcRelAggregates> mIsDecomposedBy = new List<IfcRelAggregates>();//	 : 	SET OF IfcRelDecomposes FOR RelatingObject;
@@ -169,11 +169,11 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRelAssociates> mHasAssociations = new SET<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
 
 		public SET<IfcRelAssigns> HasAssignments { get { return mHasAssignments; } set { mHasAssignments.Clear(); if (value != null) { mHasAssignments.CollectionChanged -= mHasAssignments_CollectionChanged; mHasAssignments = value; mHasAssignments.CollectionChanged += mHasAssignments_CollectionChanged; } } }
-		public IfcRelNests Nests { get { return mNests; } set { if (mNests != null) mNests.mRelatedObjects.Remove(mIndex); mNests = value; if (value != null && !value.mRelatedObjects.Contains(mIndex)) value.mRelatedObjects.Add(mIndex); } }
+		public IfcRelNests Nests { get { return mNests; } set { if (mNests != null) mNests.mRelatedObjects.Remove(this); mNests = value; if (value != null && !value.mRelatedObjects.Contains(this)) value.mRelatedObjects.Add(this); } }
 		public SET<IfcRelNests> IsNestedBy { get { return mIsNestedBy; } set { mIsNestedBy.Clear(); if (value != null) { mIsNestedBy.CollectionChanged -= mIsNestedBy_CollectionChanged; mIsNestedBy = value; mIsNestedBy.CollectionChanged += mIsNestedBy_CollectionChanged; } } }
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
 		public ReadOnlyCollection<IfcRelAggregates> IsDecomposedBy { get { return new ReadOnlyCollection<IfcRelAggregates>(mIsDecomposedBy); } }
-		public IfcRelAggregates Decomposes { get { return mDecomposes; } set { if (mDecomposes != null) mDecomposes.mRelatedObjects.Remove(mIndex); mDecomposes = value; if (value != null && !value.mRelatedObjects.Contains(mIndex)) value.mRelatedObjects.Add(mIndex); } }
+		public IfcRelAggregates Decomposes { get { return mDecomposes; } set { if (mDecomposes != null) mDecomposes.mRelatedObjects.Remove(this); mDecomposes = value; if (value != null && !value.mRelatedObjects.Contains(this)) value.mRelatedObjects.Add(this); } }
 		public SET<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
 
 		protected IfcObjectDefinition() : base() { }
@@ -196,7 +196,7 @@ namespace GeometryGym.Ifc
 				dup.RelatedObjects.Add(this);
 			}
 			if (o.mDecomposes != null)
-				(db.Factory.Duplicate(o.mDecomposes, ownerHistory, false) as IfcRelAggregates).addObject(this);
+				(db.Factory.Duplicate(o.mDecomposes, ownerHistory, false) as IfcRelAggregates).RelatedObjects.Add(this);
 			foreach (IfcRelAssociates associates in o.mHasAssociations)
 			{
 				IfcRelAssociates dup = db.Factory.Duplicate(associates, ownerHistory, downStream) as IfcRelAssociates;
@@ -283,24 +283,23 @@ namespace GeometryGym.Ifc
 		public void AddNested(IfcObjectDefinition o)
 		{
 			if (o.mNests != null)
-				o.mNests.removeObject(o);
+				o.mNests.RelatedObjects.Remove(o);
 			if (mIsNestedBy.Count() == 0)
 			{
 				IfcRelNests rn = new IfcRelNests(this, o);
 			}
-			else mIsNestedBy[0].addRelated(o);
+			else mIsNestedBy[0].RelatedObjects.Add(o);
 		}
-		public bool AddAggregated(IfcObjectDefinition o)
+		public void AddAggregated(IfcObjectDefinition o)
 		{
 			if (o.mDecomposes != null)
-				o.mDecomposes.removeObject(o);
+				o.mDecomposes.mRelatedObjects.Remove(o);
 			if (mIsDecomposedBy.Count == 0)
 			{
 				new IfcRelAggregates(this, o);
-				return true;
 			}
 			else
-				return mIsDecomposedBy[0].addObject(o);
+				mIsDecomposedBy[0].RelatedObjects.Add(o);
 		}
 		
 		internal virtual void relateNested(IfcRelNests n) { mIsNestedBy.Add(n); }
@@ -500,8 +499,8 @@ namespace GeometryGym.Ifc
 				nests.changeSchema(schema);
 			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
 				mHasAssociations[icounter].changeSchema(schema);
-			for (int icounter = 0; icounter < mIsDecomposedBy.Count; icounter++)
-				mIsDecomposedBy[icounter].changeSchema(schema);
+			foreach (IfcObjectDefinition od in mIsDecomposedBy.SelectMany(x => x.RelatedObjects))
+				od.changeSchema(schema);
 			base.changeSchema(schema);
 		}
 		public virtual IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
@@ -720,10 +719,13 @@ namespace GeometryGym.Ifc
 		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
-		internal static string Organization
+		private static string mOrganization;
+		public static string Organization
 		{
 			get
 			{
+				if (!string.IsNullOrEmpty(mOrganization))
+					return mOrganization;
 				try
 				{
 #if (!NETSTANDARD2_0)
@@ -734,6 +736,10 @@ namespace GeometryGym.Ifc
 				}
 				catch (Exception) { }
 				return "Unknown";
+			}
+			set
+			{
+				mOrganization = value;
 			}
 		}
 

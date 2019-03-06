@@ -209,7 +209,6 @@ namespace GeometryGym.Ifc
 			Elevation = elevation;
 		}
 		public IfcFacilityPart(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = name; }
-		internal bool addStorey(IfcBuildingStorey s) { return base.AddAggregated(s); }
 	}
 	//ENTITY IfcFailureConnectionCondition
 	[Serializable]

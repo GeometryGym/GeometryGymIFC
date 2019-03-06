@@ -473,33 +473,20 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = "";
-			if (mRelatedObjects.Count > 0)
-			{
-				str += ParserSTEP.LinkToString(mRelatedObjects[0]);
-				for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mRelatedObjects[icounter]);
-			}
-			else
+			if (mRelatedObjects.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingObject) + ",(" + str + ")";
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingObject) + ",(#" + string.Join(",#", RelatedObjects.Select(x=>x.Index)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRelatingObject = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos, len);
+			RelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcObjectDefinition));
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			RelatingObject.mIsDecomposedBy.Add(this);
-			ReadOnlyCollection<IfcObjectDefinition> ods = RelatedObjects;
-			for (int icounter = 0; icounter < ods.Count; icounter++)
-			{
-				if (ods[icounter] != null)
-					ods[icounter].mDecomposes = this;
-			}
 		}
 	}
 	public abstract partial class IfcRelAssigns : IfcRelationship //	ABSTRACT SUPERTYPE OF(ONEOF(IfcRelAssignsToActor, IfcRelAssignsToControl, IfcRelAssignsToGroup, IfcRelAssignsToProcess, IfcRelAssignsToProduct, IfcRelAssignsToResource))
@@ -1146,21 +1133,20 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedObjects.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",#" + mRelatingObject.Index + ",(#" + string.Join(",#", mRelatedObjects) + ")";
+			return base.BuildStringSTEP(release) + ",#" + mRelatingObject.Index + ",(#" + string.Join(",#", mRelatedObjects.Select(x=>x.Index)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRelatingObject = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectDefinition;
-			mRelatedObjects = ParserSTEP.StripListLink(str, ref pos, len);
+			RelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcObjectDefinition));
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			IfcObjectDefinition relating = RelatingObject;
 			relating.relateNested(this);
-			ReadOnlyCollection<IfcObjectDefinition> ods = RelatedObjects;
-			foreach (IfcObjectDefinition od in ods)
+			foreach (IfcObjectDefinition od in RelatedObjects)
 			{
 				if (od == null)
 					continue;

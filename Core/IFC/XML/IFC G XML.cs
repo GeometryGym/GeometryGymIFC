@@ -106,7 +106,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(ParentContext.GetXML(xml.OwnerDocument, "ParentContext", this, processed));
+			if(host.StepId != ParentContext.StepId)
+				xml.AppendChild(ParentContext.GetXML(xml.OwnerDocument, "ParentContext", this, processed));
 			if (!double.IsNaN(mTargetScale))
 				xml.SetAttribute("TargetScale", mTargetScale.ToString());
 			xml.SetAttribute("TargetView", mTargetView.ToString().ToLower());

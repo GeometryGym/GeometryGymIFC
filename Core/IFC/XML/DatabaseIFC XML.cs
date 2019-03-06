@@ -150,7 +150,7 @@ null, Type.EmptyTypes, null);
 				BaseClassIfc entity = constructor.Invoke(new object[] { }) as BaseClassIfc;
 				if (entity != null)
 				{
-					int index = NextBlank;
+					int index = NextBlank();
 					if(!string.IsNullOrEmpty(id))
 					{
 						int i = 0;

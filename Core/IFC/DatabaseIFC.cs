@@ -484,6 +484,7 @@ namespace GeometryGym.Ifc
 			}
 			ReleaseVersion release = Release;
 #if (qsMULTITHREAD)
+			//properties and materialConstituents
 			ConcurrentBag<string> errors = new ConcurrentBag<string>();
 			Parallel.ForEach(bag, new ParallelOptions { MaxDegreeOfParallelism = 4 }, obj =>
 			{
@@ -499,7 +500,21 @@ namespace GeometryGym.Ifc
 			foreach (string error in errors)
 				logError(error);
 #else
+			List<ConstructorClass> secondPass = new List<ConstructorClass>();
 			foreach (ConstructorClass obj in bag)
+			{
+				try
+				{
+					int pos = 0;
+					string def = obj.DefinitionString;
+					if (obj.Object is IfcPropertySet || obj.Object is IfcMaterialConstituentSet)
+						secondPass.Add(obj);
+					else
+						obj.Object.parse(def, ref pos, release, def.Length, dictionary);
+				}
+				catch (Exception x) { logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+			}
+			foreach(ConstructorClass obj in secondPass)
 			{
 				try
 				{
@@ -720,22 +735,22 @@ namespace GeometryGym.Ifc
 			BaseClassIfc result = BaseClassIfc.Construct(className);
 			if (result == null)
 				return null;
-			mDatabase[mDatabase.NextBlank] = result;
+			mDatabase[mDatabase.NextBlank()] = result;
 			return result; 
 		}
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping(); 
 		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, true); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
-		internal BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
+		public BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
 		{
 			if (entity == null)
 				return null;
 			int index = mDuplicateMapping.FindExisting(entity);
 			if(index > 0)
 				return mDatabase[index];
+			BaseClassIfc result = null;
 			if (!string.IsNullOrEmpty(entity.mGlobalId))
 			{
-				BaseClassIfc result = null;
 				if (mDatabase.mDictionary.TryGetValue(entity.mGlobalId, out result))
 				{
 					if (result != null)
@@ -746,6 +761,15 @@ namespace GeometryGym.Ifc
 				}
 			}
 			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
+			result = Duplicate(entity, type, downStream);
+			if (result != null)
+				return result;
+			if(type.IsSubclassOf(typeof(IfcProfileProperties)))
+				return Duplicate(entity, typeof(IfcProfileProperties), downStream);
+			return null;
+		}
+		private BaseClassIfc Duplicate(BaseClassIfc entity, Type type, bool downStream)
+		{
 			if (type != null)
 			{
 				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };

@@ -41,7 +41,7 @@ namespace GeometryGym.STEP
 		public DatabaseSTEP() { }
 
 		private SortedDictionary<int, T> mObjects = new SortedDictionary<int, T>();
-		public int LastKey { get { return mObjects.Count == 0 ? 0 : mObjects.Last().Key; } }
+		public int LastKey() { return mObjects.Count == 0 ? 0 : mObjects.Last().Key; }
 
 		public int NextObjectRecord { set { mNextBlank = value; } }
 		public virtual T this[int index]
@@ -69,20 +69,17 @@ namespace GeometryGym.STEP
 				value.mIndex = index;
 			}
 		}
-		internal void appendObject(T o) { this[NextBlank] = o; }
+		internal void appendObject(T o) { this[NextBlank()] = o; }
 		private int mNextBlank
 		{
 			get;
 			set;
 		} = 1;
-		internal int NextBlank
+		internal int NextBlank()
 		{
-			get
-			{
-				while (mObjects.ContainsKey(mNextBlank))
-					mNextBlank++;
-				return mNextBlank;
-			}
+			while (mObjects.ContainsKey(mNextBlank))
+				mNextBlank++;
+			return mNextBlank;
 		}
 		IEnumerator<T> IEnumerable<T>.GetEnumerator()
 		{

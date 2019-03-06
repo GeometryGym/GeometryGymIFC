@@ -139,10 +139,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mUAxes.ConvertAll(x => x.Index.ToString()));
-			str += "),(#" + string.Join(",#", mVAxes.ConvertAll(x => x.Index.ToString()));
-			str += (mWAxes.Count == 0 ? "),$" : "),#" + string.Join(",#", mWAxes.ConvertAll(x=>x.Index.ToString())));
-			return str + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcGridTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mUAxes.ConvertAll(x => x.Index.ToString())) + "),(#" + 
+				string.Join(",#", mVAxes.ConvertAll(x => x.Index.ToString())) + (mWAxes.Count == 0 ? "),$" : "),(#" + 
+				string.Join(",#", mWAxes.ConvertAll(x=>x.Index.ToString())) + ")") +  (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcGridTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

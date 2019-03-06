@@ -197,7 +197,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcObjectDefinition od = mDatabase.ParseXml<IfcObjectDefinition>(cn as XmlElement);
 						if (od != null)
-							addObject(od);
+							RelatedObjects.Add(od);
 					}
 				}
 				else if (string.Compare(name, "RelatingObject") == 0)
@@ -591,7 +591,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcObjectDefinition od = mDatabase.ParseXml<IfcObjectDefinition>(cn as XmlElement);
 						if (od != null)
-							addRelated(od);
+							RelatedObjects.Add(od);
 					}
 				}
 				else if (string.Compare(name, "RelatingObject") == 0)

@@ -241,28 +241,15 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			List<int> cps = mControlPointsList[0];
-			string str = base.BuildStringSTEP(release) + "," + mUDegree + "," + mVDegree + ",((" +
-				ParserSTEP.LinkToString(cps[0]);
-			for (int jcounter = 1; jcounter < cps.Count; jcounter++)
-				str += "," + ParserSTEP.LinkToString(cps[jcounter]);
-			str += ")";
-			for (int icounter = 1; icounter < mControlPointsList.Count; icounter++)
-			{
-				cps = mControlPointsList[icounter];
-				str += ",(" + ParserSTEP.LinkToString(cps[0]);
-				for (int jcounter = 1; jcounter < cps.Count; jcounter++)
-					str += "," + ParserSTEP.LinkToString(cps[jcounter]);
-				str += ")";
-			}
-			return str + "),." + mSurfaceForm.ToString() + ".," + ParserIfc.LogicalToString(mUClosed) + ","
-				+ ParserIfc.LogicalToString(mVClosed) + "," + ParserIfc.LogicalToString(mSelfIntersect);
+			return base.BuildStringSTEP(release) + "," + mUDegree + "," + mVDegree + ",(" + string.Join(",", mControlPointsList.Select(x=> "(#" + string.Join(",#", x.Select(p=>p.StepId)) + ")")) + "),." + 
+				mSurfaceForm.ToString() + ".," + ParserIfc.LogicalToString(mUClosed) + "," + ParserIfc.LogicalToString(mVClosed) + "," + ParserIfc.LogicalToString(mSelfIntersect);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mUDegree = int.Parse(ParserSTEP.StripField(str, ref pos, len));
 			mVDegree = int.Parse(ParserSTEP.StripField(str, ref pos, len));
-			mControlPointsList = ParserSTEP.StripListListLink(str, ref pos, len);
+			foreach(List<int> ids in ParserSTEP.StripListListLink(str, ref pos, len))
+				ControlPointsList.Add(new LIST<IfcCartesianPoint>(ids.Select(x => dictionary[x] as IfcCartesianPoint)));
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcBSplineSurfaceForm>(s.Replace(".", ""), true, out mSurfaceForm);
@@ -373,7 +360,9 @@ namespace GeometryGym.Ifc
 	
 	public partial class IfcBuildingSystem : IfcSystem //IFC4
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mLongName == "$" ? ",$,." : ",'" + mLongName + "',.") + mPredefinedType.ToString() + "."); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBuildingSystemTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + (mLongName == "$" ? "$" : "'" + mLongName + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

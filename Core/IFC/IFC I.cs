@@ -168,7 +168,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcIntersectionCurve() : base() { }
 		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
-		internal IfcIntersectionCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve,p1,p2,cr) { }
+		internal IfcIntersectionCurve(IfcCurve curve3D, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve3D, p1, p2, cr) { }
 	}
 	[Serializable]
 	public partial class IfcInventory : IfcGroup

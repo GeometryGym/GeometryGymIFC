@@ -37,12 +37,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPcurve : IfcCurve
 	{
-		public override Curve Curve
+		public override Curve Curve()
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			throw new NotImplementedException();
 		}
 	}
 	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/

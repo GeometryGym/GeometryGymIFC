@@ -612,7 +612,7 @@ namespace GeometryGym.Ifc
 				if (e.IsNestedBy.Count() == 0)
 					new IfcRelNests(e, this);
 				else
-					e.IsNestedBy[0].addRelated(this);
+					e.IsNestedBy[0].RelatedObjects.Add(this);
 			}
 		}
 		protected IfcPort(IfcElementType t) : base(t.mDatabase)
@@ -628,7 +628,7 @@ namespace GeometryGym.Ifc
 					new IfcRelNests(t, this);
 				}
 				else
-					t.IsNestedBy[0].addRelated(this);
+					t.IsNestedBy[0].RelatedObjects.Add(this);
 			}
 		}
 
@@ -1084,22 +1084,24 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		public bool AddElement(IfcProduct product)
+		public void AddElement(IfcProduct product)
 		{
 			product.detachFromHost();
-			return addProduct(product);
+			addProduct(product);
 		}
 		internal virtual void detachFromHost()
 		{
 			if (mDecomposes != null)
-				mDecomposes.removeObject(this);
+				mDecomposes.RelatedObjects.Remove(this);
 		}
-		protected virtual bool addProduct(IfcProduct product)
+		protected virtual void addProduct(IfcProduct product)
 		{
 			if (mIsDecomposedBy.Count > 0)
-				return mIsDecomposedBy[0].addObject(product);
-			new IfcRelAggregates(this, product);
-			return true;
+				mIsDecomposedBy[0].RelatedObjects.Add(product);
+			else
+			{
+				new IfcRelAggregates(this, product);
+			}
 		}
 		
 		protected override List<T> Extract<T>(Type type)
@@ -1284,6 +1286,7 @@ namespace GeometryGym.Ifc
 			mProfileName = p.mProfileName;
 			foreach (IfcProfileProperties pp in p.mHasProperties)
 				(db.Factory.Duplicate(pp) as IfcProfileProperties).ProfileDefinition = this;
+
 		}
 		public IfcProfileDef(DatabaseIfc db, string name) : base(db)
 		{
@@ -1428,17 +1431,13 @@ namespace GeometryGym.Ifc
 		{
 			if (mIsDecomposedBy.Count == 0)
 				return null;
-			BaseClassIfc ent = mDatabase[mIsDecomposedBy[0].mRelatedObjects[0]];
+			BaseClassIfc ent = mIsDecomposedBy[0].mRelatedObjects[0];
 			IfcBuilding result = ent as IfcBuilding;
 			if (result != null)
 				return result;
 			IfcSite s = ent as IfcSite;
 			if (s != null)
-			{
-				List<IfcBuilding> bs = s.getBuildings();
-				if (bs.Count > 0)
-					return bs[0];
-			}
+				return s.IsDecomposedBy.SelectMany(x=>x.RelatedObjects).OfType<IfcBuilding>().FirstOrDefault();
 			return null;
 		}
 	}
@@ -1762,7 +1761,7 @@ namespace GeometryGym.Ifc
 		internal IfcPropertyListValue() : base() { }
 		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue p) : base(db, p)
 		{
-			mNominalValue = p.mNominalValue;
+			mNominalValue.AddRange(p.mNominalValue);
 			if (p.mUnit > 0)
 				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit]) as IfcUnit;
 		}
@@ -1807,21 +1806,17 @@ namespace GeometryGym.Ifc
 	{
 		public override string StepClassName { get { return "IfcPropertySet"; } }
 		private Dictionary<string,IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
-		private List<int> mPropertyIndices = new List<int>();
 
-		public ReadOnlyDictionary<string,IfcProperty> HasProperties { get { return new ReadOnlyDictionary<string, IfcProperty>( mHasProperties); } }
-
-		protected override void initialize()
-		{
-			base.initialize();
-			mHasProperties = new Dictionary<string, IfcProperty>();
-			mPropertyIndices = new List<int>();
-		}
+		public Dictionary<string,IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcPropertySet() : base() { }
 		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.RelatedObjects.Add(obj); }
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
-		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { s.mPropertyIndices.ForEach(x => addProperty( db.Factory.Duplicate(s.mDatabase[x]) as IfcProperty)); }
+		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
+		{
+			foreach(IfcProperty p in s.HasProperties.Values)
+				addProperty( db.Factory.Duplicate(p) as IfcProperty);
+		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
 		public IfcPropertySet(string name, IfcProperty prop) : base(prop.mDatabase, name) { addProperty(prop); }
@@ -1855,15 +1850,12 @@ namespace GeometryGym.Ifc
 			}
 			mHasProperties[property.Name] = property;
 			property.mPartOfPset.Add(this);
-			if(!mPropertyIndices.Contains(property.mIndex))
-				mPropertyIndices.Add(property.mIndex);
 		}
 		public void RemoveProperty(IfcProperty property)
 		{
 			if (property != null)
 			{
 				mHasProperties.Remove(property.Name);
-				mPropertyIndices.Remove(property.mIndex);
 				property.mPartOfPset.Remove(this);
 			}
 		}
@@ -1881,17 +1873,12 @@ namespace GeometryGym.Ifc
 			{
 				if (string.IsNullOrEmpty(name))
 					return;
-				IfcProperty existing = this[name];
-				if (existing != null)
-					mPropertyIndices.Remove(existing.Index);
 				mHasProperties[name] = value;
-				mPropertyIndices.Add(value.Index);
 			}
 		}
 		public void SetProperties(IEnumerable<IfcProperty> properties)
 		{
 			mHasProperties.Clear();
-			mPropertyIndices.Clear();
 			foreach (IfcProperty property in properties)
 				addProperty(property);
 		}
@@ -1934,11 +1921,6 @@ namespace GeometryGym.Ifc
 						else
 							result.AddRange(mHasProperties.Values);
 					}
-					else
-					{
-						foreach (int i in r.mListPositions)
-							result.Add(mDatabase[mPropertyIndices[i - 1]] as IfcProperty);
-					}
 					return result;
 				}
 			}
@@ -1959,11 +1941,7 @@ namespace GeometryGym.Ifc
 							result.AddRange(mHasProperties[name].retrieveReference(r.InnerReference));
 					}
 				}
-				else
-				{
-					foreach (int i in r.mListPositions)
-						result.AddRange(mDatabase[mPropertyIndices[i - 1]].retrieveReference(ir));
-				}
+				
 				return result;
 			}
 			return base.retrieveReference(r);

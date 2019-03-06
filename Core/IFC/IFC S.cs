@@ -301,20 +301,9 @@ namespace GeometryGym.Ifc
 			mName = a.mName;
 			mDescription = a.mDescription;
 			mProductDefinitional = a.mProductDefinitional;
-			if(a.mPartOfProductDefinitionShape > 0)
-				PartOfProductDefinitionShape = db.Factory.Duplicate(a.mDatabase[a.mPartOfProductDefinitionShape]) as IfcProductRepresentationSelect;
 		}
-		public IfcShapeAspect(IfcShapeModel shape) : base(shape.mDatabase) { mShapeRepresentations.Add(shape.mIndex); shape.mOfShapeAspect = this;  }
-		public IfcShapeAspect(List<IfcShapeModel> reps, string name, string desc, IfcProductRepresentationSelect pr)
-			: this(reps[0].mDatabase, name, desc, pr) { reps.ForEach(x=>addRepresentation(x)); }
-		public IfcShapeAspect(IfcShapeModel rep, string name, string desc, IfcProductRepresentationSelect pr)
-			: this(rep.mDatabase, name, desc, pr) { mShapeRepresentations.Add(rep.mIndex); rep.mOfShapeAspect = this; }
-		private IfcShapeAspect(DatabaseIfc db, string name, string desc, IfcProductRepresentationSelect pr) : base(db)
-		{
-			Name = name;
-			Description = desc;
-			PartOfProductDefinitionShape = pr;
-		}
+		public IfcShapeAspect(List<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations[0].Database) { shapeRepresentations.ForEach(x=>addRepresentation(x)); }
+		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { mShapeRepresentations.Add(shapeRepresentation.mIndex); shapeRepresentation.mOfShapeAspect = this; }
 		
 		internal void addRepresentation(IfcShapeModel model) { mShapeRepresentations.Add(model.mIndex); model.mOfShapeAspect = this; }
 	}
@@ -742,15 +731,13 @@ additional types	some additional representation types are given:
 		internal IfcSpace(DatabaseIfc db, IfcSpace s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
 		public IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-		protected override bool addProduct(IfcProduct product)
+		protected override void addProduct(IfcProduct product)
 		{
 			IfcCovering covering = product as IfcCovering;
 			if (covering != null)
-			{
 				mHasCoverings[0].RelatedCoverings.Add(covering);
-				return true;
-			}
-			return base.addProduct(product);
+			else
+				base.addProduct(product);
 		}
 		public void AddBoundary(IfcRelSpaceBoundary boundary) { mBoundedBy.Add(boundary); }
 	}
@@ -834,6 +821,14 @@ additional types	some additional representation types are given:
 			{
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
 					db.Factory.Duplicate(css, ownerHistory, downStream);
+				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
+				{
+					IfcSystem sys = db.Factory.Duplicate(system, true) as IfcSystem;
+					if(system.ServicesBuildings == null)
+					{
+						new IfcRelServicesBuildings(sys, this);
+					}
+				}
 			}
 		}
 		protected IfcSpatialElement(IfcSpatialElement host, string name) : this(new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(new IfcCartesianPoint(host.mDatabase, 0, 0, 0))))
@@ -852,15 +847,13 @@ additional types	some additional representation types are given:
 		}
 		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 
-		protected override bool addProduct(IfcProduct product)
+		protected override void addProduct(IfcProduct product)
 		{
 			product.detachFromHost();
 			if (mContainsElements.Count == 0)
 				new IfcRelContainedInSpatialStructure(product,this);
 			else
 				mContainsElements[0].RelatedElements.Add(product);
-				
-			return true;
 		}
 
 		protected override void initialize()
@@ -898,21 +891,7 @@ additional types	some additional representation types are given:
 			ContainsElements[0].RelatedElements.Add(g);
 			return true;
 		}
-		internal List<IfcBuilding> getBuildings()
-		{
-			List<IfcBuilding> result = new List<IfcBuilding>();
-			for (int icounter = 0; icounter < mIsDecomposedBy.Count; icounter++)
-			{
-				ReadOnlyCollection<IfcObjectDefinition> ods = mIsDecomposedBy[icounter].RelatedObjects;
-				foreach (IfcObjectDefinition od in ods)
-				{
-					IfcBuilding b = od as IfcBuilding;
-					if (b != null)
-						result.Add(b);
-				}
-			}
-			return result;
-		}
+		
 		protected override List<T> Extract<T>(Type type) 
 		{
 			if (typeof(IfcSpatialElement).IsAssignableFrom(type))
@@ -1397,7 +1376,7 @@ additional types	some additional representation types are given:
 			List<IfcShapeModel> aspects = new List<IfcShapeModel>();
 			aspects.Add( new IfcShapeRepresentation(new IfcPointOnCurve(mDatabase,curve, 0)));
 			aspects.Add(new IfcShapeRepresentation(new IfcPointOnCurve(mDatabase, curve, 1)));
-			VaryingAppliedLoadLocation = new IfcShapeAspect(aspects, "", "", null);
+			VaryingAppliedLoadLocation = new IfcShapeAspect(aspects);
 		}
 
 		internal void addSubsequentLoad(IfcStructuralLoad load) { mSubsequentAppliedLoads.Add(load.mIndex); }
@@ -2052,18 +2031,15 @@ additional types	some additional representation types are given:
 			AssociatedGeometry.AddRange(c.AssociatedGeometry.Select(x => db.Factory.Duplicate(x) as IfcPcurve));
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve, IfcPcurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
+		internal IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve3D.mDatabase)
 		{
-			Curve3D = curve;
+			Curve3D = curve3D;
 			AssociatedGeometry.Add(p1);
 			mMasterRepresentation = cr;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve.mDatabase)
+		internal IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : this(curve3D, p1, cr)
 		{
-			Curve3D = curve;
-			AssociatedGeometry.Add(p1);
 			AssociatedGeometry.Add(p2);
-			mMasterRepresentation = cr;
 		}
 	}
 	[Serializable]
@@ -2434,7 +2410,6 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
-		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.StepClassName); } }
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
@@ -2444,7 +2419,7 @@ additional types	some additional representation types are given:
 		{
 			if(s.mServicesBuildings != null)
 			{
-				IfcRelServicesBuildings rsb = db.Factory.Duplicate(s.mServicesBuildings) as IfcRelServicesBuildings;
+				IfcRelServicesBuildings rsb = db.Factory.Duplicate(s.mServicesBuildings, ownerHistory, false) as IfcRelServicesBuildings;
 				rsb.RelatingSystem = this;
 			}
 		}

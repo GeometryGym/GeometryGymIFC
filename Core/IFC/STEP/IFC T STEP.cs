@@ -210,7 +210,7 @@ namespace GeometryGym.Ifc
 				(string.IsNullOrEmpty(mPagerNumber) ? ",$" : ",'" + ParserIfc.Encode(mPagerNumber) + "'") +
 				(mElectronicMailAddresses.Count == 0 ? ",$" : ",('" + string.Join("','", mElectronicMailAddresses.Select(x => ParserIfc.Encode(x))) + "')") +
 				(string.IsNullOrEmpty(mWWWHomePageURL) ? ",$" : ",'" + ParserIfc.Encode(mWWWHomePageURL) + "'") +
-				(release <= ReleaseVersion.IFC4 ? "" : (mMessagingIDs.Count == 0 ? ",$" : ",('" + string.Join("','", mMessagingIDs.Select(x => ParserIfc.Encode(x))) + "')"));
+				(release < ReleaseVersion.IFC4 ? "" : (mMessagingIDs.Count == 0 ? ",$" : ",('" + string.Join("','", mMessagingIDs.Select(x => ParserIfc.Encode(x))) + "')"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

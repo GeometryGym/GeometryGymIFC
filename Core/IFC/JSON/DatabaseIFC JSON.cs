@@ -34,8 +34,8 @@ namespace GeometryGym.Ifc
 {
 	public partial class DatabaseIfc
 	{
-		internal void ReadJSONFile(string filename) { FileName = filename; ReadJSONFile(new StreamReader(filename)); }
-		internal void ReadJSONFile(TextReader reader)
+		public void ReadJSONFile(string filename) { FileName = filename; ReadJSONFile(new StreamReader(filename)); }
+		public void ReadJSONFile(TextReader reader)
 		{
 			mRelease = ReleaseVersion.IFC2x3;
 			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
@@ -202,9 +202,7 @@ namespace GeometryGym.Ifc
 									}
 								}
 							
-								if (mNextUnassigned == 0)
-									mNextUnassigned = Math.Max(LastKey * 2, 1000);
-								index = mNextUnassigned++;
+								index = NextBlank();
 								this[index] = result;
 
 								if (point != null || direction != null || placement != null)
@@ -221,7 +219,6 @@ namespace GeometryGym.Ifc
 				return default(T);
 			result.parseJObject(obj);
 			parseBespoke(result, obj);
-			appendObject(result);
 			return (T)(IBaseClassIfc)result;
 		}
 

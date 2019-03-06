@@ -195,25 +195,30 @@ namespace GeometryGym.Ifc
 	{
 		internal string mName = "$";// : OPTIONAL IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText 
-		internal List<int> mMaterialConstituents = new List<int>();// LIST [1:?] OF IfcMaterialConstituent;
+		internal Dictionary<string, IfcMaterialConstituent> mMaterialConstituents = new Dictionary<string, IfcMaterialConstituent>();// LIST [1:?] OF IfcMaterialConstituent;
 
 		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcMaterialConstituent> MaterialConstituents { get { return new ReadOnlyCollection<IfcMaterialConstituent>( mMaterialConstituents.ConvertAll(x => mDatabase[x] as IfcMaterialConstituent)); } }
+		public Dictionary<string, IfcMaterialConstituent> MaterialConstituents { get { return mMaterialConstituents; } }
 
-		public override IfcMaterial PrimaryMaterial() { return MaterialConstituents[0].PrimaryMaterial(); }
+		public override IfcMaterial PrimaryMaterial() { return MaterialConstituents.First().Value.PrimaryMaterial(); }
 
 		internal IfcMaterialConstituentSet() : base() { }
-		internal IfcMaterialConstituentSet(DatabaseIfc db, IfcMaterialConstituentSet m) : base(db, m) { m.MaterialConstituents.ToList().ForEach(x => addConstituent( db.Factory.Duplicate(x) as IfcMaterialConstituent)); mName = m.mName; mDescription = m.mDescription; }
-		public IfcMaterialConstituentSet(string name, string desc, List<IfcMaterialConstituent> mcs)
-			: base(mcs[0].mDatabase)
+		internal IfcMaterialConstituentSet(DatabaseIfc db, IfcMaterialConstituentSet m) : base(db, m)
+		{
+			mName = m.mName;
+			mDescription = m.mDescription;
+			foreach (IfcMaterialConstituent constituent in m.MaterialConstituents.Values)
+				MaterialConstituents[constituent.Name] = db.Factory.Duplicate(constituent) as IfcMaterialConstituent;
+		}
+		public IfcMaterialConstituentSet(string name, string desc, IEnumerable<IfcMaterialConstituent> materialConstituents)
+			: base(materialConstituents.First().Database)
 		{
 			Name = name;
 			Description = desc;
-			mMaterialConstituents = mcs.ConvertAll(x => x.mIndex);
+			foreach (IfcMaterialConstituent constituent in materialConstituents)
+				mMaterialConstituents[constituent.Name] = constituent;
 		}
-		
-		internal void addConstituent(IfcMaterialConstituent constituent) { mMaterialConstituents.Add(constituent.mIndex); }
 	}
 	[Serializable]
 	public abstract partial class IfcMaterialDefinition : BaseClassIfc, IfcObjectReferenceSelect, IfcMaterialSelect, IfcResourceObjectSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterial ,IfcMaterialConstituent ,IfcMaterialConstituentSet ,IfcMaterialLayer ,IfcMaterialProfile ,IfcMaterialProfileSet));

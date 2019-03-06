@@ -59,6 +59,7 @@ namespace GeometryGym.Ifc
 			}
 			
 			XmlElement element = doc.CreateElement(name);//, mDatabase.mXmlNamespace);
+			processed[mIndex] = element;
 			SetXML(element, host, processed);
 			
 			if(mDatabase.XMLMandatoryId)
@@ -71,7 +72,6 @@ namespace GeometryGym.Ifc
 				att.Value = type;
 				element.SetAttributeNode(att);
 			}
-			processed[mIndex] = element;
 			return element;
 		}
 		internal virtual void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

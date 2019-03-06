@@ -29,14 +29,11 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcLine : IfcCurve
 	{
-		public override Curve Curve => new LineCurve(Line);
-		public Line Line
+		public override Curve Curve() { return new LineCurve(Line()); }
+		public Line Line()
 		{
-			get
-			{
-				Point3d pt = Pnt.Location;
-				return new Line(pt, pt + Dir.Vector);
-			}
+			Point3d pt = Pnt.Location;
+			return new Line(pt, pt + Dir.Vector);
 		}
 	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement

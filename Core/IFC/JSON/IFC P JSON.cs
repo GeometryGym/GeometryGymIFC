@@ -586,7 +586,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["HasProperties"] = new JArray(mPropertyIndices.ConvertAll(x=>mDatabase[x].getJson(this, options)));
+			obj["HasProperties"] = new JArray(mHasProperties.Values.Select(x=>x.getJson(this, options)));
 		}
 	}
 	public partial class IfcPropertySetDefinition : IfcPropertyDefinition

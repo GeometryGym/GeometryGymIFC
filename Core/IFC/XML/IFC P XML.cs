@@ -893,7 +893,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			setChild(xml, "HasProperties", mPropertyIndices.ConvertAll(x=>mDatabase[x]), processed);	
+			setChild(xml, "HasProperties", mHasProperties.Values, processed);	
 		}
 	}
 	public partial class IfcPropertySetDefinition : IfcPropertyDefinition

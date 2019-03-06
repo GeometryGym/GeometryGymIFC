@@ -29,19 +29,16 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcBoundedCurve
 	{
-		public override Curve Curve
+		public override Curve Curve()
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			throw new NotImplementedException();
 		}
 		
 	}
 	public partial class IfcBSplineCurve
 	{
 		protected IfcBSplineCurve(DatabaseIfc m, NurbsCurve nonRationalCurve, bool twoD)
-			: this(m, nonRationalCurve.Degree, IfcBSplineCurveForm.UNSPECIFIED)
+			: this(m, nonRationalCurve.Degree)
 		{
 			int ilast = nonRationalCurve.Points.Count - (nonRationalCurve.IsPeriodic ? mDegree : 0);
 			if (twoD)
@@ -71,8 +68,8 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBSplineCurveWithKnots
 	{
-		public IfcBSplineCurveWithKnots(DatabaseIfc db, int degree, List<Point3d> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
-			base(degree, controlPoints.ConvertAll(x=>new IfcCartesianPoint(db, x)), form)
+		public IfcBSplineCurveWithKnots(DatabaseIfc db, int degree, List<Point3d> controlPoints, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
+			base(degree, controlPoints.ConvertAll(x=>new IfcCartesianPoint(db, x)))
 		{
 			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
@@ -85,8 +82,8 @@ namespace GeometryGym.Ifc
 			ClosedCurve = nc.IsClosed ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 			adoptKnotsAndMultiplicities(nc);
 		}
-		public IfcBSplineCurveWithKnots(DatabaseIfc m, int degree, List<Point2d> controlPoints, IfcBSplineCurveForm form, List<int> multiplicities, List<double> knots, IfcKnotType knotSpec) :
-			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)), form)
+		public IfcBSplineCurveWithKnots(DatabaseIfc m, int degree, List<Point2d> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
+			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)))
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
 				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());

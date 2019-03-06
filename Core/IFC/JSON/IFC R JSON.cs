@@ -105,7 +105,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addObject(x));
+			RelatedObjects.AddRange(mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
 				JArray array = new JArray();
-				if (host == null || !mRelatedObjects.Contains(host.mIndex))
+				if (host == null || !mRelatedObjects.Contains(host))
 				{
 					foreach (IfcObjectDefinition od in RelatedObjects)
 						array.Add(od.getJson(this, options));
@@ -504,16 +504,15 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingObject", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				RelatingObject = mDatabase.ParseJObject<IfcObjectDefinition>(jobj);
-			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
+			RelatedObjects.AddRange(mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			if (mRelatingObject != host)
 				obj["RelatingObject"] = RelatingObject.getJson(this, options);
-			ReadOnlyCollection<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			JArray array = new JArray();
-			foreach (IfcObjectDefinition od in relatedObjects)
+			foreach (IfcObjectDefinition od in RelatedObjects)
 				array.Add(od.getJson(this, options));
 			obj["RelatedObjects"] = array;
 		}

@@ -110,16 +110,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = ParserSTEP.LinkToString(mMaterialConstituents[0]);
-			for (int icounter = 1; icounter < mMaterialConstituents.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mMaterialConstituents[icounter]);
-			return base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$,(" : "'" + mDescription + "',(") + str + ")";
+			return base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$,(#" : "'" + mDescription + "',(#") + string.Join(",#", mMaterialConstituents.Values.Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			mMaterialConstituents = ParserSTEP.StripListLink(str, ref pos, len);
+			foreach(IfcMaterialConstituent constituent in ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcMaterialConstituent))
+				mMaterialConstituents[constituent.Name] = constituent;
 		}
 	}
 	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation

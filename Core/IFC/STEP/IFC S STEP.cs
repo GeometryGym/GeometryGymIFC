@@ -227,17 +227,13 @@ namespace GeometryGym.Ifc
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
 			mProductDefinitional = ParserIfc.StripLogical(str,ref pos, len);
-			mPartOfProductDefinitionShape = ParserSTEP.StripLink(str, ref pos, len);
+			PartOfProductDefinitionShape = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProductRepresentationSelect;
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			foreach(IfcShapeModel model in ShapeRepresentations)
 				model.mOfShapeAspect = this;
-
-			IfcProductRepresentationSelect pds = PartOfProductDefinitionShape;
-			if (pds != null)
-				pds.AddShapeAspect(this);
 		}
 	}
 	public partial class IfcShellBasedSurfaceModel : IfcGeometricRepresentationItem
