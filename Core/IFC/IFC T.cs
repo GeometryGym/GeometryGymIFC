@@ -1004,17 +1004,34 @@ namespace GeometryGym.Ifc
 			if (mObjectTypeOf != null)
 				mObjectTypeOf.changeSchema(schema);
 		}
-		internal void IsolateObject(string filename)
+		internal void IsolateObject(string filename, bool relatedObjects)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
 			IfcTypeObject typeObject = db.Factory.Duplicate(this, true) as IfcTypeObject;
-			if (mObjectTypeOf != null)
+			if (relatedObjects)
 			{
-				foreach (IfcObject o in mObjectTypeOf.RelatedObjects)
-					db.Factory.Duplicate(o);
+				if (mObjectTypeOf != null)
+				{
+					foreach (IfcObject o in mObjectTypeOf.RelatedObjects)
+						db.Factory.Duplicate(o);
+				}
+				if (HasContext != null)
+					(db.Factory.Duplicate(mDatabase.Context, false) as IfcContext).AddDeclared(typeObject);
 			}
-			if (HasContext != null)
-				(db.Factory.Duplicate(mDatabase.Context) as IfcContext).AddDeclared(typeObject);
+			else
+			{
+				if (HasContext != null)
+				{
+					IfcContext context = mDatabase.Context;
+					if (db.Release > ReleaseVersion.IFC2x3)
+					{
+						IfcProjectLibrary library = new IfcProjectLibrary(db, context.Name) { LongName = context.LongName, GlobalId = context.GlobalId, UnitsInContext = db.Factory.Duplicate(context.UnitsInContext, true) as IfcUnitAssignment };
+						library.AddDeclared(typeObject);
+					}
+					else
+						(db.Factory.Duplicate(mDatabase.Context, false) as IfcContext).AddDeclared(typeObject);
+				}
+			}
 			IfcProject project = db.Project;
 			if (project != null)
 			{

@@ -930,7 +930,7 @@ additional types	some additional representation types are given:
 				if (s == null && p == null)
 					return od.CreateOrFindStructAnalysisModel();
 			}
-			return new IfcStructuralAnalysisModel(this, Name, IfcAnalysisModelTypeEnum.LOADING_3D) { Description = Description };
+			return new IfcStructuralAnalysisModel(this, Name, IfcAnalysisModelTypeEnum.LOADING_3D) { Description = Description, SharedPlacement = ObjectPlacement };
 		}
 		public override IfcStructuralAnalysisModel FindStructAnalysisModel(bool strict)
 		{
