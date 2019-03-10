@@ -1156,13 +1156,13 @@ additional types	some additional representation types are given:
 		internal int mOrientationOf2DPlane;// : OPTIONAL IfcAxis2Placement3D;
 		internal List<int> mLoadedBy = new List<int>();//  : OPTIONAL SET [1:?] OF IfcStructuralLoadGroup;
 		internal List<int> mHasResults = new List<int>();//: OPTIONAL SET [1:?] OF IfcStructuralResultGroup  
-		internal int mSharedPlacement;//	:	OPTIONAL IfcObjectPlacement;
+		internal IfcObjectPlacement mSharedPlacement;//	:	OPTIONAL IfcObjectPlacement;
 
 		public IfcAnalysisModelTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcAxis2Placement3D OrientationOf2DPlane { get { return mDatabase[mOrientationOf2DPlane] as IfcAxis2Placement3D; } set { mOrientationOf2DPlane = value == null ? 0 : value.mIndex;  } }
 		public ReadOnlyCollection<IfcStructuralLoadGroup> LoadedBy { get { return new ReadOnlyCollection<IfcStructuralLoadGroup>(mLoadedBy.ConvertAll(x => mDatabase[x] as IfcStructuralLoadGroup)); } }
 		public ReadOnlyCollection<IfcStructuralResultGroup> HasResults { get { return new ReadOnlyCollection<IfcStructuralResultGroup>( mHasResults.ConvertAll(x => mDatabase[x] as IfcStructuralResultGroup)); } } 
-		public IfcObjectPlacement SharedPlacement { get { return mDatabase[mSharedPlacement] as IfcObjectPlacement; } set { mSharedPlacement = (value == null ? 0 : value.mIndex); } }
+		public IfcObjectPlacement SharedPlacement { get { return mSharedPlacement; } set { mSharedPlacement = value; } }
 
 		internal IfcStructuralAnalysisModel() : base() { }
 		internal IfcStructuralAnalysisModel(DatabaseIfc db, IfcStructuralAnalysisModel m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream)
@@ -1172,13 +1172,16 @@ additional types	some additional representation types are given:
 				OrientationOf2DPlane = db.Factory.Duplicate(m.OrientationOf2DPlane) as IfcAxis2Placement3D;
 			m.LoadedBy.ToList().ForEach(x => addLoadGroup( db.Factory.Duplicate(x) as IfcStructuralLoadGroup));
 			m.HasResults.ToList().ForEach(x => addResultGroup( db.Factory.Duplicate(x) as IfcStructuralResultGroup));
-			if(m.mSharedPlacement > 0)
+			if(m.mSharedPlacement != null)
 				SharedPlacement = db.Factory.Duplicate(m.SharedPlacement) as IfcObjectPlacement;
 		}
 		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name)
 		{
 			mPredefinedType = type;
-			SharedPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
+			if (mDatabase.Release < ReleaseVersion.IFC4)
+				SharedPlacement = bldg.ObjectPlacement;
+			else
+				SharedPlacement = new IfcLocalPlacement(bldg.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
 		}
 
 		internal void addLoadGroup(IfcStructuralLoadGroup lg) { mLoadedBy.Add(lg.mIndex); lg.mLoadGroupFor.Add(this); }
@@ -1261,6 +1264,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcEdgeCurve e, IfcStructuralPointConnection A, ExtremityAttributes start, IfcStructuralPointConnection B, ExtremityAttributes end, IfcMaterialProfileSetUsage mp, IfcDirection dir,int id)
 			: base(sm, mp ,id)
 		{
+			ObjectPlacement = sm.SharedPlacement;
 			EdgeCurve = e;
 			Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(sm.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis),e));
 			IfcRelConnectsStructuralMember csm = IfcRelConnectsStructuralMember.Create(this, A, true, start);
@@ -1805,13 +1809,15 @@ additional types	some additional representation types are given:
 		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFaceSurface f, IfcMaterial material, int id, double thickness)
 			: base(sm, material, id)
 		{
-			Representation = new IfcProductRepresentation(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), f));
+			ObjectPlacement = sm.SharedPlacement;
+			Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), f));
 			mThickness = thickness;
 		}
 		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFaceSurface f, IfcMaterialLayer materialLayer, int id)
 			: base(sm, materialLayer, id)
 		{
-			Representation = new IfcProductRepresentation(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), f));
+			ObjectPlacement = sm.SharedPlacement;
+			Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), f));
 		}
 	}
 	[Serializable]

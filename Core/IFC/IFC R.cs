@@ -2316,7 +2316,6 @@ namespace GeometryGym.Ifc
 				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, false) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
-
 			if (i.mStyledByItem != null)
 			{
 				IfcStyledItem si = db.Factory.Duplicate(i.mStyledByItem) as IfcStyledItem;

@@ -480,8 +480,8 @@ namespace GeometryGym.Ifc
 				foreach (int item in mHasResults)
 					element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
 			}
-			if (mSharedPlacement > 0)
-				xml.AppendChild(mDatabase[mSharedPlacement].GetXML(xml.OwnerDocument, "SharedPlacement", this, processed));
+			if (mSharedPlacement != null)
+				xml.AppendChild(SharedPlacement.GetXML(xml.OwnerDocument, "SharedPlacement", this, processed));
 		}
 	}
 	public abstract partial class IfcStructuralConnection : IfcStructuralItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveConnection ,IfcStructuralPointConnection ,IfcStructuralSurfaceConnection))

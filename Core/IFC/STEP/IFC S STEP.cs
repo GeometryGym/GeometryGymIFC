@@ -616,28 +616,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".," + ParserSTEP.LinkToString(mOrientationOf2DPlane) + ",";
-			if (mLoadedBy.Count == 0)
-				str += "$,";
-			else
-			{
-				str += "(" + ParserSTEP.LinkToString(mLoadedBy[0]);
-				for (int icounter = 1; icounter < mLoadedBy.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mLoadedBy[icounter]);
-				str += "),";
-			}
-			if (mHasResults.Count == 0)
-				str += "$";
-			else
-			{
-				str += "(" + ParserSTEP.LinkToString(mHasResults[0]);
-				for (int icounter = 1; icounter < mHasResults.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mHasResults[icounter]);
-				str += ")";
-			}
-			if (release != ReleaseVersion.IFC2x3)
-				str += (mSharedPlacement == 0 ? ",$" : ",#" + mSharedPlacement);
-			return str;
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".," + ParserSTEP.LinkToString(mOrientationOf2DPlane) + 
+				(mLoadedBy.Count == 0 ?	",$," : ",(#" + string.Join(",#", mLoadedBy) + "),") + (mHasResults.Count == 0 ? "$" : "(#" + string.Join(",#", mHasResults) + ")") +	
+				(release > ReleaseVersion.IFC2x3 ? "," + ParserSTEP.ObjToLinkString(mSharedPlacement) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -647,7 +628,7 @@ namespace GeometryGym.Ifc
 			mLoadedBy = ParserSTEP.StripListLink(str, ref pos, len);
 			mHasResults = ParserSTEP.StripListLink(str, ref pos, len);
 			if(release > ReleaseVersion.IFC2x3)
-				mSharedPlacement = ParserSTEP.StripLink(str, ref pos, len);
+				SharedPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;
 		}
 	}
 	public abstract partial class IfcStructuralConnection : IfcStructuralItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveConnection ,IfcStructuralPointConnection ,IfcStructuralSurfaceConnection))

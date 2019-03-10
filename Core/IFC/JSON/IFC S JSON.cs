@@ -338,8 +338,6 @@ namespace GeometryGym.Ifc
 				JObject jobj = token as JObject;
 				if (jobj != null)
 					SharedPlacement = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
-				else
-					mSharedPlacement = token.Value<int>();
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -353,7 +351,7 @@ namespace GeometryGym.Ifc
 				obj["LoadedBy"] = new JArray(mLoadedBy.ConvertAll(x => mDatabase[x].getJson(this, options)));
 			if (mHasResults.Count > 0)
 				obj["HasResults"] = new JArray(mHasResults.ConvertAll(x => mDatabase[x].getJson(this, options)));
-			if (mSharedPlacement > 0)
+			if (mSharedPlacement != null)
 				obj["SharedPlacement"] = SharedPlacement.getJson(this, options);
 		}
 	}
