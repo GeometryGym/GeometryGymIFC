@@ -627,7 +627,16 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDefinitionSelect));
+			foreach(int id in ParserSTEP.StripListLink(str, ref pos, len))
+			{
+				BaseClassIfc obj = null;
+				if (dictionary.TryGetValue(id, out obj))
+				{
+					IfcDefinitionSelect definitionSelect = obj as IfcDefinitionSelect;
+					if(definitionSelect != null)
+						RelatedObjects.Add(definitionSelect);
+				}
+			}
 		}
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]

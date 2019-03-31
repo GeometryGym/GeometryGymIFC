@@ -878,7 +878,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			element.setRelatingType(this);
 			return element;
 		}
-
 	}
 	[Serializable]
 	public partial class IfcEllipse : IfcConic

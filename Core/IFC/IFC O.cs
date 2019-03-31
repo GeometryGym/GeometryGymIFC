@@ -304,6 +304,7 @@ namespace GeometryGym.Ifc
 		
 		internal virtual void relateNested(IfcRelNests n) { mIsNestedBy.Add(n); }
 		
+		internal IfcMaterialSelect RelatedMaterial() { return (mMaterialSelectIFC4 != null ? mMaterialSelectIFC4 : GetMaterialSelect()); }
 		protected virtual IfcMaterialSelect GetMaterialSelect()
 		{
 			foreach (IfcRelAssociates ra in HasAssociations)

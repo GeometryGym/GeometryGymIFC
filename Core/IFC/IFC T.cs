@@ -128,7 +128,16 @@ namespace GeometryGym.Ifc
 		internal IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
 
 		internal IfcTask() : base() { }
-		internal IfcTask(DatabaseIfc db, IfcTask t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mStatus = t.mStatus; mWorkMethod = t.mWorkMethod; mIsMilestone = t.mIsMilestone; mPriority = t.mPriority; if (t.mTaskTime > 0) TaskTime = db.Factory.Duplicate(t.TaskTime) as IfcTaskTime; mPredefinedType = t.mPredefinedType; }
+		internal IfcTask(DatabaseIfc db, IfcTask t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		{
+			mStatus = t.mStatus;
+			mWorkMethod = t.mWorkMethod;
+			mIsMilestone = t.mIsMilestone;
+			mPriority = t.mPriority;
+			if (t.mTaskTime > 0)
+				TaskTime = db.Factory.Duplicate(t.TaskTime) as IfcTaskTime;
+			mPredefinedType = t.mPredefinedType;
+		}
 		public IfcTask(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]

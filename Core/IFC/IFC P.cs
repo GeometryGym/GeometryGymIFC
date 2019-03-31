@@ -904,7 +904,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcStyledItem> StyledItems { get { return new ReadOnlyCollection<IfcStyledItem>(mStyledItems); } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
-		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { s.mStyles.ToList().ForEach(x => addStyle(db.Factory.Duplicate(s.mDatabase[x]) as IfcPresentationStyleSelect)); }
+		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(s.mDatabase[x]).Index)); }
 		public IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
 		public IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
 		
@@ -944,7 +944,17 @@ namespace GeometryGym.Ifc
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
 
 		protected IfcProcess() : base() { }
-		protected IfcProcess(DatabaseIfc db, IfcProcess p, IfcOwnerHistory ownerHistory, bool downStream ) : base(db, p, ownerHistory, downStream) { mIdentification = p.mIdentification; mLongDescription = p.mLongDescription; }
+		protected IfcProcess(DatabaseIfc db, IfcProcess p, IfcOwnerHistory ownerHistory, bool downStream ) : base(db, p, ownerHistory, downStream)
+		{
+			mIdentification = p.mIdentification;
+			mLongDescription = p.mLongDescription;
+			if (downStream)
+			{
+				foreach (IfcRelAssignsToProcess rap in mOperatesOn)
+					db.Factory.Duplicate(rap);
+			}
+
+		}
 		protected IfcProcess(DatabaseIfc db) : base(db)
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)

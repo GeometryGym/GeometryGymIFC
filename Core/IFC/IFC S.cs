@@ -2412,7 +2412,7 @@ additional types	some additional representation types are given:
 		public IfcSwitchingDeviceType(DatabaseIfc m, string name, IfcSwitchingDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcSymbolStyle // DEPRECEATED IFC4
+	//ENTITY IfcSymbolStyle // IfcPresentationStyleSelect DEPRECEATED IFC4
 	[Serializable]
 	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{

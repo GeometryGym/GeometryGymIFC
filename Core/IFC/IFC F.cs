@@ -83,8 +83,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcFaceBasedSurfaceModel() : base() { }
 		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s) : base(db,s) { s.FbsmFaces.ToList().ForEach(x => addFace( db.Factory.Duplicate(x) as IfcConnectedFaceSet)); }
-		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet face) : base(face.mDatabase) { mFbsmFaces.Add(face.mIndex); }
-		public IfcFaceBasedSurfaceModel(List<IfcConnectedFaceSet> faces) : base(faces[0].mDatabase) { faces.ForEach(x => addFace(x)); }
+		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet faceSet) : base(faceSet.mDatabase) { mFbsmFaces.Add(faceSet.mIndex); }
+		public IfcFaceBasedSurfaceModel(IEnumerable<IfcConnectedFaceSet> faceSets) : base(faceSets.First().mDatabase) { mFbsmFaces.AddRange(faceSets.Select(x=>x.StepId)); }
 
 		internal void addFace(IfcConnectedFaceSet face) { mFbsmFaces.Add(face.mIndex); }
 	}
@@ -293,7 +293,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcFillAreaStyle : IfcPresentationStyle
+	public partial class IfcFillAreaStyle : IfcPresentationStyle, IfcPresentationStyleSelect
 	{
 		internal SET<IfcFillStyleSelect> mFillStyles = new SET<IfcFillStyleSelect>();// : SET [1:?] OF IfcFillStyleSelect;
 	
@@ -302,6 +302,7 @@ namespace GeometryGym.Ifc
 		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
 		public IfcFillAreaStyle(IfcFillStyleSelect style) : base(style.Database) { mFillStyles.Add(style); }
 		public IfcFillAreaStyle(IEnumerable<IfcFillStyleSelect> styles) : base(styles.First().Database) { mFillStyles.AddRange(styles); }
+		internal IfcFillAreaStyle(DatabaseIfc db, IfcFillAreaStyle fillAreaStyle) : base(db, fillAreaStyle) { FillStyles.AddRange(fillAreaStyle.FillStyles.Select(x => db.Factory.Duplicate(x) as IfcFillStyleSelect)); }
 	}
 	[Serializable]
 	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem, IfcFillStyleSelect

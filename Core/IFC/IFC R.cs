@@ -767,7 +767,10 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingProcess; } 
 
 		internal IfcRelAssignsToProcess() : base() { }
-		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingProcess = db.Factory.Duplicate(r.RelatingProcess, ownerHistory, false) as IfcProcess; }
+		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		{
+			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess, ownerHistory, false) as IfcProcess;
+		}
 		public IfcRelAssignsToProcess(IfcProcess relProcess) : base(relProcess.mDatabase) { RelatingProcess = relProcess; }
 		public IfcRelAssignsToProcess(IfcProcess relProcess, IfcObjectDefinition related) : base(related) { RelatingProcess = relProcess; }
 		public IfcRelAssignsToProcess(IfcProcess relProcess, IEnumerable<IfcObjectDefinition> related) : base(related) { RelatingProcess = relProcess; }
