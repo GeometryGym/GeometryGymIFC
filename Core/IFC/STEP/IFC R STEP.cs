@@ -1159,7 +1159,6 @@ namespace GeometryGym.Ifc
 			{
 				if (od == null)
 					continue;
-				od.Nests = this;
 				IfcDistributionPort distributionPort = od as IfcDistributionPort;
 				if(distributionPort != null)
 				{

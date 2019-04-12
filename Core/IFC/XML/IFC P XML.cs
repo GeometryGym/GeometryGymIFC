@@ -501,6 +501,8 @@ namespace GeometryGym.Ifc
 					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 				else if (string.Compare(name, "Representation") == 0)
 					Representation = mDatabase.ParseXml<IfcProductRepresentation>(child as XmlElement);
+				else if (string.Compare(name, "Placement") == 0)
+					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)

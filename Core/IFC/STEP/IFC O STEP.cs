@@ -58,7 +58,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mBenchmarkValues = ParserSTEP.StripListLink(str, ref pos, len);
-			string s = ParserSTEP.StripString(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcLogicalOperatorEnum>(s.Replace(".", ""), true, out mLogicalAggregator);
 			Enum.TryParse<IfcObjectiveEnum>(ParserSTEP.StripField( str, ref pos, len).Replace(".", ""), true, out mObjectiveQualifier);

@@ -308,7 +308,9 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			JObject jobj = obj.GetValue("ObjectPlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
+			if (jobj == null)
+				jobj = obj.GetValue("Placement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if(jobj != null)
 				ObjectPlacement = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
 			base.parseJObject(obj);
 			jobj = obj.GetValue("Representation", StringComparison.InvariantCultureIgnoreCase) as JObject;
