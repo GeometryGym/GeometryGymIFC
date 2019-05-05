@@ -1858,13 +1858,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcCsgSolid() : base() { }
 		internal IfcCsgSolid(DatabaseIfc db, IfcCsgSolid p) : base(db,p) { TreeRootExpression = db.Factory.Duplicate(p.mDatabase[ p.mTreeRootExpression]) as IfcCsgSelect; }
-		public IfcCsgSolid(IfcCsgSelect csg)
-			: base(csg.Database)
-		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned && mDatabase.mModelView != ModelView.Ifc4DesignTransfer)
-				throw new Exception("Invalid Model View for IfcCsgSolid : " + mDatabase.ModelView.ToString());
-			TreeRootExpression = csg;
-		}
+		public IfcCsgSolid(IfcCsgSelect csg) : base(csg.Database) { TreeRootExpression = csg; }
 	}
 	[Serializable]
 	public partial class IfcCShapeProfileDef : IfcParameterizedProfileDef
