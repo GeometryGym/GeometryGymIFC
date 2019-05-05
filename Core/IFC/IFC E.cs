@@ -666,9 +666,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public partial class IfcElementAssembly : IfcElement
 	{
-		//GG
-		private IfcObjectDefinition mHost = null;
-
 		internal IfcAssemblyPlaceEnum mAssemblyPlace = IfcAssemblyPlaceEnum.NOTDEFINED;//: OPTIONAL IfcAssemblyPlaceEnum;
 		internal IfcElementAssemblyTypeEnum mPredefinedType = IfcElementAssemblyTypeEnum.NOTDEFINED;//: OPTIONAL IfcElementAssemblyTypeEnum;
 		public IfcAssemblyPlaceEnum AssemblyPlace { get { return mAssemblyPlace; } set { mAssemblyPlace = value; } }
@@ -676,23 +673,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcElementAssembly() : base() { }
 		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
-		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum place, IfcElementAssemblyTypeEnum type) : base(host.mDatabase) { mHost = host; AssemblyPlace = place; PredefinedType = type; }
-		 
-		protected override void addProduct(IfcProduct product)
-		{
-			if (mIsDecomposedBy.Count == 0 || mIsDecomposedBy[0].mRelatedObjects.Count == 0)
-			{
-				IfcProduct hostproduct = mHost as IfcProduct;
-				if(hostproduct != null)
-					hostproduct.AddElement(this);
-				else
-				{
-					new IfcRelAggregates(mHost, this);
-				}
-			}
-			else
-				base.addProduct(product);
-		}
+		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum place, IfcElementAssemblyTypeEnum type) : base(host, null, null) { AssemblyPlace = place; PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcElementAssemblyType : IfcElementType //IFC4
@@ -739,7 +720,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcElementQuantity() : base() { }
 		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, IfcOwnerHistory ownerHistory, bool downStream) : base(db, q, ownerHistory, downStream) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
-		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.RelatedObjects.Add(obj); }
+		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcElementQuantity(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcElementQuantity(string name, IfcPhysicalQuantity quantity) : base(quantity.mDatabase, name) { addQuantity(quantity); }

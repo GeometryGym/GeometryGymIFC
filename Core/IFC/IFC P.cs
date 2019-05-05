@@ -1820,7 +1820,7 @@ namespace GeometryGym.Ifc
 		public Dictionary<string,IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcPropertySet() : base() { }
-		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; DefinesOccurrence.RelatedObjects.Add(obj); }
+		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
 		{
@@ -1963,11 +1963,11 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal SET<IfcTypeObject> mDefinesType = new SET<IfcTypeObject>();// :	SET OF IfcTypeObject FOR HasPropertySets; IFC4change
 		internal List<IfcRelDefinesByTemplate> mIsDefinedBy = new List<IfcRelDefinesByTemplate>();//IsDefinedBy	 :	SET OF IfcRelDefinesByTemplate FOR RelatedPropertySets;
-		private IfcRelDefinesByProperties mDefinesOccurrence = null; //:	SET [0:1] OF IfcRelDefinesByProperties FOR RelatingPropertyDefinition;
+		private SET<IfcRelDefinesByProperties> mDefinesOccurrence = new SET<IfcRelDefinesByProperties>(); //:	SET [0:1] OF IfcRelDefinesByProperties FOR RelatingPropertyDefinition;
 		
 		public SET<IfcTypeObject> DefinesType { get { return mDefinesType; } }
 		public ReadOnlyCollection<IfcRelDefinesByTemplate> IsDefinedBy { get { return new ReadOnlyCollection<IfcRelDefinesByTemplate>(mIsDefinedBy); } }
-		public IfcRelDefinesByProperties DefinesOccurrence { get { if (mDefinesOccurrence == null) mDefinesOccurrence = new IfcRelDefinesByProperties(this) { Name = Name }; return mDefinesOccurrence; } set { mDefinesOccurrence = value; } }
+		public SET<IfcRelDefinesByProperties> DefinesOccurrence { get { return mDefinesOccurrence; } }
 
 		protected IfcPropertySetDefinition() : base() { }
 		protected IfcPropertySetDefinition(DatabaseIfc db, IfcPropertySetDefinition s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
@@ -1981,12 +1981,11 @@ namespace GeometryGym.Ifc
 				to.HasPropertySets.Add(this);
 			else
 			{
-				if (mDefinesOccurrence == null)
-					mDefinesOccurrence = new IfcRelDefinesByProperties(relatedObject, this);
+				if (mDefinesOccurrence.Count == 0)
+					new IfcRelDefinesByProperties(relatedObject, this);
 				else
-					mDefinesOccurrence.RelatedObjects.Add(relatedObject);
+					mDefinesOccurrence[0].RelatedObjects.Add(relatedObject);
 			}
-
 		}
 
 		internal bool IsInstancePropertySet
@@ -2012,7 +2011,6 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcPropertySetTemplateTypeEnum mTemplateType = Ifc.IfcPropertySetTemplateTypeEnum.NOTDEFINED;//	:	OPTIONAL IfcPropertySetTemplateTypeEnum;
 		private string mApplicableEntity = "$";//	:	OPTIONAL IfcIdentifier;
-		private List<int> mHasPropertyTemplateIndices = new List<int>(1);//
 		private Dictionary<string, IfcPropertyTemplate> mHasPropertyTemplates = new Dictionary<string, IfcPropertyTemplate>();//  : SET [1:?] OF IfcPropertyTemplate;
 
 		//INVERSE
@@ -2030,18 +2028,17 @@ namespace GeometryGym.Ifc
 				mApplicableTypes = null;
 			}
 		}
-		public ReadOnlyDictionary<string, IfcPropertyTemplate> HasPropertyTemplates { get { return new ReadOnlyDictionary<string, IfcPropertyTemplate>(mHasPropertyTemplates); } }
+		public Dictionary<string, IfcPropertyTemplate> HasPropertyTemplates { get { return mHasPropertyTemplates; } }
 		public ReadOnlyCollection<IfcRelDefinesByTemplate> Defines => new ReadOnlyCollection<IfcRelDefinesByTemplate>(mDefines);
 
 		protected override void initialize()
 		{
 			base.initialize();
 			mHasPropertyTemplates = new Dictionary<string, IfcPropertyTemplate>();
-			mHasPropertyTemplateIndices = new List<int>();
 		}
 
 		internal IfcPropertySetTemplate() : base() { }
-		public IfcPropertySetTemplate(DatabaseIfc db, string name) : base(db,name) { }
+		public IfcPropertySetTemplate(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySetTemplate(DatabaseIfc db, IfcPropertySetTemplate p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
 		{
 			mTemplateType = p.mTemplateType;
@@ -2052,7 +2049,7 @@ namespace GeometryGym.Ifc
 		public IfcPropertySetTemplate(string name, IfcPropertyTemplate propertyTemplate) : this(propertyTemplate.mDatabase, name) { AddPropertyTemplate(propertyTemplate); }
 		public IfcPropertySetTemplate(string name, IEnumerable<IfcPropertyTemplate> propertyTemplates) : base(propertyTemplates.First().mDatabase, name) { foreach(IfcPropertyTemplate propertyTemplate in propertyTemplates) AddPropertyTemplate(propertyTemplate); }
 		
-		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplateIndices.Add(template.mIndex); mHasPropertyTemplates[template.Name] = template; template.mPartOfPsetTemplate.Add(this); }
+		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplates[template.Name] = template; template.mPartOfPsetTemplate.Add(this); }
 		public IfcPropertyTemplate this[string name]
 		{
 			get
@@ -2064,7 +2061,7 @@ namespace GeometryGym.Ifc
 				return result;
 			}
 		}
-		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfPsetTemplate.Remove(this); mHasPropertyTemplateIndices.Remove(template.Index); mHasPropertyTemplates.Remove(templateName); } }
+		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfPsetTemplate.Remove(this);  mHasPropertyTemplates.Remove(templateName); } }
 		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.GetObjectDefinitionType()); }
 		public bool IsApplicable(Type type,string predefined)
 		{

@@ -1647,7 +1647,7 @@ namespace GeometryGym.Ifc
 			//RelatedObjects = d.RelatedObjects.ConvertAll(x=>db.Factory.Duplicate(x) as IfcObjectDefinition);
 			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition, ownerHistory, downStream) as IfcPropertySetDefinition;
 		}
-		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.mDatabase) { mRelatingPropertyDefinition = propertySet; }
+		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.mDatabase) { mRelatingPropertyDefinition = propertySet; propertySet.DefinesOccurrence.Add(this); }
 		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.Add(relatedObject); }
 		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> relatedObjects, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.AddRange(relatedObjects); }
 

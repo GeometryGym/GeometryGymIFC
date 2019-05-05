@@ -1030,7 +1030,6 @@ namespace GeometryGym.Ifc
 			RelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcObjectDefinition));
 			mRelatingPropertyDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPropertySetDefinition;
 		}
-
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines //IFC4
 	{

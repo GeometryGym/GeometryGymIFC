@@ -246,22 +246,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcElementAssembly : IfcElement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release)
-		{
-			bool empty = Representation == null;
-			if (empty)
-			{
-				for (int icounter = 0; icounter < mIsDecomposedBy.Count; icounter++)
-				{
-					if (mIsDecomposedBy[icounter].mRelatedObjects.Count > 0)
-					{
-						empty = false;
-						break;
-					}
-				}
-			}
-			return (empty ? "" : base.BuildStringSTEP(release) + ",." + mAssemblyPlace.ToString() + ".,." + mPredefinedType.ToString() + ".");
-		}
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mAssemblyPlace.ToString() + ".,." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

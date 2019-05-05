@@ -315,7 +315,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)
-		
 		{
 			if (relativeTo != null)
 				PlacementRelTo = relativeTo;

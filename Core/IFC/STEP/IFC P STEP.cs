@@ -772,7 +772,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			foreach (IfcProperty property in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcProperty))
-				mHasProperties[property.Name] = property;
+				addProperty(property);
 		}
 	}
 	public partial class IfcPropertySetTemplate : IfcPropertyTemplateDefinition
@@ -781,11 +781,8 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4 || mHasPropertyTemplates.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + (mTemplateType == IfcPropertySetTemplateTypeEnum.NOTDEFINED ? ",$," : ",." + mTemplateType + ".,") +
-				(mApplicableEntity == "$" ? "$,(" : "'" + mApplicableEntity + "',(") + ParserSTEP.LinkToString(mHasPropertyTemplateIndices[0]);
-			for (int icounter = 1; icounter < mHasPropertyTemplates.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mHasPropertyTemplateIndices[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + (mTemplateType == IfcPropertySetTemplateTypeEnum.NOTDEFINED ? ",$," : ",." + mTemplateType + ".,") +
+				(mApplicableEntity == "$" ? "$,(#" : "'" + mApplicableEntity + "',(#") + string.Join(",#", mHasPropertyTemplates.Values.Select(x => x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -794,21 +791,8 @@ namespace GeometryGym.Ifc
 			if (field.StartsWith("."))
 				Enum.TryParse<IfcPropertySetTemplateTypeEnum>(field.Replace(".", ""), true, out mTemplateType);
 			mApplicableEntity = ParserSTEP.StripString(str, ref pos, len);
-			mHasPropertyTemplateIndices = ParserSTEP.StripListLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (int i in mHasPropertyTemplateIndices)
-			{
-				try
-				{
-					IfcPropertyTemplate template = mDatabase[i] as IfcPropertyTemplate;
-					mHasPropertyTemplates[template.Name] = template;
-					template.mPartOfPsetTemplate.Add(this);
-				}
-				catch(Exception) { }
-			}
+			foreach (IfcPropertyTemplate property in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcPropertyTemplate))
+				AddPropertyTemplate(property);	
 		}
 	}
 	public partial class IfcPropertySingleValue : IfcSimpleProperty
