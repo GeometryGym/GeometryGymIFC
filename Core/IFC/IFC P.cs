@@ -2016,7 +2016,7 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcRelDefinesByTemplate> mDefines = new List<IfcRelDefinesByTemplate>();//	:	SET OF IfcRelDefinesByTemplate FOR RelatingTemplate;
 
-		private List<ApplicableType> mApplicableTypes = null;
+		private ApplicableFilter mApplicableFilter = null;
 
 		public IfcPropertySetTemplateTypeEnum TemplateType { get { return mTemplateType; } set { mTemplateType = value; } }
 		public string ApplicableEntity
@@ -2025,7 +2025,7 @@ namespace GeometryGym.Ifc
 			set
 			{
 				mApplicableEntity = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value));
-				mApplicableTypes = null;
+				mApplicableFilter = null;
 			}
 		}
 		public Dictionary<string, IfcPropertyTemplate> HasPropertyTemplates { get { return mHasPropertyTemplates; } }
@@ -2062,35 +2062,20 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfPsetTemplate.Remove(this);  mHasPropertyTemplates.Remove(templateName); } }
-		public bool IsApplicable(IfcObjectDefinition obj) { return IsApplicable(obj.GetType(), obj.GetObjectDefinitionType()); }
-		public bool IsApplicable(Type type,string predefined)
+		public bool IsApplicable(IfcObjectDefinition obj)
 		{
-			if (mApplicableTypes == null)
-				fillApplicableTypes();
-			foreach (ApplicableType t in mApplicableTypes)
-			{
-				if (t.isApplicable(type, predefined))
-					return true;
-			}
-			return false;
+			if (mApplicableFilter == null)
+				mApplicableFilter = new ApplicableFilter(ApplicableEntity);
+			return IsApplicable(obj);
 		}
-		private void fillApplicableTypes()
+		public bool IsApplicable(Type typeIfc,string predefined)
 		{
-			mApplicableTypes = new List<ApplicableType>();
-			string[] fields = mApplicableEntity.Split(",".ToCharArray());
-			foreach(string str in fields)
-			{
-				if (string.IsNullOrEmpty(str))
-					continue;
-				string[] pair = str.Split("/".ToCharArray());
-				string typename = (pair == null ? str : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
-				Type type = Type.GetType("GeometryGym.Ifc." + typename);
-				if (type == null)
-					continue;	
-				mApplicableTypes.Add( new ApplicableType(type,predefined));
-			}
+			if (mApplicableFilter == null)
+				mApplicableFilter = new ApplicableFilter(ApplicableEntity);
 
+			return mApplicableFilter.IsApplicable(typeIfc, predefined);
 		}
+		
 	}
 	[Serializable]
 	public partial class IfcPropertySingleValue : IfcSimpleProperty

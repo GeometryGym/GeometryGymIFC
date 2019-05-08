@@ -1602,7 +1602,40 @@ namespace GeometryGym.Ifc
 		}
 	}
 
+	public class ApplicableFilter
+	{
+		private List<ApplicableType> mApplicableTypes = new List<ApplicableType>();
+		public ApplicableFilter(string filter)
+		{
+			mApplicableTypes = new List<ApplicableType>();
+			string[] fields = filter.Split(",".ToCharArray());
+			foreach (string str in fields)
+			{
+				if (string.IsNullOrEmpty(str))
+					continue;
+				string[] pair = str.Split("/".ToCharArray());
+				string typename = (pair == null ? str : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
+				Type type = Type.GetType("GeometryGym.Ifc." + typename);
+				if (type == null)
+					continue;
+				mApplicableTypes.Add(new ApplicableType(type, predefined));
+			}
+		}
 
+		public bool IsApplicable(IfcObjectDefinition obj)
+		{
+			return IsApplicable(obj.GetType(), obj.GetObjectDefinitionType());
+		}
+		public bool IsApplicable(Type typeIfc, string predefined)
+		{
+			foreach (ApplicableType t in mApplicableTypes)
+			{
+				if (t.isApplicable(typeIfc, predefined))
+					return true;
+			}
+			return false;
+		}
+	}
 	internal class ApplicableType
 	{
 		private Type mType = null;
