@@ -524,6 +524,11 @@ namespace GeometryGym.Ifc
 		{
 			if (string.Compare(date, "$") == 0)
 				return DateTime.MinValue;
+			try
+			{
+				return DateTime.Parse(date);
+			}
+			catch(Exception) { }
 			string str = date.Replace("'", "");
 			string[] fields = str.Split("-".ToCharArray());
 			return new DateTime(int.Parse(fields[0]), int.Parse(fields[1]), int.Parse(fields[2]));
