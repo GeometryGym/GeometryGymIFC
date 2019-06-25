@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Units");
+			XmlElement element = xml.OwnerDocument.CreateElement("Units", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcUnit unit in Units)
 				element.AppendChild(mDatabase[unit.Index].GetXML(xml.OwnerDocument, "", this, processed));

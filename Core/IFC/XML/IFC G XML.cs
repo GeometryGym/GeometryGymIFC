@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 			}
 			if (mHasSubContexts.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasSubContexts");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasSubContexts", mDatabase.mXmlNamespace);
 				foreach (IfcGeometricRepresentationSubContext sub in mHasSubContexts)
 					element.AppendChild(sub.GetXML(xml.OwnerDocument, "", this, processed));
 				xml.AppendChild(element);
@@ -136,7 +136,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Elements");
+			XmlElement element = xml.OwnerDocument.CreateElement("Elements", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcGeometricSetSelect el in mElements)
 				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
@@ -175,19 +175,19 @@ namespace GeometryGym.Ifc
 			XmlElement uAxes = null, vAxes = null, wAxes = null;
 			if (mUAxes.Count > 0)
 			{
-				uAxes = xml.OwnerDocument.CreateElement("UAxes");
+				uAxes = xml.OwnerDocument.CreateElement("UAxes", mDatabase.mXmlNamespace);
 				foreach (IfcGridAxis a in UAxes)
 					uAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mVAxes.Count > 0)
 			{
-				vAxes = xml.OwnerDocument.CreateElement("VAxes");
+				vAxes = xml.OwnerDocument.CreateElement("VAxes", mDatabase.mXmlNamespace);
 				foreach (IfcGridAxis a in VAxes)
 					vAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mWAxes.Count > 0)
 			{
-				wAxes = xml.OwnerDocument.CreateElement("WAxes");
+				wAxes = xml.OwnerDocument.CreateElement("WAxes", mDatabase.mXmlNamespace);
 				foreach (IfcGridAxis a in WAxes)
 					wAxes.AppendChild(a.GetXML(xml.OwnerDocument, "", this, processed));
 			}
@@ -255,7 +255,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mIsGroupedBy.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("IsGroupedBy");
+				XmlElement element = xml.OwnerDocument.CreateElement("IsGroupedBy", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcRelAssignsToGroup rag in mIsGroupedBy)
 					element.AppendChild(rag.GetXML(xml.OwnerDocument, "", this, processed));

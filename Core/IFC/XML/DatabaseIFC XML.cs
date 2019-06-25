@@ -52,9 +52,9 @@ namespace GeometryGym.Ifc
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			Release = ReleaseVersion.IFC4;
-			foreach(XmlNode node in doc.DocumentElement.ChildNodes)
+			foreach (XmlNode node in doc.DocumentElement.ChildNodes)
 			{
-				ParseXml<IBaseClassIfc>( node as XmlElement);
+				ParseXml<IBaseClassIfc>(node as XmlElement);
 			}
 			postImport();
 		}
@@ -86,14 +86,14 @@ namespace GeometryGym.Ifc
 		{
 			if (xml == null)
 				return default(T);
-			if(xml.HasAttribute("ref"))
+			if (xml.HasAttribute("ref"))
 			{
 				string str = xml.Attributes["ref"].Value;
 				if (mParsed.ContainsKey(str))
 					return (T)(IBaseClassIfc)mParsed[str];
-				if(xml.HasAttribute("xsi:nil"))
+				if (xml.HasAttribute("xsi:nil"))
 				{
-					string query = string.Format("//*[@id='{0}']", str); 
+					string query = string.Format("//*[@id='{0}']", str);
 					xml = (XmlElement)xml.OwnerDocument.SelectSingleNode(query);
 					if (xml == null)
 						return default(T);
@@ -121,7 +121,7 @@ namespace GeometryGym.Ifc
 			if (type == null)
 			{
 				type = typeof(T);
-				if(xml.Attributes.Count == 0 && xml.ChildNodes.Count == 1)
+				if (xml.Attributes.Count == 0 && xml.ChildNodes.Count == 1)
 				{
 					XmlNode node = xml.ChildNodes[0];
 					Type childType = BaseClassIfc.GetType(node.Name);
@@ -130,16 +130,16 @@ namespace GeometryGym.Ifc
 						return ParseXml<T>(node as XmlElement);
 					}
 				}
-			}	
-			if(type.IsAbstract)
+			}
+			if (type.IsAbstract)
 			{
-				IEnumerable<Type> types = type.Assembly.GetTypes().Where(x=> x != type && type.IsAssignableFrom(x));
+				IEnumerable<Type> types = type.Assembly.GetTypes().Where(x => x != type && type.IsAssignableFrom(x));
 				if (types != null && types.Count() == 1)
 					type = types.First();
 			}
 			ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
 null, Type.EmptyTypes, null);
-			if(type.IsAbstract && xml.HasChildNodes && xml.ChildNodes.Count == 1)
+			if (type.IsAbstract && xml.HasChildNodes && xml.ChildNodes.Count == 1)
 			{
 				T result = ParseXml<T>(xml.ChildNodes[0] as XmlElement);
 				if (result != null)
@@ -151,7 +151,7 @@ null, Type.EmptyTypes, null);
 				if (entity != null)
 				{
 					int index = NextBlank();
-					if(!string.IsNullOrEmpty(id))
+					if (!string.IsNullOrEmpty(id))
 					{
 						int i = 0;
 						if (id[0] == 'i')
@@ -168,7 +168,7 @@ null, Type.EmptyTypes, null);
 					if (xml.HasAttribute("id"))
 					{
 						string str = xml.Attributes["id"].Value;
-						if(!mParsed.ContainsKey(str))
+						if (!mParsed.ContainsKey(str))
 							mParsed.Add(str, entity);
 					}
 					return (T)(IBaseClassIfc)entity;
@@ -184,12 +184,13 @@ null, Type.EmptyTypes, null);
 			{
 				ParseXml<IBaseClassIfc>(node as XmlElement);
 			}
-			
+
 			return default(T);
 		}
-		internal string mXmlNamespace = "http://www.buildingsmart-tech.org/ifcXML/IFC4_ADD2";
-		internal string mXmlSchema = "http://www.buildingsmart-tech.org/ifc/IFC4/Add2/IFC4_ADD2.xsd";
-		internal string mXsiNamespace = "http://www.w3.org/2001/XMLSchema-instance";
+		internal string mXmlNamespace = @"http://www.buildingsmart-tech.org/ifc/IFC4x1/final";
+		internal string mXmlSchema = @"http://standards.buildingsmart.org/IFC/RELEASE/IFC4_1/FINAL/XML/IFC4x1.xsd";
+
+		internal string mXsiNamespace = @"http://www.w3.org/2001/XMLSchema-instance";
 		public bool WriteXMLFile(string filename)
 		{
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
@@ -198,36 +199,37 @@ null, Type.EmptyTypes, null);
 			XmlDocument doc = new XmlDocument();
 			XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
 			doc.AppendChild(dec);
-			
-			XmlElement el = doc.CreateElement("ifc:ifcXML", mXmlNamespace);
-			
+
+			XmlElement el = doc.CreateElement("ifcXML", mXmlNamespace);
 			doc.AppendChild(el);
-			XmlAttribute schemaLocation = doc.CreateAttribute("xsi", "schemaLocation",mXsiNamespace);
+
+			XmlAttribute schemaLocation = doc.CreateAttribute("xsi", "schemaLocation", mXsiNamespace);
 			schemaLocation.Value = mXmlSchema;
 			el.SetAttributeNode(schemaLocation);
 
-			XmlAttribute ns = doc.CreateAttribute("xlmns", "ifc", mXmlNamespace);
-			ns.Value = mXmlNamespace;
-			el.SetAttribute("xlmns", mXmlNamespace);
-
 			Dictionary<int, XmlElement> processed = new Dictionary<int, XmlElement>();
 			IfcContext context = Context;
-			if(context != null)
+			if (context != null)
 				el.AppendChild(Context.GetXML(doc, "", null, processed));
 
-			if (context == null || (context.mIsDecomposedBy.Count == 0 && context.Declares.Count == 0))
+			List<BaseClassIfc> toProcess = new List<BaseClassIfc>();
+			foreach (BaseClassIfc e in this)
 			{
-				foreach (BaseClassIfc e in this)
+				if (!processed.ContainsKey(e.Index))
 				{
-					if (!processed.ContainsKey(e.Index))
+					if (e is IfcRelationship)
 						el.AppendChild(e.GetXML(doc, "", null, processed));
+					else
+						toProcess.Add(e);
 				}
 			}
+			foreach (BaseClassIfc e in toProcess)
+				el.AppendChild(e.GetXML(doc, "", null, processed));
 
 			XmlTextWriter writer;
 			try
 			{
-				writer = new XmlTextWriter(filename,Encoding.UTF8);
+				writer = new XmlTextWriter(filename, Encoding.UTF8);
 				writer.Formatting = Formatting.Indented;
 				try
 				{
@@ -239,12 +241,11 @@ null, Type.EmptyTypes, null);
 					writer.Close();
 				}
 			}
-			catch(Exception ) { }
+			catch (Exception) { }
 			Thread.CurrentThread.CurrentUICulture = current;
 			return true;
 		}
-		
+
 	}
 }
 
- 

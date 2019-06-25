@@ -195,7 +195,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("MaterialLayers");
+			XmlElement element = xml.OwnerDocument.CreateElement("MaterialLayers", mDatabase.mXmlNamespace);
 			foreach (IfcMaterialLayer l in MaterialLayers)
 				element.AppendChild(l.GetXML(xml.OwnerDocument, "", this, processed));
 			xml.AppendChild(element);
@@ -277,7 +277,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			XmlElement element = xml.OwnerDocument.CreateElement("MaterialProfiles");
+			XmlElement element = xml.OwnerDocument.CreateElement("MaterialProfiles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcMaterialProfile p in MaterialProfiles)
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
@@ -314,7 +314,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(convert(xml.OwnerDocument, mValueComponent, "ValueComponent"));
+			xml.AppendChild(convert(xml.OwnerDocument, mValueComponent, "ValueComponent", mDatabase.mXmlNamespace));
 			xml.AppendChild(mDatabase[mUnitComponent].GetXML(xml.OwnerDocument, "UnitComponent", this, processed));
 		}
 	}
@@ -356,7 +356,7 @@ namespace GeometryGym.Ifc
 			if (mDataValue > 0)
 				xml.AppendChild(mDatabase[mDataValue].GetXML(xml.OwnerDocument, "DataValue", this, processed));
 			else if(mDataValueValue != null)
-				xml.AppendChild(convert(xml.OwnerDocument, mDataValueValue, "DataValue"));
+				xml.AppendChild(convert(xml.OwnerDocument, mDataValueValue, "DataValue", mDatabase.mXmlNamespace));
 			if(mReferencePath > 0)
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath", this, processed));
 		}

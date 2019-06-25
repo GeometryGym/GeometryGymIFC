@@ -62,11 +62,11 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Points.GetXML(xml.OwnerDocument, "Points", this, processed));
 			if (mSegments.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Segments");
+				XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcSegmentIndexSelect seg in Segments)
 				{
-					XmlElement s = xml.OwnerDocument.CreateElement(seg.GetType().Name + "-wrapper");
+					XmlElement s = xml.OwnerDocument.CreateElement(seg.GetType().Name + "-wrapper", mDatabase.mXmlNamespace);
 					element.AppendChild(s);
 					IfcArcIndex ai = seg as IfcArcIndex;
 					if (ai != null)

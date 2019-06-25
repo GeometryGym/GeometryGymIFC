@@ -65,14 +65,14 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Name", Name);
 			if (mRows.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Rows");
+				XmlElement element = xml.OwnerDocument.CreateElement("Rows", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcTableRow r in Rows)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", null, processed));
 			}
 			if (mColumns.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Columns");
+				XmlElement element = xml.OwnerDocument.CreateElement("Columns", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcTableColumn c in Columns)
 					element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
@@ -137,10 +137,10 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if(mRowCells.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("RowCells");
+				XmlElement element = xml.OwnerDocument.CreateElement("RowCells", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcValue v in RowCells)
-					element.AppendChild(convert(xml.OwnerDocument, v, "IfcValue"));
+					element.AppendChild(convert(xml.OwnerDocument, v, "IfcValue", mDatabase.mXmlNamespace));
 			}
 			xml.SetAttribute("IsHeading", mIsHeading.ToString().ToLower());
 		}
@@ -188,44 +188,44 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mTelephoneNumbers.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("TelephoneNumbers");
+				XmlElement element = xml.OwnerDocument.CreateElement("TelephoneNumbers", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (string line in TelephoneNumbers)
 				{
-					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper", mDatabase.mXmlNamespace);
 					l.InnerText = line;
 					element.AppendChild(l);
 				}
 			}
 			if (mTelephoneNumbers.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("FacsimileNumbers");
+				XmlElement element = xml.OwnerDocument.CreateElement("FacsimileNumbers", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (string line in FacsimileNumbers)
 				{
-					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper", mDatabase.mXmlNamespace);
 					l.InnerText = line;
 					element.AppendChild(l);
 				}
 			}
 			if (mElectronicMailAddresses.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("ElectronicMailAddresses");
+				XmlElement element = xml.OwnerDocument.CreateElement("ElectronicMailAddresses", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (string line in ElectronicMailAddresses)
 				{
-					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper");
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcLabel-wrapper", mDatabase.mXmlNamespace);
 					l.InnerText = line;
 					element.AppendChild(l);
 				}
 			}
 			if (mMessagingIDs.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("MessagingIDs");
+				XmlElement element = xml.OwnerDocument.CreateElement("MessagingIDs", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (string line in MessagingIDs)
 				{
-					XmlElement l = xml.OwnerDocument.CreateElement("IfcURIReference-wrapper");
+					XmlElement l = xml.OwnerDocument.CreateElement("IfcURIReference-wrapper", mDatabase.mXmlNamespace);
 					l.InnerText = line;
 					element.AppendChild(l);
 				}
@@ -406,10 +406,10 @@ namespace GeometryGym.Ifc
 		}
 		internal XmlElement getXML(XmlDocument doc, string name, Dictionary<int, XmlElement> processed, DatabaseIfc db)
 		{
-			XmlElement result = doc.CreateElement(name);
+			XmlElement result = doc.CreateElement(name, db.mXmlNamespace);
 			if (!double.IsNaN(mIfcParameterValue))
 			{
-				XmlElement element = doc.CreateElement("IfcParameterValue-wrapper");
+				XmlElement element = doc.CreateElement("IfcParameterValue-wrapper", db.mXmlNamespace);
 				element.InnerText = mIfcParameterValue.ToString();
 				result.AppendChild(element);
 			}
@@ -489,7 +489,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			XmlElement element = xml.OwnerDocument.CreateElement("HasPropertySets");
+			XmlElement element = xml.OwnerDocument.CreateElement("HasPropertySets", mDatabase.mXmlNamespace);
 			if (mHasPropertySets.Count > 0)
 			{
 				foreach (IfcPropertySetDefinition item in HasPropertySets)
@@ -528,7 +528,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mRepresentationMaps.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("RepresentationMaps");
+				XmlElement element = xml.OwnerDocument.CreateElement("RepresentationMaps", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 
 				foreach (IfcRepresentationMap item in RepresentationMaps)

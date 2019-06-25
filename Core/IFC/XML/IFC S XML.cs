@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 			if(mReinforcementRole != IfcReinforcingBarRoleEnum.NOTDEFINED)
 				xml.SetAttribute("ReinforcementRole", mReinforcementRole.ToString().ToLower());
 			xml.AppendChild(SectionDefinition.GetXML(xml.OwnerDocument, "SectionDefinition", this, processed));
-			XmlElement element = xml.OwnerDocument.CreateElement("CrossSectionReinforcementDefinitions");
+			XmlElement element = xml.OwnerDocument.CreateElement("CrossSectionReinforcementDefinitions", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcReinforcementBarProperties p in CrossSectionReinforcementDefinitions)
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
@@ -96,7 +96,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("ShapeRepresentations");
+			XmlElement element = xml.OwnerDocument.CreateElement("ShapeRepresentations", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcShapeModel s in ShapeRepresentations)
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
@@ -129,7 +129,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("SbsmBoundary");
+			XmlElement element = xml.OwnerDocument.CreateElement("SbsmBoundary", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (int i in mSbsmBoundary)
 				element.AppendChild(mDatabase[i].GetXML(xml.OwnerDocument, "", this, processed));
@@ -326,7 +326,7 @@ namespace GeometryGym.Ifc
 					if (rcss.mRelatedElements.Count > 0)
 					{
 						if (element == null)
-							element = xml.OwnerDocument.CreateElement("ContainsElements");
+							element = xml.OwnerDocument.CreateElement("ContainsElements", mDatabase.mXmlNamespace);
 						element.AppendChild(rcss.GetXML(xml.OwnerDocument, "", this, processed));
 					}
 				}
@@ -335,7 +335,7 @@ namespace GeometryGym.Ifc
 			}
 			if (mServicedBySystems.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("ServicedBySystems");
+				XmlElement element = xml.OwnerDocument.CreateElement("ServicedBySystems", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcRelServicesBuildings rsbs in ServicedBySystems)
 					element.AppendChild(rsbs.GetXML(xml.OwnerDocument, "", this, processed));
@@ -468,14 +468,14 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mDatabase[mOrientationOf2DPlane].GetXML(xml.OwnerDocument, "OrientationOf2DPlane", this, processed));
 			if (mLoadedBy.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("LoadedBy");
+				XmlElement element = xml.OwnerDocument.CreateElement("LoadedBy", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (int item in mLoadedBy)
 					element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mHasResults.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasResults");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasResults", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (int item in mHasResults)
 					element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
@@ -652,7 +652,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Styles");
+			XmlElement element = xml.OwnerDocument.CreateElement("Styles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (int item in mStyles)
 				element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
@@ -753,7 +753,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Side", mSide.ToString().ToLower());
-			XmlElement element = xml.OwnerDocument.CreateElement("Styles");
+			XmlElement element = xml.OwnerDocument.CreateElement("Styles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (int item in mStyles)
 				element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));

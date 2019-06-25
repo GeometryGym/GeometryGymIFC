@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Tag", Tag);
 			if(mHasOpenings.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasOpenings");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasOpenings", mDatabase.mXmlNamespace);
 				foreach (IfcRelVoidsElement voids in mHasOpenings)
 				{
 					if (voids.mIndex != host.mIndex)
@@ -91,8 +91,8 @@ namespace GeometryGym.Ifc
 				if (element.HasChildNodes)
 					xml.AppendChild(element);
 			}
-			XmlElement referencedBy = xml.OwnerDocument.CreateElement("ReferencedInStructures");
-			foreach(IfcRelReferencedInSpatialStructure rss in mReferencedInStructures)
+			XmlElement referencedBy = xml.OwnerDocument.CreateElement("ReferencedInStructures", mDatabase.mXmlNamespace);
+			foreach (IfcRelReferencedInSpatialStructure rss in mReferencedInStructures)
 			{
 				if (rss != host)
 					referencedBy.AppendChild(rss.GetXML(xml.OwnerDocument, "", this, processed));
@@ -205,7 +205,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			XmlElement element = xml.OwnerDocument.CreateElement("Properties");
+			XmlElement element = xml.OwnerDocument.CreateElement("Properties", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcProperty p in Properties.Values)
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
@@ -260,12 +260,12 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
-			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences");
+			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
 			foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
 				element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			if(element.HasChildNodes)
 				xml.AppendChild(element);
-			element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
+			element = xml.OwnerDocument.CreateElement("HasConstraintRelationships", mDatabase.mXmlNamespace);
 			foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 			{
 				if (host.mIndex != r.mIndex)
@@ -273,7 +273,7 @@ namespace GeometryGym.Ifc
 			}
 			if (element.HasChildNodes)
 				xml.AppendChild(element);
-			element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources");
+			element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources", mDatabase.mXmlNamespace);
 			foreach (IfcExternalReferenceRelationship r in ExternalReferenceForResources)
 			{
 				if (host.mIndex != r.mIndex)

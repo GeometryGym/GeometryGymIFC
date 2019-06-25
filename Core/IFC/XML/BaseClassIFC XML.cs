@@ -47,9 +47,12 @@ namespace GeometryGym.Ifc
 				{
 					XmlElement existing = processed[mIndex];
 					if (!existing.HasAttribute("id"))
-						existing.SetAttribute("id", "i" + mIndex);
+                    {
+                        if (existing.Attributes.Count == 0)
+                            existing.SetAttribute("id", "i" + mIndex);
+                    }
 				}
-				XmlElement xelement = doc.CreateElement(name);//, mDatabase.mXmlNamespace);
+				XmlElement xelement = doc.CreateElement(name, mDatabase.mXmlNamespace);
 				XmlAttribute nil = doc.CreateAttribute("xsi", "nil", mDatabase.mXsiNamespace);
 				nil.Value = "true";
 				xelement.SetAttributeNode(nil);
@@ -58,7 +61,7 @@ namespace GeometryGym.Ifc
 				return xelement;
 			}
 			
-			XmlElement element = doc.CreateElement(name);//, mDatabase.mXmlNamespace);
+			XmlElement element = doc.CreateElement(name, mDatabase.mXmlNamespace);
 			processed[mIndex] = element;
 			SetXML(element, host, processed);
 			
@@ -66,11 +69,12 @@ namespace GeometryGym.Ifc
 				element.SetAttribute("id", "i" + mIndex);
 			if (string.Compare(name, type) != 0)
 			{
-				XmlAttribute att = doc.CreateAttribute("xsi","type",mDatabase.mXsiNamespace);
-				//att.Prefix = "xsi";
-				//att.LocalName = type;
-				att.Value = type;
-				element.SetAttributeNode(att);
+				element.SetAttribute("type", mDatabase.mXsiNamespace, type);	
+				//XmlAttribute att = doc.CreateAttribute("xsi","type",mDatabase.mXsiNamespace);
+				////att.Prefix = "xsi";
+				////att.LocalName = type;
+				//att.Value = type;
+				//element.SetAttributeNode(att);
 			}
 			return element;
 		}
@@ -95,19 +99,19 @@ namespace GeometryGym.Ifc
 		{
 			if (objects == null || objects.Count() == 0)
 				return;
-			XmlElement element = xml.OwnerDocument.CreateElement(name);
+			XmlElement element = xml.OwnerDocument.CreateElement(name, mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IBaseClassIfc o in objects)
 				element.AppendChild(mDatabase[o.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
-		internal static XmlNode convert(XmlDocument doc, IfcValue value, string name)
+		internal static XmlNode convert(XmlDocument doc, IfcValue value, string name, string ifcnamespace)
 		{
 			string keyword = value.GetType().Name;
-			XmlElement v = doc.CreateElement(keyword + "-wrapper");
+			XmlElement v = doc.CreateElement(keyword + "-wrapper", ifcnamespace);
 			v.InnerText = value.ValueString;
 			if (string.IsNullOrEmpty(name))
 				return v;
-			XmlElement element = doc.CreateElement(name);
+			XmlElement element = doc.CreateElement(name, ifcnamespace);
 			element.AppendChild(v);
 			return element;
 		}

@@ -132,7 +132,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Voids");
+			XmlElement element = xml.OwnerDocument.CreateElement("Voids", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcClosedShell s in Voids)
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
@@ -222,7 +222,7 @@ namespace GeometryGym.Ifc
 
 			if (!double.IsNaN(mStartDistAlong))
 				setAttribute(xml, "StartDistAlong", mStartDistAlong.ToString());
-			XmlElement element = xml.OwnerDocument.CreateElement("Segments");
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcAlignment2DHorizontalSegment s in Segments)
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
@@ -325,7 +325,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(OuterBoundary.GetXML(xml.OwnerDocument, "OuterBoundary", this, processed));
 			if (mInnerBoundaries.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("InnerBoundaries");
+				XmlElement element = xml.OwnerDocument.CreateElement("InnerBoundaries", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcCurve c in InnerBoundaries)
 					element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
@@ -440,7 +440,7 @@ namespace GeometryGym.Ifc
 			if (mAppliedValueIndex > 0 && (host == null || host.mIndex != mAppliedValueIndex))
 				xml.AppendChild(mDatabase[mAppliedValueIndex].GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
 			else if (mAppliedValueValue != null)
-				xml.AppendChild(convert(xml.OwnerDocument, mAppliedValueValue, "AppliedValue"));
+				xml.AppendChild(convert(xml.OwnerDocument, mAppliedValueValue, "AppliedValue", mDatabase.mXmlNamespace));
 			if (mUnitBasis > 0)
 				xml.AppendChild(UnitBasis.GetXML(xml.OwnerDocument, "UnitBasis", this, processed));
 			//todo
@@ -450,7 +450,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("ArithmeticOperator", mArithmeticOperator.ToString().ToLower());
 			if (mComponents.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Components");
+				XmlElement element = xml.OwnerDocument.CreateElement("Components", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcAppliedValue v in Components)
 					element.AppendChild(v.GetXML(xml.OwnerDocument, "", this, processed));
@@ -458,14 +458,14 @@ namespace GeometryGym.Ifc
 
 			if (mHasExternalReferences.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mHasConstraintRelationships.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships", mDatabase.mXmlNamespace);
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
 					if (r.mIndex != host.mIndex)
@@ -535,7 +535,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("InnerCurves");
+			XmlElement element = xml.OwnerDocument.CreateElement("InnerCurves", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcCurve c in InnerCurves)
 				element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));

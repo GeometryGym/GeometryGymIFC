@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Bounds");
+			XmlElement element = xml.OwnerDocument.CreateElement("Bounds", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcFaceBound face in Bounds)
 				element.AppendChild(face.GetXML(xml.OwnerDocument, "", this, processed));
@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("FbsmFaces");
+			XmlElement element = xml.OwnerDocument.CreateElement("FbsmFaces", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcConnectedFaceSet face in FbsmFaces)
 				element.AppendChild(face.GetXML(xml.OwnerDocument, "", this, processed));
@@ -129,7 +129,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Voids");
+			XmlElement element = xml.OwnerDocument.CreateElement("Voids", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcClosedShell s in Voids)
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));

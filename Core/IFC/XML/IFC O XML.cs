@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mIsTypedBy.GetXML(xml.OwnerDocument, "IsTypedBy", this, processed));
 			if (mIsDefinedBy.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("IsDefinedBy");
+				XmlElement element = xml.OwnerDocument.CreateElement("IsDefinedBy", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcRelDefinesByProperties rd in IsDefinedBy)
 					element.AppendChild(rd.GetXML(xml.OwnerDocument, "", this, processed));
@@ -118,7 +118,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mHasAssignments.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasAssignments");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasAssignments", mDatabase.mXmlNamespace);
 				foreach (IfcRelAssigns rap in mHasAssignments)
 				{
 					if (rap.mIndex != host.mIndex)
@@ -129,27 +129,27 @@ namespace GeometryGym.Ifc
 			}
 			if (mIsNestedBy.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("IsNestedBy");
+				XmlElement element = xml.OwnerDocument.CreateElement("IsNestedBy", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcRelNests rn in IsNestedBy)
 					element.AppendChild(rn.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mIsDecomposedBy.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("IsDecomposedBy");
+				XmlElement element = xml.OwnerDocument.CreateElement("IsDecomposedBy", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcRelAggregates rags in IsDecomposedBy)
 					element.AppendChild(rags.GetXML(xml.OwnerDocument, "", this, processed));
 			}
-			if (mHasAssociations.Count > 0)
-			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasAssociations");
-				xml.AppendChild(element);
-				foreach (IfcRelAssociates ra in HasAssociations)
-					element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
-			}
-		}
-	}
+            //if (mHasAssociations.Count > 0)
+            //{
+            //	XmlElement element = xml.OwnerDocument.CreateElement("HasAssociations", mDatabase.mXmlNamespace);
+            //	xml.AppendChild(element);
+            //	foreach (IfcRelAssociates ra in HasAssociations)
+            //		element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
+            //}
+        }
+    }
 	public partial class IfcObjective : IfcConstraint
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -182,7 +182,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mBenchmarkValues.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("BenchmarkValues");
+				XmlElement element = xml.OwnerDocument.CreateElement("BenchmarkValues", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcConstraint constraint in BenchmarkValues)
 					element.AppendChild(constraint.GetXML(xml.OwnerDocument, "", this, processed));
@@ -223,7 +223,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 			if (mHasFillings.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasFillings");
+				XmlElement element = xml.OwnerDocument.CreateElement("HasFillings", mDatabase.mXmlNamespace);
 				foreach (IfcRelFillsElement fills in mHasFillings)
 				{
 					if (fills.mIndex != host.mIndex)
@@ -284,14 +284,14 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 			if (mRoles.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Roles");
+				XmlElement element = xml.OwnerDocument.CreateElement("Roles", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcActorRole role in Roles)
 					element.AppendChild(role.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mAddresses.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("Addresses");
+				XmlElement element = xml.OwnerDocument.CreateElement("Addresses", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
 				foreach (IfcAddress address in Addresses)
 					element.AppendChild(address.GetXML(xml.OwnerDocument, "", this, processed));
@@ -323,7 +323,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(RelatingOrganization.GetXML(xml.OwnerDocument, "RelatingOrganization", this, processed));
-			XmlElement element = xml.OwnerDocument.CreateElement("RelatedOrganizations");
+			XmlElement element = xml.OwnerDocument.CreateElement("RelatedOrganizations", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcOrganization o in RelatedOrganizations)
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
