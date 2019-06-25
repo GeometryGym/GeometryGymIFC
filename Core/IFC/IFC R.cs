@@ -587,7 +587,10 @@ namespace GeometryGym.Ifc
 		{
 			RelatingObject = db.Factory.Duplicate(a.RelatingObject, ownerHistory, downStream) as IfcObjectDefinition;
 			if (downStream)
-				RelatedObjects.AddRange(a.RelatedObjects.Select(x => db.Factory.Duplicate(x, ownerHistory, downStream) as IfcObjectDefinition));
+            {
+                foreach (IfcObjectDefinition objectDefinition in a.RelatedObjects)
+                    db.Factory.Duplicate(objectDefinition, ownerHistory, true);
+            }
 		}
 		internal IfcRelAggregates(IfcObjectDefinition relObject) : base(relObject.mDatabase)
 		{
@@ -1384,55 +1387,11 @@ namespace GeometryGym.Ifc
 		}
 		private void relate(IfcProduct product)
 		{
-			IfcElement element = product as IfcElement;
-			if (element != null)
+			if (product.mContainedInStructure != this)
 			{
-				if (element.mContainedInStructure != this)
-				{
-					if (element.mContainedInStructure != null)
-						element.mContainedInStructure.removeObject(element);
-					element.mContainedInStructure = this;
-				}
-			}
-			else
-			{
-				IfcGrid grid = product as IfcGrid;
-				if (grid != null)
-				{
-					if (grid.mContainedInStructure != this)
-					{
-						if (grid.mContainedInStructure != null)
-							grid.mContainedInStructure.removeObject(grid);
-						grid.mContainedInStructure = this;
-					}
-				}
-				else
-				{
-					IfcAnnotation annotation = product as IfcAnnotation;
-					if (annotation != null)
-					{
-						if (annotation.mContainedInStructure != this)
-						{
-							if (annotation.mContainedInStructure != null)
-								annotation.mContainedInStructure.removeObject(annotation);
-							annotation.mContainedInStructure = this;
-						}
-
-					}
-					else
-					{
-						IfcPositioningElement positioningElement = product as IfcPositioningElement;
-						if(positioningElement  != null)
-						{
-							if (positioningElement.mContainedInStructure != this)
-							{
-								if (positioningElement.mContainedInStructure != null)
-									positioningElement.mContainedInStructure.removeObject(positioningElement);
-								positioningElement.mContainedInStructure = this;
-							}
-						}
-					}
-				}
+				if (product.mContainedInStructure != null)
+					product.mContainedInStructure.removeObject(product);
+				product.mContainedInStructure = this;
 			}
 		}
 		private void removeObject(IfcProduct product)

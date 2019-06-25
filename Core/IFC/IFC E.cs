@@ -314,7 +314,6 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new SET<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
 		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedFrom = new SET<IfcRelConnectsElements>();//	 : 	SET OF IfcRelConnectsElements FOR RelatedElement;
-		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		internal List<IfcRelCoversBldgElements> mHasCoverings = new List<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
@@ -381,11 +380,7 @@ namespace GeometryGym.Ifc
 					rv.RelatingBuildingElement = this;
 				}
 			}
-			if (e.mContainedInStructure != null)
-			{
-				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure;
-				rcss.RelatedElements.Add(this);
-			}
+		
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
 			{
 				IfcRelConnectsStructuralActivity rc = db.Factory.Duplicate(rcss) as IfcRelConnectsStructuralActivity;

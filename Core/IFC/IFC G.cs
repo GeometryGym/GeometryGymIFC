@@ -223,9 +223,7 @@ namespace GeometryGym.Ifc
 		private LIST<IfcGridAxis> mVAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
 		private LIST<IfcGridAxis> mWAxes = new LIST<IfcGridAxis>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcGridAxis;
 		internal IfcGridTypeEnum mPredefinedType = IfcGridTypeEnum.NOTDEFINED;// :OPTIONAL IfcGridTypeEnum; //IFC4 CHANGE  New attribute.
-																			  //INVERSE
-		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
-
+		//INVERSE
 		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } set { mUAxes.Clear(); if (value != null) { mUAxes.CollectionChanged -= mUAxes_CollectionChanged; mUAxes = value; mUAxes.CollectionChanged += mUAxes_CollectionChanged; } } }

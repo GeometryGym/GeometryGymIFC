@@ -1604,17 +1604,19 @@ namespace GeometryGym.Ifc
 
 	public class ApplicableFilter
 	{
+		internal string Filter { get; private set; }
 		private List<ApplicableType> mApplicableTypes = new List<ApplicableType>();
 		public ApplicableFilter(string filter)
 		{
 			mApplicableTypes = new List<ApplicableType>();
-			string[] fields = filter.Split(",".ToCharArray());
+            Filter = filter;
+			string[] fields = filter.Split(",;".ToCharArray());
 			foreach (string str in fields)
 			{
 				if (string.IsNullOrEmpty(str))
 					continue;
-				string[] pair = str.Split("/".ToCharArray());
-				string typename = (pair == null ? str : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
+				string[] pair = str.Trim().Split("/".ToCharArray());
+				string typename = (pair == null ? str.Trim() : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
 				Type type = Type.GetType("GeometryGym.Ifc." + typename);
 				if (type == null)
 					continue;

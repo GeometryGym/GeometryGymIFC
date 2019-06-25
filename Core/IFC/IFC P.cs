@@ -676,15 +676,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{
-		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
-		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
-		{
-			if (e.mContainedInStructure != null)
-				(db.Factory.Duplicate(e.mContainedInStructure, false) as IfcRelContainedInSpatialStructure).RelatedElements.Add(this);
-		}
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
@@ -977,6 +972,7 @@ namespace GeometryGym.Ifc
 		private IfcObjectPlacement mObjectPlacement = null; //: OPTIONAL IfcObjectPlacement;
 		private IfcProductRepresentation mRepresentation =  null; //: OPTIONAL IfcProductRepresentation 
 		//INVERSE
+		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
 
 		//Specified on IfcElement
@@ -1053,6 +1049,11 @@ namespace GeometryGym.Ifc
 				foreach (IfcObjectDefinition od in rap.RelatedObjects)
 					rp.RelatedObjects.Add(db.Factory.Duplicate(od, ownerHistory, false) as IfcObjectDefinition);
 				rp.RelatingProduct = this;
+			}
+			if (p.mContainedInStructure != null)
+			{
+				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, false) as IfcRelContainedInSpatialStructure;
+				rcss.RelatedElements.Add(this);
 			}
 		}
 		protected IfcProduct(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host.mDatabase)
@@ -1625,7 +1626,7 @@ namespace GeometryGym.Ifc
 		internal IfcValue mSetPointValue;// 	OPTIONAL IfcValue; IFC4
 
 		public IfcValue UpperBoundValue { get { return mUpperBoundValue; } set { mUpperBoundValue = value; } }
-		public IfcValue LowerBoundValue { get { return mUpperBoundValue; } set { mUpperBoundValue = value; } }
+		public IfcValue LowerBoundValue { get { return mLowerBoundValue; } set { mLowerBoundValue = value; } }
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
 		public IfcValue SetPointValue { get { return mSetPointValue; } set { mSetPointValue = value; } }
 
@@ -2247,7 +2248,17 @@ namespace GeometryGym.Ifc
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 
 		internal IfcProxy() : base() { }
-		internal IfcProxy(DatabaseIfc db, IfcProxy p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mProxyType = p.mProxyType; mTag = p.mTag; }
+		internal IfcProxy(DatabaseIfc db, IfcProxy p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		{
+			mProxyType = p.mProxyType;
+			mTag = p.mTag;
+
+			if (p.mContainedInStructure != null)
+			{
+				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, false) as IfcRelContainedInSpatialStructure;
+				rcss.RelatedElements.Add(this);
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcPump : IfcFlowMovingDevice //IFC4

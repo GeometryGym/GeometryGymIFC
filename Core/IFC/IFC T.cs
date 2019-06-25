@@ -960,13 +960,10 @@ namespace GeometryGym.Ifc
 				return pset;
 			return null;
 		}
-		public IfcProfileProperties ProfileProperties
+		public IfcProfileProperties ProfileProperties()
 		{
-			get
-			{
-				IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
-				return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
-			}
+			IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
+			return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
 		}
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference r)
 		{
@@ -1098,6 +1095,7 @@ namespace GeometryGym.Ifc
 		protected override void initialize()
 		{
 			base.initialize();
+			RelatedMaterial();
 
 			mRepresentationMaps.CollectionChanged += mRepresentationMaps_CollectionChanged;
 			mReferencedBy.CollectionChanged += mReferencedBy_CollectionChanged;

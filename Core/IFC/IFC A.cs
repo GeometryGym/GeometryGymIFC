@@ -409,7 +409,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAnnotation : IfcProduct
 	{    //INVERSE
-		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
+		// IfcRelContainedInSpatialStructure ContainedInStructure;
 
 		internal IfcAnnotation() : base() { }
 		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { }
