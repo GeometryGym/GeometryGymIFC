@@ -1122,7 +1122,13 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	//ENTITY IfcExternallyDefinedHatchStyle : , IfcFillStyleSelect 
+	[Serializable]
+	public partial class IfcExternallyDefinedHatchStyle : IfcExternalReference, IfcFillStyleSelect
+	{
+		internal IfcExternallyDefinedHatchStyle() : base() { }
+		internal IfcExternallyDefinedHatchStyle(DatabaseIfc db, IfcExternallyDefinedHatchStyle s) : base(db, s) { }
+		public IfcExternallyDefinedHatchStyle(DatabaseIfc db) : base(db) { }
+	}
 	[Serializable]
 	public partial class IfcExternallyDefinedSurfaceStyle : IfcExternalReference, IfcSurfaceStyleElementSelect
 	{
@@ -1145,7 +1151,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		private string mLocation = "$";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
 		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
 		private string mName = "";//  : OPTIONAL IfcLabel;
-								  //INVERSE  
+		//INVERSE  
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcExternalReferenceRelationship> mExternalReferenceForResources = new List<IfcExternalReferenceRelationship>();//	:	SET [0:?] OF IfcExternalReferenceRelationship FOR RelatingReference;

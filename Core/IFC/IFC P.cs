@@ -906,7 +906,7 @@ namespace GeometryGym.Ifc
 		internal void addStyle(IfcPresentationStyleSelect style) { mStyles.Add(style.Index); }
 		public void associateItem(IfcStyledItem item) { mStyledItems.Add(item); }
 	}
-	public interface IfcPresentationStyleSelect : IBaseClassIfc { } //DEPRECEATED IFC4 TYPE  = SELECT(IfcNullStyle, IfcCurveStyle, IfcSymbolStyle, IfcFillAreaStyle, IfcTextStyle, IfcSurfaceStyle);
+	public partial interface IfcPresentationStyleSelect : IBaseClassIfc { } //DEPRECEATED IFC4 TYPE  = SELECT(IfcNullStyle, IfcCurveStyle, IfcSymbolStyle, IfcFillAreaStyle, IfcTextStyle, IfcSurfaceStyle);
 	[Serializable]
 	public partial class IfcProcedure : IfcProcess
 	{

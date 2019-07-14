@@ -95,4 +95,22 @@ namespace GeometryGym.Ifc
 				obj["ElevationOfTerrain"] = ElevationOfTerrain.ToString();
 		}
 	}
+	public partial class IfcFillAreaStyle : IfcPresentationStyle, IfcPresentationStyleSelect
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("ModelorDraughting", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				bool.TryParse(token.Value<string>(), out mModelorDraughting);
+			FillStyles.AddRange(mDatabase.extractJArray<IfcFillStyleSelect>(obj.GetValue("FillStyles", StringComparison.InvariantCultureIgnoreCase) as JArray));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if(mDatabase.Release > ReleaseVersion.IFC2x3)
+			obj["ModelorDraughting"] = mModelorDraughting.ToString();
+			obj["FillStyles"] = new JArray(mFillStyles.ConvertAll(x => x.getJson(this, options)));
+		}
+	}
 }

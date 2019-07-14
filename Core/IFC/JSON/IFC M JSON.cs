@@ -94,6 +94,9 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Category = token.Value<string>();
+			JObject jobj = obj.GetValue("HasRepresentation", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				HasRepresentation = mDatabase.ParseJObject<IfcMaterialDefinitionRepresentation>(jobj);
 
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -103,6 +106,9 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Category", Category);
+
+			if (mHasRepresentation != null)
+				obj["HasRepresentation"] = mHasRepresentation.getJson(this, options);
 		}
 	}
 

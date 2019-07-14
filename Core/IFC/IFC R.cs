@@ -2216,12 +2216,19 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcRepresentationItem r in e.NewItems)
+				{
+
+					addItem(r);
 					r.mRepresents.Add(this);
+				}
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcRepresentationItem r in e.OldItems)
+				{
+					removeItem(r);
 					r.mRepresents.Remove(this);
+				}
 			}
 		}
 		protected override List<T> Extract<T>(Type type)
@@ -2231,6 +2238,9 @@ namespace GeometryGym.Ifc
 				result.AddRange(item.Extract<T>());
 			return result;
 		}
+
+		protected virtual void addItem(IfcRepresentationItem item) { }
+		protected virtual void removeItem(IfcRepresentationItem item) { }
 
 		internal override void changeSchema(ReleaseVersion schema)
 		{

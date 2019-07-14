@@ -654,8 +654,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Styles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (int item in mStyles)
-				element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (BaseClassIfc item in mStyles)
+				element.AppendChild(item.GetXML(xml.OwnerDocument, "", this, processed));
 			setAttribute(xml, "Name", Name);
 		}
 	}

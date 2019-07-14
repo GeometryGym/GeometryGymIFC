@@ -949,9 +949,9 @@ namespace GeometryGym.Ifc
 			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mItem);
 			if (mStyles.Count > 0)
 			{
-				result += ",(" + ParserSTEP.LinkToString(mStyles[0]);
+				result += ",(#" + mStyles[0].StepId;
 				for (int icounter = 1; icounter < mStyles.Count; icounter++)
-					result += "," + ParserSTEP.LinkToString(mStyles[icounter]);
+					result += ",#" + mStyles[icounter].StepId;
 			}
 			else
 				result += ",(";
@@ -960,7 +960,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mItem = ParserSTEP.StripLink(str, ref pos, len);
-			mStyles = ParserSTEP.StripListLink(str, ref pos, len);
+			Styles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=> dictionary[x] as IfcStyleAssignmentSelect));
 			mName = ParserSTEP.StripString(str, ref pos, len);
 		}
 		internal override void postParseRelate()

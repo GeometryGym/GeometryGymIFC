@@ -296,8 +296,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcFillAreaStyle : IfcPresentationStyle, IfcPresentationStyleSelect
 	{
 		internal SET<IfcFillStyleSelect> mFillStyles = new SET<IfcFillStyleSelect>();// : SET [1:?] OF IfcFillStyleSelect;
-	
+		internal bool mModelorDraughting = true;//	:	OPTIONAL BOOLEAN;
 		public SET<IfcFillStyleSelect> FillStyles { get { return mFillStyles; } }// : SET [1:?] OF IfcFillStyleSelect;
+		public bool ModelorDraughting { get { return mModelorDraughting; } set { mModelorDraughting = value; } }
+
 		internal IfcFillAreaStyle() : base() { }
 		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
 		public IfcFillAreaStyle(IfcFillStyleSelect style) : base(style.Database) { mFillStyles.Add(style); }

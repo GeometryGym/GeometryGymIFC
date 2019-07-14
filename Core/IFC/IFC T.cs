@@ -119,7 +119,7 @@ namespace GeometryGym.Ifc
 		internal bool mIsMilestone = false;// : BOOLEAN
 		internal int mPriority;// : OPTIONAL INTEGER IFC4
 		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
-		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum
+		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum IFC4
 
 		public string Status { get { return mStatus; } set { mStatus = value; } }
 		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
@@ -964,6 +964,46 @@ namespace GeometryGym.Ifc
 		{
 			IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
 			return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
+		}
+		internal void MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
+		{
+			material = null;
+			profile = null;
+			foreach (IfcRelAssociates associates in mHasAssociations)
+			{
+				if (associates is IfcRelAssociatesMaterial am)
+				{
+					IfcMaterialSelect ms = am.RelatingMaterial;
+					IfcMaterialProfile mp = ms as IfcMaterialProfile;
+					if (mp == null)
+					{
+						IfcMaterialProfileSet mps = ms as IfcMaterialProfileSet;
+						if (mps != null)
+							mp = mps.MaterialProfiles[0];
+						else
+						{
+							IfcMaterialProfileSetUsage mpu = ms as IfcMaterialProfileSetUsage;
+							if (mpu != null)
+								mp = mpu.ForProfileSet.MaterialProfiles[0];
+						}
+					}
+					if (mp != null)
+					{
+						material = mp.Material;
+						profile = mp.Profile;
+						return;
+					}
+					IfcMaterial m = ms as IfcMaterial;
+					if (m != null)
+						material = m;
+				}
+				if (associates is IfcRelAssociatesProfileProperties ap)
+				{
+					IfcProfileProperties profileProperties = ap.RelatingProfileProperties;
+					if (profileProperties != null)
+						profile = profileProperties.ProfileDefinition;
+				}
+			}
 		}
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference r)
 		{

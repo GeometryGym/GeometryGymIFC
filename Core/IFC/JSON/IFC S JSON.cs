@@ -625,8 +625,8 @@ namespace GeometryGym.Ifc
 			if (mItem > 0 && Item != host)
 				obj["Item"] = Item.getJson(this, options);
 			JArray array = new JArray();
-			foreach (int style in mStyles)
-				array.Add(mDatabase[style].getJson(this, options));
+			foreach (IfcStyleAssignmentSelect style in mStyles)
+				array.Add(style.getJson(this, options));
 			obj["Styles"] = array;
 			base.setAttribute(obj, "Name", Name);
 		}

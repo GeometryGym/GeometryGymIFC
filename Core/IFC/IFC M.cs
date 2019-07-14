@@ -338,13 +338,29 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcStyledRepresentation r in e.NewItems)
-					base.Representations.Add(r);	
+				{
+					if (!base.Representations.Contains(r))
+						base.Representations.Add(r);	
+				}
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcStyledRepresentation r in e.OldItems)
 					base.Representations.Remove(r);
 			}
+		}
+
+		protected override void addRepresentation(IfcRepresentation r)
+		{
+			IfcStyledRepresentation styledRepresentation = r as IfcStyledRepresentation;
+			if (styledRepresentation != null && !mStyledRepresentations.Contains(styledRepresentation))
+				mStyledRepresentations.Add(styledRepresentation);
+		}
+		protected override void removeRepresentation(IfcRepresentation r)
+		{
+			IfcStyledRepresentation styledRepresentation = r as IfcStyledRepresentation;
+			if (mStyledRepresentations != null)
+				mStyledRepresentations.Remove(styledRepresentation);
 		}
 	}
 	[Serializable]

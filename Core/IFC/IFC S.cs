@@ -1847,7 +1847,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStyledItem : IfcRepresentationItem, NamedObjectIfc
 	{
 		private int mItem;// : OPTIONAL IfcRepresentationItem;
-		private List<int> mStyles = new List<int>();// : SET [1:?] OF IfcStyleAssignmentSelect; ifc2x3 IfcPresentationStyleAssignment;
+		private SET<IfcStyleAssignmentSelect> mStyles = new SET<IfcStyleAssignmentSelect>();// : SET [1:?] OF IfcStyleAssignmentSelect; ifc2x3 IfcPresentationStyleAssignment;
 		private string mName = "$";// : OPTIONAL IfcLabel; 
 
 		public IfcRepresentationItem Item
@@ -1867,7 +1867,7 @@ additional types	some additional representation types are given:
 				}
 			}
 		}
-		public ReadOnlyCollection<IfcStyleAssignmentSelect> Styles { get { return new ReadOnlyCollection<IfcStyleAssignmentSelect>( mStyles.ConvertAll(x => mDatabase[x] as IfcStyleAssignmentSelect)); } }
+		public SET<IfcStyleAssignmentSelect> Styles { get { return mStyles; } }
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcStyledItem() : base() { }
@@ -1875,38 +1875,39 @@ additional types	some additional representation types are given:
 		{
 			//if (i.mItem > 0)
 			//	Item = db.Factory.Duplicate(i.Item) as IfcRepresentationItem;
-			i.mStyles.ForEach(x => addStyle(db.Factory.Duplicate(i.mDatabase[x]) as IfcStyleAssignmentSelect));
+
+			foreach(IfcStyleAssignmentSelect style in i.Styles)
+				addStyle(db.Factory.Duplicate(style) as IfcStyleAssignmentSelect);
 			mName = i.mName;
 		}
-		public IfcStyledItem(IfcStyleAssignmentSelect style) : base(style.Database)
-		{
-			if (mDatabase.mRelease < ReleaseVersion.IFC4)
-			{
-				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
-				if (presentationStyleAssignment != null)
-					mStyles.Add(presentationStyleAssignment.mIndex);
-				else
-				{
-					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
-					if (presentationStyle != null)
-						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle).mIndex);
-				}
-			}
-			else
-				mStyles.Add(style.Index);
-		}
+		public IfcStyledItem(IfcStyleAssignmentSelect style) : base(style.Database) { addStyle(style); }
 		public IfcStyledItem(IfcRepresentationItem item, IfcStyleAssignmentSelect style) : this(style) { Item = item; }
 		public IfcStyledItem(IfcRepresentationItem item, IEnumerable<IfcStyleAssignmentSelect> styles) : base(item.mDatabase)
 		{
 			Item = item;
-			mStyles.AddRange(styles.Select(x => x.Index));
+			Styles.AddRange(styles);
 		}
-		internal void addStyle(IfcStyleAssignmentSelect style) { mStyles.Add(style.Index); }
+		internal void addStyle(IfcStyleAssignmentSelect style)
+		{
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
+			{
+				if (style is IfcPresentationStyleAssignment presentationStyleAssignment)
+					mStyles.Add(presentationStyleAssignment);
+				else
+				{
+					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
+					if (presentationStyle != null)
+						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle));
+				}
+			}
+			else
+				mStyles.Add(style);
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
-			foreach (int i in mStyles)
-				result.AddRange(mDatabase[i].Extract<T>());
+			foreach (BaseClassIfc style in Styles)
+				result.AddRange(style.Extract<T>());
 			return result;
 		}
 
@@ -1962,13 +1963,29 @@ additional types	some additional representation types are given:
 			if (e.NewItems != null)
 			{
 				foreach (IfcStyledItem r in e.NewItems)
-					base.Items.Add(r);
+				{
+					if(!base.Items.Contains(r))
+						base.Items.Add(r);
+				}
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcStyledItem r in e.OldItems)
 					base.Items.Remove(r);
 			}
+		}
+
+		protected override void addItem(IfcRepresentationItem item)
+		{
+			IfcStyledItem styledItem = item as IfcStyledItem;
+			if (styledItem != null && !mStyledItems.Contains(styledItem))
+				mStyledItems.Add(styledItem);
+		}
+		protected override void removeItem(IfcRepresentationItem item)
+		{
+			IfcStyledItem styledItem = item as IfcStyledItem;
+			if (styledItem != null)
+				mStyledItems.Remove(styledItem);
 		}
 	}
 	[Serializable]
