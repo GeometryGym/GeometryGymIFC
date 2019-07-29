@@ -466,6 +466,8 @@ namespace GeometryGym.Ifc
 			mGreen = ParserSTEP.StripDouble(str, ref pos, len);
 			mBlue = ParserSTEP.StripDouble(str, ref pos, len);
 		}
+
+	
 	}
 	public partial class IfcColourRgbList : IfcPresentationItem
 	{

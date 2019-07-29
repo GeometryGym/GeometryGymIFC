@@ -1095,44 +1095,21 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mTransparency) +
-				(mDiffuseColour > 0 ? ",#" + mDiffuseColour : (mDiffuseColourMeasure == null ? ",$" : "," + mDiffuseColourMeasure.ToString())) +
-				(mTransmissionColour > 0 ? ",#" + mTransmissionColour : (mTransmissionColourMeasure == null ? ",$" : "," + mTransmissionColourMeasure.ToString())) +
-				(mDiffuseTransmissionColour > 0 ? ",#" + mDiffuseTransmissionColour : (mDiffuseTransmissionColourMeasure == null ? ",$" : "," + mDiffuseTransmissionColourMeasure.ToString())) +
-				(mReflectionColour > 0 ? ",#" + mReflectionColour : (mReflectionColourMeasure == null ? ",$" : "," + mReflectionColourMeasure.ToString())) +
-				(mSpecularColour > 0 ? ",#" + mSpecularColour : (mSpecularColourMeasure == null ? ",$" : "," + mSpecularColourMeasure.ToString())) +
-				(mSpecularHighlight == null ? ",$" : "," + mSpecularHighlight.ToString()) + ",." + mReflectanceMethod.ToString() + ".";
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mTransparency) + "," +
+				ParserIfc.STEPString(mDiffuseColour) + "," + ParserIfc.STEPString(mTransmissionColour) + "," +
+				ParserIfc.STEPString(mDiffuseTransmissionColour) + "," + ParserIfc.STEPString(mReflectionColour) + "," +
+				ParserIfc.STEPString(mSpecularColour) + (mSpecularHighlight == null ? ",$" : "," + mSpecularHighlight.ToString()) + ",." + mReflectanceMethod.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mTransparency = ParserSTEP.StripDouble(str, ref pos, len);
+			mDiffuseColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
+			mTransmissionColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
+			mDiffuseTransmissionColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
+			mReflectionColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
+			mSpecularColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("#"))
-				mDiffuseColour = ParserSTEP.ParseLink(s);
-			else
-				mDiffuseColourMeasure = ParserIfc.parseColourOrFactor(s) as IfcNormalisedRatioMeasure;
-			s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("#"))
-				mTransmissionColour = ParserSTEP.ParseLink(s);
-			else
-				mTransmissionColourMeasure = ParserIfc.parseColourOrFactor(s) as IfcNormalisedRatioMeasure;
-			s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("#"))
-				mDiffuseTransmissionColour = ParserSTEP.ParseLink(s);
-			else
-				mDiffuseTransmissionColourMeasure = ParserIfc.parseColourOrFactor(s) as IfcNormalisedRatioMeasure;
-			s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("#"))
-				mReflectionColour = ParserSTEP.ParseLink(s);
-			else
-				mReflectionColourMeasure = ParserIfc.parseColourOrFactor(s) as IfcNormalisedRatioMeasure;
-			s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("#"))
-				mSpecularColour = ParserSTEP.ParseLink(s);
-			else
-				mSpecularColourMeasure = ParserIfc.parseColourOrFactor(s) as IfcNormalisedRatioMeasure;
-			s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
 			{
 				if (s.StartsWith("IFCSPECULARROUGHNESS"))

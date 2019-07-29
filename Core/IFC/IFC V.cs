@@ -29,11 +29,16 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
-	public abstract class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	public abstract partial class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
 	{
 		public abstract object Value { get; set; }
 		public abstract Type ValueType { get; }
 		public abstract string ValueString { get; }
+
+		public int StepId { get { return 0; } }
+		public string StepClassName { get { return this.GetType().Name; } }
+		public int Index { get { return 0; } }
+		public DatabaseIfc Database { get { return null; } }
 	}  
 	[Serializable]
 	public partial class IfcValve : IfcFlowController //IFC4

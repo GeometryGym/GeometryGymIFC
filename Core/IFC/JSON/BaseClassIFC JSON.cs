@@ -206,5 +206,17 @@ namespace GeometryGym.Ifc
 				return;
 			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.Index].getJson(host, options)));
 		}
+
+		public static void setJSON(IfcColourOrFactor colourOrFactor, string name, JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			if (colourOrFactor == null)
+				return;
+			IfcNormalisedRatioMeasure normalisedRatioMeasure = colourOrFactor as IfcNormalisedRatioMeasure;
+			if (normalisedRatioMeasure != null)
+				obj[name] = DatabaseIfc.extract(normalisedRatioMeasure);
+			else
+				obj[name] = (colourOrFactor as BaseClassIfc).getJson(host, options);
+		}
+		 
 	}
 }

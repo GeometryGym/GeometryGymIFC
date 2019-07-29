@@ -648,6 +648,72 @@ namespace GeometryGym.Ifc
 			obj["Styles"] = new JArray(mStyles.ConvertAll(x => mDatabase[x].getJson(this, options)));
 		}
 	}
+	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("RefractionIndex", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mRefractionIndex = token.Value<double>();
+			JObject jobj = obj.GetValue("DispersionFactor", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				mDispersionFactor = token.Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mRefractionIndex))
+				obj["RefractionIndex"] = mRefractionIndex;
+			if (!double.IsNaN(mDispersionFactor))
+				obj["DispersionFactor"] = mDispersionFactor;
+		}
+	}
+	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Transparency", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Transparency = token.Value<double>();
+			JObject jobj = obj.GetValue("DiffuseColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				DiffuseColour = extractObject<IfcColourOrFactor>(jobj);
+			jobj = obj.GetValue("TransmissionColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				TransmissionColour = extractObject<IfcColourOrFactor>(jobj);
+			jobj = obj.GetValue("DiffuseTransmissionColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				DiffuseTransmissionColour = extractObject<IfcColourOrFactor>(jobj);
+			jobj = obj.GetValue("ReflectionColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ReflectionColour = extractObject<IfcColourOrFactor>(jobj);
+			jobj = obj.GetValue("SpecularColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				SpecularColour = extractObject<IfcColourOrFactor>(jobj);
+			jobj = obj.GetValue("SpecularHighlight", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				SpecularHighlight = extractObject<IfcSpecularHighlightSelect>(jobj);
+			token = obj.GetValue("ReflectanceMethod", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcReflectanceMethodEnum>(token.Value<string>(), out mReflectanceMethod);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if(!double.IsNaN(mTransparency))
+				obj["Transparency"] = Transparency;
+			setJSON(DiffuseColour, "DiffuseColour", obj, this, options);
+			setJSON(TransmissionColour, "TransmissionColour", obj, this, options);
+			setJSON(DiffuseTransmissionColour, "DiffuseTransmissionColour", obj, this, options);
+			setJSON(ReflectionColour, "ReflectionColour", obj, this, options);
+			setJSON(SpecularColour, "SpecularColour", obj, this, options);
+			if (SpecularHighlight != null)
+				obj["SpecularHighlight"] = (SpecularHighlight as BaseClassIfc).getJson(this, options);
+			obj["ReflectanceMethod"] = ReflectanceMethod.ToString();
+		}
+	}
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
 		internal override void parseJObject(JObject obj)

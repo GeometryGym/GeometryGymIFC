@@ -971,9 +971,10 @@ namespace GeometryGym.Ifc
 			profile = null;
 			foreach (IfcRelAssociates associates in mHasAssociations)
 			{
-				if (associates is IfcRelAssociatesMaterial am)
+				IfcRelAssociatesMaterial associatesMaterial = associates as IfcRelAssociatesMaterial;
+				if (associatesMaterial != null)
 				{
-					IfcMaterialSelect ms = am.RelatingMaterial;
+					IfcMaterialSelect ms = associatesMaterial.RelatingMaterial;
 					IfcMaterialProfile mp = ms as IfcMaterialProfile;
 					if (mp == null)
 					{
@@ -997,9 +998,10 @@ namespace GeometryGym.Ifc
 					if (m != null)
 						material = m;
 				}
-				if (associates is IfcRelAssociatesProfileProperties ap)
+				IfcRelAssociatesProfileProperties associatesProfileProperties = associates as IfcRelAssociatesProfileProperties;	
+				if (associatesProfileProperties != null)
 				{
-					IfcProfileProperties profileProperties = ap.RelatingProfileProperties;
+					IfcProfileProperties profileProperties = associatesProfileProperties.RelatingProfileProperties;
 					if (profileProperties != null)
 						profile = profileProperties.ProfileDefinition;
 				}

@@ -127,90 +127,101 @@ namespace GeometryGym.Ifc
 				}
 				if (token == null)
 					type = typeof(T);
-				if (type != null && !type.IsAbstract)
+				if (type != null)
 				{
-					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-	null, Type.EmptyTypes, null);
-					if (constructor != null)
+					if (type.IsAbstract)
 					{
-						result  = constructor.Invoke(new object[] { }) as BaseClassIfc;
-						if (result != null)
+						JProperty jtoken = (JProperty)obj.First;
+						Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
+						if(valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
+							return (T)(IBaseClassIfc)ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString());
+
+					}
+					else
+					{
+						ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+		null, Type.EmptyTypes, null);
+						if (constructor != null)
 						{
-							result.mDatabase = this;
-							token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-							int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
-							if (token != null)
+							result = constructor.Invoke(new object[] { }) as BaseClassIfc;
+							if (result != null)
 							{
-								if (token.Type == JTokenType.Integer)
+								result.mDatabase = this;
+								token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+								int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
+								if (token != null)
 								{
-									try
+									if (token.Type == JTokenType.Integer)
 									{
-										int i = token.Value<int>();
-										if (this[i] == null)
-											index = i;
-									}
-									catch (Exception) { }
-									// TODO merge if existing equivalent
-								}
-								else if(token.Type == JTokenType.String)
-								{
-									result.mGlobalId = token.Value<string>();
-									mDictionary.TryAdd(result.mGlobalId, result);
-								}
-							}
-							IfcCartesianPoint point = result as IfcCartesianPoint;
-							IfcDirection direction = result as IfcDirection;
-							IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
-							if (index == 0)
-							{
-								if (point != null)
-								{
-									point.parseJObject(obj);
-									if (point.isOrigin)
-									{
-										if (point.is2D)
-											return (T)(IBaseClassIfc)Factory.Origin2d;
-										return (T)(IBaseClassIfc)Factory.Origin;
-									}
-								}
-								else
-								{
-									if (direction != null)
-									{
-										direction.parseJObject(obj);
-										if (!direction.is2D)
+										try
 										{
-											if (direction.isXAxis)
-												return (T)(IBaseClassIfc)Factory.XAxis;
-											if (direction.isYAxis)
-												return (T)(IBaseClassIfc)Factory.YAxis;
-											if (direction.isZAxis)
-												return (T)(IBaseClassIfc)Factory.ZAxis;
-											if (direction.isXAxisNegative)
-												return (T)(IBaseClassIfc)Factory.XAxisNegative;
-											if (direction.isYAxisNegative)
-												return (T)(IBaseClassIfc)Factory.YAxisNegative;
-											if (direction.isZAxisNegative)
-												return (T)(IBaseClassIfc)Factory.ZAxisNegative;
+											int i = token.Value<int>();
+											if (this[i] == null)
+												index = i;
+										}
+										catch (Exception) { }
+										// TODO merge if existing equivalent
+									}
+									else if (token.Type == JTokenType.String)
+									{
+										result.mGlobalId = token.Value<string>();
+										mDictionary.TryAdd(result.mGlobalId, result);
+									}
+								}
+								IfcCartesianPoint point = result as IfcCartesianPoint;
+								IfcDirection direction = result as IfcDirection;
+								IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
+								if (index == 0)
+								{
+									if (point != null)
+									{
+										point.parseJObject(obj);
+										if (point.isOrigin)
+										{
+											if (point.is2D)
+												return (T)(IBaseClassIfc)Factory.Origin2d;
+											return (T)(IBaseClassIfc)Factory.Origin;
 										}
 									}
-									if (placement != null)
+									else
 									{
-										placement.parseJObject(obj);
-										if (placement.IsXYPlane)
-											return (T)(IBaseClassIfc)Factory.XYPlanePlacement;
+										if (direction != null)
+										{
+											direction.parseJObject(obj);
+											if (!direction.is2D)
+											{
+												if (direction.isXAxis)
+													return (T)(IBaseClassIfc)Factory.XAxis;
+												if (direction.isYAxis)
+													return (T)(IBaseClassIfc)Factory.YAxis;
+												if (direction.isZAxis)
+													return (T)(IBaseClassIfc)Factory.ZAxis;
+												if (direction.isXAxisNegative)
+													return (T)(IBaseClassIfc)Factory.XAxisNegative;
+												if (direction.isYAxisNegative)
+													return (T)(IBaseClassIfc)Factory.YAxisNegative;
+												if (direction.isZAxisNegative)
+													return (T)(IBaseClassIfc)Factory.ZAxisNegative;
+											}
+										}
+										if (placement != null)
+										{
+											placement.parseJObject(obj);
+											if (placement.IsXYPlane)
+												return (T)(IBaseClassIfc)Factory.XYPlanePlacement;
+										}
 									}
-								}
-							
-								index = NextBlank();
-								this[index] = result;
 
-								if (point != null || direction != null || placement != null)
-									return (T)(IBaseClassIfc)result;
+									index = NextBlank();
+									this[index] = result;
+
+									if (point != null || direction != null || placement != null)
+										return (T)(IBaseClassIfc)result;
+								}
+								else
+									this[index] = result;
+
 							}
-							else
-								this[index] = result;
-							
 						}
 					}
 				}
@@ -284,7 +295,7 @@ namespace GeometryGym.Ifc
 #if(DEBUG)
 				sw.Write(ifcFile.ToString());
 #else
-				sw.Write(ifcFile.ToString(Newtonsoft.Json.Formatting.None, new Newtonsoft.Json.JsonConverter[0]));
+				sw.Write(ifcFile.ToString(Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonConverter[0]));
 #endif
 				sw.Close();
 			}

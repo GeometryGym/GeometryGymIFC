@@ -143,6 +143,10 @@ namespace GeometryGym.Ifc
 						return Construct("IfcProfileDef");
 					if (string.Compare(className, "IfcBuildingElement", true) == 0)
 						return Construct("IfcBuildingElementProxy");
+					if (string.Compare(className, "IfcReinforcingElement", true) == 0)
+						return Construct("IfcReinforcingBar");
+					if (string.Compare(className, "IfcBuildingElementComponent", true) == 0)
+						return Construct("IfcBuildingElementPart");
 				}
 				mConstructors.TryAdd(className, constructor);
 			}

@@ -516,12 +516,11 @@ namespace GeometryGym.Ifc
 		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement, length) { }
 		protected IfcBuildingElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement,arcOrigin, arcAngle) { }
 	}
-	/*internal class IfcBuildingElementComponent : IfcBuildingElement //IFC4 DELETED
+	[Obsolete("DELETED IFC4", false)]
+	public abstract class IfcBuildingElementComponent : IfcBuildingElement 
 	{
-		protected IfcBuildingElementComponent(IfcBuildingElementComponent b) : base(b) { }
 		protected IfcBuildingElementComponent() : base() { }
-		protected static void parseFields(IfcBuildingElementComponent c, List<string> arrFields, ref int ipos) { IfcBuildingElement.parseFields(c, arrFields, ref ipos); }
-	}*/
+	}
 	[Serializable]
 	public partial class IfcBuildingElementPart : IfcElementComponent
 	{

@@ -227,25 +227,47 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
-		internal static IfcColourOrFactor parseColourOrFactor(string str)
+		internal static IfcColourOrFactor parseColourOrFactor(string str, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			if (string.IsNullOrEmpty(str) || str[0] == '#' || str[0] == '$')
+			if (string.IsNullOrEmpty(str) || str[0] == '$')
 				return null;
-		
+
+			if(str[0] == '#')
+			{
+				int i = ParserSTEP.ParseLink(str);
+				if(i > 0)
+					return dictionary[i] as IfcColourOrFactor;
+				return null;
+			}
 			string kw = "", def = "";
 			int id = 0,pos = 0;
 			ParserSTEP.GetKeyWord(str, out id, out kw, out def);
 			if (string.IsNullOrEmpty(kw))
 				return null;
-			if (string.Compare(kw, "IFCCOLOURRGB", false) == 0)
+			if (string.Compare(kw, "IFCCOLOURRGB", true) == 0)
 			{
 				IfcColourRgb color = new IfcColourRgb();
 				color.parse(def, ref pos, ReleaseVersion.IFC2x3, def.Length, null);
 				return color;
 			}
-			return new IfcNormalisedRatioMeasure(ParserSTEP.ParseDouble(def));
+			double ratio = 0;
+			if(double.TryParse(def,out ratio)) 
+				return new IfcNormalisedRatioMeasure(ratio);
+			return null;
 		}
 
+		public static string STEPString(IfcColourOrFactor colourOrFactor)
+		{
+			if (colourOrFactor == null)
+				return "$";
+			IfcColourRgb colourRgb = colourOrFactor as IfcColourRgb;
+			if (colourRgb != null)
+				return "#" + colourRgb.StepId;
+			IfcNormalisedRatioMeasure normalisedRatioMeasure = colourOrFactor as IfcNormalisedRatioMeasure;
+			if (normalisedRatioMeasure != null)
+				return normalisedRatioMeasure.ToString();
+			return "$";
+		}
 		private static Dictionary<string, Type> mDerivedMeasureValueTypes = null;
 		private static Dictionary<string, Type> DerivedMeasureValueTypes
 		{

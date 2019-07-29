@@ -682,7 +682,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProperties : IfcExtendedProperties //IFC4, IFC2x3 ABSTRACT SUPERTYPE OF (ONE(IfcExtendedMaterialProperties,IfcFuelProperties,IfcGeneralMaterialProperties,IfcHygroscopicMaterialProperties,IfcMechanicalMaterialProperties,IfcOpticalMaterialProperties,IfcProductsOfCombustionProperties,IfcThermalMaterialProperties,IfcWaterProperties));
 	{
-		public override string StepClassName { get { return "IfcMaterialProperties"; } }
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4 ? base.StepClassName : "IfcMaterialProperties"); } }
 		private IfcMaterialDefinition mMaterial;// : IfcMaterialDefinition; 
 		public IfcMaterialDefinition Material { get { return mMaterial; } set { mMaterial = value; value.HasProperties.Add(this); } }
 

@@ -28,6 +28,13 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public abstract partial class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	{
+		public JObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options)
+		{
+			return DatabaseIfc.extract(this);
+		}
+	}
 	public partial class IfcValveType : IfcFlowControllerType
 	{
 		internal override void parseJObject(JObject obj)

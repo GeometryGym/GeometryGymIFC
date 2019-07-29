@@ -724,7 +724,7 @@ namespace GeometryGym.Ifc
 		public IfcCoilType(DatabaseIfc m, string name, IfcCoilTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	public partial interface IfcColour : IBaseClassIfc, IfcFillStyleSelect { }// = SELECT (IfcColourSpecification ,IfcPreDefinedColour); 
-	public partial interface IfcColourOrFactor { } // IfcNormalisedRatioMeasure, IfcColourRgb);
+	public partial interface IfcColourOrFactor : IBaseClassIfc { } // IfcNormalisedRatioMeasure, IfcColourRgb);
 	[Serializable]
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{

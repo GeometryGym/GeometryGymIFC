@@ -360,6 +360,7 @@ namespace GeometryGym.Ifc
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if (str.StartsWith("."))
 				Enum.TryParse<IfcReinforcingBarSurfaceEnum>(s.Replace(".", ""), true, out mBarSurface);
+			
 		}
 	}
 	public partial class IfcReinforcingBarType : IfcReinforcingElementType  //IFC4

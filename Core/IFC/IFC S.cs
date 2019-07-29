@@ -1009,7 +1009,7 @@ additional types	some additional representation types are given:
 		internal IfcSpatialZoneType(DatabaseIfc db, IfcSpatialZoneType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
 		public IfcSpatialZoneType(DatabaseIfc m, string name, IfcSpatialZoneTypeEnum t) : base(m) { Name = name; PredefinedType = t; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
 	}
-	public interface IfcSpecularHighlightSelect { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
+	public interface IfcSpecularHighlightSelect : IBaseClassIfc { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
 	[Serializable]
 	public partial class IfcSphere : IfcCsgPrimitive3D
 	{
@@ -1891,7 +1891,8 @@ additional types	some additional representation types are given:
 		{
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
-				if (style is IfcPresentationStyleAssignment presentationStyleAssignment)
+				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
+				if (presentationStyleAssignment != null)
 					mStyles.Add(presentationStyleAssignment);
 				else
 				{
@@ -2186,8 +2187,9 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
-		internal double mRefractionIndex, mDispersionFactor;//	 :	OPTIONAL IfcReal;
+		internal double mRefractionIndex = double.NaN, mDispersionFactor = double.NaN;//	 :	OPTIONAL IfcReal;
 		internal IfcSurfaceStyleRefraction() : base() { }
+		public IfcSurfaceStyleRefraction(DatabaseIfc db) : base(db) { }
 		internal IfcSurfaceStyleRefraction(DatabaseIfc db, IfcSurfaceStyleRefraction s) : base(db, s)
 		{
 			mRefractionIndex = s.mRefractionIndex;
@@ -2198,72 +2200,16 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
 	{
 		internal double mTransparency = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
-		private int mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
-		private IfcNormalisedRatioMeasure mDiffuseColourMeasure, mTransmissionColourMeasure, mDiffuseTransmissionColourMeasure, mReflectionColourMeasure, mSpecularColourMeasure;//:	OPTIONAL IfcColourOrFactor;
+		private IfcColourOrFactor mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
 		internal IfcSpecularHighlightSelect mSpecularHighlight;// : OPTIONAL 
 		internal IfcReflectanceMethodEnum mReflectanceMethod = IfcReflectanceMethodEnum.NOTDEFINED;// : IfcReflectanceMethodEnum; 
 
 		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
-		public IfcColourOrFactor DiffuseColour
-		{
-			get { return (mDiffuseColour > 0 ? mDatabase[mDiffuseColour] as IfcColourOrFactor : mDiffuseColourMeasure); }
-			set
-			{
-				IfcColourRgb col = value as IfcColourRgb;
-				if (col != null)
-					mDiffuseColour = col.mIndex;
-				else
-					mDiffuseColourMeasure = value as IfcNormalisedRatioMeasure;
-			}
-		}
-		public IfcColourOrFactor TransmissionColour
-		{
-			get { return (mTransmissionColour > 0 ? mDatabase[mTransmissionColour] as IfcColourOrFactor : mTransmissionColourMeasure); }
-			set
-			{
-				IfcColourRgb col = value as IfcColourRgb;
-				if (col != null)
-					mTransmissionColour = col.mIndex;
-				else
-					mTransmissionColourMeasure = value as IfcNormalisedRatioMeasure;
-			}
-		}
-		public IfcColourOrFactor DiffuseTransmissionColour
-		{
-			get { return (mDiffuseTransmissionColour > 0 ? mDatabase[mDiffuseTransmissionColour] as IfcColourOrFactor : mDiffuseTransmissionColourMeasure); }
-			set
-			{
-				IfcColourRgb col = value as IfcColourRgb;
-				if (col != null)
-					mDiffuseTransmissionColour = col.mIndex;
-				else
-					mDiffuseTransmissionColourMeasure = value as IfcNormalisedRatioMeasure;
-			}
-		}
-		public IfcColourOrFactor ReflectionColour
-		{
-			get { return (mReflectionColour > 0 ? mDatabase[mReflectionColour] as IfcColourOrFactor : mReflectionColourMeasure); }
-			set
-			{
-				IfcColourRgb col = value as IfcColourRgb;
-				if (col != null)
-					mReflectionColour = col.mIndex;
-				else
-					mReflectionColourMeasure = value as IfcNormalisedRatioMeasure;
-			}
-		}
-		public IfcColourOrFactor SpecularColour
-		{
-			get { return (mSpecularColour > 0 ? mDatabase[mSpecularColour] as IfcColourOrFactor : mSpecularColourMeasure); }
-			set
-			{
-				IfcColourRgb col = value as IfcColourRgb;
-				if (col != null)
-					mSpecularColour = col.mIndex;
-				else
-					mSpecularColourMeasure = value as IfcNormalisedRatioMeasure;
-			}
-		}
+		public IfcColourOrFactor DiffuseColour { get { return mDiffuseColour; } set { mDiffuseColour = value; } }
+		public IfcColourOrFactor TransmissionColour { get { return mTransmissionColour; } set { mTransmissionColour = value; } }
+		public IfcColourOrFactor DiffuseTransmissionColour { get { return mDiffuseTransmissionColour; } set { mDiffuseTransmissionColour = value; } }
+		public IfcColourOrFactor ReflectionColour { get { return mReflectionColour; } set { mReflectionColour = value; } }
+		public IfcColourOrFactor SpecularColour { get { return mSpecularColour; } set { mSpecularColour = value; } }
 		public IfcSpecularHighlightSelect SpecularHighlight { get { return mSpecularHighlight; } set { mSpecularHighlight = value; } }
 		public IfcReflectanceMethodEnum ReflectanceMethod { get { return mReflectanceMethod; } set { mReflectanceMethod = value; } }
 
