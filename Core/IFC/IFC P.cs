@@ -569,15 +569,15 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcPolyloop : IfcLoop
+	public partial class IfcPolyLoop : IfcLoop
 	{
 		internal LIST<IfcCartesianPoint> mPolygon = new LIST<IfcCartesianPoint> ();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
 		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } set { mPolygon = value; } }
 
-		internal IfcPolyloop() : base() { }
-		internal IfcPolyloop(DatabaseIfc db, IfcPolyloop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
-		public IfcPolyloop(IEnumerable<IfcCartesianPoint> polygon) : base(polygon.First().mDatabase) { mPolygon.AddRange(polygon); }
-		public IfcPolyloop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
+		internal IfcPolyLoop() : base() { }
+		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
+		public IfcPolyLoop(IEnumerable<IfcCartesianPoint> polygon) : base(polygon.First().mDatabase) { mPolygon.AddRange(polygon); }
+		public IfcPolyLoop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
 
 		protected override List<T> Extract<T>(Type type)
 		{

@@ -211,7 +211,7 @@ namespace GeometryGym.Ifc
 			obj["Points"] = new JArray(Points.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
-	public partial class IfcPolyloop : IfcLoop
+	public partial class IfcPolyLoop : IfcLoop
 	{
 		internal override void parseJObject(JObject obj)
 		{

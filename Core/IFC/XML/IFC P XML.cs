@@ -280,7 +280,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcPolyloop : IfcLoop
+	public partial class IfcPolyLoop : IfcLoop
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

@@ -710,7 +710,18 @@ namespace GeometryGym.Ifc
 			setJSON(ReflectionColour, "ReflectionColour", obj, this, options);
 			setJSON(SpecularColour, "SpecularColour", obj, this, options);
 			if (SpecularHighlight != null)
-				obj["SpecularHighlight"] = (SpecularHighlight as BaseClassIfc).getJson(this, options);
+			{
+				BaseClassIfc baseClass = SpecularHighlight as BaseClassIfc;
+				if(baseClass != null)
+					obj["SpecularHighlight"] = baseClass.getJson(this, options);
+				else
+				{
+					IfcValue value = SpecularHighlight as IfcValue;
+					if (value != null)
+						obj["SpecularHighlight"] = DatabaseIfc.extract(value); ;
+						
+				}
+			}
 			obj["ReflectanceMethod"] = ReflectanceMethod.ToString();
 		}
 	}
