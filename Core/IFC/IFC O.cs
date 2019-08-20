@@ -556,7 +556,7 @@ namespace GeometryGym.Ifc
 		public IfcObjective(DatabaseIfc db, string name, IfcConstraintEnum constraint, IfcObjectiveEnum qualifier)
 		 	: base(db, name, constraint) { mObjectiveQualifier = qualifier; }
 
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			if (children)
 			{
@@ -567,7 +567,7 @@ namespace GeometryGym.Ifc
 						bc.Dispose(true);
 				}
 			}
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 
 		public void AddBenchmark(IfcConstraint benchmark) { mBenchmarkValues.Add(benchmark.mIndex); }

@@ -115,10 +115,16 @@ namespace GeometryGym.Ifc
 			revised.mIndex = mIndex;
 			mDatabase[mIndex] = revised;
 		}
-		public virtual bool Dispose(bool children)
+		public bool Dispose(bool children)
 		{
 			if (mDatabase == null)
 				return true;
+			if (mDatabase.IsDisposed())
+				return true;
+			return DisposeWorker(children);
+		}
+		protected virtual bool DisposeWorker(bool children)
+		{
 			mDatabase[mIndex] = null;
 			return true;
 		}

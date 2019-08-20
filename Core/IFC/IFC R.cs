@@ -2400,7 +2400,7 @@ namespace GeometryGym.Ifc
 			mRelatedResourceObjects.Add(r.Index);
 		}
 
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			for (int icounter = 0; icounter < mRelatedResourceObjects.Count; icounter++)
 			{
@@ -2408,7 +2408,7 @@ namespace GeometryGym.Ifc
 				if (bc != null)
 					bc.Dispose(children);
 			}
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 	}
 	[Serializable]

@@ -1183,14 +1183,14 @@ namespace GeometryGym.Ifc
 					r.RelatedResourceObjects.Remove(this);
 			}
 		}
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			foreach (IfcRelAssociatesConstraint rac in mConstraintForObjects)
 				mDatabase[rac.mIndex] = null;
 			List<IfcResourceConstraintRelationship> rcrs = mPropertiesForConstraint;
 			for (int icounter = 0; icounter < rcrs.Count; icounter++)
 				rcrs[icounter].Dispose(true);
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }

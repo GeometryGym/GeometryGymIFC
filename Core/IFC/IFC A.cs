@@ -607,7 +607,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			if (children)
 			{
@@ -620,7 +620,7 @@ namespace GeometryGym.Ifc
 						bc.Dispose(true);
 				}
 			}
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }

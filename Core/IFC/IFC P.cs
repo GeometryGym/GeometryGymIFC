@@ -1571,13 +1571,13 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e);
 		}
 
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			if (mPartOfPset.Count > 0)
 				return false;
 			if (mPartOfComplex.Count > 0)
 				return false;
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 	}
 	[Serializable]
@@ -1893,7 +1893,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcProperty property in properties)
 				addProperty(property);
 		}
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			if (children)
 			{
@@ -1904,7 +1904,7 @@ namespace GeometryGym.Ifc
 						p.Dispose(true);
 				}
 			}
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 		internal override void changeSchema(ReleaseVersion schema)
 		{

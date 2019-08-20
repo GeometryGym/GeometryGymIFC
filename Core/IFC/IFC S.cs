@@ -1489,11 +1489,11 @@ additional types	some additional representation types are given:
 				new IfcRelAssignsToGroupByFactor(cases.ConvertAll(x => x as IfcObjectDefinition), this, 1);
 			}
 		}
-		public override bool Dispose(bool children)
+		protected override bool DisposeWorker(bool children)
 		{
 			foreach (IfcStructuralAnalysisModel structuralAnalysisModel in mLoadGroupFor.ToList())
 				structuralAnalysisModel.mLoadedBy.Remove(this.Index);
-			return base.Dispose(children);
+			return base.DisposeWorker(children);
 		}
 	}
 	[Serializable]
