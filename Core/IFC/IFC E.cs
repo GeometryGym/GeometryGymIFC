@@ -551,18 +551,19 @@ namespace GeometryGym.Ifc
 		internal static IfcElement ConstructElement(string className, IfcObjectDefinition container, IfcObjectPlacement pl, IfcProductRepresentation r) { return ConstructElement(className, container, pl, r, null); }
 		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement pl, IfcProductRepresentation r, IfcDistributionSystem system)
 		{
-			string str = className, definedType = "", lower = str.ToLower();
-			if (host.mDatabase.Release < ReleaseVersion.IFC4)
-			{
-				if (lower.StartsWith("ifcshadingdevice"))
-					str = "IfcBuildingElementProxy.ShadingDevice";
-				if (lower.StartsWith("ifcgeographicelement"))
-					str = "IfcBuildingElementProxy.GeographicElement";
-				if (lower.StartsWith("ifccivilelement"))
-					str = "IfcBuildingElementProxy.CivilElement";
-			}
+			string str = className, definedType = "";
 			if (!string.IsNullOrEmpty(str))
 			{
+				string lower = str.ToLower();
+				if (host.mDatabase.Release < ReleaseVersion.IFC4)
+				{
+					if (lower.StartsWith("ifcshadingdevice"))
+						str = "IfcBuildingElementProxy.ShadingDevice";
+					if (lower.StartsWith("ifcgeographicelement"))
+						str = "IfcBuildingElementProxy.GeographicElement";
+					if (lower.StartsWith("ifccivilelement"))
+						str = "IfcBuildingElementProxy.CivilElement";
+				}
 				string[] fields = str.Split(".".ToCharArray());
 				if (fields.Length > 1)
 				{

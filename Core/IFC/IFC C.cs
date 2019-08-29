@@ -1162,7 +1162,6 @@ namespace GeometryGym.Ifc
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
 		}
 		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

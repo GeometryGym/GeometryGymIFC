@@ -1008,6 +1008,7 @@ namespace GeometryGym.Ifc
 			RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], ownerHistory, downStream) as IfcMaterialSelect;
 		}
 		public IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { RelatingMaterial = material; }
+		public IfcRelAssociatesMaterial(IfcMaterialSelect material, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingMaterial = material; }
 	}
 	[Serializable]
 	public partial class IfcRelAssociatesProfileProperties : IfcRelAssociates //IFC4 DELETED Replaced by IfcRelAssociatesMaterial together with material-profile sets

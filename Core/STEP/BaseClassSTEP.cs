@@ -71,6 +71,8 @@ namespace GeometryGym.STEP
 		
 		internal static Type GetType(string classNameIfc, string nameSpace)
 		{
+			if (string.IsNullOrEmpty(classNameIfc))
+				return null;
 			Type type = null;
 			string name = classNameIfc;
 			string[] fields = classNameIfc.Split(".".ToCharArray());
