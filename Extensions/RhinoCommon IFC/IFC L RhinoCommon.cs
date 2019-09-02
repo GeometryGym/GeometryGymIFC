@@ -38,33 +38,32 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
 	{
-		private Transform mtransform = Transform.Unset;
-		public override Transform Transform
+		public override Transform Transform()
 		{
-			get
+			IfcObjectPlacement placementRelTo = PlacementRelTo;
+			IfcAxis2Placement relativePlacement = RelativePlacement;
+			bool identityRelative = relativePlacement == null;
+			if(relativePlacement != null)
 			{
-				if (!mCalculated)
+				if (mDatabase != null && relativePlacement.Plane.IsValid)
 				{
-					mCalculated = true;
-					IfcObjectPlacement placementRelTo = PlacementRelTo;
-					IfcAxis2Placement relativePlacement = RelativePlacement;
-					if (placementRelTo == null || placementRelTo.isXYPlane)
-					{
-						if (relativePlacement == null || relativePlacement.IsXYPlane)
-							mtransform = Transform.Identity;
-						else
-							mtransform = Transform.ChangeBasis(relativePlacement.Plane,Plane.WorldXY);
-					}
-					else
-					{
-						if (relativePlacement == null || relativePlacement.IsXYPlane)
-							mtransform = placementRelTo.Transform;
-						else
-							mtransform = placementRelTo.Transform * Transform.ChangeBasis(relativePlacement.Plane, Plane.WorldXY);
-					}
+					Plane plane = relativePlacement.Plane;
+					if (plane.Origin.DistanceTo(Point3d.Origin) < mDatabase.Tolerance && plane.XAxis.IsParallelTo(Vector3d.XAxis) == 1 && plane.YAxis.IsParallelTo(Vector3d.YAxis) == 1)
+						identityRelative = true;
 				}
-				return mtransform;
+				else
+					identityRelative = relativePlacement.IsXYPlane;
 			}
+			if (placementRelTo == null || placementRelTo.isXYPlane)
+			{
+				if (identityRelative)
+					return Rhino.Geometry.Transform.Identity;
+				else
+					return Rhino.Geometry.Transform.ChangeBasis(relativePlacement.Plane,Plane.WorldXY);
+			}
+			if (identityRelative)
+				return placementRelTo.Transform();
+			return placementRelTo.Transform() * Rhino.Geometry.Transform.ChangeBasis(relativePlacement.Plane, Plane.WorldXY);
 		}
 	} 
 }

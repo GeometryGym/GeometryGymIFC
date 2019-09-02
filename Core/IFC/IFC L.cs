@@ -286,8 +286,6 @@ namespace GeometryGym.Ifc
 		private IfcObjectPlacement mPlacementRelTo = null;// : OPTIONAL IfcObjectPlacement;
 		private IfcAxis2Placement mRelativePlacement = null;// : IfcAxis2Placement;
 
-		private bool mCalculated = false;
-
 		public IfcObjectPlacement PlacementRelTo
 		{
 			get { return mPlacementRelTo; }
@@ -303,7 +301,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement RelativePlacement
 		{
 			get { return mRelativePlacement; }
-			set { mRelativePlacement = value; mCalculated = false; }
+			set { mRelativePlacement = value; }
 		}
 
 		internal IfcLocalPlacement() : base() { }

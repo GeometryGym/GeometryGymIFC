@@ -49,6 +49,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
-		public override Transform Transform { get { return Transform.ChangeBasis(PlacementLocation.LocationPlane, Plane.WorldXY); } }
+		public override Transform Transform() { return Rhino.Geometry.Transform.ChangeBasis(PlacementLocation.LocationPlane, Plane.WorldXY);  }
 	}
 }

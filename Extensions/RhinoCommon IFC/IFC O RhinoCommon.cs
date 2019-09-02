@@ -34,14 +34,14 @@ namespace GeometryGym.Ifc
 			get
 			{
 				Point3d o = new Point3d(), x = new Point3d(1, 0, 0), y = new Point3d(0, 1, 0);
-				Transform tr = Transform;
+				Transform tr = Transform();
 				o.Transform(tr);
 				x.Transform(tr);
 				y.Transform(tr);
 				return new Plane(o, x, y);
 			}
 		}
-		public abstract Transform Transform { get; }
+		public abstract Transform Transform();
 	}
 
 	public partial class IfcOffsetCurve2D : IfcOffsetCurve
