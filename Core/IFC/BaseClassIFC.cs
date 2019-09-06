@@ -53,9 +53,12 @@ namespace GeometryGym.Ifc
 #else
 		public BaseClassIfc() : base() { } // this(new DatabaseIfc(false, ModelView.Ifc4NotAssigned) { Format = FormatIfcSerialization.JSON }) { }
 #endif
-		protected BaseClassIfc(BaseClassIfc basis) : base()
+		protected BaseClassIfc(BaseClassIfc basis, bool replace) : base()
 		{
-			basis.ReplaceDatabase(this);
+			if (replace)
+				basis.ReplaceDatabase(this);
+			else
+				basis.Database.appendObject(this);	
 		}
 		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base() { mGlobalId = e.mGlobalId; db.appendObject(this); db.Factory.mDuplicateMapping.AddObject(e, mIndex);  }
 		protected BaseClassIfc(DatabaseIfc db) : base()

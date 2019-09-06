@@ -41,6 +41,7 @@ namespace GeometryGym.Ifc
 			public string ProjectFolder = "";
 			public HashSet<string> Encountered = new HashSet<string>();
 			public JsonStyle Style = JsonStyle.Default;
+			public bool Local = false;  //Convert to nesting
 			public int LengthDigitCount = 4;
 			internal RepositoryAttributes RepositoryAttributes = new RepositoryAttributes();
 			internal ReleaseVersion Version = ReleaseVersion.IFC4A2;

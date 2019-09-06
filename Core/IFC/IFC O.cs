@@ -83,7 +83,19 @@ namespace GeometryGym.Ifc
 		}
 		
 		protected IfcObject() : base() { }
-		protected IfcObject(IfcObject basis) : base(basis) { mObjectType = basis.mObjectType; mIsDeclaredBy = basis.mIsDeclaredBy; mIsTypedBy = basis.mIsTypedBy; mIsDefinedBy = basis.mIsDefinedBy; }
+		protected IfcObject(IfcObject obj, bool replace) : base(obj, replace)
+		{
+			mObjectType = obj.mObjectType;
+			IfcTypeObject typeObject = obj.RelatingType();
+			if (typeObject != null)
+				setRelatingType(typeObject);
+			if(replace)
+			{
+				mIsDeclaredBy = obj.mIsDeclaredBy;
+				mIsDefinedBy.AddRange(obj.mIsDefinedBy);
+			}
+
+		}
 		protected IfcObject(DatabaseIfc db, IfcObject o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory,downStream)//, bool downStream) : base(db, o, downStream)
 		{
 			mObjectType = o.mObjectType;
@@ -95,7 +107,7 @@ namespace GeometryGym.Ifc
 			if(o.mIsTypedBy != null)
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, ownerHistory,false) as IfcRelDefinesByType;
 		}
-		internal IfcObject(DatabaseIfc db) : base(db) { }
+		protected IfcObject(DatabaseIfc db) : base(db) { }
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -178,15 +190,12 @@ namespace GeometryGym.Ifc
 
 		protected IfcObjectDefinition() : base() { }
 		protected IfcObjectDefinition(DatabaseIfc db) : base(db) {  }
-		protected IfcObjectDefinition(IfcObjectDefinition basis) : base(basis)
+		protected IfcObjectDefinition(IfcObjectDefinition objectDefinition, bool replace) : base(objectDefinition, replace)
 		{
-			mHasAssignments = basis.mHasAssignments;
-			mNests = basis.mNests;
-			mIsNestedBy = basis.mIsNestedBy;
-			mHasContext = basis.mHasContext;
-			mIsDecomposedBy = basis.mIsDecomposedBy;
-			mDecomposes = basis.mDecomposes;
-			mHasAssociations = basis.mHasAssociations;
+			if(replace)
+			{
+				//todo
+			}
 		}
 		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory)
 		{

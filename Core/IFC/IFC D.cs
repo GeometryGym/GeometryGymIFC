@@ -358,7 +358,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcDistributionElement : IfcElement //SUPERTYPE OF (ONEOF (IfcDistributionControlElement ,IfcDistributionFlowElement))
 	{
 		internal IfcDistributionElement() : base() { }
-		protected IfcDistributionElement(IfcDistributionElement basis) : base(basis) { }
+		protected IfcDistributionElement(IfcDistributionElement distributionElement, bool replace) : base(distributionElement, replace) { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.AddRelated(this); }
@@ -384,7 +384,7 @@ namespace GeometryGym.Ifc
 		internal IfcDistributionPort mSourcePort, mSinkPort;
 
 		internal IfcDistributionFlowElement() : base() { }
-		protected IfcDistributionFlowElement(IfcDistributionFlowElement basis) : base(basis) { mSourcePort = basis.mSourcePort; mSinkPort = basis.mSinkPort;  }
+		protected IfcDistributionFlowElement(IfcDistributionFlowElement basis, bool replace) : base(basis, replace) { mSourcePort = basis.mSourcePort; mSinkPort = basis.mSinkPort;  }
 		internal IfcDistributionFlowElement(DatabaseIfc db, IfcDistributionFlowElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
 		public IfcDistributionFlowElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}

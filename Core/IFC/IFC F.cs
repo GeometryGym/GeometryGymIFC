@@ -526,7 +526,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcFlowTerminal" : base.StepClassName); } }
 
 		internal IfcFlowTerminal() : base() { }
-		protected IfcFlowTerminal(IfcFlowTerminal basis) : base(basis) { }
+		protected IfcFlowTerminal(IfcFlowTerminal basis, bool replace) : base(basis, replace) { }
 		internal IfcFlowTerminal(DatabaseIfc db, IfcFlowTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
 		public IfcFlowTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}

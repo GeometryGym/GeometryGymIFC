@@ -139,6 +139,15 @@ namespace GeometryGym.Ifc
 			mPredefinedType = t.mPredefinedType;
 		}
 		public IfcTask(DatabaseIfc db) : base(db) { }
+		public IfcTask(IfcTask task) : base(task)
+		{
+			mStatus = task.mStatus;
+			mWorkMethod = task.mWorkMethod;
+			mIsMilestone = task.mIsMilestone;
+			mPriority = task.mPriority;
+			mTaskTime = task.mTaskTime;
+			mPredefinedType = task.mPredefinedType;
+		}
 	}
 	[Serializable]
 	public partial class IfcTaskTime : IfcSchedulingTime //IFC4
@@ -879,7 +888,7 @@ namespace GeometryGym.Ifc
 		public new string Name { get { return base.Name; } set { base.Name = string.IsNullOrEmpty( value) ? "NameNotAssigned" : value; } }
 
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
-		protected IfcTypeObject(IfcTypeObject basis) : base(basis) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
+		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
 		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
 		[Obsolete("DEPRECEATED IFC4", false)]
 		public IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }

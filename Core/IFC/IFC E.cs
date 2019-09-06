@@ -341,10 +341,10 @@ namespace GeometryGym.Ifc
 		//List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		protected IfcElement() : base() { }
-		protected IfcElement(IfcElement basis) : base(basis)
+		protected IfcElement(IfcElement element, bool replace) : base(element, replace)
 		{
-			mTag = basis.mTag;
-#warning todo finish inverse
+			mTag = element.mTag;
+			//todo setInverse
 		}
 		protected IfcElement(DatabaseIfc db) : base(db) { }
 		protected IfcElement(DatabaseIfc db, IfcElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)

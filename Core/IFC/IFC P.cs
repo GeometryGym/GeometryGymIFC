@@ -955,6 +955,11 @@ namespace GeometryGym.Ifc
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
 				throw new Exception("Invalid Model View for IfcProcess : " + db.ModelView.ToString());
 		}
+		protected IfcProcess(IfcProcess process) : base(process, false)
+		{
+			mIdentification = process.mIdentification;
+			mLongDescription = process.mLongDescription;
+		}
 		public bool AddOperatesOn(IfcObjectDefinition related)
 		{
 			if (mOperatesOn.Count == 0)
@@ -1028,7 +1033,16 @@ namespace GeometryGym.Ifc
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
 
 		protected IfcProduct() : base() { }
-		protected IfcProduct(IfcProduct basis) : base(basis) { ObjectPlacement = basis.ObjectPlacement; Representation = basis.Representation; mReferencedBy = basis.mReferencedBy; }
+		protected IfcProduct(IfcProduct product, bool replace) : base(product, replace)
+		{
+			ObjectPlacement = product.ObjectPlacement;
+			Representation = product.Representation;
+			if(replace)
+			{
+				mReferencedBy = product.mReferencedBy;
+				mContainedInStructure = product.mContainedInStructure;
+			}
+		}
 		protected IfcProduct(IfcProductRepresentation rep) : base(rep.mDatabase) { Representation = rep; }
 		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { ObjectPlacement = placement; }
 		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)

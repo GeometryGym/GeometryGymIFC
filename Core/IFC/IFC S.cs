@@ -752,7 +752,7 @@ additional types	some additional representation types are given:
 		public IfcSpaceHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSpaceHeater() : base() { }
-		internal IfcSpaceHeater(IfcFlowTerminal basis) : base(basis) { }
+		internal IfcSpaceHeater(IfcFlowTerminal flowTerminal) : base(flowTerminal, true) { }
 		internal IfcSpaceHeater(DatabaseIfc db, IfcSpaceHeater h, IfcOwnerHistory ownerHistory, bool downStream) : base(db, h, ownerHistory, downStream) { mPredefinedType = h.mPredefinedType; }
 		public IfcSpaceHeater(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}

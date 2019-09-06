@@ -309,6 +309,7 @@ namespace GeometryGym.Ifc
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcWorkControl() : base() { }
+		protected IfcWorkControl(DatabaseIfc db) : base(db) { }
 		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream)
 		{
 			mCreationDate = c.mCreationDate;
@@ -326,6 +327,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWorkPlanTypeEnum mPredefinedType = IfcWorkPlanTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkPlanTypeEnum; IFC4
 		internal IfcWorkPlan() : base() { }
+		public IfcWorkPlan(DatabaseIfc db) : base(db) { }
 		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
 	}
 	[Serializable]

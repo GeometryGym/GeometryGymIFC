@@ -2593,7 +2593,14 @@ namespace GeometryGym.Ifc
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 
 		protected IfcRoot() : base() { mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid()); }
-		protected IfcRoot(IfcRoot basis) : base(basis) { GlobalId = basis.mGlobalId; mOwnerHistory = basis.mOwnerHistory; mName = basis.mName; mDescription = basis.mDescription; }
+		protected IfcRoot(IfcRoot root, bool replace) : base(root, replace)
+		{
+			if (replace)
+				mGlobalId = root.mGlobalId;
+			mOwnerHistory = root.mOwnerHistory;
+			mName = root.mName;
+			mDescription = root.mDescription;
+		}
 		protected IfcRoot(DatabaseIfc db) : base(db)
 		{
 			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
