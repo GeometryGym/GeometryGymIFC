@@ -64,6 +64,7 @@ namespace GeometryGym.STEP
 			}
 			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + StepClassName.ToUpper() + "(" + str.Substring(1) + ");";
 		}
+		public string STEPSerialization() { return StepClassName.ToUpper() + "(" + BuildStringSTEP().Substring(1) + ")"; }
 		public override string ToString() { return StringSTEP(); }
 		protected virtual string BuildStringSTEP() { return ""; } 
 		public void  AddComment(string comment) { mComments.Add(comment); }

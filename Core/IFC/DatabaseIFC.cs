@@ -706,7 +706,7 @@ namespace GeometryGym.Ifc
 			mDictionary.TryGetValue(key(obj), out result);
 			return result;
 		}
-		internal void AddObject(BaseClassIfc obj, int index) { mDictionary.Add(key(obj), index); }
+		internal void AddObject(BaseClassIfc obj, int index) { mDictionary[key(obj)] = index; }
 		private string key(BaseClassIfc obj) { return obj.mDatabase.id + "|" + obj.mIndex; }
 		internal bool Remove(BaseClassIfc obj)
 		{
@@ -738,7 +738,9 @@ namespace GeometryGym.Ifc
 			mDatabase[mDatabase.NextBlank()] = result;
 			return result; 
 		}
-		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping(); 
+		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
+		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
+		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
 		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, true); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
 		public BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
@@ -819,6 +821,54 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 
+		internal IfcProperty Duplicate(IfcProperty property)
+		{
+			int index = mDuplicateMapping.FindExisting(property);
+			if (index > 0)
+				return mDatabase[index] as IfcProperty;
+			string stepString = dictionaryKey( property);
+			IfcProperty result = null;
+			if(!string.IsNullOrEmpty(stepString) && mProperties.TryGetValue(stepString, out result))
+			{
+				mDuplicateMapping.AddObject(property, result.StepId);
+				return result;
+			}
+			result = Duplicate(property, true) as IfcProperty;
+			mProperties[stepString] = result;
+			return result;
+		}
+		internal IfcPropertySetDefinition Duplicate(IfcPropertySetDefinition propertySet)
+		{
+			int index = mDuplicateMapping.FindExisting(propertySet);
+			if (index > 0)
+				return mDatabase[index] as IfcPropertySetDefinition;
+			IfcPropertySetDefinition result = Duplicate(propertySet, true) as IfcPropertySetDefinition, existing = null;
+			string stepString = dictionaryKeyIgnoreId(result);
+			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
+			{
+				mDuplicateMapping.AddObject(propertySet, existing.Index);
+				result.Dispose(false);
+				return existing;
+			}
+			mPropertySets[stepString] = result;
+			return result;
+		}
+
+		private string dictionaryKey(BaseClassIfc obj)
+		{
+			string result = obj.STEPSerialization();
+			if (string.IsNullOrEmpty(result))
+				return null;
+			return result.Substring(3);
+		}
+		private string dictionaryKeyIgnoreId(IfcRoot root)
+		{
+			string result = dictionaryKey(root);
+			if (string.IsNullOrEmpty(result))
+				return null;
+
+			return result.Replace("'" + root.GlobalId + "',", "");
+		}
 		internal void initData()
 		{
 			initGeom();

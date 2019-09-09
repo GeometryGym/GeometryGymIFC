@@ -518,6 +518,10 @@ namespace GeometryGym.Ifc
 					return extractMeasureValue(type, value);
 			    if(type.IsSubclassOf(typeof(IfcDerivedMeasureValue)))	
 					return extractDerivedMeasureValue(type, value);
+				if (type == typeof(IfcSpecularExponent))
+					return new IfcSpecularExponent(double.Parse(value));
+				if (type == typeof(IfcSpecularRoughness))
+					return new IfcSpecularRoughness(double.Parse(value));
 			}
 			return null;
 		}

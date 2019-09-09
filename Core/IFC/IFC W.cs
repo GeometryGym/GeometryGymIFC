@@ -308,8 +308,17 @@ namespace GeometryGym.Ifc
 		public SET<IfcPerson> Creators { get { return mCreators; } } 
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
-		protected IfcWorkControl() : base() { }
-		protected IfcWorkControl(DatabaseIfc db) : base(db) { }
+		protected IfcWorkControl() : base() { mCreationDate = DateTime.Now; mStartTime = DateTime.Now; }
+		protected IfcWorkControl(DatabaseIfc db) : base(db)
+		{
+			mCreationDate = DateTime.Now;
+			mStartTime = DateTime.Now;
+			if (db.Release < ReleaseVersion.IFC4)
+			{
+				mSSCreationDate = new IfcCalendarDate(db, DateTime.Now).StepId;
+				mSSStartTime = mSSCreationDate;
+			}
+		}
 		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream)
 		{
 			mCreationDate = c.mCreationDate;

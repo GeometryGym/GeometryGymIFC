@@ -117,9 +117,9 @@ namespace GeometryGym.Ifc
 
 		internal IfcCalendarDate() : base() { }
 		internal IfcCalendarDate(DatabaseIfc db, IfcCalendarDate d) : base(db,d) { mDayComponent = d.mDayComponent; mMonthComponent = d.mMonthComponent; mYearComponent = d.mYearComponent; }
-		public IfcCalendarDate(DatabaseIfc m, int day, int month, int year) : base(m)
+		public IfcCalendarDate(DatabaseIfc db, DateTime date) : this(db, date.Day, date.Month, date.Year) { }
+		public IfcCalendarDate(DatabaseIfc db, int day, int month, int year) : base(db)
 		{
-			if (m.mRelease != ReleaseVersion.IFC2x3) throw new Exception("IfcCalanderDate DEPRECEATED, use IfcDate");
 			mDayComponent = day;
 			mMonthComponent = month;
 			mYearComponent = year;

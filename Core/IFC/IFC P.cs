@@ -1840,7 +1840,7 @@ namespace GeometryGym.Ifc
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
 		{
 			foreach(IfcProperty p in s.HasProperties.Values)
-				addProperty( db.Factory.Duplicate(p) as IfcProperty);
+				addProperty( db.Factory.Duplicate(p));
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
