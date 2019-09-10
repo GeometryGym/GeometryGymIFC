@@ -487,12 +487,20 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Description = token.Value<string>();
+			foreach (IfcPropertySet pset in mDatabase.extractJArray<IfcPropertySet>(obj.GetValue("PartOfPset", StringComparison.InvariantCultureIgnoreCase) as JArray))
+				pset.addProperty(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Name"] = Name;
 			setAttribute(obj, "Description", Description);
+			if(host is IfcExtendedProperties)
+			{
+				List<IfcPropertySet> psets = mPartOfPset.Where(x=>x.mDefinesType.Count == 0 && x.DefinesOccurrence.Count==0).ToList();
+				if(psets.Count > 0)
+					createArray(obj, "PartOfPset", psets, this, options);
+			}
 		}
 	}
 	public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));

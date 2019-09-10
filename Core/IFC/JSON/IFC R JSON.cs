@@ -439,7 +439,9 @@ namespace GeometryGym.Ifc
 			JArray array = obj.GetValue("RelatedPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
 				mDatabase.extractJArray<IfcPropertySetDefinition>(array).ForEach(x=>AddRelated(x));
-			RelatingTemplate = extractObject<IfcPropertySetTemplate>(obj.GetValue("RelatingTemplate", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			JObject jobj = obj.GetValue("RelatingTemplate", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if(jobj != null)
+				RelatingTemplate = extractObject<IfcPropertySetTemplate>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
