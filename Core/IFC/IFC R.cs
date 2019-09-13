@@ -2170,6 +2170,8 @@ namespace GeometryGym.Ifc
 			get { return mContextOfItems; }
 			set
 			{
+				if (mContextOfItems != null)
+					mContextOfItems.RepresentationsInContext.Remove(this);
 				mContextOfItems = value;
 				if (value != null)
 				{

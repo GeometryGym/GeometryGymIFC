@@ -352,6 +352,7 @@ additional types	some additional representation types are given:
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = "AdvancedBrep"; }
+		public IfcShapeRepresentation(IfcAnnotationFillArea area) : base(area.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.PlanSymbol2d), area) { RepresentationType = "FillArea"; }
 		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? "Clipping" : "CSG"; }
 		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = "BoundingBox"; }
 		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = "CSG"; }
