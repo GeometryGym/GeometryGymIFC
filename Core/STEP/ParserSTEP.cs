@@ -95,7 +95,9 @@ namespace GeometryGym.STEP
 				if (ilast > len)
 					return;
 			}
-			def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
+			int length = len - jcounter - ilast - 1;
+			if(length > 0)
+				def = strLine.Substring(jcounter + 1, len - jcounter - ilast - 1);//(strLine[len-1] == ';' ? 3 : 2));
 		}
 
 		public static string ParseString(string str)
@@ -683,7 +685,7 @@ namespace GeometryGym.STEP
 				}
 				else
 					result += c;
-				if (icounter == len)
+				if (icounter >= len)
 					break;
 				c = s[icounter++];
 				if (icounter == len)
@@ -835,6 +837,8 @@ namespace GeometryGym.STEP
 		}
 		public static int StripLink(string s, ref int pos, int len)
 		{
+			if (pos >= len)
+				return 0;
 			int icounter = pos;
 			while (char.IsWhiteSpace(s[icounter]))
 			{

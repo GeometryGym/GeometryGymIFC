@@ -156,6 +156,10 @@ namespace GeometryGym.Ifc
 						return Construct("IfcReinforcingBar");
 					if (string.Compare(className, "IfcBuildingElementComponent", true) == 0)
 						return Construct("IfcBuildingElementPart");
+					if (string.Compare(className, "IfcFlowSegmentType", true) == 0)
+						return Construct("IfcDistributionElementType");
+					else
+						return null;
 				}
 				mConstructors.TryAdd(className, constructor);
 			}

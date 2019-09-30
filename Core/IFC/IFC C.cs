@@ -838,6 +838,19 @@ namespace GeometryGym.Ifc
 				property.mPartOfComplex.Remove(this);
 			}
 		}
+		public IfcProperty FindProperty(string name)
+		{
+			IfcProperty result = this[name];
+			if (result != null)
+				return result;
+			foreach (IfcComplexProperty complexProperty in mHasProperties.OfType<IfcComplexProperty>())
+			{
+				result = complexProperty.FindProperty(name);
+				if (result != null)
+					return result;
+			}
+			return null;
+		}
 		public IfcProperty this[string name]
 		{
 			get

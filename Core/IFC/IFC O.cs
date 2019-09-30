@@ -32,14 +32,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcObject : IfcObjectDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcActor, IfcControl, IfcGroup, IfcProcess, IfcProduct, IfcProject, IfcResource))
 	{
-		internal string mObjectType = "$"; //: OPTIONAL IfcLabel;
+		internal string mObjectType = ""; //: OPTIONAL IfcLabel;
 		//INVERSE
 		internal IfcRelDefinesByObject mIsDeclaredBy = null;
 		internal List<IfcRelDefinesByObject> mDeclares = new List<IfcRelDefinesByObject>();
 		internal IfcRelDefinesByType mIsTypedBy = null;
 		internal List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
 
-		public string ObjectType { get { return mObjectType == "$" ? "" : ParserIfc.Decode(mObjectType); } set { mObjectType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ObjectType { get { return mObjectType; } set { mObjectType = value; } }
 		public IfcRelDefinesByType IsTypedBy
 		{
 			get { return mIsTypedBy; }
@@ -124,15 +124,16 @@ namespace GeometryGym.Ifc
 				mIsTypedBy.changeSchema(schema);
 			base.changeSchema(schema);
 		}
-		public override IfcProperty FindProperty(string name)
+		public override IfcProperty FindProperty(string name) { return FindProperty(name, true); }
+		public IfcProperty FindProperty(string name, bool includeRelatedType)
 		{
-			foreach (IfcPropertySet pset in mIsDefinedBy.ConvertAll(x=>x.RelatingPropertyDefinition).OfType<IfcPropertySet>())
+			foreach (IfcPropertySet pset in mIsDefinedBy.Select(x=>x.RelatingPropertyDefinition).OfType<IfcPropertySet>())
 			{
-				IfcProperty property = pset[name];
-				if (property != null)
-					return property;
+				IfcProperty result = pset.FindProperty(name);
+				if (result != null)
+					return result;
 			}
-			return (mIsTypedBy != null ? mIsTypedBy.RelatingType.FindProperty(name) : null);
+			return (includeRelatedType && mIsTypedBy != null ? mIsTypedBy.RelatingType.FindProperty(name) : null);
 		}
 		public IfcPhysicalQuantity FindQuantity(string name)
 		{
@@ -148,14 +149,17 @@ namespace GeometryGym.Ifc
 		{
 			removeProperty(property, IsDefinedBy);	
 		}
-		public override IfcPropertySetDefinition FindPropertySet(string name)
+
+
+		public override IfcPropertySetDefinition FindPropertySet(string name) { return FindPropertySet(name, true); }
+		public IfcPropertySetDefinition FindPropertySet(string name, bool includeRelatedType)
 		{
 			foreach(IfcPropertySetDefinition pset in mIsDefinedBy.Select(x=>x.RelatingPropertyDefinition))
 			{
 				if (string.Compare(pset.Name, name) == 0)
 					return pset;
 			}
-			return null;
+			return (includeRelatedType && mIsTypedBy != null ? mIsTypedBy.RelatingType.FindPropertySet(name) : null);
 		}
 
 		public string GetPredefinedType(bool checkRelatingType)

@@ -1574,6 +1574,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcPropertySet> PartOfPset { get { return new ReadOnlyCollection<IfcPropertySet>(mPartOfPset); } }
 
 		protected IfcProperty() : base() { }
+		protected IfcProperty(IfcProperty property) : base(property) { Name = property.Name; Description = property.Description; }
 		protected IfcProperty(DatabaseIfc db, IfcProperty p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; }
 		protected IfcProperty(DatabaseIfc db, string name) : base(db) { Name = name; }
 
@@ -1603,6 +1604,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 		protected IfcPropertyAbstraction() : base() { }
+		protected IfcPropertyAbstraction(IfcPropertyAbstraction propertyAbstraction) : base(propertyAbstraction.Database) { }
 		protected IfcPropertyAbstraction(DatabaseIfc db) : base(db) { }
 		protected IfcPropertyAbstraction(DatabaseIfc db, IfcPropertyAbstraction p) : base(db, p) { }
 		protected override void initialize()
@@ -1683,6 +1685,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcPropertyDefinition() : base() { }
 		internal IfcPropertyDefinition(DatabaseIfc db) : base(db) { }
+		protected IfcPropertyDefinition(IfcPropertyDefinition propertyDefinition) : base(propertyDefinition, false) {  }
 		protected IfcPropertyDefinition(DatabaseIfc db, IfcPropertyDefinition p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory)
 		{
 			foreach (IfcRelAssociates associates in mHasAssociations)
@@ -1837,6 +1840,11 @@ namespace GeometryGym.Ifc
 		internal IfcPropertySet() : base() { }
 		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
+		public IfcPropertySet(IfcPropertySet pset) : base(pset)
+		{
+			foreach (IfcProperty property in pset.HasProperties.Values)
+				HasProperties[property.Name] = property;
+		}
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
 		{
 			foreach(IfcProperty p in s.HasProperties.Values)
@@ -1849,7 +1857,6 @@ namespace GeometryGym.Ifc
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IfcProperty prop) : base(relatedObject, name) { addProperty(prop); }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IEnumerable<IfcProperty> props) : base(relatedObject, name) { foreach(IfcProperty p in props) addProperty(p);  }
 		
-
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -1872,6 +1879,7 @@ namespace GeometryGym.Ifc
 			{
 				if (property.isDuplicate(existing))
 					return;
+				existing.mPartOfPset.Remove(this);
 			}
 			mHasProperties[property.Name] = property;
 			property.mPartOfPset.Add(this);
@@ -1884,6 +1892,20 @@ namespace GeometryGym.Ifc
 				property.mPartOfPset.Remove(this);
 			}
 		}
+
+		public IfcProperty FindProperty(string name)
+		{
+			IfcProperty result = this[name];
+			if (result != null)
+				return result;
+			foreach(IfcComplexProperty complexProperty in mHasProperties.OfType<IfcComplexProperty>())
+			{
+				result = complexProperty.FindProperty(name);
+				if (result != null)
+					return result;
+			}
+			return null;
+		}
 		public IfcProperty this[string name]
 		{
 			get
@@ -1892,7 +1914,7 @@ namespace GeometryGym.Ifc
 					return null;
 				IfcProperty result = null;
 				mHasProperties.TryGetValue(name, out result);
-				return result;
+					return result;
 			}
 			set
 			{
@@ -1985,6 +2007,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelDefinesByProperties> DefinesOccurrence { get { return mDefinesOccurrence; } }
 
 		protected IfcPropertySetDefinition() : base() { }
+		protected IfcPropertySetDefinition(IfcPropertySetDefinition pset) : base(pset) { }
 		protected IfcPropertySetDefinition(DatabaseIfc db, IfcPropertySetDefinition s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
 		protected IfcPropertySetDefinition(DatabaseIfc m, string name) : base(m) { Name = name; }
 		protected IfcPropertySetDefinition(IfcObjectDefinition relatedObject, string name) : base(relatedObject.mDatabase) { RelateObjectDefinition(relatedObject); Name = name; }
@@ -2103,6 +2126,12 @@ namespace GeometryGym.Ifc
 
 		internal string mVal;
 		internal IfcPropertySingleValue() : base() { }
+
+		public IfcPropertySingleValue(IfcPropertySingleValue propertySingleValue) : base(propertySingleValue)
+		{
+			NominalValue = propertySingleValue.NominalValue;
+			Unit = propertySingleValue.Unit;
+		}
 		internal IfcPropertySingleValue(DatabaseIfc db, IfcPropertySingleValue s) : base(db, s)
 		{
 			mNominalValue = s.mNominalValue;
@@ -2153,6 +2182,34 @@ namespace GeometryGym.Ifc
 				return true;
 			}
 			return false;
+		}
+
+		public bool SetValueOrDuplicate(IfcValue val, IfcObjectDefinition obj)
+		{
+			IfcPropertySet pset = (mPartOfPset.Count == 1 ? mPartOfPset[0] : null);
+			if(pset != null && mPartOfComplex.Count == 0)
+			{
+				int count = pset.DefinesOccurrence.SelectMany(x => x.RelatedObjects).Count() + pset.DefinesType.Count;
+				if (count == 1)
+				{
+					NominalValue = val;
+					return true;
+				}
+			}
+			foreach(IfcPropertySet propertySet in mPartOfPset)
+			{
+				IfcRelDefinesByProperties defines = propertySet.DefinesOccurrence.Where(x => x.RelatedObjects.Contains(obj)).FirstOrDefault();
+				if(defines != null)
+				{
+					IfcPropertySet duplicate = new IfcPropertySet(pset);
+					duplicate[Name] = new IfcPropertySingleValue(this) { NominalValue = val };
+					defines.RelatedObjects.Remove(obj);
+					duplicate.RelateObjectDefinition(obj);
+					return true;
+				}
+			}
+			return false;
+
 		}
 	}
 	[Serializable]

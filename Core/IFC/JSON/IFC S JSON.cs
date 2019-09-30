@@ -265,7 +265,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mCompositionType != IfcElementCompositionEnum.NA)
+			if (mCompositionType != IfcElementCompositionEnum.NOTDEFINED)
 				obj["CompositionType"] = mCompositionType.ToString();
 		}
 	}

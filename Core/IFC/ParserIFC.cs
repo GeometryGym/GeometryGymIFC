@@ -738,6 +738,13 @@ namespace GeometryGym.Ifc
 		}
 		#endregion // Conversion Methods
 
+		public static string HashGlobalID(string uniqueString)
+		{
+			System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
+			byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(uniqueString));
+			Guid guid = new Guid(hash);
+			return EncodeGuid(guid);
+		}
 	 
 	}
 }

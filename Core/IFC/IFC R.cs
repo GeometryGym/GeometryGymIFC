@@ -787,7 +787,8 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingProduct as NamedObjectIfc; }
 
 		internal IfcRelAssignsToProduct() : base() { }
-		internal IfcRelAssignsToProduct(DatabaseIfc db, IfcRelAssignsToProduct r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { }
+		internal IfcRelAssignsToProduct(DatabaseIfc db, IfcRelAssignsToProduct r, IfcOwnerHistory ownerHistory, bool downStream) 
+			: base(db, r, ownerHistory, downStream) { RelatingProduct = db.Factory.Duplicate(r.RelatingProduct as BaseClassIfc, ownerHistory, downStream) as IfcProductSelect; }
 		public IfcRelAssignsToProduct(IfcProductSelect relProduct) : base(relProduct.Database) { RelatingProduct = relProduct; }
 		public IfcRelAssignsToProduct(IfcObjectDefinition relObject, IfcProductSelect relProduct) : base(relObject) { RelatingProduct = relProduct; }
 		public IfcRelAssignsToProduct(IEnumerable<IfcObjectDefinition> relObjects, IfcProductSelect relProduct) : base(relObjects) { RelatingProduct = relProduct; }
@@ -2598,15 +2599,18 @@ namespace GeometryGym.Ifc
 		protected IfcRoot(IfcRoot root, bool replace) : base(root, replace)
 		{
 			if (replace)
+			{
 				mGlobalId = root.mGlobalId;
-			mOwnerHistory = root.mOwnerHistory;
+				mOwnerHistory = root.mOwnerHistory;
+			}
+			else
+				OwnerHistory = root.Database.Factory.OwnerHistoryAdded;
 			mName = root.mName;
 			mDescription = root.mDescription;
 		}
 		protected IfcRoot(DatabaseIfc db) : base(db)
 		{
 			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
-			//m.mGlobalIDs.Add(mGlobalId);
 			if (db.Release < ReleaseVersion.IFC4 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
 				OwnerHistory = db.Factory.OwnerHistoryAdded;
 		}

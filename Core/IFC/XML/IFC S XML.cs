@@ -353,7 +353,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mCompositionType != IfcElementCompositionEnum.NA)
+			if (mCompositionType != IfcElementCompositionEnum.NOTDEFINED)
 				xml.SetAttribute("CompositionType", mCompositionType.ToString().ToLower());
 		}
 	}

@@ -826,7 +826,7 @@ namespace GeometryGym.Ifc
 			int index = mDuplicateMapping.FindExisting(property);
 			if (index > 0)
 				return mDatabase[index] as IfcProperty;
-			string stepString = dictionaryKey( property);
+			string stepString = dictionaryKey(property);
 			IfcProperty result = null;
 			if(!string.IsNullOrEmpty(stepString) && mProperties.TryGetValue(stepString, out result))
 			{
@@ -846,6 +846,8 @@ namespace GeometryGym.Ifc
 			string stepString = dictionaryKeyIgnoreId(result);
 			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
 			{
+				if (result.StepId == existing.StepId)
+					return result;
 				mDuplicateMapping.AddObject(propertySet, existing.Index);
 				result.Dispose(false);
 				return existing;
@@ -1440,7 +1442,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				if (mDatabase.Release > ReleaseVersion.IFC2x3 && !mOptions.GenerateOwnerHistory)
+				if (mDatabase.Release > ReleaseVersion.IFC2x3 && (!mOptions.GenerateOwnerHistory || mDatabase.ModelView == ModelView.Ifc4Reference))
 					return null;
 				if(mOwnerHistoryAdded == null)
 					mOwnerHistoryAdded = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);

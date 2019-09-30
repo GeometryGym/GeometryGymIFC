@@ -495,6 +495,7 @@ additional types	some additional representation types are given:
 	public abstract partial class IfcSimpleProperty : IfcProperty //ABSTRACT SUPERTYPE OF (ONEOF (IfcPropertyBoundedValue ,IfcPropertyEnumeratedValue ,
 	{ // IfcPropertyListValue,IfcPropertyReferenceValue,IfcPropertySingleValue,IfcPropertyTableValue)) 
 		protected IfcSimpleProperty() : base() { }
+		protected IfcSimpleProperty(IfcSimpleProperty simpleProperty) : base(simpleProperty) { }
 		protected IfcSimpleProperty(DatabaseIfc db, IfcSimpleProperty p) : base(db, p) { }
 		protected IfcSimpleProperty(DatabaseIfc m, string name) : base(m, name) { }
 	}
@@ -972,7 +973,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
 	{
-		internal IfcElementCompositionEnum mCompositionType = IfcElementCompositionEnum.NA;// : IfcElementCompositionEnum;  IFC4 Optional 
+		internal IfcElementCompositionEnum mCompositionType = IfcElementCompositionEnum.NOTDEFINED;// : IfcElementCompositionEnum;  IFC4 Optional 
 		public IfcElementCompositionEnum CompositionType { get { return mCompositionType; } set { mCompositionType = value; } }
 
 		protected IfcSpatialStructureElement() : base() { }
