@@ -36,7 +36,11 @@ namespace GeometryGym.STEP
 	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
 		internal string mFileName = "";
-		public string FileName { get { return mFileName; } set { mFileName = value; FolderPath = Path.GetDirectoryName(value); } }
+		public string FileName
+		{
+			get { return mFileName; }
+			set { mFileName = value; if(!string.IsNullOrEmpty(value)) FolderPath = Path.GetDirectoryName(value); }
+		}
 
 		public DatabaseSTEP() { }
 

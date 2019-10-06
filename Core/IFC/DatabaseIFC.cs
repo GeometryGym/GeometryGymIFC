@@ -201,17 +201,6 @@ namespace GeometryGym.Ifc
 			return hdr;
 		}
 		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; } 
-		public string ToSTEP()
-		{
-			string result = getHeaderString("") + "\r\n";
-			foreach(BaseClassIfc e in this)
-			{
-				string str = e.ToString();
-				if (str != "")
-					result += str +"\r\n";
-			}
-			return result + getFooterString();
-		}
 		public static DatabaseIfc ParseString(string str)
 		{
 			if (string.IsNullOrEmpty(str))
@@ -641,14 +630,14 @@ namespace GeometryGym.Ifc
 			char[] chars = Path.GetInvalidFileNameChars();
 			foreach (char c in chars)
 				fn = fn.Replace(c, '_');
-			FileName = Path.Combine(FolderPath, fn  + Path.GetExtension(filename));
-			if(filename.EndsWith("xml"))
+			FileName = Path.Combine(FolderPath, fn + Path.GetExtension(filename));
+			if (filename.EndsWith("xml"))
 			{
-				WriteXMLFile(FileName);
+				WriteXmlFile(FileName);
 				return true;
 			}
 #if (!NOIFCJSON)
-			else if(FileName.EndsWith("json"))
+			else if (FileName.EndsWith("json"))
 			{
 				ToJSON(FileName);
 				return true;
@@ -668,7 +657,17 @@ namespace GeometryGym.Ifc
 			}
 			else
 #endif
-			sw = new StreamWriter(FileName);
+				sw = new StreamWriter(FileName);
+
+#if (!NOIFCZIP)
+			if (zip)
+				za.Dispose();
+#endif
+			return WriteSTEP(sw, FileName);
+		}
+		public bool WriteSTEP(TextWriter sw, string filename)
+		{
+			FileName = filename;
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			sw.Write(getHeaderString(filename) + "\r\n");
@@ -688,11 +687,20 @@ namespace GeometryGym.Ifc
 			sw.Write(getFooterString());
 			sw.Close();
 			Thread.CurrentThread.CurrentUICulture = current;
-#if (!NOIFCZIP)
-			if (zip)
-				za.Dispose();
-#endif
+
 			return true;
+		}
+
+		public string ToString(FormatIfcSerialization format)
+		{
+			if(format == FormatIfcSerialization.XML)
+				return XmlString();
+			if (format == FormatIfcSerialization.JSON)
+				return JSON().ToString();
+			StringWriter stringWriter = new StringWriter();
+			if (WriteSTEP(stringWriter, FileName))
+				return stringWriter.ToString();
+			return null;
 		}
 	}
 	public class DuplicateMapping

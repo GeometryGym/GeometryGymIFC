@@ -26,6 +26,7 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 using System.Xml;
+using System.Xml.Serialization;
 //using System.Xml.Linq;
 
 
@@ -191,11 +192,8 @@ null, Type.EmptyTypes, null);
 		internal string mXmlSchema = @"http://standards.buildingsmart.org/IFC/RELEASE/IFC4_1/FINAL/XML/IFC4x1.xsd";
 
 		internal string mXsiNamespace = @"http://www.w3.org/2001/XMLSchema-instance";
-		public bool WriteXMLFile(string filename)
+		public XmlDocument XmlDocument()
 		{
-			CultureInfo current = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
 			XmlDocument doc = new XmlDocument();
 			XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
 			doc.AppendChild(dec);
@@ -226,10 +224,15 @@ null, Type.EmptyTypes, null);
 			foreach (BaseClassIfc e in toProcess)
 				el.AppendChild(e.GetXML(doc, "", null, processed));
 
-			XmlTextWriter writer;
+			return doc;
+		}
+		public bool WriteXml(XmlTextWriter writer)
+		{
+			CultureInfo current = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			XmlDocument doc = XmlDocument();
 			try
 			{
-				writer = new XmlTextWriter(filename, Encoding.UTF8);
 				writer.Formatting = Formatting.Indented;
 				try
 				{
@@ -244,6 +247,20 @@ null, Type.EmptyTypes, null);
 			catch (Exception) { }
 			Thread.CurrentThread.CurrentUICulture = current;
 			return true;
+		}
+		public string XmlString()
+		{
+			StringWriter sw = new StringWriter();
+			XmlTextWriter writer = new XmlTextWriter(sw);
+			if (WriteXml(writer))
+				return sw.ToString();
+			return null;
+
+		}
+		public bool WriteXmlFile(string filename)
+		{
+			XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8);
+			return WriteXml(writer);
 		}
 
 	}
