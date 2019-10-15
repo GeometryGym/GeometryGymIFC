@@ -66,10 +66,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
 	{
 		internal int mEdgeGeometry;// IfcCurve;
-		internal bool mSameSense;// : BOOL;
+		internal bool mSameSense = false;// : BOOL;
 
 		public IfcCurve EdgeGeometry { get { return mDatabase[mEdgeGeometry] as IfcCurve; } set { mEdgeGeometry = value.mIndex; } }
-		public bool SameSense { get { return mSameSense; } }
+		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 		
 		internal IfcEdgeCurve() : base() { }
 		internal IfcEdgeCurve(DatabaseIfc db, IfcEdgeCurve e) : base(db,e) { EdgeGeometry = db.Factory.Duplicate(e.EdgeGeometry) as IfcCurve; mSameSense = e.mSameSense; }
