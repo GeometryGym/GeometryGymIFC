@@ -1009,7 +1009,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSurfaceCurve : IfcCurve //IFC4 Add2
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mCurve3D.StepId + (mAssociatedGeometry.Count==0 ? ",$,." : ",(#" + mAssociatedGeometry[0] + (mAssociatedGeometry.Count == 2 ? ",#" + mAssociatedGeometry[1] : "") + "),.") + mMasterRepresentation.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mCurve3D.StepId + (mAssociatedGeometry.Count==0 ? ",$,." : ",(#" + mAssociatedGeometry[0].StepId + (mAssociatedGeometry.Count == 2 ? ",#" + mAssociatedGeometry[1].StepId : "") + "),.") + mMasterRepresentation.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			Curve3D = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
