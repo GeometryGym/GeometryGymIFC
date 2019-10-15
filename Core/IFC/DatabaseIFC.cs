@@ -75,9 +75,14 @@ namespace GeometryGym.Ifc
 		{
 			mRelease = schema;
 			mModelView = view;
-#if (RHINO)
+#if (RHINO || GH)
 			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
-			Tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
+			if (doc != null)
+			{
+				Tolerance = doc.ModelAbsoluteTolerance;
+				ToleranceAngleRadians = doc.ModelAngleToleranceRadians;
+			}
 #endif
 			//mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
 			if (generate)
@@ -139,6 +144,11 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+		public double ToleranceAngleRadians
+		{
+			get { return mModelToleranceAngleRadians; }
+			set { mModelToleranceAngleRadians = value; }
+		}
 		public double ScaleSI
 		{
 			get
@@ -164,7 +174,7 @@ namespace GeometryGym.Ifc
 			}
 			internal set { mModelSIScale = value; }
 		}
-		private double mModelTolerance = 0.0001,mModelSIScale = double.NaN;
+		private double mModelTolerance = 0.0001, mModelSIScale = double.NaN, mModelToleranceAngleRadians = Math.PI / 1800;
 		internal int mLengthDigits = 5;
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }
