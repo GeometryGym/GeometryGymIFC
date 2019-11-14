@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		public IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcGasTerminalType() : base() { }
-		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -83,7 +83,7 @@ namespace GeometryGym.Ifc
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcGeographicElement() : base() { }
-		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
@@ -92,7 +92,7 @@ namespace GeometryGym.Ifc
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcGeographicElementType() : base() { }
-		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
@@ -231,7 +231,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcGridAxis> WAxes { get { return mWAxes; } set { mWAxes.Clear(); if (value != null) { mWAxes.CollectionChanged -= mWAxes_CollectionChanged; mWAxes = value; mWAxes.CollectionChanged += mWAxes_CollectionChanged; } } }
 
 		internal IfcGrid() : base() { }
-		internal IfcGrid(DatabaseIfc db, IfcGrid g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream)
+		internal IfcGrid(DatabaseIfc db, IfcGrid g, DuplicateOptions options) : base(db, g, options)
 		{
 			UAxes.AddRange(g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
 			VAxes.AddRange(g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
@@ -455,12 +455,12 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelAssignsToGroup> IsGroupedBy { get { return new ReadOnlyCollection<IfcRelAssignsToGroup>( mIsGroupedBy); } }
 
 		internal IfcGroup() : base() { }
-		internal IfcGroup(DatabaseIfc db, IfcGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream)
+		internal IfcGroup(DatabaseIfc db, IfcGroup g, DuplicateOptions options) : base(db, g, options)
 		{
-			if(downStream)
+			if(options.DuplicateDownstream)
 			{
 				foreach (IfcRelAssignsToGroup rags in g.mIsGroupedBy)
-					db.Factory.Duplicate(rags, ownerHistory, true);
+					db.Factory.Duplicate(rags, options);
 			}
 		}
 		public IfcGroup(DatabaseIfc db, string name) : base(db) { Name = name; }

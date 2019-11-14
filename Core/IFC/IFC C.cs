@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 		internal IfcCableCarrierFittingTypeEnum mPredefinedType = IfcCableCarrierFittingTypeEnum.NOTDEFINED;// OPTIONAL : IfcCableCarrierFittingTypeEnum;
 		public IfcCableCarrierFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCableCarrierFitting() : base() { }
-		internal IfcCableCarrierFitting(DatabaseIfc db, IfcCableCarrierFitting f, IfcOwnerHistory ownerHistory, bool downStream) : base(db,f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
+		internal IfcCableCarrierFitting(DatabaseIfc db, IfcCableCarrierFitting f, DuplicateOptions options) : base(db,f, options) { mPredefinedType = f.mPredefinedType; }
 		protected IfcCableCarrierFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		internal IfcCableCarrierFittingTypeEnum mPredefinedType = IfcCableCarrierFittingTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum; 
 		public IfcCableCarrierFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCableCarrierFittingType() : base() { }
-		internal IfcCableCarrierFittingType(DatabaseIfc db, IfcCableCarrierFittingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCableCarrierFittingType(DatabaseIfc db, IfcCableCarrierFittingType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCableCarrierFittingType(DatabaseIfc m, string name, IfcCableCarrierFittingTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 		public IfcCableCarrierSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCableCarrierSegment() : base() { }
-		internal IfcCableCarrierSegment(DatabaseIfc db, IfcCableCarrierSegment s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcCableCarrierSegment(DatabaseIfc db, IfcCableCarrierSegment s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcCableCarrierSegmentType : IfcFlowSegmentType
@@ -65,7 +65,7 @@ namespace GeometryGym.Ifc
 		public IfcCableCarrierSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCableCarrierSegmentType() : base() { }
-		internal IfcCableCarrierSegmentType(DatabaseIfc db, IfcCableCarrierSegmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCableCarrierSegmentType(DatabaseIfc db, IfcCableCarrierSegmentType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCableCarrierSegmentType(DatabaseIfc m, string name, IfcCableCarrierSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 		public IfcCableFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCableFitting() : base() { }
-		internal IfcCableFitting(DatabaseIfc db, IfcCableFitting f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
+		internal IfcCableFitting(DatabaseIfc db, IfcCableFitting f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
 		public IfcCableFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 		public IfcCableFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCableFittingType() : base() { }
-		public IfcCableFittingType(DatabaseIfc db, IfcCableFittingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		public IfcCableFittingType(DatabaseIfc db, IfcCableFittingType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcCableSegment : IfcFlowSegment //IFC4
@@ -94,7 +94,7 @@ namespace GeometryGym.Ifc
 		public IfcCableSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcCableSegment() : base() { }
-		internal IfcCableSegment(DatabaseIfc db, IfcCableSegment s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcCableSegment(DatabaseIfc db, IfcCableSegment s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcCableSegmentType : IfcFlowSegmentType
@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 		public IfcCableSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCableSegmentType() : base() { }
-		internal IfcCableSegmentType(DatabaseIfc db, IfcCableSegmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCableSegmentType(DatabaseIfc db, IfcCableSegmentType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCableSegmentType(DatabaseIfc m, string name, IfcCableSegmentTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 		public IfcCableSegmentType(DatabaseIfc m, string name, IfcMaterialProfileSet mps, IfcCableSegmentTypeEnum t) : base(m) { Name = name; MaterialSelect = mps; PredefinedType = t; }
 	}
@@ -314,7 +314,7 @@ namespace GeometryGym.Ifc
 		internal double mWidth;// : OPTIONAL IfcPositiveLengthMeasure
 		internal double mHeight;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcChamferEdgeFeature() : base() { }
-		internal IfcChamferEdgeFeature(DatabaseIfc db, IfcChamferEdgeFeature f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mWidth = f.mWidth; mHeight = f.mHeight; }
+		internal IfcChamferEdgeFeature(DatabaseIfc db, IfcChamferEdgeFeature f, DuplicateOptions options) : base(db, f, options) { mWidth = f.mWidth; mHeight = f.mHeight; }
 	}
 	[Serializable]
 	public partial class IfcChiller : IfcEnergyConversionDevice //IFC4
@@ -323,7 +323,7 @@ namespace GeometryGym.Ifc
 		public IfcChillerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcChiller() : base() { }
-		internal IfcChiller(DatabaseIfc db, IfcChiller c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcChiller(DatabaseIfc db, IfcChiller c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcChiller(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -333,7 +333,7 @@ namespace GeometryGym.Ifc
 		public IfcChillerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcChillerType() : base() { }
-		internal IfcChillerType(DatabaseIfc db, IfcChillerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcChillerType(DatabaseIfc db, IfcChillerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcChillerType(DatabaseIfc db, string name, IfcChillerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -343,7 +343,7 @@ namespace GeometryGym.Ifc
 		public IfcChimneyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcChimney() : base() { }
-		internal IfcChimney(DatabaseIfc db, IfcChimney c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcChimney(DatabaseIfc db, IfcChimney c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcChimney(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -353,7 +353,7 @@ namespace GeometryGym.Ifc
 		public IfcChimneyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcChimneyType() : base() { } 
-		internal IfcChimneyType(DatabaseIfc db, IfcChimneyType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcChimneyType(DatabaseIfc db, IfcChimneyType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcChimneyType(DatabaseIfc m, string name, IfcChimneyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -410,7 +410,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCivilElement : IfcElement  //IFC4
 	{
 		internal IfcCivilElement() : base() { }
-		internal IfcCivilElement(DatabaseIfc db, IfcCivilElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		internal IfcCivilElement(DatabaseIfc db, IfcCivilElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcCivilElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
@@ -419,21 +419,21 @@ namespace GeometryGym.Ifc
 		// INVERSE
 		//ContainedInSegment : IfcBridgeSegment FOR SegmentParts;
 		protected IfcCivilElementPart() : base() { }
-		protected IfcCivilElementPart(DatabaseIfc db, IfcCivilElementPart e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		protected IfcCivilElementPart(DatabaseIfc db, IfcCivilElementPart e, DuplicateOptions options) : base(db, e, options) { }
 		protected IfcCivilElementPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcCivilElementType : IfcElementType //IFC4
 	{
 		internal IfcCivilElementType() : base() { }
-		internal IfcCivilElementType(DatabaseIfc db, IfcCivilElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
+		internal IfcCivilElementType(DatabaseIfc db, IfcCivilElementType t, DuplicateOptions options) : base(db, t, options) { }
 		public IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public partial class IfcCivilSheath : IfcCivilElementPart //IFC5
 	{
 		internal IfcCivilSheath() : base() { }
-		internal IfcCivilSheath(DatabaseIfc db, IfcCivilSheath s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
+		internal IfcCivilSheath(DatabaseIfc db, IfcCivilSheath s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcCivilSheath(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -441,13 +441,13 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcCivilStructureElement() : base() { }
 		protected IfcCivilStructureElement(IfcSpatialStructureElement host, string name) : base(host, name) { }
-		protected IfcCivilStructureElement(DatabaseIfc db, IfcCivilStructureElement p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { }
+		protected IfcCivilStructureElement(DatabaseIfc db, IfcCivilStructureElement p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	[Serializable]
 	public partial class IfcCivilVoid : IfcCivilElementPart //IFC5
 	{
 		internal IfcCivilVoid() : base() { }
-		internal IfcCivilVoid(DatabaseIfc db, IfcCivilVoid v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream) { }
+		internal IfcCivilVoid(DatabaseIfc db, IfcCivilVoid v, DuplicateOptions options) : base(db, v, options) { }
 		public IfcCivilVoid(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -710,7 +710,7 @@ namespace GeometryGym.Ifc
 		public IfcCoilTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCoil() : base() { }
-		internal IfcCoil(DatabaseIfc db, IfcCoil c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcCoil(DatabaseIfc db, IfcCoil c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcCoil(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -720,7 +720,7 @@ namespace GeometryGym.Ifc
 		public IfcCoilTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCoilType() : base() { }
-		internal IfcCoilType(DatabaseIfc db, IfcCoilType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCoilType(DatabaseIfc db, IfcCoilType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCoilType(DatabaseIfc m, string name, IfcCoilTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	public partial interface IfcColour : IBaseClassIfc, IfcFillStyleSelect { }// = SELECT (IfcColourSpecification ,IfcPreDefinedColour); 
@@ -762,7 +762,7 @@ namespace GeometryGym.Ifc
 		public IfcColumnTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcColumn() : base()  { }
-		internal IfcColumn(DatabaseIfc db, IfcColumn c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcColumn(DatabaseIfc db, IfcColumn c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcColumn(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcColumn(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
 	}
@@ -771,7 +771,7 @@ namespace GeometryGym.Ifc
 	{
 		public override string StepClassName { get { return "IfcColumn"; } }
 		internal IfcColumnStandardCase() : base() { }
-		internal IfcColumnStandardCase(DatabaseIfc db, IfcColumnStandardCase c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		internal IfcColumnStandardCase(DatabaseIfc db, IfcColumnStandardCase c, DuplicateOptions options) : base(db, c, options) { }
 		public IfcColumnStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
 	} 
 	[Serializable]
@@ -781,7 +781,7 @@ namespace GeometryGym.Ifc
 		public IfcColumnTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcColumnType() : base() { }
-		internal IfcColumnType(DatabaseIfc db, IfcColumnType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcColumnType(DatabaseIfc db, IfcColumnType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcColumnType(DatabaseIfc m, string name, IfcColumnTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcColumnType(string name, IfcMaterialProfile ps, IfcColumnTypeEnum type) : this(name,new IfcMaterialProfileSet(ps.Name, ps), type) { }
 		public IfcColumnType(string name, IfcMaterialProfileSet ps, IfcColumnTypeEnum type) : base(ps.mDatabase)
@@ -876,11 +876,11 @@ namespace GeometryGym.Ifc
 		public ReadOnlyDictionary<string,IfcPropertyTemplate> HasPropertyTemplates { get { return new ReadOnlyDictionary<string, IfcPropertyTemplate>(mHasPropertyTemplates); } }
 
 		internal IfcComplexPropertyTemplate() : base() { }
-		public IfcComplexPropertyTemplate(DatabaseIfc db, IfcComplexPropertyTemplate t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		public IfcComplexPropertyTemplate(DatabaseIfc db, IfcComplexPropertyTemplate t, DuplicateOptions options) : base(db, t, options)
 		{
 			mUsageName = t.mUsageName;
 			mTemplateType = t.mTemplateType;
-			if(downStream)
+			if(options.DuplicateDownstream)
 				t.HasPropertyTemplates.Values.ToList().ForEach(x => AddPropertyTemplate(db.Factory.Duplicate(x) as IfcPropertyTemplate));
 		}
 		public IfcComplexPropertyTemplate(DatabaseIfc db, string name) : base(db, name) { }
@@ -978,7 +978,7 @@ namespace GeometryGym.Ifc
 		internal IfcCompressorTypeEnum mPredefinedType = IfcCompressorTypeEnum.NOTDEFINED;// OPTIONAL : IfcCompressorTypeEnum;
 		public IfcCompressorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCompressor() : base() { }
-		internal IfcCompressor(DatabaseIfc db, IfcCompressor c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcCompressor(DatabaseIfc db, IfcCompressor c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcCompressor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -987,7 +987,7 @@ namespace GeometryGym.Ifc
 		internal IfcCompressorTypeEnum mPredefinedType = IfcCompressorTypeEnum.NOTDEFINED;// : IfcCompressorTypeEnum;
 		public IfcCompressorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCompressorType() : base() { }
-		internal IfcCompressorType(DatabaseIfc db, IfcCompressorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCompressorType(DatabaseIfc db, IfcCompressorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCompressorType(DatabaseIfc m, string name, IfcCompressorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -997,7 +997,7 @@ namespace GeometryGym.Ifc
 		public IfcCommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCommunicationsAppliance() : base() { }
-		internal IfcCommunicationsAppliance(DatabaseIfc db, IfcCommunicationsAppliance a, IfcOwnerHistory ownerHistory, bool downStream) : base(db,a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
+		internal IfcCommunicationsAppliance(DatabaseIfc db, IfcCommunicationsAppliance a, DuplicateOptions options) : base(db,a, options) { mPredefinedType = a.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcCommunicationsApplianceType : IfcFlowTerminalType
@@ -1005,7 +1005,7 @@ namespace GeometryGym.Ifc
 		internal IfcCommunicationsApplianceTypeEnum mPredefinedType = IfcCommunicationsApplianceTypeEnum.NOTDEFINED;// : IfcCommunicationsApplianceBoxTypeEnum; 
 		public IfcCommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCommunicationsApplianceType() : base() { }
-		internal IfcCommunicationsApplianceType(DatabaseIfc db, IfcCommunicationsApplianceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCommunicationsApplianceType(DatabaseIfc db, IfcCommunicationsApplianceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCommunicationsApplianceType(DatabaseIfc m, string name, IfcCommunicationsApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -1015,7 +1015,7 @@ namespace GeometryGym.Ifc
 		public IfcCondenserTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCondenser() : base() { }
-		internal IfcCondenser(DatabaseIfc db, IfcCondenser c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcCondenser(DatabaseIfc db, IfcCondenser c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcCondenser(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1024,7 +1024,7 @@ namespace GeometryGym.Ifc
 		internal IfcCondenserTypeEnum mPredefinedType = IfcCondenserTypeEnum.NOTDEFINED;// : IfcCondenserTypeEnum;
 		public IfcCondenserTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCondenserType() : base() { }
-		internal IfcCondenserType(DatabaseIfc db, IfcCondenserType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCondenserType(DatabaseIfc db, IfcCondenserType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCondenserType(DatabaseIfc m, string name, IfcCondenserTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -1032,7 +1032,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCondition : IfcGroup //DEPRECEATED IFC4
 	{
 		internal IfcCondition() : base() { }
-		internal IfcCondition(DatabaseIfc db, IfcCondition c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		internal IfcCondition(DatabaseIfc db, IfcCondition c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -1041,7 +1041,7 @@ namespace GeometryGym.Ifc
 		internal int mCriterion;// : IfcConditionCriterionSelect;
 		internal int mCriterionDateTime;// : IfcDateTimeSelect; 
 		internal IfcConditionCriterion() : base() { }
-		internal IfcConditionCriterion(DatabaseIfc db, IfcConditionCriterion c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { } // mCriterion = c.mCriterion; mCriterionDateTime = c.mCriterionDateTime; }
+		internal IfcConditionCriterion(DatabaseIfc db, IfcConditionCriterion c, DuplicateOptions options) : base(db, c, options) { } // mCriterion = c.mCriterion; mCriterionDateTime = c.mCriterionDateTime; }
 	}
 	[Serializable]
 	public abstract partial class IfcConic : IfcCurve /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCircle ,IfcEllipse))*/
@@ -1220,7 +1220,7 @@ namespace GeometryGym.Ifc
 		public IfcConstructionEquipmentResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcConstructionEquipmentResource() : base() { }
-		internal IfcConstructionEquipmentResource(DatabaseIfc db, IfcConstructionEquipmentResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcConstructionEquipmentResource(DatabaseIfc db, IfcConstructionEquipmentResource r, DuplicateOptions options) : base(db,r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcConstructionEquipmentResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1230,7 +1230,7 @@ namespace GeometryGym.Ifc
 		public IfcConstructionEquipmentResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcConstructionEquipmentResourceType() : base() { }
-		internal IfcConstructionEquipmentResourceType(DatabaseIfc db, IfcConstructionEquipmentResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcConstructionEquipmentResourceType(DatabaseIfc db, IfcConstructionEquipmentResourceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcConstructionEquipmentResourceType(DatabaseIfc db, string name, IfcConstructionEquipmentResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1241,7 +1241,7 @@ namespace GeometryGym.Ifc
 		//Suppliers	 : 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
 		//UsageRatio	 : 	OPTIONAL IfcRatioMeasure; ifc2x3
 		internal IfcConstructionMaterialResource() : base() { }
-		internal IfcConstructionMaterialResource(DatabaseIfc db, IfcConstructionMaterialResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcConstructionMaterialResource(DatabaseIfc db, IfcConstructionMaterialResource r, DuplicateOptions options) : base(db,r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcConstructionMaterialResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1251,7 +1251,7 @@ namespace GeometryGym.Ifc
 		public IfcConstructionMaterialResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcConstructionMaterialResourceType() : base() { }
-		internal IfcConstructionMaterialResourceType(DatabaseIfc db, IfcConstructionMaterialResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcConstructionMaterialResourceType(DatabaseIfc db, IfcConstructionMaterialResourceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcConstructionMaterialResourceType(DatabaseIfc db, string name, IfcConstructionMaterialResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1261,7 +1261,7 @@ namespace GeometryGym.Ifc
 		public IfcConstructionProductResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcConstructionProductResource() : base() { }
-		internal IfcConstructionProductResource(DatabaseIfc db, IfcConstructionProductResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcConstructionProductResource(DatabaseIfc db, IfcConstructionProductResource r, DuplicateOptions options) : base(db,r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcConstructionProductResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1271,7 +1271,7 @@ namespace GeometryGym.Ifc
 		public IfcConstructionProductResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcConstructionProductResourceType() : base() { }
-		internal IfcConstructionProductResourceType(DatabaseIfc db, IfcConstructionProductResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcConstructionProductResourceType(DatabaseIfc db, IfcConstructionProductResourceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcConstructionProductResourceType(DatabaseIfc db, string name, IfcConstructionProductResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1289,7 +1289,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcAppliedValue> BaseCosts { get { return new ReadOnlyCollection<IfcAppliedValue>( mBaseCosts.ConvertAll(x => mDatabase[x] as IfcAppliedValue)); } }
 		public IfcPhysicalQuantity BaseQuantity { get { return mBaseQuantity; } set { mBaseQuantity = value; } }
 		protected IfcConstructionResource() : base() { }
-		protected IfcConstructionResource(DatabaseIfc db, IfcConstructionResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db,r, ownerHistory, downStream)
+		protected IfcConstructionResource(DatabaseIfc db, IfcConstructionResource r, DuplicateOptions options) : base(db,r, options)
 		{
 			if(r.mUsage > 0)
 				Usage = db.Factory.Duplicate(r.Usage) as IfcResourceTime;
@@ -1313,7 +1313,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcConstructionResourceType() : base() { }
 		protected IfcConstructionResourceType(DatabaseIfc db) : base(db) { }
-		protected IfcConstructionResourceType(DatabaseIfc db, IfcConstructionResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		protected IfcConstructionResourceType(DatabaseIfc db, IfcConstructionResourceType t, DuplicateOptions options) : base(db, t, options)
 		{
 			t.BaseCosts.ToList().ForEach(x => addCost(db.Factory.Duplicate(x) as IfcAppliedValue));
 			BaseQuantity = db.Factory.Duplicate(t.BaseQuantity) as IfcPhysicalQuantity;
@@ -1344,7 +1344,14 @@ namespace GeometryGym.Ifc
 			{
 				mUnitsInContext = (value == null ? 0 : value.mIndex);
 				if(value != null)
-					mDatabase.Factory.Options.AngleUnitsInRadians = Math.Abs(1 - value.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT)) < 1e-4;
+				{
+					IfcNamedUnit namedUnit = value[IfcUnitEnum.PLANEANGLEUNIT];
+					if(namedUnit != null)
+					{
+						double scale = namedUnit.SIFactor;
+						mDatabase.Factory.Options.AngleUnitsInRadians = Math.Abs(1 - scale) < 1e-4;
+					}
+				}
 			}
 		}
 
@@ -1352,7 +1359,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelDeclares> Declares { get { return new ReadOnlyCollection<IfcRelDeclares>( mDeclares); } }
 	
 		protected IfcContext() : base() { }
-		protected IfcContext(DatabaseIfc db, IfcContext c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream)
+		protected IfcContext(DatabaseIfc db, IfcContext c, DuplicateOptions options) : base(db, c, options)
 		{
 			if(db.mContext == null)
 				db.mContext = this;
@@ -1509,7 +1516,7 @@ namespace GeometryGym.Ifc
 		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public ReadOnlyCollection<IfcRelAssignsToControl> Controls => new ReadOnlyCollection<IfcRelAssignsToControl>(mControls);
 		protected IfcControl() : base() { }
-		protected IfcControl(DatabaseIfc db, IfcControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mIdentification = c.mIdentification; }
+		protected IfcControl(DatabaseIfc db, IfcControl c, DuplicateOptions options) : base(db, c, options) { mIdentification = c.mIdentification; }
 		protected IfcControl(DatabaseIfc db) : base(db)
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
@@ -1525,7 +1532,7 @@ namespace GeometryGym.Ifc
 		public IfcControllerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcController() : base() { }
-		internal IfcController(DatabaseIfc db, IfcController c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcController(DatabaseIfc db, IfcController c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcController(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1535,7 +1542,7 @@ namespace GeometryGym.Ifc
 		public IfcControllerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcControllerType() : base() { }
-		internal IfcControllerType(DatabaseIfc db, IfcControllerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcControllerType(DatabaseIfc db, IfcControllerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcControllerType(DatabaseIfc m, string name, IfcControllerTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -1608,7 +1615,7 @@ namespace GeometryGym.Ifc
 		public IfcCooledBeamTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCooledBeam() : base() { }
-		internal IfcCooledBeam(DatabaseIfc db, IfcCooledBeam b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream) { mPredefinedType = b.mPredefinedType; }
+		internal IfcCooledBeam(DatabaseIfc db, IfcCooledBeam b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
 		public IfcCooledBeam(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1618,7 +1625,7 @@ namespace GeometryGym.Ifc
 		public IfcCooledBeamTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCooledBeamType() : base() { }
-		internal IfcCooledBeamType(DatabaseIfc db, IfcCooledBeamType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCooledBeamType(DatabaseIfc db, IfcCooledBeamType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCooledBeamType(DatabaseIfc m, string name, IfcCooledBeamTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1628,7 +1635,7 @@ namespace GeometryGym.Ifc
 		public IfcCoolingTowerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCoolingTower() : base() { }
-		internal IfcCoolingTower(DatabaseIfc db, IfcCoolingTower t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCoolingTower(DatabaseIfc db, IfcCoolingTower t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCoolingTower(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1638,7 +1645,7 @@ namespace GeometryGym.Ifc
 		public IfcCoolingTowerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCoolingTowerType() : base() { }
-		internal IfcCoolingTowerType(DatabaseIfc db, IfcCoolingTowerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCoolingTowerType(DatabaseIfc db, IfcCoolingTowerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCoolingTowerType(DatabaseIfc m, string name, IfcCoolingTowerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -1698,7 +1705,7 @@ namespace GeometryGym.Ifc
 		public IfcCostItemTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCostItem() : base() { } 
-		internal IfcCostItem(DatabaseIfc db, IfcCostItem i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
+		internal IfcCostItem(DatabaseIfc db, IfcCostItem i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
 		internal IfcCostItem(IfcCostSchedule s, IfcCostItemTypeEnum t)
 			: base(s.mDatabase) { s.AddAggregated(this); mPredefinedType = t; }
 		internal IfcCostItem(IfcCostItem i, IfcCostItemTypeEnum t)
@@ -1742,7 +1749,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		internal IfcCostSchedule() : base() { }
-		internal IfcCostSchedule(DatabaseIfc db, IfcCostSchedule s, IfcOwnerHistory ownerHistory, bool downStream) : base(db,s, ownerHistory, downStream)
+		internal IfcCostSchedule(DatabaseIfc db, IfcCostSchedule s, DuplicateOptions options) : base(db,s, options)
 		{
 			mSubmittedBy = s.mSubmittedBy;
 			mPreparedBy = s.mPreparedBy;
@@ -1784,7 +1791,7 @@ namespace GeometryGym.Ifc
 		public IfcRelCoversSpaces CoversSpaces { get { return mCoversSpaces; } set { mCoversSpaces = value; } }
 		
 		internal IfcCovering() : base() { }
-		internal IfcCovering(DatabaseIfc db, IfcCovering c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcCovering(DatabaseIfc db, IfcCovering c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcCovering(DatabaseIfc db) : base(db) { }
 		public IfcCovering(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
@@ -1795,7 +1802,7 @@ namespace GeometryGym.Ifc
 		public IfcCoveringTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCoveringType() : base() { }
-		internal IfcCoveringType(DatabaseIfc db, IfcCoveringType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db,t,ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCoveringType(DatabaseIfc db, IfcCoveringType t, DuplicateOptions options) : base(db,t,options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCoveringType(DatabaseIfc m, string name, IfcCoveringTypeEnum type) : base(m) { Name = name; mPredefinedType = type; } 
 	}
 	[Obsolete("DELETED IFC4", false)]
@@ -1837,7 +1844,7 @@ namespace GeometryGym.Ifc
 		public IfcCrewResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCrewResource() : base() { }
-		internal IfcCrewResource(DatabaseIfc db, IfcCrewResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcCrewResource(DatabaseIfc db, IfcCrewResource r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcCrewResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1847,7 +1854,7 @@ namespace GeometryGym.Ifc
 		public IfcCrewResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCrewResourceType() : base() { }
-		internal IfcCrewResourceType(DatabaseIfc db, IfcCrewResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCrewResourceType(DatabaseIfc db, IfcCrewResourceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCrewResourceType(DatabaseIfc m, string name, IfcCrewResourceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1906,7 +1913,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCurtainWall() : base() { }
-		internal IfcCurtainWall(DatabaseIfc db, IfcCurtainWall w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { mPredefinedType = w.mPredefinedType; }
+		internal IfcCurtainWall(DatabaseIfc db, IfcCurtainWall w, DuplicateOptions options) : base(db, w, options) { mPredefinedType = w.mPredefinedType; }
 		public IfcCurtainWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1916,7 +1923,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcCurtainWallType() : base() { }
-		internal IfcCurtainWallType(DatabaseIfc db, IfcCurtainWallType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcCurtainWallType(DatabaseIfc db, IfcCurtainWallType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcCurtainWallType(DatabaseIfc m, string name, IfcCurtainWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]

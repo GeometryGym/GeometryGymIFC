@@ -150,7 +150,7 @@ namespace GeometryGym.Ifc
 		public IfcInterceptorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcInterceptor() : base() { }
-		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
+		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
 		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -160,7 +160,7 @@ namespace GeometryGym.Ifc
 		public IfcInterceptorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcInterceptorType() : base() { }
-		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcInterceptorType(DatabaseIfc db, string name, IfcInterceptorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -180,7 +180,7 @@ namespace GeometryGym.Ifc
 		internal int mCurrentValue;// : OPTIONAL IfcCostValue;
 		internal int mOriginalValue;// : OPTIONAL IfcCostValue;
 		internal IfcInventory() : base() { }
-		internal IfcInventory(DatabaseIfc db, IfcInventory i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream)
+		internal IfcInventory(DatabaseIfc db, IfcInventory i, DuplicateOptions options) : base(db, i, options)
 		{
 #warning todo
 			//mInventoryType = p.mInventoryType;

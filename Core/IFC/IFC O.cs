@@ -96,7 +96,7 @@ namespace GeometryGym.Ifc
 			}
 
 		}
-		protected IfcObject(DatabaseIfc db, IfcObject o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory,downStream)//, bool downStream) : base(db, o, downStream)
+		protected IfcObject(DatabaseIfc db, IfcObject o, DuplicateOptions options) : base(db, o, options)//, bool downStream) : base(db, o, downStream)
 		{
 			mObjectType = o.mObjectType;
 			foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
@@ -106,7 +106,7 @@ namespace GeometryGym.Ifc
 			}
 			
 			if(o.mIsTypedBy != null)
-				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, ownerHistory,false) as IfcRelDefinesByType;
+				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, options) as IfcRelDefinesByType;
 		}
 		protected IfcObject(DatabaseIfc db) : base(db) { }
 		protected override List<T> Extract<T>(Type type)
@@ -202,28 +202,33 @@ namespace GeometryGym.Ifc
 				//todo
 			}
 		}
-		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory)
+		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, DuplicateOptions options) : base(db, o, options.OwnerHistory)
 		{
-			foreach(IfcRelAssigns assigns in o.mHasAssignments)
+			if (options.DuplicateHost)
 			{
-				IfcRelAssigns dup = db.Factory.Duplicate(assigns, ownerHistory, false) as IfcRelAssigns;
-				dup.RelatedObjects.Add(this);
+				foreach(IfcRelAssigns assigns in o.mHasAssignments)
+				{
+					IfcRelAssigns dup = db.Factory.Duplicate(assigns, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelAssigns;
+					dup.RelatedObjects.Add(this);
+				}
+				if (o.mDecomposes != null)
+					(db.Factory.Duplicate(o.mDecomposes, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelAggregates).RelatedObjects.Add(this);
+				if(o.mNests != null)
+					(db.Factory.Duplicate(o.mNests, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelNests).RelatedObjects.Add(this);
+				if (mHasContext != null)
+					(db.Factory.Duplicate(mHasContext, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelDeclares).RelatedDefinitions.Add(this);	
 			}
-			if (o.mDecomposes != null)
-				(db.Factory.Duplicate(o.mDecomposes, ownerHistory, false) as IfcRelAggregates).RelatedObjects.Add(this);
 			foreach (IfcRelAssociates associates in o.mHasAssociations)
 			{
-				IfcRelAssociates dup = db.Factory.Duplicate(associates, ownerHistory, downStream) as IfcRelAssociates;
+				IfcRelAssociates dup = db.Factory.Duplicate(associates, new DuplicateOptions(options) { DuplicateDownstream = true }) as IfcRelAssociates;
 				dup.RelatedObjects.Add(this);
 			}
-			if (mHasContext != null)
-				(db.Factory.Duplicate(mHasContext, ownerHistory, false) as IfcRelDeclares).RelatedDefinitions.Add(this);	
-			if(downStream)
+			if(options.DuplicateDownstream)
 			{
 				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
-					mDatabase.Factory.Duplicate(rag, ownerHistory, true);
+					mDatabase.Factory.Duplicate(rag, options);
 				foreach (IfcRelNests rn in o.mIsNestedBy)
-					mDatabase.Factory.Duplicate(rn, ownerHistory, true);
+					mDatabase.Factory.Duplicate(rn, options);
 			}
 		}
 		protected override void initialize()
@@ -439,7 +444,7 @@ namespace GeometryGym.Ifc
 						IfcMaterialLayerSet set = related[icounter].detectMaterialLayerSet();
 						if (set == null)
 							continue;
-						if (!set.isDuplicate(layerSet))
+						if (!set.isDuplicate(layerSet, mDatabase.Tolerance))
 							return null;
 					}
 					return layerSet;
@@ -597,7 +602,7 @@ namespace GeometryGym.Ifc
 		public IfcOccupantTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcOccupant() : base() { }
-		internal IfcOccupant(DatabaseIfc db, IfcOccupant o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { mPredefinedType = o.mPredefinedType; }
+		internal IfcOccupant(DatabaseIfc db, IfcOccupant o, DuplicateOptions options) : base(db, o, options) { mPredefinedType = o.mPredefinedType; }
 		public IfcOccupant(IfcActorSelect a, IfcOccupantTypeEnum type) : base(a) { mPredefinedType = type; }
 	}
 	public abstract partial class IfcOffsetCurve : IfcCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcOffsetCurve2D, IfcOffsetCurve3D, IfcOffsetCurveByDistances))
@@ -672,12 +677,12 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcRelFillsElement> HasFillings { get { return new ReadOnlyCollection<IfcRelFillsElement>( mHasFillings); } }
 
 		internal IfcOpeningElement() : base() { }
-		internal IfcOpeningElement(DatabaseIfc db, IfcOpeningElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
+		internal IfcOpeningElement(DatabaseIfc db, IfcOpeningElement e, DuplicateOptions options) : base(db, e, options)
 		{
 			mPredefinedType = e.mPredefinedType;
-			if (downStream)
+			if (options.DuplicateDownstream)
 				foreach (IfcRelFillsElement fills in e.HasFillings)
-					mDatabase.Factory.Duplicate(fills, true);
+					mDatabase.Factory.Duplicate(fills, options);
 		}
 		internal IfcOpeningElement(DatabaseIfc db) : base(db) { }
 		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductRepresentation rep) : base(host.mDatabase)
@@ -695,7 +700,7 @@ namespace GeometryGym.Ifc
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcOpeningElement" : base.StepClassName); } }
 		internal IfcOpeningStandardCase() : base() { }
-		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, IfcOwnerHistory ownerHistory, bool downStream) : base(db, o, ownerHistory, downStream) { }
+		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, DuplicateOptions options) : base(db, o, options) { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }
 		public IfcOpeningStandardCase(DatabaseIfc db, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(db) { ObjectPlacement = placement; Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(eas)); }
 	}
@@ -874,7 +879,7 @@ namespace GeometryGym.Ifc
 		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcOutlet() : base() { }
-		internal IfcOutlet(DatabaseIfc db, IfcOutlet o, IfcOwnerHistory ownerHistory, bool downStream) : base(db,o, ownerHistory, downStream) { mPredefinedType = o.mPredefinedType; }
+		internal IfcOutlet(DatabaseIfc db, IfcOutlet o, DuplicateOptions options) : base(db,o, options) { mPredefinedType = o.mPredefinedType; }
 		public IfcOutlet(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -884,7 +889,7 @@ namespace GeometryGym.Ifc
 		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcOutletType() : base() { }
-		internal IfcOutletType(DatabaseIfc db, IfcOutletType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcOutletType(DatabaseIfc db, IfcOutletType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcOutletType(DatabaseIfc m, string name, IfcOutletTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -931,29 +936,29 @@ namespace GeometryGym.Ifc
 			CreationDate = DateTime.Now;
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e)
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcOwnerHistory o = e as IfcOwnerHistory;
-			if (o == null || !OwningUser.isDuplicate(o.OwningUser) || !OwningApplication.isDuplicate(o.OwningApplication))
+			if (o == null || !OwningUser.isDuplicate(o.OwningUser, tol) || !OwningApplication.isDuplicate(o.OwningApplication, tol))
 				return false;
 			if (mState != o.mState || mChangeAction != o.mChangeAction || mLastModifiedDate != o.mLastModifiedDate || mCreationDate != o.mCreationDate)
 				return false;
 			if (mLastModifyingUser != null)
 			{
-				if (o.mLastModifyingUser == null || !LastModifyingUser.isDuplicate(o.LastModifyingUser))
+				if (o.mLastModifyingUser == null || !LastModifyingUser.isDuplicate(o.LastModifyingUser, tol))
 					return false;
 			}
 			else if (o.mLastModifyingUser != null)
 				return false;
 			if (mLastModifyingApplication != null)
 			{
-				if (o.mLastModifyingApplication == null || !LastModifyingApplication.isDuplicate(o.LastModifyingApplication))
+				if (o.mLastModifyingApplication == null || !LastModifyingApplication.isDuplicate(o.LastModifyingApplication, tol))
 					return false;
 			}
 			else if (o.mLastModifyingApplication != null)
 				return false;
 
-			return base.isDuplicate(e);
+			return base.isDuplicate(e, tol);
 		}
 	}
 }

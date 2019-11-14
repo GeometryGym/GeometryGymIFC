@@ -1399,11 +1399,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRepresentationMap : BaseClassIfc, IfcProductRepresentationSelect
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mMappingOrigin) + "," + ParserSTEP.LinkToString(mMappedRepresentation); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mMappingOrigin.StepId + ",#" + mMappedRepresentation.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mMappingOrigin = ParserSTEP.StripLink(str, ref pos, len);
-			mMappedRepresentation = ParserSTEP.StripLink(str, ref pos, len);
+			MappingOrigin = dictionary[ ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
+			MappedRepresentation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRepresentation;
 		}
 	}
 

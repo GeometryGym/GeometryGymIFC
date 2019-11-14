@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 		public IfcSanitaryTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSanitaryTerminal() : base() { }
-		internal IfcSanitaryTerminal(DatabaseIfc db, IfcSanitaryTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSanitaryTerminal(DatabaseIfc db, IfcSanitaryTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSanitaryTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 		public IfcSanitaryTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSanitaryTerminalType() : base() { }
-		internal IfcSanitaryTerminalType(DatabaseIfc db, IfcSanitaryTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSanitaryTerminalType(DatabaseIfc db, IfcSanitaryTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSanitaryTerminalType(DatabaseIfc m, string name, IfcSanitaryTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -83,7 +83,7 @@ namespace GeometryGym.Ifc
 		public double Completion { get { return mCompletion; } set { mCompletion = value; } }
 
 		internal IfcScheduleTimeControl() : base() { }
-		internal IfcScheduleTimeControl(DatabaseIfc db, IfcScheduleTimeControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream)
+		internal IfcScheduleTimeControl(DatabaseIfc db, IfcScheduleTimeControl c, DuplicateOptions options) : base(db,c, options)
 		{
 			mActualStart = c.mActualStart; mEarlyStart = c.mEarlyStart; mLateStart = c.mLateStart; mScheduleStart = c.mScheduleStart;
 			mActualFinish = c.mActualFinish; mEarlyFinish = c.mEarlyFinish; mLateFinish = c.mLateFinish; mScheduleFinish = c.mScheduleFinish;
@@ -242,7 +242,7 @@ namespace GeometryGym.Ifc
 		public IfcSensorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcSensor() : base() { }
-		internal IfcSensor(DatabaseIfc db, IfcSensor s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcSensor(DatabaseIfc db, IfcSensor s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 		public IfcSensor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -252,7 +252,7 @@ namespace GeometryGym.Ifc
 		public IfcSensorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSensorType() : base() { }
-		internal IfcSensorType(DatabaseIfc db, IfcSensorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSensorType(DatabaseIfc db, IfcSensorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSensorType(DatabaseIfc m, string name, IfcSensorTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -266,7 +266,7 @@ namespace GeometryGym.Ifc
 		public IfcShadingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcShadingDevice() : base() { }
-		internal IfcShadingDevice(DatabaseIfc db, IfcShadingDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		internal IfcShadingDevice(DatabaseIfc db, IfcShadingDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
 		public IfcShadingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -276,7 +276,7 @@ namespace GeometryGym.Ifc
 		public IfcShadingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcShadingDeviceType() : base() { }
-		internal IfcShadingDeviceType(DatabaseIfc db, IfcShadingDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcShadingDeviceType(DatabaseIfc db, IfcShadingDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcShadingDeviceType(DatabaseIfc m, string name, IfcShadingDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -520,7 +520,7 @@ additional types	some additional representation types are given:
 		public IfcStateEnum AccessState { get { return mAccessState; } set { mAccessState = value; } }
 
 		internal IfcSimplePropertyTemplate() : base() { }
-		internal IfcSimplePropertyTemplate(DatabaseIfc db, IfcSimplePropertyTemplate s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
+		internal IfcSimplePropertyTemplate(DatabaseIfc db, IfcSimplePropertyTemplate s, DuplicateOptions options) : base(db, s, options)
 		{
 			mTemplateType = s.mTemplateType;
 			mPrimaryMeasureType = s.mPrimaryMeasureType;
@@ -552,7 +552,7 @@ additional types	some additional representation types are given:
 		public IfcPostalAddress SiteAddress { get { return mDatabase[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSite() : base() { }
-		internal IfcSite(DatabaseIfc db, IfcSite site, IfcOwnerHistory ownerHistory, bool downStream) : base(db, site, ownerHistory, downStream) 
+		internal IfcSite(DatabaseIfc db, IfcSite site, DuplicateOptions options) : base(db, site, options) 
 		{ 
 			mRefLatitude = site.mRefLatitude; 
 			mRefLongitude = site.mRefLongitude; 
@@ -597,7 +597,7 @@ additional types	some additional representation types are given:
 		public IfcSlabTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSlab() : base() { }
-		internal IfcSlab(DatabaseIfc db, IfcSlab s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcSlab(DatabaseIfc db, IfcSlab s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -605,14 +605,14 @@ additional types	some additional representation types are given:
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
 		internal IfcSlabElementedCase() : base() { }
-		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
+		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public partial class IfcSlabStandardCase : IfcSlab
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
 		internal IfcSlabStandardCase() : base() { }
-		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
+		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)
 		{
 			SetMaterial(layerSetUsage);
@@ -628,7 +628,7 @@ additional types	some additional representation types are given:
 
 		public IfcSlabType() : base() { }
 		public IfcSlabType(DatabaseIfc m, string name, IfcSlabTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		internal IfcSlabType(DatabaseIfc db, IfcSlabType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSlabType(DatabaseIfc db, IfcSlabType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSlabType(string name, IfcMaterialLayerSet ls, IfcSlabTypeEnum type) : base(ls.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = ls; }
 	}
 	//ENTITY IfcSlippageConnectionCondition
@@ -639,7 +639,7 @@ additional types	some additional representation types are given:
 		public IfcSolarDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSolarDevice() : base() { }
-		internal IfcSolarDevice(DatabaseIfc db, IfcSolarDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		internal IfcSolarDevice(DatabaseIfc db, IfcSolarDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
 		public IfcSolarDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -649,7 +649,7 @@ additional types	some additional representation types are given:
 		public IfcSolarDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSolarDeviceType() : base() { }
-		internal IfcSolarDeviceType(DatabaseIfc db, IfcSolarDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSolarDeviceType(DatabaseIfc db, IfcSolarDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSolarDeviceType(DatabaseIfc m, string name, IfcSolarDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -670,7 +670,7 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcSoundValue> SoundValues { get { return new ReadOnlyCollection<IfcSoundValue>( mSoundValues.ConvertAll(x => mDatabase[x] as IfcSoundValue)); } }
 
 		internal IfcSoundProperties() : base() { }
-		internal IfcSoundProperties(DatabaseIfc db, IfcSoundProperties p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		internal IfcSoundProperties(DatabaseIfc db, IfcSoundProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mIsAttenuating = p.mIsAttenuating;
 			mSoundScale = p.mSoundScale;
@@ -690,7 +690,7 @@ additional types	some additional representation types are given:
 		public IfcTimeSeries SoundLevelTimeSeries { get { return mDatabase[mSoundLevelTimeSeries] as IfcTimeSeries; } set { mSoundLevelTimeSeries = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSoundValue() : base() { }
-		internal IfcSoundValue(DatabaseIfc db, IfcSoundValue v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream)
+		internal IfcSoundValue(DatabaseIfc db, IfcSoundValue v, DuplicateOptions options) : base(db, v, options)
 		{
 			if (v.mSoundLevelTimeSeries > 0)
 				SoundLevelTimeSeries = db.Factory.Duplicate(v.SoundLevelTimeSeries) as IfcTimeSeries;
@@ -730,7 +730,7 @@ additional types	some additional representation types are given:
 		public List<IfcRelSpaceBoundary> BoundedBy { get { return mBoundedBy; } }
 
 		internal IfcSpace() : base() { }
-		internal IfcSpace(DatabaseIfc db, IfcSpace s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
+		internal IfcSpace(DatabaseIfc db, IfcSpace s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
 		public IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		protected override void addProduct(IfcProduct product)
@@ -755,7 +755,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSpaceHeater() : base() { }
 		internal IfcSpaceHeater(IfcFlowTerminal flowTerminal) : base(flowTerminal, true) { }
-		internal IfcSpaceHeater(DatabaseIfc db, IfcSpaceHeater h, IfcOwnerHistory ownerHistory, bool downStream) : base(db, h, ownerHistory, downStream) { mPredefinedType = h.mPredefinedType; }
+		internal IfcSpaceHeater(DatabaseIfc db, IfcSpaceHeater h, DuplicateOptions options) : base(db, h, options) { mPredefinedType = h.mPredefinedType; }
 		public IfcSpaceHeater(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -766,7 +766,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSpaceHeaterType() : base() { }
 		internal IfcSpaceHeaterType(IfcDistributionFlowElementType basis) : base(basis) { }
-		internal IfcSpaceHeaterType(DatabaseIfc db, IfcSpaceHeaterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSpaceHeaterType(DatabaseIfc db, IfcSpaceHeaterType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSpaceHeaterType(DatabaseIfc m, string name, IfcSpaceHeaterTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -779,7 +779,7 @@ additional types	some additional representation types are given:
 		internal double mStandardRequiredArea;// : IfcAreaMeasure; 
 		public IfcSpatialStructureElement RequestedLocation { get { return mDatabase[mRequestedLocation] as IfcSpatialStructureElement; } set { mRequestedLocation = value == null ? 0 : value.mIndex; } }
 		internal IfcSpaceProgram() : base() { }
-		internal IfcSpaceProgram(DatabaseIfc db, IfcSpaceProgram p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		internal IfcSpaceProgram(DatabaseIfc db, IfcSpaceProgram p, DuplicateOptions options) : base(db, p, options)
 		{
 			mSpaceProgramIdentifier = p.mSpaceProgramIdentifier;
 			mMaxRequiredArea = p.mMaxRequiredArea;
@@ -798,7 +798,7 @@ additional types	some additional representation types are given:
 		public IfcSpaceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSpaceType() : base() { }
-		internal IfcSpaceType(DatabaseIfc db, IfcSpaceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSpaceType(DatabaseIfc db, IfcSpaceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSpaceType(DatabaseIfc db, string name, IfcSpaceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -816,16 +816,16 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>( mReferencesElements); } }
 
 		protected IfcSpatialElement() : base() { }
-		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
+		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, DuplicateOptions options) : base(db, e, options)
 		{
 			mLongName = e.mLongName;
-			if (downStream)
+			if (options.DuplicateDownstream)
 			{
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
-					db.Factory.Duplicate(css, ownerHistory, downStream);
+					db.Factory.Duplicate(css, options);
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
-					IfcSystem sys = db.Factory.Duplicate(system, true) as IfcSystem;
+					IfcSystem sys = db.Factory.Duplicate(system, options) as IfcSystem;
 					if(system.ServicesBuildings == null)
 					{
 						new IfcRelServicesBuildings(sys, this);
@@ -968,7 +968,7 @@ additional types	some additional representation types are given:
 
 		protected IfcSpatialElementType() : base() { }
 		protected IfcSpatialElementType(DatabaseIfc db) : base(db) { }
-		protected IfcSpatialElementType(DatabaseIfc db, IfcSpatialElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mElementType = t.mElementType; }
+		protected IfcSpatialElementType(DatabaseIfc db, IfcSpatialElementType t, DuplicateOptions options) : base(db, t, options) { mElementType = t.mElementType; }
 	}
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
@@ -979,7 +979,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement() : base() { }
 		protected IfcSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
-		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mCompositionType = e.mCompositionType; }
+		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { mCompositionType = e.mCompositionType; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
@@ -988,7 +988,7 @@ additional types	some additional representation types are given:
 	{
 		protected IfcSpatialStructureElementType() : base() { }
 		protected IfcSpatialStructureElementType(DatabaseIfc db) : base(db) { }
-		protected IfcSpatialStructureElementType(DatabaseIfc db, IfcSpatialStructureElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
+		protected IfcSpatialStructureElementType(DatabaseIfc db, IfcSpatialStructureElementType t, DuplicateOptions options) : base(db, t, options) { }
 	}
 	[Serializable]
 	public partial class IfcSpatialZone : IfcSpatialElement  //IFC4
@@ -997,7 +997,7 @@ additional types	some additional representation types are given:
 		public IfcSpatialZoneTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		protected IfcSpatialZone() : base() { }
-		protected IfcSpatialZone(DatabaseIfc db, IfcSpatialZone p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
+		protected IfcSpatialZone(DatabaseIfc db, IfcSpatialZone p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; }
 		public IfcSpatialZone(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
 		public IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
 	}
@@ -1008,7 +1008,7 @@ additional types	some additional representation types are given:
 		public IfcSpatialZoneTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSpatialZoneType() : base() { }
-		internal IfcSpatialZoneType(DatabaseIfc db, IfcSpatialZoneType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSpatialZoneType(DatabaseIfc db, IfcSpatialZoneType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSpatialZoneType(DatabaseIfc m, string name, IfcSpatialZoneTypeEnum t) : base(m) { Name = name; PredefinedType = t; if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone Type only valid in IFC4 or newer!"); }
 	}
 	public interface IfcSpecularHighlightSelect : IBaseClassIfc { } //SELECT ( IfcSpecularExponent, IfcSpecularRoughness);
@@ -1038,7 +1038,7 @@ additional types	some additional representation types are given:
 		public IfcStackTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStackTerminal() : base() { }
-		internal IfcStackTerminal(DatabaseIfc db, IfcStackTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcStackTerminal(DatabaseIfc db, IfcStackTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcStackTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1048,7 +1048,7 @@ additional types	some additional representation types are given:
 		public IfcStackTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStackTerminalType() : base() { }
-		internal IfcStackTerminalType(DatabaseIfc db, IfcStackTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcStackTerminalType(DatabaseIfc db, IfcStackTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcStackTerminalType(DatabaseIfc m, string name, IfcStackTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1058,7 +1058,7 @@ additional types	some additional representation types are given:
 		public IfcStairTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStair() : base() { }
-		internal IfcStair(DatabaseIfc db, IfcStair s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcStair(DatabaseIfc db, IfcStair s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 		public IfcStair(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1073,7 +1073,7 @@ additional types	some additional representation types are given:
 		public IfcStairFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStairFlight() : base() { }
-		internal IfcStairFlight(DatabaseIfc db, IfcStairFlight f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mNumberOfRiser = f.mNumberOfRiser; mNumberOfTreads = f.mNumberOfTreads; mRiserHeight = f.mRiserHeight; mTreadLength = f.mTreadLength; mPredefinedType = f.mPredefinedType; }
+		internal IfcStairFlight(DatabaseIfc db, IfcStairFlight f, DuplicateOptions options) : base(db, f, options) { mNumberOfRiser = f.mNumberOfRiser; mNumberOfTreads = f.mNumberOfTreads; mRiserHeight = f.mRiserHeight; mTreadLength = f.mTreadLength; mPredefinedType = f.mPredefinedType; }
 		public IfcStairFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1083,7 +1083,7 @@ additional types	some additional representation types are given:
 		public IfcStairFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStairFlightType() : base() { }
-		internal IfcStairFlightType(DatabaseIfc db, IfcStairFlightType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcStairFlightType(DatabaseIfc db, IfcStairFlightType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcStairFlightType(DatabaseIfc m, string name, IfcStairFlightTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1093,7 +1093,7 @@ additional types	some additional representation types are given:
 		public IfcStairTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStairType() : base() { }
-		internal IfcStairType(DatabaseIfc db, IfcStairType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcStairType(DatabaseIfc db, IfcStairType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcStairType(DatabaseIfc m, string name, IfcStairTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -1106,7 +1106,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralReaction CausedBy { get { return mDatabase[mCausedBy] as IfcStructuralReaction; } set { mCausedBy = (value == null ? 0 : value.mIndex); } }
 
 		protected IfcStructuralAction() : base() { }
-		protected IfcStructuralAction(DatabaseIfc db, IfcStructuralAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db,a, ownerHistory, downStream)
+		protected IfcStructuralAction(DatabaseIfc db, IfcStructuralAction a, DuplicateOptions options) : base(db,a, options)
 		{
 			mDestabilizingLoad = a.mDestabilizingLoad;
 			if(a.mCausedBy > 0)
@@ -1136,7 +1136,7 @@ additional types	some additional representation types are given:
 		public IfcRelConnectsStructuralActivity AssignedToStructuralItem { get { return mAssignedToStructuralItem; } set { mAssignedToStructuralItem = value; } }
 
 		protected IfcStructuralActivity() : base() { }
-		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivity a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream)
+		protected IfcStructuralActivity(DatabaseIfc db, IfcStructuralActivity a, DuplicateOptions options) : base(db, a, options)
 		{
 			AppliedLoad = db.Factory.Duplicate(a.AppliedLoad) as IfcStructuralLoad;
 			mGlobalOrLocal = a.mGlobalOrLocal;
@@ -1167,7 +1167,7 @@ additional types	some additional representation types are given:
 		public IfcObjectPlacement SharedPlacement { get { return mSharedPlacement; } set { mSharedPlacement = value; } }
 
 		internal IfcStructuralAnalysisModel() : base() { }
-		internal IfcStructuralAnalysisModel(DatabaseIfc db, IfcStructuralAnalysisModel m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream)
+		internal IfcStructuralAnalysisModel(DatabaseIfc db, IfcStructuralAnalysisModel m, DuplicateOptions options) : base(db, m, options)
 		{
 			mPredefinedType = m.mPredefinedType;
 			if(m.mOrientationOf2DPlane > 0)
@@ -1210,7 +1210,7 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcRelConnectsStructuralMember> ConnectsStructuralMembers { get { return new ReadOnlyCollection<IfcRelConnectsStructuralMember>(mConnectsStructuralMembers); } }
 
 		protected IfcStructuralConnection() : base() { }
-		protected IfcStructuralConnection(DatabaseIfc db, IfcStructuralConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { if(c.mAppliedCondition > 0) AppliedCondition = db.Factory.Duplicate(c.AppliedCondition) as IfcBoundaryCondition; }
+		protected IfcStructuralConnection(DatabaseIfc db, IfcStructuralConnection c, DuplicateOptions options) : base(db, c, options) { if(c.mAppliedCondition > 0) AppliedCondition = db.Factory.Duplicate(c.AppliedCondition) as IfcBoundaryCondition; }
 		protected IfcStructuralConnection(IfcStructuralAnalysisModel sm) : base(sm) {  }
 	}
 	[Serializable]
@@ -1232,7 +1232,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralCurveActivityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStructuralCurveAction() : base() { }
-		internal IfcStructuralCurveAction(DatabaseIfc db, IfcStructuralCurveAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db,a, ownerHistory, downStream) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
+		internal IfcStructuralCurveAction(DatabaseIfc db, IfcStructuralCurveAction a, DuplicateOptions options) : base(db,a, options) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoadSingleForce force, double length, bool global)
 			: base(lc, member, new IfcStructuralLoadConfiguration(force, length), null, global) { mPredefinedType = IfcStructuralCurveActivityTypeEnum.DISCRETE; }
 		public IfcStructuralCurveAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoad load, bool global, bool projected, IfcStructuralCurveActivityTypeEnum type)
@@ -1242,7 +1242,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralCurveConnection : IfcStructuralConnection
 	{
 		internal IfcStructuralCurveConnection() : base() { }
-		internal IfcStructuralCurveConnection(DatabaseIfc db, IfcStructuralCurveConnection c, IfcOwnerHistory ownerHistory, bool downSream) : base(db, c, ownerHistory, downSream) { }
+		internal IfcStructuralCurveConnection(DatabaseIfc db, IfcStructuralCurveConnection c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralCurveMember : IfcStructuralMember
@@ -1256,7 +1256,7 @@ additional types	some additional representation types are given:
 		internal IfcEdgeCurve EdgeCurve { get; set; } //Used for load applications in ifc2x3
 
 		public IfcStructuralCurveMember() : base() { }
-		internal IfcStructuralCurveMember(DatabaseIfc db, IfcStructuralCurveMember m, IfcOwnerHistory ownerHistory, bool downStream) : base(db,m, ownerHistory, downStream) { mPredefinedType = m.mPredefinedType; Axis = db.Factory.Duplicate(m.Axis) as IfcDirection; }
+		internal IfcStructuralCurveMember(DatabaseIfc db, IfcStructuralCurveMember m, DuplicateOptions options) : base(db,m, options) { mPredefinedType = m.mPredefinedType; Axis = db.Factory.Duplicate(m.Axis) as IfcDirection; }
 		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcStructuralPointConnection A, IfcStructuralPointConnection B, IfcMaterialProfileSetUsage mp, IfcDirection dir, int id)
 			: this(sm,A,null,B,null,mp,dir,id) { }
 		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcStructuralPointConnection A, IfcStructuralPointConnection B, IfcDirection dir, int id)
@@ -1300,14 +1300,14 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralCurveMemberVarying : IfcStructuralCurveMember
 	{
 		internal IfcStructuralCurveMemberVarying() : base() { }
-		internal IfcStructuralCurveMemberVarying(DatabaseIfc db, IfcStructuralCurveMemberVarying m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { }
+		internal IfcStructuralCurveMemberVarying(DatabaseIfc db, IfcStructuralCurveMemberVarying m, DuplicateOptions options) : base(db, m, options) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralCurveReaction : IfcStructuralReaction
 	{
 		internal IfcStructuralCurveActivityTypeEnum mPredefinedType = IfcStructuralCurveActivityTypeEnum.NOTDEFINED;//: 	IfcStructuralCurveActivityTypeEnum; 
 		internal IfcStructuralCurveReaction() : base() { }
-		internal IfcStructuralCurveReaction(DatabaseIfc db, IfcStructuralCurveReaction r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcStructuralCurveReaction(DatabaseIfc db, IfcStructuralCurveReaction r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralItem : IfcProduct, IfcStructuralActivityAssignmentSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralConnection ,IfcStructuralMember))
@@ -1317,7 +1317,7 @@ additional types	some additional representation types are given:
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 		public ReadOnlyCollection<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return new ReadOnlyCollection<IfcRelConnectsStructuralActivity>(mAssignedStructuralActivity); } }
 		protected IfcStructuralItem() : base() { }
-		protected IfcStructuralItem(DatabaseIfc db, IfcStructuralItem i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream)
+		protected IfcStructuralItem(DatabaseIfc db, IfcStructuralItem i, DuplicateOptions options) : base(db, i, options)
 		{
 			foreach(IfcRelConnectsStructuralActivity rcss in i.mAssignedStructuralActivity)
 			{
@@ -1342,7 +1342,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralLinearAction : IfcStructuralCurveAction 
 	{
 		internal IfcStructuralLinearAction() : base() { }
-		internal IfcStructuralLinearAction(DatabaseIfc db, IfcStructuralLinearAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) {  }
+		internal IfcStructuralLinearAction(DatabaseIfc db, IfcStructuralLinearAction a, DuplicateOptions options) : base(db, a, options) {  }
 		public IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoadTemperature load)
 			: this(lc, member, load, true,false, IfcStructuralCurveActivityTypeEnum.CONST) { }
 		public IfcStructuralLinearAction(IfcStructuralLoadCase lc, IfcStructuralCurveMember member, IfcStructuralLoadLinearForce load, bool global, bool projected) 
@@ -1368,7 +1368,7 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcStructuralLoad> SubsequentAppliedLoads { get { return new ReadOnlyCollection<IfcStructuralLoad>( mSubsequentAppliedLoads.ConvertAll(x => mDatabase[x] as IfcStructuralLoad)); } }
 
 		internal IfcStructuralLinearActionVarying() : base() { }
-		internal IfcStructuralLinearActionVarying(DatabaseIfc db, IfcStructuralLinearActionVarying a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream)
+		internal IfcStructuralLinearActionVarying(DatabaseIfc db, IfcStructuralLinearActionVarying a, DuplicateOptions options) : base(db, a, options)
 		{
 			VaryingAppliedLoadLocation = db.Factory.Duplicate( a.VaryingAppliedLoadLocation) as IfcShapeAspect;
 			a.SubsequentAppliedLoads.ToList().ForEach(x=>addSubsequentLoad(db.Factory.Duplicate(x) as IfcStructuralLoad));
@@ -1437,7 +1437,7 @@ additional types	some additional representation types are given:
 		public Tuple<double,double,double> SelfWeightCoefficients { get { return mSelfWeightCoefficients; } set { mSelfWeightCoefficients = value; } }
 
 		internal IfcStructuralLoadCase() : base() { }
-		internal IfcStructuralLoadCase(DatabaseIfc db, IfcStructuralLoadCase c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mSelfWeightCoefficients = c.mSelfWeightCoefficients; }
+		internal IfcStructuralLoadCase(DatabaseIfc db, IfcStructuralLoadCase c, DuplicateOptions options) : base(db, c, options) { mSelfWeightCoefficients = c.mSelfWeightCoefficients; }
 		public IfcStructuralLoadCase(IfcStructuralAnalysisModel model, string name, IfcActionTypeEnum action, IfcActionSourceTypeEnum source)
 			: base(model, name, IfcLoadGroupTypeEnum.LOAD_CASE, action, source) { new IfcRelAssignsToGroup(this) { Name = Name + " Actions", Description = Description }; }
 	}
@@ -1460,7 +1460,7 @@ additional types	some additional representation types are given:
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcStructuralLoadGroup() : base() { }
-		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { mPredefinedType = g.mPredefinedType; mActionType = g.mActionType; mActionSource = g.mActionSource; mCoefficient = g.mCoefficient; mPurpose = g.mPurpose; }
+		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; mActionType = g.mActionType; mActionSource = g.mActionSource; mCoefficient = g.mCoefficient; mPurpose = g.mPurpose; }
 		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type, IfcActionTypeEnum action, IfcActionSourceTypeEnum source)
 			: base(sm.mDatabase, name) { mLoadGroupFor.Add(sm); sm.addLoadGroup(this); mPredefinedType = type; mActionType = action; mActionSource = source; }
 		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, List<double> factors, List<IfcStructuralLoadGroup> cases, bool ULS)
@@ -1594,7 +1594,7 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcRelConnectsStructuralMember> ConnectedBy { get { return new ReadOnlyCollection<IfcRelConnectsStructuralMember>(mConnectedBy); } }
 
 		protected IfcStructuralMember() : base() { }
-		protected IfcStructuralMember(DatabaseIfc db, IfcStructuralMember m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream)
+		protected IfcStructuralMember(DatabaseIfc db, IfcStructuralMember m, DuplicateOptions options) : base(db, m, options)
 		{
 			foreach (IfcRelConnectsStructuralMember sm in m.mConnectedBy)
 				(db.Factory.Duplicate(sm) as IfcRelConnectsStructuralMember).RelatingStructuralMember = this;
@@ -1612,7 +1612,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralPlanarAction : IfcStructuralSurfaceAction // Ifc2x3 IfcStructuralAction
 	{
 		internal IfcStructuralPlanarAction() : base() { }
-		internal IfcStructuralPlanarAction(DatabaseIfc db, IfcStructuralPlanarAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) {  }
+		internal IfcStructuralPlanarAction(DatabaseIfc db, IfcStructuralPlanarAction a, DuplicateOptions options) : base(db, a, options) {  }
 		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadPlanarForce load, bool global, bool projected)
 			: base(lc, item, load, global, projected, IfcStructuralSurfaceActivityTypeEnum.CONST) { }
 		public IfcStructuralPlanarAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoadTemperature load, bool global, bool projected)
@@ -1628,7 +1628,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralPointAction : IfcStructuralAction
 	{
 		internal IfcStructuralPointAction() : base() { }
-		internal IfcStructuralPointAction(DatabaseIfc db, IfcStructuralPointAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { }
+		internal IfcStructuralPointAction(DatabaseIfc db, IfcStructuralPointAction a, DuplicateOptions options) : base(db, a, options) { }
 		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleForce l, bool global) : base(lc, point, l, null, global) { }
 		public IfcStructuralPointAction(IfcStructuralLoadCase lc, IfcStructuralPointConnection point, IfcStructuralLoadSingleDisplacement l, bool global) : base(lc, point, l, null, global) { }
 	}
@@ -1644,7 +1644,7 @@ additional types	some additional representation types are given:
 		}
 
 		public IfcStructuralPointConnection() : base() { }
-		internal IfcStructuralPointConnection(DatabaseIfc db, IfcStructuralPointConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		internal IfcStructuralPointConnection(DatabaseIfc db, IfcStructuralPointConnection c, DuplicateOptions options) : base(db, c, options) { }
 		public IfcStructuralPointConnection(IfcStructuralAnalysisModel sm, IfcVertexPoint point)
 			: base(sm) { Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), point)); }
 	
@@ -1663,7 +1663,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralPointReaction : IfcStructuralReaction
 	{
 		internal IfcStructuralPointReaction() : base() { }
-		internal IfcStructuralPointReaction(DatabaseIfc db, IfcStructuralPointReaction r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { }
+		internal IfcStructuralPointReaction(DatabaseIfc db, IfcStructuralPointReaction r, DuplicateOptions options) : base(db, r, options) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -1721,7 +1721,7 @@ additional types	some additional representation types are given:
 	{   //INVERSE 
 		//internal List<int> mCauses = new List<int>();// : OPTIONAL IfcStructuralReaction;
 		protected IfcStructuralReaction() : base() { }
-		protected IfcStructuralReaction(DatabaseIfc db, IfcStructuralReaction p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { }
+		protected IfcStructuralReaction(DatabaseIfc db, IfcStructuralReaction p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralResultGroup : IfcGroup
@@ -1736,7 +1736,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralAnalysisModel ResultGroupFor { get { return mResultGroupFor; } set { mResultGroupFor = value; } }
 
 		internal IfcStructuralResultGroup() : base() { }
-		internal IfcStructuralResultGroup(DatabaseIfc db, IfcStructuralResultGroup g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream)
+		internal IfcStructuralResultGroup(DatabaseIfc db, IfcStructuralResultGroup g, DuplicateOptions options) : base(db, g, options)
 		{
 			mTheoryType = g.mTheoryType;
 			if(g.mResultForLoadGroup > 0)
@@ -1772,7 +1772,7 @@ additional types	some additional representation types are given:
 		public IfcStructuralSurfaceActivityTypeEnum PredefinedType {  get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcStructuralSurfaceAction() : base() { }
-		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
+		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, DuplicateOptions options) : base(db, a, options) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
@@ -1795,7 +1795,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralSurfaceConnection : IfcStructuralConnection
 	{
 		internal IfcStructuralSurfaceConnection() : base() { }
-		internal IfcStructuralSurfaceConnection(DatabaseIfc db, IfcStructuralSurfaceConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		internal IfcStructuralSurfaceConnection(DatabaseIfc db, IfcStructuralSurfaceConnection c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
@@ -1807,7 +1807,7 @@ additional types	some additional representation types are given:
 		public double Thickness { get { return mThickness; } set { mThickness = value; } }
 
 		public IfcStructuralSurfaceMember() : base() { }
-		internal IfcStructuralSurfaceMember(DatabaseIfc db, IfcStructuralSurfaceMember m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { mPredefinedType = m.mPredefinedType; mThickness = m.mThickness; }
+		internal IfcStructuralSurfaceMember(DatabaseIfc db, IfcStructuralSurfaceMember m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; mThickness = m.mThickness; }
 		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFaceSurface f, IfcMaterial material, int id, double thickness)
 			: base(sm, material, id)
 		{
@@ -1831,7 +1831,7 @@ additional types	some additional representation types are given:
 		public IfcShapeAspect VaryingThicknessLocation { get { return mDatabase[mVaryingThicknessLocation] as IfcShapeAspect; } set { mVaryingThicknessLocation = value.mIndex; } }
 
 		internal IfcStructuralSurfaceMemberVarying() : base() { }
-		internal IfcStructuralSurfaceMemberVarying(DatabaseIfc db, IfcStructuralSurfaceMemberVarying m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { mSubsequentThickness.AddRange(m.mSubsequentThickness); mVaryingThicknessLocation = m.mVaryingThicknessLocation; }
+		internal IfcStructuralSurfaceMemberVarying(DatabaseIfc db, IfcStructuralSurfaceMemberVarying m, DuplicateOptions options) : base(db, m, options) { mSubsequentThickness.AddRange(m.mSubsequentThickness); mVaryingThicknessLocation = m.mVaryingThicknessLocation; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -1914,7 +1914,7 @@ additional types	some additional representation types are given:
 			return result;
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e)
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcStyledItem s = e as IfcStyledItem;
 			if (s == null || string.Compare(Name, s.Name,false) != 0 || mStyles.Count != s.mStyles.Count)
@@ -1927,7 +1927,7 @@ additional types	some additional representation types are given:
 				bool duplicate = false;
 				for (int icounter = 0; icounter <styles.Count; icounter++)
 				{
-					if(baseClass.isDuplicate(styles[icounter]))
+					if(baseClass.isDuplicate(styles[icounter], tol))
 					{
 						duplicate = true;
 						styles.RemoveAt(icounter);
@@ -1937,7 +1937,7 @@ additional types	some additional representation types are given:
 				if (!duplicate)
 					return false;
 			}
-			return base.isDuplicate(e);
+			return base.isDuplicate(e, tol);
 		}
 	}
 	[Serializable]
@@ -2006,7 +2006,7 @@ additional types	some additional representation types are given:
 		public IfcSubContractResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSubContractResource() : base() { }
-		internal IfcSubContractResource(DatabaseIfc db, IfcSubContractResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcSubContractResource(DatabaseIfc db, IfcSubContractResource r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcSubContractResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -2016,7 +2016,7 @@ additional types	some additional representation types are given:
 		public IfcSubContractResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSubContractResourceType() : base() { }
-		internal IfcSubContractResourceType(DatabaseIfc db, IfcSubContractResourceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSubContractResourceType(DatabaseIfc db, IfcSubContractResourceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSubContractResourceType(DatabaseIfc db, string name, IfcSubContractResourceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -2363,7 +2363,7 @@ additional types	some additional representation types are given:
 		public IfcSwitchingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSwitchingDevice() : base() { }
-		internal IfcSwitchingDevice(DatabaseIfc db, IfcSwitchingDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		internal IfcSwitchingDevice(DatabaseIfc db, IfcSwitchingDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
 		public IfcSwitchingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -2373,7 +2373,7 @@ additional types	some additional representation types are given:
 		public IfcSwitchingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSwitchingDeviceType() : base() { }
-		internal IfcSwitchingDeviceType(DatabaseIfc db, IfcSwitchingDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSwitchingDeviceType(DatabaseIfc db, IfcSwitchingDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSwitchingDeviceType(DatabaseIfc m, string name, IfcSwitchingDeviceTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -2386,11 +2386,11 @@ additional types	some additional representation types are given:
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
 
 		internal IfcSystem() : base() { }
-		internal IfcSystem(DatabaseIfc db, IfcSystem s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream)
+		internal IfcSystem(DatabaseIfc db, IfcSystem s, DuplicateOptions options) : base(db, s, options)
 		{
-			if(s.mServicesBuildings != null)
+			if(options.DuplicateHost && s.mServicesBuildings != null)
 			{
-				IfcRelServicesBuildings rsb = db.Factory.Duplicate(s.mServicesBuildings, ownerHistory, false) as IfcRelServicesBuildings;
+				IfcRelServicesBuildings rsb = db.Factory.Duplicate(s.mServicesBuildings, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelServicesBuildings;
 				rsb.RelatingSystem = this;
 			}
 		}
@@ -2412,7 +2412,7 @@ additional types	some additional representation types are given:
 		public IfcSystemFurnitureElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSystemFurnitureElement() : base() { }
-		internal IfcSystemFurnitureElement(DatabaseIfc db, IfcSystemFurnitureElement f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
+		internal IfcSystemFurnitureElement(DatabaseIfc db, IfcSystemFurnitureElement f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
 		public IfcSystemFurnitureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -2422,7 +2422,7 @@ additional types	some additional representation types are given:
 		public IfcSystemFurnitureElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcSystemFurnitureElementType() : base() { }
-		internal IfcSystemFurnitureElementType(DatabaseIfc db, IfcSystemFurnitureElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSystemFurnitureElementType(DatabaseIfc db, IfcSystemFurnitureElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcSystemFurnitureElementType(DatabaseIfc db, string name, IfcSystemFurnitureElementTypeEnum type) : base(db,name)
 		{
 			mPredefinedType = type;

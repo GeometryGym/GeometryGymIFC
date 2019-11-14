@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 		public IfcHeatExchangerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcHeatExchanger() : base() { }
-		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcHeatExchanger(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 		public IfcHeatExchangerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcHeatExchangerType() : base() { }
-		internal IfcHeatExchangerType(DatabaseIfc db, IfcHeatExchangerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcHeatExchangerType(DatabaseIfc db, IfcHeatExchangerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 		public IfcHumidifierTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcHumidifier() : base() { }
-		internal IfcHumidifier(DatabaseIfc db, IfcHumidifier h, IfcOwnerHistory ownerHistory, bool downStream) : base(db,h, ownerHistory, downStream) { mPredefinedType = h.mPredefinedType; }
+		internal IfcHumidifier(DatabaseIfc db, IfcHumidifier h, DuplicateOptions options) : base(db,h, options) { mPredefinedType = h.mPredefinedType; }
 		public IfcHumidifier(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 		internal IfcHumidifierTypeEnum mPredefinedType = IfcHumidifierTypeEnum.NOTDEFINED;// : IfcHumidifierExchangerEnum;
 		public IfcHumidifierTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcHumidifierType() : base() { }
-		internal IfcHumidifierType(DatabaseIfc db, IfcHumidifierType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcHumidifierType(DatabaseIfc db, IfcHumidifierType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcHumidifierType(DatabaseIfc m, string name, IfcHumidifierTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]

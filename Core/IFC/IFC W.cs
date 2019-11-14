@@ -35,21 +35,21 @@ namespace GeometryGym.Ifc
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWall() : base() { }
-		internal IfcWall(DatabaseIfc db, IfcWall w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { mPredefinedType = w.mPredefinedType; }
+		internal IfcWall(DatabaseIfc db, IfcWall w, DuplicateOptions options) : base(db, w, options) { mPredefinedType = w.mPredefinedType; }
 		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcWallElementedCase : IfcWall
 	{
 		internal IfcWallElementedCase() : base() { }
-		internal IfcWallElementedCase(DatabaseIfc db, IfcWallElementedCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
+		internal IfcWallElementedCase(DatabaseIfc db, IfcWallElementedCase w, DuplicateOptions options) : base(db, w, options) { }
 	}
 	[Serializable]
 	public partial class IfcWallStandardCase : IfcWall
 	{
 		public override string StepClassName { get { return "IfcWall" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcWallStandardCase() : base() { }
-		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
+		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, DuplicateOptions options) : base(db, w, options) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
 			:base(container,new IfcLocalPlacement(container.ObjectPlacement, placement),null)
 		{
@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWallType() : base() { }
-		internal IfcWallType(DatabaseIfc db, IfcWallType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcWallType(DatabaseIfc db, IfcWallType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcWallType(DatabaseIfc m, string name, IfcWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcWallType(string name, IfcMaterialLayerSet ls, IfcWallTypeEnum type) : base(ls.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = ls; }
 	}
@@ -92,7 +92,7 @@ namespace GeometryGym.Ifc
 		public IfcWasteTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWasteTerminal() : base() { }
-		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcWasteTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -102,7 +102,7 @@ namespace GeometryGym.Ifc
 		public IfcWasteTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWasteTerminalType() : base() { }
-		internal IfcWasteTerminalType(DatabaseIfc db, IfcWasteTerminalType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcWasteTerminalType(DatabaseIfc db, IfcWasteTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -142,7 +142,7 @@ namespace GeometryGym.Ifc
 		public string UserDefinedPartitioningType { get { return (mUserDefinedPartitioningType == "$" ? "" : ParserIfc.Decode(mUserDefinedPartitioningType)); } set { mUserDefinedPartitioningType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcWindow() : base() { }
-		internal IfcWindow(DatabaseIfc db, IfcWindow w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
+		internal IfcWindow(DatabaseIfc db, IfcWindow w, DuplicateOptions options) : base(db, w, options) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
 		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -157,7 +157,7 @@ namespace GeometryGym.Ifc
 		[Obsolete("DEPRECEATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 		internal IfcWindowLiningProperties() : base() { }
-		internal IfcWindowLiningProperties(DatabaseIfc db, IfcWindowLiningProperties p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		internal IfcWindowLiningProperties(DatabaseIfc db, IfcWindowLiningProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mLiningDepth = p.mLiningDepth;
 			mLiningThickness = p.mLiningThickness;
@@ -202,7 +202,7 @@ namespace GeometryGym.Ifc
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcWindowPanelProperties() : base() { }
-		internal IfcWindowPanelProperties(DatabaseIfc db, IfcWindowPanelProperties p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		internal IfcWindowPanelProperties(DatabaseIfc db, IfcWindowPanelProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mOperationType = p.mOperationType;
 			mPanelPosition = p.mPanelPosition;
@@ -225,7 +225,7 @@ namespace GeometryGym.Ifc
 	{
 		public override string StepClassName { get { return "IfcWindow"; } }
 		internal IfcWindowStandardCase() : base() { }
-		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w, IfcOwnerHistory ownerHistory, bool downStream) : base(db, w, ownerHistory, downStream) { }
+		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w, DuplicateOptions options) : base(db, w, options) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
@@ -236,7 +236,7 @@ namespace GeometryGym.Ifc
 		internal bool mParameterTakesPrecedence;// : BOOLEAN;
 		internal bool mSizeable;// : BOOLEAN;
 		internal IfcWindowStyle() : base() { }
-		internal IfcWindowStyle(DatabaseIfc db, IfcWindowStyle s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mConstructionType = s.mConstructionType; mOperationType = s.mOperationType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
+		internal IfcWindowStyle(DatabaseIfc db, IfcWindowStyle s, DuplicateOptions options) : base(db, s, options) { mConstructionType = s.mConstructionType; mOperationType = s.mOperationType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 	}
 	[Serializable]
 	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
@@ -250,7 +250,7 @@ namespace GeometryGym.Ifc
 		public IfcWindowTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWindowType() : base() { }
-		internal IfcWindowType(DatabaseIfc db, IfcWindowType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mPartitioningType = t.mPartitioningType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedPartitioningType = t.mUserDefinedPartitioningType; }
+		internal IfcWindowType(DatabaseIfc db, IfcWindowType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mPartitioningType = t.mPartitioningType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedPartitioningType = t.mUserDefinedPartitioningType; }
 		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcWindowType(DatabaseIfc m, string name, IfcWindowTypeEnum type, IfcWindowTypePartitioningEnum partition, bool parameterTakesPrecendence)
 			: base(m) { Name = name; mPredefinedType = type; mPartitioningType = partition; mParameterTakesPrecedence = parameterTakesPrecendence; }
@@ -278,7 +278,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcWorkTime> WorkingTimes { get { return new ReadOnlyCollection<IfcWorkTime>(mWorkingTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
 		public ReadOnlyCollection<IfcWorkTime> ExceptionTimes { get { return new ReadOnlyCollection<IfcWorkTime>( mExceptionTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
 		internal IfcWorkCalendar() : base() { }
-		internal IfcWorkCalendar(DatabaseIfc db, IfcWorkCalendar c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream)
+		internal IfcWorkCalendar(DatabaseIfc db, IfcWorkCalendar c, DuplicateOptions options) : base(db, c, options)
 		{
 			c.WorkingTimes.ToList().ForEach(x => addWorkingTime( db.Factory.Duplicate(x) as IfcWorkTime));
 			c.ExceptionTimes.ToList().ForEach(x=>addExceptionTimes( db.Factory.Duplicate(x) as IfcWorkTime));
@@ -319,7 +319,7 @@ namespace GeometryGym.Ifc
 				mSSStartTime = mSSCreationDate;
 			}
 		}
-		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db,c, ownerHistory, downStream)
+		protected IfcWorkControl(DatabaseIfc db, IfcWorkControl c, DuplicateOptions options) : base(db,c, options)
 		{
 			mCreationDate = c.mCreationDate;
 			Creators.AddRange(c.mCreators.ConvertAll(x=>db.Factory.Duplicate(x) as IfcPerson));
@@ -337,14 +337,14 @@ namespace GeometryGym.Ifc
 		internal IfcWorkPlanTypeEnum mPredefinedType = IfcWorkPlanTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkPlanTypeEnum; IFC4
 		internal IfcWorkPlan() : base() { }
 		public IfcWorkPlan(DatabaseIfc db) : base(db) { }
-		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mPredefinedType = p.mPredefinedType; }
+		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcWorkSchedule : IfcWorkControl
 	{
 		internal IfcWorkScheduleTypeEnum mPredefinedType = IfcWorkScheduleTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkScheduleTypeEnum; IFC4
 		internal IfcWorkSchedule() : base() { }
-		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { mPredefinedType = s.mPredefinedType; }
+		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 	}
 	[Serializable]
 	public partial class IfcWorkTime : IfcSchedulingTime //IFC4

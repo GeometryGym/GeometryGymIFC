@@ -97,7 +97,7 @@ namespace GeometryGym.Ifc
 		public IfcTankTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTank() : base() { }
-		internal IfcTank(DatabaseIfc db, IfcTank t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTank(DatabaseIfc db, IfcTank t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTank(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 		public IfcTankTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTankType() : base() { }
-		internal IfcTankType(DatabaseIfc db, IfcTankType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTankType(DatabaseIfc db, IfcTankType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTankType(DatabaseIfc db, string name, IfcTankTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -128,7 +128,7 @@ namespace GeometryGym.Ifc
 		internal IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
 
 		internal IfcTask() : base() { }
-		internal IfcTask(DatabaseIfc db, IfcTask t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		internal IfcTask(DatabaseIfc db, IfcTask t, DuplicateOptions options) : base(db, t, options)
 		{
 			mStatus = t.mStatus;
 			mWorkMethod = t.mWorkMethod;
@@ -201,7 +201,7 @@ namespace GeometryGym.Ifc
 		public string WorkMethod { get { return (mWorkMethod == "$" ? "" : ParserIfc.Decode(mWorkMethod)); } set { mWorkMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcTaskType() : base() { }
-		internal IfcTaskType(DatabaseIfc db, IfcTaskType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
+		internal IfcTaskType(DatabaseIfc db, IfcTaskType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
 		public IfcTaskType(DatabaseIfc m, string name, IfcTaskTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -238,7 +238,7 @@ namespace GeometryGym.Ifc
 		internal double mMinCurvatureRadius;// : OPTIONAL IfcPositiveLengthMeasure; 
 		public IfcTendonTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcTendon() : base() { }
-		internal IfcTendon(DatabaseIfc db, IfcTendon t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		internal IfcTendon(DatabaseIfc db, IfcTendon t, DuplicateOptions options) : base(db, t, options)
 		{
 			mPredefinedType = t.mPredefinedType;
 			mNominalDiameter = t.mNominalDiameter;
@@ -268,7 +268,7 @@ namespace GeometryGym.Ifc
 		public IfcTendonAnchorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTendonAnchor() : base() { }
-		internal IfcTendonAnchor(DatabaseIfc db, IfcTendonAnchor a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
+		internal IfcTendonAnchor(DatabaseIfc db, IfcTendonAnchor a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
 		public IfcTendonAnchor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	//IfcTendonAnchorType
@@ -284,7 +284,7 @@ namespace GeometryGym.Ifc
 		public double NominalDiameter { get { return mNominalDiameter; } set { mNominalDiameter = value; } }
 
 		internal IfcTendonType() : base() { }
-		internal IfcTendonType(DatabaseIfc db, IfcTendonType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		internal IfcTendonType(DatabaseIfc db, IfcTendonType t, DuplicateOptions options) : base(db, t, options)
 		{
 			mPredefinedType = t.mPredefinedType;
 			mNominalDiameter = t.mNominalDiameter;
@@ -556,7 +556,7 @@ namespace GeometryGym.Ifc
 		public IfcTransformerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransformer() : base() { }
-		internal IfcTransformer(DatabaseIfc db, IfcTransformer t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTransformer(DatabaseIfc db, IfcTransformer t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransformer(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -566,7 +566,7 @@ namespace GeometryGym.Ifc
 		public IfcTransformerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransformerType() : base() { }
-		internal IfcTransformerType(DatabaseIfc db, IfcTransformerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTransformerType(DatabaseIfc db, IfcTransformerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransformerType(DatabaseIfc m, string name, IfcTransformerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -621,7 +621,7 @@ namespace GeometryGym.Ifc
 		//public double CapacityByNumber { get { return CapacityByNumber; } set { mCapacityByNumber = value; } }
 
 		internal IfcTransportElement() : base() { }
-		internal IfcTransportElement(DatabaseIfc db, IfcTransportElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		internal IfcTransportElement(DatabaseIfc db, IfcTransportElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcTransportElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -631,7 +631,7 @@ namespace GeometryGym.Ifc
 		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransportElementType() : base() { }
-		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -775,7 +775,7 @@ namespace GeometryGym.Ifc
 
 			double radius = Math.Sqrt(Math.Pow(pt1[0] - x, 2) + Math.Pow(pt1[1] - y, 2));
 			BasisCurve = new IfcCircle(new IfcAxis2Placement2D(new IfcCartesianPoint(db, x, y)) { RefDirection = new IfcDirection(db, pt1[0]-x, pt1[1]-y) }, radius);
-			mTrim1 = new IfcTrimmingSelect(0,start);
+			mTrim1 = new IfcTrimmingSelect(0, start);
 			mSenseAgreement = (((arcInteriorPoint.Item1 - pt1[0]) * (pt3[1] - arcInteriorPoint.Item2)) - ((arcInteriorPoint.Item2 - pt1[1]) * (pt3[0] - arcInteriorPoint.Item1))) > 0;
 			double t3 = Math.Atan2(pt3[1] - y, pt3[0] - x), t1 = Math.Atan2(pt1[1] - y, pt1[0] - x);
 			if (t3 < 0)
@@ -848,7 +848,7 @@ namespace GeometryGym.Ifc
 		public IfcTubeBundleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTubeBundle() : base() { }
-		internal IfcTubeBundle(DatabaseIfc db, IfcTubeBundle b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream) { mPredefinedType = b.mPredefinedType; }
+		internal IfcTubeBundle(DatabaseIfc db, IfcTubeBundle b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
 		public IfcTubeBundle(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -858,7 +858,7 @@ namespace GeometryGym.Ifc
 		public IfcTubeBundleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTubeBundleType() : base() { }
-		internal IfcTubeBundleType(DatabaseIfc db, IfcTubeBundleType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcTubeBundleType(DatabaseIfc db, IfcTubeBundleType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcTubeBundleType(DatabaseIfc m, string name, IfcTubeBundleTypeEnum t) : base(m) { Name = name; PredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -889,7 +889,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
 		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
-		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
+		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, DuplicateOptions options) : base(db, t, options) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
 		[Obsolete("DEPRECEATED IFC4", false)]
 		public IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
 
@@ -1064,7 +1064,7 @@ namespace GeometryGym.Ifc
 		internal void IsolateObject(string filename, bool relatedObjects)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
-			IfcTypeObject typeObject = db.Factory.Duplicate(this, true) as IfcTypeObject;
+			IfcTypeObject typeObject = db.Factory.Duplicate(this, new DuplicateOptions() { DuplicateDownstream = true }) as IfcTypeObject;
 			if (relatedObjects)
 			{
 				if (mObjectTypeOf != null)
@@ -1073,7 +1073,7 @@ namespace GeometryGym.Ifc
 						db.Factory.Duplicate(o);
 				}
 				if (HasContext != null)
-					(db.Factory.Duplicate(mDatabase.Context, false) as IfcContext).AddDeclared(typeObject);
+					(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
 			}
 			else
 			{
@@ -1082,11 +1082,11 @@ namespace GeometryGym.Ifc
 					IfcContext context = mDatabase.Context;
 					if (db.Release > ReleaseVersion.IFC2x3)
 					{
-						IfcProjectLibrary library = new IfcProjectLibrary(db, context.Name) { LongName = context.LongName, GlobalId = context.GlobalId, UnitsInContext = db.Factory.Duplicate(context.UnitsInContext, true) as IfcUnitAssignment };
+						IfcProjectLibrary library = new IfcProjectLibrary(db, context.Name) { LongName = context.LongName, GlobalId = context.GlobalId, UnitsInContext = db.Factory.Duplicate(context.UnitsInContext, new DuplicateOptions() { DuplicateDownstream = true }) as IfcUnitAssignment };
 						library.AddDeclared(typeObject);
 					}
 					else
-						(db.Factory.Duplicate(mDatabase.Context, false) as IfcContext).AddDeclared(typeObject);
+						(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
 				}
 			}
 			IfcProject project = db.Project;
@@ -1119,7 +1119,7 @@ namespace GeometryGym.Ifc
 		public string ProcessType { get { return (mProcessType == "$" ? "" : ParserIfc.Decode(mProcessType)); } set { mProcessType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcTypeProcess() : base() { }
-		protected IfcTypeProcess(DatabaseIfc db, IfcTypeProcess t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mProcessType = t.mProcessType; }
+		protected IfcTypeProcess(DatabaseIfc db, IfcTypeProcess t, DuplicateOptions options) : base(db, t, options) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mProcessType = t.mProcessType; }
 		protected IfcTypeProcess(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1140,7 +1140,7 @@ namespace GeometryGym.Ifc
 			mRepresentationMaps = basis.mRepresentationMaps;
 			mTag = basis.mTag;
 		}
-		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
+		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, DuplicateOptions options) : base(db, t, options) { RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
 		public IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 
 		protected override void initialize()
@@ -1311,7 +1311,7 @@ namespace GeometryGym.Ifc
 		public string ResourceType { get { return (mResourceType == "$" ? "" : ParserIfc.Decode(mResourceType)); } set { mResourceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcTypeResource() : base() { }
-		protected IfcTypeResource(DatabaseIfc db, IfcTypeResource t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mResourceType = t.mResourceType; }
+		protected IfcTypeResource(DatabaseIfc db, IfcTypeResource t, DuplicateOptions options) : base(db, t, options) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mResourceType = t.mResourceType; }
 		protected IfcTypeResource(DatabaseIfc db) : base(db) { }
 	}
 }

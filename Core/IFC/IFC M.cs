@@ -826,7 +826,7 @@ namespace GeometryGym.Ifc
 		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMechanicalFastener() : base() { }
-		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
+		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f, DuplicateOptions options) : base(db, f, options) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
 		public IfcMechanicalFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcMechanicalFastener(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
@@ -840,7 +840,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMechanicalFastenerType() : base() { }
 		internal IfcShapeRepresentation mProfileRep = null;
-		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; mPredefinedType = t.mPredefinedType; }
+		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, DuplicateOptions options) : base(db, t, options) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; mPredefinedType = t.mPredefinedType; }
 		public IfcMechanicalFastenerType(DatabaseIfc db, string name, IfcMechanicalFastenerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -913,7 +913,7 @@ namespace GeometryGym.Ifc
 		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMedicalDevice() : base() { }
-		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
 		public IfcMedicalDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -923,7 +923,7 @@ namespace GeometryGym.Ifc
 		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMedicalDeviceType() : base() { }
-		internal IfcMedicalDeviceType(DatabaseIfc db, IfcMedicalDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcMedicalDeviceType(DatabaseIfc db, IfcMedicalDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcMedicalDeviceType(DatabaseIfc m, string name, IfcMedicalDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -933,7 +933,7 @@ namespace GeometryGym.Ifc
 		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMember() : base() { }
-		internal IfcMember(DatabaseIfc db, IfcMember m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { mPredefinedType = m.mPredefinedType; }
+		internal IfcMember(DatabaseIfc db, IfcMember m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
 		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcMember(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
@@ -943,7 +943,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return "IfcMember"; } }
 
 		internal IfcMemberStandardCase() : base() { }
-		internal IfcMemberStandardCase(DatabaseIfc db, IfcMemberStandardCase m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { }
+		internal IfcMemberStandardCase(DatabaseIfc db, IfcMemberStandardCase m, DuplicateOptions options) : base(db, m, options) { }
 		public IfcMemberStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -953,7 +953,7 @@ namespace GeometryGym.Ifc
 		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMemberType() : base() { }
-		internal IfcMemberType(DatabaseIfc db, IfcMemberType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcMemberType(DatabaseIfc db, IfcMemberType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase)
 		{
 			Name = name;
@@ -1043,7 +1043,7 @@ namespace GeometryGym.Ifc
 		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMotorConnection() : base() { }
-		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcMotorConnection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -1053,7 +1053,7 @@ namespace GeometryGym.Ifc
 		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcMotorConnectionType() : base() { }
-		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcMotorConnectionType(DatabaseIfc m, string name, IfcMotorConnectionTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]

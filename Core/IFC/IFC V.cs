@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcValve() : base() { }
-		internal IfcValve(DatabaseIfc db, IfcValve v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream) { mPredefinedType = v.mPredefinedType; }
+		internal IfcValve(DatabaseIfc db, IfcValve v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
 		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcValveType() : base() { }
-		internal IfcValveType(DatabaseIfc db, IfcValveType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcValveType(DatabaseIfc db, IfcValveType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcVibrationIsolator() : base() { }
-		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, IfcOwnerHistory ownerHistory, bool downStream) : base(db, i, ownerHistory, downStream) { mPredefinedType = i.mPredefinedType; }
+		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
 		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -136,14 +136,14 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcVibrationIsolatorType() : base() { }
-		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcVibrationIsolatorType(DatabaseIfc m, string name, IfcVibrationIsolatorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }
-		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 	}
 	[Serializable]
@@ -162,7 +162,7 @@ namespace GeometryGym.Ifc
 		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		
 		internal IfcVoidingFeature() : base() { }
-		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory, downStream) { mPredefinedType = v.mPredefinedType; }
+		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
 	}
 

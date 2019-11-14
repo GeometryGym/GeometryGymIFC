@@ -78,7 +78,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcQuantitySet() : base() { }
 		protected IfcQuantitySet(DatabaseIfc db, string name) : base(db,name) { }
-		protected IfcQuantitySet(DatabaseIfc db, IfcQuantitySet s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory, downStream) { }
+		protected IfcQuantitySet(DatabaseIfc db, IfcQuantitySet s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity

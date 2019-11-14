@@ -675,7 +675,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["MappingOrigin"] = mDatabase[mMappingOrigin].getJson(this, options);
+			obj["MappingOrigin"] = MappingOrigin.getJson(this, options);
 			obj["MappedRepresentation"] = MappedRepresentation.getJson(this, options);
 			if (mHasShapeAspects.Count > 0)
 				obj["HasShapeAspects"] = new JArray(mHasShapeAspects.ConvertAll(x => x.getJson(this, options)));

@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 	{
 		internal double mFeatureLength;// OPTIONAL IfcPositiveLengthMeasure; 
 		protected IfcEdgeFeature() : base() { }
-		protected IfcEdgeFeature(DatabaseIfc db, IfcEdgeFeature f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mFeatureLength = f.mFeatureLength; }
+		protected IfcEdgeFeature(DatabaseIfc db, IfcEdgeFeature f, DuplicateOptions options) : base(db, f, options) { mFeatureLength = f.mFeatureLength; }
 	}
 	[Serializable]
 	public partial class IfcEdgeLoop : IfcLoop
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricAppliance() : base() { }
-		internal IfcElectricAppliance(DatabaseIfc db, IfcElectricAppliance a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
+		internal IfcElectricAppliance(DatabaseIfc db, IfcElectricAppliance a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
 		public IfcElectricAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -157,7 +157,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricApplianceType() : base() { }
-		internal IfcElectricApplianceType(DatabaseIfc db, IfcElectricApplianceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricApplianceType(DatabaseIfc db, IfcElectricApplianceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricApplianceType(DatabaseIfc m, string name, IfcElectricApplianceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -167,7 +167,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricDistributionBoard() : base() { }
-		internal IfcElectricDistributionBoard(DatabaseIfc db, IfcElectricDistributionBoard b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream) { mPredefinedType = b.mPredefinedType; }
+		internal IfcElectricDistributionBoard(DatabaseIfc db, IfcElectricDistributionBoard b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
 		public IfcElectricDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -177,7 +177,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricDistributionBoardType() : base() { }
-		internal IfcElectricDistributionBoardType(DatabaseIfc db, IfcElectricDistributionBoardType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricDistributionBoardType(DatabaseIfc db, IfcElectricDistributionBoardType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricDistributionBoardType(DatabaseIfc m, string name, IfcElectricDistributionBoardTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -191,7 +191,7 @@ namespace GeometryGym.Ifc
 		public string UserDefinedFunction { get { return mUserDefinedFunction == "$" ? "" : ParserIfc.Decode(mUserDefinedFunction); } set { mUserDefinedFunction = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 
 		internal IfcElectricDistributionPoint() : base() { }
-		internal IfcElectricDistributionPoint(DatabaseIfc db, IfcElectricDistributionPoint p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
+		internal IfcElectricDistributionPoint(DatabaseIfc db, IfcElectricDistributionPoint p, DuplicateOptions options) : base(db, p, options) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
 		public IfcElectricDistributionPoint(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -201,7 +201,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowStorageDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricFlowStorageDevice() : base() { }
-		internal IfcElectricFlowStorageDevice(DatabaseIfc db, IfcElectricFlowStorageDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { mPredefinedType = d.mPredefinedType; }
+		internal IfcElectricFlowStorageDevice(DatabaseIfc db, IfcElectricFlowStorageDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
 		public IfcElectricFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -211,7 +211,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowStorageDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricFlowStorageDeviceType() : base() { }
-		internal IfcElectricFlowStorageDeviceType(DatabaseIfc db, IfcElectricFlowStorageDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricFlowStorageDeviceType(DatabaseIfc db, IfcElectricFlowStorageDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricFlowStorageDeviceType(DatabaseIfc db, string name, IfcElectricFlowStorageDeviceTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -221,7 +221,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricGeneratorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricGenerator() : base() { }
-		internal IfcElectricGenerator(DatabaseIfc db, IfcElectricGenerator g, IfcOwnerHistory ownerHistory, bool downStream) : base(db, g, ownerHistory, downStream) { mPredefinedType = g.mPredefinedType; }
+		internal IfcElectricGenerator(DatabaseIfc db, IfcElectricGenerator g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; }
 		public IfcElectricGenerator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -231,7 +231,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricGeneratorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricGeneratorType() : base() { }
-		internal IfcElectricGeneratorType(DatabaseIfc db, IfcElectricGeneratorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricGeneratorType(DatabaseIfc db, IfcElectricGeneratorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricGeneratorType(DatabaseIfc db, string name, IfcElectricGeneratorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -242,7 +242,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricHeaterType() : base() { }
-		internal IfcElectricHeaterType(DatabaseIfc db, IfcElectricHeaterType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricHeaterType(DatabaseIfc db, IfcElectricHeaterType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricHeaterType(DatabaseIfc db, string name, IfcElectricHeaterTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -252,7 +252,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricMotorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricMotor() : base() { }
-		internal IfcElectricMotor(DatabaseIfc db, IfcElectricMotor m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream) { mPredefinedType = m.mPredefinedType; }
+		internal IfcElectricMotor(DatabaseIfc db, IfcElectricMotor m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
 		public IfcElectricMotor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -262,7 +262,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricMotorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricMotorType() : base() { }
-		internal IfcElectricMotorType(DatabaseIfc db, IfcElectricMotorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricMotorType(DatabaseIfc db, IfcElectricMotorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricMotorType(DatabaseIfc db, string name, IfcElectricMotorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -272,7 +272,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricTimeControlTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricTimeControl() : base() { }
-		internal IfcElectricTimeControl(DatabaseIfc db, IfcElectricTimeControl c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcElectricTimeControl(DatabaseIfc db, IfcElectricTimeControl c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcElectricTimeControl(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -282,7 +282,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricTimeControlTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElectricTimeControlType() : base() { }
-		internal IfcElectricTimeControlType(DatabaseIfc db, IfcElectricTimeControlType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElectricTimeControlType(DatabaseIfc db, IfcElectricTimeControlType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricTimeControlType(DatabaseIfc m, string name, IfcElectricTimeControlTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
@@ -292,7 +292,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcElectricalCircuit : IfcSystem // DEPRECEATED IFC4
 	{
 		internal IfcElectricalCircuit() : base() { }
-		internal IfcElectricalCircuit(DatabaseIfc db, IfcElectricalCircuit c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		internal IfcElectricalCircuit(DatabaseIfc db, IfcElectricalCircuit c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Obsolete("DEPRECEATED IFC2x2", false)]
 	[Serializable]
@@ -347,7 +347,7 @@ namespace GeometryGym.Ifc
 			//todo setInverse
 		}
 		protected IfcElement(DatabaseIfc db) : base(db) { }
-		protected IfcElement(DatabaseIfc db, IfcElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream)
+		protected IfcElement(DatabaseIfc db, IfcElement e, DuplicateOptions options) : base(db, e, options)
 		{
 			mTag = e.mTag;
 #warning todo finish inverse
@@ -361,22 +361,22 @@ namespace GeometryGym.Ifc
 				int relatingIndex = db.Factory.mDuplicateMapping.FindExisting(relating), relatedIndex = db.Factory.mDuplicateMapping.FindExisting(related);
 				if (relating.mIndex != e.mIndex && relatingIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, false) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelConnectsElements;
 					rce.RelatedElement = this;
 					rce.RelatingElement = db[relatingIndex] as IfcElement;
 				}
 				else if (related.mIndex != e.mIndex && relatedIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, false) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelConnectsElements;
 					rce.RelatingElement = this;
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
 			}
-			if (downStream)
+			if (options.DuplicateDownstream)
 			{
 				foreach (IfcRelVoidsElement ve in e.mHasOpenings)
 				{
-					IfcRelVoidsElement rv = db.Factory.Duplicate(ve) as IfcRelVoidsElement;
+					IfcRelVoidsElement rv = db.Factory.Duplicate(ve, options) as IfcRelVoidsElement;
 					rv.RelatingBuildingElement = this;
 				}
 			}
@@ -668,7 +668,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcElementAssemblyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElementAssembly() : base() { }
-		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mPredefinedType = a.mPredefinedType; }
+		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
 		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum place, IfcElementAssemblyTypeEnum type) : base(host, null, null) { AssemblyPlace = place; PredefinedType = type; }
 	}
 	[Serializable]
@@ -678,14 +678,14 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcElementAssemblyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcElementAssemblyType() : base() { }
-		internal IfcElementAssemblyType(DatabaseIfc db, IfcElementAssemblyType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcElementAssemblyType(DatabaseIfc db, IfcElementAssemblyType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElementAssemblyType(DatabaseIfc m, string name, IfcElementAssemblyTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	[Serializable]
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
 	{
 		protected IfcElementComponent() : base() { }
-		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { }
+		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c, DuplicateOptions options) : base(db, c, options) { }
 		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
 		protected IfcElementComponent(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
@@ -693,7 +693,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public abstract partial class IfcElementComponentType : IfcElementType // ABSTRACT SUPERTYPE OF (ONEOF	((IfcBuildingElementPartType, IfcDiscreteAccessoryType, IfcFastenerType, IfcMechanicalFastenerType, IfcReinforcingElementType, IfcVibrationIsolatorType)))
 	{
 		protected IfcElementComponentType() : base() { }
-		protected IfcElementComponentType(DatabaseIfc db, IfcElementComponentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
+		protected IfcElementComponentType(DatabaseIfc db, IfcElementComponentType t, DuplicateOptions options) : base(db, t, options) { }
 		protected IfcElementComponentType(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -715,7 +715,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 
 		internal IfcElementQuantity() : base() { }
-		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, IfcOwnerHistory ownerHistory, bool downStream) : base(db, q, ownerHistory, downStream) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
+		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, DuplicateOptions options) : base(db, q, options) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
 		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcElementQuantity(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
@@ -792,7 +792,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			IfcPhysicalQuantity existing = null;
 			if (mQuantities.TryGetValue(quantity.Name, out existing))
 			{
-				if (quantity.isDuplicate(existing))
+				if (quantity.isDuplicate(existing, mDatabase.Tolerance))
 					return;
 			}
 			mQuantities[quantity.Name] = quantity;
@@ -837,7 +837,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		protected IfcElementType() : base() { }
 		protected IfcElementType(IfcElementType basis) : base(basis) { mElementType = basis.mElementType; }
-		protected IfcElementType(DatabaseIfc db, IfcElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mElementType = t.mElementType; }
+		protected IfcElementType(DatabaseIfc db, IfcElementType t, DuplicateOptions options) : base(db, t, options) { mElementType = t.mElementType; }
 		protected IfcElementType(DatabaseIfc db) : base(db) { }
 		
 		public IfcMaterialSelect MaterialSelect
@@ -891,7 +891,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public override string StepClassName { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcEnergyConversionDevice" : base.StepClassName; } }
 
 		internal IfcEnergyConversionDevice() : base() { }
-		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream) { }
+		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, DuplicateOptions options) : base(db, d, options) { }
 		public IfcEnergyConversionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -901,7 +901,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		//,IfcHumidifierType ,IfcMotorConnectionType ,IfcSpaceHeaterType ,IfcTransformerType ,IfcTubeBundleType ,IfcUnitaryEquipmentType))
 		protected IfcEnergyConversionDeviceType() : base() { }
 		protected IfcEnergyConversionDeviceType(DatabaseIfc db) : base(db) { }
-		protected IfcEnergyConversionDeviceType(DatabaseIfc db, IfcEnergyConversionDeviceType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
+		protected IfcEnergyConversionDeviceType(DatabaseIfc db, IfcEnergyConversionDeviceType t, DuplicateOptions options) : base(db, t, options) { }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//IfcEnergyProperties // DEPRECEATED IFC4
@@ -912,7 +912,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEngineTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEngine() : base() { }
-		internal IfcEngine(DatabaseIfc db, IfcEngine e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcEngine(DatabaseIfc db, IfcEngine e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcEngine(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -922,7 +922,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEngineTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEngineType() : base() { }
-		internal IfcEngineType(DatabaseIfc db, IfcEngineType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcEngineType(DatabaseIfc db, IfcEngineType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcEngineType(DatabaseIfc db, string name, IfcEngineTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -940,14 +940,14 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public partial class IfcEquipmentElement : IfcElement  
 	{
 		internal IfcEquipmentElement() : base() { }
-		internal IfcEquipmentElement(DatabaseIfc db, IfcEquipmentElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		internal IfcEquipmentElement(DatabaseIfc db, IfcEquipmentElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
 	public partial class IfcEquipmentStandard : IfcControl 
 	{
 		internal IfcEquipmentStandard() : base() { }
-		internal IfcEquipmentStandard(DatabaseIfc db, IfcEquipmentStandard s, IfcOwnerHistory ownerHistory, bool downStream) : base(db,s, ownerHistory, downStream) { }
+		internal IfcEquipmentStandard(DatabaseIfc db, IfcEquipmentStandard s, DuplicateOptions options) : base(db,s, options) { }
 	}
 	[Serializable]
 	public partial class IfcEvaporativeCooler : IfcEnergyConversionDevice //IFC4
@@ -956,7 +956,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEvaporativeCoolerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEvaporativeCooler() : base() { }
-		internal IfcEvaporativeCooler(DatabaseIfc db, IfcEvaporativeCooler c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { mPredefinedType = c.mPredefinedType; }
+		internal IfcEvaporativeCooler(DatabaseIfc db, IfcEvaporativeCooler c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
 		public IfcEvaporativeCooler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -966,7 +966,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEvaporativeCoolerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEvaporativeCoolerType() : base() { }
-		internal IfcEvaporativeCoolerType(DatabaseIfc db, IfcEvaporativeCoolerType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcEvaporativeCoolerType(DatabaseIfc db, IfcEvaporativeCoolerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcEvaporativeCoolerType(DatabaseIfc db, string name, IfcEvaporativeCoolerTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -976,7 +976,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEvaporatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEvaporator() : base() { }
-		internal IfcEvaporator(DatabaseIfc db, IfcEvaporator e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcEvaporator(DatabaseIfc db, IfcEvaporator e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcEvaporator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -986,7 +986,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEvaporatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcEvaporatorType() : base() { }
-		internal IfcEvaporatorType(DatabaseIfc db, IfcEvaporatorType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcEvaporatorType(DatabaseIfc db, IfcEvaporatorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcEvaporatorType(DatabaseIfc db, string name, IfcEvaporatorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -997,7 +997,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
 		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
 		internal IfcEvent() : base() { }
-		internal IfcEvent(DatabaseIfc db, IfcEvent e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
+		internal IfcEvent(DatabaseIfc db, IfcEvent e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
 	}
 	[Serializable]
 	public partial class IfcEventType : IfcTypeProcess //IFC4
@@ -1011,7 +1011,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public string UserDefinedEventTriggerType { get { return (mUserDefinedEventTriggerType == "$" ? "" : ParserIfc.Decode(mUserDefinedEventTriggerType)); } set { mUserDefinedEventTriggerType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcEventType() : base() { }
-		internal IfcEventType(DatabaseIfc db, IfcEventType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; mEventTriggerType = t.mEventTriggerType; mUserDefinedEventTriggerType = t.mUserDefinedEventTriggerType; }
+		internal IfcEventType(DatabaseIfc db, IfcEventType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mEventTriggerType = t.mEventTriggerType; mUserDefinedEventTriggerType = t.mUserDefinedEventTriggerType; }
 		public IfcEventType(DatabaseIfc m, string name, IfcEventTypeEnum t, IfcEventTriggerTypeEnum trigger)
 			: base(m) { Name = name; mPredefinedType = t; mEventTriggerType = trigger; }
 	}
@@ -1247,7 +1247,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public ReadOnlyCollection<IfcRelSpaceBoundary> BoundedBy { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>( mBoundedBy); } }
 
 		internal IfcExternalSpatialElement() : base() { }
-		internal IfcExternalSpatialElement(DatabaseIfc db, IfcExternalSpatialElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcExternalSpatialElement(DatabaseIfc db, IfcExternalSpatialElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcExternalSpatialElement(IfcSite host, string name, IfcExternalSpatialElementTypeEnum te)
 			: base(host, name) { mPredefinedType = te; }
 		
@@ -1259,7 +1259,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcExternalSpatialStructureElement() : base() { }
 		protected IfcExternalSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { }
 		protected IfcExternalSpatialStructureElement(IfcSite host, string name) : base(host, name) { }
-		protected IfcExternalSpatialStructureElement(DatabaseIfc db, IfcExternalSpatialStructureElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { }
+		protected IfcExternalSpatialStructureElement(DatabaseIfc db, IfcExternalSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
 	[Serializable]
 	public partial class IfcExtrudedAreaSolid : IfcSweptAreaSolid // SUPERTYPE OF(IfcExtrudedAreaSolidTapered)

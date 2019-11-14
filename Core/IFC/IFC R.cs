@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 		public IfcRailingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRailing() : base() { }
-		internal IfcRailing(DatabaseIfc db, IfcRailing r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcRailing(DatabaseIfc db, IfcRailing r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcRailing(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -53,7 +53,7 @@ namespace GeometryGym.Ifc
 		public IfcRailingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRailingType() : base() { }
-		internal IfcRailingType(DatabaseIfc db, IfcRailingType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcRailingType(DatabaseIfc db, IfcRailingType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcRailingType(DatabaseIfc m, string name, IfcRailingTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -63,7 +63,7 @@ namespace GeometryGym.Ifc
 		public IfcRampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRamp() : base() { }
-		internal IfcRamp(DatabaseIfc db, IfcRamp r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcRamp(DatabaseIfc db, IfcRamp r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcRamp(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 		public IfcRampFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRampFlight() : base() { }
-		internal IfcRampFlight(DatabaseIfc db, IfcRampFlight f, IfcOwnerHistory ownerHistory, bool downStream) : base(db, f, ownerHistory, downStream) { mPredefinedType = f.mPredefinedType; }
+		internal IfcRampFlight(DatabaseIfc db, IfcRampFlight f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
 		public IfcRampFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -83,7 +83,7 @@ namespace GeometryGym.Ifc
 		public IfcRampFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRampFlightType() : base() { }
-		internal IfcRampFlightType(DatabaseIfc db, IfcRampFlightType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcRampFlightType(DatabaseIfc db, IfcRampFlightType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcRampFlightType(DatabaseIfc m, string name, IfcRampFlightTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 		public IfcRampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRampType() : base() { }
-		internal IfcRampType(DatabaseIfc db, IfcRampType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcRampType(DatabaseIfc db, IfcRampType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcRampType(DatabaseIfc m, string name, IfcRampTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Obsolete("DEPRECEATED IFC4", false)]
@@ -396,7 +396,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcSectionReinforcementProperties> ReinforcementSectionDefinitions { get { return new ReadOnlyCollection<IfcSectionReinforcementProperties>(mReinforcementSectionDefinitions.ConvertAll(x => mDatabase[x] as IfcSectionReinforcementProperties)); } }
 
 		internal IfcReinforcementDefinitionProperties() : base() { }
-		internal IfcReinforcementDefinitionProperties(DatabaseIfc db, IfcReinforcementDefinitionProperties p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory, downStream)
+		internal IfcReinforcementDefinitionProperties(DatabaseIfc db, IfcReinforcementDefinitionProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mDefinitionType = p.mDefinitionType;
 			p.ReinforcementSectionDefinitions.ToList().ForEach(x => addSection(db.Factory.Duplicate(x) as IfcSectionReinforcementProperties));
@@ -432,7 +432,7 @@ namespace GeometryGym.Ifc
 		public IfcReinforcingBarSurfaceEnum BarSurface { get { return mBarSurface; } set { mBarSurface = value; } }
 
 		internal IfcReinforcingBar() : base() { }
-		internal IfcReinforcingBar(DatabaseIfc db, IfcReinforcingBar b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory, downStream)
+		internal IfcReinforcingBar(DatabaseIfc db, IfcReinforcingBar b, DuplicateOptions options) : base(db, b, options)
 		{
 			mNominalDiameter = b.mNominalDiameter;
 			mCrossSectionArea = b.mCrossSectionArea;
@@ -462,7 +462,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcBendingParameterSelect> BendingParameters { get { return new ReadOnlyCollection<IfcBendingParameterSelect>(mBendingParameters); } }
 
 		internal IfcReinforcingBarType() : base() { }
-		internal IfcReinforcingBarType(DatabaseIfc db, IfcReinforcingBarType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream)
+		internal IfcReinforcingBarType(DatabaseIfc db, IfcReinforcingBarType t, DuplicateOptions options) : base(db, t, options)
 		{
 			mPredefinedType = t.mPredefinedType;
 			mNominalDiameter = t.mNominalDiameter;
@@ -489,7 +489,7 @@ namespace GeometryGym.Ifc
 		public string SteelGrade { get { return (mSteelGrade == "$" ? "" : ParserIfc.Decode(mSteelGrade)); } set { mSteelGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcReinforcingElement() : base() { }
-		protected IfcReinforcingElement(DatabaseIfc db, IfcReinforcingElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mSteelGrade = e.mSteelGrade; }
+		protected IfcReinforcingElement(DatabaseIfc db, IfcReinforcingElement e, DuplicateOptions options) : base(db, e, options) { mSteelGrade = e.mSteelGrade; }
 		public IfcReinforcingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -497,7 +497,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcReinforcingElementType() : base() { }
 		protected IfcReinforcingElementType(DatabaseIfc db) : base(db) { }
-		protected IfcReinforcingElementType(DatabaseIfc db, IfcReinforcingElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { }
+		protected IfcReinforcingElementType(DatabaseIfc db, IfcReinforcingElementType t, DuplicateOptions options) : base(db, t, options) { }
 	}
 	[Serializable]
 	public partial class IfcReinforcingMesh : IfcReinforcingElement
@@ -519,7 +519,7 @@ namespace GeometryGym.Ifc
 		public IfcReinforcingMeshTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcReinforcingMesh() : base() { }
-		internal IfcReinforcingMesh(DatabaseIfc db, IfcReinforcingMesh m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream)
+		internal IfcReinforcingMesh(DatabaseIfc db, IfcReinforcingMesh m, DuplicateOptions options) : base(db, m, options)
 		{
 			mMeshLength = m.mMeshLength;
 			mMeshWidth = m.mMeshWidth;
@@ -557,7 +557,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcBendingParameterSelect> BendingParameters { get { return new ReadOnlyCollection<IfcBendingParameterSelect>(mBendingParameters); } }
 
 		internal IfcReinforcingMeshType() : base() { }
-		internal IfcReinforcingMeshType(DatabaseIfc db, IfcReinforcingMeshType m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m, ownerHistory, downStream)
+		internal IfcReinforcingMeshType(DatabaseIfc db, IfcReinforcingMeshType m, DuplicateOptions options) : base(db, m, options)
 		{
 			mPredefinedType = m.mPredefinedType;
 			mMeshLength = m.mMeshLength;
@@ -583,13 +583,13 @@ namespace GeometryGym.Ifc
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
 
 		internal IfcRelAggregates() : base() { }
-		internal IfcRelAggregates(DatabaseIfc db, IfcRelAggregates a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory)
+		internal IfcRelAggregates(DatabaseIfc db, IfcRelAggregates a, DuplicateOptions options) : base(db, a, options.OwnerHistory)
 		{
-			RelatingObject = db.Factory.Duplicate(a.RelatingObject, ownerHistory, downStream) as IfcObjectDefinition;
-			if (downStream)
+			RelatingObject = db.Factory.Duplicate(a.RelatingObject, options) as IfcObjectDefinition;
+			if (options.DuplicateDownstream)
             {
                 foreach (IfcObjectDefinition objectDefinition in a.RelatedObjects)
-                    db.Factory.Duplicate(objectDefinition, ownerHistory, true);
+                    db.Factory.Duplicate(objectDefinition, options);
             }
 		}
 		internal IfcRelAggregates(IfcObjectDefinition relObject) : base(relObject.mDatabase)
@@ -648,10 +648,10 @@ namespace GeometryGym.Ifc
 
 		protected IfcRelAssigns() : base() { }
 		protected IfcRelAssigns(DatabaseIfc db) : base(db) { }
-		protected IfcRelAssigns(DatabaseIfc db, IfcRelAssigns a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory)
+		protected IfcRelAssigns(DatabaseIfc db, IfcRelAssigns a, DuplicateOptions options) : base(db, a, options.OwnerHistory)
 		{
-			if (downStream)
-				RelatedObjects.AddRange(a.RelatedObjects.ConvertAll(x => db.Factory.Duplicate(x, ownerHistory, downStream) as IfcObjectDefinition));
+			if (options.DuplicateDownstream)
+				RelatedObjects.AddRange(a.RelatedObjects.ConvertAll(x => db.Factory.Duplicate(x, options) as IfcObjectDefinition));
 			mRelatedObjectsType = a.mRelatedObjectsType;
 		}
 		protected IfcRelAssigns(IfcObjectDefinition related) : this(new List<IfcObjectDefinition>() { related }) { }
@@ -698,7 +698,7 @@ namespace GeometryGym.Ifc
 		internal new ReadOnlyCollection<IfcTask> RelatedObjects { get { return new ReadOnlyCollection<IfcTask>(base.RelatedObjects.Cast<IfcTask>().ToList()); } }
 
 		internal IfcRelAssignsTasks() : base() { }
-		internal IfcRelAssignsTasks(DatabaseIfc db, IfcRelAssignsTasks r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { if (r.mTimeForTask > 0) TimeForTask = db.Factory.Duplicate(r.TimeForTask, ownerHistory, downStream) as IfcScheduleTimeControl; }
+		internal IfcRelAssignsTasks(DatabaseIfc db, IfcRelAssignsTasks r, DuplicateOptions options) : base(db, r, options) { if (r.mTimeForTask > 0) TimeForTask = db.Factory.Duplicate(r.TimeForTask, options) as IfcScheduleTimeControl; }
 		public IfcRelAssignsTasks(IfcWorkControl relating, IfcTask related ) : base(relating, related) { }
 		public IfcRelAssignsTasks(IfcWorkControl relControl, IEnumerable<IfcTask> relObjects) : base(relControl, relObjects) { }
 	}
@@ -714,7 +714,12 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingActor; } 
 
 		internal IfcRelAssignsToActor() : base() { }
-		internal IfcRelAssignsToActor(DatabaseIfc db, IfcRelAssignsToActor r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingActor = db.Factory.Duplicate(r.RelatingActor, ownerHistory, false) as IfcActor; if (r.mActingRole != null) ActingRole = db.Factory.Duplicate(r.ActingRole, ownerHistory, downStream) as IfcActorRole; }
+		internal IfcRelAssignsToActor(DatabaseIfc db, IfcRelAssignsToActor r, DuplicateOptions options) : base(db, r, options)
+		{
+			RelatingActor = db.Factory.Duplicate(r.RelatingActor, options) as IfcActor;
+			if (r.mActingRole != null)
+				ActingRole = db.Factory.Duplicate(r.ActingRole, options) as IfcActorRole;
+		}
 		public IfcRelAssignsToActor(IfcActor relActor) : base(relActor.mDatabase) { RelatingActor = relActor; }
 		public IfcRelAssignsToActor(IfcActor relActor, IfcObjectDefinition relObject) : base(relObject) { RelatingActor = relActor; }
 		public IfcRelAssignsToActor(IfcActor relActor, List<IfcObjectDefinition> relObjects) : base(relObjects) { RelatingActor = relActor; }
@@ -728,7 +733,10 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingControl; } 
 
 		internal IfcRelAssignsToControl() : base() { }
-		internal IfcRelAssignsToControl(DatabaseIfc db, IfcRelAssignsToControl r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingControl = db.Factory.Duplicate(r.RelatingControl, ownerHistory, false) as IfcControl; }
+		internal IfcRelAssignsToControl(DatabaseIfc db, IfcRelAssignsToControl r, DuplicateOptions options) : base(db, r, options)
+		{
+			RelatingControl = db.Factory.Duplicate(r.RelatingControl, new DuplicateOptions() { DuplicateDownstream = false }) as IfcControl;
+		}
 		public IfcRelAssignsToControl(IfcControl relControl) : base(relControl.mDatabase) { RelatingControl = relControl;  }
 		public IfcRelAssignsToControl(IfcControl relControl, IfcObjectDefinition relObject) : base(relObject) { RelatingControl = relControl; }
 		public IfcRelAssignsToControl(IfcControl relControl, IEnumerable<IfcObjectDefinition> relObjects) : base(relObjects) { RelatingControl = relControl; }
@@ -742,7 +750,10 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingGroup; } 
 
 		internal IfcRelAssignsToGroup() : base() { }
-		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, ownerHistory, false) as IfcGroup; }
+		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a, DuplicateOptions options) : base(db, a, options)
+		{
+			RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, new DuplicateOptions() { DuplicateDownstream = false }) as IfcGroup;
+		}
 		public IfcRelAssignsToGroup(IfcGroup relgroup) : base(relgroup.mDatabase) { RelatingGroup = relgroup; }
 		public IfcRelAssignsToGroup(IfcObjectDefinition related, IfcGroup relating) : base(related) { RelatingGroup = relating; }
 		public IfcRelAssignsToGroup(IEnumerable<IfcObjectDefinition> related, IfcGroup relating) : base(related) { RelatingGroup = relating; }
@@ -755,7 +766,7 @@ namespace GeometryGym.Ifc
 		public double Factor { get { return mFactor; } set { mFactor = value; } }
 
 		internal IfcRelAssignsToGroupByFactor() : base() { }
-		internal IfcRelAssignsToGroupByFactor(DatabaseIfc db, IfcRelAssignsToGroupByFactor a, IfcOwnerHistory ownerHistory, bool downStream) : base(db, a, ownerHistory, downStream) { mFactor = a.mFactor; }
+		internal IfcRelAssignsToGroupByFactor(DatabaseIfc db, IfcRelAssignsToGroupByFactor a, DuplicateOptions options) : base(db, a, options) { mFactor = a.mFactor; }
 		public IfcRelAssignsToGroupByFactor(IfcGroup relgroup, double factor) : base(relgroup) { mFactor = factor; }
 		public IfcRelAssignsToGroupByFactor(IEnumerable<IfcObjectDefinition> relObjects, IfcGroup relgroup, double factor) : base(relObjects, relgroup) { mFactor = factor; }
 	}
@@ -770,9 +781,9 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingProcess; } 
 
 		internal IfcRelAssignsToProcess() : base() { }
-		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess, ownerHistory, false) as IfcProcess;
+			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess, new DuplicateOptions() { DuplicateDownstream = false }) as IfcProcess;
 		}
 		public IfcRelAssignsToProcess(IfcProcess relProcess) : base(relProcess.mDatabase) { RelatingProcess = relProcess; }
 		public IfcRelAssignsToProcess(IfcProcess relProcess, IfcObjectDefinition related) : base(related) { RelatingProcess = relProcess; }
@@ -787,8 +798,8 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingProduct as NamedObjectIfc; }
 
 		internal IfcRelAssignsToProduct() : base() { }
-		internal IfcRelAssignsToProduct(DatabaseIfc db, IfcRelAssignsToProduct r, IfcOwnerHistory ownerHistory, bool downStream) 
-			: base(db, r, ownerHistory, downStream) { RelatingProduct = db.Factory.Duplicate(r.RelatingProduct as BaseClassIfc, ownerHistory, downStream) as IfcProductSelect; }
+		internal IfcRelAssignsToProduct(DatabaseIfc db, IfcRelAssignsToProduct r, DuplicateOptions options) 
+			: base(db, r, options) { RelatingProduct = db.Factory.Duplicate(r.RelatingProduct as BaseClassIfc, options) as IfcProductSelect; }
 		public IfcRelAssignsToProduct(IfcProductSelect relProduct) : base(relProduct.Database) { RelatingProduct = relProduct; }
 		public IfcRelAssignsToProduct(IfcObjectDefinition relObject, IfcProductSelect relProduct) : base(relObject) { RelatingProduct = relProduct; }
 		public IfcRelAssignsToProduct(IEnumerable<IfcObjectDefinition> relObjects, IfcProductSelect relProduct) : base(relObjects) { RelatingProduct = relProduct; }
@@ -816,7 +827,10 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingResource; }
 
 		internal IfcRelAssignsToResource() : base() { }
-		internal IfcRelAssignsToResource(DatabaseIfc db, IfcRelAssignsToResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingResource = db.Factory.Duplicate(r.RelatingResource, ownerHistory, false) as IfcResource; }
+		internal IfcRelAssignsToResource(DatabaseIfc db, IfcRelAssignsToResource r, DuplicateOptions options) : base(db, r, options)
+		{
+			RelatingResource = db.Factory.Duplicate(r.RelatingResource, new DuplicateOptions() { DuplicateDownstream = false }) as IfcResource;
+		}
 		public IfcRelAssignsToResource(IfcResource relResource) : base(relResource.mDatabase) { RelatingResource = relResource; }
 		public IfcRelAssignsToResource(IfcResource relResource, IfcObjectDefinition relObject) : base(relObject) { RelatingResource = relResource; }
 	}
@@ -831,7 +845,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcRelAssociates() : base() { }
 		protected IfcRelAssociates(DatabaseIfc db) : base(db) { }
-		protected IfcRelAssociates(DatabaseIfc db, IfcRelAssociates r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		protected IfcRelAssociates(DatabaseIfc db, IfcRelAssociates r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
 			//RelatedObjects = r.mRelatedObjects.ConvertAll(x => db.Factory.Duplicate(r.mDatabase[x]) as IfcDefinitionSelect);
 		}
@@ -894,7 +908,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingClassification; } 
 
 		internal IfcRelAssociatesClassification() : base() { }
-		internal IfcRelAssociatesClassification(DatabaseIfc db, IfcRelAssociatesClassification r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		internal IfcRelAssociatesClassification(DatabaseIfc db, IfcRelAssociatesClassification r, DuplicateOptions options) : base(db, r, options)
 		{
 			RelatingClassification = db.Factory.Duplicate(r.RelatingClassification) as IfcClassificationSelect;
 		}
@@ -913,7 +927,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingConstraint; } 
 
 		internal IfcRelAssociatesConstraint() : base() { }
-		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { RelatingConstraint = db.Factory.Duplicate(c.RelatingConstraint) as IfcConstraint; }
+		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c, DuplicateOptions options) : base(db, c, options) { RelatingConstraint = db.Factory.Duplicate(c.RelatingConstraint) as IfcConstraint; }
 		public IfcRelAssociatesConstraint(IfcConstraint c) : base(c.mDatabase) { RelatingConstraint = c; }
 		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, IfcConstraint constraint) : base(related) { RelatingConstraint = constraint; }
 
@@ -966,7 +980,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingDocument; } 
 
 		internal IfcRelAssociatesDocument() : base() { }
-		internal IfcRelAssociatesDocument(DatabaseIfc db, IfcRelAssociatesDocument r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingDocument = db.Factory.Duplicate(r.mDatabase[r.mRelatingDocument], ownerHistory, downStream) as IfcDocumentSelect; }
+		internal IfcRelAssociatesDocument(DatabaseIfc db, IfcRelAssociatesDocument r, DuplicateOptions options) : base(db, r, options) { RelatingDocument = db.Factory.Duplicate(r.mDatabase[r.mRelatingDocument], options) as IfcDocumentSelect; }
 		public IfcRelAssociatesDocument(IfcDocumentSelect document) : base(document.Database) { RelatingDocument = document; }
 		public IfcRelAssociatesDocument(IfcDefinitionSelect related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
 		public IfcRelAssociatesDocument(IEnumerable<IfcDefinitionSelect> related, IfcDocumentSelect document) : base(related) { RelatingDocument = document; }
@@ -980,7 +994,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingLibrary; } 
 
 		internal IfcRelAssociatesLibrary() : base() { }
-		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RelatingLibrary = db.Factory.Duplicate(r.mDatabase[r.mRelatingLibrary], ownerHistory, downStream) as IfcLibrarySelect; }
+		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r, DuplicateOptions options) : base(db, r, options) { RelatingLibrary = db.Factory.Duplicate(r.mDatabase[r.mRelatingLibrary], options) as IfcLibrarySelect; }
 		public IfcRelAssociatesLibrary(IfcLibrarySelect library, IfcDefinitionSelect related) : base(related) { RelatingLibrary = library; }
 	}
 	[Serializable]
@@ -1004,9 +1018,9 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingMaterial; } 
 
 		internal IfcRelAssociatesMaterial() : base() { }
-		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		internal IfcRelAssociatesMaterial(DatabaseIfc db, IfcRelAssociatesMaterial r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], ownerHistory, downStream) as IfcMaterialSelect;
+			RelatingMaterial = db.Factory.Duplicate(r.mDatabase[r.mRelatingMaterial], options) as IfcMaterialSelect;
 		}
 		public IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { RelatingMaterial = material; }
 		public IfcRelAssociatesMaterial(IfcMaterialSelect material, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingMaterial = material; }
@@ -1025,7 +1039,7 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingProfileProperties; } 
 
 		internal IfcRelAssociatesProfileProperties() : base() { }
-		internal IfcRelAssociatesProfileProperties(DatabaseIfc db, IfcRelAssociatesProfileProperties r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		internal IfcRelAssociatesProfileProperties(DatabaseIfc db, IfcRelAssociatesProfileProperties r, DuplicateOptions options) : base(db, r, options)
 		{
 			RelatingProfileProperties = db.Factory.Duplicate(r.RelatingProfileProperties) as IfcProfileProperties;
 			if (r.mProfileSectionLocation > 0)
@@ -1080,7 +1094,7 @@ namespace GeometryGym.Ifc
 		public IfcElement RelatedElement { get { return mRelatedElement; } set { mRelatedElement = value; if(value != null && !value.ConnectedFrom.Contains(this)) value.ConnectedFrom.Add(this); } }
 
 		internal IfcRelConnectsElements() : base() { }
-		internal IfcRelConnectsElements(DatabaseIfc db, IfcRelConnectsElements r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelConnectsElements(DatabaseIfc db, IfcRelConnectsElements r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
 			if (r.mConnectionGeometry != null)
 				ConnectionGeometry = db.Factory.Duplicate(r.ConnectionGeometry) as IfcConnectionGeometry;
@@ -1102,7 +1116,7 @@ namespace GeometryGym.Ifc
 		internal IfcConnectionTypeEnum mRelatingConnectionType = IfcConnectionTypeEnum.NOTDEFINED;// : IfcConnectionTypeEnum; 
 
 		internal IfcRelConnectsPathElements() : base() { }
-		internal IfcRelConnectsPathElements(DatabaseIfc db, IfcRelConnectsPathElements r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream)
+		internal IfcRelConnectsPathElements(DatabaseIfc db, IfcRelConnectsPathElements r, DuplicateOptions options) : base(db, r, options)
 		{
 			mRelatingPriorities.AddRange(r.mRelatingPriorities);
 			mRelatedPriorities.AddRange(r.mRelatedPriorities);
@@ -1122,12 +1136,12 @@ namespace GeometryGym.Ifc
 		public IfcElement RealizingElement { get { return mDatabase[mRealizingElement] as IfcElement; } set { mRealizingElement = value == null ? 0 : value.mIndex; } }
 
 		internal IfcRelConnectsPorts() : base() { }
-		internal IfcRelConnectsPorts(DatabaseIfc db, IfcRelConnectsPorts r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelConnectsPorts(DatabaseIfc db, IfcRelConnectsPorts r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingPort = db.Factory.Duplicate(r.RelatingPort, ownerHistory, downStream) as IfcPort;
-			RelatedPort = db.Factory.Duplicate(r.RelatedPort, ownerHistory, downStream) as IfcPort;
+			RelatingPort = db.Factory.Duplicate(r.RelatingPort, options) as IfcPort;
+			RelatedPort = db.Factory.Duplicate(r.RelatedPort, options) as IfcPort;
 			if (r.mRealizingElement > 0)
-				RealizingElement = db.Factory.Duplicate(r.RealizingElement, ownerHistory, downStream) as IfcElement;
+				RealizingElement = db.Factory.Duplicate(r.RealizingElement, options) as IfcElement;
 		}
 		public IfcRelConnectsPorts(IfcPort relatingPort, IfcPort relatedPort) : base(relatingPort.mDatabase) { RelatingPort = relatingPort; RelatedPort = relatedPort; }
 
@@ -1143,7 +1157,11 @@ namespace GeometryGym.Ifc
 		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; value.HasPortsSS.Add(this); } }
 
 		internal IfcRelConnectsPortToElement() : base() { }
-		internal IfcRelConnectsPortToElement(DatabaseIfc db, IfcRelConnectsPortToElement r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { RelatingPort = db.Factory.Duplicate(r.RelatingPort, ownerHistory, downStream) as IfcPort; RelatedElement = db.Factory.Duplicate(r.RelatedElement, ownerHistory, downStream) as IfcElement; }
+		internal IfcRelConnectsPortToElement(DatabaseIfc db, IfcRelConnectsPortToElement r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
+		{
+			RelatingPort = db.Factory.Duplicate(r.RelatingPort, options) as IfcPort;
+			RelatedElement = db.Factory.Duplicate(r.RelatedElement, options) as IfcElement;
+		}
 		public IfcRelConnectsPortToElement(IfcPort p, IfcElement e) : base(p.mDatabase)
 		{
 			mRelatingPort = p.mIndex;
@@ -1163,10 +1181,10 @@ namespace GeometryGym.Ifc
 		public IfcStructuralActivity RelatedStructuralActivity { get { return mDatabase[mRelatedStructuralActivity] as IfcStructuralActivity; } set { mRelatedStructuralActivity = value.Index; } }
 
 		internal IfcRelConnectsStructuralActivity() : base() { }
-		internal IfcRelConnectsStructuralActivity(DatabaseIfc db, IfcRelConnectsStructuralActivity c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory)
+		internal IfcRelConnectsStructuralActivity(DatabaseIfc db, IfcRelConnectsStructuralActivity c, DuplicateOptions options) : base(db, c, options.OwnerHistory)
 		{
 			//mRelatingElement = c.mRelatingElement; 
-			RelatedStructuralActivity = db.Factory.Duplicate(c.RelatedStructuralActivity, ownerHistory, downStream) as IfcStructuralActivity;
+			RelatedStructuralActivity = db.Factory.Duplicate(c.RelatedStructuralActivity, options) as IfcStructuralActivity;
 		}
 		public IfcRelConnectsStructuralActivity(IfcStructuralActivityAssignmentSelect item, IfcStructuralActivity a)
 			: base(a.mDatabase) { mRelatingElement = item.Index; mRelatedStructuralActivity = a.mIndex; }
@@ -1181,10 +1199,10 @@ namespace GeometryGym.Ifc
 		public IfcStructuralMember RelatedStructuralMember { get { return mDatabase[mRelatedStructuralMember] as IfcStructuralMember; } set { mRelatedStructuralMember = value.mIndex; value.mStructuralMemberForGG = this; } }
 
 		internal IfcRelConnectsStructuralElement() : base() { }
-		internal IfcRelConnectsStructuralElement(DatabaseIfc db, IfcRelConnectsStructuralElement c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory)
+		internal IfcRelConnectsStructuralElement(DatabaseIfc db, IfcRelConnectsStructuralElement c, DuplicateOptions options) : base(db, c, options.OwnerHistory)
 		{
-			RelatingElement = db.Factory.Duplicate(c.RelatingElement, ownerHistory, downStream) as IfcElement;
-			RelatedStructuralMember = db.Factory.Duplicate(c.RelatedStructuralMember, ownerHistory, downStream) as IfcStructuralMember;
+			RelatingElement = db.Factory.Duplicate(c.RelatingElement, options) as IfcElement;
+			RelatedStructuralMember = db.Factory.Duplicate(c.RelatedStructuralMember, options) as IfcStructuralMember;
 		}
 		public IfcRelConnectsStructuralElement(IfcElement elem, IfcStructuralMember memb) : base(elem.mDatabase)
 		{
@@ -1212,7 +1230,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D ConditionCoordinateSystem { get { return mDatabase[mConditionCoordinateSystem] as IfcAxis2Placement3D; } set { mConditionCoordinateSystem = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcRelConnectsStructuralMember() : base() { }
-		internal IfcRelConnectsStructuralMember(DatabaseIfc db, IfcRelConnectsStructuralMember r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelConnectsStructuralMember(DatabaseIfc db, IfcRelConnectsStructuralMember r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
 			//RelatingStructuralMember = db.Factory.Duplicate(r.RelatingStructuralMember) as IfcStructuralMember; 
 			RelatedStructuralConnection = db.Factory.Duplicate(r.RelatedStructuralConnection) as IfcStructuralConnection;
@@ -1247,7 +1265,7 @@ namespace GeometryGym.Ifc
 		public IfcConnectionGeometry ConnectionConstraint { get { return mDatabase[mConnectionConstraint] as IfcConnectionGeometry; } set { mConnectionConstraint = value.mIndex; } }
 
 		internal IfcRelConnectsWithEccentricity() : base() { }
-		internal IfcRelConnectsWithEccentricity(DatabaseIfc db, IfcRelConnectsWithEccentricity c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory, downStream) { ConnectionConstraint = db.Factory.Duplicate(c.ConnectionConstraint) as IfcConnectionGeometry; }
+		internal IfcRelConnectsWithEccentricity(DatabaseIfc db, IfcRelConnectsWithEccentricity c, DuplicateOptions options) : base(db, c, options) { ConnectionConstraint = db.Factory.Duplicate(c.ConnectionConstraint) as IfcConnectionGeometry; }
 		public IfcRelConnectsWithEccentricity(IfcStructuralMember memb, IfcStructuralConnection connection, IfcConnectionGeometry cg)
 			: base(memb, connection) { mConnectionConstraint = cg.mIndex; }
 	}
@@ -1259,7 +1277,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcElement> RealizingElements { get { return mRealizingElements; } }
 
 		internal IfcRelConnectsWithRealizingElements() : base() { }
-		internal IfcRelConnectsWithRealizingElements(DatabaseIfc db, IfcRelConnectsWithRealizingElements r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { RealizingElements.AddRange(r.RealizingElements.Select(x => db.Factory.Duplicate(x, ownerHistory, downStream) as IfcElement)); mConnectionType = r.mConnectionType; }
+		internal IfcRelConnectsWithRealizingElements(DatabaseIfc db, IfcRelConnectsWithRealizingElements r, DuplicateOptions options) : base(db, r, options) { RealizingElements.AddRange(r.RealizingElements.Select(x => db.Factory.Duplicate(x, options) as IfcElement)); mConnectionType = r.mConnectionType; }
 		public IfcRelConnectsWithRealizingElements(IfcConnectionGeometry cg, IfcElement relating, IfcElement related, IfcElement realizing)
 			: base(relating, related)
 		{
@@ -1336,13 +1354,13 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcRelContainedInSpatialStructure() : base() { }// RelatedElements = new RelatedElementsCollection(this); }
-		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, IfcOwnerHistory ownerHistory, bool downstream) : base(db, r, ownerHistory)
+		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, ownerHistory, false) as IfcSpatialElement;
-			if (downstream)
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement;
+			if (options.DuplicateDownstream)
 			{
 				foreach(IfcProduct p  in r.RelatedElements)
-					db.Factory.Duplicate(p, ownerHistory, downstream);
+					db.Factory.Duplicate(p, options);
 			}
 		}
 		public IfcRelContainedInSpatialStructure(IfcSpatialElement host) : base(host.mDatabase)
@@ -1438,7 +1456,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcCovering> RelatedCoverings { get { return new ReadOnlyCollection<IfcCovering>(mRelatedCoverings.ConvertAll(x => mDatabase[x] as IfcCovering)); } }
 
 		internal IfcRelCoversBldgElements() : base() { }
-		internal IfcRelCoversBldgElements(DatabaseIfc db, IfcRelCoversBldgElements c, IfcOwnerHistory ownerHistory, bool downStream) : base(db, c, ownerHistory) { RelatingBuildingElement = db.Factory.Duplicate(c.RelatingBuildingElement, ownerHistory, downStream) as IfcElement; c.RelatedCoverings.ToList().ForEach(x => addCovering(db.Factory.Duplicate(x, ownerHistory, downStream) as IfcCovering)); }
+		internal IfcRelCoversBldgElements(DatabaseIfc db, IfcRelCoversBldgElements c, DuplicateOptions options) : base(db, c, options.OwnerHistory) { RelatingBuildingElement = db.Factory.Duplicate(c.RelatingBuildingElement, options) as IfcElement; c.RelatedCoverings.ToList().ForEach(x => addCovering(db.Factory.Duplicate(x, options) as IfcCovering)); }
 		public IfcRelCoversBldgElements(IfcElement e, IfcCovering covering) : base(e.mDatabase)
 		{
 			mRelatingBuildingElement = e.mIndex;
@@ -1473,10 +1491,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcCovering> RelatedCoverings { get { return mRelatedCoverings; } }
 
 		internal IfcRelCoversSpaces() : base() { }
-		internal IfcRelCoversSpaces(DatabaseIfc db, IfcRelCoversSpaces r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelCoversSpaces(DatabaseIfc db, IfcRelCoversSpaces r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatedSpace = db.Factory.Duplicate(r.RelatedSpace, ownerHistory, downStream) as IfcSpace;
-			RelatedCoverings.AddRange( r.RelatedCoverings.ConvertAll(x => db.Factory.Duplicate(x, ownerHistory, downStream) as IfcCovering));
+			RelatedSpace = db.Factory.Duplicate(r.RelatedSpace, options) as IfcSpace;
+			RelatedCoverings.AddRange( r.RelatedCoverings.ConvertAll(x => db.Factory.Duplicate(x, options) as IfcCovering));
 		}
 		public IfcRelCoversSpaces(IfcSpace s, IfcCovering covering) : base(s.mDatabase)
 		{
@@ -1519,11 +1537,11 @@ namespace GeometryGym.Ifc
 
 		internal IfcRelDeclares() : base() { }
 		internal IfcRelDeclares(IfcContext c) : base(c.mDatabase) { mRelatingContext = c; c.mDeclares.Add(this); }
-		internal IfcRelDeclares(DatabaseIfc db, IfcRelDeclares r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelDeclares(DatabaseIfc db, IfcRelDeclares r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingContext = db.Factory.Duplicate(r.RelatingContext, ownerHistory, false) as IfcContext;
-			if (downStream)
-				RelatedDefinitions.AddRange(r.RelatedDefinitions.ConvertAll(x => db.Factory.Duplicate(r.mDatabase[x.Index], ownerHistory, downStream) as IfcDefinitionSelect));
+			RelatingContext = db.Factory.Duplicate(r.RelatingContext, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext;
+			if (options.DuplicateDownstream)
+				RelatedDefinitions.AddRange(r.RelatedDefinitions.ConvertAll(x => db.Factory.Duplicate(r.mDatabase[x.Index], options) as IfcDefinitionSelect));
 		}
 		public IfcRelDeclares(IfcContext c, IfcDefinitionSelect def) : this(c) { RelatedDefinitions.Add(def); }
 		public IfcRelDeclares(IfcContext c, IEnumerable<IfcDefinitionSelect> defs) : this(c) { RelatedDefinitions.AddRange(defs); }
@@ -1585,7 +1603,7 @@ namespace GeometryGym.Ifc
 		public override IfcRoot Relating() { return RelatingObject; } 
 
 		internal IfcRelDefinesByObject() : base() { }
-		internal IfcRelDefinesByObject(DatabaseIfc db, IfcRelDefinesByObject r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { r.RelatedObjects.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, ownerHistory, downStream) as IfcObject)); RelatingObject = db.Factory.Duplicate(r.RelatingObject, ownerHistory, downStream) as IfcObject; }
+		internal IfcRelDefinesByObject(DatabaseIfc db, IfcRelDefinesByObject r, DuplicateOptions options) : base(db, r, options.OwnerHistory) { r.RelatedObjects.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, options) as IfcObject)); RelatingObject = db.Factory.Duplicate(r.RelatingObject, options) as IfcObject; }
 		public IfcRelDefinesByObject(IfcObject relObj) : base(relObj.mDatabase) { mRelatingObject = relObj.mIndex; relObj.mIsDeclaredBy = this; }
 
 		internal void addRelated(IfcObject obj) { mRelatedObjects.Add(obj.mIndex); obj.mIsDeclaredBy = this; }
@@ -1603,10 +1621,10 @@ namespace GeometryGym.Ifc
 
 		internal IfcRelDefinesByProperties() : base() { }
 		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) { Name = "NameRelDefinesByProperties"; Description = "DescriptionRelDefinesByProperties"; }
-		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory)
+		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, DuplicateOptions options) : base(db, d, options.OwnerHistory)
 		{
 			//RelatedObjects = d.RelatedObjects.ConvertAll(x=>db.Factory.Duplicate(x) as IfcObjectDefinition);
-			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition, ownerHistory, downStream) as IfcPropertySetDefinition;
+			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition, options) as IfcPropertySetDefinition;
 		}
 		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.mDatabase) { mRelatingPropertyDefinition = propertySet; propertySet.DefinesOccurrence.Add(this); }
 		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.Add(relatedObject); }
@@ -1695,7 +1713,7 @@ namespace GeometryGym.Ifc
 		public override IfcRoot Relating() { return RelatingTemplate; } 
 
 		internal IfcRelDefinesByTemplate() : base() { }
-		internal IfcRelDefinesByTemplate(DatabaseIfc db, IfcRelDefinesByTemplate r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { r.RelatedPropertySets.ToList().ForEach(x => AddRelated(db.Factory.Duplicate(x, ownerHistory, downStream) as IfcPropertySetDefinition)); RelatingTemplate = db.Factory.Duplicate(r.RelatingTemplate, ownerHistory, downStream) as IfcPropertySetTemplate; }
+		internal IfcRelDefinesByTemplate(DatabaseIfc db, IfcRelDefinesByTemplate r, DuplicateOptions options) : base(db, r, options.OwnerHistory) { r.RelatedPropertySets.ToList().ForEach(x => AddRelated(db.Factory.Duplicate(x, options) as IfcPropertySetDefinition)); RelatingTemplate = db.Factory.Duplicate(r.RelatingTemplate, options) as IfcPropertySetTemplate; }
 		public IfcRelDefinesByTemplate(IfcPropertySetTemplate relating) : base(relating.mDatabase) { RelatingTemplate = relating; }
 		public IfcRelDefinesByTemplate(IfcPropertySetDefinition related, IfcPropertySetTemplate relating) : this(relating) { AddRelated(related); }
 		public IfcRelDefinesByTemplate(List<IfcPropertySetDefinition> related, IfcPropertySetTemplate relating) : this(relating) { related.ForEach(x => AddRelated(x)); }
@@ -1715,10 +1733,10 @@ namespace GeometryGym.Ifc
 		public override IfcRoot Relating() { return RelatingType; } 
 
 		internal IfcRelDefinesByType() : base() { }
-		internal IfcRelDefinesByType(DatabaseIfc db, IfcRelDefinesByType r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelDefinesByType(DatabaseIfc db, IfcRelDefinesByType r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
 			//mRelatedObjects = new List<int>(d.mRelatedObjects.ToArray()); 
-			RelatingType = db.Factory.Duplicate(r.RelatingType, ownerHistory, downStream) as IfcTypeObject;
+			RelatingType = db.Factory.Duplicate(r.RelatingType, options) as IfcTypeObject;
 		}
 		public IfcRelDefinesByType(IfcTypeObject relType) : base(relType.mDatabase) { RelatingType = relType; }
 		public IfcRelDefinesByType(IfcObject related, IfcTypeObject relating) : this(relating) { RelatedObjects.Add(related); }
@@ -1757,7 +1775,7 @@ namespace GeometryGym.Ifc
 		public IfcElement RelatedBuildingElement { get { return mDatabase[mRelatedBuildingElement] as IfcElement; } set { mRelatedBuildingElement = value.mIndex; } }
 
 		internal IfcRelFillsElement() : base() { }
-		internal IfcRelFillsElement(DatabaseIfc db, IfcRelFillsElement r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { RelatingOpeningElement = db.Factory.Duplicate(r.RelatingOpeningElement, ownerHistory, downStream) as IfcOpeningElement; RelatedBuildingElement = db.Factory.Duplicate(r.RelatedBuildingElement, ownerHistory, downStream) as IfcElement; }
+		internal IfcRelFillsElement(DatabaseIfc db, IfcRelFillsElement r, DuplicateOptions options) : base(db, r, options.OwnerHistory) { RelatingOpeningElement = db.Factory.Duplicate(r.RelatingOpeningElement, options) as IfcOpeningElement; RelatedBuildingElement = db.Factory.Duplicate(r.RelatedBuildingElement, options) as IfcElement; }
 		public IfcRelFillsElement(IfcOpeningElement oe, IfcElement e) : base(oe.mDatabase) { mRelatingOpeningElement = oe.mIndex; mRelatedBuildingElement = e.mIndex; }
 	}
 	[Serializable]
@@ -1769,7 +1787,7 @@ namespace GeometryGym.Ifc
 		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
 
 		internal IfcRelFlowControlElements() : base() { }
-		internal IfcRelFlowControlElements(DatabaseIfc db, IfcRelFlowControlElements r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory) { RelatingPort = db.Factory.Duplicate(r.RelatingPort, ownerHistory, downStream) as IfcPort; RelatedElement = db.Factory.Duplicate(r.RelatedElement, ownerHistory, downStream) as IfcElement; }
+		internal IfcRelFlowControlElements(DatabaseIfc db, IfcRelFlowControlElements r, DuplicateOptions options) : base(db, r, options.OwnerHistory) { RelatingPort = db.Factory.Duplicate(r.RelatingPort, options) as IfcPort; RelatedElement = db.Factory.Duplicate(r.RelatedElement, options) as IfcElement; }
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcRelInteractionRequirements  // DEPRECEATED IFC4
@@ -1789,12 +1807,12 @@ namespace GeometryGym.Ifc
 		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
 
 		internal IfcRelInterferesElements() : base() { }
-		internal IfcRelInterferesElements(DatabaseIfc db, IfcRelInterferesElements r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory)
+		internal IfcRelInterferesElements(DatabaseIfc db, IfcRelInterferesElements r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingElement = db.Factory.Duplicate(r.RelatingElement, ownerHistory, downStream) as IfcElement;
-			RelatedElement = db.Factory.Duplicate(r.RelatedElement, ownerHistory, downStream) as IfcElement;
+			RelatingElement = db.Factory.Duplicate(r.RelatingElement, options) as IfcElement;
+			RelatedElement = db.Factory.Duplicate(r.RelatedElement, options) as IfcElement;
 			if (r.mInterferenceGeometry > 0)
-				InterferenceGeometry = db.Factory.Duplicate(r.InterferenceGeometry, ownerHistory, downStream) as IfcConnectionGeometry;
+				InterferenceGeometry = db.Factory.Duplicate(r.InterferenceGeometry, options) as IfcConnectionGeometry;
 			mInterferenceType = r.mInterferenceType;
 			mImpliedOrder = r.mImpliedOrder;
 		}
@@ -1811,10 +1829,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
 
 		internal IfcRelNests() : base() { }
-		internal IfcRelNests(DatabaseIfc db, IfcRelNests n, IfcOwnerHistory ownerHistory, bool downStream) : base(db, n, ownerHistory)
+		internal IfcRelNests(DatabaseIfc db, IfcRelNests n, DuplicateOptions options) : base(db, n, options.OwnerHistory)
 		{
-			RelatingObject = db.Factory.Duplicate(n.RelatingObject, ownerHistory, downStream) as IfcObjectDefinition;
-			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, ownerHistory, downStream) as IfcObjectDefinition));
+			RelatingObject = db.Factory.Duplicate(n.RelatingObject, options) as IfcObjectDefinition;
+			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, options) as IfcObjectDefinition));
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject) : base(relatingObject.mDatabase)
 		{
@@ -1918,9 +1936,9 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcProperty> OverridingProperties { get { return new ReadOnlyCollection<IfcProperty>(mOverridingProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
 
 		internal IfcRelOverridesProperties() : base() { }
-		internal IfcRelOverridesProperties(DatabaseIfc db, IfcRelOverridesProperties d, IfcOwnerHistory ownerHistory, bool downStream) : base(db, d, ownerHistory, downStream)
+		internal IfcRelOverridesProperties(DatabaseIfc db, IfcRelOverridesProperties d, DuplicateOptions options) : base(db, d, options)
 		{
-			mOverridingProperties = d.OverridingProperties.ToList().ConvertAll(x => db.Factory.Duplicate(x, ownerHistory, downStream).mIndex);
+			mOverridingProperties = d.OverridingProperties.ToList().ConvertAll(x => db.Factory.Duplicate(x, options).mIndex);
 		}
 		internal IfcRelOverridesProperties(IfcPropertySetDefinition ifcproperty) : base(ifcproperty) { }
 		public IfcRelOverridesProperties(IfcObjectDefinition od, IfcPropertySetDefinition ifcproperty) : base(od, ifcproperty) { }
@@ -1936,7 +1954,7 @@ namespace GeometryGym.Ifc
 		public IfcFeatureElementAddition RelatedFeatureElement { get { return mDatabase[mRelatedFeatureElement] as IfcFeatureElementAddition; } set { mRelatedFeatureElement = value.mIndex; } }
 
 		protected IfcRelProjectsElement() : base() { }
-		protected IfcRelProjectsElement(DatabaseIfc db, IfcRelProjectsElement p, IfcOwnerHistory ownerHistory, bool downStream) : base(db, p, ownerHistory) { RelatingElement = db.Factory.Duplicate(p.RelatingElement, ownerHistory, downStream) as IfcElement; RelatedFeatureElement = db.Factory.Duplicate(p.RelatedFeatureElement, ownerHistory, downStream) as IfcFeatureElementAddition; }
+		protected IfcRelProjectsElement(DatabaseIfc db, IfcRelProjectsElement p, DuplicateOptions options) : base(db, p, options.OwnerHistory) { RelatingElement = db.Factory.Duplicate(p.RelatingElement, options) as IfcElement; RelatedFeatureElement = db.Factory.Duplicate(p.RelatedFeatureElement, options) as IfcFeatureElementAddition; }
 		protected IfcRelProjectsElement(IfcElement e, IfcFeatureElementAddition a) : base(e.mDatabase) { mRelatingElement = e.mIndex; mRelatedFeatureElement = a.mIndex; }
 	}
 	[Serializable]
@@ -1949,11 +1967,11 @@ namespace GeometryGym.Ifc
 		public IfcSpatialElement RelatingStructure { get { return mDatabase[mRelatingStructure] as IfcSpatialElement; } set { mRelatingStructure = value.mIndex; value.mReferencesElements.Add(this); } }
 
 		internal IfcRelReferencedInSpatialStructure() : base() { }
-		internal IfcRelReferencedInSpatialStructure(DatabaseIfc db, IfcRelReferencedInSpatialStructure r, IfcOwnerHistory ownerHistory, bool downstream) : base(db, r, ownerHistory)
+		internal IfcRelReferencedInSpatialStructure(DatabaseIfc db, IfcRelReferencedInSpatialStructure r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			if (downstream)
-				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, ownerHistory, downstream) as IfcProduct));
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, ownerHistory, false) as IfcSpatialElement;
+			if (options.DuplicateDownstream)
+				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, options) as IfcProduct));
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement;
 		}
 		public IfcRelReferencedInSpatialStructure(IfcSpatialElement e) : base(e.mDatabase)
 		{
@@ -2017,10 +2035,10 @@ namespace GeometryGym.Ifc
 		public IfcLagTime TimeLag { get { return mDatabase[mTimeLag] as IfcLagTime; } set { mTimeLag = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcRelSequence() : base() { }
-		internal IfcRelSequence(DatabaseIfc db, IfcRelSequence s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory)
+		internal IfcRelSequence(DatabaseIfc db, IfcRelSequence s, DuplicateOptions options) : base(db, s, options.OwnerHistory)
 		{
-			RelatingProcess = db.Factory.Duplicate(s.RelatingProcess, ownerHistory, downStream) as IfcProcess;
-			RelatedProcess = db.Factory.Duplicate(s.RelatedProcess, ownerHistory, downStream) as IfcProcess;
+			RelatingProcess = db.Factory.Duplicate(s.RelatingProcess, options) as IfcProcess;
+			RelatedProcess = db.Factory.Duplicate(s.RelatedProcess, options) as IfcProcess;
 			mTimeLag = s.mTimeLag;
 			mSequenceType = s.mSequenceType;
 			mUserDefinedSequenceType = s.mUserDefinedSequenceType;
@@ -2050,10 +2068,10 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcSpatialElement> RelatedBuildings { get { return new ReadOnlyCollection<IfcSpatialElement>(mRelatedBuildings.ConvertAll(x => mDatabase[x] as IfcSpatialElement)); } }
 
 		internal IfcRelServicesBuildings() : base() { }
-		internal IfcRelServicesBuildings(DatabaseIfc db, IfcRelServicesBuildings s, IfcOwnerHistory ownerHistory, bool downStream) : base(db, s, ownerHistory)
+		internal IfcRelServicesBuildings(DatabaseIfc db, IfcRelServicesBuildings s, DuplicateOptions options) : base(db, s, options.OwnerHistory)
 		{
-			RelatingSystem = db.Factory.Duplicate(s.RelatingSystem, ownerHistory, downStream) as IfcSystem;
-			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, false) as IfcSpatialElement));
+			RelatingSystem = db.Factory.Duplicate(s.RelatingSystem, options) as IfcSystem;
+			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
 			: base(system.mDatabase) { mRelatingSystem = system.mIndex; mRelatedBuildings.Add(se.mIndex); se.mServicedBySystems.Add(this); }
@@ -2078,13 +2096,13 @@ namespace GeometryGym.Ifc
 		public IfcConnectionGeometry ConnectionGeometry { get { return mDatabase[mConnectionGeometry] as IfcConnectionGeometry; } set { mConnectionGeometry = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcRelSpaceBoundary() : base() { }
-		internal IfcRelSpaceBoundary(DatabaseIfc db, IfcRelSpaceBoundary b, IfcOwnerHistory ownerHistory, bool downStream) : base(db, b, ownerHistory)
+		internal IfcRelSpaceBoundary(DatabaseIfc db, IfcRelSpaceBoundary b, DuplicateOptions options) : base(db, b, options.OwnerHistory)
 		{
-			RelatingSpace = db.Factory.Duplicate(b.mDatabase[b.mRelatingSpace], ownerHistory, downStream) as IfcSpaceBoundarySelect;
+			RelatingSpace = db.Factory.Duplicate(b.mDatabase[b.mRelatingSpace], options) as IfcSpaceBoundarySelect;
 			if (b.mRelatedBuildingElement > 0)
-				RelatedBuildingElement = db.Factory.Duplicate(b.RelatedBuildingElement, ownerHistory, downStream) as IfcElement;
+				RelatedBuildingElement = db.Factory.Duplicate(b.RelatedBuildingElement, options) as IfcElement;
 			if (b.mConnectionGeometry > 0)
-				ConnectionGeometry = db.Factory.Duplicate(b.ConnectionGeometry, ownerHistory, downStream) as IfcConnectionGeometry;
+				ConnectionGeometry = db.Factory.Duplicate(b.ConnectionGeometry, options) as IfcConnectionGeometry;
 			mPhysicalOrVirtualBoundary = b.mPhysicalOrVirtualBoundary;
 			mInternalOrExternalBoundary = b.mInternalOrExternalBoundary;
 		}
@@ -2106,7 +2124,7 @@ namespace GeometryGym.Ifc
 
 		public IfcRelSpaceBoundary1stLevel ParentBoundary { get { return mDatabase[mParentBoundary] as IfcRelSpaceBoundary1stLevel; } set { mParentBoundary = value.mIndex; } }
 		internal IfcRelSpaceBoundary1stLevel() : base() { }
-		internal IfcRelSpaceBoundary1stLevel(DatabaseIfc db, IfcRelSpaceBoundary1stLevel r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { ParentBoundary = db.Factory.Duplicate(r.ParentBoundary, ownerHistory, downStream) as IfcRelSpaceBoundary1stLevel; }
+		internal IfcRelSpaceBoundary1stLevel(DatabaseIfc db, IfcRelSpaceBoundary1stLevel r, DuplicateOptions options) : base(db, r, options) { ParentBoundary = db.Factory.Duplicate(r.ParentBoundary, options) as IfcRelSpaceBoundary1stLevel; }
 		public IfcRelSpaceBoundary1stLevel(IfcSpaceBoundarySelect s, IfcElement e, IfcPhysicalOrVirtualEnum virt, IfcInternalOrExternalEnum intern, IfcRelSpaceBoundary1stLevel parent)
 			: base(s, e, virt, intern) { mParentBoundary = parent.mIndex; }
 	}
@@ -2120,7 +2138,7 @@ namespace GeometryGym.Ifc
 		public IfcRelSpaceBoundary2ndLevel CorrespondingBoundary { get { return mDatabase[mCorrespondingBoundary] as IfcRelSpaceBoundary2ndLevel; } set { mCorrespondingBoundary = value.mIndex; } }
 
 		internal IfcRelSpaceBoundary2ndLevel() : base() { }
-		internal IfcRelSpaceBoundary2ndLevel(DatabaseIfc db, IfcRelSpaceBoundary2ndLevel r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { CorrespondingBoundary = db.Factory.Duplicate(r.CorrespondingBoundary, ownerHistory, downStream) as IfcRelSpaceBoundary2ndLevel; }
+		internal IfcRelSpaceBoundary2ndLevel(DatabaseIfc db, IfcRelSpaceBoundary2ndLevel r, DuplicateOptions options) : base(db, r, options) { CorrespondingBoundary = db.Factory.Duplicate(r.CorrespondingBoundary, options) as IfcRelSpaceBoundary2ndLevel; }
 		public IfcRelSpaceBoundary2ndLevel(IfcSpaceBoundarySelect s, IfcElement e, IfcPhysicalOrVirtualEnum virt, IfcInternalOrExternalEnum intern, IfcRelSpaceBoundary1stLevel parent, IfcRelSpaceBoundary2ndLevel corresponding)
 			: base(s, e, virt, intern, parent) { if (corresponding != null) mCorrespondingBoundary = corresponding.mIndex; }
 
@@ -2135,10 +2153,9 @@ namespace GeometryGym.Ifc
 		public IfcFeatureElementSubtraction RelatedOpeningElement { get { return mDatabase[mRelatedOpeningElement] as IfcFeatureElementSubtraction; } set { mRelatedOpeningElement = value.mIndex; value.mVoidsElement = this; } }
 
 		internal IfcRelVoidsElement() : base() { }
-		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, IfcOwnerHistory ownerHistory, bool downStream) : base(db, v, ownerHistory)
+		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, DuplicateOptions options) : base(db, v, options.OwnerHistory)
 		{
-			if(downStream)
-				RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, ownerHistory, downStream) as IfcFeatureElementSubtraction;
+			RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, options) as IfcFeatureElementSubtraction;
 		}
 		public IfcRelVoidsElement(IfcElement host, IfcFeatureElementSubtraction fes)
 			: base(host.mDatabase) { mRelatingBuildingElement = host.mIndex; host.mHasOpenings.Add(this); mRelatedOpeningElement = fes.mIndex; fes.mVoidsElement = this; }
@@ -2201,7 +2218,7 @@ namespace GeometryGym.Ifc
 
 			foreach (IfcPresentationLayerAssignment layerAssignment in r.mLayerAssignments)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, false) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 		}
@@ -2289,7 +2306,7 @@ namespace GeometryGym.Ifc
 		{
 			foreach (IfcPresentationLayerAssignment layerAssignment in i.mLayerAssignments)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, false) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 			if (i.mStyledByItem != null)
@@ -2302,7 +2319,7 @@ namespace GeometryGym.Ifc
 
 		public void AssignLayer(IfcPresentationLayerAssignment layer) { mLayerAssignments.Add(layer); }
 
-		internal override bool isDuplicate(BaseClassIfc e)
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcRepresentationItem ri = e as IfcRepresentationItem;
 			if (ri == null)
@@ -2311,7 +2328,7 @@ namespace GeometryGym.Ifc
 			{
 				if (ri.mStyledByItem != null)
 				{
-					if (!mStyledByItem.isDuplicate(ri.mStyledByItem))
+					if (!mStyledByItem.isDuplicate(ri.mStyledByItem, tol))
 						return false;
 				}
 				else
@@ -2319,20 +2336,23 @@ namespace GeometryGym.Ifc
 			}
 			else if (ri.mStyledByItem != null)
 				return false;
-			return base.isDuplicate(e);
+			return base.isDuplicate(e, tol);
 		}
 	}
 	[Serializable]
 	public partial class IfcRepresentationMap : BaseClassIfc, IfcProductRepresentationSelect
 	{
-		internal int mMappingOrigin;// : IfcAxis2Placement;
-		internal int mMappedRepresentation;// : IfcRepresentation;
+		private IfcAxis2Placement mMappingOrigin;// : IfcAxis2Placement;
+		private IfcRepresentation mMappedRepresentation;// : IfcRepresentation;
 		//INVERSE
 		internal List<IfcShapeAspect> mHasShapeAspects = new List<IfcShapeAspect>();//	:	SET [0:?] OF IfcShapeAspect FOR PartOfProductDefinitionShape;
 		internal List<IfcMappedItem> mMapUsage = new List<IfcMappedItem>();//: 	SET OF IfcMappedItem FOR MappingSource;
 
-		public IfcAxis2Placement MappingOrigin { get { return mDatabase[mMappingOrigin] as IfcAxis2Placement; } set { mMappingOrigin = value.Index; } }
-		public IfcShapeModel MappedRepresentation { get { return mDatabase[mMappedRepresentation] as IfcShapeModel; } set { mMappedRepresentation = value.mIndex; value.mRepresentationMap = this; } }
+		public IfcAxis2Placement MappingOrigin { get { return mMappingOrigin; } set { mMappingOrigin = value; } }
+		public IfcRepresentation MappedRepresentation
+		{
+			get { return mMappedRepresentation; }
+			set { mMappedRepresentation = value; value.mRepresentationMap = this; } }  // IfcStyleModel not valid
 		public ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get { return new ReadOnlyCollection<IfcShapeAspect>(mHasShapeAspects); } }
 		public ReadOnlyCollection<IfcMappedItem> MapUsage { get { return new ReadOnlyCollection<IfcMappedItem>(mMapUsage); } }
 
@@ -2340,15 +2360,16 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcTypeProduct> Represents { get { return new ReadOnlyCollection<IfcTypeProduct>(mRepresents); } }
 
 		internal IfcRepresentationMap() : base() { }
-		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m, IfcOwnerHistory ownerHistory, bool downStream) : base(db, m)
+		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m, DuplicateOptions options) : base(db, m)
 		{
-			MappingOrigin = db.Factory.Duplicate(m.mDatabase[m.mMappingOrigin], true) as IfcAxis2Placement;
-			MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation, true) as IfcShapeModel;
+			DuplicateOptions duplicateDownstream = new DuplicateOptions() { DuplicateDownstream = true };
+			MappingOrigin = db.Factory.Duplicate((BaseClassIfc) m.mMappingOrigin, duplicateDownstream) as IfcAxis2Placement;
+			MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation, duplicateDownstream) as IfcShapeModel;
 			foreach (IfcShapeAspect shapeAspect in m.HasShapeAspects)
-				(db.Factory.Duplicate(shapeAspect, true) as IfcShapeAspect).PartOfProductDefinitionShape = this;
+				(db.Factory.Duplicate(shapeAspect, duplicateDownstream) as IfcShapeAspect).PartOfProductDefinitionShape = this;
 		}
-		public IfcRepresentationMap(IfcAxis2Placement placement, IfcShapeRepresentation representation) : base(representation.mDatabase) { mMappingOrigin = placement.Index; MappedRepresentation = representation; }
-		public IfcRepresentationMap(IfcAxis2Placement placement, IfcTopologyRepresentation representation) : base(representation.mDatabase) { mMappingOrigin = placement.Index; MappedRepresentation = representation; }
+		public IfcRepresentationMap(IfcAxis2Placement placement, IfcShapeRepresentation representation) : base(representation.mDatabase) { MappingOrigin = placement; MappedRepresentation = representation; }
+		public IfcRepresentationMap(IfcAxis2Placement placement, IfcTopologyRepresentation representation) : base(representation.mDatabase) { MappingOrigin = placement; MappedRepresentation = representation; }
 
 		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 
@@ -2377,7 +2398,7 @@ namespace GeometryGym.Ifc
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
 
 		protected IfcResource() : base() { }
-		protected IfcResource(DatabaseIfc db, IfcResource r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { }
+		protected IfcResource(DatabaseIfc db, IfcResource r, DuplicateOptions options) : base(db, r, options) { }
 		protected IfcResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -2536,7 +2557,7 @@ namespace GeometryGym.Ifc
 		public IfcRoofTypeEnum PredefinedType { get { return mPredefinedType; } }
 
 		internal IfcRoof() : base() { }
-		internal IfcRoof(DatabaseIfc db, IfcRoof r, IfcOwnerHistory ownerHistory, bool downStream) : base(db, r, ownerHistory, downStream) { mPredefinedType = r.mPredefinedType; }
+		internal IfcRoof(DatabaseIfc db, IfcRoof r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcRoof(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -2546,7 +2567,7 @@ namespace GeometryGym.Ifc
 		public IfcRoofTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcRoofType() : base() { }
-		internal IfcRoofType(DatabaseIfc db, IfcRoofType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcRoofType(DatabaseIfc db, IfcRoofType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcRoofType(DatabaseIfc m, string name, IfcRoofTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]

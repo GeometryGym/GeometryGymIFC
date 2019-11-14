@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		public IfcUnitaryControlElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcUnitaryControlElement() : base() { }
-		internal IfcUnitaryControlElement(DatabaseIfc db, IfcUnitaryControlElement e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcUnitaryControlElement(DatabaseIfc db, IfcUnitaryControlElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcUnitaryControlElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
 	}
 	[Serializable]
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		public IfcUnitaryControlElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcUnitaryControlElementType() : base() { }
-		internal IfcUnitaryControlElementType(DatabaseIfc db, IfcUnitaryControlElementType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcUnitaryControlElementType(DatabaseIfc db, IfcUnitaryControlElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcUnitaryControlElementType(DatabaseIfc m, string name, IfcUnitaryControlElementTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 		public IfcUnitaryEquipmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcUnitaryEquipment() : base() { }
-		internal IfcUnitaryEquipment(DatabaseIfc db, IfcUnitaryEquipment e, IfcOwnerHistory ownerHistory, bool downStream) : base(db, e, ownerHistory, downStream) { mPredefinedType = e.mPredefinedType; }
+		internal IfcUnitaryEquipment(DatabaseIfc db, IfcUnitaryEquipment e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcUnitaryEquipment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 		public IfcUnitaryEquipmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcUnitaryEquipmentType() : base() { }
-		internal IfcUnitaryEquipmentType(DatabaseIfc db, IfcUnitaryEquipmentType t, IfcOwnerHistory ownerHistory, bool downStream) : base(db, t, ownerHistory, downStream) { mPredefinedType = t.mPredefinedType; }
+		internal IfcUnitaryEquipmentType(DatabaseIfc db, IfcUnitaryEquipmentType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcUnitaryEquipmentType(DatabaseIfc m, string name, IfcUnitaryEquipmentTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
@@ -242,27 +242,23 @@ namespace GeometryGym.Ifc
 		
 		internal double ScaleSI(IfcUnitEnum unitType)
 		{
-			foreach (IfcNamedUnit namedUnit in Units.OfType<IfcNamedUnit>())
+			IfcNamedUnit namedUnit = this[unitType];
+			if(namedUnit != null)
 			{
-				if (namedUnit.UnitType == unitType)
-				{
-					IfcSIUnit siUnit = namedUnit as IfcSIUnit;
-					if(siUnit != null)
-						return siUnit.SIFactor;
-					IfcConversionBasedUnit conversionBasedUnit = namedUnit as IfcConversionBasedUnit;
-					if(conversionBasedUnit != null)
-						return conversionBasedUnit.SIFactor;
-				}
+				IfcSIUnit siUnit = namedUnit as IfcSIUnit;
+				if(siUnit != null)
+					return siUnit.SIFactor;
+				IfcConversionBasedUnit conversionBasedUnit = namedUnit as IfcConversionBasedUnit;
+				if(conversionBasedUnit != null)
+					return conversionBasedUnit.SIFactor;
 			}
 			return 1;
 		}
 		internal double ScaleSI(IfcDerivedUnitEnum unitType)
 		{
-			foreach (IfcDerivedUnit derivedUnit in Units.OfType<IfcDerivedUnit>())
-			{
-				if (derivedUnit.UnitType == unitType)
-					return derivedUnit.SIFactor;
-			}
+			IfcDerivedUnit derivedUnit = this[unitType];
+			if(derivedUnit != null)
+				return derivedUnit.SIFactor;
 			return 1;
 		}
 	}

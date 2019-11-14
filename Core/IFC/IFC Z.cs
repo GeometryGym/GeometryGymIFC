@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcZone() : base() { }
-		internal IfcZone(DatabaseIfc db, IfcZone z, IfcOwnerHistory ownerHistory, bool downStream) : base(db, z, ownerHistory, downStream) { mLongName = z.mLongName; }
+		internal IfcZone(DatabaseIfc db, IfcZone z, DuplicateOptions options) : base(db, z, options) { mLongName = z.mLongName; }
 		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
 		public IfcZone(IfcSpatialElement e, string name, List<IfcSpace> spaces) : base(e, name)
 		{

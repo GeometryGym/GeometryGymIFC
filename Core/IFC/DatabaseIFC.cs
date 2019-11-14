@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 			if (doc != null)
 			{
 				Tolerance = doc.ModelAbsoluteTolerance;
-				ToleranceAngleRadians = doc.ModelAngleToleranceRadians;
+				ToleranceAngleRadians = Math.Min(Math.PI/1800, doc.ModelAngleToleranceRadians);
 			}
 #endif
 			//mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
@@ -740,10 +740,15 @@ namespace GeometryGym.Ifc
 		private DatabaseIfc mDatabase = null;
 		internal FactoryIfc(DatabaseIfc db) { mDatabase = db; }
 
+	
 		public partial class GenerateOptions
 		{
 			public bool GenerateOwnerHistory { get; set; } = true;
-			public bool AngleUnitsInRadians { get; set; } = true;
+			public bool AngleUnitsInRadians
+			{
+				get;
+				set;
+			} = true;
 		}
 		internal GenerateOptions mOptions = new GenerateOptions();
 		public GenerateOptions Options { get { return mOptions; } }
@@ -759,9 +764,9 @@ namespace GeometryGym.Ifc
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
 		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
-		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, true); }
+		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = true }); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
-		public BaseClassIfc Duplicate(BaseClassIfc entity, bool downStream)
+		public BaseClassIfc Duplicate(BaseClassIfc entity, DuplicateOptions options)
 		{
 			if (entity == null)
 				return null;
@@ -781,64 +786,34 @@ namespace GeometryGym.Ifc
 				}
 			}
 			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
-			result = Duplicate(entity, type, downStream);
+			result = Duplicate(entity, type, options);
 			if (result != null)
 				return result;
 			if(type.IsSubclassOf(typeof(IfcProfileProperties)))
-				return Duplicate(entity, typeof(IfcProfileProperties), downStream);
+				return Duplicate(entity, typeof(IfcProfileProperties), options);
 			return null;
 		}
-		private BaseClassIfc Duplicate(BaseClassIfc entity, Type type, bool downStream)
+		private BaseClassIfc Duplicate(BaseClassIfc entity, Type type, DuplicateOptions options)
 		{
 			if (type != null)
 			{
 				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };
 				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
-					return constructor.Invoke(new object[] { this.mDatabase, entity, downStream }) as BaseClassIfc;
+					return constructor.Invoke(new object[] { this.mDatabase, entity, options.DuplicateDownstream }) as BaseClassIfc;
 				types = new Type[] { typeof(DatabaseIfc), type };
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
 					return constructor.Invoke(new object[] { this.mDatabase, entity }) as BaseClassIfc;
-				types = new Type[] { typeof(DatabaseIfc), type, typeof(IfcOwnerHistory), typeof(bool) };
+				types = new Type[] { typeof(DatabaseIfc), type, typeof(DuplicateOptions) };
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
-					return constructor.Invoke(new object[] { this.mDatabase, entity, null, downStream }) as BaseClassIfc;
+					return constructor.Invoke(new object[] { this.mDatabase, entity, options }) as BaseClassIfc;
 				//return Duplicate(entity, downStream);
 			}
 			return null;
 		}
-		internal BaseClassIfc Duplicate(BaseClassIfc entity, IfcOwnerHistory ownerHistory, bool downStream)
-		{
-			if (entity == null)
-				return null;
-			int index = mDuplicateMapping.FindExisting(entity);
-			if (index > 0)
-				return mDatabase[index];
-			if(!string.IsNullOrEmpty(entity.mGlobalId))
-			{
-				BaseClassIfc result = null;
-				if(mDatabase.mDictionary.TryGetValue(entity.mGlobalId,out result))
-				{
-					if (result != null)
-					{
-						mDuplicateMapping.AddObject(entity, result.mIndex);
-						return result;
-					}
-				}
-			}
-			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
-			if (type != null)
-			{
-				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(IfcOwnerHistory), typeof(bool) };
-				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
-				if (constructor != null)
-					return constructor.Invoke(new object[] { this.mDatabase, entity, ownerHistory, downStream}) as BaseClassIfc;
-				return Duplicate(entity, downStream);	
-			}
-			return null;
-		}
-
+		
 		internal IfcProperty Duplicate(IfcProperty property)
 		{
 			int index = mDuplicateMapping.FindExisting(property);
@@ -851,7 +826,7 @@ namespace GeometryGym.Ifc
 				mDuplicateMapping.AddObject(property, result.StepId);
 				return result;
 			}
-			result = Duplicate(property, true) as IfcProperty;
+			result = Duplicate(property, new DuplicateOptions() { DuplicateDownstream = true }) as IfcProperty;
 			mProperties[stepString] = result;
 			return result;
 		}
@@ -860,7 +835,7 @@ namespace GeometryGym.Ifc
 			int index = mDuplicateMapping.FindExisting(propertySet);
 			if (index > 0)
 				return mDatabase[index] as IfcPropertySetDefinition;
-			IfcPropertySetDefinition result = Duplicate(propertySet, true) as IfcPropertySetDefinition, existing = null;
+			IfcPropertySetDefinition result = Duplicate(propertySet, new DuplicateOptions() { DuplicateDownstream = true }) as IfcPropertySetDefinition, existing = null;
 			string stepString = dictionaryKeyIgnoreId(result);
 			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
 			{
@@ -1437,7 +1412,7 @@ namespace GeometryGym.Ifc
 			ownerHistory.LastModifiedDate = modified;
 			foreach (IfcOwnerHistory oh in mOwnerHistories)
 			{
-				if (oh.isDuplicate(ownerHistory))
+				if (oh.isDuplicate(ownerHistory, mDatabase.Tolerance))
 				{
 					ownerHistory.Dispose(false);
 					return oh;
@@ -1450,7 +1425,7 @@ namespace GeometryGym.Ifc
 		{
 			foreach (IfcOwnerHistory oh in mOwnerHistories)
 			{
-				if (oh.isDuplicate(ownerHistory))
+				if (oh.isDuplicate(ownerHistory, mDatabase.Tolerance))
 					return;
 			}
 			mOwnerHistories.Add(ownerHistory);
@@ -1672,6 +1647,20 @@ namespace GeometryGym.Ifc
 		}
 	}
 
+	public class DuplicateOptions
+	{
+		public bool DuplicateHost { get; set; } = true;
+		public bool DuplicateDownstream { get; set; } = true;
+		public IfcOwnerHistory OwnerHistory { get; set; } = null;
+
+		public DuplicateOptions() { }
+		public DuplicateOptions(DuplicateOptions options)
+		{
+			DuplicateHost = options.DuplicateHost;
+			DuplicateDownstream = options.DuplicateDownstream;
+			OwnerHistory = options.OwnerHistory;
+		}
+	}
 	public class ApplicableFilter
 	{
 		internal string Filter { get; private set; }

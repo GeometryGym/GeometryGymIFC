@@ -841,7 +841,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mMappingOrigin].GetXML(xml.OwnerDocument, "MappingOrigin", this, processed));
+			xml.AppendChild(((BaseClassIfc)MappingOrigin).GetXML(xml.OwnerDocument, "MappingOrigin", this, processed));
 			xml.AppendChild(MappedRepresentation.GetXML(xml.OwnerDocument, "MappedRepresentation", this, processed));
 			if(mHasShapeAspects.Count > 0)
 			{

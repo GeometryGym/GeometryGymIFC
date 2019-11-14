@@ -158,6 +158,8 @@ namespace GeometryGym.Ifc
 						return Construct("IfcBuildingElementPart");
 					if (string.Compare(className, "IfcFlowSegmentType", true) == 0)
 						return Construct("IfcDistributionElementType");
+					if (string.Compare(className, "IfcFlowTerminalType", true) == 0)
+						return Construct("IfcDistributionElementType");
 					else
 						return null;
 				}
@@ -184,7 +186,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		internal virtual bool isDuplicate(BaseClassIfc e) { return true; }
+		internal virtual bool isDuplicate(BaseClassIfc e, double tol) { return true; }
 
 		internal class RepositoryAttributes
 		{

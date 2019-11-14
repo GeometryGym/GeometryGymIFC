@@ -362,14 +362,18 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBuildingSystemTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + (mLongName == "$" ? "$" : "'" + mLongName + "'")); }
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBuildingSystemTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + (mLongName == "$" ? "$" : "'" + mLongName + "'"));
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-				Enum.TryParse<IfcBuildingSystemTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
-			mLongName = ParserSTEP.StripString(str, ref pos, len);
+			if (release > ReleaseVersion.IFC2x3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+					Enum.TryParse<IfcBuildingSystemTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+				mLongName = ParserSTEP.StripString(str, ref pos, len);
+			}
 		}
 	}
 	public partial class IfcBurner : IfcEnergyConversionDevice //IFC4
