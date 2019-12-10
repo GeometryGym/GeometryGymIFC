@@ -234,13 +234,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("ExtrudedDirection", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
-				JToken jtoken = jobj["href"];
-				if (jtoken != null)
-					mExtrudedDirection = jtoken.Value<int>();
-				else
 					ExtrudedDirection = mDatabase.ParseJObject<IfcDirection>(jobj);
-			}
 			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)
 				mDepth= token.Value<double>();

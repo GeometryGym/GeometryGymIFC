@@ -104,15 +104,7 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
 			if(token != null)
 			{
-				if (token.Type == JTokenType.Integer)
-				{
-					int index = token.Value<int>();
-					result = this[index];
-				}
-				else if (token.Type == JTokenType.String)
-				{
-					mDictionary.TryGetValue(token.Value<string>(), out result);
-				}
+				mDictionary.TryGetValue(token.Value<string>(), out result);
 				if (result != null && obj.Count == 1)
 					return (T)(IBaseClassIfc)result;
 			}
@@ -143,84 +135,78 @@ namespace GeometryGym.Ifc
 		null, Type.EmptyTypes, null);
 						if (constructor != null)
 						{
+							bool common = false;
 							result = constructor.Invoke(new object[] { }) as BaseClassIfc;
 							if (result != null)
 							{
 								result.mDatabase = this;
-								token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-								int index = 0;// (int) (this.mIfcObjects.Count * 1.2); 
-								if (token != null)
+
+								IfcCartesianPoint point = result as IfcCartesianPoint;
+								if (point != null)
 								{
-									if (token.Type == JTokenType.Integer)
+									point.parseJObject(obj);
+									if (point.isOrigin)
 									{
-										try
-										{
-											int i = token.Value<int>();
-											if (this[i] == null)
-												index = i;
-										}
-										catch (Exception) { }
-										// TODO merge if existing equivalent
-									}
-									else if (token.Type == JTokenType.String)
-									{
-										result.mGlobalId = token.Value<string>();
-										mDictionary.TryAdd(result.mGlobalId, result);
+										if (point.is2D)
+											result = Factory.Origin2d;
+										else
+											result = Factory.Origin;
+										common = true;
 									}
 								}
-								IfcCartesianPoint point = result as IfcCartesianPoint;
-								IfcDirection direction = result as IfcDirection;
-								IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
-								if (index == 0)
+								else
 								{
-									if (point != null)
+									IfcDirection direction = result as IfcDirection;
+									if (direction != null)
 									{
-										point.parseJObject(obj);
-										if (point.isOrigin)
+										direction.parseJObject(obj);
+										if (!direction.is2D)
 										{
-											if (point.is2D)
-												return (T)(IBaseClassIfc)Factory.Origin2d;
-											return (T)(IBaseClassIfc)Factory.Origin;
+											common = true;
+											if (direction.isXAxis)
+												result = Factory.XAxis;
+											else if (direction.isYAxis)
+												result = Factory.YAxis;
+											else if (direction.isZAxis)
+												result = Factory.ZAxis;
+											else if (direction.isXAxisNegative)
+												result = Factory.XAxisNegative;
+											else if (direction.isYAxisNegative)
+												result = Factory.YAxisNegative;
+											else if (direction.isZAxisNegative)
+												result = Factory.ZAxisNegative;
+											else
+												common = false;
 										}
 									}
 									else
 									{
-										if (direction != null)
-										{
-											direction.parseJObject(obj);
-											if (!direction.is2D)
-											{
-												if (direction.isXAxis)
-													return (T)(IBaseClassIfc)Factory.XAxis;
-												if (direction.isYAxis)
-													return (T)(IBaseClassIfc)Factory.YAxis;
-												if (direction.isZAxis)
-													return (T)(IBaseClassIfc)Factory.ZAxis;
-												if (direction.isXAxisNegative)
-													return (T)(IBaseClassIfc)Factory.XAxisNegative;
-												if (direction.isYAxisNegative)
-													return (T)(IBaseClassIfc)Factory.YAxisNegative;
-												if (direction.isZAxisNegative)
-													return (T)(IBaseClassIfc)Factory.ZAxisNegative;
-											}
-										}
+										IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
 										if (placement != null)
 										{
 											placement.parseJObject(obj);
 											if (placement.IsXYPlane)
-												return (T)(IBaseClassIfc)Factory.XYPlanePlacement;
+											{
+												result = Factory.XYPlanePlacement;
+												common = true;
+											}
 										}
 									}
-
-									index = NextBlank();
-									this[index] = result;
-
-									if (point != null || direction != null || placement != null)
-										return (T)(IBaseClassIfc)result;
 								}
-								else
-									this[index] = result;
+								token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+								if (token != null)
+								{
+									string id = token.Value<string>();
+									if(!(result is IfcRoot))
+										result.mGlobalId = id;
+									mDictionary.TryAdd(id, result);
+								}
 
+								if (common)
+									return (T)(IBaseClassIfc)result;
+
+								int index = NextBlank();
+								this[index] = result;
 							}
 						}
 					}
@@ -230,6 +216,9 @@ namespace GeometryGym.Ifc
 				return default(T);
 			result.parseJObject(obj);
 			parseBespoke(result, obj);
+			IfcRoot root = result as IfcRoot;
+			if (root != null)
+				mDictionary[root.GlobalId] = root;
 			return (T)(IBaseClassIfc)result;
 		}
 

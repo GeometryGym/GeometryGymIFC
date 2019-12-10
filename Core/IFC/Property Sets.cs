@@ -951,7 +951,19 @@ namespace GeometryGym.Ifc
 	}
 	//Pset_PipeSegmentOccurrence
 	//Pset_PipeSegmentPHistory
-	//Pset_PipeSegmentTypeCommon
+	public partial class Pset_PipeSegmentTypeCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public double WorkingPressure { set { AddProperty(new IfcPropertySingleValue(mDatabase, "WorkingPressure", new IfcPressureMeasure(value))); } }
+		public IfcPropertyBoundedValue<IfcPressureMeasure> PressureRange { set { value.Name = "PressureRange"; addProperty(value); } }
+		public IfcPropertyBoundedValue<IfcThermodynamicTemperatureMeasure> TemperatureRange { set { value.Name = "TemperatureRange"; addProperty(value); } }
+		public double NominalDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NominalDiameter", new IfcPositiveLengthMeasure(value))); } }
+		public double InnerDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "InnerDiameter", new IfcPositiveLengthMeasure(value))); } }
+		public double OuterDiameter { set { AddProperty(new IfcPropertySingleValue(mDatabase, "OuterDiameter", new IfcPositiveLengthMeasure(value))); } }
+		public Pset_PipeSegmentTypeCommon(IfcPipeSegment instance) : base(instance) { }
+		public Pset_PipeSegmentTypeCommon(IfcPipeSegmentType type) : base(type) { }
+	}
 	//Pset_PipeSegmentTypeCulvert
 	//Pset_PipeSegmentTypeGutter
 	//Pset_PlateCommon

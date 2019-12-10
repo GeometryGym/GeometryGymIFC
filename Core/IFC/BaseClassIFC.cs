@@ -133,7 +133,7 @@ namespace GeometryGym.Ifc
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
 
-		internal static Type GetType(string classNameIfc)
+		public static Type GetType(string classNameIfc)
 		{
 			return STEPEntity.GetType(classNameIfc, "Ifc");	
 		}

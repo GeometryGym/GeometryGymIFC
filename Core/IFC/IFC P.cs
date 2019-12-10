@@ -2211,7 +2211,27 @@ namespace GeometryGym.Ifc
 			return false;
 
 		}
+
+		public int ValueStringCompare(string value, bool ignoreCase)
+		{
+			if (NominalValue == null)
+				return -1;
+			string valueString = NominalValue.ValueString;
+			if (string.IsNullOrEmpty(valueString))
+				return -1;
+			return string.Compare(valueString, value, ignoreCase);
+		}
+		public bool ValueStringStartsWith(string value)
+		{
+			if (NominalValue == null)
+				return false;
+			string valueString = NominalValue.ValueString;
+			if (string.IsNullOrEmpty(valueString))
+				return false;
+			return valueString.StartsWith(value);
+		}
 	}
+
 	[Serializable]
 	public partial class IfcPropertyTableValue<T,U> : IfcSimpleProperty where T : IfcValue where U :IfcValue
 	{

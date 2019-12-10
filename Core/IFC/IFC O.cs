@@ -354,7 +354,15 @@ namespace GeometryGym.Ifc
 							pp.mAssociates.RelatedObjects.Add(this);
 						}
 						else
-							pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
+						{
+							if(pd.mHasProperties[0].mAssociates == null)
+							{
+								new IfcRelAssociatesProfileProperties(this, pd.mHasProperties[0]);
+							}
+							else
+								pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
+
+						}
 					}
 				}
 				else

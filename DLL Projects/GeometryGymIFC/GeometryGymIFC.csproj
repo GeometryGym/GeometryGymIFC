@@ -396,6 +396,9 @@
     <Compile Include="..\..\Core\IFC\XML\IFC Z XML.cs">
       <Link>IFC\XML\IFC Z XML.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\MVD\MVD.cs">
+      <Link>MVD\MVD.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\STEP\BaseClassSTEP.cs">
       <Link>STEP\BaseClassSTEP.cs</Link>
     </Compile>

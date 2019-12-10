@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryGymIFC", "GeometryGymIFC\GeometryGymIFC.csproj", "{6CD3BE38-25BC-4FCF-9426-D15ED4D4657C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryGymIFCRhinoCommonx64", "GeometryGymIFCRhinoCommonx64\GeometryGymIFCRhinoCommonx64.csproj", "{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryGymIFC Math.NET", "GeometryGymIFC Math.NET\GeometryGymIFC Math.NET.csproj", "{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,20 +33,11 @@ Global
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Release|x64.ActiveCfg = Release|Any CPU
 		{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}.Release|x86.ActiveCfg = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|x64.Build.0 = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Debug|x86.Build.0 = Debug|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|x64.ActiveCfg = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|x64.Build.0 = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|x86.ActiveCfg = Release|Any CPU
-		{5AD482D6-0144-4E0E-BF74-33D28C8D5D37}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B0500FB-88EA-4089-8A63-C3CAC101AC07}
 	EndGlobalSection
 EndGlobal

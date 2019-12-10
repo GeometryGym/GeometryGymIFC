@@ -345,12 +345,7 @@ namespace GeometryGym.Ifc
 		{
 			string tokens = "$";
 			if (mReferenceTokens.Count > 0)
-			{
-				tokens = "('" + mReferenceTokens;
-				for (int icounter = 1; icounter < mReferenceTokens.Count; icounter++)
-					tokens += "','" + mReferenceTokens;
-				tokens += "')";
-			}
+				tokens = "('" + string.Join("','", mReferenceTokens) + "')";
 			bool older = mDatabase.Release <= ReleaseVersion.IFC2x3;
 			string result = base.BuildStringSTEP(release) + (mSource == "$" ? (older ? ",'Unknown'," : ",$,") : ",'" + mSource + "',") +
 				(mEdition == "$" ? (older ? "'Unknown'," : "$,") : "'" + mEdition + "',") + (older ? ParserSTEP.LinkToString(mEditionDateSS) : IfcDate.STEPAttribute(mEditionDate)) +

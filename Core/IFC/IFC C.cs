@@ -1974,7 +1974,7 @@ namespace GeometryGym.Ifc
 	}
 	public interface IfcCurveOrEdgeCurve : IBaseClassIfc { }  // = SELECT (	IfcBoundedCurve, IfcEdgeCurve);
 	[Serializable]
-	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
+	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcCircularArcSegment2D, IfcLineSegment2D, IfcTransitionCurveSegment2D))
 	{
 		private IfcCartesianPoint mStartPoint;// : IfcCartesianPoint;
 		private double mStartDirection;// : IfcPlaneAngleMeasure;
@@ -2010,9 +2010,11 @@ namespace GeometryGym.Ifc
 		internal IfcCurveStyle() : base() { }
 		internal IfcCurveStyle(DatabaseIfc db, IfcCurveStyle s) : base(db,s)
 		{
-			CurveFont = db.Factory.Duplicate(s.mDatabase[s.mCurveFont]) as IfcCurveFontOrScaledCurveFontSelect;
+			if(s.mCurveFont > 0)
+				CurveFont = db.Factory.Duplicate(s.mDatabase[s.mCurveFont]) as IfcCurveFontOrScaledCurveFontSelect;
 			mCurveWidth = s.mCurveWidth;
-			CurveColour = db.Factory.Duplicate(s.mDatabase[s.mCurveColour]) as IfcColour;
+			if(s.mCurveColour > 0)
+				CurveColour = db.Factory.Duplicate(s.mDatabase[s.mCurveColour]) as IfcColour;
 			mModelOrDraughting = s.mModelOrDraughting;
 		}
 		public IfcCurveStyle(DatabaseIfc db) : base(db) { }

@@ -882,7 +882,20 @@ namespace GeometryGym.Ifc
 	}
 	//[Obsolete("DEPRECEATED IFC4", false)]
 	//ENTITY IfcRelAssociatesAppliedValue // DEPRECEATED IFC4
-	//ENTITY IfcRelAssociatesApproval
+	[Serializable]
+	public partial class IfcRelAssociatesApproval : IfcRelAssociates
+	{
+		internal int mRelatingApproval;// : IfcApproval; 
+		public IfcApproval RelatingApproval { get { return mDatabase[mRelatingApproval] as IfcApproval; } set { mRelatingApproval = value.Index; value.ApprovedObjects.Add(this); } }
+
+		public override NamedObjectIfc Relating() { return RelatingApproval; }
+
+		internal IfcRelAssociatesApproval() : base() { }
+		internal IfcRelAssociatesApproval(DatabaseIfc db, IfcRelAssociatesApproval r, DuplicateOptions options) : base(db, r, options) { RelatingApproval = db.Factory.Duplicate(r.mDatabase[r.mRelatingApproval], options) as IfcApproval; }
+		public IfcRelAssociatesApproval(IfcApproval approval) : base(approval.Database) { RelatingApproval = approval; }
+		public IfcRelAssociatesApproval(IfcDefinitionSelect related, IfcApproval approval) : base(related) { RelatingApproval = approval; }
+		public IfcRelAssociatesApproval(IEnumerable<IfcDefinitionSelect> related, IfcApproval approval) : base(related) { RelatingApproval = approval; }
+	}
 	[Serializable]
 	public partial class IfcRelAssociatesClassification : IfcRelAssociates
 	{
@@ -1053,7 +1066,8 @@ namespace GeometryGym.Ifc
 			else
 				mProfileOrientationValue = r.mProfileOrientationValue;
 		}
-		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease != ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
+		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease > ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
+		public IfcRelAssociatesProfileProperties(IfcDefinitionSelect related, IfcProfileProperties pp) : base(related) { if (pp.mDatabase.mRelease > ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
 	}
 	[Serializable]
 	public abstract partial class IfcRelationship : IfcRoot  //ABSTRACT SUPERTYPE OF (ONEOF (IfcRelAssigns ,IfcRelAssociates ,IfcRelConnects ,IfcRelDecomposes ,IfcRelDefines))
@@ -2584,14 +2598,17 @@ namespace GeometryGym.Ifc
 			{
 				if (!string.IsNullOrEmpty(value))
 				{
-					if (mDatabase != null)
+					if (string.Compare(mGlobalId, value, false) != 0)
 					{
-						BaseClassIfc obj = null;
-						mDatabase.mDictionary.TryRemove(mGlobalId, out obj);
-						if (!mDatabase.mDictionary.ContainsKey(value))
-							mDatabase.mDictionary.TryAdd(value, this);
+						if (mDatabase != null)
+						{
+							BaseClassIfc obj = null;
+							mDatabase.mDictionary.TryRemove(mGlobalId, out obj);
+							if (!mDatabase.mDictionary.ContainsKey(value))
+								mDatabase.mDictionary.TryAdd(value, this);
+						}
+						mGlobalId = value;
 					}
-					mGlobalId = value;
 				}
 			}
 		}

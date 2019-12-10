@@ -654,7 +654,7 @@ namespace GeometryGym.Ifc
 		//List<IfcAppliedValue> AppliedValueFor { get; }
 	}
 	[Serializable]
-	public partial class IfcApproval : BaseClassIfc, IfcResourceObjectSelect
+	public partial class IfcApproval : BaseClassIfc, IfcResourceObjectSelect, NamedObjectIfc
 	{
 		internal string mDescription = "$";// : OPTIONAL IfcText;
 		internal int mApprovalDateTime;// : IfcDateTimeSelect;
@@ -665,9 +665,12 @@ namespace GeometryGym.Ifc
 		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier;
 										  //INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcRelAssociatesApproval> mApprovedObjects = new SET<IfcRelAssociatesApproval>();
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
+		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcRelAssociatesApproval> ApprovedObjects { get { return mApprovedObjects; } set { mApprovedObjects.Clear();  if (value != null) { mApprovedObjects = value; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcApproval() : base() { }

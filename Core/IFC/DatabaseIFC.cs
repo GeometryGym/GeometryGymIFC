@@ -99,7 +99,7 @@ namespace GeometryGym.Ifc
 					mDictionary.TryRemove(root.GlobalId, out obj);
 				}
 				root = value as IfcRoot;
-				if(root != null)
+				if(root != null && !string.IsNullOrEmpty(root.GlobalId))
 				{
 					if (mDictionary.ContainsKey(root.GlobalId))
 						root.Guid = Guid.NewGuid();
