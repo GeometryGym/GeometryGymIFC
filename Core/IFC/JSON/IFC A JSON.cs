@@ -258,11 +258,7 @@ namespace GeometryGym.Ifc
 				Description = token.Value<string>();
 			JObject jobj = obj.GetValue("AppliedValue", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
 				AppliedValue = mDatabase.ParseJObject<IfcAppliedValueSelect>(jobj);
-				if (mAppliedValueIndex <= 0)
-					mAppliedValueValue = DatabaseIfc.ParseValue(jobj);
-			}
 			jobj = obj.GetValue("UnitBasis", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				UnitBasis = mDatabase.ParseJObject<IfcMeasureWithUnit>(jobj);
@@ -293,10 +289,14 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			if (mAppliedValueIndex > 0)
-				obj["AppliedValue"] = mDatabase[mAppliedValueIndex].getJson(this, options);
-			else if (mAppliedValueValue != null)
-				obj["AppliedValue"] = DatabaseIfc.extract(mAppliedValueValue);
+			if (mAppliedValue != null)
+			{
+				IfcValue value = mAppliedValue as IfcValue;
+				if(value != null)
+					obj["AppliedValue"] = DatabaseIfc.extract(value);
+				else
+					obj["AppliedValue"] = mAppliedValue.getJson(this, options);
+			}
 			if (mUnitBasis > 0)
 				obj["UnitBasis"] = UnitBasis.getJson(this, options);
 			//todo

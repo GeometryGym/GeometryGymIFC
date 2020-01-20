@@ -379,11 +379,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "AppliedValue") == 0)
-				{
 					AppliedValue = mDatabase.ParseXml<IfcAppliedValueSelect>(child as XmlElement);
-					if (mAppliedValueIndex == 0)
-						mAppliedValueValue = extractValue(child.FirstChild);
-				}
 				else if (string.Compare(name, "UnitBasis") == 0)
 					UnitBasis = mDatabase.ParseXml<IfcMeasureWithUnit>(child as XmlElement);
 				else if (string.Compare(name, "Components") == 0)
@@ -437,10 +433,14 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if (mAppliedValueIndex > 0 && (host == null || host.mIndex != mAppliedValueIndex))
-				xml.AppendChild(mDatabase[mAppliedValueIndex].GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
-			else if (mAppliedValueValue != null)
-				xml.AppendChild(convert(xml.OwnerDocument, mAppliedValueValue, "AppliedValue", mDatabase.mXmlNamespace));
+			if(mAppliedValue != null && (host == null || host != mAppliedValue))
+			{
+				IfcValue value = mAppliedValue as IfcValue;
+				if(value != null)
+					xml.AppendChild(convert(xml.OwnerDocument, value, "AppliedValue", mDatabase.mXmlNamespace));
+				else
+					xml.AppendChild((mAppliedValue as BaseClassIfc).GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
+			}
 			if (mUnitBasis > 0)
 				xml.AppendChild(UnitBasis.GetXML(xml.OwnerDocument, "UnitBasis", this, processed));
 			//todo

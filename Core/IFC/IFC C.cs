@@ -950,10 +950,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCompositeProfileDef : IfcProfileDef
 	{
-		private List<int> mProfiles = new List<int>();// : SET [2:?] OF IfcProfileDef;
+		private SET<IfcProfileDef> mProfiles = new SET<IfcProfileDef>();// : SET [2:?] OF IfcProfileDef;
 		private string mLabel = "$";// : OPTIONAL IfcLabel;
 
-		public ReadOnlyCollection<IfcProfileDef> Profiles { get { return new ReadOnlyCollection<IfcProfileDef>( mProfiles.ConvertAll(x => mDatabase[x] as IfcProfileDef)); } }
+		public SET<IfcProfileDef> Profiles { get { return mProfiles; } }
 		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcCompositeProfileDef() : base() { }
@@ -962,15 +962,15 @@ namespace GeometryGym.Ifc
 			p.Profiles.ToList().ForEach(x => addProfile(db.Factory.Duplicate(x) as IfcProfileDef));
 			mLabel = p.mLabel;
 		}
-		private IfcCompositeProfileDef(DatabaseIfc m, string name) : base(m,name)
+		private IfcCompositeProfileDef(DatabaseIfc db, string name) : base(db, name)
 		{
-			if (mDatabase.mModelView == ModelView.Ifc4Reference)
-				throw new Exception("Invalid Model View for IfcCompositeProfileDef : " + m.ModelView.ToString());
+			if (db != null && db.mModelView == ModelView.Ifc4Reference)
+				throw new Exception("Invalid Model View for IfcCompositeProfileDef : " + db.ModelView.ToString());
 		}
-		public IfcCompositeProfileDef(string name, List<IfcProfileDef> defs) : this(defs[0].mDatabase, name) { mProfiles = defs.ConvertAll(x => x.mIndex); }
-		public IfcCompositeProfileDef(string name, IfcProfileDef p1, IfcProfileDef p2) : this(p1.mDatabase, name) { mProfiles.Add(p1.mIndex); mProfiles.Add(p2.mIndex); }
+		public IfcCompositeProfileDef(string name, List<IfcProfileDef> defs) : this(defs[0].mDatabase, name) { mProfiles.AddRange(defs); }
+		public IfcCompositeProfileDef(string name, IfcProfileDef p1, IfcProfileDef p2) : this(p1.mDatabase, name) { mProfiles.Add(p1); mProfiles.Add(p2); }
 
-		internal void addProfile(IfcProfileDef profile) { mProfiles.Add(profile.mIndex); }
+		internal void addProfile(IfcProfileDef profile) { mProfiles.Add(profile); }
 	}
 	[Serializable]
 	public partial class IfcCompressor : IfcFlowMovingDevice //IFC4

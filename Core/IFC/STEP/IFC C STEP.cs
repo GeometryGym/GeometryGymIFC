@@ -604,15 +604,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mProfiles[0]);
-			for (int icounter = 1; icounter < mProfiles.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mProfiles[icounter]);
-			return str + (mLabel == "$" ? "),$" : "),'" + mLabel + "'");
+			return ",(#" + String.Join(",#", mProfiles.Select(x=>x.StepId)) + (mLabel == "$" ? "),$" : "),'" + mLabel + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mProfiles = ParserSTEP.StripListLink(str, ref pos, len);
+			mProfiles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcProfileDef));
 			mLabel = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}

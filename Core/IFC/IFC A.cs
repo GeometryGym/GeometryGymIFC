@@ -538,8 +538,7 @@ namespace GeometryGym.Ifc
 	{  // SUPERTYPE OF(IfcCostValue);
 		internal string mName = "$";// : OPTIONAL IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
-		internal int mAppliedValueIndex = 0;// : OPTIONAL IfcAppliedValueSelect
-		internal IfcValue mAppliedValueValue = null;
+		internal IfcAppliedValueSelect mAppliedValue = null;// : OPTIONAL IfcAppliedValueSelect;
 		internal int mUnitBasis;// : OPTIONAL IfcMeasureWithUnit;
 		internal DateTime mApplicableDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
 		internal DateTime mFixedUntilDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
@@ -556,8 +555,7 @@ namespace GeometryGym.Ifc
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcAppliedValueSelect AppliedValue { get { return mDatabase[mAppliedValueIndex] as IfcAppliedValueSelect; } set { mAppliedValueIndex = (value == null ? 0 : value.Index); } }
-		public IfcValue Value { get { return mAppliedValueValue; } set { mAppliedValueValue = value; } }
+		public IfcAppliedValueSelect AppliedValue { get { return mAppliedValue; } set { mAppliedValue = value; } }
 		public IfcMeasureWithUnit UnitBasis { get { return mDatabase[mUnitBasis] as IfcMeasureWithUnit; } set { mUnitBasis = (value == null ? 0 : value.mIndex); } }
 		public DateTime ApplicableDate { get { return mApplicableDate; } set { mApplicableDate = value; } }
 		public DateTime FixedUntilDate { get { return mFixedUntilDate; } set { mFixedUntilDate = value; } }
@@ -571,14 +569,23 @@ namespace GeometryGym.Ifc
 		internal IfcAppliedValue() : base() { }
 		internal IfcAppliedValue(DatabaseIfc db, IfcAppliedValue v) : base(db, v)
 		{
-			mName = v.mName; mDescription = v.mDescription; mAppliedValueIndex = v.mAppliedValueIndex; mAppliedValueValue = v.mAppliedValueValue;
+			mName = v.mName;
+			mDescription = v.mDescription;
+			if(v.mAppliedValue != null)
+			{
+				IfcValue value = v.mAppliedValue as IfcValue;
+				if (value != null)
+					mAppliedValue = value;
+				else
+					AppliedValue = db.Factory.Duplicate(v.mAppliedValue) as IfcAppliedValueSelect;
+			}
 			UnitBasis = db.Factory.Duplicate(v.UnitBasis) as IfcMeasureWithUnit;
 			mApplicableDate = v.mApplicableDate; mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator;
 			v.Components.ToList().ForEach(x => addComponent(db.Factory.Duplicate(x) as IfcAppliedValue));
 		}
 		public IfcAppliedValue(DatabaseIfc db) : base(db) { }
 		public IfcAppliedValue(IfcAppliedValueSelect appliedValue) : base(appliedValue.Database) { AppliedValue = appliedValue; }
-		public IfcAppliedValue(DatabaseIfc db, IfcValue value) : base(db) { Value = value; }
+		public IfcAppliedValue(DatabaseIfc db, IfcValue value) : base(db) { AppliedValue = value; }
 		public IfcAppliedValue(IfcAppliedValue component1, IfcArithmeticOperatorEnum op,IfcAppliedValue component2) : base(component1.mDatabase) { addComponent(component1); addComponent(component2); mArithmeticOperator = op; } 
 		
 
@@ -611,8 +618,9 @@ namespace GeometryGym.Ifc
 		{
 			if (children)
 			{
-				if (mAppliedValueIndex > 0)
-					mDatabase[mAppliedValueIndex].Dispose(children);
+				BaseClassIfc value = mAppliedValue as BaseClassIfc;
+				if(value != null)
+					value.Dispose(children);
 				for (int icounter = 0; icounter < mComponents.Count; icounter++)
 				{
 					BaseClassIfc bc = mDatabase[mComponents[icounter]];

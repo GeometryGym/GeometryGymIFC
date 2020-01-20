@@ -111,7 +111,48 @@ namespace GeometryGym.Ifc
 				obj["HasRepresentation"] = mHasRepresentation.getJson(this, options);
 		}
 	}
-
+	public partial class IfcMaterialConstituent : IfcMaterialDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
+			JObject jobj = obj.GetValue("Material", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Material = mDatabase.ParseJObject<IfcMaterial>(jobj);
+			JToken token = obj.GetValue("Fraction", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Fraction = token.Value<double>();
+			Category = extractString(obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			setAttribute(obj, "Name", Name);
+			setAttribute(obj, "Description", Description);
+			if (mMaterial > 0)
+				obj["Material"] = Material.getJson(this, options);
+			setAttribute(obj, "Category", Category);
+		}
+	}
+	public partial class IfcMaterialConstituentSet : IfcMaterialDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			mDatabase.extractJArray<IfcMaterialConstituent>(obj.GetValue("MaterialConstituents", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => MaterialConstituents[x.Name] = x);
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["MaterialConstituents"] = new JArray(MaterialConstituents.Values.Select(x => x.getJson(this, options)));
+			setAttribute(obj, "Name", Name);
+			setAttribute(obj, "Description", Description);
+		}
+	}
 	public abstract partial class IfcMaterialDefinition : BaseClassIfc, IfcObjectReferenceSelect, IfcMaterialSelect, IfcResourceObjectSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterial ,IfcMaterialConstituent ,IfcMaterialConstituentSet ,IfcMaterialLayer ,IfcMaterialProfile ,IfcMaterialProfileSet));
 	{
 		internal override void parseJObject(JObject obj)

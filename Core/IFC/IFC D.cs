@@ -83,12 +83,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDerivedProfileDef : IfcProfileDef
 	{
-		private int mContainerProfile;// : IfcProfileDef;
-		private int mOperator;// : IfcCartesianTransformationOperator2D;
+		private IfcProfileDef mContainerProfile;// : IfcProfileDef;
+		private IfcCartesianTransformationOperator2D mOperator;// : IfcCartesianTransformationOperator2D;
 		internal string mLabel = "$";// : OPTIONAL IfcLabel;
 
-		public IfcProfileDef ContainerProfile { get { return mDatabase[mContainerProfile] as IfcProfileDef; } set { mContainerProfile = value.mIndex; } }
-		public IfcCartesianTransformationOperator2D Operator { get { return mDatabase[mOperator] as IfcCartesianTransformationOperator2D; } set { mOperator = value.mIndex; } }
+		public IfcProfileDef ContainerProfile { get { return mContainerProfile; } set { mContainerProfile = value; } }
+		public IfcCartesianTransformationOperator2D Operator { get { return mOperator; } set { mOperator = value; } }
 		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcDerivedProfileDef() : base() { }

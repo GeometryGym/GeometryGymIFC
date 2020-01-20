@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 			if(m.mHasRepresentation != null)
 				db.Factory.Duplicate(m.mHasRepresentation);
 		}
-		public IfcMaterial(DatabaseIfc m, string name) : base(m) { Name = name; }
+		public IfcMaterial(DatabaseIfc db, string name) : base(db) { Name = name; }
 
 		internal void associateElement(IfcElement el) { Associate(el); }
 		internal void associateElement(IfcElementType eltype) { Associate(eltype); }
@@ -1017,7 +1017,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcMetric(DatabaseIfc db, string name, IfcConstraintEnum constraint) : base(db, name, constraint) { }
 	}
-	public interface IfcMetricValueSelect { } //SELECT ( IfcMeasureWithUnit, IfcTable, IfcTimeSeries, IfcAppliedValue, IfcValue, IfcReference);
+	public interface IfcMetricValueSelect : IBaseClassIfc { } //SELECT ( IfcMeasureWithUnit, IfcTable, IfcTimeSeries, IfcAppliedValue, IfcValue, IfcReference);
 	[Serializable]
 	public partial class IfcMirroredProfileDef : IfcDerivedProfileDef //SUPERTYPE OF(IfcMirroredProfileDef)
 	{

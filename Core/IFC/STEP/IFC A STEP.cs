@@ -374,7 +374,17 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			string result = base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',");
-			result += (mAppliedValueValue != null ? mAppliedValueValue.ToString() : ParserSTEP.LinkToString(mAppliedValueIndex)) + "," + ParserSTEP.LinkToString(mUnitBasis) + ",";
+			if (mAppliedValue == null)
+				result += "$";
+			else
+			{
+				IfcValue val = mAppliedValue as IfcValue;
+				if (val != null)
+					result += val.ToString();
+				else
+					result += ParserSTEP.LinkToString((mAppliedValue as BaseClassIfc).StepId);
+			}
+			result += "," + ParserSTEP.LinkToString(mUnitBasis) + ",";
 			if (release < ReleaseVersion.IFC4)
 				return result +  (mSSApplicableDate == null ? ",$" : ",#" + mSSApplicableDate.Index) + (mSSFixedUntilDate == null ? ",$" : ",#" + mSSFixedUntilDate.Index);
 			string str = "$";
@@ -394,9 +404,10 @@ namespace GeometryGym.Ifc
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			mAppliedValueValue = ParserIfc.parseValue(s);
-			if (mAppliedValueValue == null)
-				mAppliedValueIndex = ParserSTEP.ParseLink(s);
+			if(s.StartsWith("IFC"))
+				mAppliedValue = ParserIfc.parseValue(s);
+			else
+				mAppliedValue = dictionary[ ParserSTEP.ParseLink(s)] as IfcAppliedValueSelect;
 			mUnitBasis = ParserSTEP.StripLink(str, ref pos, len);
 			if(release < ReleaseVersion.IFC4)
 			{

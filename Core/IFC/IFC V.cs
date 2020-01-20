@@ -29,7 +29,7 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
-	public abstract partial class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	public abstract partial class IfcValue : IfcMetricValueSelect, IfcAppliedValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
 	{
 		public abstract object Value { get; set; }
 		public abstract Type ValueType { get; }

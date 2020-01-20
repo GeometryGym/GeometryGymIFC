@@ -634,15 +634,15 @@ namespace GeometryGym.Ifc
 
 		internal IfcElement getElement()
 		{
-			if (mDatabase.mRelease <= ReleaseVersion.IFC2x3)
+			IfcRelNests nests = Nests;
+			if (nests != null)
 			{
+				IfcElement result = nests.RelatingObject as IfcElement;
+				if (result != null)
+					return result;
 			}
-			else
-			{
-				IfcRelNests nests = Nests;
-				if (nests != null)
-					return nests.RelatingObject as IfcElement;
-			}
+			if(mContainedIn != null)
+				return mContainedIn.RelatedElement;
 			return null;
 		}
 	}
