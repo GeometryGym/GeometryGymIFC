@@ -94,13 +94,13 @@ namespace GeometryGym.Ifc
 		internal IfcVertexBasedTextureMap(IfcVertexBasedTextureMap m) : base() { mTextureVertices = new List<int>(m.mTextureVertices.ToArray()); mTexturePoints = new List<int>(m.mTexturePoints.ToArray()); }
 	}
 	[Serializable]
-	public partial class IfcVertexloop : IfcLoop
+	public partial class IfcVertexLoop : IfcLoop
 	{
 		internal int mLoopVertex;// : IfcVertex; 
 		public IfcVertex LoopVertex { get { return mDatabase[mLoopVertex] as IfcVertex; } set { mLoopVertex = value.mIndex; } }
 
-		internal IfcVertexloop() : base() { }
-		internal IfcVertexloop(DatabaseIfc db, IfcVertexloop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
+		internal IfcVertexLoop() : base() { }
+		internal IfcVertexLoop(DatabaseIfc db, IfcVertexLoop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
 	}
 	[Serializable]
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint

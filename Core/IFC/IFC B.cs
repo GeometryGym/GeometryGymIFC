@@ -275,7 +275,7 @@ namespace GeometryGym.Ifc
 			: base(m, name, x, y, z, xx, yy, zz) { mWarpingStiffness = w; }
 	}
 	[Serializable]
-	public abstract partial class IfcBoundedCurve : IfcCurve, IfcCurveOrEdgeCurve  //ABSTRACT SUPERTYPE OF (ONEOF (IfcBSplineCurve ,IfcCompositeCurve ,IfcPolyline ,IfcTrimmedCurve)) IFC4 IfcIndexedPolyCurve IFC4x1 IfcCurveSegment2D
+	public abstract partial class IfcBoundedCurve : IfcCurve, IfcCurveOrEdgeCurve  //ABSTRACT SUPERTYPE OF (ONEOF (IfcBSplineCurve ,IfcCompositeCurve ,IfcPolyline ,IfcTrimmedCurve)) IFC4 IfcIndexedPolyCurve IFC4x1 IfcCurveSegment2D IfcAlignment2DHorizontal
 	{
 		protected IfcBoundedCurve() : base() { }
 		protected IfcBoundedCurve(DatabaseIfc db) : base(db) { }

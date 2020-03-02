@@ -49,7 +49,7 @@ namespace GeometryGym.STEP
 			if (string.IsNullOrEmpty(line))
 				return;
 			string strLine = line.Trim();
-			int jlast = strLine.Length, jcounter = (line[0] == '#' ? 1 : 0);
+			int jlast = strLine.Length, jcounter = (strLine[0] == '#' ? 1 : 0);
 			char c;
 			for (; jcounter < jlast; jcounter++)
 			{

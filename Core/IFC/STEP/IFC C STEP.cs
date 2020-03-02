@@ -331,7 +331,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + StepLengthString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -517,22 +517,17 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + "',(#" + string.Join(",#", mPropertyIndices) + ")";
+			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + "',(#" + string.Join(",#", mHasProperties.Values.Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mUsageName = ParserSTEP.StripString(str, ref pos, len);
-			mPropertyIndices.AddRange(ParserSTEP.StripListLink(str, ref pos, len));
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (int i in mPropertyIndices)
+			foreach(int i in ParserSTEP.StripListLink(str, ref pos, len))
 			{
-				IfcProperty p = mDatabase[i] as IfcProperty;
-				if (p != null)
-					addProperty(p);
+				IfcProperty property = dictionary[i] as IfcProperty;
+				if (property != null)
+					addProperty(property);
 			}
 		}
 	}
@@ -1322,7 +1317,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + ParserSTEP.DoubleToString(mSegmentLength); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + StepLengthString(mSegmentLength); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			mStartPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;

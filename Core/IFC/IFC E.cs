@@ -1031,20 +1031,18 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
-		protected string mName = "$"; //: OPTIONAL IfcLabel;
-		protected string mDescription = "$"; //: OPTIONAL IfcText;
+		protected string mName = ""; //: OPTIONAL IfcLabel;
+		protected string mDescription = ""; //: OPTIONAL IfcText;
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
-		private List<int> mPropertyIndices = new List<int>();
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public ReadOnlyDictionary<string, IfcProperty> Properties { get { return new ReadOnlyDictionary<string, IfcProperty>( mProperties); } }
 
 		protected override void initialize()
 		{
 			base.initialize();
 			mProperties = new Dictionary<string, IfcProperty>();
-			mPropertyIndices = new List<int>();
 		}
 
 		protected IfcExtendedProperties() : base() { }
@@ -1058,20 +1056,13 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		
 		public void AddProperty(IfcProperty property)
 		{
-			if (property != null && !mProperties.ContainsKey(property.Name))
-			{
+			if (property != null)
 				mProperties[property.Name] = property;
-				if(!mPropertyIndices.Contains(property.Index))
-					mPropertyIndices.Add(property.mIndex);
-			}
 		}
 		public void RemoveProperty(IfcProperty property)
 		{
 			if (property != null)
-			{
 				mProperties.Remove(property.Name);
-				mPropertyIndices.Remove(property.mIndex);
-			}
 		}
 		public IfcProperty this[string name]
 		{

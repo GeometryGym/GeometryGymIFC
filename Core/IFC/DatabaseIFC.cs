@@ -472,13 +472,17 @@ namespace GeometryGym.Ifc
 				ParserSTEP.GetKeyWord(str, out ifcID, out kw, out def);
 				if(!string.IsNullOrEmpty(kw))
 				{
-					BaseClassIfc obj = BaseClassIfc.Construct(kw);
-					if (obj != null)
+					try
 					{
-						dictionary[ifcID] = obj;
-						bag.Add(new ConstructorClass(obj, def));
-						this[ifcID] = obj;
+						BaseClassIfc obj = BaseClassIfc.Construct(kw);
+						if (obj != null)
+						{
+							dictionary[ifcID] = obj;
+							bag.Add(new ConstructorClass(obj, def));
+							this[ifcID] = obj;
+						}
 					}
+					catch (Exception) { }
 				}
 			}
 			ReleaseVersion release = Release;

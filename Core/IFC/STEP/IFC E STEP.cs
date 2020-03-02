@@ -466,28 +466,21 @@ namespace GeometryGym.Ifc
 				return "";
 			if (release < ReleaseVersion.IFC4)
 				return base.BuildStringSTEP(release);
-			string str = base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mDescription == "$" ? "$,(#" : "'" + mDescription + "',(#") + mPropertyIndices[0];
-			for (int icounter = 1; icounter < mPropertyIndices.Count; icounter++)
-				str += ",#" + mPropertyIndices[icounter];
-			return str + ")";
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserIfc.Encode(mName) + "',") 
+				+ (string.IsNullOrEmpty(mDescription) ? "$,(#" : "'" + mDescription + "',(#") + string.Join(",#", mProperties.Values.Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			if (release != ReleaseVersion.IFC2x3)
 			{
 				mName = ParserSTEP.StripString(str, ref pos, len);
-				mDescription = ParserSTEP.StripString(str, ref pos, len); 
-				mPropertyIndices = ParserSTEP.StripListLink(str,ref pos, len);
-			}
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (int i in mPropertyIndices)
-			{
-				IfcProperty p = mDatabase[i] as IfcProperty;
-				if (p != null)
-					AddProperty(p);	
+				mDescription = ParserSTEP.StripString(str, ref pos, len);
+				foreach (int i in ParserSTEP.StripListLink(str, ref pos, len))
+				{
+					IfcProperty property = dictionary[i] as IfcProperty;
+					if (property != null)
+						mProperties[property.Name] = property;
+				}
 			}
 		}
 	}

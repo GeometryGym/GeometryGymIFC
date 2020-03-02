@@ -175,10 +175,6 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
-		//protected string mName = "$"; //: OPTIONAL IfcLabel;
-		//private string mDescription = "$"; //: OPTIONAL IfcText;
-		//internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
-		//private List<int> mPropertyIndices = new List<int>();
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);

@@ -108,7 +108,7 @@ namespace GeometryGym.Ifc
 			obj["CurveGeometry"] = CurveGeometry.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1
+	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal override void parseJObject(JObject obj)
 		{

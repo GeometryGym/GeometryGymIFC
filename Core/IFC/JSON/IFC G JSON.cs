@@ -29,7 +29,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
+	public partial class IfcGeneralProfileProperties : IfcProfilePropertiesDEPRECATED //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
 	{
 		internal override void parseJObject(JObject obj)
 		{

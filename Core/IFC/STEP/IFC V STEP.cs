@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 			mTexturePoints = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcVertexloop : IfcLoop
+	public partial class IfcVertexLoop : IfcLoop
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mLoopVertex); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length); }

@@ -800,7 +800,6 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return "IfcComplexProperty"; } }
 		internal string mUsageName;// : IfcIdentifier;
 		private Dictionary<string, IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
-		private List<int> mPropertyIndices = new List<int>();
 
 		public string UsageName { get { return mUsageName; } set { mUsageName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
 		public ReadOnlyDictionary<string, IfcProperty> HasProperties { get { return new ReadOnlyDictionary<string, IfcProperty>(mHasProperties); } }
@@ -825,8 +824,6 @@ namespace GeometryGym.Ifc
 			{
 				mHasProperties[property.Name] = property;
 				property.mPartOfComplex.Add(this);
-				if(!mPropertyIndices.Contains(property.Index))
-					mPropertyIndices.Add(property.mIndex);
 			}
 		}
 		public void RemoveProperty(IfcProperty property)
@@ -834,7 +831,6 @@ namespace GeometryGym.Ifc
 			if (property != null)
 			{
 				mHasProperties.Remove(property.Name);
-				mPropertyIndices.Remove(property.mIndex);
 				property.mPartOfComplex.Remove(this);
 			}
 		}
@@ -1927,7 +1923,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallType(DatabaseIfc m, string name, IfcCurtainWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
 	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
 		internal IfcEdgeCurve mEdge = null;
 

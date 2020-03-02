@@ -120,6 +120,8 @@ namespace GeometryGym.Ifc
 		internal int mPriority;// : OPTIONAL INTEGER IFC4
 		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum IFC4
+		//INVERSE
+		internal List<IfcRelAssignsTasks> mOwningControls = new List<IfcRelAssignsTasks>(); //gg
 
 		public string Status { get { return mStatus; } set { mStatus = value; } }
 		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
@@ -1108,7 +1110,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcTypeProcess : IfcTypeObject //ABSTRACT SUPERTYPE OF(ONEOF(IfcEventType, IfcProcedureType, IfcTaskType))
+	public abstract partial class IfcTypeProcess : IfcTypeObject, IfcProcessSelect  //ABSTRACT SUPERTYPE OF(ONEOF(IfcEventType, IfcProcedureType, IfcTaskType))
 	{
 		private string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
 		private string mLongDescription = "$";//	 :	OPTIONAL IfcText;
@@ -1300,7 +1302,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcTypeResource : IfcTypeObject //ABSTRACT SUPERTYPE OF(IfcConstructionResourceType)
+	public abstract partial class IfcTypeResource : IfcTypeObject, IfcResourceSelect //ABSTRACT SUPERTYPE OF(IfcConstructionResourceType)
 	{
 		internal string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "$";//	 :	OPTIONAL IfcText;

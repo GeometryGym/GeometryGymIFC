@@ -699,8 +699,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcRelAssignsTasks() : base() { }
 		internal IfcRelAssignsTasks(DatabaseIfc db, IfcRelAssignsTasks r, DuplicateOptions options) : base(db, r, options) { if (r.mTimeForTask > 0) TimeForTask = db.Factory.Duplicate(r.TimeForTask, options) as IfcScheduleTimeControl; }
-		public IfcRelAssignsTasks(IfcWorkControl relating, IfcTask related ) : base(relating, related) { }
-		public IfcRelAssignsTasks(IfcWorkControl relControl, IEnumerable<IfcTask> relObjects) : base(relControl, relObjects) { }
+		public IfcRelAssignsTasks(IfcWorkControl relating, IfcTask related ) : base(relating, related) { related.mOwningControls.Add(this); }
 	}
 	[Serializable]
 	public partial class IfcRelAssignsToActor : IfcRelAssigns
@@ -1742,7 +1741,7 @@ namespace GeometryGym.Ifc
 		private IfcTypeObject mRelatingType = null;// : IfcTypeObject  
 
 		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } set { mRelatedObjects.Clear(); if (value != null) { mRelatedObjects.CollectionChanged -= mRelatedObjects_CollectionChanged; mRelatedObjects = value; mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged; } } }
-		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; value.mObjectTypeOf = this; } }
+		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; if(value != null) value.mObjectTypeOf = this; } }
 
 		public override IfcRoot Relating() { return RelatingType; } 
 
@@ -1877,20 +1876,20 @@ namespace GeometryGym.Ifc
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
+			if (e.OldItems != null)
+			{
+				foreach (IfcObjectDefinition o in e.OldItems)
+				{
+					if (o.Nests == this)
+						o.mNests = null;
+				}
+			}
 			if (e.NewItems != null)
 			{
 				foreach (IfcObjectDefinition o in e.NewItems)
 				{
 					if (o.Nests != this)
 						o.mNests = this;
-				}
-			}
-			if (e.OldItems != null)
-			{
-				foreach (IfcObjectDefinition o in e.OldItems)
-				{
-					if(o.Nests == this)
-						o.mNests = null;
 				}
 			}
 		}
@@ -2401,7 +2400,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcResource : IfcObject //ABSTRACT SUPERTYPE OF (ONEOF (IfcConstructionResource))
+	public abstract partial class IfcResource : IfcObject, IfcResourceSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcConstructionResource))
 	{
 		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "";//: OPTIONAL IfcText; 
@@ -2470,6 +2469,7 @@ namespace GeometryGym.Ifc
 		SET<IfcExternalReferenceRelationship> HasExternalReferences { get; set; }
 		void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship);
 	}
+	public interface IfcResourceSelect : IBaseClassIfc { } // SELECT(IfcResource, IfcTypeResource)
 	[Serializable]
 	public partial class IfcResourceTime : IfcSchedulingTime //IFC4
 	{
@@ -2534,9 +2534,9 @@ namespace GeometryGym.Ifc
 		internal IfcRevolvedAreaSolidTapered(DatabaseIfc db, IfcRevolvedAreaSolidTapered e) : base(db, e) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea) as IfcProfileDef; }
 		public IfcRevolvedAreaSolidTapered(IfcProfileDef start, IfcAxis2Placement3D placement, IfcAxis1Placement axis, double angle, IfcProfileDef end) : base(start, placement, axis, angle) { EndSweptArea = end; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
-	public partial class IfcRibPlateProfileProperties : IfcProfileProperties // DEPRECEATED IFC4
+	public partial class IfcRibPlateProfileProperties : IfcProfilePropertiesDEPRECATED
 	{
 		internal double mThickness, mRibHeight, mRibWidth, mRibSpacing;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcRibPlateDirectionEnum mDirection;// : IfcRibPlateDirectionEnum;*/

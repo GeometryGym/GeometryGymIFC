@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 		internal IfcLampType(DatabaseIfc db, IfcLampType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcLampType(DatabaseIfc m, string name, IfcLampTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
-	public interface IfcLayeredItem : IBaseClassIfc // = SELECT(IfcRepresentationItem, IfcRepresentation);
+	public interface IfcLayeredItem : IBaseClassIfc // SELECT(IfcRepresentationItem, IfcRepresentation);
 	{
 		SET<IfcPresentationLayerAssignment> LayerAssignments { get; }
 	}

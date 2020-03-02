@@ -1508,9 +1508,9 @@ namespace GeometryGym.Ifc
          mEndSweptArea = ParserSTEP.StripLink(str, ref pos, len);
       }
    }
-   public partial class IfcRibPlateProfileProperties : IfcProfileProperties // DEPRECEATED IFC4
+   public partial class IfcRibPlateProfileProperties : IfcProfilePropertiesDEPRECATED // DELETED IFC4
 	{
-#warning building step
+		protected override string BuildStringSTEP(ReleaseVersion release) { string str = base.BuildStringSTEP(release); return (string.IsNullOrEmpty(str) || release != ReleaseVersion.IFC2x3 ? "" : str + "," + ParserSTEP.DoubleOptionalToString(mThickness) + "," + ParserSTEP.DoubleOptionalToString(mRibHeight) + "," + ParserSTEP.DoubleOptionalToString(mRibWidth) + "," + ParserSTEP.DoubleOptionalToString(mRibSpacing) + ",." + mDirection.ToString() + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

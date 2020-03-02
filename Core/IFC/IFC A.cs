@@ -261,9 +261,9 @@ namespace GeometryGym.Ifc
 	{
 		internal double mStartDistAlong = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal LIST<IfcAlignment2DHorizontalSegment> mSegments = new LIST<IfcAlignment2DHorizontalSegment>();// : LIST [1:?] OF IfcAlignment2DHorizontalSegment;
-																											   //INVERSE
-																											   //ToAlignmentCurve : SET[1:?] OF IfcAlignmentCurve FOR Horizontal;
-		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
+		//INVERSE
+		//ToAlignmentCurve : SET[1:?] OF IfcAlignmentCurve FOR Horizontal;
+		public double StartDistAlong { get { return double.IsNaN(mStartDistAlong) ? 0 : mStartDistAlong; } set { mStartDistAlong = value; } }
 		public LIST<IfcAlignment2DHorizontalSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 
 		internal IfcAlignment2DHorizontal() : base() { }
@@ -285,7 +285,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment2DHorizontalSegment(IfcCurveSegment2D seg) : base(seg.mDatabase) { CurveGeometry = seg; }
 	}
 	[Serializable]
-	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
+	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
 		private IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
 		private string mStartTag = "$";// : OPTIONAL IfcLabel;
@@ -338,10 +338,10 @@ namespace GeometryGym.Ifc
 		public bool IsConvex { get { return mIsConvex; } set { mIsConvex = value; } }
 
 		internal IfcAlignment2DVerSegParabolicArc() : base() { }
-		public IfcAlignment2DVerSegParabolicArc(DatabaseIfc db, double startDist, double horizontalLength, double startHeight, double startGradient, double radius, bool isConvex)
+		public IfcAlignment2DVerSegParabolicArc(DatabaseIfc db, double startDist, double horizontalLength, double startHeight, double startGradient, double parabolaConstant, bool isConvex)
 			: base(db, startDist, horizontalLength, startHeight, startGradient)
 		{
-			mParabolaConstant = radius;
+			mParabolaConstant = parabolaConstant;
 			mIsConvex = isConvex;
 		}
 	}

@@ -544,33 +544,40 @@ namespace GeometryGym.Ifc
 			mProfileName = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
+	public partial class IfcProfileProperties : IfcExtendedProperties //IFC4 
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			IfcProfileDef profileDefinition = ProfileDefinition;
 			if (profileDefinition == null)
 				return "";
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mName == "$" ? ",$,#" : ",'" + mName + "',#") : ",#") + profileDefinition.Index;
+			return base.BuildStringSTEP(release) + ",#" + profileDefinition.Index;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			if (release < ReleaseVersion.IFC4)
-			{
-				mName = ParserSTEP.StripString(str, ref pos, len);
-				mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
-			}
-			else
-			{
-				base.parse(str, ref pos, release, len, dictionary);
-				mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
-			}
+			base.parse(str, ref pos, release, len, dictionary);
+			mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 		internal override void postParseRelate()
 		{
 			base.postParseRelate();
 			if(mProfileDefinition != null)
 				ProfileDefinition.mHasProperties.Add(this);
+		}
+	}
+	public partial class IfcProfilePropertiesDEPRECATED : BaseClassIfc //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			IfcProfileDef profileDefinition = ProfileDefinition;
+			if (profileDefinition == null)
+				return "";
+			return base.BuildStringSTEP(release) + (mProfileName == "$" ? ",$,#" : ",'" + mProfileName + "',#") + profileDefinition.Index;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mProfileName = ParserSTEP.StripString(str, ref pos, len);
+			mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 	}
 	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4

@@ -926,7 +926,7 @@ namespace GeometryGym.Ifc
 		public IfcProcedureType(DatabaseIfc m, string name, IfcProcedureTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
-	public abstract partial class IfcProcess : IfcObject // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
+	public abstract partial class IfcProcess : IfcObject, IfcProcessSelect  // ABSTRACT SUPERTYPE OF (ONEOF (IfcProcedure ,IfcTask))
 	{
 		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "";//: OPTIONAL IfcText; 
@@ -971,6 +971,7 @@ namespace GeometryGym.Ifc
 			return true;
 		}
 	}
+	public interface IfcProcessSelect : IBaseClassIfc { } // SELECT(IfcProcess, IfcTypeProcess)
 	[Serializable]
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
@@ -1378,7 +1379,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
-		public override string StepClassName { get { return (mDatabase == null || mDatabase.Release > ReleaseVersion.IFC2x3 ? "IfcProfileProperties" : base.StepClassName); } }
+		public override string StepClassName { get { return "IfcProfileProperties"; } }
 		//[Obsolete("DEPRECEATED IFC4", false)]
 		//internal string mProfileName = "$";// : OPTIONAL IfcLabel; DELETED IFC4
 		private IfcProfileDef mProfileDefinition = null;// : OPTIONAL IfcProfileDef; 
@@ -1414,6 +1415,30 @@ namespace GeometryGym.Ifc
 			p.mHasProperties.Add(this);
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
+		}
+	}
+	[Obsolete("DEPRECEATED IFC4", false)]
+	[Serializable]
+	public partial class IfcProfilePropertiesDEPRECATED : BaseClassIfc //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
+	{
+		internal string mProfileName = "$";// : OPTIONAL IfcLabel; DELETED IFC4
+		private IfcProfileDef mProfileDefinition = null;// : OPTIONAL IfcProfileDef; 
+		public IfcProfileDef ProfileDefinition
+		{
+			get { return mProfileDefinition; }
+			set { mProfileDefinition = value; }
+		}
+
+		internal IfcProfilePropertiesDEPRECATED() : base() { }
+		internal IfcProfilePropertiesDEPRECATED(DatabaseIfc db, IfcProfilePropertiesDEPRECATED p) : base(db, p)
+		{
+			mProfileName = p.mProfileName;
+			ProfileDefinition = db.Factory.Duplicate(p.ProfileDefinition) as IfcProfileDef;
+		}
+		internal IfcProfilePropertiesDEPRECATED(IfcProfileDef p) : base(p == null ? null : p.mDatabase)
+		{
+			if (p != null)
+				ProfileDefinition = p;
 		}
 	}
 	[Serializable]

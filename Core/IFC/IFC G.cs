@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
-	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
+	public partial class IfcGeneralProfileProperties : IfcProfilePropertiesDEPRECATED //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
 	{ 
 		internal double mPhysicalWeight = double.NaN;// : OPTIONAL IfcMassPerLengthMeasure;
 		internal double mPerimeter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -74,7 +74,6 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties() : base() { }
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p) : base(db, p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
-		public IfcGeneralProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props, p) { }
 	}
 	[Serializable]
 	public partial class IfcGeographicElement : IfcElement  //IFC4
