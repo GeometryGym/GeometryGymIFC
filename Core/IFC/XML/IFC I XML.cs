@@ -70,11 +70,11 @@ namespace GeometryGym.Ifc
 					element.AppendChild(s);
 					IfcArcIndex ai = seg as IfcArcIndex;
 					if (ai != null)
-						s.InnerText = ai.mA + " " + ai.mB + " " + ai.mC;
+						s.InnerText = ai[0] + " " + ai[1] + " " + ai[2];
 					else
 					{
 						IfcLineIndex li = seg as IfcLineIndex;
-						s.InnerText = string.Join(" ", li.mIndices.ConvertAll(x => x.ToString()));
+						s.InnerText = string.Join(" ", li.ConvertAll(x => x.ToString()));
 					}
 				}
 			}

@@ -259,17 +259,13 @@ namespace GeometryGym.Ifc
 		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}
 	[Serializable]
-	public partial class IfcLineIndex : IfcSegmentIndexSelect
+	public partial class IfcLineIndex : List<int>, IfcSegmentIndexSelect
 	{
-		internal List<int> mIndices = new List<int>();
-		public IfcLineIndex(int a, int b) { mIndices.Add(a); mIndices.Add(b); }
-		public IfcLineIndex(IEnumerable<int> indices) { mIndices.AddRange(indices); }
+		public IfcLineIndex(int a, int b) { base.Add(a); base.Add(b); }
+		public IfcLineIndex(IEnumerable<int> indices) { base.AddRange(indices); }
 		public override string ToString()
 		{
-			string indices = "";
-			for (int icounter = 1; icounter < mIndices.Count; icounter++)
-				indices += "," + mIndices[icounter];
-			return "IFCLINEINDEX((" + mIndices[0] + indices + "))";
+			return "IFCLINEINDEX((" + string.Join(",", this) + "))";
 		}
 	}
 	[Serializable]

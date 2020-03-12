@@ -59,17 +59,17 @@ namespace GeometryGym.Ifc
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve 
 	{
 		private IfcCartesianPointList mPoints; // IfcCartesianPointList
-		internal List<IfcSegmentIndexSelect> mSegments = new List<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
+		internal LIST<IfcSegmentIndexSelect> mSegments = new LIST<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
 		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcBoolean
 
 		public IfcCartesianPointList Points { get { return mPoints; } set { mPoints = value; } }
-		public ReadOnlyCollection<IfcSegmentIndexSelect> Segments { get { return new ReadOnlyCollection<IfcSegmentIndexSelect>( mSegments); } }
+		public LIST<IfcSegmentIndexSelect> Segments { get { return mSegments; } }
 		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
 		internal IfcIndexedPolyCurve() : base() { }
 		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
-		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { mSegments = segs; }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
 
 		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
 		internal override void changeSchema(ReleaseVersion schema)

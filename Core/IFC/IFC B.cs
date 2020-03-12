@@ -293,14 +293,14 @@ namespace GeometryGym.Ifc
 				{
 					IfcArcIndex arc = seg as IfcArcIndex;
 					if(arc != null)
-						segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcTrimmedCurve(pts[arc.mA - 1], points.ElementAt(arc.mB - 1), pts[arc.mC - 1])));
+						segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcTrimmedCurve(pts[arc[0] - 1], points.ElementAt(arc[1] - 1), pts[arc[2] - 1])));
 					else
 					{
 						IfcLineIndex line = seg as IfcLineIndex;
 						if(line != null)
 						{
-							for(int icounter = 1; icounter < line.mIndices.Count; icounter++)
-								segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcPolyline(pts[line.mIndices[icounter - 1]-1], pts[line.mIndices[icounter]-1])));
+							for(int icounter = 1; icounter < line.Count; icounter++)
+								segs.Add(new IfcCompositeCurveSegment(IfcTransitionCode.CONTINUOUS, true, new IfcPolyline(pts[line[icounter - 1]-1], pts[line[icounter]-1])));
 						}
 					}
 				}

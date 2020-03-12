@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCartesianPointList : IfcGeometricRepresentationItem //IFC4
 	{
-		internal abstract List<Point3d> Points { get; }
+		public abstract List<Point3d> Points();
 	}
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
 	{
@@ -53,12 +53,12 @@ namespace GeometryGym.Ifc
 		{
 			mCoordList = coordList.Select(x => new double[] { x.X, x.Y }).ToArray();
 		}
-		internal override List<Point3d> Points { get { return mCoordList.ToList().ConvertAll(x => new Point3d(x[0], x[1], 0)); } }
+		public override List<Point3d> Points() { return mCoordList.ToList().ConvertAll(x => new Point3d(x[0], x[1], 0)); }
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
 		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Point3d> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.X, x.Y, x.Z }).ToArray(); }
-		internal override List<Point3d> Points { get { return mCoordList.Select(x => new Point3d(x[0], x[1], x[2])).ToList(); } }
+		public override List<Point3d> Points() { return mCoordList.Select(x => new Point3d(x[0], x[1], x[2])).ToList(); } 
 	}
 	public abstract partial class IfcCartesianTransformationOperator
 	{

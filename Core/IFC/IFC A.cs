@@ -249,8 +249,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
 	{
 		internal IfcAlignmentTypeEnum mPredefinedType = IfcAlignmentTypeEnum.NOTDEFINED;// : OPTIONAL IfcAlignmentTypeEnum;
-
 		public IfcAlignmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcAlignment() : base() { }
 		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, DuplicateOptions options) 
 			: base(db, alignment, options) { PredefinedType = alignment.PredefinedType; }
@@ -385,6 +385,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment2DHorizontal Horizontal { get { return mHorizontal; } set { mHorizontal = value; } }
 		public IfcAlignment2DVertical Vertical { get { return mVertical; } set { mVertical = value; } }
 		public string Tag { get { return (mTag == "$" ? "" : ParserIfc.Decode(mTag)); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+
 		internal IfcAlignmentCurve() : base() { }
 		internal IfcAlignmentCurve(DatabaseIfc db, IfcAlignmentCurve c) : base(db, c)
 		{
@@ -791,11 +792,10 @@ namespace GeometryGym.Ifc
 		internal void addVoid(IfcCurve inner) { mInnerCurves.Add(inner.mIndex); }
 	}
 	[Serializable]
-	public partial class IfcArcIndex : IfcSegmentIndexSelect
+	public partial class IfcArcIndex : List<int>, IfcSegmentIndexSelect
 	{
-		internal int mA, mB, mC;
-		public IfcArcIndex(int a, int b, int c) { mA = a; mB = b; mC = c; }
-		public override string ToString() { return "IFCARCINDEX((" + mA + "," + mB + "," + mC + "))"; }
+		public IfcArcIndex(int a, int b, int c) { Add(a); Add(b); Add(c); }
+		public override string ToString() { return "IFCARCINDEX((" + this[0] + "," + this[1] + "," + this[2] + "))"; }
 	}
 	[Serializable]
 	public partial class IfcAsset : IfcGroup

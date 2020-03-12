@@ -78,12 +78,12 @@ namespace GeometryGym.Ifc
 					JObject jobj = new JObject();
 					if (ai != null)
 					{
-						jobj["IfcArcIndex"] = ai.mA + " " + ai.mB + " " + ai.mC;
+						jobj["IfcArcIndex"] = ai[0] + " " + ai[1] + " " + ai[2];
 					}
 					else
 					{
 						IfcLineIndex li = seg as IfcLineIndex;
-						jobj["IfcLineIndex"] = string.Join(" ", li.mIndices.ConvertAll(x => x.ToString()));
+						jobj["IfcLineIndex"] = string.Join(" ", li.ConvertAll(x => x.ToString()));
 					}
 					array.Add(jobj);
 				}
