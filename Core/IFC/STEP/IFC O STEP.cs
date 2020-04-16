@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 			Tag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
-	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
+	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRepeatFactor); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -137,8 +137,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	//ENTITY IfcOpticalMaterialProperties // DEPRECEATED IFC4
-	//ENTITY IfcOrderAction // DEPRECEATED IFC4
+	//ENTITY IfcOpticalMaterialProperties // DEPRECATED IFC4
+	//ENTITY IfcOrderAction // DEPRECATED IFC4
 	public partial class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -162,6 +162,20 @@ namespace GeometryGym.Ifc
 		}
 	}
 	//ENTITY IfcOrganizationRelationship; //optional name
+	public partial class IfcOrientationExpression : IfcGeometricRepresentationItem
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mLateralAxisDirection.StepId +
+			",#" + mVerticalAxisDirection.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			LateralAxisDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+			VerticalAxisDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+		}
+	}
 	public partial class IfcOrientedEdge : IfcEdge
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mEdgeElement.StepId + "," + ParserSTEP.BoolToString(mOrientation); }

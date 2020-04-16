@@ -221,13 +221,13 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "HasExternalReferences") == 0)
+				if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							mHasExternalReferences.Add(r);
+							mHasExternalReference.Add(r);
 					}
 				}
 				else if (string.Compare(name, "HasConstraintRelationships") == 0)
@@ -256,8 +256,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
-			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
-			foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
+			foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 				element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			if(element.HasChildNodes)
 				xml.AppendChild(element);

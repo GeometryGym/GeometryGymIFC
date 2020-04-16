@@ -40,6 +40,7 @@ namespace GeometryGym.Ifc
 		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 		public IfcHalfSpaceSolid(IfcSurface baseSurface, bool agreementFlag) : base(baseSurface.mDatabase) { BaseSurface = baseSurface; AgreementFlag = agreementFlag; }
 	}
+	public interface IfcHatchLineDistanceSelect : IBaseClassIfc { } // SELECT(IfcPositiveLengthMeasure, IfcVector);
 	[Serializable]
 	public partial class IfcHeatExchanger : IfcEnergyConversionDevice //IFC4
 	{
@@ -79,9 +80,9 @@ namespace GeometryGym.Ifc
 		internal IfcHumidifierType(DatabaseIfc db, IfcHumidifierType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcHumidifierType(DatabaseIfc m, string name, IfcHumidifierTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		internal double mUpperVaporResistanceFactor = double.NaN, mLowerVaporResistanceFactor = double.NaN; //: OPTIONAL IfcPositiveRatioMeasure;
 		internal double mIsothermalMoistureCapacity = double.NaN; //: : OPTIONAL IfcIsothermalMoistureCapacityMeasure;

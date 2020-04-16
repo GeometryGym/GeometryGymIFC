@@ -194,7 +194,7 @@ namespace GeometryGym.Ifc
 			Location = extractString(obj.GetValue("Location", StringComparison.InvariantCultureIgnoreCase));
 			Identification = extractString(obj.GetValue("Identification", StringComparison.InvariantCultureIgnoreCase));
 			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
-			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray))
+			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.addRelated(this);
@@ -207,7 +207,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Location", Location);
 			setAttribute(obj, "Identification", Identification);
 			setAttribute(obj, "Name", Name);
-			createArray(obj, "HasExternalReferences", HasExternalReferences, this, options);
+			createArray(obj, "HasExternalReference", HasExternalReference, this, options);
 			createArray(obj, "HasConstraintRelationships", HasConstraintRelationships, this, options);
 			createArray(obj, "ExternalReferenceForResources", ExternalReferenceForResources, this, options);
 		}

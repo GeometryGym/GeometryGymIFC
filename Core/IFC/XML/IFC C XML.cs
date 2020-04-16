@@ -786,7 +786,7 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "CreatingActor") == 0)
 					CreatingActor = mDatabase.ParseXml<IfcActorSelect>(child as XmlElement);
-				else if (string.Compare(name, "HasExternalReferences") == 0)
+				else if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -829,11 +829,11 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mDatabase[mCreatingActor].GetXML(xml.OwnerDocument, "CreatingActor", host, processed));
 			setAttribute(xml, "UserDefinedGrade", UserDefinedGrade);
 
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if(mPropertiesForConstraint.Count > 0)

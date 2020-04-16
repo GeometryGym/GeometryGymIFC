@@ -118,7 +118,29 @@ namespace GeometryGym.Ifc
 			mElevation = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	//ENTITY IfcFailureConnectionCondition
+	public partial class IfcFailureConnectionCondition : IfcStructuralConnectionCondition
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," +
+			ParserSTEP.DoubleOptionalToString(mTensionFailureX) + "," +
+			ParserSTEP.DoubleOptionalToString(mTensionFailureY) + "," +
+			ParserSTEP.DoubleOptionalToString(mTensionFailureZ) + "," +
+			ParserSTEP.DoubleOptionalToString(mCompressionFailureX) + "," +
+			ParserSTEP.DoubleOptionalToString(mCompressionFailureY) + "," +
+			ParserSTEP.DoubleOptionalToString(mCompressionFailureZ);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			TensionFailureX = ParserSTEP.StripDouble(str, ref pos, len);
+			TensionFailureY = ParserSTEP.StripDouble(str, ref pos, len);
+			TensionFailureZ = ParserSTEP.StripDouble(str, ref pos, len);
+			CompressionFailureX = ParserSTEP.StripDouble(str, ref pos, len);
+			CompressionFailureY = ParserSTEP.StripDouble(str, ref pos, len);
+			CompressionFailureZ = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcFanTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
@@ -175,8 +197,23 @@ namespace GeometryGym.Ifc
 			mHatchLineAngle = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
-	//ENTITY IfcFillAreaStyleTiles
+	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECATED IFC4
+	public partial class IfcFillAreaStyleTiles : IfcGeometricRepresentationItem
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",(#" + string.Join(",#", mTilingPattern.ConvertAll(x => x.StepId.ToString())) + ")" +
+			",(#" + string.Join(",#", mTiles.ConvertAll(x => x.StepId.ToString())) + ")" + "," +
+			ParserSTEP.DoubleOptionalToString(mTilingScale);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			TilingPattern.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcVector));
+			Tiles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcStyledItem));
+			TilingScale = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcFilter : IfcFlowTreatmentDevice //IFC4  
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcFilterTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }

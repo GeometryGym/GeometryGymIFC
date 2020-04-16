@@ -55,6 +55,36 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBeamTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcBearing : IfcBuildingElement
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			(mPredefinedType == IfcBearingTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcBearingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcBearingType : IfcBuildingElementType
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcBearingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcBlobTexture : IfcSurfaceTexture
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mRasterFormat + "'," + ParserSTEP.BoolToString(mRasterCode); }
@@ -197,6 +227,36 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mEnclosure); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mEnclosure = ParserSTEP.StripLink(str, ref pos, len); }
+	}
+	public partial class IfcBridge : IfcFacility
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			(mPredefinedType == IfcBridgeTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcBridgeTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcBridgePart : IfcFacilityPart
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			(mPredefinedType == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcBridgePartTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
 	}
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
 	{

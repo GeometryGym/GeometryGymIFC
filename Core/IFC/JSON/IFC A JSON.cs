@@ -266,7 +266,7 @@ namespace GeometryGym.Ifc
 			mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addComponent(x));
 
 
-			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			for (int icounter = 0; icounter < ers.Count; icounter++)
 				ers[icounter].RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> crs = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray);
@@ -306,8 +306,8 @@ namespace GeometryGym.Ifc
 				obj["ArithmeticOperator"] = ArithmeticOperator.ToString();
 			if(mComponents.Count > 0)
 				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, options)));
-			if (mHasExternalReferences.Count > 0)
-				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ToList().ConvertAll(x => x.getJson(this, options)));
+			if (mHasExternalReference.Count > 0)
+				obj["HasExternalReference"] = new JArray(HasExternalReference.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mHasConstraintRelationships.Count > 0)
 			{
 				JArray array = new JArray();

@@ -28,9 +28,9 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcGasTerminalType : IfcFlowTerminalType // DEPRECEATED IFC4
+	public partial class IfcGasTerminalType : IfcFlowTerminalType // DEPRECATED IFC4
 	{
 		internal IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
 		public IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -39,9 +39,9 @@ namespace GeometryGym.Ifc
 		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcGeneralMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcGeneralMaterialProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		internal double mMolecularWeight = double.NaN; //: OPTIONAL IfcMolecularWeightMeasure;
 		internal double mPorosity = double.NaN; //: OPTIONAL IfcNormalisedRatioMeasure;
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
-	public partial class IfcGeneralProfileProperties : IfcProfilePropertiesDEPRECATED //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
+	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
 	{ 
 		internal double mPhysicalWeight = double.NaN;// : OPTIONAL IfcMassPerLengthMeasure;
 		internal double mPerimeter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -456,6 +456,7 @@ namespace GeometryGym.Ifc
 				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcVirtualGridIntersection;
 		}
 	}
+	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);
 	[Serializable]
 	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{

@@ -57,13 +57,13 @@ namespace GeometryGym.Ifc
 		internal string mUserDefinedRole = "$";// : OPTIONAL IfcLabel
 		internal string mDescription = "$";// : OPTIONAL IfcText; 
 										   //INVERSE
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public IfcRoleEnum Role { get { return mRole; } set { mRole = value; } }
 		public string UserDefinedRole { get { return (mUserDefinedRole == "$" ? "" : ParserIfc.Decode(mUserDefinedRole)); } set { mUserDefinedRole = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcActorRole() : base() { }
@@ -74,9 +74,9 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -401,9 +401,9 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentCurve(IfcAlignment2DHorizontal horizontal, IfcAlignment2DVertical vertical) : this(horizontal) { Vertical = vertical; }
 		
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout //IFC4 depreceated
+	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout //IFC4 DEPRECATED
 	{
 		internal IfcAngularDimension() : base() { }
 	}
@@ -427,9 +427,9 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public abstract partial class IfcAnnotationCurveOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public abstract partial class IfcAnnotationCurveOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		protected IfcAnnotationCurveOccurrence() : base() { }
 	}
@@ -447,9 +447,9 @@ namespace GeometryGym.Ifc
 		public IfcAnnotationFillArea(IfcCurve outerBoundary) : base(outerBoundary.mDatabase) { OuterBoundary = outerBoundary; }
 		public IfcAnnotationFillArea(IfcCurve outerBoundary, List<IfcCurve> innerBoundaries) : this(outerBoundary) { InnerBoundaries.AddRange(innerBoundaries); }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcPoint mFillStyleTarget;// : OPTIONAL IfcPoint;
 		internal IfcGlobalOrLocalEnum  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
@@ -457,16 +457,16 @@ namespace GeometryGym.Ifc
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
 		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f) : base(db,f) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public abstract partial class IfcAnnotationOccurrence : IfcStyledItem //DEPRECEATED IFC4
+	public abstract partial class IfcAnnotationOccurrence : IfcStyledItem //DEPRECATED IFC4
 	{
 		protected IfcAnnotationOccurrence(DatabaseIfc db, IfcAnnotationOccurrence o) : base(db,o) { }
 		protected IfcAnnotationOccurrence() : base() { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECEATED IFC4
+	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECATED IFC4
 	{
 		internal IfcGeometricRepresentationItem mItem;// : IfcGeometricRepresentationItem;
 		internal IfcTextureCoordinate mTextureCoordinates;// OPTIONAL IfcTextureCoordinate;
@@ -477,22 +477,22 @@ namespace GeometryGym.Ifc
 		internal IfcAnnotationSurface() : base() { } 
 		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Factory.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates != null) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAnnotationSurfaceOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public partial class IfcAnnotationSurfaceOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcAnnotationSurfaceOccurrence() : base() { }
 		internal IfcAnnotationSurfaceOccurrence(DatabaseIfc db, IfcAnnotationSurfaceOccurrence o) : base(db,o) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAnnotationSymbolOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public partial class IfcAnnotationSymbolOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcAnnotationSymbolOccurrence() : base() { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcAnnotationTextOccurrence() : base() { }
 		internal IfcAnnotationTextOccurrence(DatabaseIfc db, IfcAnnotationTextOccurrence o) : base(db,o) { }
@@ -550,7 +550,7 @@ namespace GeometryGym.Ifc
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
 		internal List<int> mComponents = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
 		//INVERSE
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcAppliedValue> mComponentFor = new List<IfcAppliedValue>(); //gg
 
@@ -564,7 +564,7 @@ namespace GeometryGym.Ifc
 		public string Condition { get { return (mCondition == "$" ? "" : ParserIfc.Decode(mCondition)); } set { mCondition = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
 		public ReadOnlyCollection<IfcAppliedValue> Components { get { return new ReadOnlyCollection<IfcAppliedValue>( mComponents.ConvertAll(x => mDatabase[x] as IfcAppliedValue)); } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		internal IfcAppliedValue() : base() { }
@@ -594,9 +594,9 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -635,9 +635,9 @@ namespace GeometryGym.Ifc
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 		internal void addComponent(IfcAppliedValue value) { mComponents.Add(value.mIndex); value.mComponentFor.Add(this); }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		internal IfcAppliedValue mComponentOfTotal;// : IfcAppliedValue;
 		internal SET<IfcAppliedValue> mComponents = new SET<IfcAppliedValue>();// : SET [1:?] OF IfcAppliedValue;
@@ -673,12 +673,12 @@ namespace GeometryGym.Ifc
 		internal string mName = "$";// :OPTIONAL IfcLabel;
 		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier;
 										  //INVERSE
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		private SET<IfcRelAssociatesApproval> mApprovedObjects = new SET<IfcRelAssociatesApproval>();
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public SET<IfcRelAssociatesApproval> ApprovedObjects { get { return mApprovedObjects; } set { mApprovedObjects.Clear();  if (value != null) { mApprovedObjects = value; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
@@ -697,9 +697,9 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -719,9 +719,9 @@ namespace GeometryGym.Ifc
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcApprovalActorRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcApprovalActorRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		internal int mActor;// : IfcActorSelect;
 		internal int mApproval;// : IfcApproval;
@@ -729,9 +729,9 @@ namespace GeometryGym.Ifc
 		internal IfcApprovalActorRelationship() : base() { }
 		//internal IfcApprovalActorRelationship(IfcApprovalActorRelationship o) : base() { mActor = o.mActor; mApproval = o.mApproval; mRole = o.mRole; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcApprovalPropertyRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcApprovalPropertyRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		internal List<int> mApprovedProperties = new List<int>();// : SET [1:?] OF IfcProperty;
 		internal int mApproval;// : IfcApproval; 

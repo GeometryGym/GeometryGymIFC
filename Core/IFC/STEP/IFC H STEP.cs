@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcHumidifierTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcHygroscopicMaterialProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 

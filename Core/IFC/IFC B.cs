@@ -71,10 +71,33 @@ namespace GeometryGym.Ifc
 				MaterialSelect = ps;
 		}
 	}
-	public interface IfcBendingParameterSelect { } // 	IfcLengthMeasure, IfcPlaneAngleMeasure
-	[Obsolete("DEPRECEATED IFC4", false)]
 	[Serializable]
-	public partial class IfcBezierCurve : IfcBSplineCurve // DEPRECEATED IFC4
+	public partial class IfcBearing : IfcBuildingElement
+	{
+		private IfcBearingTypeEnum mPredefinedType = IfcBearingTypeEnum.NOTDEFINED; //: OPTIONAL IfcBearingTypeEnum;
+		public IfcBearingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcBearing() : base() { }
+		public IfcBearing(DatabaseIfc db) : base(db) { }
+		public IfcBearing(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcBearingType : IfcBuildingElementType
+	{
+		private IfcBearingTypeEnum mPredefinedType = IfcBearingTypeEnum.NOTDEFINED; //: IfcBearingTypeEnum;
+		public IfcBearingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcBearingType() : base() { }
+		public IfcBearingType(DatabaseIfc db, string name, IfcBearingTypeEnum predefinedType)
+			: base(db, name)
+		{
+			PredefinedType = predefinedType;
+		}
+	}
+	public interface IfcBendingParameterSelect { } // 	IfcLengthMeasure, IfcPlaneAngleMeasure
+	[Obsolete("DEPRECATED IFC4", false)]
+	[Serializable]
+	public partial class IfcBezierCurve : IfcBSplineCurve // DEPRECATED IFC4
 	{
 		internal IfcBezierCurve() : base() { }
 		internal IfcBezierCurve(DatabaseIfc db, IfcBezierCurve c) : base(db,c) { }
@@ -349,6 +372,24 @@ namespace GeometryGym.Ifc
 		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
 	}
 	[Serializable]
+	public partial class IfcBridge : IfcFacility
+	{
+		private IfcBridgeTypeEnum mPredefinedType = IfcBridgeTypeEnum.NOTDEFINED; //: OPTIONAL IfcBridgeTypeEnum;
+		public IfcBridgeTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcBridge() : base() { }
+		public IfcBridge(DatabaseIfc db) : base(db) { }
+		public IfcBridge(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcBridgePart : IfcFacilityPart
+	{
+		private IfcBridgePartTypeEnum mPredefinedType = IfcBridgePartTypeEnum.NOTDEFINED; //: OPTIONAL IfcBridgePartTypeEnum;
+		public IfcBridgePartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcBridgePart() : base() { }
+	}
+	[Serializable]
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
 	{
 		private int mDegree;// : INTEGER;
@@ -584,6 +625,7 @@ namespace GeometryGym.Ifc
 		//IfcRoofType, IfcShadingDeviceType, IfcSlabType, IfcStairFlightType, IfcStairType, IfcWallType, IfcWindowType))
 		protected IfcBuildingElementType() : base() { }
 		protected IfcBuildingElementType(DatabaseIfc db) : base(db) { }
+		protected IfcBuildingElementType(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected IfcBuildingElementType(DatabaseIfc db, IfcBuildingElementType t, DuplicateOptions options) : base(db, t, options) { }
 	}
 	[Serializable]

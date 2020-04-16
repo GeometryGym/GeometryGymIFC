@@ -340,30 +340,15 @@ namespace GeometryGym.Ifc
 			IfcMaterialSelect m = material;
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
+				List<IfcProfileDef> profileDefs = new List<IfcProfileDef>();
 				IfcMaterialProfile profile = material as IfcMaterialProfile;
 				if (profile != null)
 				{
 					m = profile.Material;
 					mMaterialSelectIFC4 = profile;
-					IfcProfileDef pd = profile.Profile;
-					if (pd != null)
-					{
-						if (pd.mHasProperties.Count == 0)
-						{
-							IfcProfileProperties pp = new IfcProfileProperties(pd);
-							pp.mAssociates.RelatedObjects.Add(this);
-						}
-						else
-						{
-							if(pd.mHasProperties[0].mAssociates == null)
-							{
-								new IfcRelAssociatesProfileProperties(this, pd.mHasProperties[0]);
-							}
-							else
-								pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
-
-						}
-					}
+					IfcProfileDef profileDef = profile.Profile;
+					if(profileDef != null)
+						profileDefs.Add(profileDef);
 				}
 				else
 				{
@@ -382,18 +367,29 @@ namespace GeometryGym.Ifc
 						{
 							IfcProfileDef pd = matp.Profile;
 							if (pd != null)
-							{
-								if (pd.mHasProperties.Count == 0)
-								{
-									IfcProfileProperties pp = new IfcProfileProperties(pd);
-								}
-								pd.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
-							}
+								profileDefs.Add(pd);
 						}
 					}
 					else
 					{
 						//constituentset....
+					}
+				}
+				foreach(IfcProfileDef profileDef in profileDefs)
+				{
+					if (profileDef.mHasProperties.Count == 0)
+					{
+						IfcGeneralProfileProperties generalProfileProperties = new IfcGeneralProfileProperties(profileDef);
+						generalProfileProperties.mAssociates.RelatedObjects.Add(this);
+					}
+					else
+					{
+						if (profileDef.mHasProperties[0].mAssociates == null)
+						{
+							new IfcRelAssociatesProfileProperties(this, profileDef.mHasProperties[0]);
+						}
+						else
+							profileDef.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
 					}
 				}
 			}
@@ -664,9 +660,9 @@ namespace GeometryGym.Ifc
 
 	}
 
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
+	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
 	{
 		internal int mRepeatFactor;//  : IfcVector 
 		public IfcVector RepeatFactor { get { return mDatabase[mRepeatFactor] as IfcVector; } set { mRepeatFactor = value.mIndex; } }
@@ -712,10 +708,10 @@ namespace GeometryGym.Ifc
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }
 		public IfcOpeningStandardCase(DatabaseIfc db, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(db) { ObjectPlacement = placement; Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(eas)); }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcOpticalMaterialProperties // DEPRECEATED IFC4
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcOrderAction // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcOpticalMaterialProperties // DEPRECATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcOrderAction // DEPRECATED IFC4
 	[Serializable]
 	public partial class IfcOpenShell : IfcConnectedFaceSet, IfcShell
 	{
@@ -732,7 +728,7 @@ namespace GeometryGym.Ifc
 		private LIST<IfcActorRole> mRoles = new LIST<IfcActorRole>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
 		private LIST<IfcAddress> mAddresses = new LIST<IfcAddress>();//: OPTIONAL LIST [1:?] OF IfcAddress; 
 													   //INVERSE
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -744,7 +740,7 @@ namespace GeometryGym.Ifc
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public LIST<IfcActorRole> Roles { get { return mRoles; } }
 		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		private static string mOrganization;
@@ -786,9 +782,9 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -837,15 +833,32 @@ namespace GeometryGym.Ifc
 			{
 				//foreach (IfcResourceObjectSelect r in e.NewItems)
 				//{
-				//	if (!r.HasExternalReferences.Contains(this))
-				//		r.HasExternalReferences.Add(this);
+				//	if (!r.HasExternalReference.Contains(this))
+				//		r.HasExternalReference.Add(this);
 				//}
 			}
 			if (e.OldItems != null)
 			{
 				//foreach (IfcResourceObjectSelect r in e.OldItems)
-				//	r.HasExternalReferences.Remove(this);
+				//	r.HasExternalReference.Remove(this);
 			}
+		}
+	}
+	[Serializable]
+	public partial class IfcOrientationExpression : IfcGeometricRepresentationItem
+	{
+		private IfcDirection mLateralAxisDirection = null; //: IfcDirection;
+		private IfcDirection mVerticalAxisDirection = null; //: IfcDirection;
+
+		public IfcDirection LateralAxisDirection { get { return mLateralAxisDirection; } set { mLateralAxisDirection = value; } }
+		public IfcDirection VerticalAxisDirection { get { return mVerticalAxisDirection; } set { mVerticalAxisDirection = value; } }
+
+		public IfcOrientationExpression() : base() { }
+		public IfcOrientationExpression(IfcDirection lateralAxisDirection, IfcDirection verticalAxisDirection)
+			: base(lateralAxisDirection.Database)
+		{
+			LateralAxisDirection = lateralAxisDirection;
+			VerticalAxisDirection = verticalAxisDirection;
 		}
 	}
 	[Serializable]

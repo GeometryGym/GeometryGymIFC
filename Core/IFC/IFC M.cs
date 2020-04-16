@@ -225,12 +225,12 @@ namespace GeometryGym.Ifc
 	{
 		//INVERSE  
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		private SET<IfcMaterialProperties> mHasProperties = new SET<IfcMaterialProperties>();
 		[NonSerialized] internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } set { mAssociatedTo.Clear(); if (value != null) { mAssociatedTo.CollectionChanged -= mAssociatedTo_CollectionChanged; mAssociatedTo =value; mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged; } } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public SET<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
@@ -245,7 +245,7 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 			mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged;
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
 		private void mAssociatedTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
@@ -269,7 +269,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -295,7 +295,7 @@ namespace GeometryGym.Ifc
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 
-		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReferences.Add(referenceRelationship); }
+		public void AddExternalReferenceRelationship(IfcExternalReferenceRelationship referenceRelationship) { mHasExternalReference.Add(referenceRelationship); }
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 
 		public IfcProperty FindProperty(string name)
@@ -478,9 +478,9 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialLayerWithOffsets(IfcMaterial mat, double thickness, string name, IfcLayerSetDirectionEnum d, double startOffset,double endOffset)
 			: base(mat, thickness, name) { mOffsetDirection = d; mOffsetValues = new double[]{ startOffset,endOffset}; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcMaterialList : BaseClassIfc, IfcMaterialSelect, NamedObjectIfc //DEPRECEATED IFC4
+	public partial class IfcMaterialList : BaseClassIfc, IfcMaterialSelect, NamedObjectIfc //DEPRECATED IFC4
 	{
 		internal List<int> mMaterials = new List<int>();// LIST [1:?] OF IfcMaterial; 
 		//INVERSE
@@ -797,9 +797,9 @@ namespace GeometryGym.Ifc
 			return sif;
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcMechanicalConcreteMaterialProperties : IfcMechanicalMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalConcreteMaterialProperties : IfcMechanicalMaterialProperties // DEPRECATED IFC4
 	{
 		internal double mCompressiveStrength = double.NaN;// : OPTIONAL IfcPressureMeasure;
 		internal double mMaxAggregateSize = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -820,8 +820,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMechanicalFastener : IfcElementComponent //IFC4 change
 	{
-		internal double mNominalDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; IFC4 depreceated
-		internal double mNominalLength = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;  IFC4 depreceated
+		internal double mNominalDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; IFC4 DEPRECATED
+		internal double mNominalLength = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;  IFC4 DEPRECATED
 		internal IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : OPTIONAL IfcMechanicalFastenerTypeEnum;
 		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
@@ -843,9 +843,9 @@ namespace GeometryGym.Ifc
 		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, DuplicateOptions options) : base(db, t, options) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; mPredefinedType = t.mPredefinedType; }
 		public IfcMechanicalFastenerType(DatabaseIfc db, string name, IfcMechanicalFastenerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		internal double mDynamicViscosity = double.NaN;// : OPTIONAL IfcDynamicViscosityMeasure;
 		internal double mYoungModulus = double.NaN;// : OPTIONAL IfcModulusOfElasticityMeasure;
@@ -865,9 +865,9 @@ namespace GeometryGym.Ifc
 		public IfcMechanicalMaterialProperties(IfcMaterial mat, double dynVisc, double youngs, double shear, double poisson, double thermalExp)
 			: base(mat) { mDynamicViscosity = dynVisc; mYoungModulus = youngs; mShearModulus = shear; mPoissonRatio = poisson; mThermalExpansionCoefficient = thermalExp; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcMechanicalSteelMaterialProperties : IfcMechanicalMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalSteelMaterialProperties : IfcMechanicalMaterialProperties // DEPRECATED IFC4
 	{
 		internal double mYieldStress = double.NaN, mUltimateStress = double.NaN;// : OPTIONAL IfcPressureMeasure;
 		internal double mUltimateStrain = double.NaN;// :  OPTIONAL IfcPositiveRatioMeasure;
@@ -1026,6 +1026,9 @@ namespace GeometryGym.Ifc
 		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p) : base(db,p) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, new IfcCartesianTransformationOperator2D(p.mDatabase) { Axis1 = new IfcDirection(p.mDatabase, -1, 0) },name) { }
 	}
+	public interface IfcModulusOfRotationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfRotationalSubgradeReactionMeasure);
+	public interface IfcModulusOfSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfSubgradeReactionMeasure);
+	public interface IfcModulusOfTranslationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfLinearSubgradeReactionMeasure);
 	[Serializable]
 	public partial class IfcMonetaryUnit : BaseClassIfc, IfcUnit
 	{
@@ -1056,6 +1059,6 @@ namespace GeometryGym.Ifc
 		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcMotorConnectionType(DatabaseIfc m, string name, IfcMotorConnectionTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcMove // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcMove // DEPRECATED IFC4
 }

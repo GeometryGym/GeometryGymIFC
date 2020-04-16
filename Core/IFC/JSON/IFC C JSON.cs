@@ -391,7 +391,7 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ConstraintSource = token.Value<string>();
 			CreatingActor = mDatabase.ParseJObject<IfcActorSelect>(obj.GetValue("CreatingActor", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcExternalReferenceRelationship er in ers)
 				er.RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> rcr = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("PropertiesForConstraint", StringComparison.InvariantCultureIgnoreCase) as JArray);
@@ -411,12 +411,12 @@ namespace GeometryGym.Ifc
 			obj["ConstraintGrade"] = mConstraintGrade.ToString();
 			setAttribute(obj, "ConstraintSource", ConstraintSource);
 
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
 				JArray array = new JArray();
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 					array.Add(r.getJson(this, options));
-				obj["HasExternalReferences"] = array;
+				obj["HasExternalReference"] = array;
 			}
 			if (mPropertiesForConstraint.Count > 0)
 			{

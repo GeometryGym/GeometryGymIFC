@@ -850,7 +850,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECEATED IFC4 renamed
+	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECATED IFC4 renamed
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

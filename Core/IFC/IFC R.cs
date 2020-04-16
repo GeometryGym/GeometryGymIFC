@@ -30,9 +30,9 @@ using System.Collections.Specialized;
 
 namespace GeometryGym.Ifc
 {
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcRadiusDimension : IfcDimensionCurveDirectedCallout // DEPRECEATED IFC4
+	public partial class IfcRadiusDimension : IfcDimensionCurveDirectedCallout // DEPRECATED IFC4
 	{
 		internal IfcRadiusDimension() : base() { }
 	}
@@ -96,9 +96,9 @@ namespace GeometryGym.Ifc
 		internal IfcRampType(DatabaseIfc db, IfcRampType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcRampType(DatabaseIfc m, string name, IfcRampTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcRationalBezierCurve : IfcBezierCurve // DEPRECEATED IFC4
+	public partial class IfcRationalBezierCurve : IfcBezierCurve // DEPRECATED IFC4
 	{
 		internal List<double> mWeightsData = new List<double>();// : LIST [2:?] OF REAL;	
 		internal IfcRationalBezierCurve() : base() { }
@@ -354,9 +354,38 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcReferencesValueDocument; // DEPRECEATED IFC4
-	//ENTITY IfcRegularTimeSeries
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcReferencesValueDocument; // DEPRECATED IFC4
+	[Serializable]
+	public partial class IfcReferent : IfcPositioningElement
+	{
+		private IfcReferentTypeEnum mPredefinedType = IfcReferentTypeEnum.NOTDEFINED; //: OPTIONAL IfcReferentTypeEnum;
+		private double mRestartDistance = double.NaN; //: OPTIONAL IfcLengthMeasure;
+
+		public IfcReferentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public double RestartDistance { get { return mRestartDistance; } set { mRestartDistance = value; } }
+
+		public IfcReferent() : base() { }
+		public IfcReferent(IfcSite host) : base(host) { }
+		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcRegularTimeSeries : IfcTimeSeries
+	{
+		private double mTimeStep = 0; //: IfcTimeMeasure;
+		private LIST<IfcTimeSeriesValue> mValues = new LIST<IfcTimeSeriesValue>(); //: LIST[1:?] OF IfcTimeSeriesValue;
+
+		public double TimeStep { get { return mTimeStep; } set { mTimeStep = value; } }
+		public LIST<IfcTimeSeriesValue> Values { get { return mValues; } set { mValues = value; } }
+
+		public IfcRegularTimeSeries() : base() { }
+		public IfcRegularTimeSeries(string name, DateTime startTime, DateTime endTime, IfcTimeSeriesDataTypeEnum timeSeriesDataType, IfcDataOriginEnum dataOrigin, double timeStep, IEnumerable<IfcTimeSeriesValue> values)
+			: base(values.First().Database, name, startTime, endTime, timeSeriesDataType, dataOrigin)
+		{
+			TimeStep = timeStep;
+			Values.AddRange(values);
+		}
+	}
 	[Serializable]
 	public partial class IfcReinforcementBarProperties : IfcPreDefinedProperties
 	{
@@ -484,11 +513,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcReinforcingElement : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor))
 	{
-		private string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 Depreceated 
-		[Obsolete("DEPRECEATED IFC4", false)]
+		private string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 DEPRECATED 
+		[Obsolete("DEPRECATED IFC4", false)]
 		public string SteelGrade { get { return (mSteelGrade == "$" ? "" : ParserIfc.Decode(mSteelGrade)); } set { mSteelGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcReinforcingElement() : base() { }
+		protected IfcReinforcingElement(DatabaseIfc db) : base(db) { }
 		protected IfcReinforcingElement(DatabaseIfc db, IfcReinforcingElement e, DuplicateOptions options) : base(db, e, options) { mSteelGrade = e.mSteelGrade; }
 		public IfcReinforcingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
@@ -497,6 +527,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcReinforcingElementType() : base() { }
 		protected IfcReinforcingElementType(DatabaseIfc db) : base(db) { }
+		protected IfcReinforcingElementType(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected IfcReinforcingElementType(DatabaseIfc db, IfcReinforcingElementType t, DuplicateOptions options) : base(db, t, options) { }
 	}
 	[Serializable]
@@ -683,8 +714,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
-	public partial class IfcRelAssignsTasks : IfcRelAssignsToControl // IFC4 depreceated
+	[Obsolete("DEPRECATED IFC4", false)]
+	public partial class IfcRelAssignsTasks : IfcRelAssignsToControl // IFC4 DEPRECATED
 	{
 		private int mTimeForTask;// :  	OPTIONAL IfcScheduleTimeControl; 
 
@@ -815,8 +846,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRelAssignsToProjectOrder // DEPRECEATED IFC4 
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRelAssignsToProjectOrder // DEPRECATED IFC4 
 	[Serializable]
 	public partial class IfcRelAssignsToResource : IfcRelAssigns
 	{
@@ -879,8 +910,8 @@ namespace GeometryGym.Ifc
 
 		public override string ToString() { return (mRelatedObjects.Count == 0 ? "" : base.ToString()); }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRelAssociatesAppliedValue // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRelAssociatesAppliedValue // DEPRECATED IFC4
 	[Serializable]
 	public partial class IfcRelAssociatesApproval : IfcRelAssociates
 	{
@@ -1075,9 +1106,9 @@ namespace GeometryGym.Ifc
 		internal IfcRelationship(DatabaseIfc db) : base(db) { }
 		protected IfcRelationship(DatabaseIfc db, IfcRelationship r, IfcOwnerHistory ownerHistory) : base(db, r, ownerHistory) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcRelaxation : BaseClassIfc// DEPRECEATED IFC4
+	public partial class IfcRelaxation : BaseClassIfc// DEPRECATED IFC4
 	{
 		internal double mRelaxationValue;// : IfcNormalisedRatioMeasure;
 		internal double mInitialStress;// : IfcNormalisedRatioMeasure; 
@@ -1802,8 +1833,8 @@ namespace GeometryGym.Ifc
 		internal IfcRelFlowControlElements() : base() { }
 		internal IfcRelFlowControlElements(DatabaseIfc db, IfcRelFlowControlElements r, DuplicateOptions options) : base(db, r, options.OwnerHistory) { RelatingPort = db.Factory.Duplicate(r.RelatingPort, options) as IfcPort; RelatedElement = db.Factory.Duplicate(r.RelatedElement, options) as IfcElement; }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRelInteractionRequirements  // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRelInteractionRequirements  // DEPRECATED IFC4
 	[Serializable]
 	public partial class IfcRelInterferesElements : IfcRelConnects
 	{
@@ -1938,10 +1969,10 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRelOccupiesSpaces // DEPRECEATED IFC4
-	[Obsolete("DEPRECEATED IFC4", false)]
-	public partial class IfcRelOverridesProperties : IfcRelDefinesByProperties // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRelOccupiesSpaces // DEPRECATED IFC4
+	[Obsolete("DEPRECATED IFC4", false)]
+	public partial class IfcRelOverridesProperties : IfcRelDefinesByProperties // DEPRECATED IFC4
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease <= ReleaseVersion.IFC2x3 ? base.StepClassName : "IFCRELOVERRIDESPROPERTIES"); } }
 		private List<int> mOverridingProperties = new List<int>();// : 	SET [1:?] OF IfcProperty;
@@ -1956,6 +1987,23 @@ namespace GeometryGym.Ifc
 		internal IfcRelOverridesProperties(IfcPropertySetDefinition ifcproperty) : base(ifcproperty) { }
 		public IfcRelOverridesProperties(IfcObjectDefinition od, IfcPropertySetDefinition ifcproperty) : base(od, ifcproperty) { }
 		public IfcRelOverridesProperties(List<IfcObjectDefinition> objs, IfcPropertySetDefinition ifcproperty) : base(objs, ifcproperty) { }
+	}
+	[Serializable]
+	public partial class IfcRelPositions : IfcRelConnects
+	{
+		private IfcPositioningElement mRelatingPositioningElement = null; //: IfcPositioningElement;
+		private SET<IfcProduct> mRelatedProducts = new SET<IfcProduct>(); //: SET[1:?] OF IfcProduct;
+
+		public IfcPositioningElement RelatingPositioningElement { get { return mRelatingPositioningElement; } set { mRelatingPositioningElement = value; } }
+		public SET<IfcProduct> RelatedProducts { get { return mRelatedProducts; } set { mRelatedProducts = value; } }
+
+		public IfcRelPositions() : base() { }
+		public IfcRelPositions(DatabaseIfc db, IfcPositioningElement relatingPositioningElement, IEnumerable<IfcProduct> relatedProducts)
+			: base(db)
+		{
+			RelatingPositioningElement = relatingPositioningElement;
+			RelatedProducts.AddRange(relatedProducts);
+		}
 	}
 	[Serializable]
 	public partial class IfcRelProjectsElement : IfcRelDecomposes // IFC2x3 IfcRelDecomposes
@@ -2031,8 +2079,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRelSchedulesCostItems // DEPRECEATED IFC4 
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRelSchedulesCostItems // DEPRECATED IFC4 
 	[Serializable]
 	public partial class IfcRelSequence : IfcRelConnects
 	{
@@ -2415,7 +2463,24 @@ namespace GeometryGym.Ifc
 		protected IfcResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
-	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECEATED IFC4 renamed
+	public partial class IfcResourceApprovalRelationship : IfcResourceLevelRelationship
+	{
+		private SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>(); //: SET[1:?] OF IfcResourceObjectSelect;
+		private IfcApproval mRelatingApproval = null; //: IfcApproval;
+
+		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects = value; } }
+		public IfcApproval RelatingApproval { get { return mRelatingApproval; } set { mRelatingApproval = value; } }
+
+		public IfcResourceApprovalRelationship() : base() { }
+		public IfcResourceApprovalRelationship(IEnumerable<IfcResourceObjectSelect> relatedResourceObjects, IfcApproval relatingApproval)
+			: base(relatingApproval.Database)
+		{
+			RelatedResourceObjects.AddRange(relatedResourceObjects);
+			RelatingApproval = relatingApproval;
+		}
+	}
+	[Serializable]
+	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECATED IFC4 renamed
 	{
 		internal int mRelatingConstraint;// :	IfcConstraint;
 		internal List<int> mRelatedResourceObjects = new List<int>();// :	SET [1:?] OF IfcResourceObjectSelect;
@@ -2454,8 +2519,8 @@ namespace GeometryGym.Ifc
 	{ // IfcCurrencyRelationship, IfcDocumentInformationRelationship, IfcExternalReferenceRelationship, IfcMaterialRelationship, IfcOrganizationRelationship, IfcPropertyDependencyRelationship, IfcResourceApprovalRelationship, IfcResourceConstraintRelationship));
 		internal string mName = "$";// : OPTIONAL IfcLabel
 		internal string mDescription = "$";// : OPTIONAL IfcText; 
-										   //INVERSE
-										   //mHasExternalReference
+		//INVERSE
+		//mHasExternalReference
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -2466,7 +2531,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcResourceObjectSelect : IBaseClassIfc //IFC4 SELECT (	IfcPropertyAbstraction, IfcPhysicalQuantity, IfcAppliedValue, 
 	{   //IfcContextDependentUnit, IfcConversionBasedUnit, IfcProfileDef, IfcActorRole, IfcApproval, IfcConstraint, IfcTimeSeries, IfcMaterialDefinition, IfcPerson, IfcPersonAndOrganization, IfcOrganization, IfcExternalReference, IfcExternalInformation););
-		SET<IfcExternalReferenceRelationship> HasExternalReferences { get; set; }
+		SET<IfcExternalReferenceRelationship> HasExternalReference { get; set; }
 		void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship);
 	}
 	public interface IfcResourceSelect : IBaseClassIfc { } // SELECT(IfcResource, IfcTypeResource)
@@ -2536,7 +2601,7 @@ namespace GeometryGym.Ifc
 	}
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
-	public partial class IfcRibPlateProfileProperties : IfcProfilePropertiesDEPRECATED
+	public partial class IfcRibPlateProfileProperties : IfcProfileProperties
 	{
 		internal double mThickness, mRibHeight, mRibWidth, mRibSpacing;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcRibPlateDirectionEnum mDirection;// : IfcRibPlateDirectionEnum;*/
@@ -2676,8 +2741,8 @@ namespace GeometryGym.Ifc
 		public IfcRotationalStiffnessSelect(bool fix) { mRigid = fix; }
 		public IfcRotationalStiffnessSelect(double stiff) { mStiffness = new IfcRotationalStiffnessMeasure(stiff); }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcRoundedEdgeFeature // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcRoundedEdgeFeature // DEPRECATED IFC4
 	[Serializable]
 	public partial class IfcRoundedRectangleProfileDef : IfcRectangleProfileDef
 	{

@@ -161,6 +161,7 @@ namespace GeometryGym.Ifc
 		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set { mElevationOfTerrain = value; } }
 
 		internal IfcFacility() : base() { }
+		public IfcFacility(DatabaseIfc db) : base(db.Factory.RootPlacement) { }
 		internal IfcFacility(DatabaseIfc db, IfcFacility f, DuplicateOptions options) : base(db, f, options)
 		{
 			mElevationOfRefHeight = f.mElevationOfRefHeight;
@@ -210,7 +211,26 @@ namespace GeometryGym.Ifc
 		}
 		public IfcFacilityPart(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = name; }
 	}
-	//ENTITY IfcFailureConnectionCondition
+	[Serializable]
+	public partial class IfcFailureConnectionCondition : IfcStructuralConnectionCondition
+	{
+		private double mTensionFailureX = double.NaN; //: OPTIONAL IfcForceMeasure;
+		private double mTensionFailureY = double.NaN; //: OPTIONAL IfcForceMeasure;
+		private double mTensionFailureZ = double.NaN; //: OPTIONAL IfcForceMeasure;
+		private double mCompressionFailureX = double.NaN; //: OPTIONAL IfcForceMeasure;
+		private double mCompressionFailureY = double.NaN; //: OPTIONAL IfcForceMeasure;
+		private double mCompressionFailureZ = double.NaN; //: OPTIONAL IfcForceMeasure;
+
+		public double TensionFailureX { get { return mTensionFailureX; } set { mTensionFailureX = value; } }
+		public double TensionFailureY { get { return mTensionFailureY; } set { mTensionFailureY = value; } }
+		public double TensionFailureZ { get { return mTensionFailureZ; } set { mTensionFailureZ = value; } }
+		public double CompressionFailureX { get { return mCompressionFailureX; } set { mCompressionFailureX = value; } }
+		public double CompressionFailureY { get { return mCompressionFailureY; } set { mCompressionFailureY = value; } }
+		public double CompressionFailureZ { get { return mCompressionFailureZ; } set { mCompressionFailureZ = value; } }
+
+		public IfcFailureConnectionCondition() : base() { }
+		public IfcFailureConnectionCondition(DatabaseIfc db) : base(db) { }
+	}
 	[Serializable]
 	public partial class IfcFan : IfcFlowMovingDevice //IFC4
 	{
@@ -311,7 +331,7 @@ namespace GeometryGym.Ifc
 	{
 		internal int mHatchLineAppearance;// : IfcCurveStyle;
 		internal string mStartOfNextHatchLine;// : IfcHatchLineDistanceSelect; IfcOneDirectionRepeatFactor,IfcPositiveLengthMeasure
-		internal int mPointOfReferenceHatchLine;// : OPTIONAL IfcCartesianPoint; //DEPRECEATED IFC4
+		internal int mPointOfReferenceHatchLine;// : OPTIONAL IfcCartesianPoint; //DEPRECATED IFC4
 		internal int mPatternStart;// : OPTIONAL IfcCartesianPoint;
 		internal double mHatchLineAngle;// : IfcPlaneAngleMeasure;
 
@@ -330,11 +350,30 @@ namespace GeometryGym.Ifc
 			mHatchLineAngle = h.mHatchLineAngle;
 		}
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECEATED IFC4
-	//ENTITY IfcFillAreaStyleTiles : , IfcFillStyleSelect 
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECATED IFC4
+	[Serializable]
+	public partial class IfcFillAreaStyleTiles : IfcGeometricRepresentationItem, IfcFillStyleSelect
+	{
+		private LIST<IfcVector> mTilingPattern = new LIST<IfcVector>(); //: LIST[2:2] OF IfcVector;
+		private SET<IfcStyledItem> mTiles = new SET<IfcStyledItem>(); //: SET[1:?] OF IfcStyledItem;
+		private double mTilingScale = 0; //: IfcPositiveRatioMeasure;
+
+		public LIST<IfcVector> TilingPattern { get { return mTilingPattern; } set { mTilingPattern = value; } }
+		public SET<IfcStyledItem> Tiles { get { return mTiles; } set { mTiles = value; } }
+		public double TilingScale { get { return mTilingScale; } set { mTilingScale = value; } }
+
+		public IfcFillAreaStyleTiles() : base() { }
+		public IfcFillAreaStyleTiles(IEnumerable<IfcVector> tilingPattern, IEnumerable<IfcStyledItem> tiles, double tilingScale)
+			: base(tilingPattern.First().Database)
+		{
+			TilingPattern.AddRange(tilingPattern);
+			Tiles.AddRange(tiles);
+			TilingScale = tilingScale;
+		}
+	}
 	public interface IfcFillStyleSelect : IBaseClassIfc { } // SELECT ( IfcFillAreaStyleHatching, IfcFillAreaStyleTiles, IfcExternallyDefinedHatchStyle, IfcColour);
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcFilter : IfcFlowTreatmentDevice //IFC4  
 	{
@@ -555,7 +594,7 @@ namespace GeometryGym.Ifc
 		protected IfcFlowTreatmentDeviceType(DatabaseIfc db) : base(db) { }
 		protected IfcFlowTreatmentDeviceType(DatabaseIfc db,  IfcFlowTreatmentDeviceType t, DuplicateOptions options) : base(db, t, options) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcFluidFlowProperties : IfcPropertySetDefinition 
 	{
@@ -615,17 +654,17 @@ namespace GeometryGym.Ifc
 		public IfcFootingType(DatabaseIfc m, string name, IfcFootingTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 		public IfcFootingType(string name, IfcMaterialProfileSet mps, IfcFootingTypeEnum type) : base(mps.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mps; }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
+	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcFuelProperties
 	[Serializable]
-	public partial class IfcFurnishingElement : IfcElement // DEPRECEATED IFC4 to make abstract SUPERTYPE OF(ONEOF(IfcFurniture, IfcSystemFurnitureElement))
+	public partial class IfcFurnishingElement : IfcElement // DEPRECATED IFC4 to make abstract SUPERTYPE OF(ONEOF(IfcFurniture, IfcSystemFurnitureElement))
 	{
 		internal IfcFurnishingElement() : base() { }
 		internal IfcFurnishingElement(DatabaseIfc db, IfcFurnishingElement e, DuplicateOptions options) : base(db, e, options) { }
 		internal IfcFurnishingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcFurnishingElementType : IfcElementType //IFC4 Depreceated //SUPERTYPE OF (ONEOF (IfcFurnitureType ,IfcSystemFurnitureElementType))
+	public partial class IfcFurnishingElementType : IfcElementType //IFC4 DEPRECATED //SUPERTYPE OF (ONEOF (IfcFurnitureType ,IfcSystemFurnitureElementType))
 	{
 		internal IfcFurnishingElementType() : base() { }
 		internal IfcFurnishingElementType(DatabaseIfc db, IfcFurnishingElementType t, DuplicateOptions options) : base(db, t, options) { }
@@ -640,7 +679,7 @@ namespace GeometryGym.Ifc
 		internal IfcFurniture(DatabaseIfc db, IfcFurniture f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
 		public IfcFurniture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcFurnitureStandard : IfcControl 
 	{

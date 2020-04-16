@@ -460,7 +460,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Name", Name);
 		}
 	}
-	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
+	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
 	{
 
 		internal override void ParseXml(XmlElement xml)
@@ -625,8 +625,8 @@ namespace GeometryGym.Ifc
 
 			if (mDatabase.Release >= ReleaseVersion.IFC2x3)
 			{
-				XmlElement externalReferences = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				XmlElement externalReferences = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 				{
 					if (r == host)
 						continue;
@@ -768,7 +768,7 @@ namespace GeometryGym.Ifc
     }
     public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
 	{
-		//internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4 
+		//internal List<IfcExternalReferenceRelationship> mHasExternalReference = new List<IfcExternalReferenceRelationship>(); //IFC4 
 		//internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -776,7 +776,7 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "HasExternalReferences") == 0)
+				if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -799,11 +799,11 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
             //if (mHasConstraintRelationships.Count > 0)

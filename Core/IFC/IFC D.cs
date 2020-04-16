@@ -48,9 +48,9 @@ namespace GeometryGym.Ifc
 		internal IfcDamperType(DatabaseIfc db, IfcDamperType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcDamperType(DatabaseIfc m, string name, IfcDamperTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
-	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DEPRECEATED IFC4
+	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DELETED IFC4
 	{
 		internal int mDateComponent;// : IfcCalendarDate;
 		internal int mTimeComponent;// : IfcLocalTime;
@@ -70,10 +70,26 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	
 	public interface IfcDateTimeSelect : IBaseClassIfc { DateTime DateTime { get; } } // IFC2x3 IfcCalenderDate, IfcDateAndTime, IfcLocalTime 
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcDefinedSymbol  // DEPRECEATED IFC4
+	[Serializable]
+	public partial class IfcDeepFoundation : IfcBuildingElement
+	{
+		public IfcDeepFoundation() : base() { }
+		public IfcDeepFoundation(DatabaseIfc db) : base(db) { }
+		public IfcDeepFoundation(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		internal IfcDeepFoundation(DatabaseIfc db, IfcDeepFoundation f, DuplicateOptions options) : base(db, f, options) { }
+	}
+	[Serializable]
+	public partial class IfcDeepFoundationType : IfcBuildingElementType
+	{
+		public IfcDeepFoundationType() : base() { }
+		public IfcDeepFoundationType(DatabaseIfc db) : base(db) { }
+		public IfcDeepFoundationType(DatabaseIfc db, string name) : base(db, name) { }
+		internal IfcDeepFoundationType(DatabaseIfc db, IfcDeepFoundationType t, DuplicateOptions options) : base(db, t, options) { }
+	}
+
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcDefinedSymbol  // DEPRECATED IFC4
 	public interface IfcDefinitionSelect : IBaseClassIfc // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
 	{
 		IfcRelDeclares HasContext { get; set; }
@@ -144,9 +160,9 @@ namespace GeometryGym.Ifc
 		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Factory.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
 		public IfcDerivedUnitElement(IfcNamedUnit u, int exponent) : base(u.mDatabase) { mUnit = u.mIndex; mExponent = exponent; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDiameterDimension : IfcDimensionCurveDirectedCallout // DEPRECEATED IFC4
+	public partial class IfcDiameterDimension : IfcDimensionCurveDirectedCallout // DEPRECATED IFC4
 	{
 		internal IfcDiameterDimension() : base() { }
 		//internal IfcDiameterDimension(IfcDiameterDimension el) : base(el) { }
@@ -184,45 +200,45 @@ namespace GeometryGym.Ifc
 			mLuminousIntensityExponent = luminous;
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDimensionCalloutRelationship : IfcDraughtingCalloutRelationship // DEPRECEATED IFC4
+	public partial class IfcDimensionCalloutRelationship : IfcDraughtingCalloutRelationship // DEPRECATED IFC4
 	{
 		internal IfcDimensionCalloutRelationship() : base() { }
 		//internal IfcDimensionCalloutRelationship(DatabaseIfc db, IfcDimensionCalloutRelationship r) : base(db,r) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDimensionCurve : IfcAnnotationCurveOccurrence // DEPRECEATED IFC4
+	public partial class IfcDimensionCurve : IfcAnnotationCurveOccurrence // DEPRECATED IFC4
 	{
 		internal List<int> mAnnotatedBySymbols = new List<int>();// SET [0:2] OF IfcTerminatorSymbol FOR AnnotatedCurve; 
 		internal IfcDimensionCurve() : base() { }
 		//internal IfcDimensionCurve(DatabaseIfc db, IfcDimensionCurve p) : base(p) { mAnnotatedBySymbols = new List<int>(p.mAnnotatedBySymbols.ToArray()); }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDimensionCurveDirectedCallout : IfcDraughtingCallout // DEPRECEATED IFC4 SUPERTYPE OF (ONEOF (IfcAngularDimension ,IfcDiameterDimension ,IfcLinearDimension ,IfcRadiusDimension))
+	public partial class IfcDimensionCurveDirectedCallout : IfcDraughtingCallout // DEPRECATED IFC4 SUPERTYPE OF (ONEOF (IfcAngularDimension ,IfcDiameterDimension ,IfcLinearDimension ,IfcRadiusDimension))
 	{
 		internal IfcDimensionCurveDirectedCallout() : base() { }
 	//	internal IfcDimensionCurveDirectedCallout(DatabaseIfc db, IfcDimensionCurveDirectedCallout c) : base(db,c) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol // DEPRECEATED IFC4
+	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol // DEPRECATED IFC4
 	{
 		internal IfcDimensionExtentUsage mRole;// : IfcDimensionExtentUsage;
 		internal IfcDimensionCurveTerminator() : base() { }
 	//	internal IfcDimensionCurveTerminator(IfcDimensionCurveTerminator i) : base(i) { mRole = i.mRole; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDimensionPair : IfcDraughtingCalloutRelationship // DEPRECEATED IFC4
+	public partial class IfcDimensionPair : IfcDraughtingCalloutRelationship // DEPRECATED IFC4
 	{
 		internal IfcDimensionPair() : base() { }
 		//internal IfcDimensionPair(IfcDimensionPair i) : base((IfcDraughtingCalloutRelationship)i) { }
 	}
 	[Serializable]
-	public partial class IfcDirection : IfcGeometricRepresentationItem
+	public partial class IfcDirection : IfcGeometricRepresentationItem, IfcGridPlacementDirectionSelect, IfcVectorOrDirection
 	{
 		[NonSerialized] private double mDirectionRatioX = 0, mDirectionRatioY = 0, mDirectionRatioZ = double.NaN; // DirectionRatios : LIST [2:3] OF IfcReal;
 
@@ -427,9 +443,9 @@ namespace GeometryGym.Ifc
 		internal IfcDistributionSystem(DatabaseIfc db, IfcDistributionSystem s, DuplicateOptions options) : base(db, s, options) { mLongName = s.mLongName; mPredefinedType = s.mPredefinedType; }
 		public IfcDistributionSystem(IfcSpatialElement bldg, string name, IfcDistributionSystemEnum type) : base(bldg, name) { mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDocumentElectronicFormat : BaseClassIfc // DEPRECEATED IFC4
+	public partial class IfcDocumentElectronicFormat : BaseClassIfc // DEPRECATED IFC4
 	{
 		internal string mFileExtension = "$";//  OPTIONAL IfcLabel;
 		internal string mMimeContentType = "$";//  OPTIONAL IfcLabel;
@@ -465,7 +481,7 @@ namespace GeometryGym.Ifc
 		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }
 		public string Description { get { return mDescription == "$" ? "" : ParserIfc.Decode(mDescription); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		[Obsolete("DEPRECEATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4", false)]
 		public ReadOnlyCollection<IfcDocumentReference> DocumentReferences { get { return new ReadOnlyCollection<IfcDocumentReference>(mDocumentReferences.ConvertAll(x => mDatabase[x] as IfcDocumentReference)); } }
 		public string Location { get { return mLocation == "$" ? "" : ParserIfc.Decode(mLocation); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Purpose { get { return mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -577,7 +593,7 @@ namespace GeometryGym.Ifc
 		internal double mLiningDepth, mLiningThickness, mThresholdDepth, mThresholdThickness, mTransomThickness;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mTransomOffset = double.NaN, mLiningOffset = double.NaN, mThresholdOffset = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mCasingThickness = double.NaN, mCasingDepth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect;  // DEPRECEATED IFC4
+		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect;  // DEPRECATED IFC4
 		internal double mLiningToPanelOffsetX = double.NaN, mLiningToPanelOffsetY = double.NaN;//	 :	OPTIONAL IfcLengthMeasure;  IFC4
 
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
@@ -608,7 +624,7 @@ namespace GeometryGym.Ifc
 		internal IfcDoorPanelOperationEnum mOperationType;// : IfcDoorPanelOperationEnum;
 		internal double mPanelWidth = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		internal IfcDoorPanelPositionEnum mPanelPosition;// :IfcDoorPanelPositionEnum;
-		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect;  // DEPRECEATED IFC4
+		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect;  // DEPRECATED IFC4
 
 		public double PanelDepth { get { return mPanelDepth; } set { mPanelDepth = value; } }
 		public IfcDoorPanelOperationEnum OperationType { get { return mOperationType; } set { mOperationType = value; } }
@@ -616,7 +632,7 @@ namespace GeometryGym.Ifc
 		public IfcDoorPanelPositionEnum PanelPosition { get { return mPanelPosition; } set { mPanelPosition = value; } }
 
 		internal IfcDoorPanelProperties() : base() { }
-		[Obsolete("DEPRECEATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 		internal IfcDoorPanelProperties(DatabaseIfc db, IfcDoorPanelProperties p, DuplicateOptions options) : base(db, p, options)
 		{
@@ -635,7 +651,7 @@ namespace GeometryGym.Ifc
 		internal IfcDoorStandardCase() : base() { }
 		internal IfcDoorStandardCase(DatabaseIfc db, IfcDoorStandardCase d, DuplicateOptions options) : base(db, d, options) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcDoorStyle : IfcTypeProduct //IFC2x3 
 	{
@@ -686,18 +702,18 @@ namespace GeometryGym.Ifc
 			mParameterTakesPrecedence = parameterTakesPrecendence;
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDraughtingCallout : IfcGeometricRepresentationItem // DEPRECEATED IFC4 SUPERTYPE OF (ONEOF (IfcDimensionCurveDirectedCallout ,IfcStructuredDimensionCallout))
+	public partial class IfcDraughtingCallout : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF (ONEOF (IfcDimensionCurveDirectedCallout ,IfcStructuredDimensionCallout))
 	{
 		internal List<int> mContents = new List<int>(); //: SET [1:?] OF IfcDraughtingCalloutElement 
 		internal IfcDraughtingCallout() : base() { }
 		//internal IfcDraughtingCallout(IfcDraughtingCallout el) : base(el) { mContents = new List<int>(el.mContents.ToArray()); }
 	}
 	public interface IfcDraughtingCalloutElement : IBaseClassIfc { } //SELECT (IfcAnnotationCurveOccurrence ,IfcAnnotationTextOccurrence ,IfcAnnotationSymbolOccurrence);
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECEATED IFC4
+	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECATED IFC4
 	{
 		internal string mName = "$";// : OPTIONAL IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
@@ -717,9 +733,9 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcDraughtingPreDefinedCurveFont() : base() { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcDraughtingPreDefinedTextFont : IfcPreDefinedTextFont // DEPRECEATED IFC4
+	public partial class IfcDraughtingPreDefinedTextFont : IfcPreDefinedTextFont // DEPRECATED IFC4
 	{
 		internal IfcDraughtingPreDefinedTextFont() : base() { }
 	}

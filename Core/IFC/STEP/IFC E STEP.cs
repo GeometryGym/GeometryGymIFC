@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 			EdgeGeometry.mEdge = this;
 		}
 	}
-	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECEATED IFC4
+	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mFeatureLength); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricDistributionBoardTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECEATED IFC4
+	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mDistributionPointFunction.ToString() + (mUserDefinedFunction == "$" ? ".,$" : ".,'" + mUserDefinedFunction + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -174,7 +174,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricGeneratorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcElectricHeaterType : IfcFlowTerminalType // DEPRECEATED IFC4
+	public partial class IfcElectricHeaterType : IfcFlowTerminalType // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -229,7 +229,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricTimeControlTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	//ENTITY IfcElectricalBaseProperties // DEPRECEATED IFC4
+	//ENTITY IfcElectricalBaseProperties // DEPRECATED IFC4
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
 	{ 
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + (mTag == "$" ? "$" : "'" + mTag + "'"); }
@@ -324,7 +324,7 @@ namespace GeometryGym.Ifc
 			mSemiAxis2 = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	//IfcEnergyProperties // DEPRECEATED IFC4
+	//IfcEnergyProperties // DEPRECATED IFC4
 	public partial class IfcEngine : IfcEnergyConversionDevice //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -350,7 +350,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcEngineTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcEnvironmentalImpactValue : IfcAppliedValue //DEPRECEATED
+	public partial class IfcEnvironmentalImpactValue : IfcAppliedValue //DEPRECATED
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mImpactType + "',." + mEnvCategory.ToString() + ".," +( mUserDefinedCategory == "$" ? "$" : "'" + mUserDefinedCategory + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -430,6 +430,25 @@ namespace GeometryGym.Ifc
 			mEventOccurrenceTime = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
+	public partial class IfcEventTime : IfcSchedulingTime
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," +
+			IfcDateTime.STEPAttribute(mActualDate) + "," +
+			IfcDateTime.STEPAttribute(mEarlyDate) + "," +
+			IfcDateTime.STEPAttribute(mLateDate) + "," +
+			IfcDateTime.STEPAttribute(mScheduleDate);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			ActualDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+			EarlyDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+			LateDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+			ScheduleDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+		}
+	}
 	public partial class IfcEventType : IfcTypeProcess //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,." + mEventTriggerType.ToString() + (mUserDefinedEventTriggerType == "$" ? ".,$" : (".,'" + mUserDefinedEventTriggerType + "'"))); }
@@ -441,7 +460,7 @@ namespace GeometryGym.Ifc
 			mUserDefinedEventTriggerType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties  // DEPRECEATED IFC4
+	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties  // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -485,7 +504,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	//ENTITY IfcExternallyDefinedHatchStyle
-	//ENTITY IfcExternallyDefinedSymbol // DEPRECEATED IFC4
+	//ENTITY IfcExternallyDefinedSymbol // DEPRECATED IFC4
 	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect//ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle
 	{ 
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mLocation == "$" ? ",$," : ",'" + mLocation + "',") + (mIdentification == "$" ? "$" : "'" + mIdentification + "'") + (string.IsNullOrEmpty(mName) ? ",$" : ",'" + ParserIfc.Encode(mName) + "'"); }

@@ -333,7 +333,7 @@ namespace GeometryGym.Ifc
 			mInnerBoundaries.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=> dictionary[x] as IfcCurve));
 		}
 	}
-	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 Depreceated
+	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mFillStyleTarget + ",." + mGlobalOrLocal.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -344,7 +344,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcGlobalOrLocalEnum>(s.Replace(".", ""), true, out mGlobalOrLocal);
 		}
 	}
-	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECEATED IFC4
+	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mItem + "," + ParserSTEP.ObjToLinkString(mTextureCoordinates); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -433,11 +433,11 @@ namespace GeometryGym.Ifc
 				v.mComponentFor.Add(this);
 		}
 	}
-	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",#" + mComponentOfTotal.Index + ",(#" + 
+			return base.BuildStringSTEP(release) + ",#" + mComponentOfTotal.StepId + ",(#" + 
 				string.Join(",#", mComponents.Select(x=>x.Index))+ "),." + mArithmeticOperator.ToString() + ".," + mName + "," + mDescription;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -463,7 +463,7 @@ namespace GeometryGym.Ifc
 			mIdentifier = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcApprovalActorRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcApprovalActorRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mActor) + "," + ParserSTEP.LinkToString(mApproval) + "," + ParserSTEP.LinkToString(mRole);  }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -473,7 +473,7 @@ namespace GeometryGym.Ifc
 			mRole = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcApprovalPropertyRelationship : BaseClassIfc //DEPRECEATED IFC4
+	public partial class IfcApprovalPropertyRelationship : BaseClassIfc //DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

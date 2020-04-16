@@ -476,7 +476,7 @@ namespace GeometryGym.Ifc
 							addComponent(v);
 					}
 				}
-				else if (string.Compare(name, "HasExternalReferences") == 0)
+				else if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -541,11 +541,11 @@ namespace GeometryGym.Ifc
 					element.AppendChild(v.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mHasConstraintRelationships.Count > 0)

@@ -61,7 +61,7 @@ namespace GeometryGym.Ifc
 		public IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcVector : IfcGeometricRepresentationItem
+	public partial class IfcVector : IfcGeometricRepresentationItem, IfcHatchLineDistanceSelect, IfcVectorOrDirection
 	{
 		internal int mOrientation; // : IfcDirection;
 		internal double mMagnitude;// : IfcLengthMeasure; 
@@ -73,6 +73,7 @@ namespace GeometryGym.Ifc
 		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
 		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.mDatabase) { Orientation = orientation; Magnitude = magnitude; }
 	}
+	public interface IfcVectorOrDirection : IBaseClassIfc { } // SELECT(IfcDirection, IfcVector);
 	[Serializable]
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
@@ -84,8 +85,8 @@ namespace GeometryGym.Ifc
 		public IfcVertex(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
-	[Obsolete("DEPRECEATED IFC4", false)]
-	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECEATED IFC4
+	[Obsolete("DEPRECATED IFC4", false)]
+	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECATED IFC4
 	{
 		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
 		internal List<int> mTexturePoints = new List<int>();// LIST [3:?] OF IfcCartesianPoint; 
@@ -120,6 +121,25 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
+	public partial class IfcVibrationDamper : IfcElementComponent
+	{
+		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: OPTIONAL IfcVibrationDamperTypeEnum;
+		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcVibrationDamper() : base() { }
+		public IfcVibrationDamper(DatabaseIfc db) : base(db) { }
+		public IfcVibrationDamper(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcVibrationDamperType : IfcElementComponentType
+	{
+		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: OPTIONAL IfcVibrationDamperTypeEnum;
+		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcVibrationDamperType() : base() { }
+		public IfcVibrationDamperType(DatabaseIfc db, string name) : base(db, name) { }
+	}
+	[Serializable]
 	public partial class IfcVibrationIsolator : IfcElementComponent
 	{
 		internal IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : OPTIONAL IfcVibrationIsolatorTypeEnum;
@@ -147,7 +167,7 @@ namespace GeometryGym.Ifc
 		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 	}
 	[Serializable]
-	public partial class IfcVirtualGridIntersection : BaseClassIfc
+	public partial class IfcVirtualGridIntersection : BaseClassIfc, IfcGridPlacementDirectionSelect
 	{
 		private Tuple<int,int> mIntersectingAxes = new Tuple<int,int>(0,0);// : LIST [2:2] OF UNIQUE IfcGridAxis;
 		private Tuple<double,double,double> mOffsetDistances = null;// : LIST [2:3] OF IfcLengthMeasure; 

@@ -219,7 +219,7 @@ namespace GeometryGym.Ifc
 			mOffsetValues = arrNodes.ConvertAll(x => ParserSTEP.ParseDouble(x)).ToArray();
 		}
 	}
-	public partial class IfcMaterialList : BaseClassIfc, IfcMaterialSelect //DEPRECEATED IFC4
+	public partial class IfcMaterialList : BaseClassIfc, IfcMaterialSelect //DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -337,7 +337,7 @@ namespace GeometryGym.Ifc
 			mUnitComponent = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcMechanicalConcreteMaterialProperties : IfcMechanicalMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalConcreteMaterialProperties : IfcMechanicalMaterialProperties // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mCompressiveStrength) + "," + ParserSTEP.DoubleOptionalToString(mMaxAggregateSize) + (mAdmixturesDescription == "$" ? ",$," : ",'" + mAdmixturesDescription + "',") + (mWorkability == "$" ? "$," : "'" + mWorkability + "',") + ParserSTEP.DoubleOptionalToString(mProtectivePoreRatio) + (mWaterImpermeability== "$" ? ",$" : ",'" + mWaterImpermeability + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -381,7 +381,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalMaterialProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mDynamicViscosity) + "," + ParserSTEP.DoubleOptionalToString(mYoungModulus) + "," + ParserSTEP.DoubleOptionalToString(mShearModulus) + "," + ParserSTEP.DoubleOptionalToString(mPoissonRatio) + "," + ParserSTEP.DoubleOptionalToString(mThermalExpansionCoefficient); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -394,7 +394,7 @@ namespace GeometryGym.Ifc
 			mThermalExpansionCoefficient = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	public partial class IfcMechanicalSteelMaterialProperties : IfcMechanicalMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcMechanicalSteelMaterialProperties : IfcMechanicalMaterialProperties // DEPRECATED IFC4
 	{
 		
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -511,5 +511,5 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMotorConnectionTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	//ENTITY IfcMove // DEPRECEATED IFC4
+	//ENTITY IfcMove // DEPRECATED IFC4
 }

@@ -32,8 +32,8 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("DEPRECEATED IFC4", false)] IFC2X, [Obsolete("DEPRECEATED IFC4", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
-	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, Ifc2x3NotAssigned };
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
 	{

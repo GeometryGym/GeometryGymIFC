@@ -286,7 +286,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
+	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -410,7 +410,7 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ProfileName = token.Value<string>();
 			
-			HasExternalReferences.AddRange(mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			HasExternalReference.AddRange(mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			HasProperties.AddRange(mDatabase.extractJArray<IfcProfileProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -422,14 +422,14 @@ namespace GeometryGym.Ifc
 			if (mDatabase == null || mDatabase.Release >= ReleaseVersion.IFC2x3)
 			{
 				JArray jArray = new JArray();
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 				{
 					if (r == host)
 						continue;
 					jArray.Add(r.getJson(this, options));
 				}
 				if (jArray.Count > 0)
-					obj["HasExternalReferences"] = jArray;
+					obj["HasExternalReference"] = jArray;
 
 
 				jArray = new JArray();
@@ -508,7 +508,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray))
+			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.addRelated(this);
@@ -516,7 +516,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			createArray(obj, "HasExternalReferences", HasExternalReferences, this, options);
+			createArray(obj, "HasExternalReference", HasExternalReference, this, options);
 			//if (mHasConstraintRelationships.Count > 0)
 
 		}

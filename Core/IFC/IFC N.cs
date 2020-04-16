@@ -65,6 +65,8 @@ namespace GeometryGym.Ifc
 					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0);
 			}
 		}
+		public IfcNamedUnit(IfcDimensionalExponents dimensions, IfcUnitEnum unitType)
+			: base(dimensions.Database) { Dimensions = dimensions; UnitType = unitType; }
 
 		public abstract double SIFactor { get; }
 	}

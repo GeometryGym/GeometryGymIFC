@@ -192,8 +192,37 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcInventory(DatabaseIfc m, string name) : base(m, name) { }
 	}
-	//ENTITY IfcIrregularTimeSeries
-	//ENTITY IfcIrregularTimeSeriesValue;
+	[Serializable]
+	public partial class IfcIrregularTimeSeries : IfcTimeSeries
+	{
+		private LIST<IfcIrregularTimeSeriesValue> mValues = new LIST<IfcIrregularTimeSeriesValue>(); //: LIST[1:?] OF IfcIrregularTimeSeriesValue;
+
+		public LIST<IfcIrregularTimeSeriesValue> Values { get { return mValues; } set { mValues = value; } }
+
+		public IfcIrregularTimeSeries() : base() { }
+		public IfcIrregularTimeSeries(string name, DateTime startTime, DateTime endTime, IfcTimeSeriesDataTypeEnum timeSeriesDataType, IfcDataOriginEnum dataOrigin, IEnumerable<IfcIrregularTimeSeriesValue> values)
+			: base(values.First().Database, name, startTime, endTime, timeSeriesDataType, dataOrigin)
+		{
+			Values.AddRange(values);
+		}
+	}
+	[Serializable]
+	public partial class IfcIrregularTimeSeriesValue : BaseClassIfc
+	{
+		private DateTime mTimeStamp = DateTime.MinValue; //: IfcDateTime;
+		private LIST<IfcValue> mListValues = new LIST<IfcValue>(); //: LIST[1:?] OF IfcValue;
+
+		public DateTime TimeStamp { get { return mTimeStamp; } set { mTimeStamp = value; } }
+		public LIST<IfcValue> ListValues { get { return mListValues; } set { mListValues = value; } }
+
+		public IfcIrregularTimeSeriesValue() : base() { }
+		public IfcIrregularTimeSeriesValue(DatabaseIfc db, DateTime timeStamp, IEnumerable<IfcValue> listValues)
+			: base(db)
+		{
+			TimeStamp = timeStamp;
+			ListValues.AddRange(listValues);
+		}
+	}
 	[Serializable]
 	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{

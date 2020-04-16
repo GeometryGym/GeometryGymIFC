@@ -105,9 +105,9 @@ namespace GeometryGym.Ifc
 		internal IfcWasteTerminalType(DatabaseIfc db, IfcWasteTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcWasteTerminalType(DatabaseIfc m, string name, IfcWasteTerminalTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcWaterProperties : IfcMaterialProperties // DEPRECEATED IFC4
+	public partial class IfcWaterProperties : IfcMaterialProperties // DEPRECATED IFC4
 	{
 		internal bool mIsPotable = false;// : 	OPTIONAL BOOLEAN;
 		internal double mHardness = double.NaN, mAlkalinityConcentration = double.NaN, mAcidityConcentration = double.NaN;// : : 	OPTIONAL IfcIonConcentrationMeasure
@@ -152,9 +152,9 @@ namespace GeometryGym.Ifc
 		internal double mLiningThickness = double.NaN; //: OPTIONAL  IfcNonNegativeLengthMeasure
 		internal double mTransomThickness = double.NaN, mMullionThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mFirstTransomOffset = double.NaN, mSecondTransomOffset = double.NaN, mFirstMullionOffset = double.NaN, mSecondMullionOffset = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
-		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 Depreceated
+		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 DEPRECATED
 		internal double mLiningOffset = double.NaN, mLiningToPanelOffsetX = double.NaN, mLiningToPanelOffsetY = double.NaN;//	 :	OPTIONAL IfcLengthMeasure;
-		[Obsolete("DEPRECEATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 		internal IfcWindowLiningProperties() : base() { }
 		internal IfcWindowLiningProperties(DatabaseIfc db, IfcWindowLiningProperties p, DuplicateOptions options) : base(db, p, options)
@@ -197,8 +197,8 @@ namespace GeometryGym.Ifc
 		internal IfcWindowPanelPositionEnum mPanelPosition;// :IfcWindowPanelPositionEnume;
 		internal double mFrameDepth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mFrameThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 Depreceated
-		[Obsolete("DEPRECEATED IFC4", false)]
+		private int mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 DEPRECATED
+		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mDatabase[mShapeAspectStyle] as IfcShapeAspect; } set { mShapeAspectStyle = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcWindowPanelProperties() : base() { }
@@ -211,8 +211,8 @@ namespace GeometryGym.Ifc
 			if (p.mShapeAspectStyle > 0)
 				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle) as IfcShapeAspect;
 		}
-		internal IfcWindowPanelProperties(DatabaseIfc m, string name, IfcWindowPanelOperationEnum op, IfcWindowPanelPositionEnum panel, double frameDepth, double frameThick)
-			: base(m, name)
+		public IfcWindowPanelProperties(DatabaseIfc db, string name, IfcWindowPanelOperationEnum op, IfcWindowPanelPositionEnum panel, double frameDepth, double frameThick)
+			: base(db, name)
 		{
 			mOperationType = op;
 			mPanelPosition = panel;
@@ -227,7 +227,7 @@ namespace GeometryGym.Ifc
 		internal IfcWindowStandardCase() : base() { }
 		internal IfcWindowStandardCase(DatabaseIfc db, IfcWindowStandardCase w, DuplicateOptions options) : base(db, w, options) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcWindowStyle : IfcTypeProduct // IFC2x3
 	{

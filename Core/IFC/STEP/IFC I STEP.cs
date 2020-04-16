@@ -208,8 +208,41 @@ namespace GeometryGym.Ifc
 			mOriginalValue = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	//ENTITY IfcIrregularTimeSeries
-	//ENTITY IfcIrregularTimeSeriesValue;ductFittingTypeEnum;
+	public partial class IfcIrregularTimeSeries : IfcTimeSeries
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",(#" + string.Join(",#", mValues.ConvertAll(x => x.StepId.ToString())) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			Values.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcIrregularTimeSeriesValue));
+		}
+	}
+	public partial class IfcIrregularTimeSeriesValue : BaseClassIfc
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," + IfcDateTime.STEPAttribute(mTimeStamp) + ",(#" + string.Join(",#", mListValues.ConvertAll(x => x.ToString())) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			TimeStamp = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s != "$")
+			{
+				List<string> ss = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+				for (int icounter = 0; icounter < ss.Count; icounter++)
+				{
+					IfcValue v = ParserIfc.parseValue(ss[icounter]);
+					if (v != null)
+						mListValues.Add(v);
+				}
+			}
+		}
+	}
 	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
