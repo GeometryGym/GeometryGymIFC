@@ -31,6 +31,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPoint : IfcPoint
 	{
 		public override Point3d Location { get { return new Point3d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
+		public Point2d Location2d() { return new Point2d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY); }
 		internal Point3d Coordinates3d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = value.Z; } }
 		internal Point2d Coordinates2d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = double.NaN; } }
 		internal IfcCartesianPoint(DatabaseIfc m, Point3d pt) : base(m) { Coordinates3d = pt; }

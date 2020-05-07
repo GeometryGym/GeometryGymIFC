@@ -742,12 +742,11 @@ namespace GeometryGym.Ifc
 			foreach (IfcRepresentationItem item in Items)
 				element.AppendChild(item.GetXML(xml.OwnerDocument, "", this, processed));
 
-			if (mLayerAssignments.Count > 0)
+			if (mLayerAssignment != null)
 			{
-				element = xml.OwnerDocument.CreateElement("LayerAssignments", mDatabase.mXmlNamespace);
+				element = xml.OwnerDocument.CreateElement("LayerAssignment", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcPresentationLayerAssignment pla in mLayerAssignments)
-					element.AppendChild(pla.GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild(mLayerAssignment.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 		}
 	}
@@ -808,12 +807,11 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mLayerAssignments.Count > 0)
+			if (mLayerAssignment != null)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("LayerAssignments", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("LayerAssignment", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcPresentationLayerAssignment pla in mLayerAssignments)
-					element.AppendChild(pla.GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild(mLayerAssignment.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mStyledByItem != null)
 			{

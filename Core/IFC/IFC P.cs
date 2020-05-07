@@ -842,8 +842,7 @@ namespace GeometryGym.Ifc
 				{
 					if (i != null)
 					{
-						if(!i.LayerAssignments.Contains(this))
-							i.LayerAssignments.Add(this);
+						i.LayerAssignment = this;
 					}
 				}
 			}
@@ -852,7 +851,7 @@ namespace GeometryGym.Ifc
 				foreach (IfcLayeredItem i in e.OldItems)
 				{
 					if (i != null)
-						i.LayerAssignments.Remove(this);
+						i.LayerAssignment = null;
 				}
 			}
 		}

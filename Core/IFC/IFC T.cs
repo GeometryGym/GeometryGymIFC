@@ -694,7 +694,7 @@ namespace GeometryGym.Ifc
 		private double mEndRadius = double.PositiveInfinity;// OPTIONAL IfcPositiveLengthMeasure;
 		private bool mIsStartRadiusCCW;// : IfcBoolean;
 		private bool mIsEndRadiusCCW;// : IfcBoolean;
-		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.BIQUADRATICPARABOLA;
+		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.CLOTHOIDCURVE;
 
 		public double StartRadius { get { return double.IsNaN(mStartRadius) ? double.PositiveInfinity : mStartRadius; } set { mStartRadius = value; } }
 		public double EndRadius { get { return double.IsNaN(mEndRadius) ? double.PositiveInfinity : mEndRadius; } set { mEndRadius = value; } }

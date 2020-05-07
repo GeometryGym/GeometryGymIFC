@@ -591,8 +591,8 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "RepresentationType", RepresentationType);
 			obj["Items"] = new JArray(Items.ToList().ConvertAll(x => x.getJson(this, options)));
 
-			if (mLayerAssignments.Count > 0)
-				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, options)));
+			if (mLayerAssignment != null)
+				obj["LayerAssignment"] = new JArray(mLayerAssignment.getJson(this, options));
 		}
 	}
 	public abstract partial class IfcRepresentationContext : BaseClassIfc
@@ -646,8 +646,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mLayerAssignments.Count > 0)
-				obj["LayerAssignments"] = new JArray(mLayerAssignments.ConvertAll(x => x.getJson(this, options)));
+			if (mLayerAssignment != null)
+				obj["LayerAssignments"] = new JArray(mLayerAssignment.getJson(this, options));
 			if (mStyledByItem != null)
 				obj["StyledByItem"] = mStyledByItem.getJson(this, options);
 		}

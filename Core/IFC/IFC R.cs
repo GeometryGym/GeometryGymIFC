@@ -2241,7 +2241,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcRepresentationItem> mItems = new SET<IfcRepresentationItem>();//  : SET [1:?] OF IfcRepresentationItem; 
 		//INVERSE 
 		internal IfcRepresentationMap mRepresentationMap = null;//	 : 	SET [0:1] OF IfcRepresentationMap FOR MappedRepresentation;
-		internal SET<IfcPresentationLayerAssignment> mLayerAssignments = new SET<IfcPresentationLayerAssignment>();// new List<>();//	IFC4 change : 	SET OF IfcPresentationLayerAssignment FOR AssignedItems;
+		internal IfcPresentationLayerAssignment mLayerAssignment = null;// IFC4 change : 	SET OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal List<IfcProductRepresentation> mOfProductRepresentation = new List<IfcProductRepresentation>();/// IFC4 change	 : 	SET [0:n] OF IfcProductRepresentation FOR Representations;
 
 		public IfcRepresentationContext ContextOfItems
@@ -2265,7 +2265,7 @@ namespace GeometryGym.Ifc
 		public string RepresentationType { get { return mRepresentationType; } set { mRepresentationType = value; } }
 		public SET<IfcRepresentationItem> Items { get { return mItems; } set { mItems.Clear(); if (value != null) { mItems.CollectionChanged -= mItems_CollectionChanged; mItems = value; mItems.CollectionChanged += mItems_CollectionChanged; } } }
 
-		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
+		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
 		public ReadOnlyCollection<IfcProductRepresentation> OfProductRepresentation { get { return new ReadOnlyCollection<IfcProductRepresentation>(mOfProductRepresentation); } }
 
 		protected IfcRepresentation() : base() { }
@@ -2277,9 +2277,9 @@ namespace GeometryGym.Ifc
 			mRepresentationType = r.mRepresentationType;
 			Items.AddRange(r.Items.ConvertAll(x => db.Factory.Duplicate(x) as IfcRepresentationItem));
 
-			foreach (IfcPresentationLayerAssignment layerAssignment in r.mLayerAssignments)
+			if(r.mLayerAssignment != null)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(r.mLayerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 		}
@@ -2330,7 +2330,6 @@ namespace GeometryGym.Ifc
 			foreach (IfcRepresentationItem item in Items)
 				item.changeSchema(schema);
 		}
-		public void AssignLayer(IfcPresentationLayerAssignment layer) { mLayerAssignments.Add(layer); }
 	}
 	[Serializable]
 	public abstract partial class IfcRepresentationContext : BaseClassIfc //ABSTRACT SUPERTYPE OF(IfcGeometricRepresentationContext);
@@ -2351,23 +2350,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/
 	{ //INVERSE
-		internal SET<IfcPresentationLayerAssignment> mLayerAssignments = new SET<IfcPresentationLayerAssignment>();// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
+		internal IfcPresentationLayerAssignment mLayerAssignment = null;// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal IfcStyledItem mStyledByItem = null;// : SET [0:1] OF IfcStyledItem FOR Item; 
 
 		internal List<IfcRepresentation> mRepresents = new List<IfcRepresentation>();
 
-		public SET<IfcPresentationLayerAssignment> LayerAssignment { get { return mLayerAssignments; } }
-		[Obsolete("REPLACED IFC4", false)]
-		public SET<IfcPresentationLayerAssignment> LayerAssignments { get { return mLayerAssignments; } }
+		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
 		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
 
 
 		protected IfcRepresentationItem() : base() { }
 		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i) : base(db, i)
 		{
-			foreach (IfcPresentationLayerAssignment layerAssignment in i.mLayerAssignments)
+			if(i.mLayerAssignment != null)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(layerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(i.mLayerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 			if (i.mStyledByItem != null)
@@ -2377,8 +2374,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 		protected IfcRepresentationItem(DatabaseIfc db) : base(db) { }
-
-		public void AssignLayer(IfcPresentationLayerAssignment layer) { mLayerAssignments.Add(layer); }
 
 		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{

@@ -261,10 +261,11 @@ namespace GeometryGym.Ifc
 	{
 		internal double mStartDistAlong = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal LIST<IfcAlignment2DHorizontalSegment> mSegments = new LIST<IfcAlignment2DHorizontalSegment>();// : LIST [1:?] OF IfcAlignment2DHorizontalSegment;
-		//INVERSE
-		//ToAlignmentCurve : SET[1:?] OF IfcAlignmentCurve FOR Horizontal;
+																											   //INVERSE
+		internal SET<IfcAlignmentCurve> mToAlignmentCurve = new SET<IfcAlignmentCurve>();// : SET[1:?] OF IfcAlignmentCurve FOR Horizontal;
 		public double StartDistAlong { get { return double.IsNaN(mStartDistAlong) ? 0 : mStartDistAlong; } set { mStartDistAlong = value; } }
 		public LIST<IfcAlignment2DHorizontalSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public SET<IfcAlignmentCurve> ToAlignmentCurve { get { return mToAlignmentCurve; } set { mToAlignmentCurve = value;  } } 
 
 		internal IfcAlignment2DHorizontal() : base() { }
 		internal IfcAlignment2DHorizontal(DatabaseIfc db, IfcAlignment2DHorizontal a) : base(db, a)

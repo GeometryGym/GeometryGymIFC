@@ -1419,7 +1419,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",#" + mContextOfItems.Index + 
+			string str = base.BuildStringSTEP(release) + (mContextOfItems == null ? ",$" : ",#" + mContextOfItems.Index) + 
 				(string.IsNullOrEmpty(mRepresentationIdentifier) ? ",$," : ",'" + ParserIfc.Encode(mRepresentationIdentifier) + "',") + 
 				(string.IsNullOrEmpty(mRepresentationType) ? "$,(" : "'" + ParserIfc.Encode(mRepresentationType) + "',(");
 			if (mItems.Count > 0)
