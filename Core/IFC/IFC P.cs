@@ -159,7 +159,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
-		public string Name { get { return (string.IsNullOrEmpty(GivenName) ? FamilyName : GivenName + (string.IsNullOrEmpty(FamilyName) ? "" : " " + FamilyName)); } }
+		public string Name { get { return (string.IsNullOrEmpty(GivenName) ? (string.IsNullOrEmpty(FamilyName) ? Identification : FamilyName) : GivenName + (string.IsNullOrEmpty(FamilyName) ? "" : " " + FamilyName)); } }
 
 		internal IfcPerson() : base() { }
 		public IfcPerson(DatabaseIfc db) : base(db) { }

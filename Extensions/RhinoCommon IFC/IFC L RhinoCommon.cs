@@ -36,6 +36,13 @@ namespace GeometryGym.Ifc
 			return new Line(pt, pt + Dir.Vector);
 		}
 	}
+	public partial class IfcLinearPlacement : IfcObjectPlacement
+	{
+		public override Transform Transform()
+		{
+			throw new NotImplementedException();
+		}
+	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
 	{
 		public override Transform Transform()

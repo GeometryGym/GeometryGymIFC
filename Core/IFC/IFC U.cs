@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcUnitaryControlElementType() : base() { }
 		internal IfcUnitaryControlElementType(DatabaseIfc db, IfcUnitaryControlElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcUnitaryControlElementType(DatabaseIfc m, string name, IfcUnitaryControlElementTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcUnitaryControlElementType(DatabaseIfc db, string name, IfcUnitaryControlElementTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcUnitaryEquipment : IfcEnergyConversionDevice //IFC4

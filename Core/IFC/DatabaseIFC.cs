@@ -193,8 +193,12 @@ namespace GeometryGym.Ifc
 			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
-			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
-			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
+			IfcPerson person = Factory.Person;
+			hdr += "/* author */ ('" + person.Name + "'),\r\n";
+			string organizationName = Factory.Organization.Name;
+			if (organizationName == "UNKNOWN")
+				organizationName = IfcOrganization.Organization;
+			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
 			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
 			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
 			hdr += "/* authorization */ 'None');\r\n\r\n";
@@ -1361,6 +1365,7 @@ namespace GeometryGym.Ifc
 					mPersonOrganization = new IfcPersonAndOrganization(Person, Organization);
 				return mPersonOrganization;
 			}
+			set { mPersonOrganization = value; }
 		}
 		private IfcPerson mPerson = null;
 		internal IfcPerson Person
@@ -1369,25 +1374,25 @@ namespace GeometryGym.Ifc
 			{
 				if (mPerson == null)
 				{
-					mPerson = new IfcPerson(mDatabase, System.Environment.UserName.Replace("'", ""), "", "");
+					mPerson = new IfcPerson(mDatabase, System.Environment.UserName, "", "");
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
-			string str = GGYM.ggAssembly.mOptions.OwnerRole;
-			if (!string.IsNullOrEmpty(str))
-			{
-				IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcRoleEnum>(str, out role))
-				{
-					if (role != IfcRoleEnum.NOTDEFINED)
-						mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
-				}
-				else
-					mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
-			}
+					string str = GGYM.ggAssembly.mOptions.OwnerRole;
+					if (!string.IsNullOrEmpty(str))
+					{
+						IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
+						if (Enum.TryParse<IfcRoleEnum>(str, out role))
+						{
+							if (role != IfcRoleEnum.NOTDEFINED)
+								mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
+						}
+						else
+							mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
+					}
 #endif
 				}
 				return mPerson;
 			}
-
+			set { mPerson = value; }
 		}
 		private IfcOrganization mOrganization = null;
 		internal IfcOrganization Organization
@@ -1398,7 +1403,10 @@ namespace GeometryGym.Ifc
 					mOrganization = new IfcOrganization(mDatabase, IfcOrganization.Organization);
 				return mOrganization;
 			}
-
+			set
+			{
+				mOrganization = value;
+			}
 		}
 		internal List<IfcOwnerHistory> mOwnerHistories = new List<IfcOwnerHistory>();
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcPersonAndOrganization owner, IfcApplication application, DateTime created)
