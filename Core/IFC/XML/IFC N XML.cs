@@ -53,4 +53,35 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("UnitType", mUnitType.ToString().ToLower());
 		}
 	}
+	public partial class IfcNavigationElement : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcNavigationElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcNavigationElementTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcNavigationElementType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcNavigationElementTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 }

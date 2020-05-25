@@ -423,7 +423,7 @@ namespace GeometryGym.Ifc
 	public partial class Pset_BuildingSystemCommon : IfcPropertySet
 	{
 		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
-		public Pset_BuildingSystemCommon(IfcBuildingSystem instance) : base(instance) { }
+		public Pset_BuildingSystemCommon(IfcBuiltSystem instance) : base(instance) { }
 	}
 	public partial class Pset_BuildingUse : IfcPropertySet
 	{

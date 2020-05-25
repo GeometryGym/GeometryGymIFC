@@ -192,6 +192,9 @@
     <Compile Include="..\..\Core\IFC\JSON\IFC J JSON.cs">
       <Link>IFC\JSON\IFC J JSON.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC K JSON.cs">
+      <Link>IFC\JSON\IFC K JSON.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\IFC\JSON\IFC L JSON.cs">
       <Link>IFC\JSON\IFC L JSON.cs</Link>
     </Compile>
@@ -356,6 +359,9 @@
     </Compile>
     <Compile Include="..\..\Core\IFC\XML\IFC J XML.cs">
       <Link>IFC\XML\IFC J XML.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\XML\IFC K XML.cs">
+      <Link>IFC\XML\IFC K XML.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\IFC\XML\IFC L XML.cs">
       <Link>IFC\XML\IFC L XML.cs</Link>

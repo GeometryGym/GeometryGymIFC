@@ -357,7 +357,7 @@ namespace GeometryGym.Ifc
 		public IfcChillerType(DatabaseIfc db, string name, IfcChillerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcChimney : IfcBuildingElement
+	public partial class IfcChimney : IfcBuiltElement
 	{
 		internal IfcChimneyTypeEnum mPredefinedType = IfcChimneyTypeEnum.NOTDEFINED;//: OPTIONAL IfcChimneyTypeEnum; 
 		public IfcChimneyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -367,7 +367,7 @@ namespace GeometryGym.Ifc
 		public IfcChimney(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcChimneyType : IfcBuildingElementType
+	public partial class IfcChimneyType : IfcBuiltElementType
 	{
 		internal IfcChimneyTypeEnum mPredefinedType = IfcChimneyTypeEnum.NOTDEFINED;
 		public IfcChimneyTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -776,7 +776,7 @@ namespace GeometryGym.Ifc
 		protected IfcColourSpecification(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
-	public partial class IfcColumn : IfcBuildingElement
+	public partial class IfcColumn : IfcBuiltElement
 	{
 		internal IfcColumnTypeEnum mPredefinedType = IfcColumnTypeEnum.NOTDEFINED;//: OPTIONAL IfcColumnTypeEnum; 
 		public IfcColumnTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -795,7 +795,7 @@ namespace GeometryGym.Ifc
 		public IfcColumnStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
 	} 
 	[Serializable]
-	public partial class IfcColumnType : IfcBuildingElementType
+	public partial class IfcColumnType : IfcBuiltElementType
 	{
 		internal IfcColumnTypeEnum mPredefinedType = IfcColumnTypeEnum.NOTDEFINED;
 		public IfcColumnTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1656,6 +1656,26 @@ namespace GeometryGym.Ifc
 			: base(unit, name, mu) { mConversionOffset = offset; }
 	}
 	[Serializable]
+	public partial class IfcConveyorSegment : IfcFlowSegment
+	{
+		private IfcConveyorSegmentTypeEnum mPredefinedType = IfcConveyorSegmentTypeEnum.NOTDEFINED; //: OPTIONAL IfcConveyorSegmentTypeEnum;
+		public IfcConveyorSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcConveyorSegment() : base() { }
+		public IfcConveyorSegment(DatabaseIfc db) : base(db) { }
+		public IfcConveyorSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
+	public partial class IfcConveyorSegmentType : IfcFlowSegmentType
+	{
+		private IfcConveyorSegmentTypeEnum mPredefinedType = IfcConveyorSegmentTypeEnum.NOTDEFINED; //: IfcConveyorSegmentTypeEnum;
+		public IfcConveyorSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcConveyorSegmentType() : base() { }
+		public IfcConveyorSegmentType(DatabaseIfc db, string name, IfcConveyorSegmentTypeEnum predefinedType)
+			: base(db) { Name = name; PredefinedType = predefinedType; }
+	}
+	[Serializable]
 	public partial class IfcCooledBeam : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcCooledBeamTypeEnum mPredefinedType = IfcCooledBeamTypeEnum.NOTDEFINED;// OPTIONAL : IfcCooledBeamTypeEnum;
@@ -1827,7 +1847,27 @@ namespace GeometryGym.Ifc
 		public IfcCostValue(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
-	public partial class IfcCovering : IfcBuildingElement
+	public partial class IfcCourse : IfcBuiltElement
+	{
+		private IfcCourseTypeEnum mPredefinedType = IfcCourseTypeEnum.NOTDEFINED; //: OPTIONAL IfcCourseTypeEnum;
+		public IfcCourseTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcCourse() : base() { }
+		public IfcCourse(DatabaseIfc db) : base(db) { }
+		public IfcCourse(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcCourseType : IfcBuiltElementType
+	{
+		private IfcCourseTypeEnum mPredefinedType = IfcCourseTypeEnum.NOTDEFINED; //: IfcCourseTypeEnum;
+		public IfcCourseTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcCourseType() : base() { }
+		public IfcCourseType(DatabaseIfc db, string name, IfcCourseTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
+	[Serializable]
+	public partial class IfcCovering : IfcBuiltElement
 	{
 		internal IfcCoveringTypeEnum mPredefinedType = IfcCoveringTypeEnum.NOTDEFINED;// : OPTIONAL IfcCoveringTypeEnum;
 		//INVERSE
@@ -1843,7 +1883,7 @@ namespace GeometryGym.Ifc
 		public IfcCovering(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcCoveringType : IfcBuildingElementType
+	public partial class IfcCoveringType : IfcBuiltElementType
 	{
 		internal IfcCoveringTypeEnum mPredefinedType = IfcCoveringTypeEnum.NOTDEFINED;
 		public IfcCoveringTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1977,7 +2017,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcCurtainWall : IfcBuildingElement
+	public partial class IfcCurtainWall : IfcBuiltElement
 	{
 		internal IfcCurtainWallTypeEnum mPredefinedType = IfcCurtainWallTypeEnum.NOTDEFINED;//: OPTIONAL IfcCurtainWallTypeEnum; 
 		public IfcCurtainWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1987,7 +2027,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcCurtainWallType : IfcBuildingElementType
+	public partial class IfcCurtainWallType : IfcBuiltElementType
 	{
 		internal IfcCurtainWallTypeEnum mPredefinedType = IfcCurtainWallTypeEnum.NOTDEFINED;
 		public IfcCurtainWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1997,7 +2037,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallType(DatabaseIfc m, string name, IfcCurtainWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcLinearAxisSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
 	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
 		internal IfcEdgeCurve mEdge = null;
 

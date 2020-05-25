@@ -195,6 +195,141 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
+	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			foreach (IfcAlignment2DCantSegment o in Segments)
+				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
+			xml.SetAttribute("RailHeadDistance", mRailHeadDistance.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute railHeadDistance = xml.Attributes["RailHeadDistance"];
+			if (railHeadDistance != null)
+				double.TryParse(railHeadDistance.Value, out mRailHeadDistance);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcAlignment2DCantSegment o = mDatabase.ParseXml<IfcAlignment2DCantSegment>(cn as XmlElement);
+						if (o != null)
+							Segments.Add(o);
+					}
+				}
+			}
+		}
+	}
+	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("StartDistAlong", mStartDistAlong.ToString());
+			xml.SetAttribute("HorizontalLength", mHorizontalLength.ToString());
+			xml.SetAttribute("StartCantLeft", mStartCantLeft.ToString());
+			if (!double.IsNaN(mEndCantLeft))
+				xml.SetAttribute("EndCantLeft", mEndCantLeft.ToString());
+			xml.SetAttribute("StartCantRight", mStartCantRight.ToString());
+			if (!double.IsNaN(mEndCantRight))
+				xml.SetAttribute("EndCantRight", mEndCantRight.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startDistAlong = xml.GetAttribute("StartDistAlong");
+			if (!string.IsNullOrEmpty(startDistAlong))
+				double.TryParse(startDistAlong, out mStartDistAlong);
+			string horizontalLength = xml.GetAttribute("HorizontalLength");
+			if (!string.IsNullOrEmpty(horizontalLength))
+				double.TryParse(horizontalLength, out mHorizontalLength);
+			string startCantLeft = xml.GetAttribute("StartCantLeft");
+			if (!string.IsNullOrEmpty(startCantLeft))
+				double.TryParse(startCantLeft, out mStartCantLeft);
+			string endCantLeft = xml.GetAttribute("EndCantLeft");
+			if (!string.IsNullOrEmpty(endCantLeft))
+				double.TryParse(endCantLeft, out mEndCantLeft);
+			string startCantRight = xml.GetAttribute("StartCantRight");
+			if (!string.IsNullOrEmpty(startCantRight))
+				double.TryParse(startCantRight, out mStartCantRight);
+			string endCantRight = xml.GetAttribute("EndCantRight");
+			if (!string.IsNullOrEmpty(endCantRight))
+				double.TryParse(endCantRight, out mEndCantRight);
+		}
+	}
+	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mStartRadius))
+				xml.SetAttribute("StartRadius", mStartRadius.ToString());
+			if (!double.IsNaN(mEndRadius))
+				xml.SetAttribute("EndRadius", mEndRadius.ToString());
+			xml.SetAttribute("IsStartRadiusCCW", (mIsStartRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("IsEndRadiusCCW", (mIsEndRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("TransitionCurveType", mTransitionCurveType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startRadius = xml.GetAttribute("StartRadius");
+			if (!string.IsNullOrEmpty(startRadius))
+				double.TryParse(startRadius, out mStartRadius);
+			string endRadius = xml.GetAttribute("EndRadius");
+			if (!string.IsNullOrEmpty(endRadius))
+				double.TryParse(endRadius, out mEndRadius);
+			string isStartRadiusCCW = xml.GetAttribute("IsStartRadiusCCW");
+			if (!string.IsNullOrEmpty(isStartRadiusCCW))
+				bool.TryParse(isStartRadiusCCW, out mIsStartRadiusCCW);
+			string isEndRadiusCCW = xml.GetAttribute("IsEndRadiusCCW");
+			if (!string.IsNullOrEmpty(isEndRadiusCCW))
+				bool.TryParse(isEndRadiusCCW, out mIsEndRadiusCCW);
+			XmlAttribute transitionCurveType = xml.Attributes["TransitionCurveType"];
+			if (transitionCurveType != null)
+				Enum.TryParse<IfcTransitionCurveType>(transitionCurveType.Value, out mTransitionCurveType);
+		}
+	}
+	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mStartRadius))
+				xml.SetAttribute("StartRadius", mStartRadius.ToString());
+			if (!double.IsNaN(mEndRadius))
+				xml.SetAttribute("EndRadius", mEndRadius.ToString());
+			xml.SetAttribute("IsStartRadiusCCW", (mIsStartRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("IsEndRadiusCCW", (mIsEndRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("TransitionCurveType", mTransitionCurveType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startRadius = xml.GetAttribute("StartRadius");
+			if (!string.IsNullOrEmpty(startRadius))
+				double.TryParse(startRadius, out mStartRadius);
+			string endRadius = xml.GetAttribute("EndRadius");
+			if (!string.IsNullOrEmpty(endRadius))
+				double.TryParse(endRadius, out mEndRadius);
+			string isStartRadiusCCW = xml.GetAttribute("IsStartRadiusCCW");
+			if (!string.IsNullOrEmpty(isStartRadiusCCW))
+				bool.TryParse(isStartRadiusCCW, out mIsStartRadiusCCW);
+			string isEndRadiusCCW = xml.GetAttribute("IsEndRadiusCCW");
+			if (!string.IsNullOrEmpty(isEndRadiusCCW))
+				bool.TryParse(isEndRadiusCCW, out mIsEndRadiusCCW);
+			XmlAttribute transitionCurveType = xml.Attributes["TransitionCurveType"];
+			if (transitionCurveType != null)
+				Enum.TryParse<IfcTransitionCurveType>(transitionCurveType.Value, out mTransitionCurveType);
+		}
+	}
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal override void ParseXml(XmlElement xml)

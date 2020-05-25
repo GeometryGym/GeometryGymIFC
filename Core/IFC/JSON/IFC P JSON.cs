@@ -53,6 +53,37 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcPavement : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if(mFlexible != IfcLogicalEnum.UNKNOWN)
+				obj["Flexible"] = mFlexible == IfcLogicalEnum.TRUE ? "TRUE" : "FALSE";
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mFlexible = token.Value<bool>() ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+		}
+	}
+	public partial class IfcPavementType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Flexible"] = mFlexible ? "TRUE" : "FALSE";
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mFlexible = token.Value<bool>();
+		}
+	}
 	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
 	{
 		internal override void parseJObject(JObject obj)

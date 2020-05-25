@@ -29,7 +29,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcWall : IfcBuildingElement
+	public partial class IfcWall : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcWallType : IfcBuildingElementType
+	public partial class IfcWallType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

@@ -170,7 +170,30 @@ namespace GeometryGym.Ifc
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
 			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x=>db.Factory.Duplicate(x) as IfcAxis2Placement3D));
 		}
-	} 
+	}
+	[Serializable]
+	public partial class IfcSectionedSurface : IfcSurface
+	{
+		private IfcCurve mDirectrix = null; //: IfcCurve;
+		private LIST<IfcDistanceExpression> mCrossSectionPositions = new LIST<IfcDistanceExpression>(); //: LIST[2:?] OF IfcDistanceExpression;
+		private LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>(); //: LIST[2:?] OF IfcProfileDef;
+		private bool mFixedAxisVertical = false; //: IfcBoolean;
+
+		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
+		public LIST<IfcDistanceExpression> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions = value; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections = value; } }
+		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
+
+		public IfcSectionedSurface() : base() { }
+		public IfcSectionedSurface(IfcCurve directrix, IEnumerable<IfcDistanceExpression> crossSectionPositions, IEnumerable<IfcProfileDef> crossSections, bool fixedAxisVertical)
+			: base(directrix.Database)
+		{
+			Directrix = directrix;
+			CrossSectionPositions.AddRange(crossSectionPositions);
+			CrossSections.AddRange(crossSections);
+			FixedAxisVertical = fixedAxisVertical;
+		}
+	}
 	[Serializable]
 	public partial class IfcSectionProperties : IfcPreDefinedProperties // IFC2x3 BaseClassIfc
 	{
@@ -260,7 +283,7 @@ namespace GeometryGym.Ifc
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcShadingDevice : IfcBuildingElement
+	public partial class IfcShadingDevice : IfcBuiltElement
 	{
 		internal IfcShadingDeviceTypeEnum mPredefinedType = IfcShadingDeviceTypeEnum.NOTDEFINED;//: OPTIONAL IfcShadingDeviceTypeEnum; 
 		public IfcShadingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -270,7 +293,7 @@ namespace GeometryGym.Ifc
 		public IfcShadingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcShadingDeviceType : IfcBuildingElementType
+	public partial class IfcShadingDeviceType : IfcBuiltElementType
 	{
 		internal IfcShadingDeviceTypeEnum mPredefinedType = IfcShadingDeviceTypeEnum.NOTDEFINED;
 		public IfcShadingDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -493,6 +516,54 @@ additional types	some additional representation types are given:
 		}
 	}
 	[Serializable]
+	public partial class IfcSign : IfcElementComponent
+	{
+		private IfcSignTypeEnum mPredefinedType = IfcSignTypeEnum.NOTDEFINED; //: OPTIONAL IfcSignTypeEnum;
+		public IfcSignTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcSign() : base() { }
+		public IfcSign(DatabaseIfc db) : base(db) { }
+		public IfcSign(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcSignal : IfcFlowTerminal
+	{
+		private IfcSignalTypeEnum mPredefinedType = IfcSignalTypeEnum.NOTDEFINED; //: OPTIONAL IfcSignalTypeEnum;
+		public IfcSignalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcSignal() : base() { }
+		public IfcSignal(DatabaseIfc db) : base(db) { }
+		public IfcSignal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
+	public partial class IfcSignalType : IfcFlowTerminalType
+	{
+		private IfcSignalTypeEnum mPredefinedType = IfcSignalTypeEnum.NOTDEFINED; //: IfcSignalTypeEnum;
+		public IfcSignalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcSignalType() : base() { }
+		public IfcSignalType(DatabaseIfc db, string name, IfcSignalTypeEnum predefinedType) : base(db)
+		{
+			Name = name;
+			PredefinedType = predefinedType;
+		}
+	}
+
+	[Serializable]
+	public partial class IfcSignType : IfcElementComponentType
+	{
+		private IfcSignTypeEnum mPredefinedType = IfcSignTypeEnum.NOTDEFINED; //: IfcSignTypeEnum;
+		public IfcSignTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcSignType() : base() { }
+		public IfcSignType(DatabaseIfc db, string name, IfcSignTypeEnum predefinedType)
+			: base(db, name)
+		{
+			PredefinedType = predefinedType;
+		}
+	}
+
+	[Serializable]
 	public abstract partial class IfcSimpleProperty : IfcProperty //ABSTRACT SUPERTYPE OF (ONEOF (IfcPropertyBoundedValue ,IfcPropertyEnumeratedValue ,
 	{ // IfcPropertyListValue,IfcPropertyReferenceValue,IfcPropertySingleValue,IfcPropertyTableValue)) 
 		protected IfcSimpleProperty() : base() { }
@@ -568,7 +639,7 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSIUnit : IfcNamedUnit
 	{
-		private static double[] mFactors = new double[] { Math.Pow(10, 18), Math.Pow(10, 15), Math.Pow(10, 12), Math.Pow(10, 9), Math.Pow(10, 6), Math.Pow(10, 3), Math.Pow(10, 2), Math.Pow(10, 1), Math.Pow(10, -1), Math.Pow(10, -2), Math.Pow(10, -3), Math.Pow(10, -6), Math.Pow(10, -9), Math.Pow(10, -12), Math.Pow(10, -15), Math.Pow(10, -18), 1 };
+		private static double[] mFactors = new double[] { 1, Math.Pow(10, 18), Math.Pow(10, 15), Math.Pow(10, 12), Math.Pow(10, 9), Math.Pow(10, 6), Math.Pow(10, 3), Math.Pow(10, 2), Math.Pow(10, 1), Math.Pow(10, -1), Math.Pow(10, -2), Math.Pow(10, -3), Math.Pow(10, -6), Math.Pow(10, -9), Math.Pow(10, -12), Math.Pow(10, -15), Math.Pow(10, -18) };
 		private IfcSIPrefix mPrefix = IfcSIPrefix.NONE;// : OPTIONAL IfcSIPrefix;
 		private IfcSIUnitName mName;// : IfcSIUnitName; 
 
@@ -592,7 +663,7 @@ additional types	some additional representation types are given:
 		}
 	}
 	[Serializable]
-	public partial class IfcSlab : IfcBuildingElement
+	public partial class IfcSlab : IfcBuiltElement
 	{
 		internal IfcSlabTypeEnum mPredefinedType = IfcSlabTypeEnum.NOTDEFINED;// : OPTIONAL IfcSlabTypeEnum 
 		public IfcSlabTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -622,7 +693,7 @@ additional types	some additional representation types are given:
 		}
 	}
 	[Serializable]
-	public partial class IfcSlabType : IfcBuildingElementType
+	public partial class IfcSlabType : IfcBuiltElementType
 	{
 		internal IfcSlabTypeEnum mPredefinedType = IfcSlabTypeEnum.NOTDEFINED;
 		public IfcSlabTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -674,6 +745,13 @@ additional types	some additional representation types are given:
 		protected IfcSolidModel(DatabaseIfc db, IfcSolidModel p) : base(db,p) { }
 	}
 	public interface IfcSolidOrShell : IBaseClassIfc { } // SELECT(IfcSolidModel, IfcClosedShell);
+	[Serializable]
+	public partial class IfcSolidStratum : IfcGeotechnicalStratum
+	{
+		public IfcSolidStratum() : base() { }
+		public IfcSolidStratum(DatabaseIfc db) : base(db) { }
+		public IfcSolidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcSoundProperties : IfcPropertySetDefinition // DEPRECATED IFC4
@@ -747,7 +825,7 @@ additional types	some additional representation types are given:
 		internal IfcSpace() : base() { }
 		internal IfcSpace(DatabaseIfc db, IfcSpace s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
-		public IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSpace(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { }
 		protected override void addProduct(IfcProduct product)
 		{
 			IfcCovering covering = product as IfcCovering;
@@ -817,18 +895,22 @@ additional types	some additional representation types are given:
 		public IfcSpaceType(DatabaseIfc db, string name, IfcSpaceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcSpatialElement : IfcProduct //ABSTRACT SUPERTYPE OF (ONEOF (IfcExternalSpatialStructureElement ,IfcSpatialStructureElement ,IfcSpatialZone))
+	public abstract partial class IfcSpatialElement : IfcProduct, IfcInterferenceSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExternalSpatialStructureElement ,IfcSpatialStructureElement ,IfcSpatialZone))
 	{
 		private string mLongName = "$";// : OPTIONAL IfcLabel; 
-									   //INVERSE
+		//INVERSE
 		internal SET<IfcRelContainedInSpatialStructure> mContainsElements = new SET<IfcRelContainedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
 		internal List<IfcRelServicesBuildings> mServicedBySystems = new List<IfcRelServicesBuildings>();// : SET [0:?] OF IfcRelServicesBuildings FOR RelatedBuildings;	
 		internal List<IfcRelReferencedInSpatialStructure> mReferencesElements = new List<IfcRelReferencedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
+		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
+		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcRelContainedInSpatialStructure> ContainsElements { get { return mContainsElements; } set { mContainsElements.Clear(); if (value != null) { mContainsElements.CollectionChanged -= mContainsElements_CollectionChanged; mContainsElements = value; mContainsElements.CollectionChanged += mContainsElements_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcRelServicesBuildings> ServicedBySystems { get { return new ReadOnlyCollection<IfcRelServicesBuildings>( mServicedBySystems); } }
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>( mReferencesElements); } }
+		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
+		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
 
 		protected IfcSpatialElement() : base() { }
 		protected IfcSpatialElement(DatabaseIfc db, IfcSpatialElement e, DuplicateOptions options) : base(db, e, options)
@@ -985,6 +1067,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialElementType(DatabaseIfc db) : base(db) { }
 		protected IfcSpatialElementType(DatabaseIfc db, IfcSpatialElementType t, DuplicateOptions options) : base(db, t, options) { mElementType = t.mElementType; }
 	}
+	public interface IfcSpatialReferenceSelect : IBaseClassIfc { } // SELECT(IfcProduct, IfcSystem);
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
 	{
@@ -996,7 +1079,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { mCompositionType = e.mCompositionType; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
-		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcSpatialStructureElement(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { Name = name; }
 	}
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElementType : IfcSpatialElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcSpaceType))
@@ -1067,7 +1150,7 @@ additional types	some additional representation types are given:
 		public IfcStackTerminalType(DatabaseIfc m, string name, IfcStackTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcStair : IfcBuildingElement
+	public partial class IfcStair : IfcBuiltElement
 	{
 		internal IfcStairTypeEnum mPredefinedType = IfcStairTypeEnum.NOTDEFINED;// OPTIONAL : IfcStairTypeEnum
 		public IfcStairTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1077,7 +1160,7 @@ additional types	some additional representation types are given:
 		public IfcStair(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcStairFlight : IfcBuildingElement
+	public partial class IfcStairFlight : IfcBuiltElement
 	{
 		internal int mNumberOfRiser = int.MinValue;//	:	OPTIONAL INTEGER;
 		internal int mNumberOfTreads = int.MinValue;//	:	OPTIONAL INTEGER;
@@ -1092,7 +1175,7 @@ additional types	some additional representation types are given:
 		public IfcStairFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcStairFlightType : IfcBuildingElementType
+	public partial class IfcStairFlightType : IfcBuiltElementType
 	{
 		internal IfcStairFlightTypeEnum mPredefinedType = IfcStairFlightTypeEnum.NOTDEFINED;
 		public IfcStairFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1102,7 +1185,7 @@ additional types	some additional representation types are given:
 		public IfcStairFlightType(DatabaseIfc m, string name, IfcStairFlightTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcStairType : IfcBuildingElementType
+	public partial class IfcStairType : IfcBuiltElementType
 	{
 		internal IfcStairTypeEnum mPredefinedType = IfcStairTypeEnum.NOTDEFINED;
 		public IfcStairTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1328,6 +1411,8 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralCurveReaction : IfcStructuralReaction
 	{
 		internal IfcStructuralCurveActivityTypeEnum mPredefinedType = IfcStructuralCurveActivityTypeEnum.NOTDEFINED;//: 	IfcStructuralCurveActivityTypeEnum; 
+		public IfcStructuralCurveActivityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcStructuralCurveReaction() : base() { }
 		internal IfcStructuralCurveReaction(DatabaseIfc db, IfcStructuralCurveReaction r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 	}
@@ -2103,29 +2188,19 @@ additional types	some additional representation types are given:
 		}
 	}
 	[Serializable]
-	public partial class IfcSurfaceCurveSweptAreaSolid : IfcSweptAreaSolid
+	public partial class IfcSurfaceCurveSweptAreaSolid : IfcDirectrixCurveSweptAreaSolid
 	{
-		internal int mDirectrix; // : IfcCurve;
-		internal double mStartParam =  double.NaN;// : OPT IfcParameterValue; OPT IFC4
-		internal double mEndParam = double.NaN;//: OPT IfcParameterValue; OPT IFC4
 		internal int mReferenceSurface;// : IfcSurface; 
-
-		public IfcCurve Directrix { get { return mDatabase[mDirectrix] as IfcCurve; } set { mDirectrix = value.mIndex; } }
 		public IfcSurface ReferenceSurface { get { return mDatabase[mReferenceSurface] as IfcSurface; } set { mReferenceSurface = value.mIndex; } }
-		public double StartParam { get { return mStartParam; } set { mStartParam = value; } }
-		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
 
 		internal IfcSurfaceCurveSweptAreaSolid() : base() { }
 		internal IfcSurfaceCurveSweptAreaSolid(DatabaseIfc db, IfcSurfaceCurveSweptAreaSolid s) : base(db, s) 
 		{ 
-			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve; 
-			mStartParam = s.mStartParam; 
-			mEndParam = s.mEndParam; 
 			ReferenceSurface = db.Factory.Duplicate(s.ReferenceSurface) as IfcSurface; 
 		}
-		public IfcSurfaceCurveSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcSurface referenceSurface) : base(sweptArea)
+		public IfcSurfaceCurveSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcSurface referenceSurface) 
+			: base(sweptArea, directrix)
 		{
-			Directrix = directrix;
 			ReferenceSurface = referenceSurface;
 		}
 	}
@@ -2437,7 +2512,7 @@ additional types	some additional representation types are given:
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcSymbolStyle // IfcPresentationStyleSelect DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
+	public partial class IfcSystem : IfcGroup, IfcSpatialReferenceSelect //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  

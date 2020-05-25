@@ -37,4 +37,32 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcUnitEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mUnitType);
 		}
 	}
+	public partial class IfcNavigationElement : IfcBuiltElement
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + (mPredefinedType == IfcNavigationElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcNavigationElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcNavigationElementType : IfcBuiltElementType
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcNavigationElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 }

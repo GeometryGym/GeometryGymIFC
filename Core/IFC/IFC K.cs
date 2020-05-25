@@ -27,5 +27,24 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	
+	[Serializable]
+	public partial class IfcKerb : IfcBuiltElement
+	{
+		private bool mMountable = false; //: IfcBoolean;
+		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
+
+		public IfcKerb() : base() { }
+		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
+		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, bool mountable) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcKerbType : IfcBuiltElementType
+	{
+		private bool mMountable = false; //: IfcBoolean;
+		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
+
+		public IfcKerbType() : base() { }
+		public IfcKerbType(DatabaseIfc db, string name, bool mountable)
+			: base(db, name) { Mountable = mountable; }
+	}
 }

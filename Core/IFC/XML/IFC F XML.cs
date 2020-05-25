@@ -155,7 +155,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcFixedReferenceSweptAreaSolid : IfcSweptAreaSolid //IFC4
+	public partial class IfcFixedReferenceSweptAreaSolid : IfcDirectrixCurveSweptAreaSolid //IFC4
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -163,24 +163,13 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "Directrix") == 0)
-					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
-				else if (string.Compare(name, "FixedReference") == 0)
+				if (string.Compare(name, "FixedReference") == 0)
 					FixedReference = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
 			}
-			if (xml.HasAttribute("StartParam"))
-				mStartParam = double.Parse(xml.Attributes["StartParam"].Value);
-			if (xml.HasAttribute("EndParam"))
-				mStartParam = double.Parse(xml.Attributes["EndParam"].Value);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
-			if (!double.IsNaN(mStartParam))
-				xml.SetAttribute("StartParam", mStartParam.ToString());
-			if (!double.IsNaN(mEndParam))
-				xml.SetAttribute("EndParam", mEndParam.ToString());
 			xml.AppendChild(FixedReference.GetXML(xml.OwnerDocument, "FixedReference", this, processed));
 		}
 	}

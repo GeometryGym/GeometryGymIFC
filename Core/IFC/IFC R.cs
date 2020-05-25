@@ -37,7 +37,27 @@ namespace GeometryGym.Ifc
 		internal IfcRadiusDimension() : base() { }
 	}
 	[Serializable]
-	public partial class IfcRailing : IfcBuildingElement
+	public partial class IfcRail : IfcBuiltElement
+	{
+		private IfcRailTypeEnum mPredefinedType = IfcRailTypeEnum.NOTDEFINED; //: OPTIONAL IfcRailTypeEnum;
+		public IfcRailTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcRail() : base() { }
+		public IfcRail(DatabaseIfc db) : base(db) { }
+		public IfcRail(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcRailType : IfcBuiltElementType
+	{
+		private IfcRailTypeEnum mPredefinedType = IfcRailTypeEnum.NOTDEFINED; //: IfcRailTypeEnum;
+		public IfcRailTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcRailType() : base() { }
+		public IfcRailType(DatabaseIfc db, string name, IfcRailTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
+	[Serializable]
+	public partial class IfcRailing : IfcBuiltElement
 	{
 		internal IfcRailingTypeEnum mPredefinedType = IfcRailingTypeEnum.NOTDEFINED;// : OPTIONAL IfcRailingTypeEnum
 		public IfcRailingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -47,7 +67,7 @@ namespace GeometryGym.Ifc
 		public IfcRailing(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcRailingType : IfcBuildingElementType
+	public partial class IfcRailingType : IfcBuiltElementType
 	{
 		internal IfcRailingTypeEnum mPredefinedType = IfcRailingTypeEnum.NOTDEFINED;
 		public IfcRailingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -57,7 +77,15 @@ namespace GeometryGym.Ifc
 		public IfcRailingType(DatabaseIfc m, string name, IfcRailingTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcRamp : IfcBuildingElement
+	public partial class IfcRailway : IfcFacility
+	{
+		public IfcRailway() : base() { }
+		public IfcRailway(DatabaseIfc db)
+			: base(db) { }
+		public IfcRailway(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcRamp : IfcBuiltElement
 	{
 		internal IfcRampTypeEnum mPredefinedType = IfcRampTypeEnum.NOTDEFINED;// OPTIONAL : IfcRampTypeEnum
 		public IfcRampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -67,7 +95,7 @@ namespace GeometryGym.Ifc
 		public IfcRamp(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcRampFlight : IfcBuildingElement
+	public partial class IfcRampFlight : IfcBuiltElement
 	{
 		internal IfcRampFlightTypeEnum mPredefinedType = IfcRampFlightTypeEnum.NOTDEFINED;// OPTIONAL : IfcRampTypeEnum
 		public IfcRampFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -77,7 +105,7 @@ namespace GeometryGym.Ifc
 		public IfcRampFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcRampFlightType : IfcBuildingElementType
+	public partial class IfcRampFlightType : IfcBuiltElementType
 	{
 		internal IfcRampFlightTypeEnum mPredefinedType = IfcRampFlightTypeEnum.NOTDEFINED;
 		public IfcRampFlightTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -87,7 +115,7 @@ namespace GeometryGym.Ifc
 		public IfcRampFlightType(DatabaseIfc m, string name, IfcRampFlightTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcRampType : IfcBuildingElementType //IFC4
+	public partial class IfcRampType : IfcBuiltElementType //IFC4
 	{
 		internal IfcRampTypeEnum mPredefinedType = IfcRampTypeEnum.NOTDEFINED;
 		public IfcRampTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -385,6 +413,16 @@ namespace GeometryGym.Ifc
 			TimeStep = timeStep;
 			Values.AddRange(values);
 		}
+	}
+	[Serializable]
+	public partial class IfcReinforcedSoil : IfcEarthworksElement
+	{
+		private IfcReinforcedSoilTypeEnum mPredefinedType = IfcReinforcedSoilTypeEnum.NOTDEFINED; //: OPTIONAL IfcReinforcedSoilTypeEnum;
+		public IfcReinforcedSoilTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcReinforcedSoil() : base() { }
+		public IfcReinforcedSoil(DatabaseIfc db) : base(db) { }
+		public IfcReinforcedSoil(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcReinforcementBarProperties : IfcPreDefinedProperties
@@ -803,21 +841,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssignsToProcess : IfcRelAssigns
 	{
-		internal int mRelatingProcess;// : IfcProcess; 
+		internal int mRelatingProcess;// : IfcProcessSelect
 		internal IfcMeasureWithUnit mQuantityInProcess = null;//	 : 	OPTIONAL IfcMeasureWithUnit;
-		public IfcProcess RelatingProcess { get { return mDatabase[mRelatingProcess] as IfcProcess; } set { mRelatingProcess = value.mIndex; } }
+		public IfcProcessSelect RelatingProcess { get { return mDatabase[mRelatingProcess] as IfcProcessSelect; } set { mRelatingProcess = value.StepId; } }
 		public IfcMeasureWithUnit QuantityInProcess { get { return mQuantityInProcess; } set { mQuantityInProcess = value; } }
 
-		public override NamedObjectIfc Relating() { return RelatingProcess; } 
+		public override NamedObjectIfc Relating() { return RelatingProcess as NamedObjectIfc; } 
 
 		internal IfcRelAssignsToProcess() : base() { }
 		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess, new DuplicateOptions() { DuplicateDownstream = false }) as IfcProcess;
+			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = false }) as IfcProcess;
 		}
-		public IfcRelAssignsToProcess(IfcProcess relProcess) : base(relProcess.mDatabase) { RelatingProcess = relProcess; }
-		public IfcRelAssignsToProcess(IfcProcess relProcess, IfcObjectDefinition related) : base(related) { RelatingProcess = relProcess; }
-		public IfcRelAssignsToProcess(IfcProcess relProcess, IEnumerable<IfcObjectDefinition> related) : base(related) { RelatingProcess = relProcess; }
+		public IfcRelAssignsToProcess(IfcProcessSelect relProcess) : base(relProcess.Database) { RelatingProcess = relProcess; }
+		public IfcRelAssignsToProcess(IfcProcessSelect relProcess, IfcObjectDefinition related) : base(related) { RelatingProcess = relProcess; }
+		public IfcRelAssignsToProcess(IfcProcessSelect relProcess, IEnumerable<IfcObjectDefinition> related) : base(related) { RelatingProcess = relProcess; }
 	}
 	[Serializable]
 	public partial class IfcRelAssignsToProduct : IfcRelAssigns
@@ -851,18 +889,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssignsToResource : IfcRelAssigns
 	{
-		internal int mRelatingResource;// : IfcResource; 
-		public IfcResource RelatingResource { get { return mDatabase[mRelatingResource] as IfcResource; } set { mRelatingResource = value.mIndex; } }
+		internal int mRelatingResource;// : IfcResourceSelect; 
+		public IfcResourceSelect RelatingResource { get { return mDatabase[mRelatingResource] as IfcResourceSelect; } set { mRelatingResource = value.StepId; } }
 
-		public override NamedObjectIfc Relating() { return RelatingResource; }
+		public override NamedObjectIfc Relating() { return RelatingResource as NamedObjectIfc; }
 
 		internal IfcRelAssignsToResource() : base() { }
 		internal IfcRelAssignsToResource(DatabaseIfc db, IfcRelAssignsToResource r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingResource = db.Factory.Duplicate(r.RelatingResource, new DuplicateOptions() { DuplicateDownstream = false }) as IfcResource;
+			RelatingResource = db.Factory.Duplicate(r.RelatingResource as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = false }) as IfcResource;
 		}
-		public IfcRelAssignsToResource(IfcResource relResource) : base(relResource.mDatabase) { RelatingResource = relResource; }
-		public IfcRelAssignsToResource(IfcResource relResource, IfcObjectDefinition relObject) : base(relObject) { RelatingResource = relResource; }
+		public IfcRelAssignsToResource(IfcResourceSelect relResource) : base(relResource.Database) { RelatingResource = relResource; }
+		public IfcRelAssignsToResource(IfcResourceSelect relResource, IfcObjectDefinition relObject) : base(relObject) { RelatingResource = relResource; }
 	}
 	[Serializable]
 	public abstract partial class IfcRelAssociates : IfcRelationship   //ABSTRACT SUPERTYPE OF (ONEOF(IfcRelAssociatesApproval,IfcRelAssociatesclassification,IfcRelAssociatesConstraint,IfcRelAssociatesDocument,IfcRelAssociatesLibrary,IfcRelAssociatesMaterial))
@@ -1067,6 +1105,18 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRelAssociatesMaterial(IfcMaterialSelect material) : base(material.Database) { RelatingMaterial = material; }
 		public IfcRelAssociatesMaterial(IfcMaterialSelect material, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingMaterial = material; }
+	}
+	[Serializable]
+	public partial class IfcRelAssociatesProfileDef : IfcRelAssociates
+	{
+		private IfcProfileDef mRelatingProfileDef = null; //: IfcProfileDef;
+		public IfcProfileDef RelatingProfileDef { get { return mRelatingProfileDef; } set { mRelatingProfileDef = value; } }
+
+		public IfcRelAssociatesProfileDef() : base() { }
+		public IfcRelAssociatesProfileDef(IEnumerable<IfcDefinitionSelect> relatedObjects, IfcProfileDef relatingProfileDef)
+			: base(relatedObjects) { RelatingProfileDef = relatingProfileDef; }
+
+		public override NamedObjectIfc Relating() { return RelatingProfileDef; }
 	}
 	[Serializable]
 	public partial class IfcRelAssociatesProfileProperties : IfcRelAssociates //IFC4 DELETED Replaced by IfcRelAssociatesMaterial together with material-profile sets
@@ -1656,21 +1706,21 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
 	{
 		private SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// IFC4 change SET [1:?] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
-		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinition; 
+		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinitionSelect; 
 
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
 		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } set { mRelatingPropertyDefinition = value; } }
 
-		public override IfcRoot Relating() { return RelatingPropertyDefinition; } 
+		public override IfcRoot Relating() { return RelatingPropertyDefinition as IfcRoot; } 
 
 		internal IfcRelDefinesByProperties() : base() { }
 		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) { Name = "NameRelDefinesByProperties"; Description = "DescriptionRelDefinesByProperties"; }
 		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, DuplicateOptions options) : base(db, d, options.OwnerHistory)
 		{
 			//RelatedObjects = d.RelatedObjects.ConvertAll(x=>db.Factory.Duplicate(x) as IfcObjectDefinition);
-			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition, options) as IfcPropertySetDefinition;
+			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition as BaseClassIfc, options) as IfcPropertySetDefinition;
 		}
-		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.mDatabase) { mRelatingPropertyDefinition = propertySet; propertySet.DefinesOccurrence.Add(this); }
+		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.Database) { mRelatingPropertyDefinition = propertySet; propertySet.DefinesOccurrence.Add(this); }
 		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.Add(relatedObject); }
 		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> relatedObjects, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.AddRange(relatedObjects); }
 
@@ -1838,14 +1888,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelInterferesElements : IfcRelConnects
 	{
-		internal int mRelatingElement;// : IfcElement;
+		internal int mRelatingElement;// : IfcInterferenceSelect;
 		internal int mRelatedElement;// : IfcElement;
 		internal int mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
 		internal string mInterferenceType = "$";// : OPTIONAL IfcIdentifier;
 		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 
-		public IfcElement RelatingElement { get { return mDatabase[mRelatingElement] as IfcElement; } set { mRelatingElement = value.mIndex; } }
-		public IfcElement RelatedElement { get { return mDatabase[mRelatedElement] as IfcElement; } set { mRelatedElement = value.mIndex; } }
+		public IfcInterferenceSelect RelatingElement { get { return mDatabase[mRelatingElement] as IfcInterferenceSelect; } set { mRelatingElement = value.StepId; } }
+		public IfcInterferenceSelect RelatedElement { get { return mDatabase[mRelatedElement] as IfcInterferenceSelect; } set { mRelatedElement = value.StepId; } }
 		public IfcConnectionGeometry InterferenceGeometry { get { return mDatabase[mInterferenceGeometry] as IfcConnectionGeometry; } set { mInterferenceGeometry = value == null ? 0 : value.mIndex; } }
 		public string InterferenceType { get { return (mInterferenceType == "$" ? "" : ParserIfc.Decode(mInterferenceType)); } set { mInterferenceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
@@ -1853,15 +1903,15 @@ namespace GeometryGym.Ifc
 		internal IfcRelInterferesElements() : base() { }
 		internal IfcRelInterferesElements(DatabaseIfc db, IfcRelInterferesElements r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingElement = db.Factory.Duplicate(r.RelatingElement, options) as IfcElement;
-			RelatedElement = db.Factory.Duplicate(r.RelatedElement, options) as IfcElement;
+			RelatingElement = db.Factory.Duplicate(r.RelatingElement as BaseClassIfc, options) as IfcInterferenceSelect;
+			RelatedElement = db.Factory.Duplicate(r.RelatedElement as BaseClassIfc, options) as IfcInterferenceSelect;
 			if (r.mInterferenceGeometry > 0)
 				InterferenceGeometry = db.Factory.Duplicate(r.InterferenceGeometry, options) as IfcConnectionGeometry;
 			mInterferenceType = r.mInterferenceType;
 			mImpliedOrder = r.mImpliedOrder;
 		}
-		public IfcRelInterferesElements(IfcElement relatingElement, IfcElement relatedElement)
-			: base(relatingElement.mDatabase) { RelatingElement = relatingElement; RelatedElement = relatedElement; }
+		public IfcRelInterferesElements(IfcInterferenceSelect relatingElement, IfcInterferenceSelect relatedElement)
+			: base(relatingElement.Database) { RelatingElement = relatingElement; RelatedElement = relatedElement; }
 	}
 	[Serializable]
 	public partial class IfcRelNests : IfcRelDecomposes
@@ -2448,10 +2498,11 @@ namespace GeometryGym.Ifc
 		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "";//: OPTIONAL IfcText; 
 		//INVERSE 
-		internal List<IfcRelAssignsToResource> mResourceOf = new List<IfcRelAssignsToResource>();// : SET [0:?] OF IfcRelAssignsToResource FOR RelatingResource; 
+		internal SET<IfcRelAssignsToResource> mResourceOf = new SET<IfcRelAssignsToResource>();// : SET [0:?] OF IfcRelAssignsToResource FOR RelatingResource; 
 
 		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+		public SET<IfcRelAssignsToResource> ResourceOf { get { return mResourceOf; } } 
 
 		protected IfcResource() : base() { }
 		protected IfcResource(DatabaseIfc db, IfcResource r, DuplicateOptions options) : base(db, r, options) { }
@@ -2529,7 +2580,10 @@ namespace GeometryGym.Ifc
 		SET<IfcExternalReferenceRelationship> HasExternalReference { get; set; }
 		void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship);
 	}
-	public interface IfcResourceSelect : IBaseClassIfc { } // SELECT(IfcResource, IfcTypeResource)
+	public interface IfcResourceSelect : IBaseClassIfc // SELECT(IfcResource, IfcTypeResource)
+	{
+		SET<IfcRelAssignsToResource> ResourceOf { get; }
+	}
 	[Serializable]
 	public partial class IfcResourceTime : IfcSchedulingTime //IFC4
 	{
@@ -2625,7 +2679,15 @@ namespace GeometryGym.Ifc
 		internal IfcRightCircularCylinder(DatabaseIfc db, IfcRightCircularCylinder c) : base(db, c) { mHeight = c.mHeight; mRadius = c.mRadius; }
 	}
 	[Serializable]
-	public partial class IfcRoof : IfcBuildingElement
+	public partial class IfcRoad : IfcFacility
+	{
+		public IfcRoad() : base() { }
+		public IfcRoad(DatabaseIfc db)
+			: base(db) { }
+		public IfcRoad(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcRoof : IfcBuiltElement
 	{
 		internal IfcRoofTypeEnum mPredefinedType = IfcRoofTypeEnum.NOTDEFINED;// OPTIONAL : IfcRoofTypeEnum; 
 		public IfcRoofTypeEnum PredefinedType { get { return mPredefinedType; } }
@@ -2635,7 +2697,7 @@ namespace GeometryGym.Ifc
 		public IfcRoof(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcRoofType : IfcBuildingElementType //IFC4
+	public partial class IfcRoofType : IfcBuiltElementType //IFC4
 	{
 		internal IfcRoofTypeEnum mPredefinedType = IfcRoofTypeEnum.NOTDEFINED;
 		public IfcRoofTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }

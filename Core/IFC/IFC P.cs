@@ -87,6 +87,28 @@ namespace GeometryGym.Ifc
 		internal void addEdge(IfcOrientedEdge edge) { mEdgeList.Add(edge.mIndex); }
 	}
 	[Serializable]
+	public partial class IfcPavement : IfcBuiltElement
+	{
+		private IfcLogicalEnum mFlexible = IfcLogicalEnum.UNKNOWN; //: OPTIONAL IfcBoolean;
+		public IfcLogicalEnum Flexible { get { return mFlexible; } set { mFlexible = value; } }
+
+		public IfcPavement() : base() { }
+		public IfcPavement(DatabaseIfc db) : base(db) { }
+		public IfcPavement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcPavementType : IfcBuiltElementType
+	{
+		private bool mFlexible = false; //: IfcBoolean;
+		public bool Flexible { get { return mFlexible; } set { mFlexible = value; } }
+
+		public IfcPavementType() : base() { }
+		public IfcPavementType(DatabaseIfc db, string name, bool flexible) : base(db, name)
+		{
+			Flexible = flexible;
+		}
+	}
+	[Serializable]
 	public partial class IfcPcurve : IfcCurve, IfcCurveOnSurface
 	{
 		internal IfcSurface mBasisSurface;// :	IfcSurface;
@@ -103,6 +125,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcPerformanceHistory : IfcControl
 	{
 		internal string mLifeCyclePhase;// : IfcLabel; 
+		private IfcPerformanceHistoryTypeEnum mPredefinedType = IfcPerformanceHistoryTypeEnum.NOTDEFINED;// OPTIONAL : IfcPerformanceHistoryTypeEnum;
+		public IfcPerformanceHistoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public string LifeCyclePhase { get { return mLifeCyclePhase; } set { mLifeCyclePhase = value; } }// : IfcLabel; 
 		internal IfcPerformanceHistory() : base() { }
 		internal IfcPerformanceHistory(DatabaseIfc db, IfcPerformanceHistory h, DuplicateOptions options) : base(db, h, options) { mLifeCyclePhase = h.mLifeCyclePhase; }
 	}
@@ -467,7 +493,14 @@ namespace GeometryGym.Ifc
 		public IfcPlane(IfcAxis2Placement3D placement) : base(placement) { }
 	}
 	[Serializable]
-	public partial class IfcPlate : IfcBuildingElement
+	public partial class IfcPlant : IfcGeographicElement
+	{
+		public IfcPlant() : base() { }
+		public IfcPlant(DatabaseIfc db) : base(db) { }
+		public IfcPlant(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcPlate : IfcBuiltElement
 	{
 		internal IfcPlateTypeEnum mPredefinedType = IfcPlateTypeEnum.NOTDEFINED;//: OPTIONAL IfcPlateTypeEnum;
 		public IfcPlateTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -485,7 +518,7 @@ namespace GeometryGym.Ifc
 		internal IfcPlateStandardCase(DatabaseIfc db, IfcPlateStandardCase p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	[Serializable]
-	public partial class IfcPlateType : IfcBuildingElementType
+	public partial class IfcPlateType : IfcBuiltElementType
 	{
 		internal IfcPlateTypeEnum mPredefinedType = IfcPlateTypeEnum.NOTDEFINED;
 		public IfcPlateTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -720,7 +753,9 @@ namespace GeometryGym.Ifc
 	{
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		protected IfcPositioningElement() : base() { }
+		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
 		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
+		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductRepresentation representation) : base(placement, representation) { }
 		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
@@ -975,10 +1010,11 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal List<IfcRelSequence> mIsPredecessorTo = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatingProcess; 
 		internal List<IfcRelSequence> mIsSuccessorFrom = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
-		internal List<IfcRelAssignsToProcess> mOperatesOn = new List<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
+		internal SET<IfcRelAssignsToProcess> mOperatesOn = new SET<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
 		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+		public SET<IfcRelAssignsToProcess> OperatesOn { get { return mOperatesOn; } }
 
 		protected IfcProcess() : base() { }
 		protected IfcProcess(DatabaseIfc db, IfcProcess p, DuplicateOptions options ) : base(db, p, options)
@@ -1013,9 +1049,12 @@ namespace GeometryGym.Ifc
 			return true;
 		}
 	}
-	public interface IfcProcessSelect : IBaseClassIfc { } // SELECT(IfcProcess, IfcTypeProcess)
+	public interface IfcProcessSelect : IBaseClassIfc // SELECT(IfcProcess, IfcTypeProcess)c
+	{
+		SET<IfcRelAssignsToProcess> OperatesOn { get; }
+	} 
 	[Serializable]
-	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
+	public abstract partial class IfcProduct : IfcObject, IfcProductSelect, IfcSpatialReferenceSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
 		private IfcObjectPlacement mObjectPlacement = null; //: OPTIONAL IfcObjectPlacement;
 		private IfcProductRepresentation mRepresentation =  null; //: OPTIONAL IfcProductRepresentation 
@@ -2038,7 +2077,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcPropertySetDefinition : IfcPropertyDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcElementQuantity,IfcEnergyProperties ,
+	public abstract partial class IfcPropertySetDefinition : IfcPropertyDefinition, IfcPropertySetDefinitionSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcElementQuantity,IfcEnergyProperties ,
 	{ // IfcFluidFlowProperties,IfcPropertySet, IfcServiceLifeFactor, IfcSoundProperties ,IfcSoundValue ,IfcSpaceThermalLoadProperties ))
 		//INVERSE
 		internal SET<IfcTypeObject> mDefinesType = new SET<IfcTypeObject>();// :	SET OF IfcTypeObject FOR HasPropertySets; IFC4change

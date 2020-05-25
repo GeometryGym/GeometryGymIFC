@@ -82,6 +82,7 @@ namespace GeometryGym.Ifc
 		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcGeographicElement() : base() { }
+		internal IfcGeographicElement(DatabaseIfc db) : base(db) { }
 		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
 		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
@@ -216,14 +217,50 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcGeometricSetSelect : IBaseClassIfc { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
 	[Serializable]
-	public partial class IfcGrid : IfcProduct
+	public partial class IfcGeomodel : IfcGeotechnicalAssembly
+	{
+		public IfcGeomodel() : base() { }
+		public IfcGeomodel(DatabaseIfc db) : base(db) { }
+		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcGeoslice : IfcGeotechnicalAssembly
+	{
+		public IfcGeoslice() : base() { }
+		public IfcGeoslice(DatabaseIfc db) : base(db) { }
+		public IfcGeoslice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public abstract partial class IfcGeotechnicalAssembly : IfcGeotechnicalElement
+	{
+		protected IfcGeotechnicalAssembly() : base() { }
+		protected IfcGeotechnicalAssembly(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public abstract partial class IfcGeotechnicalElement : IfcElement
+	{
+		protected IfcGeotechnicalElement() : base() { }
+		protected IfcGeotechnicalElement(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public abstract partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
+	{
+
+		protected IfcGeotechnicalStratum() : base() { }
+		protected IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcGrid : IfcPositioningElement
 	{
 		private LIST<IfcGridAxis> mUAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
 		private LIST<IfcGridAxis> mVAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
 		private LIST<IfcGridAxis> mWAxes = new LIST<IfcGridAxis>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcGridAxis;
 		internal IfcGridTypeEnum mPredefinedType = IfcGridTypeEnum.NOTDEFINED;// :OPTIONAL IfcGridTypeEnum; //IFC4 CHANGE  New attribute.
 		//INVERSE
-		internal IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } set { mUAxes.Clear(); if (value != null) { mUAxes.CollectionChanged -= mUAxes_CollectionChanged; mUAxes = value; mUAxes.CollectionChanged += mUAxes_CollectionChanged; } } }
 		public LIST<IfcGridAxis> VAxes { get { return mVAxes; } set { mVAxes.Clear(); if (value != null) { mVAxes.CollectionChanged -= mVAxes_CollectionChanged; mVAxes = value; mVAxes.CollectionChanged += mVAxes_CollectionChanged; } } }

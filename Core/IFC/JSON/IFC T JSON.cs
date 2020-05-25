@@ -45,6 +45,37 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcTrackElement : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcTrackElementTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTrackElementTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcTrackElementType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTrackElementTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
 	{
 		internal override void parseJObject(JObject obj)

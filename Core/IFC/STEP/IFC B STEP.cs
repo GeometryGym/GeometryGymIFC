@@ -30,7 +30,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcBeam : IfcBuildingElement
+	public partial class IfcBeam : IfcBuiltElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBeamTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcBeamType : IfcBuildingElementType
+	public partial class IfcBeamType : IfcBuiltElementType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -55,7 +55,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBeamTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcBearing : IfcBuildingElement
+	public partial class IfcBearing : IfcBuiltElement
 	{
 		protected override string BuildStringSTEP()
 		{
@@ -70,7 +70,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBearingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcBearingType : IfcBuildingElementType
+	public partial class IfcBearingType : IfcBuiltElementType
 	{
 		protected override string BuildStringSTEP()
 		{
@@ -247,15 +247,28 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() +
-			(mPredefinedType == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+			if (PredefinedType != null && mDatabase.Release < ReleaseVersion.IFC4X3)
+			{
+				IfcBridgePartTypeEnum part = IfcBridgePartTypeEnum.NOTDEFINED;
+				if (!PredefinedType.isEnumeration(ref part))
+					part = IfcBridgePartTypeEnum.NOTDEFINED;
+				return base.BuildStringSTEP() + (part == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + part.ToString() + ".");
+			}
+			return base.BuildStringSTEP();
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-				Enum.TryParse<IfcBridgePartTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+			if (release < ReleaseVersion.IFC4X3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+				{
+					IfcBridgePartTypeEnum partType = IfcBridgePartTypeEnum.NOTDEFINED;
+					if (Enum.TryParse<IfcBridgePartTypeEnum>(s.Replace(".", ""), true, out partType))
+						PredefinedType = new IfcFacilityPartTypeSelect(partType);
+				}
+			}
 		}
 	}
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
@@ -386,7 +399,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBuildingElementPartTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcBuildingElementProxy : IfcBuildingElement
+	public partial class IfcBuildingElementProxy : IfcBuiltElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -406,7 +419,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBuildingElementProxyTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcBuildingElementProxyType : IfcBuildingElementType
+	public partial class IfcBuildingElementProxyType : IfcBuiltElementType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -417,12 +430,20 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcBuildingElementProxyTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	
-	public partial class IfcBuildingSystem : IfcSystem //IFC4
+	public partial class IfcBuildingStorey : IfcSpatialStructureElement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mElevation); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mElevation = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
+	public partial class IfcBuiltSystem : IfcSystem //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBuildingSystemTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + (mLongName == "$" ? "$" : "'" + mLongName + "'"));
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBuiltSystemTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + (mLongName == "$" ? "$" : "'" + mLongName + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -431,7 +452,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
-					Enum.TryParse<IfcBuildingSystemTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+					Enum.TryParse<IfcBuiltSystemTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 				mLongName = ParserSTEP.StripString(str, ref pos, len);
 			}
 		}

@@ -423,7 +423,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcTextStyleForDefinedFont : BaseClassIfc
+	public partial class IfcTextStyleForDefinedFont : IfcPresentationItem
 	{
 		internal int mColour;// : IfcColour;
 		internal int mBackgroundColour;// : OPTIONAL IfcColour;
@@ -668,6 +668,26 @@ namespace GeometryGym.Ifc
 		public IfcToroidalSurface(IfcAxis2Placement3D placement, double majorRadius, double minorRadius) : base(placement) { MajorRadius = majorRadius; MinorRadius = minorRadius; }
 	}
 	[Serializable]
+	public partial class IfcTrackElement : IfcBuiltElement
+	{
+		private IfcTrackElementTypeEnum mPredefinedType = IfcTrackElementTypeEnum.NOTDEFINED; //: OPTIONAL IfcTrackElementTypeEnum;
+		public IfcTrackElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcTrackElement() : base() { }
+		public IfcTrackElement(DatabaseIfc db) : base(db) { }
+		public IfcTrackElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcTrackElementType : IfcBuiltElementType
+	{
+		private IfcTrackElementTypeEnum mPredefinedType = IfcTrackElementTypeEnum.NOTDEFINED; //: IfcTrackElementTypeEnum;
+		public IfcTrackElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcTrackElementType() : base() { }
+		public IfcTrackElementType(DatabaseIfc db, string name, IfcTrackElementTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
+	[Serializable]
 	public partial class IfcTransformer : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcTransformerTypeEnum mPredefinedType = IfcTransformerTypeEnum.NOTDEFINED;// OPTIONAL : IfcTransformerTypeEnum;
@@ -730,11 +750,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTransportElement : IfcElement
 	{
-		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcTransportElementTypeEnum;
+		internal IfcTransportElementTypeSelect mPredefinedType = null;// : 	OPTIONAL IfcTransportElementTypeSelect;
 		internal double mCapacityByWeight = double.NaN;// : 	OPTIONAL IfcMassMeasure;
 		internal double mCapacityByNumber = double.NaN;//	 : 	OPTIONAL IfcCountMeasure;
 
-		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcTransportElementTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		//public double CapacityByWeight { get { return mCapacityByWeight; } set { mCapacityByWeight = value; } }
 		//public double CapacityByNumber { get { return CapacityByNumber; } set { mCapacityByNumber = value; } }
 
@@ -745,12 +765,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTransportElementType : IfcElementType
 	{
-		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// IfcTransportElementTypeEnum; 
-		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		internal IfcTransportElementTypeSelect mPredefinedType = new IfcTransportElementTypeSelect(IfcTransportElementFixedTypeEnum.NOTDEFINED);// IfcTransportElementTypeEnum; 
+		public IfcTransportElementTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransportElementType() : base() { }
 		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeSelect type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef
@@ -1231,10 +1251,14 @@ namespace GeometryGym.Ifc
 		private string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
 		private string mLongDescription = "$";//	 :	OPTIONAL IfcText;
 		private string mProcessType = "$";//	 :	OPTIONAL IfcLabel;
+		//INVERSE
+		internal SET<IfcRelAssignsToProcess> mOperatesOn = new SET<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string LongDescription { get { return (mLongDescription == "$" ? "" : ParserIfc.Decode(mLongDescription)); } set { mLongDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string ProcessType { get { return (mProcessType == "$" ? "" : ParserIfc.Decode(mProcessType)); } set { mProcessType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		//INVERSE
+		public SET<IfcRelAssignsToProcess> OperatesOn { get { return mOperatesOn; } }
 
 		protected IfcTypeProcess() : base() { }
 		protected IfcTypeProcess(DatabaseIfc db, IfcTypeProcess t, DuplicateOptions options) : base(db, t, options) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mProcessType = t.mProcessType; }
@@ -1423,10 +1447,14 @@ namespace GeometryGym.Ifc
 		internal string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "$";//	 :	OPTIONAL IfcText;
 		internal string mResourceType = "$";//	 :	OPTIONAL IfcLabel;
+		//INVERSE
+		internal SET<IfcRelAssignsToResource> mResourceOf = new SET<IfcRelAssignsToResource>();// : SET [0:?] OF IfcRelAssignsToResource FOR RelatingResource; 
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string LongDescription { get { return (mLongDescription == "$" ? "" : ParserIfc.Decode(mLongDescription)); } set { mLongDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string ResourceType { get { return (mResourceType == "$" ? "" : ParserIfc.Decode(mResourceType)); } set { mResourceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		//INVERSE
+		public SET<IfcRelAssignsToResource> ResourceOf { get { return mResourceOf; } } 
 
 		protected IfcTypeResource() : base() { }
 		protected IfcTypeResource(DatabaseIfc db, IfcTypeResource t, DuplicateOptions options) : base(db, t, options) { mIdentification = t.mIdentification; mLongDescription = t.mLongDescription; mResourceType = t.mResourceType; }

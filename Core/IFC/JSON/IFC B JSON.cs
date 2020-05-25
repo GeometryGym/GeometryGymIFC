@@ -28,7 +28,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcBeam : IfcBuildingElement
+	public partial class IfcBeam : IfcBuiltElement
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcBeamType : IfcBuildingElementType
+	public partial class IfcBeamType : IfcBuiltElementType
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -266,7 +266,7 @@ namespace GeometryGym.Ifc
 				obj["BuildingAddress"] = BuildingAddress.getJson(this, options);
 		}
 	}
-	public partial class IfcBuildingStorey : IfcFacilityPart
+	public partial class IfcBuildingStorey : IfcSpatialStructureElement
 	{
 		internal override void parseJObject(JObject obj)
 		{

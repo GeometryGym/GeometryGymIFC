@@ -84,6 +84,17 @@ namespace GeometryGym.Ifc
 		internal override void changeSchema(ReleaseVersion schema) { MappingSource.changeSchema(schema); }
 	}
 	[Serializable]
+	public partial class IfcMarineFacility : IfcFacility
+	{
+		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: IfcMarineFacilityTypeEnum;
+		public IfcMarineFacilityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcMarineFacility() : base() { }
+		public IfcMarineFacility(DatabaseIfc db, IfcMarineFacilityTypeEnum predefinedType)
+			: base(db) { PredefinedType = predefinedType; }
+		public IfcMarineFacility(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, name, placement, representation) { }
+	}
+	[Serializable]
 	public partial class IfcMaterial : IfcMaterialDefinition, NamedObjectIfc
 	{
 		private string mName = "";// : IfcLabel; 
@@ -927,7 +938,7 @@ namespace GeometryGym.Ifc
 		public IfcMedicalDeviceType(DatabaseIfc m, string name, IfcMedicalDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
-	public partial class IfcMember : IfcBuildingElement
+	public partial class IfcMember : IfcBuiltElement
 	{
 		internal IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;//: OPTIONAL IfcMemberTypeEnum; 
 		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -947,7 +958,7 @@ namespace GeometryGym.Ifc
 		public IfcMemberStandardCase(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
-	public partial class IfcMemberType : IfcBuildingElementType
+	public partial class IfcMemberType : IfcBuiltElementType
 	{
 		internal IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;
 		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -1026,6 +1037,26 @@ namespace GeometryGym.Ifc
 		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p) : base(db,p) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, new IfcCartesianTransformationOperator2D(p.mDatabase) { Axis1 = new IfcDirection(p.mDatabase, -1, 0) },name) { }
 	}
+	[Serializable]
+	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
+	{
+		private IfcMobileTelecommunicationsApplianceTypeEnum mPredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED; //: OPTIONAL IfcMobileTelecommunicationsApplianceTypeEnum;
+		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcMobileTelecommunicationsAppliance() : base() { }
+		public IfcMobileTelecommunicationsAppliance(DatabaseIfc db) : base(db) { }
+		public IfcMobileTelecommunicationsAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
+	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
+	{
+		private IfcMobileTelecommunicationsApplianceTypeEnum mPredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED; //: IfcMobileTelecommunicationsApplianceTypeEnum;
+		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcMobileTelecommunicationsApplianceType() : base() { }
+		public IfcMobileTelecommunicationsApplianceType(DatabaseIfc db, string name, IfcMobileTelecommunicationsApplianceTypeEnum predefinedType)
+			: base(db) { Name = name; PredefinedType = predefinedType; }
+	}
 	public interface IfcModulusOfRotationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfRotationalSubgradeReactionMeasure);
 	public interface IfcModulusOfSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfSubgradeReactionMeasure);
 	public interface IfcModulusOfTranslationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfLinearSubgradeReactionMeasure);
@@ -1038,6 +1069,26 @@ namespace GeometryGym.Ifc
 		internal IfcMonetaryUnit() : base() { }
 		internal IfcMonetaryUnit(DatabaseIfc db, IfcMonetaryUnit m) : base(db, m) { mCurrency = m.mCurrency; }
 		public IfcMonetaryUnit(DatabaseIfc db, string currency) : base(db) { mCurrency = currency; }
+	}
+	[Serializable]
+	public partial class IfcMooringDevice : IfcBuiltElement
+	{
+		private IfcMooringDeviceTypeEnum mPredefinedType = IfcMooringDeviceTypeEnum.NOTDEFINED; //: OPTIONAL IfcMooringDeviceTypeEnum;
+		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcMooringDevice() : base() { }
+		public IfcMooringDevice(DatabaseIfc db) : base(db) { }
+		public IfcMooringDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcMooringDeviceType : IfcBuiltElementType
+	{
+		private IfcMooringDeviceTypeEnum mPredefinedType = IfcMooringDeviceTypeEnum.NOTDEFINED; //: IfcMooringDeviceTypeEnum;
+		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcMooringDeviceType() : base() { }
+		public IfcMooringDeviceType(DatabaseIfc db, string name, IfcMooringDeviceTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
 	}
 	[Serializable]
 	public partial class IfcMotorConnection : IfcEnergyConversionDevice //IFC4

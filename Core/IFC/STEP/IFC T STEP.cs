@@ -446,7 +446,7 @@ namespace GeometryGym.Ifc
 			mFontSize = ParserSTEP.StripField(str, ref pos, len);
 		}
 	}
-	public partial class IfcTextStyleForDefinedFont : BaseClassIfc
+	public partial class IfcTextStyleForDefinedFont : IfcPresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mColour) + "," + ParserSTEP.LinkToString(mBackgroundColour); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -616,6 +616,34 @@ namespace GeometryGym.Ifc
 			mMinorRadius = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcTrackElement : IfcBuiltElement
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + (mPredefinedType == IfcTrackElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcTrackElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcTrackElementType : IfcBuiltElementType
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcTrackElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcTransformer : IfcEnergyConversionDevice //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcTransformerTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
@@ -681,13 +709,49 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTransportElement : IfcElement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mPredefinedType == IfcTransportElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".") + (mDatabase.Release < ReleaseVersion.IFC4 ? "," + ParserSTEP.DoubleOptionalToString(mCapacityByWeight) + "," + ParserSTEP.DoubleOptionalToString(mCapacityByNumber) : ""); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			string result = base.BuildStringSTEP(release);
+			if (mPredefinedType == null)
+				result += ",$";
+			else if (release < ReleaseVersion.IFC4X3)
+			{
+				string str = mPredefinedType.ValueString();
+				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcTransportElementTypeEnum>(str, out predefined))
+					result += ",." + predefined.ToString() + ".";
+				else
+					result += ",$";
+			}
+			else
+				result += "," + mPredefinedType.ToString();
+			return result + (release < ReleaseVersion.IFC4 ? "," + ParserSTEP.DoubleOptionalToString(mCapacityByWeight) + "," + ParserSTEP.DoubleOptionalToString(mCapacityByNumber) : "");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+			{
+				IfcTransportElementTypeEnum predefinedType = IfcTransportElementTypeEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out predefinedType))
+				{
+					if (predefinedType != IfcTransportElementTypeEnum.NOTDEFINED)
+					{
+						IfcTransportElementFixedTypeEnum fixedType = IfcTransportElementFixedTypeEnum.NOTDEFINED;
+						if (Enum.TryParse<IfcTransportElementFixedTypeEnum>(predefinedType.ToString(), out fixedType))
+							PredefinedType = new IfcTransportElementTypeSelect(fixedType);
+						else
+						{
+							IfcTransportElementNonFixedTypeEnum nonFixed = IfcTransportElementNonFixedTypeEnum.NOTDEFINED;
+							if (Enum.TryParse<IfcTransportElementNonFixedTypeEnum>(predefinedType.ToString(), out nonFixed))
+								PredefinedType = new IfcTransportElementTypeSelect(nonFixed);
+						}
+					}
+				}
+			}
+			else
+				PredefinedType = IfcTransportElementTypeSelect.Parse(s);
 			if(release < ReleaseVersion.IFC4)
 			{
 				mCapacityByWeight = ParserSTEP.StripDouble(str, ref pos, len);
@@ -697,13 +761,47 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTransportElementType : IfcElementType
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			string result = base.BuildStringSTEP(release);
+			if (release < ReleaseVersion.IFC4X3)
+			{
+				string str = mPredefinedType.ValueString();
+				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcTransportElementTypeEnum>(str, out predefined))
+					result += ",." + predefined.ToString() + ".";
+				else
+					result += ",$";
+			}
+			else
+				result += "," + mPredefinedType.ToString();
+			return result;
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
-				Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+			{
+				IfcTransportElementTypeEnum predefinedType = IfcTransportElementTypeEnum.NOTDEFINED;
+				if (Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out predefinedType))
+				{
+					if (predefinedType != IfcTransportElementTypeEnum.NOTDEFINED)
+					{
+						IfcTransportElementFixedTypeEnum fixedType = IfcTransportElementFixedTypeEnum.NOTDEFINED;
+						if (Enum.TryParse<IfcTransportElementFixedTypeEnum>(predefinedType.ToString(), out fixedType))
+							PredefinedType = new IfcTransportElementTypeSelect(fixedType);
+						else
+						{
+							IfcTransportElementNonFixedTypeEnum nonFixed = IfcTransportElementNonFixedTypeEnum.NOTDEFINED;
+							if (Enum.TryParse<IfcTransportElementNonFixedTypeEnum>(predefinedType.ToString(), out nonFixed))
+								PredefinedType = new IfcTransportElementTypeSelect(nonFixed);
+						}
+					}
+				}
+			}
+			else
+				PredefinedType = IfcTransportElementTypeSelect.Parse(s);
 		}
 	}
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef

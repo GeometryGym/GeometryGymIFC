@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 			Elements = new SET<IfcGeometricSetSelect>(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
-	public partial class IfcGrid : IfcProduct
+	public partial class IfcGrid : IfcPositioningElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

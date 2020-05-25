@@ -29,20 +29,34 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcWallType : IfcBuiltElementType
+	public partial class IfcKerb : IfcBuiltElement
 	{
-		internal override void parseJObject(JObject obj)
-		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcWallTypeEnum>(token.Value<string>(), true, out mPredefinedType);
-		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)
-				obj["PredefinedType"] = mPredefinedType.ToString();
+			obj["Mountable"] = mMountable;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken mountable = obj.GetValue("Mountable", StringComparison.InvariantCultureIgnoreCase);
+			if (mountable != null)
+				mMountable = mountable.Value<bool>();
+		}
+	}
+	public partial class IfcKerbType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Mountable"] = mMountable;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken mountable = obj.GetValue("Mountable", StringComparison.InvariantCultureIgnoreCase);
+			if (mountable != null)
+				mMountable = mountable.Value<bool>();
 		}
 	}
 }

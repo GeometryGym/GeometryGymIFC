@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 	}
 	public interface IfcDateTimeSelect : IBaseClassIfc { DateTime DateTime { get; } } // IFC2x3 IfcCalenderDate, IfcDateAndTime, IfcLocalTime 
 	[Serializable]
-	public partial class IfcDeepFoundation : IfcBuildingElement
+	public partial class IfcDeepFoundation : IfcBuiltElement
 	{
 		public IfcDeepFoundation() : base() { }
 		public IfcDeepFoundation(DatabaseIfc db) : base(db) { }
@@ -80,7 +80,7 @@ namespace GeometryGym.Ifc
 		internal IfcDeepFoundation(DatabaseIfc db, IfcDeepFoundation f, DuplicateOptions options) : base(db, f, options) { }
 	}
 	[Serializable]
-	public partial class IfcDeepFoundationType : IfcBuildingElementType
+	public partial class IfcDeepFoundationType : IfcBuiltElementType
 	{
 		public IfcDeepFoundationType() : base() { }
 		public IfcDeepFoundationType(DatabaseIfc db) : base(db) { }
@@ -268,6 +268,42 @@ namespace GeometryGym.Ifc
 		internal bool isZAxisNegative { get { double tol = 1e-6; return ((double.IsNaN(mDirectionRatioX) || Math.Abs(mDirectionRatioX) < tol) && (double.IsNaN(mDirectionRatioY) || Math.Abs(mDirectionRatioY) < tol) && (Math.Abs(mDirectionRatioZ + 1) < tol)); } }
 	}
 	[Serializable]
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	{
+		private IfcCurve mDirectrix = null; //: IfcCurve;
+		private double mStartParam = double.NaN; //: OPTIONAL IfcParameterValue;
+		private double mEndParam = double.NaN; //: OPTIONAL IfcParameterValue;
+
+		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
+		public double StartParam { get { return mStartParam; } set { mStartParam = value; } }
+		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
+
+		protected IfcDirectrixCurveSweptAreaSolid() : base() { }
+		protected IfcDirectrixCurveSweptAreaSolid(DatabaseIfc db, IfcDirectrixCurveSweptAreaSolid s) : base(db, s)
+		{
+			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
+			mStartParam = s.mStartParam;
+			mEndParam = s.mEndParam;
+		}
+		protected IfcDirectrixCurveSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix)
+			: base(sweptArea) { Directrix = directrix; }
+	}
+	[Serializable]
+	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
+	{
+		private IfcCurve mDirectrix = null; //: IfcCurve;
+		private IfcDistanceExpression mStartDistance = null; //: OPTIONAL IfcDistanceExpression;
+		private IfcDistanceExpression mEndDistance = null; //: OPTIONAL IfcDistanceExpression;
+
+		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
+		public IfcDistanceExpression StartDistance { get { return mStartDistance; } set { mStartDistance = value; } }
+		public IfcDistanceExpression EndDistance { get { return mEndDistance; } set { mEndDistance = value; } }
+
+		protected IfcDirectrixDistanceSweptAreaSolid() : base() { }
+		protected IfcDirectrixDistanceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix)
+			: base(sweptArea) { Directrix = directrix; }
+	}
+	[Serializable]
 	public partial class IfcDiscreteAccessory : IfcElementComponent
 	{
 		internal IfcDiscreteAccessoryTypeEnum mPredefinedType = IfcDiscreteAccessoryTypeEnum.NOTDEFINED;// : OPTIONAL IfcDiscreteAccessoryTypeEnum;
@@ -325,6 +361,26 @@ namespace GeometryGym.Ifc
 		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = distanceAlong; }
 	}
 	[Serializable]
+	public partial class IfcDistributionBoard : IfcFlowController
+	{
+		private IfcDistributionBoardTypeEnum mPredefinedType = IfcDistributionBoardTypeEnum.NOTDEFINED; //: OPTIONAL IfcDistributionBoardTypeEnum;
+		public IfcDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcDistributionBoard() : base() { }
+		public IfcDistributionBoard(DatabaseIfc db) : base(db) { }
+		public IfcDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
+	public partial class IfcDistributionBoardType : IfcFlowControllerType
+	{
+		private IfcDistributionBoardTypeEnum mPredefinedType = IfcDistributionBoardTypeEnum.NOTDEFINED; //: IfcDistributionBoardTypeEnum;
+		public IfcDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcDistributionBoardType() : base() { }
+		public IfcDistributionBoardType(DatabaseIfc db, string name, IfcDistributionBoardTypeEnum predefinedType)
+			: base(db) { Name = name; PredefinedType = predefinedType; }
+	}
+	[Serializable]
 	public partial class IfcDistributionChamberElement : IfcDistributionFlowElement
 	{
 		internal IfcDistributionChamberElementTypeEnum mPredefinedType = IfcDistributionChamberElementTypeEnum.NOTDEFINED;//	:	OPTIONAL IfcDistributionChamberElementTypeEnum;
@@ -373,14 +429,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistributionElement : IfcElement //SUPERTYPE OF (ONEOF (IfcDistributionControlElement ,IfcDistributionFlowElement))
 	{
+		public SET<IfcRelConnectsPortToElement> HasPorts { get { return mHasPorts; } }
+
 		internal IfcDistributionElement() : base() { }
+		internal IfcDistributionElement(DatabaseIfc db) : base(db) { }
 		protected IfcDistributionElement(IfcDistributionElement distributionElement, bool replace) : base(distributionElement, replace) { }
 		protected IfcDistributionElement(DatabaseIfc db, IfcDistributionElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 		public IfcDistributionElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : this(host,p,r) { if (system != null) system.AddRelated(this); }
-		
-		public SET<IfcRelConnectsPortToElement> HasPorts { get { return mHasPorts; } }
-		
 	}
 	[Serializable]
 	public partial class IfcDistributionElementType : IfcElementType //SUPERTYPE OF(ONEOF(IfcDistributionControlElementType, IfcDistributionFlowElementType))
@@ -400,6 +456,7 @@ namespace GeometryGym.Ifc
 		internal IfcDistributionPort mSourcePort, mSinkPort;
 
 		internal IfcDistributionFlowElement() : base() { }
+		internal IfcDistributionFlowElement(DatabaseIfc db) : base(db) { }
 		protected IfcDistributionFlowElement(IfcDistributionFlowElement basis, bool replace) : base(basis, replace) { mSourcePort = basis.mSourcePort; mSinkPort = basis.mSinkPort;  }
 		internal IfcDistributionFlowElement(DatabaseIfc db, IfcDistributionFlowElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcDistributionFlowElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
@@ -536,7 +593,7 @@ namespace GeometryGym.Ifc
 		internal void addEditor(IfcActorSelect editor) { mEditors.Add(editor.Index); }
 	}
 	[Serializable]
-	public partial class IfcDocumentInformationRelationship : BaseClassIfc
+	public partial class IfcDocumentInformationRelationship : IfcResourceLevelRelationship
 	{
 		internal int mRelatingDocument; //: IfcDocumentInformation
 		internal List<int> mRelatedDocuments = new List<int>();// : SET [1:?] OF IfcDocumentInformation;
@@ -569,7 +626,7 @@ namespace GeometryGym.Ifc
 		void Associate(IfcRelAssociatesDocument associates);
 	}
 	[Serializable]
-	public partial class IfcDoor : IfcBuildingElement
+	public partial class IfcDoor : IfcBuiltElement
 	{
 		internal double mOverallHeight = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mOverallWidth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
@@ -667,7 +724,7 @@ namespace GeometryGym.Ifc
 		internal IfcDoorStyle(DatabaseIfc db, IfcDoorStyle s, DuplicateOptions options) : base(db, s, options) { mOperationType = s.mOperationType; mConstructionType = s.mConstructionType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 	}
 	[Serializable]
-	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
+	public partial class IfcDoorType : IfcBuiltElementType //IFC2x3 IfcDoorStyle
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDoorStyle" : base.StepClassName); } }
 
@@ -743,7 +800,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcDuctFitting : IfcFlowFitting //IFC4
 	{
 		internal IfcDuctFittingTypeEnum mPredefinedType = IfcDuctFittingTypeEnum.NOTDEFINED;// OPTIONAL : IfcDuctFittingTypeEnum;
-		public IfcDuctFittingTypeEnum Predefined { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcDuctFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcDuctFitting() : base() { }
 		internal IfcDuctFitting(DatabaseIfc db, IfcDuctFitting f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }

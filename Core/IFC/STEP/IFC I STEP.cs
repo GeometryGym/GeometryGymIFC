@@ -38,6 +38,20 @@ namespace GeometryGym.Ifc
 			mUrlReference = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
+	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + (mFixedAxisVertical == IfcLogicalEnum.UNKNOWN ? ",$" : ( mFixedAxisVertical == IfcLogicalEnum.TRUE ? ",.T." : ",.F")) +
+			",#" + mInclinating.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			FixedAxisVertical = ParserIfc.StripLogical(str, ref pos, len);
+			Inclinating = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxisLateralInclination;
+		}
+	}
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -192,7 +206,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release) + ",." + mInventoryType + ".,#" + mJurisdiction + ",(#" + mResponsiblePersons[0];
+			string result = base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,#" + mJurisdiction + ",(#" + mResponsiblePersons[0];
 			for (int icounter = 1; icounter < mResponsiblePersons.Count; icounter++)
 				result += ",#" + mResponsiblePersons[icounter];
 			return result + "),#" + mLastUpdateDate + (mCurrentValue == 0 ? ",$" : ",#" + mCurrentValue) + (mOriginalValue == 0 ? ",$" : ",#" + mOriginalValue);
@@ -200,12 +214,36 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Enum.TryParse<IfcInventoryTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mInventoryType);
+			Enum.TryParse<IfcInventoryTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 			mJurisdiction = ParserSTEP.StripLink(str, ref pos, len);
 			mResponsiblePersons = ParserSTEP.StripListLink(str, ref pos, len);
 			mLastUpdateDate = ParserSTEP.StripLink(str, ref pos, len);
 			mCurrentValue = ParserSTEP.StripLink(str, ref pos, len);
 			mOriginalValue = ParserSTEP.StripLink(str, ref pos, len);
+		}
+	}
+	public partial class IfcImpactProtectionDevice : IfcElementComponent
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + (mPredefinedType == null ? ",$" : mPredefinedType.ToString());
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
+		}
+	}
+	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + ",#" + mPredefinedType.ToString();
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
 		}
 	}
 	public partial class IfcIrregularTimeSeries : IfcTimeSeries

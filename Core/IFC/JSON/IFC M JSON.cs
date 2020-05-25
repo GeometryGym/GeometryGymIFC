@@ -80,6 +80,21 @@ namespace GeometryGym.Ifc
 			obj["MappingTarget"] = MappingTarget.getJson(this, options);
 		}
 	}
+	public partial class IfcMarineFacility : IfcFacility
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMarineFacilityTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcMaterial : IfcMaterialDefinition
 	{
 		internal override void parseJObject(JObject obj)
@@ -383,6 +398,68 @@ namespace GeometryGym.Ifc
 				obj["DataValue"] = DatabaseIfc.extract(mDataValueValue);
 			if (mReferencePath > 0)
 				obj["ReferencePath"] = ReferencePath.getJson(this, options);
+		}
+	}
+	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDevice : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcMooringDeviceTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDeviceType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
 }

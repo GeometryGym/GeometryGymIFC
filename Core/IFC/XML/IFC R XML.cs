@@ -29,6 +29,37 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcRail : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcRailTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcRailTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcRailType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcRailTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -155,6 +186,22 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("ListPositions", String.Join(" ", mListPositions));
 			if (mInnerReference > 0)
 				xml.AppendChild(InnerReference.GetXML(xml.OwnerDocument, "InnerReference", this, processed));
+		}
+	}
+	public partial class IfcReinforcedSoil : IfcEarthworksElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcReinforcedSoilTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcReinforcedSoilTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 	public partial class IfcReinforcementBarProperties : IfcPreDefinedProperties
@@ -425,6 +472,24 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(mDatabase[mRelatingMaterial].GetXML(xml.OwnerDocument, "RelatingMaterial", this, processed));
+		}
+	}
+	public partial class IfcRelAssociatesProfileDef : IfcRelAssociates
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(RelatingProfileDef.GetXML(xml.OwnerDocument, "RelatingProfileDef", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingProfileDef", true) == 0)
+					RelatingProfileDef = mDatabase.ParseXml<IfcProfileDef>(child as XmlElement);
+			}
 		}
 	}
 	public partial class IfcRelContainedInSpatialStructure : IfcRelConnects

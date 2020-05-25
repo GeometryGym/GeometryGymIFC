@@ -192,6 +192,9 @@
     <Compile Include="..\..\Core\IFC\JSON\IFC J JSON.cs">
       <Link>IFC\JSON\IFC J JSON.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\JSON\IFC K JSON.cs">
+      <Link>IFC\JSON\IFC K JSON.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\IFC\JSON\IFC L JSON.cs">
       <Link>IFC\JSON\IFC L JSON.cs</Link>
     </Compile>
@@ -357,6 +360,9 @@
     <Compile Include="..\..\core\ifc\xml\IFC J XML.cs">
       <Link>IFC\XML\IFC J XML.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\XML\IFC K XML.cs">
+      <Link>IFC\XML\IFC K XML.cs</Link>
+    </Compile>
     <Compile Include="..\..\core\ifc\xml\IFC L XML.cs">
       <Link>IFC\XML\IFC L XML.cs</Link>
     </Compile>
@@ -489,7 +495,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets" Condition="Exists('..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

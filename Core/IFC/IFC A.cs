@@ -257,6 +257,110 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcSite host, IfcCurve axis) : base(host, axis) { }
 	}
 	[Serializable]
+	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
+	{
+		private LIST<IfcAlignment2DCantSegment> mSegments = new LIST<IfcAlignment2DCantSegment>(); //: LIST[1:?] OF IfcAlignment2DCantSegment;
+		private double mRailHeadDistance = 0; //: IfcPositiveLengthMeasure;
+
+		public LIST<IfcAlignment2DCantSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public double RailHeadDistance { get { return mRailHeadDistance; } set { mRailHeadDistance = value; } }
+
+		public IfcAlignment2DCant() : base() { }
+		public IfcAlignment2DCant(DatabaseIfc db, IEnumerable<IfcAlignment2DCantSegment> segments, double railHeadDistance)
+			: base(db)
+		{
+			Segments.AddRange(segments);
+			RailHeadDistance = railHeadDistance;
+		}
+	}
+	[Serializable]
+	public partial class IfcAlignment2DCantSegLine : IfcAlignment2DCantSegment
+	{
+
+		public IfcAlignment2DCantSegLine() : base() { }
+		public IfcAlignment2DCantSegLine(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight)
+			: base(db, startDistAlong, horizontalLength, startCantLeft, startCantRight) { }
+	}
+	[Serializable]
+	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
+	{
+		private double mStartDistAlong = 0; //: IfcPositiveLengthMeasure;
+		private double mHorizontalLength = 0; //: IfcPositiveLengthMeasure;
+		private double mStartCantLeft = 0; //: IfcLengthMeasure;
+		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mStartCantRight = 0; //: IfcLengthMeasure;
+		private double mEndCantRight = double.NaN; //: OPTIONAL IfcLengthMeasure;
+												   //INVERSE
+		private SET<IfcAlignment2DCant> mToCant = new SET<IfcAlignment2DCant>();
+
+		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
+		public double HorizontalLength { get { return mHorizontalLength; } set { mHorizontalLength = value; } }
+		public double StartCantLeft { get { return mStartCantLeft; } set { mStartCantLeft = value; } }
+		public double EndCantLeft { get { return mEndCantLeft; } set { mEndCantLeft = value; } }
+		public double StartCantRight { get { return mStartCantRight; } set { mStartCantRight = value; } }
+		public double EndCantRight { get { return mEndCantRight; } set { mEndCantRight = value; } }
+		//INVERSE
+		public SET<IfcAlignment2DCant> ToCant { get { return mToCant; } set { mToCant = value; } }
+
+		protected IfcAlignment2DCantSegment() : base() { }
+		protected IfcAlignment2DCantSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight)
+			: base(db)
+		{
+			StartDistAlong = startDistAlong;
+			HorizontalLength = horizontalLength;
+			StartCantLeft = startCantLeft;
+			StartCantRight = startCantRight;
+		}
+	}
+	[Serializable]
+	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
+	{
+		private double mStartRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
+		private double mEndRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
+		private bool mIsStartRadiusCCW = false; //: IfcBoolean;
+		private bool mIsEndRadiusCCW = false; //: IfcBoolean;
+		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.BIQUADRATICPARABOLA; //: IfcTransitionCurveType;
+
+		public double StartRadius { get { return mStartRadius; } set { mStartRadius = value; } }
+		public double EndRadius { get { return mEndRadius; } set { mEndRadius = value; } }
+		public bool IsStartRadiusCCW { get { return mIsStartRadiusCCW; } set { mIsStartRadiusCCW = value; } }
+		public bool IsEndRadiusCCW { get { return mIsEndRadiusCCW; } set { mIsEndRadiusCCW = value; } }
+		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
+
+		public IfcAlignment2DCantSegTransition() : base() { }
+		public IfcAlignment2DCantSegTransition(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight, bool isStartRadiusCCW, bool isEndRadiusCCW, IfcTransitionCurveType transitionCurveType)
+			: base(db, startDistAlong, horizontalLength, startCantLeft, startCantRight)
+		{
+			IsStartRadiusCCW = isStartRadiusCCW;
+			IsEndRadiusCCW = isEndRadiusCCW;
+			TransitionCurveType = transitionCurveType;
+		}
+	}
+	[Serializable]
+	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
+	{
+		private double mStartRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
+		private double mEndRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
+		private bool mIsStartRadiusCCW = false; //: IfcBoolean;
+		private bool mIsEndRadiusCCW = false; //: IfcBoolean;
+		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.BIQUADRATICPARABOLA; //: IfcTransitionCurveType;
+
+		public double StartRadius { get { return mStartRadius; } set { mStartRadius = value; } }
+		public double EndRadius { get { return mEndRadius; } set { mEndRadius = value; } }
+		public bool IsStartRadiusCCW { get { return mIsStartRadiusCCW; } set { mIsStartRadiusCCW = value; } }
+		public bool IsEndRadiusCCW { get { return mIsEndRadiusCCW; } set { mIsEndRadiusCCW = value; } }
+		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
+
+		public IfcAlignment2DVerSegTransition() : base() { }
+		public IfcAlignment2DVerSegTransition(DatabaseIfc db, double startDistAlong, double horizontalLength, double startHeight, double startGradient, bool isStartRadiusCCW, bool isEndRadiusCCW, IfcTransitionCurveType transitionCurveType)
+			: base(db, startDistAlong, horizontalLength, startHeight, startGradient)
+		{
+			IsStartRadiusCCW = isStartRadiusCCW;
+			IsEndRadiusCCW = isEndRadiusCCW;
+			TransitionCurveType = transitionCurveType;
+		}
+	}
+	[Serializable]
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal double mStartDistAlong = double.NaN;// : OPTIONAL IfcLengthMeasure;
@@ -977,5 +1081,16 @@ namespace GeometryGym.Ifc
 				return base.IsXYPlane;
 			}
 		}
+	}
+	[Serializable]
+	public abstract partial class IfcAxisLateralInclination : IfcGeometricRepresentationItem
+	{
+		//INVERSE
+		private SET<IfcLinearAxisWithInclination> mToLinearAxis = new SET<IfcLinearAxisWithInclination>();
+		//INVERSE
+		public SET<IfcLinearAxisWithInclination> ToLinearAxis { get { return mToLinearAxis; } set { mToLinearAxis = value; } }
+
+		protected IfcAxisLateralInclination() : base() { }
+		protected IfcAxisLateralInclination(DatabaseIfc db) : base(db) { }
 	}
 }

@@ -29,7 +29,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcBeam : IfcBuildingElement
+	public partial class IfcBeam : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcBeamType : IfcBuildingElementType
+	public partial class IfcBeamType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -160,7 +160,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(BuildingAddress.GetXML(xml.OwnerDocument, "BuildingAddress", this, processed));
 		}
 	}
-	public partial class IfcBuildingElementProxy : IfcBuildingElement
+	public partial class IfcBuildingElementProxy : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -185,7 +185,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcBuildingElementProxyType : IfcBuildingElementType
+	public partial class IfcBuildingElementProxyType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -200,7 +200,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcBuildingStorey : IfcFacilityPart
+	public partial class IfcBuildingStorey : IfcSpatialStructureElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

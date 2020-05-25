@@ -28,5 +28,28 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	
+	public partial class IfcKerb : IfcBuiltElement
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," + (mMountable ? ".T." : ".F");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			Mountable = ParserSTEP.StripBool(str, ref pos, len);
+		}
+	}
+	public partial class IfcKerbType : IfcBuiltElementType
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," + (mMountable ? ".T." : ".F");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			Mountable = ParserSTEP.StripBool(str, ref pos, len);
+		}
+	}
 }

@@ -70,4 +70,24 @@ namespace GeometryGym.Ifc
 
 		public abstract double SIFactor { get; }
 	}
+	[Serializable]
+	public partial class IfcNavigationElement : IfcBuiltElement
+	{
+		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: OPTIONAL IfcNavigationElementTypeEnum;
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcNavigationElement() : base() { }
+		public IfcNavigationElement(DatabaseIfc db) : base(db) { }
+		public IfcNavigationElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcNavigationElementType : IfcBuiltElementType
+	{
+		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: IfcNavigationElementTypeEnum;
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcNavigationElementType() : base() { }
+		public IfcNavigationElementType(DatabaseIfc db, string name, IfcNavigationElementTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
 }

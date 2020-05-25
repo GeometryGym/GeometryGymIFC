@@ -76,6 +76,21 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Scale", mScale);
 		}
 	}
+	public partial class IfcMarineFacility : IfcFacility
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcMarineFacilityTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcMaterial : IfcMaterialDefinition
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -359,6 +374,68 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(convert(xml.OwnerDocument, mDataValueValue, "DataValue", mDatabase.mXmlNamespace));
 			if(mReferencePath > 0)
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath", this, processed));
+		}
+	}
+	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDevice : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcMooringDeviceTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDeviceType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 }

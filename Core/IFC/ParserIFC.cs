@@ -135,6 +135,19 @@ namespace GeometryGym.Ifc
 			return result;	
 		}
 
+		public static T ParseEnum<T>(string str, string enumName) where T : struct
+		{
+			int start = enumName.Length + 2, end = str.Length - start - 2;
+			return ParseEnum<T>(str.Substring(start, end));
+		}
+		public static T ParseEnum<T>(string str) where T : struct
+		{
+			T result = default(T);
+			if (string.IsNullOrEmpty(str))
+				return result;
+			Enum.TryParse<T>(str, out result);
+			return result;
+		}
 		public static IfcLogicalEnum ParseIFCLogical(string str) 
 		{
 			string s = str.Trim();

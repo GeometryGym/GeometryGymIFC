@@ -29,7 +29,7 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
-	public partial class IfcWall : IfcBuildingElement
+	public partial class IfcWall : IfcBuiltElement
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;//: OPTIONAL IfcWallTypeEnum; 
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcWallType : IfcBuildingElementType
+	public partial class IfcWallType : IfcBuiltElementType
 	{
 		internal IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;
 		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -127,7 +127,14 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcWindow : IfcBuildingElement
+	public partial class IfcWaterStratum : IfcGeotechnicalStratum
+	{
+		public IfcWaterStratum() : base() { }
+		public IfcWaterStratum(DatabaseIfc db) : base(db) { }
+		public IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcWindow : IfcBuiltElement
 	{
 		internal double mOverallHeight = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mOverallWidth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
@@ -239,7 +246,7 @@ namespace GeometryGym.Ifc
 		internal IfcWindowStyle(DatabaseIfc db, IfcWindowStyle s, DuplicateOptions options) : base(db, s, options) { mConstructionType = s.mConstructionType; mOperationType = s.mOperationType; mParameterTakesPrecedence = s.mParameterTakesPrecedence; mSizeable = s.mSizeable; }
 	}
 	[Serializable]
-	public partial class IfcWindowType : IfcBuildingElementType //IFCWindowStyle IFC2x3
+	public partial class IfcWindowType : IfcBuiltElementType //IFCWindowStyle IFC2x3
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcWindowStyle" : base.StepClassName); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;

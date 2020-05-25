@@ -32,7 +32,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 			mRelease = schema;
 			mModelView = view;
 #if (RHINO || GH)
-			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
+			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GeometryGym.GGRhino.GGRhino.ActiveUnits()];
 			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
 			if (doc != null)
 			{
@@ -1376,7 +1376,7 @@ namespace GeometryGym.Ifc
 				{
 					mPerson = new IfcPerson(mDatabase, System.Environment.UserName, "", "");
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
-					string str = GGYM.ggAssembly.mOptions.OwnerRole;
+					string str = ggAssembly.mOptions.OwnerRole;
 					if (!string.IsNullOrEmpty(str))
 					{
 						IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;

@@ -539,10 +539,25 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
-	{	//INVERSE 
+	{
+		private IfcObjectPlacement mPlacementRelTo = null;// : OPTIONAL IfcObjectPlacement;
+		//INVERSE 
 		internal List<IfcProduct> mPlacesObject = new List<IfcProduct>();// : SET [0:?] OF IfcProduct FOR ObjectPlacement; ifc2x3 [1:?] 
-		internal List<IfcLocalPlacement> mReferencedByPlacements = new List<IfcLocalPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
+		internal List<IfcObjectPlacement> mReferencedByPlacements = new List<IfcObjectPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
 		internal IfcProduct mContainerHost = null;
+
+		public IfcObjectPlacement PlacementRelTo
+		{
+			get { return mPlacementRelTo; }
+			set
+			{
+				if (mPlacementRelTo != null)
+					mPlacementRelTo.mReferencedByPlacements.Remove(this);
+				mPlacementRelTo = value;
+				if (value != null)
+					value.mReferencedByPlacements.Add(this);
+			}
+		}
 
 		protected IfcObjectPlacement() : base() { }
 		protected IfcObjectPlacement(DatabaseIfc db) : base(db) { }
@@ -669,6 +684,28 @@ namespace GeometryGym.Ifc
 
 		internal IfcOneDirectionRepeatFactor() : base() { }
 		internal IfcOneDirectionRepeatFactor(DatabaseIfc db, IfcOneDirectionRepeatFactor f) : base(db, f) { RepeatFactor = db.Factory.Duplicate(f.RepeatFactor) as IfcVector; }
+	}
+	[Serializable]
+	public partial class IfcOpenCrossProfileDef : IfcProfileDef
+	{
+		private bool mHorizontalWidths = false; //: IfcBoolean;
+		private LIST<double> mWidths = new LIST<double>(); //: LIST[1:?] OF IfcNonNegativeLengthMeasure;
+		private LIST<double> mSlopes = new LIST<double>(); //: LIST[1:?] OF IfcPlaneAngleMeasure;
+		private LIST<string> mTags = new LIST<string>(); //: OPTIONAL LIST[2:?] OF IfcLabel;
+
+		public bool HorizontalWidths { get { return mHorizontalWidths; } set { mHorizontalWidths = value; } }
+		public LIST<double> Widths { get { return mWidths; } set { mWidths = value; } }
+		public LIST<double> Slopes { get { return mSlopes; } set { mSlopes = value; } }
+		public LIST<string> Tags { get { return mTags; } set { mTags = value; } }
+
+		public IfcOpenCrossProfileDef() : base() { }
+		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes)
+			: base(db, name)
+		{
+			HorizontalWidths = horizontalWidths;
+			Widths.AddRange(widths);
+			Slopes.AddRange(slopes);
+		}
 	}
 	[Serializable]
 	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)

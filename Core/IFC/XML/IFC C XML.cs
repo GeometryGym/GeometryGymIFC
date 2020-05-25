@@ -230,7 +230,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Thickness", mThickness.ToString());
 		}
 	}
-	public partial class IfcChimney : IfcBuildingElement
+	public partial class IfcChimney : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -245,7 +245,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcChimneyType : IfcBuildingElementType
+	public partial class IfcChimneyType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -457,7 +457,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Name", Name);
 		}
 	}
-	public partial class IfcColumn : IfcBuildingElement
+	public partial class IfcColumn : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -472,7 +472,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcColumnType : IfcBuildingElementType
+	public partial class IfcColumnType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -860,6 +860,37 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcConveyorSegment : IfcFlowSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcConveyorSegmentTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcConveyorSegmentTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcConveyorSegmentType : IfcFlowSegmentType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcConveyorSegmentTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public abstract partial class IfcCoordinateOperation : BaseClassIfc // IFC4 	ABSTRACT SUPERTYPE OF(IfcMapConversion);
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -902,7 +933,38 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "VerticalDatum", VerticalDatum);
 		}
 	}
-	public partial class IfcCovering : IfcBuildingElement
+	public partial class IfcCourse : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcCourseTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcCourseTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcCourseType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcCourseTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcCovering : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -917,7 +979,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcCoveringType : IfcBuildingElementType
+	public partial class IfcCoveringType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -997,7 +1059,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("InternalFilletRadius", mInternalFilletRadius.ToString());
 		}
 	}
-	public partial class IfcCurtainWall : IfcBuildingElement
+	public partial class IfcCurtainWall : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -1012,7 +1074,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcCurtainWallType : IfcBuildingElementType
+	public partial class IfcCurtainWallType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

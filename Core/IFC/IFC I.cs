@@ -39,6 +39,39 @@ namespace GeometryGym.Ifc
 		public IfcImageTexture(DatabaseIfc db, bool repeatS, bool repeatT, string urlReference) : base(db, repeatS, repeatT) { UrlReference = urlReference; }
 	}
 	[Serializable]
+	public partial class IfcImpactProtectionDevice : IfcElementComponent
+	{
+		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: OPTIONAL IfcImpactProtectionDeviceTypeSelect;
+		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcImpactProtectionDevice() : base() { }
+		public IfcImpactProtectionDevice(DatabaseIfc db) : base(db) { }
+		public IfcImpactProtectionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
+	{
+		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: IfcImpactProtectionDeviceTypeSelect;
+		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcImpactProtectionDeviceType() : base() { }
+		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeSelect predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
+	[Serializable]
+	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
+	{
+		private IfcLogicalEnum mFixedAxisVertical = IfcLogicalEnum.UNKNOWN; //: OPTIONAL IfcBoolean;
+		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
+
+		public IfcLogicalEnum FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
+		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
+
+		public IfcInclinedReferenceSweptAreaSolid() : base() { }
+		public IfcInclinedReferenceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcAxisLateralInclination inclinating)
+			: base(sweptArea, directrix) { Inclinating = inclinating; }
+	}
+	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		internal int mMappedTo;// : IfcTessellatedFaceSet; 
@@ -163,6 +196,11 @@ namespace GeometryGym.Ifc
 		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcInterceptorType(DatabaseIfc db, string name, IfcInterceptorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
+	public interface IfcInterferenceSelect : IBaseClassIfc // SELECT(IfcSpatialElement, IfcElement);
+	{
+		SET<IfcRelInterferesElements> IsInterferedByElements { get; } 
+		SET<IfcRelInterferesElements> InterferesElements { get; } 
+	}
 	[Serializable]
 	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
 	{
@@ -173,12 +211,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcInventory : IfcGroup
 	{
-		internal IfcInventoryTypeEnum mInventoryType;// : IfcInventoryTypeEnum;
+		internal IfcInventoryTypeEnum mPredefinedType;// : IfcInventoryTypeEnum;
 		internal int mJurisdiction;// : IfcActorSelect;
 		internal List<int> mResponsiblePersons = new List<int>();// : SET [1:?] OF IfcPerson;
 		internal int mLastUpdateDate;// : IfcCalendarDate;
 		internal int mCurrentValue;// : OPTIONAL IfcCostValue;
 		internal int mOriginalValue;// : OPTIONAL IfcCostValue;
+
+		public IfcInventoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcInventory() : base() { }
 		internal IfcInventory(DatabaseIfc db, IfcInventory i, DuplicateOptions options) : base(db, i, options)
 		{

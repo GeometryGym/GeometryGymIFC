@@ -31,6 +31,29 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if(mFixedAxisVertical != IfcLogicalEnum.UNKNOWN)
+				xml.SetAttribute("FixedAxisVertical", (mFixedAxisVertical == IfcLogicalEnum.TRUE ? "true" : "false"));
+			xml.AppendChild(Inclinating.GetXML(xml.OwnerDocument, "Inclinating", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string fixedAxisVertical = xml.GetAttribute("FixedAxisVertical");
+			if (!string.IsNullOrEmpty(fixedAxisVertical))
+				mFixedAxisVertical = ParserIfc.ParseIFCLogical(fixedAxisVertical);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Inclinating", true) == 0)
+					Inclinating = mDatabase.ParseXml<IfcAxisLateralInclination>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
 	{
 		internal override void ParseXml(XmlElement xml)

@@ -185,6 +185,13 @@ namespace GeometryGym.Ifc
 		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
 	}
+	[Serializable]
+	public partial class IfcVoidStratum : IfcGeotechnicalStratum
+	{
+		public IfcVoidStratum() : base() { }
+		public IfcVoidStratum(DatabaseIfc db) : base(db) { }
+		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
 
 	[Serializable]
 	public abstract class IfcDerivedMeasureValue : IfcValue

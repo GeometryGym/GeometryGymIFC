@@ -142,7 +142,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcGrid : IfcProduct
+	public partial class IfcGrid : IfcPositioningElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

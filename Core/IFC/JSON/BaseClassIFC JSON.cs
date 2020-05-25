@@ -42,9 +42,10 @@ namespace GeometryGym.Ifc
 			public HashSet<string> Encountered = new HashSet<string>();
 			public JsonStyle Style = JsonStyle.Default;
 			public bool Local = false;  //Convert to nesting
+			public bool SerializeOwnerHistory = true, SerializeAllGlobalIds = true;
 			public int LengthDigitCount = 4;
 			internal RepositoryAttributes RepositoryAttributes = new RepositoryAttributes();
-			internal ReleaseVersion Version = ReleaseVersion.IFC4A2;
+			internal ReleaseVersion Version = ReleaseVersion.IFC4X3;
 
 			public SetJsonOptions() { }
 
@@ -56,6 +57,8 @@ namespace GeometryGym.Ifc
 				RepositoryAttributes = options.RepositoryAttributes;
 				LengthDigitCount = options.LengthDigitCount;
 				Version = options.Version;
+				SerializeAllGlobalIds = options.SerializeAllGlobalIds;
+				SerializeOwnerHistory = options.SerializeOwnerHistory;
 			}
 			internal SetJsonOptions(BaseClassIfc obj) { adopt(obj); }
 			internal SetJsonOptions(SetJsonOptions options, BaseClassIfc obj) : this(options) { adopt(obj); }
@@ -153,14 +156,14 @@ namespace GeometryGym.Ifc
 					options.Encountered.Add(mGlobalId);
 			}
 			obj["type"] = StepClassName;
-			if (common || this is IfcGeometricRepresentationSubContext || this is NamedObjectIfc)
+			if (common || this is IfcGeometricRepresentationContext || this is NamedObjectIfc)
 			{
 				if (string.IsNullOrEmpty(mGlobalId))
 				{
 					mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 					options.Encountered.Add(mGlobalId);
 				}
-				if(!(this is IfcRoot))
+				if(options.SerializeAllGlobalIds && this as IfcRoot == null)
 					obj["id"] = mGlobalId;
 			}
 			setJSON(obj, host, options);
@@ -188,7 +191,7 @@ namespace GeometryGym.Ifc
 		}
 		protected virtual void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			if(!(this is IfcRoot) && !string.IsNullOrEmpty(mGlobalId))
+			if(options.SerializeAllGlobalIds && !string.IsNullOrEmpty(mGlobalId) && this as IfcRoot == null)
 				obj["id"] = mGlobalId;
 		}
 		protected T extractObject<T>(JObject obj) where T : IBaseClassIfc

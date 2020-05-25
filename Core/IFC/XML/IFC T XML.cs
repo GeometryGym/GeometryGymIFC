@@ -243,6 +243,37 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Coordinates.GetXML(xml.OwnerDocument, "Coordinates", this, processed));
 		}
 	}
+	public partial class IfcTrackElement : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcTrackElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcTrackElementTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcTrackElementType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcTrackElementTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
 	{
 		internal override void ParseXml(XmlElement xml)

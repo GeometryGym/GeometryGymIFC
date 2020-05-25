@@ -28,6 +28,38 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcEarthworksCutTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcEarthworksCutTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcEarthworksFill : IfcEarthworksElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcEarthworksFillTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcEarthworksFillTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
 		internal override void parseJObject(JObject obj)
@@ -47,6 +79,47 @@ namespace GeometryGym.Ifc
 				obj["EdgeStart"] = EdgeStart.getJson(this, options);
 			if(mEdgeEnd != null)
 				obj["EdgeEnd"] = mEdgeEnd.getJson(this, options);
+		}
+	}
+	public partial class IfcElectricFlowTreatmentDevice : IfcFlowTreatmentDevice
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	[Serializable]
+	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
+	{
+		private IfcElectricFlowTreatmentDeviceTypeEnum mPredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED; //: IfcElectricFlowTreatmentDeviceTypeEnum;
+		public IfcElectricFlowTreatmentDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcElectricFlowTreatmentDeviceType() : base() { }
+		public IfcElectricFlowTreatmentDeviceType(DatabaseIfc db, string name, IfcElectricFlowTreatmentDeviceTypeEnum predefinedType)
+			: base(db) { Name = name; PredefinedType = predefinedType; }
+	}
+	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement

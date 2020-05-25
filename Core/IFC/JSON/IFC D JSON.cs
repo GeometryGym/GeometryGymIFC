@@ -164,6 +164,87 @@ namespace GeometryGym.Ifc
 			obj["DirectionRatios"] = mDirectionRatioX + (double.IsNaN(mDirectionRatioY) ? "" : (" " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ))));
 		}
 	}
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Directrix"] = Directrix.getJson(this, options);
+			if (!double.IsNaN(mStartParam))
+				obj["StartParam"] = mStartParam.ToString();
+			if (!double.IsNaN(mEndParam))
+				obj["EndParam"] = mEndParam.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
+			JToken startParam = obj.GetValue("StartParam", StringComparison.InvariantCultureIgnoreCase);
+			if (startParam != null)
+				mStartParam = startParam.Value<double>();
+			JToken endParam = obj.GetValue("EndParam", StringComparison.InvariantCultureIgnoreCase);
+			if (endParam != null)
+				mEndParam = endParam.Value<double>();
+		}
+	}
+	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Directrix"] = Directrix.getJson(this, options);
+			if (StartDistance != null)
+				obj["StartDistance"] = StartDistance.getJson(this, options);
+			if (EndDistance != null)
+				obj["EndDistance"] = EndDistance.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
+			jobj = obj.GetValue("StartDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				StartDistance = mDatabase.ParseJObject<IfcDistanceExpression>(jobj);
+			jobj = obj.GetValue("EndDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				EndDistance = mDatabase.ParseJObject<IfcDistanceExpression>(jobj);
+		}
+	}
+	public partial class IfcDistributionBoard : IfcFlowController
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcDistributionBoardTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcDistributionBoardTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcDistributionBoardType : IfcFlowControllerType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcDistributionBoardTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcDistributionPort : IfcPort
 	{
 		internal override void parseJObject(JObject obj)
@@ -306,7 +387,7 @@ namespace GeometryGym.Ifc
 				obj["ShapeAspectStyle"] = ShapeAspectStyle.getJson(this, options);
 		}
 	}
-	public partial class IfcDoorType : IfcBuildingElementType //IFC2x3 IfcDoorStyle
+	public partial class IfcDoorType : IfcBuiltElementType //IFC2x3 IfcDoorStyle
 	{
 		internal override void parseJObject(JObject obj)
 		{

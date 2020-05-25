@@ -111,6 +111,45 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Dir.GetXML(xml.OwnerDocument, "Dir", this, processed));
 		}
 	}
+	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
+			xml.AppendChild(Inclinating.GetXML(xml.OwnerDocument, "Inclinating", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Directrix", true) == 0)
+					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+				else if (string.Compare(name, "Inclinating", true) == 0)
+					Inclinating = mDatabase.ParseXml<IfcAxisLateralInclination>(child as XmlElement);
+			}
+		}
+	}
+	public partial class IfcLinearPlacementWithInclination : IfcLinearPlacement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Inclinating.GetXML(xml.OwnerDocument, "Inclinating", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Inclinating", true) == 0)
+					Inclinating = mDatabase.ParseXml<IfcAxisLateralInclination>(child as XmlElement);
+			}
+		}
+	}
 	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -126,7 +165,53 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
+			xml.AppendChild((Axis as BaseClassIfc).GetXML(xml.OwnerDocument, "Axis", this, processed));
+		}
+	}
+	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Span", mSpan.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string span = xml.GetAttribute("Span");
+			if (!string.IsNullOrEmpty(span))
+				double.TryParse(span, out mSpan);
+		}
+	}
+	public partial class IfcLiquidTerminal : IfcFlowTerminal
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcLiquidTerminalTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcLiquidTerminalTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcLiquidTerminalType : IfcFlowTerminalType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcLiquidTerminalTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
@@ -138,17 +223,13 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "PlacementRelTo") == 0)
-					PlacementRelTo = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
-				else if (string.Compare(name, "RelativePlacement") == 0)
+				if (string.Compare(name, "RelativePlacement") == 0)
 					RelativePlacement = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if(mPlacementRelTo != null)
-				xml.AppendChild(mPlacementRelTo.GetXML(xml.OwnerDocument, "PlacementRelTo", this, processed));
 			xml.AppendChild(mDatabase[mRelativePlacement.Index].GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
 		}
 	}

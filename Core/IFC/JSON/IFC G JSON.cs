@@ -107,14 +107,16 @@ namespace GeometryGym.Ifc
 			}
 
 			JArray arr = new JArray();
-			foreach (IfcGeometricRepresentationSubContext sub in HasSubContexts)
+			if (!(host is IfcGeometricRepresentationSubContext))
 			{
-				if (sub.mIndex != host.mIndex)
-					arr.Add(sub.getJson(this, options));
+				foreach (IfcGeometricRepresentationSubContext sub in HasSubContexts)
+				{
+					if (sub.mIndex != host.mIndex)
+						arr.Add(sub.getJson(this, options));
+				}
 			}
 			if (arr.Count > 0)
 				obj["HasSubContexts"] = arr;
-
 			if (mHasCoordinateOperation != null)
 				obj["HasCoordinateOperation"] = mHasCoordinateOperation.getJson(this, options);
 		}
@@ -169,7 +171,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcGrid : IfcProduct
+	public partial class IfcGrid : IfcPositioningElement
 	{
 		internal override void parseJObject(JObject obj)
 		{

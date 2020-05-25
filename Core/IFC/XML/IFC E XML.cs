@@ -29,6 +29,38 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcEarthworksCutTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcEarthworksCutTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcEarthworksFill : IfcEarthworksElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcEarthworksFillTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcEarthworksFillTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -50,6 +82,37 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(EdgeStart.GetXML(xml.OwnerDocument, "EdgeStart", this, processed));
 			if(mEdgeEnd != null)
 				xml.AppendChild(mEdgeEnd.GetXML(xml.OwnerDocument, "EdgeEnd", this, processed));
+		}
+	}
+	public partial class IfcElectricFlowTreatmentDevice : IfcFlowTreatmentDevice
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement

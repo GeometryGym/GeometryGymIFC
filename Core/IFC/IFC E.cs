@@ -30,6 +30,33 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
+	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	{
+		private IfcEarthworksCutTypeEnum mPredefinedType = IfcEarthworksCutTypeEnum.NOTDEFINED; //: OPTIONAL IfcEarthworksCutTypeEnum;
+		public IfcEarthworksCutTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcEarthworksCut() : base() { }
+		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcEarthworksElement : IfcBuiltElement
+	{
+		public IfcEarthworksElement() : base() { }
+		public IfcEarthworksElement(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcEarthworksFill : IfcEarthworksElement
+	{
+		private IfcEarthworksFillTypeEnum mPredefinedType = IfcEarthworksFillTypeEnum.NOTDEFINED; //: OPTIONAL IfcEarthworksFillTypeEnum;
+		public IfcEarthworksFillTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcEarthworksFill() : base() { }
+		public IfcEarthworksFill(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksFill(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
 		internal IfcVertex mEdgeStart, mEdgeEnd;// : IfcVertex;
@@ -215,6 +242,16 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowStorageDeviceType(DatabaseIfc db, string name, IfcElectricFlowStorageDeviceTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
+	public partial class IfcElectricFlowTreatmentDevice : IfcFlowTreatmentDevice
+	{
+		private IfcElectricFlowTreatmentDeviceTypeEnum mPredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED; //: OPTIONAL IfcElectricFlowTreatmentDeviceTypeEnum;
+		public IfcElectricFlowTreatmentDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcElectricFlowTreatmentDevice() : base() { }
+		public IfcElectricFlowTreatmentDevice(DatabaseIfc db) : base(db) { }
+		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
 	public partial class IfcElectricGenerator : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcElectricGeneratorTypeEnum mPredefinedType = IfcElectricGeneratorTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricGeneratorTypeEnum;
@@ -298,15 +335,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcElectricalElement : IfcElement  /* DEPRECATED IFC2x2*/ {  	}
 	[Serializable]
-	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement, IfcCivilElement
+	public abstract partial class IfcElement : IfcProduct, IfcInterferenceSelect, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement, IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
 
 		//INVERSE  
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedTo = new SET<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
-		internal List<IfcRelInterferesElements> mIsInterferedByElements = new List<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
-		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
+		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
+		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
 		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
@@ -323,8 +360,8 @@ namespace GeometryGym.Ifc
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 		public ReadOnlyCollection<IfcRelFillsElement> FillsVoids { get { return new ReadOnlyCollection<IfcRelFillsElement>(mFillsVoids); } }
 		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
-		public ReadOnlyCollection<IfcRelInterferesElements> IsInterferedByElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mIsInterferedByElements); } }
-		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
+		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
+		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
 		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
 		[Obsolete("DEPRECATED IFC4", false)]
@@ -998,6 +1035,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEventTriggerTypeEnum mEventTriggerType = IfcEventTriggerTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
 		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
+
+		public IfcEventTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcEvent() : base() { }
 		internal IfcEvent(DatabaseIfc db, IfcEvent e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
 	}

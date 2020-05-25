@@ -23,26 +23,40 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using GeometryGym.STEP;
+using System.Xml;
+//using System.Xml.Linq;
 
-using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcWallType : IfcBuiltElementType
+	public partial class IfcKerb : IfcBuiltElement
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcWallTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		internal override void ParseXml(XmlElement xml)
 		{
-			base.setJSON(obj, host, options);
-			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)
-				obj["PredefinedType"] = mPredefinedType.ToString();
+			base.ParseXml(xml);
+			string mountable = xml.GetAttribute("Mountable");
+			if (!string.IsNullOrEmpty(mountable))
+				bool.TryParse(mountable, out mMountable);
+		}
+	}
+	public partial class IfcKerbType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string mountable = xml.GetAttribute("Mountable");
+			if (!string.IsNullOrEmpty(mountable))
+				bool.TryParse(mountable, out mMountable);
 		}
 	}
 }

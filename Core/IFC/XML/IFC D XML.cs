@@ -177,6 +177,91 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("DirectionRatios", RoundRatio(mDirectionRatioX) + " " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ)));
 		}
 	}
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
+			if (!double.IsNaN(mStartParam))
+				xml.SetAttribute("StartParam", mStartParam.ToString());
+			if (!double.IsNaN(mEndParam))
+				xml.SetAttribute("EndParam", mEndParam.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startParam = xml.GetAttribute("StartParam");
+			if (!string.IsNullOrEmpty(startParam))
+				double.TryParse(startParam, out mStartParam);
+			string endParam = xml.GetAttribute("EndParam");
+			if (!string.IsNullOrEmpty(endParam))
+				double.TryParse(endParam, out mEndParam);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Directrix", true) == 0)
+					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
+		}
+	}
+	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
+			if (StartDistance != null)
+				xml.AppendChild(StartDistance.GetXML(xml.OwnerDocument, "StartDistance", this, processed));
+			if (EndDistance != null)
+				xml.AppendChild(EndDistance.GetXML(xml.OwnerDocument, "EndDistance", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Directrix", true) == 0)
+					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+				else if (string.Compare(name, "StartDistance", true) == 0)
+					StartDistance = mDatabase.ParseXml<IfcDistanceExpression>(child as XmlElement);
+				else if (string.Compare(name, "EndDistance", true) == 0)
+					EndDistance = mDatabase.ParseXml<IfcDistanceExpression>(child as XmlElement);
+			}
+		}
+	}
+	public partial class IfcDistributionBoard : IfcFlowController
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcDistributionBoardTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcDistributionBoardTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcDistributionBoardType : IfcFlowControllerType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcDistributionBoardTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcDistributionPort : IfcPort
 	{
 		//internal IfcFlowDirectionEnum mFlowDirection = IfcFlowDirectionEnum.NOTDEFINED; //:	OPTIONAL IfcFlowDirectionEnum;
@@ -272,7 +357,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(ReferencedDocument.GetXML(xml.OwnerDocument, "ReferencedDocument", this, processed));
 		}
 	}
-	public partial class IfcDoor : IfcBuildingElement
+	public partial class IfcDoor : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -287,7 +372,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcDoorType : IfcBuildingElementType
+	public partial class IfcDoorType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
