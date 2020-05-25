@@ -209,6 +209,8 @@ namespace GeometryGym.Ifc
 				version = "IFC4X1";
 			else if (mRelease == ReleaseVersion.IFC4X2)
 				version = "IFC4X2";
+			else if (mRelease == ReleaseVersion.IFC4X3)
+				version = "IFC4X3RC1";
 			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";
