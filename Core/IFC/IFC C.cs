@@ -951,16 +951,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
 	{
-		private IfcTransitionCode mTransition;// : IfcTransitionCode;
+		private IfcTransitionCode mTransition = IfcTransitionCode.CONTINUOUS;// : IfcTransitionCode;
 		private bool mSameSense;// : BOOLEAN;
-		private int mParentCurve;// : IfcCurve;  Really IfcBoundedCurve WR1
+		internal IfcCurve mParentCurve;// : IfcCurve;  Really IfcBoundedCurve WR1
 
 		public IfcTransitionCode Transition { get { return mTransition; } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
-		public IfcBoundedCurve ParentCurve { get { return mDatabase[mParentCurve] as IfcBoundedCurve; } set { mParentCurve = value.mIndex; } }
+		public IfcBoundedCurve ParentCurve { get { return mParentCurve as IfcBoundedCurve; } set { mParentCurve = value; } }
 
 		internal IfcCompositeCurveSegment() : base() { }
-		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s) : base(db,s) { mTransition = s.mTransition; mSameSense = s.mSameSense; ParentCurve = db.Factory.Duplicate(s.ParentCurve) as IfcBoundedCurve; }
+		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s) : base(db,s) { mTransition = s.mTransition; mSameSense = s.mSameSense; mParentCurve = db.Factory.Duplicate(s.mParentCurve) as IfcCurve; }
 		public IfcCompositeCurveSegment(IfcTransitionCode tc, bool sense, IfcBoundedCurve bc) : base(bc.mDatabase) { mSameSense = sense; mTransition = tc; ParentCurve = bc; }
 	}
 	[Serializable]

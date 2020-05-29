@@ -547,7 +547,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + "',(#" + string.Join(",#", mHasProperties.Values.Select(x=>x.StepId)) + ")";
+			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + 
+				(mHasProperties.Values.Count == 0 ? "',()" : "',(#" + string.Join(",#", mHasProperties.Values.Select(x=>x.StepId)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -617,12 +618,14 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mTransition.ToString() + ".," + ParserSTEP.BoolToString(mSameSense) + "," + ParserSTEP.LinkToString(mParentCurve); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mTransition.ToString() + ".," + ParserSTEP.BoolToString(mSameSense) + ",#" + mParentCurve.StepId; }
+
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mTransition = (IfcTransitionCode)Enum.Parse(typeof(IfcTransitionCode), ParserSTEP.StripField(str, ref pos, str.Length).Replace(".", ""));
+			string s = ParserSTEP.StripField(str, ref pos, str.Length).Replace(".", "");
+			Enum.TryParse<IfcTransitionCode>(s, out mTransition);
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
-			mParentCurve = ParserSTEP.StripLink(str, ref pos, len);
+			mParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
 	public partial class IfcCompositeProfileDef : IfcProfileDef

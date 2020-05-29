@@ -978,7 +978,7 @@ namespace GeometryGym.Ifc
 		internal IfcPresentationStyleAssignment() : base() { }
 		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(s.mDatabase[x]).Index)); }
 		public IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
-		public IfcPresentationStyleAssignment(List<IfcPresentationStyle> styles) : base(styles[0].mDatabase) { mStyles = styles.ConvertAll(x => x.Index); }
+		public IfcPresentationStyleAssignment(IEnumerable<IfcPresentationStyle> styles) : base(styles.First().mDatabase) { mStyles.AddRange(styles.Select(x => x.StepId)); }
 		
 		internal void addStyle(IfcPresentationStyleSelect style) { mStyles.Add(style.Index); }
 		public void associateItem(IfcStyledItem item) { mStyledItems.Add(item); }

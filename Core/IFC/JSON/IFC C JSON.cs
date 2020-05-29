@@ -455,7 +455,6 @@ namespace GeometryGym.Ifc
 		{
 			if (mDatabase.mContext == null) //this as IfcProjectLibrary == null ||
 				mDatabase.mContext = this;
-			base.parseJObject(obj);
 
 			JToken token = obj.GetValue("ObjectType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
@@ -470,6 +469,8 @@ namespace GeometryGym.Ifc
 			mDatabase.extractJArray<IfcRelDeclares>(obj.GetValue("Declares", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => x.RelatingContext = this);
 			RepresentationContexts.AddRange(mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			UnitsInContext = mDatabase.ParseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
+
+			base.parseJObject(obj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

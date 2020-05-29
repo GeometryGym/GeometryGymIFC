@@ -565,7 +565,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Transition", mTransition.ToString().ToLower());
 			xml.SetAttribute("SameSense", mSameSense.ToString().ToLower());
-			xml.AppendChild(ParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
+			xml.AppendChild(mParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
 		}
 	}
 	public partial class IfcCompositeProfileDef : IfcProfileDef

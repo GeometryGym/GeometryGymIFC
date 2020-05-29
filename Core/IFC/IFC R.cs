@@ -2682,8 +2682,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRoad : IfcFacility
 	{
 		public IfcRoad() : base() { }
-		public IfcRoad(DatabaseIfc db)
-			: base(db) { }
+		public IfcRoad(DatabaseIfc db) : base(db) { }
 		public IfcRoad(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { }
 	}
 	[Serializable]

@@ -2012,13 +2012,11 @@ additional types	some additional representation types are given:
 		{
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
-				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
-				if (presentationStyleAssignment != null)
+				if(style is IfcPresentationStyleAssignment presentationStyleAssignment)
 					mStyles.Add(presentationStyleAssignment);
 				else
 				{
-					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
-					if (presentationStyle != null)
+					if(style is IfcPresentationStyle presentationStyle)
 						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle));
 				}
 			}

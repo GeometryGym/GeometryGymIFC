@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 			mRelease = schema;
 			mModelView = view;
 #if (RHINO || GH)
-			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GeometryGym.GGRhino.GGRhino.ActiveUnits()];
+			//mModelSIScale = 1 / Utils.mLengthConversion[(int) GeometryGym.GGRhino.GGRhino.ActiveUnits()];
 			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
 			if (doc != null)
 			{
@@ -781,9 +781,13 @@ namespace GeometryGym.Ifc
 			if (entity == null)
 				return null;
 			int index = mDuplicateMapping.FindExisting(entity);
-			if(index > 0)
-				return mDatabase[index];
 			BaseClassIfc result = null;
+			if (index > 0)
+			{
+				result = mDatabase[index];
+				if (result != null)
+					return result;
+			}
 			if (!string.IsNullOrEmpty(entity.mGlobalId))
 			{
 				if (mDatabase.mDictionary.TryGetValue(entity.mGlobalId, out result))

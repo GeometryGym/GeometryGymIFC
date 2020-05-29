@@ -85,43 +85,66 @@ namespace GeometryGym.Ifc
 				}
 				if (c == '\\')
 				{
-					if (icounter + 3 < ilast && str[icounter + 2] == '\\')
+					if (icounter + 3 < ilast)
 					{
-						if (str[icounter + 1] == 'S')
+						char c3 = str[icounter + 3], c2 = str[icounter + 2], c1 = str[icounter + 1];
+						if (c2 == '\\')
 						{
-							char o = str[icounter + 3];
-							result += (char)((int)o + 128);
+							if (c1 == 'S')
+							{
+								result += (char)((int)c3 + 128);
+								icounter += 3;
+							}
+							else if (c1 == 'X' && str.Length > icounter + 4)
+							{
+								string s = str.Substring(icounter + 3, 2);
+								Int32 i = Convert.ToInt32(s, 16);
+								//byte[] byteArray = BitConverter.GetBytes(i);
+								//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
+								Encoding wind1252 = Encoding.GetEncoding(1252);
+								string istr = wind1252.GetString(new byte[] { (byte)i });
+								result += istr[0];
+								//c = charArray[0];
+								//result += (char)();
+								//result += c;
+								icounter += 4;
+							}
+							else
+								result += str[icounter];
+						}
+						else if (c3 == '\\' && c2 == '2' && c1 == 'X')
+						{
+							icounter += 4;
+							while (str[icounter] != '\\')
+							{
+								string s = str.Substring(icounter, 4);
+								c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+								//result += (char)();
+								result += c;
+								icounter += 4;
+							}
 							icounter += 3;
 						}
-						else if (str[icounter + 1] == 'X' && str.Length > icounter + 4)
+						else if (c1 == '\\' && c2 == 'X')
 						{
-							string s = str.Substring(icounter + 3, 2);
-							Int32 i = Convert.ToInt32(s, 16);
-							//byte[] byteArray = BitConverter.GetBytes(i);
-							//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
-							Encoding wind1252 = Encoding.GetEncoding(1252);
-							string istr = wind1252.GetString(new byte[] { (byte) i });
-							result += istr[0];
-							//c = charArray[0];
-							//result += (char)();
-							//result += c;
-							icounter += 4;
+							if(c3 == '2')
+							{
+								icounter += 6;
+								while (str[icounter] != '\\')
+								{
+									string s = str.Substring(icounter, 4);
+									c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+									//result += (char)();
+									result += c;
+									icounter += 4;
+								}
+								icounter += 5;
+							}
+							else
+								result += str[icounter];
 						}
 						else
 							result += str[icounter];
-					}
-					else if (str[icounter + 3] == '\\' && str[icounter + 2] == '2' && str[icounter + 1] == 'X')
-					{
-						icounter += 4;
-						while (str[icounter] != '\\')
-						{
-							string s = str.Substring(icounter, 4);
-							c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
-							//result += (char)();
-							result += c;
-							icounter += 4;
-						}
-						icounter += 3;
 					}
 					else
 						result += str[icounter];
