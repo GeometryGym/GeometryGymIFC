@@ -142,18 +142,17 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase == null ? 4 : mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["OverallWidth"] = Math.Round(mOverallWidth, digits);
-			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
-			obj["WebThickness"] = Math.Round(mWebThickness, digits);
-			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
+			obj["OverallWidth"] = formatLength(mOverallWidth);
+			obj["OverallDepth"] = formatLength(mOverallDepth);
+			obj["WebThickness"] = formatLength(mWebThickness);
+			obj["FlangeThickness"] = formatLength(mFlangeThickness);
 			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
-				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+				obj["FilletRadius"] = formatLength(mFilletRadius);
 			if (!double.IsNaN(mFlangeEdgeRadius) && mFlangeEdgeRadius > 0)
-				obj["FlangeEdgeRadius"] = Math.Round(mFlangeEdgeRadius, digits);
+				obj["FlangeEdgeRadius"] = formatLength(mFlangeEdgeRadius);
 			if (!double.IsNaN(mFlangeSlope) && mFlangeSlope > 0)
-				obj["FlangeSlope"] = mFlangeSlope;
+				obj["FlangeSlope"] = formatLength(mFlangeSlope);
 		}
 	}
 }

@@ -1177,8 +1177,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() +
-			",(" + string.Join(",", mSurfaceReinforcement1.ConvertAll(x => StepLengthString(x))) + ")" +
-			",(" + string.Join(",", mSurfaceReinforcement2.ConvertAll(x => StepLengthString(x))) + ")" + "," +
+			",(" + string.Join(",", mSurfaceReinforcement1.ConvertAll(x => formatLength(x))) + ")" +
+			",(" + string.Join(",", mSurfaceReinforcement2.ConvertAll(x => formatLength(x))) + ")" + "," +
 			ParserSTEP.DoubleOptionalToString(mShearReinforcement);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)

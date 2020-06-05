@@ -356,7 +356,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 
 			if (!double.IsNaN(mStartDistAlong))
-				setAttribute(xml, "StartDistAlong", StepLengthString(mStartDistAlong));
+				setAttribute(xml, "StartDistAlong", formatLength(mStartDistAlong));
 			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcAlignment2DHorizontalSegment s in Segments)
@@ -417,7 +417,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 
-			setAttribute(xml, "Radius", StepLengthString(Radius));
+			setAttribute(xml, "Radius", formatLength(Radius));
 			setAttribute(xml, "IsConvex", IsConvex.ToString());
 		}
 	}
@@ -435,7 +435,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 
-			setAttribute(xml, "ParabolaConstant", StepLengthString(ParabolaConstant));
+			setAttribute(xml, "ParabolaConstant", formatLength(ParabolaConstant));
 			setAttribute(xml, "IsConvex", IsConvex.ToString());
 		}
 	}
@@ -457,9 +457,9 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 
-			setAttribute(xml, "StartDistAlong", StepLengthString(StartDistAlong));
-			setAttribute(xml, "HorizontalLength", StepLengthString(HorizontalLength));
-			setAttribute(xml, "StartHeight", StepLengthString(StartHeight));
+			setAttribute(xml, "StartDistAlong", formatLength(StartDistAlong));
+			setAttribute(xml, "HorizontalLength", formatLength(HorizontalLength));
+			setAttribute(xml, "StartHeight", formatLength(StartHeight));
 			setAttribute(xml, "StartGradient", StartGradient.ToString());
 		}
 	}

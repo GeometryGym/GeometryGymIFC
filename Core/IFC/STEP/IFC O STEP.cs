@@ -102,7 +102,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOffsetCurve2D : IfcOffsetCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect);  }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mDistance) + "," + ParserIfc.LogicalToString(mSelfIntersect);  }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);
@@ -111,7 +111,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOffsetCurve3D : IfcOffsetCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mDistance, mDatabase.mLengthDigits)) + "," + ParserIfc.LogicalToString(mSelfIntersect); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mDistance) + "," + ParserIfc.LogicalToString(mSelfIntersect); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);

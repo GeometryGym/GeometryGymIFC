@@ -351,6 +351,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcWorkScheduleTypeEnum mPredefinedType = IfcWorkScheduleTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkScheduleTypeEnum; IFC4
 		internal IfcWorkSchedule() : base() { }
+		internal IfcWorkSchedule(DatabaseIfc db) : base(db) { }
 		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 	}
 	[Serializable]

@@ -275,7 +275,7 @@ namespace GeometryGym.Ifc
 		internal IfcLine(DatabaseIfc db, IfcLine l) : base(db, l) { Pnt = db.Factory.Duplicate(l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate(l.Dir) as IfcVector; }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 	}
-	public interface IfcLinearAxisSelect : IBaseClassIfc { } // SELECT(IfcLinearAxisWithInclination, IfcCurve);
+	public partial interface IfcLinearAxisSelect : IBaseClassIfc { } // SELECT(IfcLinearAxisWithInclination, IfcCurve);
 	[Serializable]
 	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem, IfcLinearAxisSelect
 	{
@@ -292,6 +292,8 @@ namespace GeometryGym.Ifc
 			Directrix = directrix;
 			Inclinating = inclinating;
 		}
+
+		
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -366,7 +368,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcLineSegment2D() : base() { }
 		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s) : base(db, s) { }
-		internal IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
+		public IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
 			: base(start, startDirection, length) { }
 	}
 	[Serializable]

@@ -703,18 +703,17 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["Depth"] = Math.Round(mDepth, digits);
-			obj["Width"] = Math.Round(mWidth, digits);
-			obj["WallThickness"] = Math.Round(mWallThickness, digits);
-			obj["Girth"] = Math.Round(mGirth, digits);
+			obj["Depth"] = formatLength(mDepth);
+			obj["Width"] = formatLength(mWidth);
+			obj["WallThickness"] = formatLength(mWallThickness);
+			obj["Girth"] = formatLength(mGirth);
 			if (!double.IsNaN(mInternalFilletRadius) && mInternalFilletRadius > 0)
-				obj["InternalFilletRadius"] = Math.Round(mInternalFilletRadius, digits);
+				obj["InternalFilletRadius"] = formatLength(mInternalFilletRadius);
 			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
 			{
 				if (!double.IsNaN(mCentreOfGravityInX) && mCentreOfGravityInX > 0)
-					obj["CentreOfGravityInX"] = mCentreOfGravityInX;
+					obj["CentreOfGravityInX"] = formatLength(mCentreOfGravityInX);
 			}
 		}
 	}

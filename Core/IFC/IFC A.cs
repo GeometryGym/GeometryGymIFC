@@ -454,7 +454,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal LIST<IfcAlignment2DVerticalSegment> mSegments = new LIST<IfcAlignment2DVerticalSegment>();// : LIST [1:?] OF IfcAlignment2DVerticalSegment;
+		internal IfcAlignmentCurve mToAlignmentCurve = null;// : SET[1:1] OF IfcAlignmentCurve FOR Vertical;
 		public LIST<IfcAlignment2DVerticalSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public IfcAlignmentCurve ToAlignmentCurve { get { return mToAlignmentCurve; } set { mToAlignmentCurve = value; } }// : SET[1:1] OF IfcAlignmentCurve FOR Vertical;
+	
 		internal IfcAlignment2DVertical() : base() { }
 		public IfcAlignment2DVertical(IEnumerable<IfcAlignment2DVerticalSegment> segments) : base(segments.First().Database) { Segments.AddRange(segments); }
 	}
@@ -484,11 +487,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
 	{
 		internal IfcAlignment2DHorizontal mHorizontal = null;// : OPTIONAL IfcAlignment2DHorizontal;
-		internal IfcAlignment2DVertical mVertical = null;// : OPTIONAL IfcAlignment2DVertical;
+		private IfcAlignment2DVertical mVertical = null;// : OPTIONAL IfcAlignment2DVertical;
 		internal string mTag = "$";// : OPTIONAL IfcLabel;
 
 		public IfcAlignment2DHorizontal Horizontal { get { return mHorizontal; } set { mHorizontal = value; } }
-		public IfcAlignment2DVertical Vertical { get { return mVertical; } set { mVertical = value; } }
+		public IfcAlignment2DVertical Vertical { get { return mVertical; } set { if (mVertical != null) mVertical.ToAlignmentCurve = null; mVertical = value; if (value != null) value.ToAlignmentCurve = this; } }
 		public string Tag { get { return (mTag == "$" ? "" : ParserIfc.Decode(mTag)); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcAlignmentCurve() : base() { }

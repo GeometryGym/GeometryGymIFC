@@ -42,12 +42,7 @@ namespace GeometryGym.Ifc
 		{
 			if (double.IsNaN(length) || double.IsInfinity(length))
 				return "$";
-			return StepLengthString(length);
-		}
-		protected string StepLengthString(double length)
-		{
-			int digits = mDatabase == null ? 5 : mDatabase.mLengthDigits;
-			return ParserSTEP.DoubleToString(Math.Round(length, digits));
+			return formatLength(length);
 		}
 	}
 }

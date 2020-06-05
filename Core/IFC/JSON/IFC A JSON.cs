@@ -508,31 +508,30 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["BottomFlangeWidth"] = Math.Round(mBottomFlangeWidth, digits);
-			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
-			obj["WebThickness"] = Math.Round(mWebThickness, digits);
-			obj["BottomFlangeThickness"] = Math.Round(mBottomFlangeThickness, digits);
+			obj["BottomFlangeWidth"] = formatLength(mBottomFlangeWidth);
+			obj["OverallDepth"] = formatLength(mOverallDepth);
+			obj["WebThickness"] = formatLength(mWebThickness);
+			obj["BottomFlangeThickness"] = formatLength(mBottomFlangeThickness);
 			if (!double.IsNaN(mBottomFlangeFilletRadius) && mBottomFlangeFilletRadius > 0)
-				obj["BottomFlangeFilletRadius"] = Math.Round(mBottomFlangeFilletRadius, digits);
-			obj["TopFlangeWidth"] = Math.Round(mTopFlangeWidth, digits);
+				obj["BottomFlangeFilletRadius"] = formatLength(mBottomFlangeFilletRadius);
+			obj["TopFlangeWidth"] = formatLength(mTopFlangeWidth);
 			if (!double.IsNaN(mTopFlangeThickness) && mTopFlangeThickness > 0)
-				obj["TopFlangeThickness"] = Math.Round(mTopFlangeThickness, digits);
+				obj["TopFlangeThickness"] = formatLength(mTopFlangeThickness);
 			if (!double.IsNaN(mTopFlangeFilletRadius) && mTopFlangeFilletRadius > 0)
-				obj["TopFlangeFilletRadius"] = Math.Round(mTopFlangeFilletRadius, digits);
+				obj["TopFlangeFilletRadius"] = formatLength(mTopFlangeFilletRadius);
 			if (!double.IsNaN(mBottomFlangeEdgeRadius) && mBottomFlangeEdgeRadius > 0)
-				obj["BottomFlangeEdgeRadius"] = Math.Round(mBottomFlangeEdgeRadius, digits);
+				obj["BottomFlangeEdgeRadius"] = formatLength(mBottomFlangeEdgeRadius);
 			if (!double.IsNaN(mBottomFlangeSlope) && mBottomFlangeSlope > 0)
 				obj["BottomFlangeSlope"] = mBottomFlangeSlope;
 			if (!double.IsNaN(mTopFlangeEdgeRadius) && mTopFlangeEdgeRadius > 0)
-				obj["TopFlangeEdgeRadius"] = Math.Round(mTopFlangeEdgeRadius, digits);
+				obj["TopFlangeEdgeRadius"] = formatLength(mTopFlangeEdgeRadius);
 			if (!double.IsNaN(mTopFlangeSlope) && mTopFlangeSlope > 0)
 				obj["TopFlangeSlope"] = mTopFlangeSlope;
 			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
 			{
 				if (!double.IsNaN(mCentreOfGravityInY) && mCentreOfGravityInY > 0)
-					obj["CentreOfGravityInY"] = mCentreOfGravityInY;
+					obj["CentreOfGravityInY"] = formatLength(mCentreOfGravityInY);
 			}
 		}
 	}

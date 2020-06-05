@@ -132,24 +132,26 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mCoordIndex = new List<int>();// : LIST [3:?] OF IfcPositiveInteger;
 		 //INVERSE
-		internal IfcPolygonalFaceSet mToFaceSet = null;
+		internal SET<IfcPolygonalFaceSet> mToFaceSet = new SET<IfcPolygonalFaceSet>();
 
-		public ReadOnlyCollection<int> CoordIndex { get { return new ReadOnlyCollection<int>( mCoordIndex); } }
-		public IfcPolygonalFaceSet ToFaceSet { get { return mToFaceSet; } set { mToFaceSet = value; } }
+		public List<int> CoordIndex { get { return mCoordIndex; } }
+		public SET<IfcPolygonalFaceSet> ToFaceSet { get { return mToFaceSet; } }
 
 		internal IfcIndexedPolygonalFace() : base() { }
 		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f) : base(db, f) { mCoordIndex.AddRange(f.mCoordIndex); }
 		public IfcIndexedPolygonalFace(DatabaseIfc db, IEnumerable<int> coords) : base(db) { mCoordIndex = coords.ToList(); }
-
-		public void AddCoordIndex(int index) { mCoordIndex.Add(index); }
+		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3) : base(db) { mCoordIndex.Add(c1); mCoordIndex.Add(c2); mCoordIndex.Add(c3); }
+		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3, int c4) : this(db, c1, c2, c3) { mCoordIndex.Add(c4); }
 	}
 	[Serializable]
 	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
 	{
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
-		public ReadOnlyCollection<List<int>> InnerCoordIndices { get { return new ReadOnlyCollection<List<int>>(mInnerCoordIndices); }  }
+		public List<List<int>> InnerCoordIndices { get { return mInnerCoordIndices; }  }
 		internal IfcIndexedPolygonalFaceWithVoids() : base() { }
 		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
+		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<int> inner) 
+			: base(db, coords) { mInnerCoordIndices.Add(inner.ToList()); }
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 
 			: base(db, coords) { mInnerCoordIndices = inners.ToList().ConvertAll(x=>x.ToList()); }
 	}

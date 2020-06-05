@@ -407,28 +407,16 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("," + ParserSTEP.BoolToString(mClosed) + ",(#" + mFaces[0]);
-			for (int icounter = 1; icounter < mFaces.Count; icounter++)
-				sb.Append(",#" + mFaces[icounter]);
-			if (mPnIndex.Count == 0)
-				sb.Append("),$");
-			else
-			{
-				sb.Append("),(" + mPnIndex[0]);
-				for (int icounter = 1; icounter < mPnIndex.Count; icounter++)
-					sb.Append("," + mPnIndex[icounter]);
-				sb.Append(")");
-			}
-
-			return base.BuildStringSTEP(release) + sb.ToString();
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.BoolToString(mClosed) + ",(#" +
+				string.Join(",#", mFaces.Select(x => x.StepId)) +
+			(mPnIndex.Count == 0 ? "),$" : "),(" + string.Join(",", mPnIndex) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mClosed = ParserSTEP.StripBool(str, ref pos, len);
-			mFaces = ParserSTEP.StripListLink(str, ref pos, len);
-			mPnIndex = ParserSTEP.StripListInt(str, ref pos, len);
+			mFaces.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=> dictionary[x] as IfcIndexedPolygonalFace));
+			mPnIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 		}
 	}
 	public partial class IfcPolyline : IfcBoundedCurve

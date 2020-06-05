@@ -206,8 +206,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			int digits = mDatabase == null ? 5 : mDatabase.mLengthDigits;
-			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + ParserSTEP.DoubleToString(Math.Round(x[0], digits)) + "," + ParserSTEP.DoubleToString(Math.Round(x[1], digits)) + ")")) + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + formatLength(x[0]) + "," + formatLength(x[1]) + ")")) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { mCoordList = ParserSTEP.SplitListDoubleTuple(str); }
 	}
@@ -215,8 +214,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			int digits = mDatabase == null ? 5 : mDatabase.mLengthDigits;
-			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + ParserSTEP.DoubleToString(Math.Round(x[0], digits)) + "," + ParserSTEP.DoubleToString(Math.Round(x[1], digits)) + "," + ParserSTEP.DoubleToString(Math.Round(x[2], digits)) + ")")) + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + formatLength(x[0]) + "," + formatLength(x[1]) + "," + formatLength(x[2]) + ")")) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { mCoordList = ParserSTEP.SplitListDoubleTriple(str); }
 	}
@@ -334,7 +332,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircle : IfcConic
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mRadius, mDatabase.mLengthDigits)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mRadius); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -343,7 +341,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircleHollowProfileDef : IfcCircleProfileDef
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mWallThickness < mDatabase.Tolerance ? "" : "," + ParserSTEP.DoubleToString(Math.Round(mWallThickness, mDatabase.mLengthDigits))); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mWallThickness < mDatabase.Tolerance ? "" : "," + formatLength(mWallThickness)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -352,7 +350,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircleProfileDef : IfcParameterizedProfileDef //SUPERTYPE OF(IfcCircleHollowProfileDef)
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Round(mRadius, mDatabase.mLengthDigits)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mRadius); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -361,7 +359,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + StepLengthString(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + "," + formatLength(mRadius) + "," + ParserSTEP.BoolToString(mIsCCW); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -1451,7 +1449,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
 	{
-		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + StepLengthString(mSegmentLength); }
+		protected override string BuildStringSTEP() { return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," + formatLength(mSegmentLength); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			mStartPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;

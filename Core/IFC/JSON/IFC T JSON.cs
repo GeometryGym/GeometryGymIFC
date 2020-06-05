@@ -147,12 +147,11 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["BottomXDim"] = Math.Round(mBottomXDim, digits);
-			obj["TopXDim"] = Math.Round(mTopXDim, digits);
-			obj["YDim"] = Math.Round(mYDim, digits);
-			obj["TopXOffset"] = Math.Round(mTopXOffset, digits);
+			obj["BottomXDim"] = formatLength(mBottomXDim);
+			obj["TopXDim"] = formatLength(mTopXDim);
+			obj["YDim"] = formatLength(mYDim);
+			obj["TopXOffset"] = formatLength(mTopXOffset);
 		}
 	}
 	//public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
@@ -264,22 +263,21 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["Depth"] = Math.Round(mDepth, digits);
-			obj["FlangeWidth"] = Math.Round(mFlangeWidth, digits);
-			obj["WebThickness"] = Math.Round(mWebThickness, digits);
-			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
+			obj["Depth"] = formatLength(mDepth);
+			obj["FlangeWidth"] = formatLength(mFlangeWidth);
+			obj["WebThickness"] = formatLength(mWebThickness);
+			obj["FlangeThickness"] = formatLength(mFlangeThickness);
 			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
-				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+				obj["FilletRadius"] = formatLength(mFilletRadius);
 			if (!double.IsNaN(mFlangeEdgeRadius) && mFlangeEdgeRadius > 0)
-				obj["FlangeEdgeRadius"] = Math.Round(mFlangeEdgeRadius, digits);
+				obj["FlangeEdgeRadius"] = formatLength(mFlangeEdgeRadius);
 			if (!double.IsNaN(mWebEdgeRadius) && mWebEdgeRadius > 0)
-				obj["WebEdgeRadius"] = Math.Round(mFlangeEdgeRadius, digits);
+				obj["WebEdgeRadius"] = formatLength(mFlangeEdgeRadius);
 			if (!double.IsNaN(mWebSlope) && mWebSlope > 0)
 				obj["WebSlope"] = mWebSlope;
 			if (!double.IsNaN(mFlangeSlope) && mFlangeSlope > 0)
-				obj["FlangeSlope"] = mFlangeSlope;
+				obj["FlangeSlope"] = formatLength(mFlangeSlope);
 		}
 	}
 	public partial class IfcTypeObject : IfcObjectDefinition //(IfcTypeProcess, IfcTypeProduct, IfcTypeResource) IFC4 ABSTRACT 

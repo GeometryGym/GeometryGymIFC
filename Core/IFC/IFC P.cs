@@ -585,18 +585,18 @@ namespace GeometryGym.Ifc
 	public partial class IfcPolygonalFaceSet : IfcTessellatedFaceSet //IFC4A2
 	{
 		internal bool mClosed; // 	OPTIONAL BOOLEAN;
-		internal List<int> mFaces = new List<int>(); // : SET [1:?] OF IfcIndexedPolygonalFace;
-		internal List<int> mPnIndex = new List<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
+		internal LIST<IfcIndexedPolygonalFace> mFaces = new LIST<IfcIndexedPolygonalFace>(); // : LIST [1:?] OF IfcIndexedPolygonalFace;
+		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
 		public bool Closed { get { return mClosed; } set { mClosed = value; } }
-		public ReadOnlyCollection<IfcIndexedPolygonalFace> Faces { get { return new ReadOnlyCollection<IfcIndexedPolygonalFace>(mFaces.ConvertAll(x => mDatabase[x] as IfcIndexedPolygonalFace)); } }
-		public ReadOnlyCollection<int> PnIndex { get { return new ReadOnlyCollection<int>(mPnIndex); } }
+		public LIST<IfcIndexedPolygonalFace> Faces { get { return mFaces; } }
+		public LIST<int> PnIndex { get { return mPnIndex; } }
 
 		internal IfcPolygonalFaceSet() : base() { }
-		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s) : base(db, s) { s.Faces.ToList().ForEach(x => addFace(db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
-		public IfcPolygonalFaceSet(IfcCartesianPointList3D pl, bool closed, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { mClosed = closed; foreach (IfcIndexedPolygonalFace face in faces) addFace(face); }
-		
-		internal void addFace(IfcIndexedPolygonalFace face) { mFaces.Add(face.mIndex); }
+		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s) : base(db, s) { Faces.AddRange(s.Faces.Select(x => db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
+		public IfcPolygonalFaceSet(IfcCartesianPointList3D pl, bool closed, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { mClosed = closed; Faces.AddRange(faces); }
+
+
 	}
 	[Serializable]
 	public partial class IfcPolyline : IfcBoundedCurve
@@ -653,6 +653,7 @@ namespace GeometryGym.Ifc
 		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
 		public IfcPolyLoop(IEnumerable<IfcCartesianPoint> polygon) : base(polygon.First().mDatabase) { mPolygon.AddRange(polygon); }
 		public IfcPolyLoop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
+		public IfcPolyLoop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3, IfcCartesianPoint cp4) : this(cp1, cp2, cp3) { mPolygon.Add(cp4); }
 
 		protected override List<T> Extract<T>(Type type)
 		{
