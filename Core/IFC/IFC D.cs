@@ -268,7 +268,7 @@ namespace GeometryGym.Ifc
 		internal bool isZAxisNegative { get { double tol = 1e-6; return ((double.IsNaN(mDirectionRatioX) || Math.Abs(mDirectionRatioX) < tol) && (double.IsNaN(mDirectionRatioY) || Math.Abs(mDirectionRatioY) < tol) && (Math.Abs(mDirectionRatioZ + 1) < tol)); } }
 	}
 	[Serializable]
-	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid //ABSTRACT SUPERTYPE OF(ONEOF(IfcFixedReferenceSweptAreaSolid, IfcSurfaceCurveSweptAreaSolid))
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
 		private double mStartParam = double.NaN; //: OPTIONAL IfcParameterValue;
@@ -300,6 +300,12 @@ namespace GeometryGym.Ifc
 		public IfcDistanceExpression EndDistance { get { return mEndDistance; } set { mEndDistance = value; } }
 
 		protected IfcDirectrixDistanceSweptAreaSolid() : base() { }
+		protected IfcDirectrixDistanceSweptAreaSolid(DatabaseIfc db, IfcDirectrixDistanceSweptAreaSolid s) : base(db, s)
+		{
+			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
+			mStartDistance = s.mStartDistance;
+			mEndDistance = s.mEndDistance;
+		}
 		protected IfcDirectrixDistanceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix)
 			: base(sweptArea) { Directrix = directrix; }
 	}
@@ -368,6 +374,7 @@ namespace GeometryGym.Ifc
 
 		public IfcDistributionBoard() : base() { }
 		public IfcDistributionBoard(DatabaseIfc db) : base(db) { }
+		public IfcDistributionBoard(DatabaseIfc db, IfcDistributionBoard distributionBoard, DuplicateOptions options) : base(db, distributionBoard, options) { PredefinedType = distributionBoard.PredefinedType; }
 		public IfcDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -377,6 +384,7 @@ namespace GeometryGym.Ifc
 		public IfcDistributionBoardTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcDistributionBoardType() : base() { }
+		public IfcDistributionBoardType(DatabaseIfc db, IfcDistributionBoardType distributionBoardType, DuplicateOptions options) : base(db, distributionBoardType, options) { PredefinedType = distributionBoardType.PredefinedType; }
 		public IfcDistributionBoardType(DatabaseIfc db, string name, IfcDistributionBoardTypeEnum predefinedType)
 			: base(db) { Name = name; PredefinedType = predefinedType; }
 	}

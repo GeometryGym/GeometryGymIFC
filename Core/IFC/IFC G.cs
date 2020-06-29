@@ -221,6 +221,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcGeomodel() : base() { }
 		public IfcGeomodel(DatabaseIfc db) : base(db) { }
+		public IfcGeomodel(DatabaseIfc db, IfcGeomodel geomodel, DuplicateOptions options) : base(db, geomodel, options) {  }
 		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -228,6 +229,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcGeoslice() : base() { }
 		public IfcGeoslice(DatabaseIfc db) : base(db) { }
+		public IfcGeoslice(DatabaseIfc db, IfcGeoslice geoslice, DuplicateOptions options) : base(db, geoslice, options) { }
 		public IfcGeoslice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -235,6 +237,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcGeotechnicalAssembly() : base() { }
 		protected IfcGeotechnicalAssembly(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalAssembly(DatabaseIfc db, IfcGeotechnicalAssembly geotechnicalAssembly, DuplicateOptions options) : base(db, geotechnicalAssembly, options) { }
 		protected IfcGeotechnicalAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -242,14 +245,15 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcGeotechnicalElement() : base() { }
 		protected IfcGeotechnicalElement(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalElement(DatabaseIfc db, IfcGeotechnicalElement geotechnicalElement, DuplicateOptions options) : base(db, geotechnicalElement, options) { }
 		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public abstract partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
 	{
-
 		protected IfcGeotechnicalStratum() : base() { }
 		protected IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
+		protected IfcGeotechnicalStratum(DatabaseIfc db, IfcGeotechnicalStratum geotechnicalStratum, DuplicateOptions options) : base(db, geotechnicalStratum, options) { }
 		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]

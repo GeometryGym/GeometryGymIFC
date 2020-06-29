@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcAxis2Placement : IBaseClassIfc //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	{
-		Transform Transform { get; }
+		Transform Transform();
 		Plane Plane { get; }
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement

@@ -388,10 +388,12 @@ namespace GeometryGym.Ifc
 		{
 			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X2 ? "," + ParserSTEP.ObjToLinkString(PlacementRelTo) : "") + "," + ParserSTEP.LinkToString(mRelativePlacement == null ? mDatabase.Factory.XYPlanePlacement.mIndex : mRelativePlacement.Index);
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X2 ? "," + ParserSTEP.ObjToLinkString(PlacementRelTo) : "") 
+				+ ",#" + mRelativePlacement.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			if(release < ReleaseVersion.IFC4X2)
 				PlacementRelTo = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;
 			RelativePlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;

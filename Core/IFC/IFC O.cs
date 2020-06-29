@@ -116,13 +116,13 @@ namespace GeometryGym.Ifc
 				result.AddRange(rdp.Extract<T>());
 			return result;
 		}
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
 			for (int icounter = 0; icounter < mIsDefinedBy.Count; icounter++)
-				mIsDefinedBy[icounter].changeSchema(schema);
+				mIsDefinedBy[icounter].changeSchema(schema, deviationTol);
 			if(mIsTypedBy != null)
-				mIsTypedBy.changeSchema(schema);
-			base.changeSchema(schema);
+				mIsTypedBy.changeSchema(schema, deviationTol);
+			base.changeSchema(schema, deviationTol);
 		}
 		public override IfcProperty FindProperty(string name) { return FindProperty(name, true); }
 		public IfcProperty FindProperty(string name, bool includeRelatedType)
@@ -410,7 +410,11 @@ namespace GeometryGym.Ifc
 			Type type = GetType();
 			PropertyInfo pi = type.GetProperty("PredefinedType");
 			if (pi != null)
-				return pi.GetValue(this).ToString();
+			{
+				object obj = pi.GetValue(this);
+				if (obj != null)
+					return obj.ToString();
+			}
 			return "";
 		}
 		public string GetObjectDefinitionType() 
@@ -515,17 +519,17 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
 			foreach(IfcRelAssigns assigns in HasAssignments)
-				assigns.changeSchema(schema);
+				assigns.changeSchema(schema, deviationTol);
 			foreach(IfcRelNests nests in IsNestedBy)
-				nests.changeSchema(schema);
+				nests.changeSchema(schema, deviationTol);
 			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
-				mHasAssociations[icounter].changeSchema(schema);
+				mHasAssociations[icounter].changeSchema(schema, deviationTol);
 			foreach (IfcObjectDefinition od in mIsDecomposedBy.SelectMany(x => x.RelatedObjects))
-				od.changeSchema(schema);
-			base.changeSchema(schema);
+				od.changeSchema(schema, deviationTol);
+			base.changeSchema(schema, deviationTol);
 		}
 		public virtual IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
 		{
@@ -570,7 +574,11 @@ namespace GeometryGym.Ifc
 					mPlacesObject.Add(p);
 			}
 		}
-		protected IfcObjectPlacement(DatabaseIfc db, IfcObjectPlacement p) : base(db,p) { }
+		protected IfcObjectPlacement(DatabaseIfc db, IfcObjectPlacement p) : base(db,p)
+		{
+			if (p.mPlacementRelTo != null)
+				PlacementRelTo = db.Factory.Duplicate(p.mPlacementRelTo) as IfcObjectPlacement;
+		}
 
 		internal virtual bool isXYPlane { get { return false; } }
 	}
@@ -672,7 +680,6 @@ namespace GeometryGym.Ifc
 		internal IfcOffsetCurveByDistances() : base() { }
 		internal IfcOffsetCurveByDistances(DatabaseIfc db, IfcOffsetCurveByDistances c) : base(db, c) { OffsetValues.AddRange(c.OffsetValues.Select(x => db.Factory.Duplicate(x) as IfcDistanceExpression)); Tag = c.Tag; }
 		public IfcOffsetCurveByDistances(IfcCurve basis, IEnumerable<IfcDistanceExpression> offsets) : base(basis) { OffsetValues.AddRange(offsets); }
-
 	}
 
 	[Obsolete("DEPRECATED IFC4", false)]
@@ -699,6 +706,14 @@ namespace GeometryGym.Ifc
 		public LIST<string> Tags { get { return mTags; } set { mTags = value; } }
 
 		public IfcOpenCrossProfileDef() : base() { }
+		internal IfcOpenCrossProfileDef(DatabaseIfc db, IfcOpenCrossProfileDef openCrossProfileDef)
+		: base(db, openCrossProfileDef)
+		{
+			HorizontalWidths = openCrossProfileDef.HorizontalWidths;
+			Widths.AddRange(openCrossProfileDef.Widths);
+			Slopes.AddRange(openCrossProfileDef.Slopes);
+			Tags.AddRange(openCrossProfileDef.Tags);
+		}
 		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes)
 			: base(db, name)
 		{
@@ -992,6 +1007,8 @@ namespace GeometryGym.Ifc
 			OwningApplication = owningApplication;
 			mChangeAction = action;
 			CreationDate = DateTime.Now;
+			if (action != IfcChangeActionEnum.NOCHANGE && action != IfcChangeActionEnum.NOTDEFINED)
+				LastModifiedDate = CreationDate;
 		}
 
 		internal override bool isDuplicate(BaseClassIfc e, double tol)

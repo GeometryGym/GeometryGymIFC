@@ -724,13 +724,13 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("Side", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcSurfaceSide>(token.Value<string>(), out mSide);
-			mDatabase.extractJArray<IfcSurfaceStyleElementSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addStyle(x));
+		 	mStyles.AddRange(mDatabase.extractJArray<IfcSurfaceStyleElementSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Side"] = mSide.ToString();
-			obj["Styles"] = new JArray(mStyles.ConvertAll(x => mDatabase[x].getJson(this, options)));
+			obj["Styles"] = new JArray(mStyles.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect

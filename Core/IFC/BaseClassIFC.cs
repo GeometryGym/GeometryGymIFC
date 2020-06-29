@@ -111,7 +111,7 @@ namespace GeometryGym.Ifc
 			return base.ToString();
 		}
 
-		internal virtual void changeSchema(ReleaseVersion schema) { }
+		internal virtual void changeSchema(ReleaseVersion schema, double deviationTol) { }
 		protected void ReplaceDatabase(BaseClassIfc revised)
 		{
 			mDatabase[revised.mIndex] = null;
@@ -145,7 +145,6 @@ namespace GeometryGym.Ifc
 				Type type = GetType(className);
 				if (type == null)
 					return null;
-				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				if (type.IsAbstract)
 				{
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
@@ -163,6 +162,7 @@ namespace GeometryGym.Ifc
 					else
 						return null;
 				}
+				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				mConstructors.TryAdd(className, constructor);
 			}
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;

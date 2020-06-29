@@ -316,6 +316,15 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D CartesianPosition { get { return mCartesianPosition; } set { mCartesianPosition = value; } }
 
 		public IfcLinearPlacement() : base() { }
+		internal IfcLinearPlacement(DatabaseIfc db, IfcLinearPlacement linearPlacement) : base(db, linearPlacement)
+		{
+			PlacementMeasuredAlong = db.Factory.Duplicate(linearPlacement.PlacementMeasuredAlong) as IfcCurve;
+			Distance = db.Factory.Duplicate(linearPlacement.Distance) as IfcDistanceExpression;
+			if (linearPlacement.Orientation != null)
+				Orientation = db.Factory.Duplicate(linearPlacement.Orientation) as IfcOrientationExpression;
+			if (linearPlacement.CartesianPosition != null)
+				CartesianPosition = db.Factory.Duplicate(linearPlacement.CartesianPosition) as IfcAxis2Placement3D;
+		}
 		public IfcLinearPlacement(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance)
 			: base(placementMeasuredAlong.Database)
 		{
@@ -330,6 +339,10 @@ namespace GeometryGym.Ifc
 		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
 
 		public IfcLinearPlacementWithInclination() : base() { }
+		internal IfcLinearPlacementWithInclination(DatabaseIfc db, IfcLinearPlacementWithInclination linearPlacement) : base(db, linearPlacement)
+		{
+			Inclinating = db.Factory.Duplicate(linearPlacement.Inclinating) as IfcAxisLateralInclination;
+		}
 		public IfcLinearPlacementWithInclination(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance, IfcAxisLateralInclination inclinating)
 			: base(placementMeasuredAlong, distance) { Inclinating = inclinating; }
 	}
@@ -350,6 +363,10 @@ namespace GeometryGym.Ifc
 		public double Span { get { return mSpan; } set { mSpan = value; } }
 
 		public IfcLinearSpanPlacement() : base() { }
+		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement): base(db, linearSpanPlacement)
+		{
+			Span = linearSpanPlacement.Span;
+		}
 		public IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance, double span)
 			: base(placementMeasuredAlong, distance) { Span = span; }
 	}
@@ -379,6 +396,7 @@ namespace GeometryGym.Ifc
 
 		public IfcLiquidTerminal() : base() { }
 		public IfcLiquidTerminal(DatabaseIfc db) : base(db) { }
+		public IfcLiquidTerminal(DatabaseIfc db, IfcLiquidTerminal liquidTerminal, DuplicateOptions options) : base(db, liquidTerminal, options) { PredefinedType = liquidTerminal.PredefinedType; }
 		public IfcLiquidTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -388,6 +406,7 @@ namespace GeometryGym.Ifc
 		public IfcLiquidTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcLiquidTerminalType() : base() { }
+		public IfcLiquidTerminalType(DatabaseIfc db, IfcLiquidTerminalType liquidTerminalType, DuplicateOptions options) : base(db, liquidTerminalType, options) { PredefinedType = liquidTerminalType.PredefinedType; }
 		public IfcLiquidTerminalType(DatabaseIfc db, string name, IfcLiquidTerminalTypeEnum predefinedType) : base(db)
 		{
 			Name = name;

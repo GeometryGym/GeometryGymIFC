@@ -362,10 +362,16 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBuilding : IfcFacility
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mBuildingAddress); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfRefHeight) + "," +
+				ParserSTEP.DoubleOptionalToString(mElevationOfTerrain) + "," + ParserSTEP.ObjToLinkString(mBuildingAddress);
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
+			mElevationOfRefHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			mElevationOfTerrain = ParserSTEP.StripDouble(str, ref pos, len);
 			mBuildingAddress = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPostalAddress;
 		}
 	}

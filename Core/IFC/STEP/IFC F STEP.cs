@@ -92,23 +92,6 @@ namespace GeometryGym.Ifc
 			mVoids = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcFacility : IfcSpatialStructureElement
-	{
-		protected override string BuildStringSTEP(ReleaseVersion release)
-		{
-			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mElevationOfRefHeight) + "," + 
-				ParserSTEP.DoubleOptionalToString(mElevationOfTerrain);
-			if (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 && this as IfcBuilding == null)
-				result += ",$";
-			return result;
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			mElevationOfRefHeight = ParserSTEP.StripDouble(str, ref pos, len);
-			mElevationOfTerrain = ParserSTEP.StripDouble(str, ref pos, len);
-		}
-	}
 	public partial class IfcFacilityPart : IfcSpatialStructureElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

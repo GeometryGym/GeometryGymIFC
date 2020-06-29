@@ -44,37 +44,11 @@ namespace GeometryGym.Ifc
 		public abstract Transform Transform();
 	}
 
-	public partial class IfcOffsetCurve2D : IfcOffsetCurve
+	public abstract partial class IfcOffsetCurve : IfcCurve
 	{
 		public override Curve Curve()
 		{
 			throw new NotImplementedException();
-		}
-	}
-	public partial class IfcOffsetCurve3D : IfcOffsetCurve
-	{
-		public override Curve Curve()
-		{
-			throw new NotImplementedException();
-		}
-	}
-	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
-	{
-		public override Curve Curve()
-		{
-			IfcCurve basisCurve = BasisCurve;
-			IList<IfcDistanceExpression> offsets = OffsetValues;
-			if (offsets.Count == 1)
-			{
-
-			}
-			else
-			{
-				List<Point3d> points = new List<Point3d>();
-
-			}
-
-			return null;
 		}
 	}
 }

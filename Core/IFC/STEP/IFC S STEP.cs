@@ -1193,10 +1193,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",." + mSide.ToString() + ".,(" + ParserSTEP.LinkToString(mStyles[0]);
-			for (int icounter = 1; icounter < mStyles.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mStyles[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",." + mSide.ToString() +
+				(mStyles.Count > 0 ? ".,(#" + string.Join(",#", mStyles.Select(x=>x.StepId)) + ")" : ".,()");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -1204,7 +1202,7 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcSurfaceSide>(s.Replace(".", ""), true, out mSide);
-			mStyles = ParserSTEP.StripListLink(str, ref pos, len);
+			mStyles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcSurfaceStyleElementSelect));
 		}
 	}
 	public partial class IfcSurfaceStyleLighting : IfcPresentationItem, IfcSurfaceStyleElementSelect

@@ -78,6 +78,7 @@ namespace GeometryGym.Ifc
 
 		public IfcNavigationElement() : base() { }
 		public IfcNavigationElement(DatabaseIfc db) : base(db) { }
+		public IfcNavigationElement(DatabaseIfc db, IfcNavigationElement navigationElement, DuplicateOptions options) : base(db, navigationElement, options) { PredefinedType = navigationElement.PredefinedType; }
 		public IfcNavigationElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -87,6 +88,7 @@ namespace GeometryGym.Ifc
 		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcNavigationElementType() : base() { }
+		public IfcNavigationElementType(DatabaseIfc db, IfcNavigationElementType navigationElementType, DuplicateOptions options) : base(db, navigationElementType, options) { PredefinedType = navigationElementType.PredefinedType; }
 		public IfcNavigationElementType(DatabaseIfc db, string name, IfcNavigationElementTypeEnum predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}

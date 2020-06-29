@@ -29,11 +29,11 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcParameterizedProfileDef
 	{
-		internal override Transform Transform
+		internal override Transform Transform()
 		{
-			get { IfcAxis2Placement2D pos = Position; return (pos == null ? Transform.Identity : pos.Transform); }
+			IfcAxis2Placement2D pos = Position;
+			return (pos == null ? Rhino.Geometry.Transform.Identity : pos.Transform()); 
 		}
-
 	}
 	public partial class IfcPcurve : IfcCurve
 	{
@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 		protected IfcPlacement(DatabaseIfc db, Point2d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
 		protected IfcPlacement(DatabaseIfc db, Point3d position) : base(db) { Location = new IfcCartesianPoint(db, position); }
 
-		public Transform Transform { get { return Transform.ChangeBasis(Plane, Plane.WorldXY); } }
+		public Transform Transform() { return Rhino.Geometry.Transform.ChangeBasis(Plane, Plane.WorldXY); }
 		public abstract Plane Plane { get; }
 	}
 	public partial class IfcPlane : IfcElementarySurface
@@ -80,19 +80,16 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
-		internal Transform PlacementTransform
+		internal Transform PlacementTransform()
 		{
-			get
-			{
-				IfcObjectPlacement p = ObjectPlacement;
-				if (p == null)
-					return Transform.Identity;
-				return p.Transform();
-			}
+			IfcObjectPlacement p = ObjectPlacement;
+			if (p == null)
+				return Transform.Identity;
+			return p.Transform();
 		}
 	}
 	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef
 	{  //,IfcCompositeProfileDef ,IfcDerivedProfileDef ,IfcParameterizedProfileDef));  IFC2x3 abstract 
-		internal virtual Transform Transform { get { return Transform.Identity; } }
+		internal virtual Transform Transform() { return Rhino.Geometry.Transform.Identity; }
 	}
 }

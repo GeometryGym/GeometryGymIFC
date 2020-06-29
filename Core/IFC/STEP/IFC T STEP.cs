@@ -731,27 +731,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-			{
-				IfcTransportElementTypeEnum predefinedType = IfcTransportElementTypeEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out predefinedType))
-				{
-					if (predefinedType != IfcTransportElementTypeEnum.NOTDEFINED)
-					{
-						IfcTransportElementFixedTypeEnum fixedType = IfcTransportElementFixedTypeEnum.NOTDEFINED;
-						if (Enum.TryParse<IfcTransportElementFixedTypeEnum>(predefinedType.ToString(), out fixedType))
-							PredefinedType = new IfcTransportElementTypeSelect(fixedType);
-						else
-						{
-							IfcTransportElementNonFixedTypeEnum nonFixed = IfcTransportElementNonFixedTypeEnum.NOTDEFINED;
-							if (Enum.TryParse<IfcTransportElementNonFixedTypeEnum>(predefinedType.ToString(), out nonFixed))
-								PredefinedType = new IfcTransportElementTypeSelect(nonFixed);
-						}
-					}
-				}
-			}
-			else
-				PredefinedType = IfcTransportElementTypeSelect.Parse(s);
+			PredefinedType = IfcTransportElementTypeSelect.Parse(s);
 			if(release < ReleaseVersion.IFC4)
 			{
 				mCapacityByWeight = ParserSTEP.StripDouble(str, ref pos, len);
@@ -781,27 +761,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-			{
-				IfcTransportElementTypeEnum predefinedType = IfcTransportElementTypeEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out predefinedType))
-				{
-					if (predefinedType != IfcTransportElementTypeEnum.NOTDEFINED)
-					{
-						IfcTransportElementFixedTypeEnum fixedType = IfcTransportElementFixedTypeEnum.NOTDEFINED;
-						if (Enum.TryParse<IfcTransportElementFixedTypeEnum>(predefinedType.ToString(), out fixedType))
-							PredefinedType = new IfcTransportElementTypeSelect(fixedType);
-						else
-						{
-							IfcTransportElementNonFixedTypeEnum nonFixed = IfcTransportElementNonFixedTypeEnum.NOTDEFINED;
-							if (Enum.TryParse<IfcTransportElementNonFixedTypeEnum>(predefinedType.ToString(), out nonFixed))
-								PredefinedType = new IfcTransportElementTypeSelect(nonFixed);
-						}
-					}
-				}
-			}
-			else
-				PredefinedType = IfcTransportElementTypeSelect.Parse(s);
+			PredefinedType = IfcTransportElementTypeSelect.Parse(s);
 		}
 	}
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef

@@ -630,7 +630,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return ",(#" + String.Join(",#", mProfiles.Select(x=>x.StepId)) + (mLabel == "$" ? "),$" : "),'" + mLabel + "'");
+			return base.BuildStringSTEP(release) + ",(#" + String.Join(",#", mProfiles.Select(x=>x.StepId)) + (mLabel == "$" ? "),$" : "),'" + mLabel + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

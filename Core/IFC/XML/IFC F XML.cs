@@ -135,26 +135,6 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcFacility : IfcSpatialStructureElement
-	{
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			if (xml.HasAttribute("ElevationOfRefHeight"))
-				ElevationOfRefHeight = double.Parse(xml.Attributes["ElevationOfRefHeight"].Value);
-			if (xml.HasAttribute("ElevationOfTerrain"))
-				ElevationOfTerrain = double.Parse(xml.Attributes["ElevationOfTerrain"].Value);
-		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			if (!double.IsNaN(mElevationOfRefHeight))
-				xml.SetAttribute("ElevationOfRefHeight", mElevationOfRefHeight.ToString());
-			if (!double.IsNaN(mElevationOfTerrain))
-				xml.SetAttribute("ElevationOfTerrain", mElevationOfTerrain.ToString());
-		}
-	}
-
 	public partial class IfcFixedReferenceSweptAreaSolid : IfcDirectrixCurveSweptAreaSolid //IFC4
 	{
 		internal override void ParseXml(XmlElement xml)

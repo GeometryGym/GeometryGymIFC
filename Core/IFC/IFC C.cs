@@ -16,17 +16,12 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using GeometryGym.STEP;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
-
-using GeometryGym.STEP;
 
 
 namespace GeometryGym.Ifc
@@ -448,27 +443,6 @@ namespace GeometryGym.Ifc
 		internal IfcCivilElementType() : base() { }
 		internal IfcCivilElementType(DatabaseIfc db, IfcCivilElementType t, DuplicateOptions options) : base(db, t, options) { }
 		public IfcCivilElementType(DatabaseIfc m, string name) : base(m) { Name = name; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
-	}
-	[Serializable]
-	public partial class IfcCivilSheath : IfcCivilElementPart //IFC5
-	{
-		internal IfcCivilSheath() : base() { }
-		internal IfcCivilSheath(DatabaseIfc db, IfcCivilSheath s, DuplicateOptions options) : base(db, s, options) { }
-		public IfcCivilSheath(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
-	}
-	[Serializable]
-	public abstract partial class IfcCivilStructureElement : IfcSpatialStructureElement //IFC5
-	{
-		protected IfcCivilStructureElement() : base() { }
-		protected IfcCivilStructureElement(IfcSpatialStructureElement host, string name) : base(host, name) { }
-		protected IfcCivilStructureElement(DatabaseIfc db, IfcCivilStructureElement p, DuplicateOptions options) : base(db, p, options) { }
-	}
-	[Serializable]
-	public partial class IfcCivilVoid : IfcCivilElementPart //IFC5
-	{
-		internal IfcCivilVoid() : base() { }
-		internal IfcCivilVoid(DatabaseIfc db, IfcCivilVoid v, DuplicateOptions options) : base(db, v, options) { }
-		public IfcCivilVoid(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcClassification : IfcExternalInformation, IfcClassificationReferenceSelect, IfcClassificationSelect, NamedObjectIfc //	SUBTYPE OF IfcExternalInformation;
@@ -1513,8 +1487,8 @@ namespace GeometryGym.Ifc
 		{
 			removeProperty(property, IsDefinedBy);
 		}
-		public void ChangeSchemaWIP(ReleaseVersion release) { changeSchema(release); }
-		internal override void changeSchema(ReleaseVersion schema)
+		public void ChangeSchemaWIP(ReleaseVersion release, double tol) { changeSchema(release, tol); }
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
 			if (schema < ReleaseVersion.IFC4)
 			{
@@ -1524,14 +1498,9 @@ namespace GeometryGym.Ifc
 			{
 				if (mDatabase.mModelView == ModelView.Ifc2x3NotAssigned)
 					mDatabase.mModelView = ModelView.Ifc4NotAssigned;
-				
-			}
-			else
-			{
-				throw new Exception("Early releases of IFC not supported yet!");
 			}
 			mDatabase.mRelease = schema;
-			base.changeSchema(schema);
+			base.changeSchema(schema, deviationTol);
 		}
 	}
 	[Serializable]
@@ -1854,6 +1823,7 @@ namespace GeometryGym.Ifc
 
 		public IfcCourse() : base() { }
 		public IfcCourse(DatabaseIfc db) : base(db) { }
+		public IfcCourse(DatabaseIfc db, IfcCourse course, DuplicateOptions options) : base(db, course, options) { PredefinedType = course.PredefinedType; }
 		public IfcCourse(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -1863,6 +1833,7 @@ namespace GeometryGym.Ifc
 		public IfcCourseTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcCourseType() : base() { }
+		public IfcCourseType(DatabaseIfc db, IfcCourseType courseType, DuplicateOptions options) : base(db, courseType, options) { PredefinedType = courseType.PredefinedType; }
 		public IfcCourseType(DatabaseIfc db, string name, IfcCourseTypeEnum predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}

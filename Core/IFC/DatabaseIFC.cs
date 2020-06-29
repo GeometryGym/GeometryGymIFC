@@ -459,7 +459,7 @@ namespace GeometryGym.Ifc
 					setFileLine(strLine);
 					continue;
 				}
-				if (c == 'E')
+				if (c == 'E' || c == 'H')
 					continue;
 				revised.Add(strLine);
 			}
@@ -549,6 +549,8 @@ namespace GeometryGym.Ifc
 					mRelease = ReleaseVersion.IFC4X1;
 				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
 					mRelease = ReleaseVersion.IFC4X2;
+				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
+					mRelease = ReleaseVersion.IFC4X3;
 				else
 					mRelease = ReleaseVersion.IFC4;
 				if (mModelView == ModelView.Ifc2x3Coordination || mModelView == ModelView.Ifc2x3NotAssigned)
@@ -1417,7 +1419,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcOwnerHistory> mOwnerHistories = new List<IfcOwnerHistory>();
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcPersonAndOrganization owner, IfcApplication application, DateTime created)
 		{
-			return OwnerHistory(action, owner, application, null, null, DateTime.MinValue, created);	
+			return OwnerHistory(action, owner, application, null, null, action == IfcChangeActionEnum.NOTDEFINED || action == IfcChangeActionEnum.NOCHANGE ? DateTime.MinValue : created, created);	
 		}
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcPersonAndOrganization owner, IfcApplication application, IfcPersonAndOrganization modifier, IfcApplication modApplication, DateTime modified, DateTime created)
 		{

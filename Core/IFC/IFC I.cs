@@ -46,6 +46,7 @@ namespace GeometryGym.Ifc
 
 		public IfcImpactProtectionDevice() : base() { }
 		public IfcImpactProtectionDevice(DatabaseIfc db) : base(db) { }
+		public IfcImpactProtectionDevice(DatabaseIfc db, IfcImpactProtectionDevice impactProtectionDevice, DuplicateOptions options) : base(db, impactProtectionDevice, options) { PredefinedType = impactProtectionDevice.PredefinedType; }
 		public IfcImpactProtectionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -55,6 +56,7 @@ namespace GeometryGym.Ifc
 		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcImpactProtectionDeviceType() : base() { }
+		public IfcImpactProtectionDeviceType(DatabaseIfc db, IfcImpactProtectionDeviceType impactProtectionDeviceType, DuplicateOptions options) : base(db, impactProtectionDeviceType, options) { PredefinedType = impactProtectionDeviceType.PredefinedType; }
 		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeSelect predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}
@@ -68,6 +70,11 @@ namespace GeometryGym.Ifc
 		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
 
 		public IfcInclinedReferenceSweptAreaSolid() : base() { }
+		public IfcInclinedReferenceSweptAreaSolid(DatabaseIfc db, IfcInclinedReferenceSweptAreaSolid inclinedReferenceSweptAreaSolid) : base(db, inclinedReferenceSweptAreaSolid)
+		{
+			FixedAxisVertical = inclinedReferenceSweptAreaSolid.FixedAxisVertical;
+			Inclinating = inclinedReferenceSweptAreaSolid.Inclinating;
+		}
 		public IfcInclinedReferenceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcAxisLateralInclination inclinating)
 			: base(sweptArea, directrix) { Inclinating = inclinating; }
 	}
@@ -105,9 +112,9 @@ namespace GeometryGym.Ifc
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
 
 		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
-			base.changeSchema(schema);
+			base.changeSchema(schema, deviationTol);
 			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcCartesianPointList cpl = Points;

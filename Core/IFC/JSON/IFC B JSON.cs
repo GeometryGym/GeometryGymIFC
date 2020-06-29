@@ -255,6 +255,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
+			JToken token = obj.GetValue("ElevationOfRefHeight", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfRefHeight = token.Value<double>();
+			token = obj.GetValue("ElevationOfTerrain", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfTerrain = token.Value<double>();
 			JObject jobj = obj.GetValue("BuildingAddress", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				BuildingAddress = mDatabase.ParseJObject<IfcPostalAddress>(jobj);
@@ -262,6 +268,10 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mElevationOfRefHeight))
+				obj["ElevationOfRefHeight"] = ElevationOfRefHeight.ToString();
+			if (!double.IsNaN(mElevationOfTerrain))
+				obj["ElevationOfTerrain"] = ElevationOfTerrain.ToString();
 			if (mBuildingAddress != null) 
 				obj["BuildingAddress"] = BuildingAddress.getJson(this, options);
 		}

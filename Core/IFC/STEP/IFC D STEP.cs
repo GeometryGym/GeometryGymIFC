@@ -63,7 +63,7 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcDefinedSymbol  // DEPRECATED IFC4
 	public partial class IfcDerivedProfileDef : IfcProfileDef
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mContainerProfile.StepId + ",#" + mOperator.StepId + (mLabel == "$" ? ",$" : ",'" + mLabel + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mContainerProfile.StepId + (mOperator == null ? ",*" : ",#" + mOperator.StepId) + (mLabel == "$" ? ",$" : ",'" + mLabel + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

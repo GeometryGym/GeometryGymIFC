@@ -63,20 +63,17 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCartesianTransformationOperator
 	{
-		internal Transform Transform
+		public Transform Transform()
 		{
-			get
-			{
-				IfcCartesianPoint cp = LocalOrigin;
-				Point3d p = (cp == null ? Point3d.Origin : cp.Location);
-				return Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
-			}
+			IfcCartesianPoint cp = LocalOrigin;
+			Point3d p = (cp == null ? Point3d.Origin : cp.Location);
+			return Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
 		}
-		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Transform.Identity : Transform.Scale(location, mScale); }
+		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(location, mScale); }
 		protected virtual Transform vecsTransform()
 		{
 			Vector3d vx = new Vector3d(1, 0, 0), vy = new Vector3d(0, 1, 0);
-			Transform tr = Transform.Identity;
+			Transform tr = Rhino.Geometry.Transform.Identity;
 			if (mAxis1 > 0)
 			{
 				vx = Axis1.Vector3d;
@@ -96,7 +93,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator2DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, mScale2, 1); }
+		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, mScale2, 1); }
 	}
 	public partial class IfcCartesianTransformationOperator3D
 	{
@@ -113,7 +110,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator3DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
+		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
@@ -132,7 +129,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcConic : IfcCurve /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCircle ,IfcEllipse))*/
 	{
-		public Transform Transform { get { return (mPosition > 0 ? Position.Transform : Transform.Translation(0, 0, 0)); } }
+		public Transform Transform { get { return (mPosition > 0 ? Position.Transform() : Transform.Translation(0, 0, 0)); } }
 		public Plane Plane { get { return (mPosition > 0 ? Position.Plane : Plane.WorldXY); } }
 	}
 	public partial class IfcConnectionPointEccentricity

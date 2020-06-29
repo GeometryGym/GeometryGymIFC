@@ -675,6 +675,7 @@ namespace GeometryGym.Ifc
 
 		public IfcTrackElement() : base() { }
 		public IfcTrackElement(DatabaseIfc db) : base(db) { }
+		public IfcTrackElement(DatabaseIfc db, IfcTrackElement trackElement, DuplicateOptions options) : base(db, trackElement, options) { PredefinedType = trackElement.PredefinedType; }
 		public IfcTrackElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -684,6 +685,7 @@ namespace GeometryGym.Ifc
 		public IfcTrackElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcTrackElementType() : base() { }
+		public IfcTrackElementType(DatabaseIfc db, IfcTrackElementType trackElementType, DuplicateOptions options) : base(db, trackElementType, options) { PredefinedType = trackElementType.PredefinedType; }
 		public IfcTrackElementType(DatabaseIfc db, string name, IfcTrackElementTypeEnum predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}
@@ -1193,11 +1195,11 @@ namespace GeometryGym.Ifc
 			}
 			return base.retrieveReference(r);
 		}
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
-			base.changeSchema(schema);
+			base.changeSchema(schema, deviationTol);
 			if (mObjectTypeOf != null)
-				mObjectTypeOf.changeSchema(schema);
+				mObjectTypeOf.changeSchema(schema, deviationTol);
 		}
 		internal void IsolateObject(string filename, bool relatedObjects)
 		{
@@ -1333,13 +1335,13 @@ namespace GeometryGym.Ifc
 			}
 		}
 		
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
 			foreach(IfcRepresentationMap repMap in RepresentationMaps)
-				repMap.changeSchema(schema);
+				repMap.changeSchema(schema, deviationTol);
 			foreach(IfcPropertySetDefinition pset in HasPropertySets)
-				pset.changeSchema(schema);
-			base.changeSchema(schema);
+				pset.changeSchema(schema, deviationTol);
+			base.changeSchema(schema, deviationTol);
 		}
 
 		internal IfcElement genMappedItemElement(IfcProduct host, IfcAxis2Placement3D relativePlacement)

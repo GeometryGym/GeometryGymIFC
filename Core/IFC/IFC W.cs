@@ -131,6 +131,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcWaterStratum() : base() { }
 		public IfcWaterStratum(DatabaseIfc db) : base(db) { }
+		public IfcWaterStratum(DatabaseIfc db, IfcWaterStratum waterStratum, DuplicateOptions options) : base(db, waterStratum, options) { }
 		public IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -251,7 +252,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcWindowStyle" : base.StepClassName); } }
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;// : IfcWindowTypePartitioningEnum; 
-		internal bool mParameterTakesPrecedence;// : BOOLEAN; 
+		internal bool mParameterTakesPrecedence = false;// : BOOLEAN; 
 		internal string mUserDefinedPartitioningType = "$"; // 	 :	OPTIONAL IfcLabel;
 
 		public IfcWindowTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }

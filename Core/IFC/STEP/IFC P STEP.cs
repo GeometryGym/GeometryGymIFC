@@ -148,33 +148,9 @@ namespace GeometryGym.Ifc
 				str += (mIdentification == "$" ? "'Unknown',$," : "'" + mIdentification + "',$,");
 			else
 				str += (mFamilyName == "$" ? "$," : "'" + mFamilyName + "',") + (mGivenName == "$" ? "$," : "'" + mGivenName + "',");
-			if (mMiddleNames.Count == 0)
-				str += "$,";
-			else
-			{
-				str += "('" + mMiddleNames[0];
-				for (int icounter = 1; icounter < mMiddleNames.Count; icounter++)
-					str += "','" + mMiddleNames[icounter];
-				str += "'),";
-			}
-			if (mPrefixTitles.Count == 0)
-				str += "$,";
-			else
-			{
-				str += "('" + mPrefixTitles[0];
-				for (int icounter = 1; icounter < mPrefixTitles.Count; icounter++)
-					str += "','" + mPrefixTitles[icounter];
-				str += "'),";
-			}
-			if (mSuffixTitles.Count == 0)
-				str += "$,";
-			else
-			{
-				str += "('" + mSuffixTitles[0];
-				for (int icounter = 1; icounter < mSuffixTitles.Count; icounter++)
-					str += "','" + mSuffixTitles[icounter];
-				str += "'),";
-			}
+			str += (mMiddleNames.Count == 0 ? "$," : "('" + string.Join("','", mMiddleNames) + "'),");
+			str += (mPrefixTitles.Count == 0 ? "$," : "('" + string.Join("','", mPrefixTitles + "'),"));
+			str += (mSuffixTitles.Count == 0 ? "$," : "('" + string.Join("','", mSuffixTitles + "'),"));
 			str += (Roles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.ConvertAll(x=>x.Index.ToString())) + "),");
 			return str + (Addresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.ConvertAll(x=>x.Index.ToString())) + ")");
 			

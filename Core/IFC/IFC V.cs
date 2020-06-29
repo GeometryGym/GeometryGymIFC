@@ -190,6 +190,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcVoidStratum() : base() { }
 		public IfcVoidStratum(DatabaseIfc db) : base(db) { }
+		public IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options) : base(db, voidStratum, options) { }
 		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 

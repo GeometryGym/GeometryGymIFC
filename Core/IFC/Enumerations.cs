@@ -57,16 +57,7 @@ namespace GeometryGym.Ifc
 	public enum IfcBenchmarkEnum { GREATERTHAN, GREATERTHANOREQUALTO, LESSTHAN, LESSTHANOREQUALTO, EQUALTO, NOTEQUALTO, INCLUDES, NOTINCLUDES, INCLUDEDIN, NOTINCLUDEDIN };
 	public enum IfcBoilerTypeEnum { NOTDEFINED, USERDEFINED, WATER, STEAM };
 	public enum IfcBooleanOperator { UNION, INTERSECTION, DIFFERENCE };
-	public enum IfcBridgeContactType { GLUE, RIVET, CONNECTOR, WELD, RESUMPTION_OF_CONCRETE, SLIDING }; //IFC5
-	public enum IfcBridgeMechanicalRoleType { UNDEFINED, LONGITUDINAL, TRANSVERSAL, COMPLETE, NONE }; //IFC5
 	public enum IfcBridgePartTypeEnum { NOTDEFINED, USERDEFINED, ABUTMENT, DECK, DECK_SEGMENT, FOUNDATION, PIER, PIER_SEGMENT, PYLON, SUBSTRUCTURE, SUPERSTRUCTURE, SURFACESTRUCTURE };
-	public enum IfcBridgePrismaticElementType { UNICELLULAR_MONO_BOX_GIRDER, MULTICELLULAR_MONO_BOX_GIRDER, UNICELLULAR_MULTI_BOX_GIRDER, MULTICELLULAR_MULTI_BOX_GIRDER, DOUBLE_BEAM_RIBBED_SLAB, MULTI_BEAM_RIBBED_SLAB, MASSIVE_SECTION_ELEMENT, HOLLOW_SECTION_ELEMENT, SOLID_SLAB, HOLLOW_SLAB, SLAB_WITH_BROAD_CANTILEVER, MASTER_BEAM, LONGITUDINAL_GIRDER, RIGIDITY_BEAM, BRACING, UPPER_FLANGE, LOWER_FLANGE, UPPER_FOOTING, LOWER_FOOTING, WEB, FLOORING_SHEET, BOTTOM_SHEET, KERB_SHEET, CANTILEVER_SHEET, PAVEMENT_SHEET, AUGET, LONGITUDINAL_WEB_STIFFENER, RAKER, TRANSVERSE_GIRDER, DEFLECTER, TRANSVERSE_MEMBER, TRANSVERSE, DIAGONALE, JAMB, TENSION_MEMBER, BONDING_BAR, TRANSVERSAL_STIFFENER, STIFFENER_FOOTING, TENDON }; //IFC5
-	public enum IfcBridgeSegmentType { TYPICAL_SEGMENT, PIER_SEGMENT, PIECE, LIFT, ELEMENT, JAMB, PYLON_HEAD, SPAN, CANTILEVER, FINITE_ELEMENT_REFERENCE }; //IFC5
-	public enum IfcBridgeStructureElementType { DECK, PIER, SMALL_PIER, PYLON, ARCH, LAUNCHING_NOSE, TEMPORARY_BENT, TRANSVERSE_GIRDER, STRUT, COUNTER_STRUT, CABLE, SUSPENDED_TENDON, SUSPENDER, MOBILE_FALSEWORK, STAYING_MAST, LAUNCHING_BEAM }; //IFC5
-	public enum IfcBridgeStructureIndicator { COMPOSITE, COATED, HOMOGENEOUS, OTHER }; //IFC5
-	public enum IfcBridgeStructureType { BOX_GIRDER_BRIDGE, ARCHED_BRIDGE, SUSPENSION_BRIDGE, CABLE_STAYED_BRIDGE, GIRDER_BRIDGE, SLAB_BRIDGE, SLAB_BRIDGE_WITH_BROAD_CANTILEVER, BOW_STRING_BRIDGE, LADDER_BRIDGE, FRAMEWORK_BRIDGE, GISCLARD_BRIDGE, PORTAL_BRIDGE }; //IFC5
-	public enum IfcBridgeSubPartType { LEFT_WEB, RIGHT_WEB, CENTRAL_WEB, TOP_SLAB, LOWER_SLAB, RIGHT_OVERHANG, LEFT_OVERHANG, UPPER_FLANGE_, LOWER_FLANGE, LOWER_FLOORING, UPPER_FLOORING, MORPHOLOGY_NODE, REFERENCE_FIBRE, BRANCH_WALL }; //IFC5
-	public enum IfcBridgeTechnologicalElementType { UNICELLULAR_MONO_BOX_GIRDER, MULTICELLULAR_MONO_BOX_GIRDER, UNICELLULAR_MULTI_BOX_GIRDER, MULTICELLULAR_MULTI_BOX_GIRDER, SOLID_SLAB, HOLLOW_SLAB, SLAB_WITH_BROAD_CANTILEVER, DOUBLE_BEAM_RIBBED_SLAB, MULTI_BEAM_RIBBED_SLAB, MASSIVE_SECTION_ELEMENT, HOLLOW_SECTION_ELEMENT, MARKETED_SECTION_GIRDER, RE_ASSEMBLED_SECTION_GIRDER, TRUSS, LADDER_OR_VIERENDEEL, BOW_STRING }; //IFC5
 	public enum IfcBridgeTypeEnum { NOTDEFINED, USERDEFINED, ARCHED, CABLE_STAYED, CANTILEVER, CULVERT, FRAMEWORK, GIRDER, SUSPENSION, TRUSS };
 	public enum IfcBSplineCurveForm { UNSPECIFIED, POLYLINE_FORM, CIRCULAR_ARC, ELLIPTIC_ARC, PARABOLIC_ARC, HYPERBOLIC_ARC };
 	public enum IfcBSplineSurfaceForm { UNSPECIFIED, PLANE_SURF, CYLINDRICAL_SURF, CONICAL_SURF, SPHERICAL_SURF, TOROIDAL_SURF, SURF_OF_REVOLUTION, RULED_SURF, GENERALISED_CONE, QUADRIC_SURF, SURF_OF_LINEAR_EXTRUSION };
@@ -353,6 +344,14 @@ namespace GeometryGym.Ifc
 		}
 		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration)
 		{
+			if(str.StartsWith("."))
+			{
+				string s = str.Substring(1, str.Length - 2);
+				if (Enum.TryParse<T>(s, out firstEnumeration))
+					return 0;
+				Enum.TryParse<U>(s, out secondEnumeration);
+				return 1;
+			}
 			string firstName = typeof(T).Name.ToLower(), secondName = typeof(U).Name.ToLower();
 			
 			if(str.ToLower().StartsWith(firstName))
@@ -401,12 +400,19 @@ namespace GeometryGym.Ifc
 		protected SelectEnum(V enumeration) { mThirdEnumeration = enumeration; mPosition = 2; }
 		public override string ToString()
 		{
-			if(mPosition == 2)
+			if (mPosition == 2)
 				return typeof(V).Name.ToUpper() + "(." + mThirdEnumeration.ToString() + ".)";
 			return base.ToString();
 		}
 		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration, ref V thirdEnumeration)
 		{
+			if (str.StartsWith("."))
+			{
+				string s = str.Substring(1, str.Length - 2);
+				if (Enum.TryParse<V>(s, out thirdEnumeration))
+					return 2;
+				return parse(str, ref firstEnumeration, ref secondEnumeration);
+			}
 			string thirdName = typeof(V).Name.ToLower();
 			if (str.ToLower().StartsWith(thirdName))
 			{
@@ -452,6 +458,15 @@ namespace GeometryGym.Ifc
 		}
 		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration, ref V thirdEnumeration, ref W fourthEnumeration, ref X fithEnumeration)
 		{
+			if (str.StartsWith("."))
+			{
+				string s = str.Substring(1, str.Length - 2);
+				if (Enum.TryParse<W>(s, out fourthEnumeration))
+					return 3;
+				if (Enum.TryParse<X>(s, out fithEnumeration))
+					return 4;
+				return parse(str, ref firstEnumeration, ref secondEnumeration);
+			}
 			string fourthName = typeof(W).Name.ToLower(), fithName = typeof(X).Name.ToLower();
 
 			if (str.ToLower().StartsWith(fourthName))
@@ -535,7 +550,6 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 	}
-
 	public class IfcImpactProtectionDeviceTypeSelect : SelectEnum<IfcImpactProtectionDeviceTypeEnum, IfcVibrationDamperTypeEnum, IfcVibrationIsolatorTypeEnum>
 	{
 		public IfcImpactProtectionDeviceTypeSelect() : base(IfcImpactProtectionDeviceTypeEnum.NOTDEFINED) { }
@@ -560,7 +574,6 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 	}
-
 	public class IfcTransportElementTypeSelect : SelectEnum<IfcTransportElementFixedTypeEnum, IfcTransportElementNonFixedTypeEnum>
 	{
 		public IfcTransportElementTypeSelect() : base(IfcTransportElementFixedTypeEnum.NOTDEFINED) { }

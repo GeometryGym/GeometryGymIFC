@@ -171,11 +171,11 @@ namespace GeometryGym.Ifc
 			mSecondOperand = second.Index;
 		}
 		
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
-			base.changeSchema(schema);
-			mDatabase[mFirstOperand].changeSchema(schema);
-			mDatabase[mSecondOperand].changeSchema(schema);
+			base.changeSchema(schema, deviationTol);
+			mDatabase[mFirstOperand].changeSchema(schema, deviationTol);
+			mDatabase[mSecondOperand].changeSchema(schema, deviationTol);
 		}
 	}
 	[Serializable]
@@ -183,6 +183,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcBorehole() : base() { }
 		public IfcBorehole(DatabaseIfc db) : base(db) { }
+		public IfcBorehole(DatabaseIfc db, IfcBorehole borehole, DuplicateOptions options) : base(db, borehole, options) { }
 		public IfcBorehole(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -386,13 +387,17 @@ namespace GeometryGym.Ifc
 
 		public IfcBridge() : base() { }
 		public IfcBridge(DatabaseIfc db) : base(db) { }
-		public IfcBridge(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { }
+		public IfcBridge(DatabaseIfc db, IfcBridge bridge, DuplicateOptions options) : base(db, bridge, options) { }
+		public IfcBridge(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { Name = name; }
+		internal IfcBridge(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcBridgePart : IfcFacilityPart
 	{
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2) return "IfcFacilityPart"; return base.StepClassName; } }
 		public IfcBridgePart() : base() { }
+		public IfcBridgePart(DatabaseIfc db) : base(db) { }
+		public IfcBridgePart(DatabaseIfc db, IfcBridgePart bridgePart, DuplicateOptions options) : base(db, bridgePart, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
@@ -527,18 +532,26 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBuilding : IfcFacility
 	{
+		internal double mElevationOfRefHeight = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		internal double mElevationOfTerrain = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal IfcPostalAddress mBuildingAddress = null;// : OPTIONAL IfcPostalAddress; 
+
+		public double ElevationOfRefHeight { get { return mElevationOfRefHeight; } set { mElevationOfRefHeight = value; } }
+		public double ElevationOfTerrain { get { return mElevationOfTerrain; } set { mElevationOfTerrain = value; } }
 		public IfcPostalAddress BuildingAddress { get { return mBuildingAddress; } set { mBuildingAddress = value; } }
 
 		internal IfcBuilding() : base() { }
 		internal IfcBuilding(DatabaseIfc db, IfcBuilding b, DuplicateOptions options) : base(db, b, options)
 		{
+			mElevationOfRefHeight = b.mElevationOfRefHeight;
+			mElevationOfTerrain = b.mElevationOfTerrain;
 			if (b.mBuildingAddress != null)
 				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress) as IfcPostalAddress;
 		}
 		public IfcBuilding(DatabaseIfc db, string name) : base(db, name) { setDefaultAddress();  }
 		public IfcBuilding(IfcSpatialStructureElement host, string name) : base(host, name) { }
-		public IfcBuilding(IfcObjectDefinition host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { setDefaultAddress(); }
+		public IfcBuilding(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, name, placement, representation) { setDefaultAddress(); }
+		internal IfcBuilding(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { setDefaultAddress(); }
 		
 
 		private void setDefaultAddress()  //Implementers Agreement requires address
@@ -648,7 +661,8 @@ namespace GeometryGym.Ifc
 		public IfcBuildingStorey(IfcFacilityPart host, string name, double elevation) : base(host, name) { Elevation = elevation; }
 		public IfcBuildingStorey(IfcSite host, string name, double elevation) : base(host, name) { Elevation = elevation; }
 		public IfcBuildingStorey(IfcBuildingStorey host, string name, double elevation) : base(host, name) { Elevation = elevation; }
-		public IfcBuildingStorey(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, name, p, r) { }
+		public IfcBuildingStorey(IfcFacility host, string name, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { Name = name; }
+		internal IfcBuildingStorey(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
 	}
 	[Serializable]
 	public partial class IfcBuiltSystem : IfcSystem //IFC4 IfcBuildingSystem
@@ -696,9 +710,9 @@ namespace GeometryGym.Ifc
 		internal IfcBurnerType(DatabaseIfc db, IfcBurnerType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcBurnerType(DatabaseIfc m, string name, IfcBurnerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 
-		internal override void changeSchema(ReleaseVersion schema)
+		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
 		{
-			base.changeSchema(schema);
+			base.changeSchema(schema, deviationTol);
 			if (schema < ReleaseVersion.IFC4)
 			{
 				IfcSpaceHeaterType spaceHeaterType = new IfcSpaceHeaterType(this);

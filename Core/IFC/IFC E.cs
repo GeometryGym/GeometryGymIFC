@@ -37,6 +37,7 @@ namespace GeometryGym.Ifc
 
 		public IfcEarthworksCut() : base() { }
 		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksCut(DatabaseIfc db, IfcEarthworksCut earthworksCut, DuplicateOptions options) : base(db, earthworksCut, options) { PredefinedType = earthworksCut.PredefinedType; }
 		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -44,6 +45,7 @@ namespace GeometryGym.Ifc
 	{
 		public IfcEarthworksElement() : base() { }
 		public IfcEarthworksElement(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksElement(DatabaseIfc db, IfcEarthworksElement earthworksElement, DuplicateOptions options) : base(db, earthworksElement, options) { }
 		public IfcEarthworksElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -54,6 +56,7 @@ namespace GeometryGym.Ifc
 
 		public IfcEarthworksFill() : base() { }
 		public IfcEarthworksFill(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksFill(DatabaseIfc db, IfcEarthworksFill earthworksFill, DuplicateOptions options) : base(db, earthworksFill, options) { PredefinedType = earthworksFill.PredefinedType; }
 		public IfcEarthworksFill(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -249,6 +252,7 @@ namespace GeometryGym.Ifc
 
 		public IfcElectricFlowTreatmentDevice() : base() { }
 		public IfcElectricFlowTreatmentDevice(DatabaseIfc db) : base(db) { }
+		public IfcElectricFlowTreatmentDevice(DatabaseIfc db, IfcElectricFlowTreatmentDevice electricFlowTreatmentDevice, DuplicateOptions options) : base(db, electricFlowTreatmentDevice, options) { PredefinedType = electricFlowTreatmentDevice.PredefinedType; }
 		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
@@ -585,85 +589,15 @@ namespace GeometryGym.Ifc
 				mContainedInStructure.RelatedElements.Remove(this);
 				//mContainedInStructure.RelatedElements.Remove(this);
 		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition container, IfcObjectPlacement pl, IfcProductRepresentation r) { return ConstructElement(className, container, pl, r, null); }
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement pl, IfcProductRepresentation r, IfcDistributionSystem system)
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation)
 		{
-			string str = className, definedType = "";
-			if (!string.IsNullOrEmpty(str))
-			{
-				string lower = str.ToLower();
-				if (host.mDatabase.Release < ReleaseVersion.IFC4)
-				{
-					if (lower.StartsWith("ifcshadingdevice"))
-						str = "IfcBuildingElementProxy.ShadingDevice";
-					if (lower.StartsWith("ifcgeographicelement"))
-						str = "IfcBuildingElementProxy.GeographicElement";
-					if (lower.StartsWith("ifccivilelement"))
-						str = "IfcBuildingElementProxy.CivilElement";
-				}
-				string[] fields = str.Split(".".ToCharArray());
-				if (fields.Length > 1)
-				{
-					str = fields[0];
-					definedType = fields[1];
-				}
-			}
-			IfcElement element = null;
-			Type type = Type.GetType("GeometryGym.Ifc." + str);
-			if (type != null)
-			{
-				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation) }, null);
-				if (ctor == null)
-				{
-					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation), typeof(IfcDistributionSystem) }, null);
-					if (ctor == null)
-						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
-					else
-						element = ctor.Invoke(new object[] { host, pl, r, system }) as IfcElement;
-				}
-				else
-					element = ctor.Invoke(new object[] { host, pl, r }) as IfcElement;
-			}
+			return ConstructElement(className, host, placement, representation, null);
+		}
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system)
+		{
+			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
 			if (element == null)
-				element = new IfcBuildingElementProxy(host, pl, r);
-
-			if (!string.IsNullOrEmpty(definedType))
-			{
-				if (host.mDatabase.mRelease < ReleaseVersion.IFC4)
-					element.ObjectType = definedType;
-				else
-				{
-					type = element.GetType();
-					PropertyInfo pi = type.GetProperty("PredefinedType");
-					if (pi != null)
-					{
-						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-						if (enumType != null)
-						{
-							FieldInfo fi = enumType.GetField(definedType);
-							if (fi == null)
-							{
-								element.ObjectType = definedType;
-								fi = enumType.GetField("NOTDEFINED");
-							}
-							if (fi != null)
-							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
-								pi.SetValue(element, newEnumValue, null);
-							}
-							else
-								element.ObjectType = definedType;
-						}
-						else
-							element.ObjectType = definedType;
-					}
-					else
-						element.ObjectType = definedType;
-				}
-			}
+				element = new IfcBuildingElementProxy(host, placement, representation);
 			return element;
 		}
 		public void AddMember(IfcStructuralMember m)

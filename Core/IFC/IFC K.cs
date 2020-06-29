@@ -35,6 +35,7 @@ namespace GeometryGym.Ifc
 
 		public IfcKerb() : base() { }
 		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
+		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
 		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, bool mountable) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -44,6 +45,7 @@ namespace GeometryGym.Ifc
 		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
 
 		public IfcKerbType() : base() { }
+		public IfcKerbType(DatabaseIfc db, IfcKerbType kerbType, DuplicateOptions options) : base(db, kerbType, options) { Mountable = kerbType.Mountable; }
 		public IfcKerbType(DatabaseIfc db, string name, bool mountable)
 			: base(db, name) { Mountable = mountable; }
 	}

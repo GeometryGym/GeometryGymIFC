@@ -42,7 +42,7 @@ namespace GeometryGym.Ifc
 				if (grid == null)
 					grid = mPartOfW;
 				if (grid != null)
-					c.Transform(grid.PlacementTransform);
+					c.Transform(grid.PlacementTransform());
 				return c;
 			}
 		}

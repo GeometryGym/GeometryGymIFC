@@ -842,7 +842,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcSurfaceStyleElementSelect s = mDatabase.ParseXml<IfcSurfaceStyleElementSelect>(cn as XmlElement);
 						if (s != null)
-							addStyle(s);
+						 	mStyles.Add(s);
 					}
 				}
 			}
@@ -853,8 +853,8 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Side", mSide.ToString().ToLower());
 			XmlElement element = xml.OwnerDocument.CreateElement("Styles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (int item in mStyles)
-				element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (IfcSurfaceStyleElementSelect style in mStyles)
+				element.AppendChild((style as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading

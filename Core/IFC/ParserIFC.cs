@@ -161,7 +161,7 @@ namespace GeometryGym.Ifc
 		public static T ParseEnum<T>(string str, string enumName) where T : struct
 		{
 			int start = enumName.Length + 2, end = str.Length - start - 2;
-			return ParseEnum<T>(str.Substring(start, end));
+			return (end <= start ? default(T) : ParseEnum<T>(str.Substring(start, end)));
 		}
 		public static T ParseEnum<T>(string str) where T : struct
 		{
@@ -213,7 +213,7 @@ namespace GeometryGym.Ifc
 			if (c == 'T')
 				result = IfcLogicalEnum.TRUE;
 			else if (c == 'F')
-				result = IfcLogicalEnum.TRUE;
+				result = IfcLogicalEnum.FALSE;
 			pos = icounter + 2;
 			return result;
 		}

@@ -243,6 +243,38 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Description", Description);
 		}
 	}
+	public partial class IfcMaterialLayerSetUsage : IfcMaterialUsageDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("ForLayerSet", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ForLayerSet = mDatabase.ParseJObject<IfcMaterialLayerSet>(jobj);
+			JToken token = obj.GetValue("LayerSetDirection", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcLayerSetDirectionEnum>(token.Value<string>(), true, out mLayerSetDirection);
+			token = obj.GetValue("DirectionSense", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcDirectionSenseEnum>(token.Value<string>(), true, out mDirectionSense);
+			token = obj.GetValue("OffsetFromReferenceLine", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mOffsetFromReferenceLine = token.Value<double>();
+			token = obj.GetValue("ReferenceExtent", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mReferenceExtent = token.Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["ForLayerSet"] = ForLayerSet.getJson(this, options);
+			obj["LayerSetDirection"] = mLayerSetDirection.ToString();
+			obj["DirectionSense"] = mDirectionSense.ToString();
+			obj["OffsetFromReferenceLine"] = mOffsetFromReferenceLine;
+			if(!double.IsNaN(mReferenceExtent))
+			obj["ReferenceExtent"] = mReferenceExtent;
+		}
+	}
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
 	{
 		internal override void parseJObject(JObject obj)
