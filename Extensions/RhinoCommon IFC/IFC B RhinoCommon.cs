@@ -27,9 +27,9 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcBoundedCurve
+	public abstract partial class IfcBoundedCurve : IfcCurve
 	{
-		public override Curve Curve()
+		public override Curve Curve(double tol)
 		{
 			throw new NotImplementedException();
 		}

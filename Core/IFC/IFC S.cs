@@ -1075,8 +1075,11 @@ additional types	some additional representation types are given:
 		protected IfcSpatialElementType(DatabaseIfc db) : base(db) { }
 		protected IfcSpatialElementType(DatabaseIfc db, IfcSpatialElementType t, DuplicateOptions options) : base(db, t, options) { mElementType = t.mElementType; }
 	}
-	public interface IfcSpatialReferenceSelect : IBaseClassIfc { } // SELECT(IfcProduct, IfcSystem);
-	[Serializable]
+	public interface IfcSpatialReferenceSelect : IBaseClassIfc // SELECT(IfcProduct, IfcSystem);
+	{
+		SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get; }
+	}
+[Serializable]
 	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
 	{
 		internal IfcElementCompositionEnum mCompositionType = IfcElementCompositionEnum.NOTDEFINED;// : IfcElementCompositionEnum;  IFC4 Optional 
@@ -2522,7 +2525,10 @@ additional types	some additional representation types are given:
 	{
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
+		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
+
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
+		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcSystem() : base() { }
 		internal IfcSystem(DatabaseIfc db, IfcSystem s, DuplicateOptions options) : base(db, s, options)

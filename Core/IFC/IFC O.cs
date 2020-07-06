@@ -906,6 +906,11 @@ namespace GeometryGym.Ifc
 		public IfcDirection VerticalAxisDirection { get { return mVerticalAxisDirection; } set { mVerticalAxisDirection = value; } }
 
 		public IfcOrientationExpression() : base() { }
+		public IfcOrientationExpression(DatabaseIfc db, IfcOrientationExpression orientationExpression) : base(db, orientationExpression)
+		{
+			LateralAxisDirection = db.Factory.Duplicate(orientationExpression.LateralAxisDirection) as IfcDirection;
+			VerticalAxisDirection = db.Factory.Duplicate(orientationExpression.VerticalAxisDirection) as IfcDirection;
+		}
 		public IfcOrientationExpression(IfcDirection lateralAxisDirection, IfcDirection verticalAxisDirection)
 			: base(lateralAxisDirection.Database)
 		{

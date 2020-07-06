@@ -60,7 +60,15 @@ namespace GeometryGym.Ifc
 			else
 				basis.Database.appendObject(this);	
 		}
-		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base() { mGlobalId = e.mGlobalId; db.appendObject(this); db.Factory.mDuplicateMapping.AddObject(e, mIndex);  }
+		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base()
+		{
+			mGlobalId = e.mGlobalId;
+			if (db != null)
+			{
+				db.appendObject(this);
+				db.Factory.mDuplicateMapping.AddObject(e, mIndex);
+			}
+		}
 		protected BaseClassIfc(DatabaseIfc db) : base()
 		{
 			if(db != null)

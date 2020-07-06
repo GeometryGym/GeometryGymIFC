@@ -999,6 +999,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRelAssociatesClassification(IfcClassificationSelect classification) : base(classification.Database) { RelatingClassification = classification; }
 		public IfcRelAssociatesClassification(IfcClassificationSelect classification, IfcDefinitionSelect related) : base(related) { RelatingClassification = classification; }
+		public IfcRelAssociatesClassification(IfcClassificationSelect classification, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingClassification = classification; }
 	}
 	[Serializable]
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates
@@ -2076,17 +2077,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelReferencedInSpatialStructure : IfcRelConnects
 	{
-		internal SET<IfcProduct> mRelatedElements = new SET<IfcProduct>();// : SET [1:?] OF IfcProduct;
+		internal SET<IfcSpatialReferenceSelect> mRelatedElements = new SET<IfcSpatialReferenceSelect>();// : SET [1:?] OF IfcProduct IFC4x3 IfcSpatialReferenceSelect;
 		private int mRelatingStructure;//  IfcSpatialElement 
 
-		public SET<IfcProduct> RelatedElements { get { return mRelatedElements; } }
+		public SET<IfcSpatialReferenceSelect> RelatedElements { get { return mRelatedElements; } }
 		public IfcSpatialElement RelatingStructure { get { return mDatabase[mRelatingStructure] as IfcSpatialElement; } set { mRelatingStructure = value.mIndex; value.mReferencesElements.Add(this); } }
 
 		internal IfcRelReferencedInSpatialStructure() : base() { }
 		internal IfcRelReferencedInSpatialStructure(DatabaseIfc db, IfcRelReferencedInSpatialStructure r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
 			if (options.DuplicateDownstream)
-				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, options) as IfcProduct));
+				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x as BaseClassIfc, options) as IfcProduct));
 			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement;
 		}
 		public IfcRelReferencedInSpatialStructure(IfcSpatialElement e) : base(e.mDatabase)
@@ -2094,7 +2095,7 @@ namespace GeometryGym.Ifc
 			mRelatingStructure = e.mIndex;
 			e.mReferencesElements.Add(this);
 		}
-		public IfcRelReferencedInSpatialStructure(IfcProduct related, IfcSpatialElement relating) : this(relating)
+		public IfcRelReferencedInSpatialStructure(IfcSpatialReferenceSelect related, IfcSpatialElement relating) : this(relating)
 		{
 			RelatedElements.Add(related);
 		}
@@ -2111,26 +2112,13 @@ namespace GeometryGym.Ifc
 				return;
 			if (e.NewItems != null)
 			{
-				foreach (IfcProduct p in e.NewItems)
-				{
-					p.mReferencedInStructures.Add(this);
-					//if (p is IfcElement element)
-					//	element.mReferencedInStructures.Add(this);
-					//else if (p is IfcSpatialElement spatial)
-					//	spatial.mReferencedInStructures.Add(this);
-
-				}
+				foreach (IfcSpatialReferenceSelect s in e.NewItems)
+					s.ReferencedInStructures.Add(this);
 			}
 			if (e.OldItems != null)
 			{
-				foreach (IfcProduct p in e.OldItems)
-				{
-					p.mReferencedInStructures.Remove(this);
-					//if (p is IfcElement element)
-					//	element.mReferencedInStructures.Remove(this);
-					//else if (p is IfcSpatialElement spatial)
-					//	spatial.mReferencedInStructures.Remove(this);
-				}	
+				foreach (IfcSpatialReferenceSelect s in e.OldItems)
+					s.ReferencedInStructures.Remove(this);
 			}
 		}
 	}

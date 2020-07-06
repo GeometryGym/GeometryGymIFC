@@ -161,7 +161,9 @@ namespace GeometryGym.Ifc
 		public static T ParseEnum<T>(string str, string enumName) where T : struct
 		{
 			int start = enumName.Length + 2, end = str.Length - start - 2;
-			return (end <= start ? default(T) : ParseEnum<T>(str.Substring(start, end)));
+			if (end < 1)
+				return default(T);
+			return ParseEnum<T>(str.Substring(start, end));
 		}
 		public static T ParseEnum<T>(string str) where T : struct
 		{
@@ -235,7 +237,13 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(kw) || !kw.ToUpper().StartsWith("IFC"))
 				return null;
 			str = str.Trim();
-			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dictionary);
+			ConcurrentDictionary<int, BaseClassIfc> dict = dictionary;
+			if(dict == null)
+			{
+				dict = new ConcurrentDictionary<int, BaseClassIfc>();
+				dict[0] = null;
+			}
+			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dict);
 			if (result == null)
 				return null;
 			result.mIndex = stepID;

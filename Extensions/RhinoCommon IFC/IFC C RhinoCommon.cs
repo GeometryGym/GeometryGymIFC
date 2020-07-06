@@ -119,7 +119,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircle : IfcConic
 	{
-		public override Curve Curve() { return new ArcCurve(Circle); }
+		public override Curve Curve(double tol) { return new ArcCurve(Circle); }
 		public Circle Circle { get { return new Circle(Plane, mRadius); } }
 	}
 	public partial class IfcCompositeCurveSegment
@@ -140,6 +140,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
 	{
-		public abstract Curve Curve();
+		public Curve Curve() { return Curve(mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
+		public abstract Curve Curve(double tol);
 	}
 }

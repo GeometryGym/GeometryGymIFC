@@ -159,8 +159,8 @@ namespace GeometryGym.Ifc
 		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<int> inner) 
 			: base(db, coords) { mInnerCoordIndices.Add(inner.ToList()); }
-		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 
-			: base(db, coords) { mInnerCoordIndices = inners.ToList().ConvertAll(x=>x.ToList()); }
+		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<List<int>> inners) 
+			: base(db, coords) { mInnerCoordIndices.AddRange(inners); }
 	}
 	[Serializable]
 	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)

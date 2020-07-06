@@ -182,7 +182,7 @@ namespace GeometryGym.Ifc
 		private IfcGeometricProjectionEnum mTargetView;// : IfcGeometricProjectionEnum;
 		internal string mUserDefinedTargetView = "$";// : OPTIONAL IfcLabel;
 
-		public IfcGeometricRepresentationContext ParentContext { get { return mParentContext; } set { mParentContext = value; value.mHasSubContexts.Add(this); } }
+		public IfcGeometricRepresentationContext ParentContext { get { return mParentContext; } set { mParentContext = value; if(value != null) value.mHasSubContexts.Add(this); } }
 		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
 		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
 		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }

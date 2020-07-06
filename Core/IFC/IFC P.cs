@@ -1063,8 +1063,7 @@ namespace GeometryGym.Ifc
 		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
 
-		//Specified on IfcElement
-		internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
+		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 
 		public IfcObjectPlacement ObjectPlacement
 		{
@@ -1112,6 +1111,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public SET<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
+		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
 

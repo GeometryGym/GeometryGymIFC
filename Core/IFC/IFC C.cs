@@ -689,7 +689,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcClassificationReferenceSelect : IBaseClassIfc { SET<IfcClassificationReference> HasReferences { get; } } // SELECT ( IfcClassificationReference, IfcClassification);
-	public interface IfcClassificationSelect : NamedObjectIfc { } // IFC4 rename IfcClassification,IfcClassificationReference 
+	public interface IfcClassificationSelect : NamedObjectIfc { IfcClassificationReference FindItem(string identification); } // IFC4 rename IfcClassification,IfcClassificationReference 
 	[Serializable]
 	public partial class IfcClosedShell : IfcConnectedFaceSet, IfcShell, IfcSolidOrShell
 	{
@@ -1450,6 +1450,13 @@ namespace GeometryGym.Ifc
 							result.Add((T)d);
 					}
 				}
+				
+			}
+			foreach (IfcRelAssociates rac in HasAssociations)
+			{
+				NamedObjectIfc relating = rac.Relating();
+				if (relating is T)
+					result.Add((T)relating);
 			}
 			foreach (IfcRelDefinesByProperties rdp in mIsDefinedBy)
 				result.AddRange(rdp.Extract<T>());

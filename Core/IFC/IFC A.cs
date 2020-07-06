@@ -1013,6 +1013,20 @@ namespace GeometryGym.Ifc
 		internal double mTopFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
 		internal double mTopFlangeSlope = double.NaN;//:	OPTIONAL IfcPlaneAngleMeasure;
 		internal double mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure IFC4 deleted
+
+		public double BottomFlangeWidth { get { return mBottomFlangeWidth; } set { mBottomFlangeWidth = value; } }
+		public double OverallDepth { get { return mOverallDepth; } set { mOverallDepth = value; } }
+		public double WebThickness { get { return mWebThickness; } set { mWebThickness = value; } }
+		public double BottomFlangeThickness { get { return mBottomFlangeThickness; } set { mBottomFlangeThickness = value; } }
+		public double BottomFlangeFilletRadius { get { return mBottomFlangeFilletRadius; } set { mBottomFlangeFilletRadius = value; } }
+		public double TopFlangeWidth { get { return mTopFlangeWidth; } set { mTopFlangeWidth = value; } }
+		public double TopFlangeThickness { get { return mTopFlangeThickness; } set { mTopFlangeThickness = value; } }
+		public double TopFlangeFilletRadius { get { return mTopFlangeFilletRadius; } set { mTopFlangeFilletRadius = value; } }
+		public double BottomFlangeEdgeRadius { get { return mBottomFlangeEdgeRadius; } set { mBottomFlangeEdgeRadius = value; } }
+		public double BottomFlangeSlope { get { return mBottomFlangeSlope; } set { mBottomFlangeSlope = value; } }
+		public double TopFlangeEdgeRadius { get { return mTopFlangeEdgeRadius; } set { mTopFlangeEdgeRadius = value; } }
+		public double TopFlangeSlope { get { return mTopFlangeSlope; } set { mTopFlangeSlope = value; } }
+
 		internal IfcAsymmetricIShapeProfileDef() : base() { }
 		internal IfcAsymmetricIShapeProfileDef(DatabaseIfc db, IfcAsymmetricIShapeProfileDef p) : base(db, p)
 		{
@@ -1029,6 +1043,14 @@ namespace GeometryGym.Ifc
 			mTopFlangeEdgeRadius = p.mTopFlangeEdgeRadius;
 			mTopFlangeSlope = p.mTopFlangeSlope;
 			mCentreOfGravityInY = p.mCentreOfGravityInY;
+		}
+		public IfcAsymmetricIShapeProfileDef(DatabaseIfc db, string name, double bottomFlangeWidth, double overallDepth, double webThickness, double bottomFlangeThickness)
+			: base(db, name)
+		{
+			BottomFlangeWidth = bottomFlangeWidth;
+			OverallDepth = overallDepth;
+			WebThickness = webThickness;
+			BottomFlangeThickness = bottomFlangeThickness;
 		}
 	}
 	[Serializable]

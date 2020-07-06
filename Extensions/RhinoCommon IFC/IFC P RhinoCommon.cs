@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPcurve : IfcCurve
 	{
-		public override Curve Curve()
+		public override Curve Curve(double tol)
 		{
 			throw new NotImplementedException();
 		}

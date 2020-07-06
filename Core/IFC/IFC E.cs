@@ -367,7 +367,6 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
 		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
-		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
 		[Obsolete("DEPRECATED IFC4", false)]
 		public SET<IfcRelConnectsPortToElement> HasPortsSS { get { return mHasPorts; } }
 		public SET<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
