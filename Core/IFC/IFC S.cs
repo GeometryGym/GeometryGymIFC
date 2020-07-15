@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcSanitaryTerminal() : base() { }
 		internal IfcSanitaryTerminal(DatabaseIfc db, IfcSanitaryTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcSanitaryTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSanitaryTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSanitaryTerminalType : IfcFlowTerminalType
@@ -273,7 +273,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcSensor() : base() { }
 		internal IfcSensor(DatabaseIfc db, IfcSensor s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
-		public IfcSensor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSensor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSensorType : IfcDistributionControlElementType
@@ -297,7 +297,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcShadingDevice() : base() { }
 		internal IfcShadingDevice(DatabaseIfc db, IfcShadingDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcShadingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcShadingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcShadingDeviceType : IfcBuiltElementType
@@ -338,7 +338,7 @@ namespace GeometryGym.Ifc
 		internal void addRepresentation(IfcShapeModel model) { mShapeRepresentations.Add(model.mIndex); model.mOfShapeAspect = this; }
 	}
 	[Serializable]
-	public abstract partial class IfcShapeModel : IfcRepresentation//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
+	public abstract partial class IfcShapeModel : IfcRepresentation<IfcRepresentationItem>//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
 	{
 		//INVERSE
 		internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
@@ -531,7 +531,7 @@ additional types	some additional representation types are given:
 		public IfcSign() : base() { }
 		public IfcSign(DatabaseIfc db) : base(db) { }
 		public IfcSign(DatabaseIfc db, IfcSign sign, DuplicateOptions options) : base(db, sign, options) { PredefinedType = sign.PredefinedType; }
-		public IfcSign(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSign(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcSignal : IfcFlowTerminal
@@ -542,7 +542,7 @@ additional types	some additional representation types are given:
 		public IfcSignal() : base() { }
 		public IfcSignal(DatabaseIfc db) : base(db) { }
 		public IfcSignal(DatabaseIfc db, IfcSignal signal, DuplicateOptions options) : base(db, signal, options) { PredefinedType = signal.PredefinedType; }
-		public IfcSignal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSignal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSignalType : IfcFlowTerminalType
@@ -681,7 +681,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSlab() : base() { }
 		internal IfcSlab(DatabaseIfc db, IfcSlab s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
-		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcSlabElementedCase : IfcSlab
@@ -736,7 +736,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSolarDevice() : base() { }
 		internal IfcSolarDevice(DatabaseIfc db, IfcSolarDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcSolarDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSolarDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSolarDeviceType : IfcEnergyConversionDeviceType
@@ -762,7 +762,7 @@ additional types	some additional representation types are given:
 		public IfcSolidStratum() : base() { }
 		public IfcSolidStratum(DatabaseIfc db) : base(db) { }
 		public IfcSolidStratum(DatabaseIfc db, IfcSolidStratum solidStratum, DuplicateOptions options) : base(db, solidStratum, options) { }
-		public IfcSolidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSolidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -837,8 +837,8 @@ additional types	some additional representation types are given:
 		internal IfcSpace() : base() { }
 		internal IfcSpace(DatabaseIfc db, IfcSpace s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; mElevationWithFlooring = s.mElevationWithFlooring; }
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
-		public IfcSpace(IfcSpatialStructureElement host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { Name = name; }
-		internal IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSpace(IfcSpatialStructureElement host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
+		internal IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		protected override void addProduct(IfcProduct product)
 		{
 			IfcCovering covering = product as IfcCovering;
@@ -862,7 +862,7 @@ additional types	some additional representation types are given:
 		internal IfcSpaceHeater() : base() { }
 		internal IfcSpaceHeater(IfcFlowTerminal flowTerminal) : base(flowTerminal, true) { }
 		internal IfcSpaceHeater(DatabaseIfc db, IfcSpaceHeater h, DuplicateOptions options) : base(db, h, options) { mPredefinedType = h.mPredefinedType; }
-		public IfcSpaceHeater(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSpaceHeater(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSpaceHeaterType : IfcFlowTerminalType
@@ -958,7 +958,7 @@ additional types	some additional representation types are given:
 				mContainerCommonPlacement.mContainerHost = this;
 			}
 		}
-		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 
 		protected override void addProduct(IfcProduct product)
 		{
@@ -1021,15 +1021,6 @@ additional types	some additional representation types are given:
 			return result;
 		}
 
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			foreach(IfcRelContainedInSpatialStructure rcss in ContainsElements)
-			{
-				foreach(IfcProduct product in rcss.RelatedElements)
-					product.changeSchema(schema, deviationTol);
-			}
-			base.changeSchema(schema, deviationTol);
-		}
 		public override IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
 		{
 			IfcStructuralAnalysisModel result = FindStructAnalysisModel(false);
@@ -1091,7 +1082,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { mCompositionType = e.mCompositionType; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
-		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElementType : IfcSpatialElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcSpaceType))
@@ -1149,7 +1140,7 @@ additional types	some additional representation types are given:
 
 		internal IfcStackTerminal() : base() { }
 		internal IfcStackTerminal(DatabaseIfc db, IfcStackTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcStackTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcStackTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcStackTerminalType : IfcFlowTerminalType
@@ -1169,7 +1160,7 @@ additional types	some additional representation types are given:
 
 		internal IfcStair() : base() { }
 		internal IfcStair(DatabaseIfc db, IfcStair s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
-		public IfcStair(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcStair(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcStairFlight : IfcBuiltElement
@@ -1184,7 +1175,7 @@ additional types	some additional representation types are given:
 
 		internal IfcStairFlight() : base() { }
 		internal IfcStairFlight(DatabaseIfc db, IfcStairFlight f, DuplicateOptions options) : base(db, f, options) { mNumberOfRiser = f.mNumberOfRiser; mNumberOfTreads = f.mNumberOfTreads; mRiserHeight = f.mRiserHeight; mTreadLength = f.mTreadLength; mPredefinedType = f.mPredefinedType; }
-		public IfcStairFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcStairFlight(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcStairFlightType : IfcBuiltElementType
@@ -1473,7 +1464,7 @@ additional types	some additional representation types are given:
 		{
 			if(mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
-				Representation = new IfcProductRepresentation(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), member.EdgeCurve));
+				Representation = new IfcProductDefinitionShape(new IfcTopologyRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), member.EdgeCurve));
 			}
 		}
 	}
@@ -1771,7 +1762,7 @@ additional types	some additional representation types are given:
 		{
 			get
 			{
-				IfcProductRepresentation representation = Representation;
+				IfcProductDefinitionShape representation = Representation;
 				if (representation == null)
 					return null;
 				return representation.Representations.OfType<IfcTopologyRepresentation>().SelectMany(x => x.Items).OfType<IfcVertexPoint>().First();
@@ -1922,7 +1913,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
 	{
 		internal IfcStructuralSurfaceMemberTypeEnum mPredefinedType = IfcStructuralSurfaceMemberTypeEnum.NOTDEFINED;// : IfcStructuralSurfaceMemberTypeEnum;
-		internal double mThickness;// : OPTIONAL IfcPositiveLengthMeasure; 
+		internal double mThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
 
 		public IfcStructuralSurfaceMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public double Thickness { get { return mThickness; } set { mThickness = value; } }
@@ -2072,21 +2063,12 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStyledRepresentation : IfcStyleModel
 	{
-		private SET<IfcStyledItem> mStyledItems = new SET<IfcStyledItem>(); 
-		public new SET<IfcStyledItem> Items { get { return mStyledItems; } set { base.Items.Clear(); mStyledItems.Clear(); if (value != null) { mStyledItems.CollectionChanged -= mStyledItems_CollectionChanged; mStyledItems = value; base.Items.AddRange(value); mStyledItems.CollectionChanged += mStyledItems_CollectionChanged; } } }
-
 		internal IfcStyledRepresentation() : base() { }
 		internal IfcStyledRepresentation(DatabaseIfc db, IfcStyledRepresentation r) : base(db, r) { }
 		public IfcStyledRepresentation(IfcStyledItem ri) : base(ri.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), ri) { }
-		public IfcStyledRepresentation(List<IfcStyledItem> reps) : base(reps[0].mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), reps.ConvertAll(x => x as IfcRepresentationItem)) { }
+		public IfcStyledRepresentation(IEnumerable<IfcStyledItem> reps) : base(reps.First().mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), reps) { }
 		public IfcStyledRepresentation(IfcRepresentationContext context, IfcStyledItem item) : base(context, item) { }
-		public IfcStyledRepresentation(IfcRepresentationContext context, List<IfcStyledItem> reps) : base(context, reps.ConvertAll(x => x as IfcRepresentationItem)) { }
-
-		protected override void initialize()
-		{
-			base.initialize();
-			mStyledItems.CollectionChanged += mStyledItems_CollectionChanged;
-		}
+		public IfcStyledRepresentation(IfcRepresentationContext context, IEnumerable<IfcStyledItem> reps) : base(context, reps) { }
 
 		private void mStyledItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -2106,27 +2088,14 @@ additional types	some additional representation types are given:
 					base.Items.Remove(r);
 			}
 		}
-
-		protected override void addItem(IfcRepresentationItem item)
-		{
-			IfcStyledItem styledItem = item as IfcStyledItem;
-			if (styledItem != null && !mStyledItems.Contains(styledItem))
-				mStyledItems.Add(styledItem);
-		}
-		protected override void removeItem(IfcRepresentationItem item)
-		{
-			IfcStyledItem styledItem = item as IfcStyledItem;
-			if (styledItem != null)
-				mStyledItems.Remove(styledItem);
-		}
 	}
 	[Serializable]
-	public abstract partial class IfcStyleModel : IfcRepresentation  //ABSTRACT SUPERTYPE OF(IfcStyledRepresentation)
+	public abstract partial class IfcStyleModel : IfcRepresentation<IfcStyledItem> //ABSTRACT SUPERTYPE OF(IfcStyledRepresentation)
 	{
 		protected IfcStyleModel() : base() { }
 		protected IfcStyleModel(DatabaseIfc db, IfcStyleModel m) : base(db, m) { }
-		protected IfcStyleModel(IfcRepresentationContext context, IfcRepresentationItem ri) : base(context, ri) { }
-		protected IfcStyleModel(IfcRepresentationContext context, List<IfcRepresentationItem> reps) : base(context,reps) { }
+		protected IfcStyleModel(IfcRepresentationContext context, IfcStyledItem styledItem) : base(context, styledItem) { }
+		protected IfcStyleModel(IfcRepresentationContext context, IEnumerable<IfcStyledItem> reps) : base(context, reps) { }
 	}
 	[Serializable]
 	public partial class IfcSubContractResource : IfcConstructionResource
@@ -2222,7 +2191,7 @@ additional types	some additional representation types are given:
 
 		public IfcSurfaceFeature() : base() { }
 		public IfcSurfaceFeature(DatabaseIfc db) : base(db) { }
-		public IfcSurfaceFeature(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSurfaceFeature(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcSurfaceOfLinearExtrusion : IfcSweptSurface
@@ -2428,22 +2397,7 @@ additional types	some additional representation types are given:
 		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release < ReleaseVersion.IFC4) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
 		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release < ReleaseVersion.IFC4 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
 
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			SweptArea.changeSchema(schema, deviationTol);
-			IfcAxis2Placement3D position = Position;
-			if (schema < ReleaseVersion.IFC4)
-			{
-				if (position == null)
-					Position = mDatabase.Factory.XYPlanePlacement;
-			}
-			else
-			{
-				if (position != null && position.IsXYPlane)
-					mPosition = 0;
-			}
-		}
+		
 	}
 	[Serializable]
 	public partial class IfcSweptDiskSolid : IfcSolidModel
@@ -2506,7 +2460,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSwitchingDevice() : base() { }
 		internal IfcSwitchingDevice(DatabaseIfc db, IfcSwitchingDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcSwitchingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcSwitchingDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcSwitchingDeviceType : IfcFlowControllerType
@@ -2558,7 +2512,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSystemFurnitureElement() : base() { }
 		internal IfcSystemFurnitureElement(DatabaseIfc db, IfcSystemFurnitureElement f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
-		public IfcSystemFurnitureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcSystemFurnitureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcSystemFurnitureElementType : IfcFurnishingElementType

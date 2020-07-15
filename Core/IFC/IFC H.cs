@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcHeatExchanger() : base() { }
 		internal IfcHeatExchanger(DatabaseIfc db, IfcHeatExchanger e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcHeatExchanger(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcHeatExchanger(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcHeatExchangerType : IfcEnergyConversionDeviceType
@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcHumidifier() : base() { }
 		internal IfcHumidifier(DatabaseIfc db, IfcHumidifier h, DuplicateOptions options) : base(db,h, options) { mPredefinedType = h.mPredefinedType; }
-		public IfcHumidifier(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcHumidifier(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcHumidifierType : IfcEnergyConversionDeviceType

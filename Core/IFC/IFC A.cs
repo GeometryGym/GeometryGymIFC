@@ -106,7 +106,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcActuator() : base() { }
 		internal IfcActuator(DatabaseIfc db, IfcActuator a, DuplicateOptions options) : base(db,a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcActuator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement,representation, system) { }
+		public IfcActuator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement,representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcActuatorType : IfcDistributionControlElementType
@@ -173,7 +173,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminal() : base() { }
 		internal IfcAirTerminal(DatabaseIfc db, IfcAirTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcAirTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcAirTerminalBox : IfcFlowController //IFC4
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirTerminalBox() : base() { }
 		internal IfcAirTerminalBox(DatabaseIfc db, IfcAirTerminalBox b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcAirTerminalBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirTerminalBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcAirTerminalBoxType : IfcFlowControllerType
@@ -213,7 +213,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAirToAirHeatRecovery() : base() { }
 		internal IfcAirToAirHeatRecovery(DatabaseIfc db, IfcAirToAirHeatRecovery a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcAirToAirHeatRecovery(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAirToAirHeatRecovery(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcAirToAirHeatRecoveryType : IfcEnergyConversionDeviceType
@@ -233,7 +233,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlarm() : base() { }
 		internal IfcAlarm(DatabaseIfc db, IfcAlarm a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcAlarm(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcAlarm(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcAlarmType : IfcDistributionControlElementType
@@ -422,7 +422,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
-		private IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
+		internal IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
 		private string mStartTag = "$";// : OPTIONAL IfcLabel;
 		private string mEndTag = "$";// : OPTIONAL IfcLabel;
 
@@ -915,12 +915,6 @@ namespace GeometryGym.Ifc
 		internal IfcArbitraryClosedProfileDef() : base() { }
 		internal IfcArbitraryClosedProfileDef(DatabaseIfc db, IfcArbitraryClosedProfileDef p) : base(db, p) { OuterCurve = db.Factory.Duplicate(p.OuterCurve) as IfcCurve; }
 		public IfcArbitraryClosedProfileDef(string name, IfcCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mOuterCurve = boundedCurve.mIndex; }//if (string.Compare(getKW, mKW) == 0) mModel.mArbProfiles.Add(this); }
-
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			OuterCurve.changeSchema(schema, deviationTol);
-		}
 	}
 	[Serializable]
 	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef //	SUPERTYPE OF(IfcCenterLineProfileDef)
@@ -943,12 +937,6 @@ namespace GeometryGym.Ifc
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner.mIndex); }
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IEnumerable<IfcCurve> inner) : base(name, perim) { mInnerCurves.AddRange(inner.Select(x=>x.StepId)); }
 		
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			foreach (IfcCurve curve in InnerCurves)
-				curve.changeSchema(schema, deviationTol);
-		}
 		internal void addVoid(IfcCurve inner) { mInnerCurves.Add(inner.mIndex); }
 	}
 	[Serializable]

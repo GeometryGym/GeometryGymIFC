@@ -134,10 +134,10 @@ namespace GeometryGym.Ifc
 				mMaterialConstituents[constituent.Name] = constituent;
 		}
 	}
-	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation
+	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRepresentedMaterial); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRepresentedMaterial = ParserSTEP.StripLink(str, ref pos, len);

@@ -61,17 +61,7 @@ namespace GeometryGym.Ifc
 					Position = mDatabase.Factory.Origin2dPlace;
 			}
 		}
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			IfcAxis2Placement2D position = Position;
-			if (schema < ReleaseVersion.IFC4)
-			{
-				if (position == null)
-					Position = mDatabase.Factory.Origin2dPlace;
-			}
-			else if (position != null && position.IsXYPlane)
-				Position = null;
-		}
+		
 	}
 	[Serializable]
 	public partial class IfcPath : IfcTopologicalRepresentationItem
@@ -95,7 +85,7 @@ namespace GeometryGym.Ifc
 		public IfcPavement() : base() { }
 		public IfcPavement(DatabaseIfc db) : base(db) { }
 		public IfcPavement(DatabaseIfc db, IfcPavement pavement, DuplicateOptions options) : base(db, pavement, options) { Flexible = pavement.Flexible; }
-		public IfcPavement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcPavement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcPavementType : IfcBuiltElementType
@@ -376,7 +366,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPile() : base() { }
 		internal IfcPile(DatabaseIfc db, IfcPile p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; mConstructionType = p.mConstructionType; }
-		public IfcPile(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcPile(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcPileType : IfcDeepFoundationType
@@ -397,7 +387,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPipeFitting() : base() { }
 		internal IfcPipeFitting(DatabaseIfc db, IfcPipeFitting f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
-		public IfcPipeFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcPipeFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcPipeFittingType : IfcFlowFittingType
@@ -423,7 +413,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPipeSegment() : base() { }
 		internal IfcPipeSegment(DatabaseIfc db, IfcPipeSegment s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
-		public IfcPipeSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcPipeSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcPipeSegmentType : IfcFlowSegmentType
@@ -497,7 +487,7 @@ namespace GeometryGym.Ifc
 		public IfcPlant() : base() { }
 		public IfcPlant(DatabaseIfc db) : base(db) { }
 		public IfcPlant(DatabaseIfc db, IfcPlant plant, DuplicateOptions options) : base(db, plant, options) { PredefinedType = plant.PredefinedType; }
-		public IfcPlant(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcPlant(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcPlate : IfcBuiltElement
@@ -507,7 +497,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcPlate() : base() { }
 		internal IfcPlate(DatabaseIfc db, IfcPlate p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; }
-		public IfcPlate(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcPlate(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcPlate(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -614,34 +604,6 @@ namespace GeometryGym.Ifc
 		public IfcPolyline(IEnumerable<IfcCartesianPoint> pts) : base(pts.First().mDatabase) { Points.AddRange(pts); }
 		public IfcPolyline(DatabaseIfc db, IEnumerable<Tuple<double, double>> points) : base(db) { Points.AddRange(points.Select(x=> new IfcCartesianPoint(db, x.Item1, x.Item2))); }
 		public IfcPolyline(DatabaseIfc db, List<Tuple<double, double, double>> points) : base(db) { Points.AddRange(points.ConvertAll(x => new IfcCartesianPoint(db, x.Item1, x.Item2, x.Item3))); }
-		
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			if (schema != ReleaseVersion.IFC2x3)
-			{
-				if (mPoints.Count > 2)
-				{
-					List<Tuple<double, double>> pts = new List<Tuple<double, double>>(mPoints.Count);
-
-					foreach (IfcCartesianPoint cp in Points)
-					{
-						if (!cp.is2D)
-						{
-							pts.Clear();
-							break;
-						}
-						LIST<double> p = cp.Coordinates;
-						pts.Add(new Tuple<double, double>(p[0], p.Count > 1 ? p[1] : 0));
-					}
-					IfcIndexedPolyCurve ipc = pts.Count > 0 ? new IfcIndexedPolyCurve(new IfcCartesianPointList2D(mDatabase, pts)) : new IfcIndexedPolyCurve(new IfcCartesianPointList3D(mDatabase, Points.ToList().ConvertAll(x => x.Tuple())));
-					ReplaceDatabase(ipc);
-					return;
-
-				}
-			}
-			else
-				base.changeSchema(schema, deviationTol);
-		}
 	}
 	[Serializable]
 	public partial class IfcPolyLoop : IfcLoop
@@ -756,8 +718,8 @@ namespace GeometryGym.Ifc
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
 		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
-		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductRepresentation representation) : base(placement, representation) { }
-		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(placement, representation) { }
+		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
 	[Serializable]
@@ -1058,7 +1020,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect, IfcSpatialReferenceSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
 	{
 		private IfcObjectPlacement mObjectPlacement = null; //: OPTIONAL IfcObjectPlacement;
-		private IfcProductRepresentation mRepresentation =  null; //: OPTIONAL IfcProductRepresentation 
+		private IfcProductDefinitionShape mRepresentation =  null; //: OPTIONAL IfcProductRepresentation 
 		//INVERSE
 		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
@@ -1077,34 +1039,29 @@ namespace GeometryGym.Ifc
 					value.mPlacesObject.Add(this);
 			}
 		}
-		public IfcProductRepresentation Representation
+		public IfcProductDefinitionShape Representation
 		{
 			get { return mRepresentation; }
 			set
 			{
-				IfcProductDefinitionShape pds = mRepresentation as IfcProductDefinitionShape;
-				if (pds != null)
-					pds.mShapeOfProduct.Remove(this);
+				if(mRepresentation != null)
+					mRepresentation.mShapeOfProduct.Remove(this);
 				mRepresentation = value;
 				if (value != null)
 				{
-					pds = value as IfcProductDefinitionShape;
-					if (pds != null)
+					mRepresentation.mShapeOfProduct.Add(this);
+					if (mObjectPlacement == null)
 					{
-						pds.mShapeOfProduct.Add(this);
-						if (mObjectPlacement == null)
+						IfcElement element = this as IfcElement;
+						if (element == null)
+							ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
+						else
 						{
-							IfcElement element = this as IfcElement;
-							if (element == null)
+							IfcProduct product = element.getContainer();
+							if (product == null)
 								ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
 							else
-							{
-								IfcProduct product = element.getContainer();
-								if (product == null)
-									ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
-								else
-									ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
-							}
+								ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
 						}
 					}
 				}
@@ -1126,9 +1083,9 @@ namespace GeometryGym.Ifc
 				mContainedInStructure = product.mContainedInStructure;
 			}
 		}
-		protected IfcProduct(IfcProductRepresentation rep) : base(rep.mDatabase) { Representation = rep; }
+		protected IfcProduct(IfcProductDefinitionShape rep) : base(rep.mDatabase) { Representation = rep; }
 		protected IfcProduct(IfcObjectPlacement placement) : base(placement.mDatabase) { ObjectPlacement = placement; }
-		protected IfcProduct(IfcObjectPlacement placement, IfcProductRepresentation rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)
+		protected IfcProduct(IfcObjectPlacement placement, IfcProductDefinitionShape rep) : base(placement == null ? rep.mDatabase : placement.mDatabase)
 		{
 			ObjectPlacement = placement;
 			Representation = rep;
@@ -1139,7 +1096,7 @@ namespace GeometryGym.Ifc
 			if (p.mObjectPlacement != null)
 				ObjectPlacement = db.Factory.Duplicate(p.ObjectPlacement) as IfcObjectPlacement;
 			if (p.mRepresentation != null)
-				Representation = db.Factory.Duplicate(p.Representation) as IfcProductRepresentation;
+				Representation = db.Factory.Duplicate(p.Representation) as IfcProductDefinitionShape;
 			foreach (IfcRelAssignsToProduct rap in p.mReferencedBy)
 			{
 				IfcRelAssignsToProduct rp = db.Factory.Duplicate(rap, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelAssignsToProduct;
@@ -1153,7 +1110,7 @@ namespace GeometryGym.Ifc
 				rcss.RelatedElements.Add(this);
 			}
 		}
-		protected IfcProduct(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host.mDatabase)
+		protected IfcProduct(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host.mDatabase)
 		{
 			IfcElement el = this as IfcElement;
 			IfcProduct product = host as IfcProduct;
@@ -1193,8 +1150,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) { return ConstructProduct(className, host, placement, representation, null); }
-		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system)
+		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
+		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
 			string str = className, definedType = "";
 			if (!string.IsNullOrEmpty(str))
@@ -1221,11 +1178,11 @@ namespace GeometryGym.Ifc
 			if (type != null)
 			{
 				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation) }, null);
+null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) }, null);
 				if (ctor == null)
 				{
 					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation), typeof(IfcDistributionSystem) }, null);
+null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) }, null);
 					if (ctor == null)
 						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 					else
@@ -1302,21 +1259,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				result.AddRange(mRepresentation.Extract<T>());
 			return result;
 		}
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			IfcProductRepresentation rep = Representation;
-			if (rep != null)
-				rep.changeSchema(schema, deviationTol);
-
-			base.changeSchema(schema, deviationTol);
-		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcProductsOfCombustionProperties	 // DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
-		private LIST<IfcShapeModel> mShapeRepresentations = new LIST<IfcShapeModel>(); 
 		//INVERSE
 		internal List<IfcProduct> mShapeOfProduct = new List<IfcProduct>();
 		internal List<IfcShapeAspect> mHasShapeAspects = new List<IfcShapeAspect>();
@@ -1324,81 +1272,43 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public ReadOnlyCollection<IfcProduct> ShapeOfProduct { get { return new ReadOnlyCollection<IfcProduct>(mShapeOfProduct); } }
 		public ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get { return new ReadOnlyCollection<IfcShapeAspect>(mHasShapeAspects); } }
 
-		public new LIST<IfcShapeModel> Representations { get { return mShapeRepresentations; } set { base.Representations.Clear(); mShapeRepresentations.Clear(); if (value != null) { mShapeRepresentations.CollectionChanged -= mShapeRepresentations_CollectionChanged;  mShapeRepresentations = value; base.Representations.AddRange(value); mShapeRepresentations.CollectionChanged += mShapeRepresentations_CollectionChanged;  } } }
-
 		internal IfcProductDefinitionShape() : base() { }
-		public IfcProductDefinitionShape(IfcShapeModel rep) : base(rep.Database) { mShapeRepresentations.Add(rep); }
-		public IfcProductDefinitionShape(IEnumerable<IfcShapeModel> reps) : base(reps.First().Database) { Representations.AddRange(reps); } 
+		public IfcProductDefinitionShape(IfcShapeModel rep) : base(rep) { }
+		public IfcProductDefinitionShape(IEnumerable<IfcShapeModel> reps) : base(reps) { } 
 		internal IfcProductDefinitionShape(DatabaseIfc db, IfcProductDefinitionShape s) : base(db, s) { }
-		protected override void initialize()
-		{
-			base.initialize();
-			mShapeRepresentations.CollectionChanged += mShapeRepresentations_CollectionChanged;
-		}
-		private void mShapeRepresentations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
-			if (mDatabase != null && mDatabase.IsDisposed())
-				return;
-			if (e.NewItems != null)
-			{
-				foreach (IfcShapeModel r in e.NewItems)
-				{
-					if(!base.Representations.Contains(r))
-						base.Representations.Add(r);
-				}
-			}
-			if (e.OldItems != null)
-			{
-				foreach (IfcShapeModel r in e.OldItems)
-					base.Representations.Remove(r);
-			}
-		}
-		protected override void addRepresentation(IfcRepresentation r)
-		{
-			IfcShapeModel shapeModel = r as IfcShapeModel;
-			if (shapeModel != null && !mShapeRepresentations.Contains(shapeModel))
-				mShapeRepresentations.Add(shapeModel);
-		}
-		protected override void removeRepresentation(IfcRepresentation r)
-		{
-			IfcShapeModel shapeModel = r as IfcShapeModel;
-			if(shapeModel != null)
-				mShapeRepresentations.Remove(shapeModel);
-		}
 		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 	}
 	[Serializable]
-	public partial class IfcProductRepresentation : BaseClassIfc, NamedObjectIfc //IFC4 Abstract (IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
+	public abstract partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc, NamedObjectIfc where Representation : IfcRepresentation<RepresentationItem> where RepresentationItem : IfcRepresentationItem //IFC4 Abstract (IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
 	{
 		private string mName = "$";// : OPTIONAL IfcLabel;
 		private string mDescription = "$";// : OPTIONAL IfcText;
-		[NonSerialized] private LIST<IfcRepresentation> mRepresentations = new LIST<IfcRepresentation>();// : LIST [1:?] OF IfcRepresentation; 
+		private LIST<Representation> mRepresentations = new LIST<Representation>();// : LIST [1:?] OF IfcRepresentation; 
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public LIST<IfcRepresentation> Representations
+		public LIST<Representation> Representations
 		{
 			get { return mRepresentations; }
 			private set { mRepresentations.Clear(); if(value != null) { mRepresentations.CollectionChanged -= mRepresentations_CollectionChanged; mRepresentations = value; mRepresentations.CollectionChanged += mRepresentations_CollectionChanged; } }
 		}
 
-		internal IfcProductRepresentation() : base() { }
+		protected IfcProductRepresentation() : base() { }
 		protected IfcProductRepresentation(DatabaseIfc db) : base(db) { }
 		[Obsolete("DEPRECATED IFC4", false)]
-		public IfcProductRepresentation(IfcRepresentation r) : base(r.mDatabase) { mRepresentations.Add(r); }
+		public IfcProductRepresentation(Representation r) : base(r.mDatabase) { mRepresentations.Add(r); }
 		[Obsolete("DEPRECATED IFC4", false)]
-		public IfcProductRepresentation(List<IfcRepresentation> reps) : base(reps[0].mDatabase) { Representations.AddRange(reps); }
-		internal IfcProductRepresentation(DatabaseIfc db, IfcProductRepresentation r) : base(db, r)
+		public IfcProductRepresentation(IEnumerable<Representation> reps) : base(reps.First().mDatabase) { Representations.AddRange(reps); }
+		internal IfcProductRepresentation(DatabaseIfc db, IfcProductRepresentation<Representation, RepresentationItem> r) : base(db, r)
 		{
 			mName = r.mName;
 			mDescription = r.mDescription;
-			Representations.AddRange(r.Representations.ToList().ConvertAll(x => db.Factory.Duplicate(x) as IfcRepresentation));
+			Representations.AddRange(r.Representations.ToList().ConvertAll(x => db.Factory.Duplicate(x) as Representation));
 		}
 
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mRepresentations.CollectionChanged += mRepresentations_CollectionChanged;
 		}
 
@@ -1408,43 +1318,33 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				return;
 			if (e.NewItems != null)
 			{
-				foreach (IfcRepresentation r in e.NewItems)
+				foreach (Representation r in e.NewItems)
 				{
 					if (r != null)
 					{
-						r.mOfProductRepresentation.Add(this);
-						addRepresentation(r);
+						if(this is IfcProductDefinitionShape pds)
+							r.mOfProductRepresentation.Add(pds);
 					}
 				}
 			}
 			if (e.OldItems != null)
 			{
-				foreach (IfcRepresentation r in e.OldItems)
+				foreach (Representation r in e.OldItems)
 				{
 					if(r != null)
 					{
-						r.mOfProductRepresentation.Remove(this);
-						removeRepresentation(r);
+						if(this is IfcProductDefinitionShape pds)
+							r.mOfProductRepresentation.Remove(pds);
 					}
 				}
 			}
 		}
-		protected virtual void addRepresentation(IfcRepresentation r) { } 
-		protected virtual void removeRepresentation(IfcRepresentation r) { } 
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
-			foreach (IfcRepresentation r in Representations)
+			foreach (Representation r in Representations)
 				result.AddRange(r.Extract<T>());
 			return result;
-
-		}
-
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			foreach (IfcRepresentation representation in Representations)
-				representation.changeSchema(schema, deviationTol);
-			base.changeSchema(schema, deviationTol);
 		}
 	}
 	public interface IfcProductRepresentationSelect : IBaseClassIfc { ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get; } void AddShapeAspect(IfcShapeAspect aspect); }// 	IfcProductDefinitionShape,	IfcRepresentationMap);
@@ -1673,36 +1573,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcProjectLibrary(DatabaseIfc m, string name, IfcUnitAssignment.Length length)
 			: base(m, name) { UnitsInContext = new IfcUnitAssignment(mDatabase).SetUnits(length); }
 
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			if (schema < ReleaseVersion.IFC4)
-			{
-				IfcBuilding building = new IfcBuilding(mDatabase, Name);
-				IfcProject project = new IfcProject(building, Name) { UnitsInContext = UnitsInContext };
-				List<IfcTypeObject> types = DeclaredTypes;
-				for (int icounter = 0; icounter < types.Count; icounter++)
-				{
-					IfcTypeObject tp = types[icounter];
-					IfcTypeProduct typeP = tp as IfcTypeProduct;
-					if (typeP != null)
-					{
-						if (typeP.mRepresentationMaps.Count > 0)
-							typeP.genMappedItemElement(building, new IfcAxis2Placement3D(mDatabase.Factory.Origin));
-					}
-
-					tp.changeSchema(schema, deviationTol);
-					List<IfcPropertySetDefinition> psets = tp.HasPropertySets.ToList();
-					foreach (IfcPropertySetDefinition pset in psets)
-					{
-						if (pset != null && pset.IsInstancePropertySet)
-							tp.mHasPropertySets.Remove(pset);
-					}
-				}
-				mDatabase[mIndex] = null;
-				return;
-			}
-		}
 	}
 	[Serializable]
 	public partial class IfcProjectOrder : IfcControl
@@ -2108,12 +1978,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 			return base.DisposeWorker(children);
 		}
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			foreach (IfcProperty property in HasProperties.Values)
-				property.changeSchema(schema, deviationTol);
-		}
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference r)
 		{
 			IfcReference ir = r.InnerReference;
@@ -2311,21 +2175,6 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcPropertySingleValue(DatabaseIfc m, string name, string value) : this(m, name, new IfcLabel(value)) { }
 		public IfcPropertySingleValue(DatabaseIfc m, string name, IfcValue val, IfcUnit unit) : this(m, name, val) {  Unit = unit; }
 
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			if(schema <= ReleaseVersion.IFC4)
-			{
-				IfcValue value = NominalValue;
-				IfcURIReference uri = value as IfcURIReference;
-				if (uri != null)
-					NominalValue = new IfcLabel(uri.URI.ToString());
-				else
-				{
-					
-				}
-			}
-		}
 		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcPropertySingleValue psv = e as IfcPropertySingleValue;
@@ -2463,7 +2312,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcProtectiveDevice() : base() { }
 		internal IfcProtectiveDevice(DatabaseIfc db, IfcProtectiveDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcProtectiveDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcProtectiveDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcProtectiveDeviceTrippingUnit : IfcDistributionControlElement //IFC4  
@@ -2473,7 +2322,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcProtectiveDeviceTrippingUnit() : base() { }
 		internal IfcProtectiveDeviceTrippingUnit(DatabaseIfc db, IfcProtectiveDeviceTrippingUnit u, DuplicateOptions options) : base(db,u, options) { mPredefinedType = u.mPredefinedType; }
-		public IfcProtectiveDeviceTrippingUnit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcProtectiveDeviceTrippingUnit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcProtectiveDeviceTrippingUnitType : IfcDistributionControlElementType
@@ -2525,7 +2374,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcPump() : base() { }
 		internal IfcPump(DatabaseIfc db, IfcPump p, DuplicateOptions options) : base(db,p, options) { mPredefinedType = p.mPredefinedType; }
-		public IfcPump(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcPump(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcPumpType : IfcFlowMovingDeviceType

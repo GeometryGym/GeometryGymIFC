@@ -554,12 +554,12 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			ObjectPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;
-			Representation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProductRepresentation;
+			Representation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProductDefinitionShape;
 		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcProductsOfCombustionProperties	 // DEPRECATED IFC4
-	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -572,7 +572,7 @@ namespace GeometryGym.Ifc
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			Representations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcRepresentation));
+			Representations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as Representation));
 		}
 	}
 	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef

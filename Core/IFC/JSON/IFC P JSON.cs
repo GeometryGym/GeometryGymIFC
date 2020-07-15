@@ -346,7 +346,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			jobj = obj.GetValue("Representation", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Representation = mDatabase.ParseJObject<IfcProductRepresentation>(jobj);
+				Representation = mDatabase.ParseJObject<IfcProductDefinitionShape>(jobj);
 
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -365,7 +365,7 @@ namespace GeometryGym.Ifc
 				obj["ObjectPlacement"] = placementObj;
 			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
-				IfcProductRepresentation representation = Representation;
+				IfcProductDefinitionShape representation = Representation;
 				if (representation != null)
 					obj["Representation"] = representation.getJson(this, options);
 			}
@@ -373,7 +373,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -403,7 +403,7 @@ namespace GeometryGym.Ifc
 				obj["HasShapeAspects"] = new JArray(mHasShapeAspects.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
-	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -414,7 +414,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Description = token.Value<string>();
-			Representations.AddRange(mDatabase.extractJArray<IfcRepresentation>(obj.GetValue("Representations", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Representations.AddRange(mDatabase.extractJArray<Representation>(obj.GetValue("Representations", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

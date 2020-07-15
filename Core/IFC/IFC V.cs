@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcValve() : base() { }
 		internal IfcValve(DatabaseIfc db, IfcValve v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
-		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcValveType : IfcFlowControllerType
@@ -128,7 +128,7 @@ namespace GeometryGym.Ifc
 
 		public IfcVibrationDamper() : base() { }
 		public IfcVibrationDamper(DatabaseIfc db) : base(db) { }
-		public IfcVibrationDamper(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcVibrationDamper(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcVibrationDamperType : IfcElementComponentType
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcVibrationIsolator() : base() { }
 		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
-		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcVibrationIsolatorType : IfcElementComponentType
@@ -164,7 +164,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcVirtualElement() : base() { }
 		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, DuplicateOptions options) : base(db, e, options) { }
-		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
 	}
 	[Serializable]
 	public partial class IfcVirtualGridIntersection : BaseClassIfc, IfcGridPlacementDirectionSelect
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcVoidingFeature() : base() { }
 		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
-		public IfcVoidingFeature(IfcElement host,IfcProductRepresentation rep,IfcVoidingFeatureTypeEnum type) : base(host,rep) { mPredefinedType = type; }
+		public IfcVoidingFeature(IfcElement host, IfcProductDefinitionShape rep, IfcVoidingFeatureTypeEnum type) : base(host, rep) { mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVoidStratum : IfcGeotechnicalStratum
@@ -191,7 +191,7 @@ namespace GeometryGym.Ifc
 		public IfcVoidStratum() : base() { }
 		public IfcVoidStratum(DatabaseIfc db) : base(db) { }
 		public IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options) : base(db, voidStratum, options) { }
-		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 
 	[Serializable]

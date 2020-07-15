@@ -1469,7 +1469,7 @@ namespace GeometryGym.Ifc
 			mParamLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
+	public partial class IfcRepresentation<RepresentationItem> : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -1485,7 +1485,7 @@ namespace GeometryGym.Ifc
 			mContextOfItems = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRepresentationContext;
 			mRepresentationIdentifier = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mRepresentationType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
-			Items.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcRepresentationItem));
+			Items.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as RepresentationItem));
 		}
 	}
 	public abstract partial class IfcRepresentationContext : BaseClassIfc //ABSTRACT SUPERTYPE OF(IfcGeometricRepresentationContext);
@@ -1503,7 +1503,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			MappingOrigin = dictionary[ ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
-			MappedRepresentation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRepresentation;
+			MappedRepresentation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcShapeModel;
 		}
 	}
 	public partial class IfcResourceApprovalRelationship : IfcResourceLevelRelationship

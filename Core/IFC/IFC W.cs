@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWall() : base() { }
 		internal IfcWall(DatabaseIfc db, IfcWall w, DuplicateOptions options) : base(db, w, options) { mPredefinedType = w.mPredefinedType; }
-		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcWallElementedCase : IfcWall
@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWasteTerminal() : base() { }
 		internal IfcWasteTerminal(DatabaseIfc db, IfcWasteTerminal t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcWasteTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcWasteTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcWasteTerminalType : IfcFlowTerminalType
@@ -132,7 +132,7 @@ namespace GeometryGym.Ifc
 		public IfcWaterStratum() : base() { }
 		public IfcWaterStratum(DatabaseIfc db) : base(db) { }
 		public IfcWaterStratum(DatabaseIfc db, IfcWaterStratum waterStratum, DuplicateOptions options) : base(db, waterStratum, options) { }
-		public IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcWindow : IfcBuiltElement
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcWindow() : base() { }
 		internal IfcWindow(DatabaseIfc db, IfcWindow w, DuplicateOptions options) : base(db, w, options) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
-		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcWindowLiningProperties : IfcPreDefinedPropertySet //IFC2x3 : IfcPropertySetDefinition

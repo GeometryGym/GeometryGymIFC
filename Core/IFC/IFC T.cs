@@ -98,7 +98,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTank() : base() { }
 		internal IfcTank(DatabaseIfc db, IfcTank t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcTank(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcTank(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcTankType : IfcFlowStorageDeviceType
@@ -261,7 +261,7 @@ namespace GeometryGym.Ifc
 			mAnchorageSlip = t.mAnchorageSlip;
 			mMinCurvatureRadius = t.mMinCurvatureRadius;
 		}
-		public IfcTendon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, double diam, double area, double forceMeasure, double pretress, double fricCoeff, double anchorSlip, double minCurveRadius)
+		public IfcTendon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, double diam, double area, double forceMeasure, double pretress, double fricCoeff, double anchorSlip, double minCurveRadius)
 			: base(host, placement, representation)
 		{
 			mNominalDiameter = diam;
@@ -281,7 +281,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTendonAnchor() : base() { }
 		internal IfcTendonAnchor(DatabaseIfc db, IfcTendonAnchor a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcTendonAnchor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcTendonAnchor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcTendonAnchorType : IfcReinforcingElementType
@@ -302,7 +302,7 @@ namespace GeometryGym.Ifc
 		public IfcTendonConduit() : base() { }
 		public IfcTendonConduit(DatabaseIfc db, IfcTendonConduitTypeEnum predefinedType)
 			: base(db) { PredefinedType = predefinedType; }
-		public IfcTendonConduit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcTendonConduitTypeEnum predefinedType) : base(host, placement, representation) { }
+		public IfcTendonConduit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcTendonConduitTypeEnum predefinedType) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcTendonConduitType : IfcReinforcingElementType
@@ -676,7 +676,7 @@ namespace GeometryGym.Ifc
 		public IfcTrackElement() : base() { }
 		public IfcTrackElement(DatabaseIfc db) : base(db) { }
 		public IfcTrackElement(DatabaseIfc db, IfcTrackElement trackElement, DuplicateOptions options) : base(db, trackElement, options) { PredefinedType = trackElement.PredefinedType; }
-		public IfcTrackElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcTrackElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcTrackElementType : IfcBuiltElementType
@@ -697,7 +697,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTransformer() : base() { }
 		internal IfcTransformer(DatabaseIfc db, IfcTransformer t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcTransformer(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcTransformer(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcTransformerType : IfcEnergyConversionDeviceType
@@ -762,7 +762,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTransportElement() : base() { }
 		internal IfcTransportElement(DatabaseIfc db, IfcTransportElement e, DuplicateOptions options) : base(db, e, options) { }
-		public IfcTransportElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcTransportElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcTransportElementType : IfcElementType
@@ -989,7 +989,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcTubeBundle() : base() { }
 		internal IfcTubeBundle(DatabaseIfc db, IfcTubeBundle b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcTubeBundle(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcTubeBundle(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcTubeBundleType : IfcEnergyConversionDeviceType
@@ -1195,12 +1195,6 @@ namespace GeometryGym.Ifc
 			}
 			return base.retrieveReference(r);
 		}
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			if (mObjectTypeOf != null)
-				mObjectTypeOf.changeSchema(schema, deviationTol);
-		}
 		internal void IsolateObject(string filename, bool relatedObjects)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
@@ -1235,7 +1229,7 @@ namespace GeometryGym.Ifc
 				IfcSite site = db.Project.RootElement() as IfcSite;
 				if (site != null)
 				{
-					IfcProductRepresentation pr = site.Representation;
+					IfcProductDefinitionShape pr = site.Representation;
 					if (pr != null)
 					{
 						site.Representation = null;
@@ -1284,7 +1278,11 @@ namespace GeometryGym.Ifc
 			mRepresentationMaps = basis.mRepresentationMaps;
 			mTag = basis.mTag;
 		}
-		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, DuplicateOptions options) : base(db, t, options) { RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap)); mTag = t.mTag; }
+		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, DuplicateOptions options) : base(db, t, options)
+		{
+			RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap));
+			mTag = t.mTag;
+		}
 		public IfcTypeProduct(DatabaseIfc db) : base(db) {  }
 
 		protected override void initialize()
@@ -1335,15 +1333,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 		
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			foreach(IfcRepresentationMap repMap in RepresentationMaps)
-				repMap.changeSchema(schema, deviationTol);
-			foreach(IfcPropertySetDefinition pset in HasPropertySets)
-				pset.changeSchema(schema, deviationTol);
-			base.changeSchema(schema, deviationTol);
-		}
-
 		internal IfcElement genMappedItemElement(IfcProduct host, IfcAxis2Placement3D relativePlacement)
 		{
 			DatabaseIfc db = host.Database;

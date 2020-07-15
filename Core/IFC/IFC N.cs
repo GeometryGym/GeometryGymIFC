@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 		public IfcNavigationElement() : base() { }
 		public IfcNavigationElement(DatabaseIfc db) : base(db) { }
 		public IfcNavigationElement(DatabaseIfc db, IfcNavigationElement navigationElement, DuplicateOptions options) : base(db, navigationElement, options) { PredefinedType = navigationElement.PredefinedType; }
-		public IfcNavigationElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcNavigationElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcNavigationElementType : IfcBuiltElementType

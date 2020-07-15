@@ -758,7 +758,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(RelatedOpeningElement.GetXML(xml.OwnerDocument, "RelatedOpeningElement", this, processed));
 		}
 	}
-	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
+	public partial class IfcRepresentation<RepresentationItem> : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -776,7 +776,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcRepresentationItem ri = mDatabase.ParseXml<IfcRepresentationItem>(cn as XmlElement);
+						RepresentationItem ri = mDatabase.ParseXml<RepresentationItem>(cn as XmlElement);
 						if (ri != null)
 							Items.Add(ri);
 					}

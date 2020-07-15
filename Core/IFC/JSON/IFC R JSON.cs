@@ -619,7 +619,7 @@ namespace GeometryGym.Ifc
 				obj["RelatedOpeningElement"] = mDatabase[mRelatedOpeningElement].getJson(this, options);
 		}
 	}
-	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
+	public partial class IfcRepresentation<RepresentationItem> : BaseClassIfc, IfcLayeredItem where RepresentationItem : IfcRepresentationItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -633,9 +633,8 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("RepresentationType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				RepresentationType = token.Value<string>();
-			Items.AddRange(mDatabase.extractJArray<IfcRepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Items.AddRange(mDatabase.extractJArray<RepresentationItem>(obj.GetValue("Items", StringComparison.InvariantCultureIgnoreCase) as JArray));
 
-				
 			List<IfcPresentationLayerAssignment> assignments = mDatabase.extractJArray<IfcPresentationLayerAssignment>(obj.GetValue("LayerAssignments", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcPresentationLayerAssignment a in assignments)
 				a.AssignedItems.Add(this);
@@ -664,7 +663,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ContextType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				ContextType = token.Value<string>();
-			RepresentationsInContext.AddRange(mDatabase.extractJArray<IfcRepresentation>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			RepresentationsInContext.AddRange(mDatabase.extractJArray<IfcRepresentation<IfcRepresentationItem>>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -678,7 +677,7 @@ namespace GeometryGym.Ifc
 			if (!string.IsNullOrEmpty(contextType))
 				obj["ContextType"] = contextType;
 			JArray reps = new JArray();
-			foreach(IfcRepresentation r in RepresentationsInContext)
+			foreach(IfcRepresentation<IfcRepresentationItem> r in RepresentationsInContext)
 			{
 				if (r.mOfProductRepresentation.Count == 0 && r.mRepresentationMap == null)
 					reps.Add(r.getJson(this, options));

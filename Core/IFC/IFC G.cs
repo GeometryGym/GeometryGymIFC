@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeographicElement() : base() { }
 		internal IfcGeographicElement(DatabaseIfc db) : base(db) { }
 		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
+		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
 	}
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
 	{
@@ -222,7 +222,7 @@ namespace GeometryGym.Ifc
 		public IfcGeomodel() : base() { }
 		public IfcGeomodel(DatabaseIfc db) : base(db) { }
 		public IfcGeomodel(DatabaseIfc db, IfcGeomodel geomodel, DuplicateOptions options) : base(db, geomodel, options) {  }
-		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcGeoslice : IfcGeotechnicalAssembly
@@ -230,7 +230,7 @@ namespace GeometryGym.Ifc
 		public IfcGeoslice() : base() { }
 		public IfcGeoslice(DatabaseIfc db) : base(db) { }
 		public IfcGeoslice(DatabaseIfc db, IfcGeoslice geoslice, DuplicateOptions options) : base(db, geoslice, options) { }
-		public IfcGeoslice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcGeoslice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public abstract partial class IfcGeotechnicalAssembly : IfcGeotechnicalElement
@@ -238,7 +238,7 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalAssembly() : base() { }
 		protected IfcGeotechnicalAssembly(DatabaseIfc db) : base(db) { }
 		protected IfcGeotechnicalAssembly(DatabaseIfc db, IfcGeotechnicalAssembly geotechnicalAssembly, DuplicateOptions options) : base(db, geotechnicalAssembly, options) { }
-		protected IfcGeotechnicalAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcGeotechnicalAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public abstract partial class IfcGeotechnicalElement : IfcElement
@@ -246,7 +246,7 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalElement() : base() { }
 		protected IfcGeotechnicalElement(DatabaseIfc db) : base(db) { }
 		protected IfcGeotechnicalElement(DatabaseIfc db, IfcGeotechnicalElement geotechnicalElement, DuplicateOptions options) : base(db, geotechnicalElement, options) { }
-		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public abstract partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
@@ -254,7 +254,7 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalStratum() : base() { }
 		protected IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
 		protected IfcGeotechnicalStratum(DatabaseIfc db, IfcGeotechnicalStratum geotechnicalStratum, DuplicateOptions options) : base(db, geotechnicalStratum, options) { }
-		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcGrid : IfcPositioningElement
@@ -405,7 +405,7 @@ namespace GeometryGym.Ifc
 			
 		}
 
-		private static IfcProductRepresentation getRepresentation(List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes, List<IfcGridAxis> wAxes)
+		private static IfcProductDefinitionShape getRepresentation(List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes, List<IfcGridAxis> wAxes)
 		{
 			List<IfcGeometricSetSelect> set = new List<IfcGeometricSetSelect>();
 			if (uAxes != null)

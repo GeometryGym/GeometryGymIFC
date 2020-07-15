@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 		public IfcEarthworksCut() : base() { }
 		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
 		public IfcEarthworksCut(DatabaseIfc db, IfcEarthworksCut earthworksCut, DuplicateOptions options) : base(db, earthworksCut, options) { PredefinedType = earthworksCut.PredefinedType; }
-		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcEarthworksElement : IfcBuiltElement
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		public IfcEarthworksElement() : base() { }
 		public IfcEarthworksElement(DatabaseIfc db) : base(db) { }
 		public IfcEarthworksElement(DatabaseIfc db, IfcEarthworksElement earthworksElement, DuplicateOptions options) : base(db, earthworksElement, options) { }
-		public IfcEarthworksElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcEarthworksElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcEarthworksFill : IfcEarthworksElement
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 		public IfcEarthworksFill() : base() { }
 		public IfcEarthworksFill(DatabaseIfc db) : base(db) { }
 		public IfcEarthworksFill(DatabaseIfc db, IfcEarthworksFill earthworksFill, DuplicateOptions options) : base(db, earthworksFill, options) { PredefinedType = earthworksFill.PredefinedType; }
-		public IfcEarthworksFill(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcEarthworksFill(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
@@ -178,7 +178,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricAppliance() : base() { }
 		internal IfcElectricAppliance(DatabaseIfc db, IfcElectricAppliance a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcElectricAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricApplianceType : IfcFlowTerminalType
@@ -198,7 +198,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricDistributionBoard() : base() { }
 		internal IfcElectricDistributionBoard(DatabaseIfc db, IfcElectricDistributionBoard b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcElectricDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricDistributionBoardType : IfcFlowControllerType
@@ -222,7 +222,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricDistributionPoint() : base() { }
 		internal IfcElectricDistributionPoint(DatabaseIfc db, IfcElectricDistributionPoint p, DuplicateOptions options) : base(db, p, options) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
-		public IfcElectricDistributionPoint(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricDistributionPoint(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricFlowStorageDevice : IfcFlowStorageDevice //IFC4
@@ -232,7 +232,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricFlowStorageDevice() : base() { }
 		internal IfcElectricFlowStorageDevice(DatabaseIfc db, IfcElectricFlowStorageDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcElectricFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricFlowStorageDeviceType : IfcFlowStorageDeviceType
@@ -253,7 +253,7 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowTreatmentDevice() : base() { }
 		public IfcElectricFlowTreatmentDevice(DatabaseIfc db) : base(db) { }
 		public IfcElectricFlowTreatmentDevice(DatabaseIfc db, IfcElectricFlowTreatmentDevice electricFlowTreatmentDevice, DuplicateOptions options) : base(db, electricFlowTreatmentDevice, options) { PredefinedType = electricFlowTreatmentDevice.PredefinedType; }
-		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricGenerator : IfcEnergyConversionDevice //IFC4
@@ -263,7 +263,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricGenerator() : base() { }
 		internal IfcElectricGenerator(DatabaseIfc db, IfcElectricGenerator g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; }
-		public IfcElectricGenerator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricGenerator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricGeneratorType : IfcEnergyConversionDeviceType
@@ -294,7 +294,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricMotor() : base() { }
 		internal IfcElectricMotor(DatabaseIfc db, IfcElectricMotor m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
-		public IfcElectricMotor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricMotor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricMotorType : IfcEnergyConversionDeviceType
@@ -314,7 +314,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricTimeControl() : base() { }
 		internal IfcElectricTimeControl(DatabaseIfc db, IfcElectricTimeControl c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
-		public IfcElectricTimeControl(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricTimeControl(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricTimeControlType : IfcFlowControllerType
@@ -433,7 +433,7 @@ namespace GeometryGym.Ifc
 				rc.RelatingElement = this;
 			}
 		}
-		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
 		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) 
 			: base(host, null, null)
 		{
@@ -588,11 +588,11 @@ namespace GeometryGym.Ifc
 				mContainedInStructure.RelatedElements.Remove(this);
 				//mContainedInStructure.RelatedElements.Remove(this);
 		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation)
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 		{
 			return ConstructElement(className, host, placement, representation, null);
 		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system)
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
 			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
 			if (element == null)
@@ -657,7 +657,7 @@ namespace GeometryGym.Ifc
 		protected IfcElementComponent() : base() { }
 		protected IfcElementComponent(DatabaseIfc db) : base(db) { }
 		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c, DuplicateOptions options) : base(db, c, options) { }
-		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
+		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host,placement,representation) { }
 		protected IfcElementComponent(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -864,7 +864,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcEnergyConversionDevice() : base() { }
 		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, DuplicateOptions options) : base(db, d, options) { }
-		public IfcEnergyConversionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEnergyConversionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public abstract partial class IfcEnergyConversionDeviceType : IfcDistributionFlowElementType
@@ -885,7 +885,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcEngine() : base() { }
 		internal IfcEngine(DatabaseIfc db, IfcEngine e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcEngine(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEngine(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEngineType : IfcEnergyConversionDeviceType
@@ -929,7 +929,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcEvaporativeCooler() : base() { }
 		internal IfcEvaporativeCooler(DatabaseIfc db, IfcEvaporativeCooler c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
-		public IfcEvaporativeCooler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEvaporativeCooler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEvaporativeCoolerType : IfcEnergyConversionDeviceType
@@ -949,7 +949,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcEvaporator() : base() { }
 		internal IfcEvaporator(DatabaseIfc db, IfcEvaporator e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcEvaporator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEvaporator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEvaporatorType : IfcEnergyConversionDeviceType

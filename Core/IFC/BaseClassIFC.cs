@@ -20,10 +20,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections;
-using System.Text;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.IO;
-using System.ComponentModel;
+using System.Text;
 
 using GeometryGym.STEP;
 
@@ -119,9 +120,26 @@ namespace GeometryGym.Ifc
 			return base.ToString();
 		}
 
-		internal virtual void changeSchema(ReleaseVersion schema, double deviationTol) { }
 		protected void ReplaceDatabase(BaseClassIfc revised)
 		{
+			if(this is IfcRepresentationItem representationItem && revised is IfcRepresentationItem revisedItem)
+			{
+				IfcStyledItem styledItem = representationItem.StyledByItem;
+				if (styledItem != null)
+					styledItem.Item = revisedItem;
+
+				foreach (IfcShapeModel shapeModel in representationItem.mRepresents.ToList())
+				{
+					shapeModel.Items.Remove(representationItem);
+					shapeModel.Items.Add(revisedItem);
+				}
+				IfcPresentationLayerAssignment layerAssignment = representationItem.mLayerAssignment;
+				if (layerAssignment != null)
+				{
+					layerAssignment.AssignedItems.Remove(representationItem);
+					layerAssignment.AssignedItems.Add(revisedItem);
+				}
+			}
 			mDatabase[revised.mIndex] = null;
 			revised.mIndex = mIndex;
 			mDatabase[mIndex] = revised;
@@ -155,6 +173,8 @@ namespace GeometryGym.Ifc
 					return null;
 				if (type.IsAbstract)
 				{
+					if (string.Compare(className, "IfcProductRepresentation", true) == 0)
+						return Construct("IfcProductDefinitionShape");
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
 						return Construct("IfcProfileDef");
 					if (string.Compare(className, "IfcBuildingElement", true) == 0)

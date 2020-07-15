@@ -116,14 +116,6 @@ namespace GeometryGym.Ifc
 				result.AddRange(rdp.Extract<T>());
 			return result;
 		}
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			for (int icounter = 0; icounter < mIsDefinedBy.Count; icounter++)
-				mIsDefinedBy[icounter].changeSchema(schema, deviationTol);
-			if(mIsTypedBy != null)
-				mIsTypedBy.changeSchema(schema, deviationTol);
-			base.changeSchema(schema, deviationTol);
-		}
 		public override IfcProperty FindProperty(string name) { return FindProperty(name, true); }
 		public IfcProperty FindProperty(string name, bool includeRelatedType)
 		{
@@ -519,18 +511,6 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			foreach(IfcRelAssigns assigns in HasAssignments)
-				assigns.changeSchema(schema, deviationTol);
-			foreach(IfcRelNests nests in IsNestedBy)
-				nests.changeSchema(schema, deviationTol);
-			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
-				mHasAssociations[icounter].changeSchema(schema, deviationTol);
-			foreach (IfcObjectDefinition od in mIsDecomposedBy.SelectMany(x => x.RelatedObjects))
-				od.changeSchema(schema, deviationTol);
-			base.changeSchema(schema, deviationTol);
-		}
 		public virtual IfcStructuralAnalysisModel CreateOrFindStructAnalysisModel()
 		{
 			return (mDecomposes != null ? mDecomposes.RelatingObject.CreateOrFindStructAnalysisModel() : null);
@@ -741,7 +721,7 @@ namespace GeometryGym.Ifc
 					mDatabase.Factory.Duplicate(fills, options);
 		}
 		internal IfcOpeningElement(DatabaseIfc db) : base(db) { }
-		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductRepresentation rep) : base(host.mDatabase)
+		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape rep) : base(host.mDatabase)
 		{
 			if (placement == null)
 				ObjectPlacement = new IfcLocalPlacement(host.ObjectPlacement, new IfcAxis2Placement3D(mDatabase.Factory.Origin));
@@ -958,7 +938,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcOutlet() : base() { }
 		internal IfcOutlet(DatabaseIfc db, IfcOutlet o, DuplicateOptions options) : base(db,o, options) { mPredefinedType = o.mPredefinedType; }
-		public IfcOutlet(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcOutlet(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcOutletType : IfcFlowTerminalType
@@ -980,7 +960,7 @@ namespace GeometryGym.Ifc
 		private int mLastModifiedDate = int.MinValue;// : OPTIONAL IfcTimeStamp;
 		private IfcPersonAndOrganization mLastModifyingUser;// : OPTIONAL IfcPersonAndOrganization;
 		private IfcApplication mLastModifyingApplication;// : OPTIONAL IfcApplication;
-		private int mCreationDate;// : IfcTimeStamp; 
+		private int mCreationDate = 0;// : IfcTimeStamp; 
 
 		public IfcPersonAndOrganization OwningUser { get { return mOwningUser; } set { mOwningUser = value; } }
 		public IfcApplication OwningApplication { get { return mOwningApplication; } set { mOwningApplication = value; } }

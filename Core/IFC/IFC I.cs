@@ -47,7 +47,7 @@ namespace GeometryGym.Ifc
 		public IfcImpactProtectionDevice() : base() { }
 		public IfcImpactProtectionDevice(DatabaseIfc db) : base(db) { }
 		public IfcImpactProtectionDevice(DatabaseIfc db, IfcImpactProtectionDevice impactProtectionDevice, DuplicateOptions options) : base(db, impactProtectionDevice, options) { PredefinedType = impactProtectionDevice.PredefinedType; }
-		public IfcImpactProtectionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcImpactProtectionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
@@ -112,27 +112,6 @@ namespace GeometryGym.Ifc
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
 
 		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			base.changeSchema(schema, deviationTol);
-			if (schema < ReleaseVersion.IFC4)
-			{
-				IfcCartesianPointList cpl = Points;
-				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;
-				if (cpl2d != null)
-				{
-					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.Select(x=>new Tuple<double,double>(x[0],x[1])), Segments.ToList());
-					int index = bc.mIndex;
-					mDatabase[mIndex] = bc;
-					mDatabase[index] = null;
-					mDatabase[cpl.mIndex] = null;
-				}
-				else
-				{
-					throw new Exception("Not Implemented");
-				}
-			}
-		}
 	}
 	[Serializable]
 	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem //SUPERTYPE OF (ONEOF (IfcIndexedPolygonalFaceWithVoids))
@@ -193,7 +172,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcInterceptor() : base() { }
 		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
-		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcInterceptorType : IfcFlowTreatmentDeviceType

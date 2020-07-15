@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mHasRepresentation.GetXML(xml.OwnerDocument, "HasRepresentation", this, processed));
 		}
 	}
-	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation
+	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -133,14 +133,12 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "RepresentedMaterial") == 0)
 					RepresentedMaterial = mDatabase.ParseXml<IfcMaterial>(child as XmlElement);
 			}
-
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			//xml.AppendChild(RepresentedMaterial.GetXML(xml.OwnerDocument, "RepresentedMaterial", this, processed));
 		}
-
 	}
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
 	{

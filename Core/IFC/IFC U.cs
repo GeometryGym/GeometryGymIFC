@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcUnitaryControlElement() : base() { }
 		internal IfcUnitaryControlElement(DatabaseIfc db, IfcUnitaryControlElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcUnitaryControlElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r, IfcDistributionSystem system) : base(host,p,r, system) { }
+		public IfcUnitaryControlElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r, IfcDistributionSystem system) : base(host,p,r, system) { }
 	}
 	[Serializable]
 	public partial class IfcUnitaryControlElementType : IfcDistributionControlElementType
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcUnitaryEquipment() : base() { }
 		internal IfcUnitaryEquipment(DatabaseIfc db, IfcUnitaryEquipment e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcUnitaryEquipment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcUnitaryEquipment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType

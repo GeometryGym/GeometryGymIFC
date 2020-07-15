@@ -99,8 +99,8 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Operator", mOperator.ToString().ToLower());
-			xml.AppendChild(mDatabase[mFirstOperand].GetXML(xml.OwnerDocument, "FirstOperand", this, processed));
-			xml.AppendChild(mDatabase[mSecondOperand].GetXML(xml.OwnerDocument, "SecondOperand", this, processed));
+			xml.AppendChild((mFirstOperand as BaseClassIfc).GetXML(xml.OwnerDocument, "FirstOperand", this, processed));
+			xml.AppendChild((mSecondOperand as BaseClassIfc).GetXML(xml.OwnerDocument, "SecondOperand", this, processed));
 		}
 	}
 	public partial class IfcBoundingBox : IfcGeometricRepresentationItem

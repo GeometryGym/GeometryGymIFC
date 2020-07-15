@@ -80,8 +80,6 @@ namespace GeometryGym.Ifc
 		internal IfcMappedItem() : base() { }
 		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i) : base(db,i) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
 		public IfcMappedItem(IfcRepresentationMap source, IfcCartesianTransformationOperator target) : base(source.mDatabase) { MappingSource = source; MappingTarget = target; }
-		
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol) { MappingSource.changeSchema(schema, deviationTol); }
 	}
 	[Serializable]
 	public partial class IfcMarineFacility : IfcFacility
@@ -94,8 +92,8 @@ namespace GeometryGym.Ifc
 		public IfcMarineFacility(DatabaseIfc db, IfcMarineFacility marineFacility, DuplicateOptions options) : base(db, marineFacility, options) { }
 		public IfcMarineFacility(DatabaseIfc db, IfcMarineFacilityTypeEnum predefinedType)
 			: base(db) { PredefinedType = predefinedType; }
-		public IfcMarineFacility(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { Name = name; }
-		internal IfcMarineFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { }
+		public IfcMarineFacility(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { Name = name; }
+		internal IfcMarineFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcMaterial : IfcMaterialDefinition, NamedObjectIfc
@@ -323,13 +321,10 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation
+	public partial class IfcMaterialDefinitionRepresentation :  IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
 		internal int mRepresentedMaterial;// : IfcMaterial;
-		private LIST<IfcStyledRepresentation> mStyledRepresentations = new LIST<IfcStyledRepresentation>(); 
-
 		public IfcMaterial RepresentedMaterial { get { return mDatabase[mRepresentedMaterial] as IfcMaterial; } set { mRepresentedMaterial = value.mIndex; if (value.mHasRepresentation != this) value.HasRepresentation = this; } }
-		public new LIST<IfcStyledRepresentation> Representations { get { return mStyledRepresentations; } set { base.Representations.Clear(); mStyledRepresentations.Clear(); if (value != null) { mStyledRepresentations.CollectionChanged -= mStyledRepresentations_CollectionChanged;  mStyledRepresentations = value; base.Representations.AddRange(value); mStyledRepresentations.CollectionChanged += mStyledRepresentations_CollectionChanged;  } } }
 
 		internal IfcMaterialDefinitionRepresentation() : base() { }
 		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r) : base(db, r)
@@ -337,45 +332,7 @@ namespace GeometryGym.Ifc
 			RepresentedMaterial = db.Factory.Duplicate(r.RepresentedMaterial) as IfcMaterial;
 		}
 		public IfcMaterialDefinitionRepresentation(IfcStyledRepresentation representation, IfcMaterial mat) : base(representation) { mRepresentedMaterial = mat.mIndex; mat.mHasRepresentation = this; }
-		public IfcMaterialDefinitionRepresentation(List<IfcStyledRepresentation> representations, IfcMaterial mat) : base(representations.ConvertAll(x => x as IfcRepresentation)) { mRepresentedMaterial = mat.mIndex; mat.mHasRepresentation = this; }
-
-		protected override void initialize()
-		{
-			base.initialize();
-			mStyledRepresentations.CollectionChanged += mStyledRepresentations_CollectionChanged;
-		}
-
-		private void mStyledRepresentations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
-			if (mDatabase != null && mDatabase.IsDisposed())
-				return;
-			if (e.NewItems != null)
-			{
-				foreach (IfcStyledRepresentation r in e.NewItems)
-				{
-					if (!base.Representations.Contains(r))
-						base.Representations.Add(r);	
-				}
-			}
-			if (e.OldItems != null)
-			{
-				foreach (IfcStyledRepresentation r in e.OldItems)
-					base.Representations.Remove(r);
-			}
-		}
-
-		protected override void addRepresentation(IfcRepresentation r)
-		{
-			IfcStyledRepresentation styledRepresentation = r as IfcStyledRepresentation;
-			if (styledRepresentation != null && !mStyledRepresentations.Contains(styledRepresentation))
-				mStyledRepresentations.Add(styledRepresentation);
-		}
-		protected override void removeRepresentation(IfcRepresentation r)
-		{
-			IfcStyledRepresentation styledRepresentation = r as IfcStyledRepresentation;
-			if (mStyledRepresentations != null)
-				mStyledRepresentations.Remove(styledRepresentation);
-		}
+		public IfcMaterialDefinitionRepresentation(IEnumerable<IfcStyledRepresentation> representations, IfcMaterial mat) : base(representations) { mRepresentedMaterial = mat.mIndex; mat.mHasRepresentation = this; }
 	}
 	[Serializable]
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
@@ -543,14 +500,6 @@ namespace GeometryGym.Ifc
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 
 		internal void addMaterial(IfcMaterial material) { mMaterials.Add(material.mIndex); }
-		internal override void changeSchema(ReleaseVersion schema, double deviationTol)
-		{
-			IfcMaterialConstituentSet mcs = new IfcMaterialConstituentSet("", "", Materials.ToList().ConvertAll(x => new IfcMaterialConstituent(x.Name, "", x, 0, "")));
-			mDatabase[mcs.mIndex] = null;
-			mcs.mIndex = mIndex;
-			mDatabase[mIndex] = mcs;
-			base.changeSchema(schema, deviationTol);
-		}
 	}
 	[Serializable]
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
@@ -841,7 +790,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMechanicalFastener() : base() { }
 		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f, DuplicateOptions options) : base(db, f, options) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
-		public IfcMechanicalFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMechanicalFastener(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcMechanicalFastener(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -928,7 +877,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMedicalDevice() : base() { }
 		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcMedicalDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcMedicalDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMedicalDeviceType : IfcFlowTerminalType
@@ -948,7 +897,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMember() : base() { }
 		internal IfcMember(DatabaseIfc db, IfcMember m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
-		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcMember(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -1049,7 +998,7 @@ namespace GeometryGym.Ifc
 		public IfcMobileTelecommunicationsAppliance() : base() { }
 		public IfcMobileTelecommunicationsAppliance(DatabaseIfc db) : base(db) { }
 		public IfcMobileTelecommunicationsAppliance(DatabaseIfc db, IfcMobileTelecommunicationsAppliance mobileAppliance, DuplicateOptions options) : base(db, mobileAppliance, options) { PredefinedType = mobileAppliance.PredefinedType; }
-		public IfcMobileTelecommunicationsAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcMobileTelecommunicationsAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
@@ -1084,7 +1033,7 @@ namespace GeometryGym.Ifc
 		public IfcMooringDevice() : base() { }
 		public IfcMooringDevice(DatabaseIfc db) : base(db) { }
 		public IfcMooringDevice(DatabaseIfc db, IfcMooringDevice mooringDevice, DuplicateOptions options) : base(db, mooringDevice, options) { PredefinedType = mooringDevice.PredefinedType; }
-		public IfcMooringDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host, placement, representation) { }
+		public IfcMooringDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcMooringDeviceType : IfcBuiltElementType
@@ -1105,7 +1054,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMotorConnection() : base() { }
 		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
-		public IfcMotorConnection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcMotorConnection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMotorConnectionType : IfcEnergyConversionDeviceType

@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcJunctionBox() : base() { }
 		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcJunctionBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcJunctionBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcJunctionBoxType : IfcFlowFittingType

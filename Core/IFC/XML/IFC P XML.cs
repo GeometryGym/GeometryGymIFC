@@ -528,7 +528,7 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "ObjectPlacement") == 0)
 					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 				else if (string.Compare(name, "Representation") == 0)
-					Representation = mDatabase.ParseXml<IfcProductRepresentation>(child as XmlElement);
+					Representation = mDatabase.ParseXml<IfcProductDefinitionShape>(child as XmlElement);
 				else if (string.Compare(name, "Placement") == 0)
 					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 			}
@@ -549,7 +549,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -589,7 +589,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -606,7 +606,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcRepresentation r = mDatabase.ParseXml<IfcRepresentation>(cn as XmlElement);
+						Representation r = mDatabase.ParseXml<Representation>(cn as XmlElement);
 						if (r != null)
 							Representations.Add(r);
 					}
@@ -622,7 +622,7 @@ namespace GeometryGym.Ifc
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("Representations", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcRepresentation rep in Representations)
+				foreach (Representation rep in Representations)
 					element.AppendChild(rep.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 		}

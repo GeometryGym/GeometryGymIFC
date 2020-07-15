@@ -121,8 +121,8 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["Operator"] = mOperator.ToString();
-			obj["FirstOperand"] = mDatabase[mFirstOperand].getJson(this, options);
-			obj["SecondOperand"] = mDatabase[mSecondOperand].getJson(this, options);
+			obj["FirstOperand"] = mFirstOperand.getJson(this, options);
+			obj["SecondOperand"] = mSecondOperand.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcBoundaryCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundaryEdgeCondition ,IfcBoundaryFaceCondition ,IfcBoundaryNodeCondition));

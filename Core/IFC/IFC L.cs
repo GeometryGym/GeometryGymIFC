@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLamp() : base() { }
 		internal IfcLamp(DatabaseIfc db, IfcLamp l, DuplicateOptions options) : base(db, l, options) { mPredefinedType = l.mPredefinedType; }
-		public IfcLamp(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcLamp(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcLampType : IfcFlowTerminalType
@@ -160,7 +160,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcLightFixture() : base() { }
 		internal IfcLightFixture(DatabaseIfc db, IfcLightFixture f, DuplicateOptions options) : base(db, f, options) { mPredefinedType = f.mPredefinedType; }
-		public IfcLightFixture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcLightFixture(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcLightFixtureType : IfcFlowTerminalType
@@ -397,7 +397,7 @@ namespace GeometryGym.Ifc
 		public IfcLiquidTerminal() : base() { }
 		public IfcLiquidTerminal(DatabaseIfc db) : base(db) { }
 		public IfcLiquidTerminal(DatabaseIfc db, IfcLiquidTerminal liquidTerminal, DuplicateOptions options) : base(db, liquidTerminal, options) { PredefinedType = liquidTerminal.PredefinedType; }
-		public IfcLiquidTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcLiquidTerminal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcLiquidTerminalType : IfcFlowTerminalType
