@@ -121,7 +121,7 @@ namespace GeometryGym.Ifc
 		public IfcSeamCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
-	public partial class IfcSectionedSolid : IfcSolidModel
+	public abstract partial class IfcSectionedSolid : IfcSolidModel
 	{
 		internal IfcCurve mDirectrix;// : IfcCurve;
 		internal LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>();// : LIST [2:?] OF IfcProfileDef;
@@ -129,11 +129,16 @@ namespace GeometryGym.Ifc
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
 		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
 
-		internal IfcSectionedSolid() : base() { }
-		internal IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s) : base(db, s)
+		protected IfcSectionedSolid() : base() { }
+		protected IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s) : base(db, s)
 		{
 			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
+		}
+		protected IfcSectionedSolid(IfcCurve directrix, IEnumerable<IfcProfileDef> crossSections) : base(directrix.Database)
+		{
+			Directrix = directrix;
+			CrossSections.AddRange(crossSections);
 		}
 	}
 	[Serializable]
@@ -150,6 +155,12 @@ namespace GeometryGym.Ifc
 		{
 			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcDistanceExpression));
 			FixedAxisVertical = s.FixedAxisVertical;
+		}
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcDistanceExpression> positions, bool fixedAxisVertical)
+			: base(directrix, profiles)
+		{
+			CrossSectionPositions.AddRange(positions);
+			FixedAxisVertical = fixedAxisVertical;
 		}
 	}
 	[Serializable]
@@ -312,17 +323,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcShapeAspect : BaseClassIfc, NamedObjectIfc
 	{
-		internal List<int> mShapeRepresentations = new List<int>();// : LIST [1:?] OF IfcShapeModel;
+		internal LIST<IfcShapeModel> mShapeRepresentations = new LIST<IfcShapeModel>();// : LIST [1:?] OF IfcShapeModel;
 		internal string mName = "$";// : OPTIONAL IfcLabel;
 		internal string mDescription = "$";// : OPTIONAL IfcText;
 		private IfcLogicalEnum mProductDefinitional;// : LOGICAL;
-		internal int mPartOfProductDefinitionShape;// IFC4 OPTIONAL IfcProductRepresentationSelect IFC2x3 IfcProductDefinitionShape;
+		internal IfcProductRepresentationSelect mPartOfProductDefinitionShape;// IFC4 OPTIONAL IfcProductRepresentationSelect IFC2x3 IfcProductDefinitionShape;
 
-		public ReadOnlyCollection<IfcShapeModel> ShapeRepresentations { get { return new ReadOnlyCollection<IfcShapeModel>( mShapeRepresentations.ConvertAll(x => mDatabase[x] as IfcShapeModel)); } }
+		public LIST<IfcShapeModel> ShapeRepresentations { get { return mShapeRepresentations; } }
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcLogicalEnum ProductDefinitional { get { return mProductDefinitional; } set { mProductDefinitional = value; } }
-		public IfcProductRepresentationSelect PartOfProductDefinitionShape { get { return mDatabase[mPartOfProductDefinitionShape] as IfcProductRepresentationSelect; } set { mPartOfProductDefinitionShape = value == null ? 0 : value.Index; if (value != null) value.AddShapeAspect(this); } }
+		public IfcProductRepresentationSelect PartOfProductDefinitionShape { get { return mPartOfProductDefinitionShape; } set { mPartOfProductDefinitionShape = value; if (value != null) value.HasShapeAspects.Add(this); } }
 
 		internal IfcShapeAspect() : base() { }
 		internal IfcShapeAspect(DatabaseIfc db, IfcShapeAspect a) : base(db,a)
@@ -333,9 +344,9 @@ namespace GeometryGym.Ifc
 			mProductDefinitional = a.mProductDefinitional;
 		}
 		public IfcShapeAspect(List<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations[0].Database) { shapeRepresentations.ForEach(x=>addRepresentation(x)); }
-		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { mShapeRepresentations.Add(shapeRepresentation.mIndex); shapeRepresentation.mOfShapeAspect = this; }
+		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { addRepresentation(shapeRepresentation); }
 		
-		internal void addRepresentation(IfcShapeModel model) { mShapeRepresentations.Add(model.mIndex); model.mOfShapeAspect = this; }
+		internal void addRepresentation(IfcShapeModel model) { mShapeRepresentations.Add(model); model.mOfShapeAspect = this; }
 	}
 	[Serializable]
 	public abstract partial class IfcShapeModel : IfcRepresentation<IfcRepresentationItem>//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))

@@ -2320,20 +2320,20 @@ namespace GeometryGym.Ifc
 		private IfcAxis2Placement mMappingOrigin;// : IfcAxis2Placement;
 		private IfcShapeModel mMappedRepresentation;// : IfcRepresentation;
 		//INVERSE
-		internal List<IfcShapeAspect> mHasShapeAspects = new List<IfcShapeAspect>();//	:	SET [0:?] OF IfcShapeAspect FOR PartOfProductDefinitionShape;
-		internal List<IfcMappedItem> mMapUsage = new List<IfcMappedItem>();//: 	SET OF IfcMappedItem FOR MappingSource;
+		internal SET<IfcShapeAspect> mHasShapeAspects = new SET<IfcShapeAspect>();//	:	SET [0:?] OF IfcShapeAspect FOR PartOfProductDefinitionShape;
+		internal SET<IfcMappedItem> mMapUsage = new SET<IfcMappedItem>();//: 	SET OF IfcMappedItem FOR MappingSource;
 
 		public IfcAxis2Placement MappingOrigin { get { return mMappingOrigin; } set { mMappingOrigin = value; } }
 		public IfcShapeModel MappedRepresentation
 		{
 			get { return mMappedRepresentation; }
 			set { mMappedRepresentation = value; value.mRepresentationMap = this; }
-		}  // IfcStyleModel not valid
-		public ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get { return new ReadOnlyCollection<IfcShapeAspect>(mHasShapeAspects); } }
-		public ReadOnlyCollection<IfcMappedItem> MapUsage { get { return new ReadOnlyCollection<IfcMappedItem>(mMapUsage); } }
+		}  
+		public SET<IfcShapeAspect> HasShapeAspects { get { return mHasShapeAspects; } }
+		public SET<IfcMappedItem> MapUsage { get { return mMapUsage; } }
 
-		internal List<IfcTypeProduct> mRepresents = new List<IfcTypeProduct>();// GG
-		public ReadOnlyCollection<IfcTypeProduct> Represents { get { return new ReadOnlyCollection<IfcTypeProduct>(mRepresents); } }
+		internal SET<IfcTypeProduct> mRepresents = new SET<IfcTypeProduct>();// GG
+		public SET<IfcTypeProduct> Represents { get { return mRepresents; } }
 
 		internal IfcRepresentationMap() : base() { }
 		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m, DuplicateOptions options) : base(db, m)
@@ -2349,8 +2349,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRepresentationMap(IfcAxis2Placement placement, IfcShapeRepresentation representation) : base(representation.mDatabase) { MappingOrigin = placement; MappedRepresentation = representation; }
 		public IfcRepresentationMap(IfcAxis2Placement placement, IfcTopologyRepresentation representation) : base(representation.mDatabase) { MappingOrigin = placement; MappedRepresentation = representation; }
-
-		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 	}
 	[Serializable]
 	public abstract partial class IfcResource : IfcObject, IfcResourceSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcConstructionResource))

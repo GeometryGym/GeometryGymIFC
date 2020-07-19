@@ -150,8 +150,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
 			xml.SetAttribute("ProductDefinitional", ProductDefinitional.ToString().ToLower());
-			if (mPartOfProductDefinitionShape > 0)
-				xml.AppendChild(mDatabase[mPartOfProductDefinitionShape].GetXML(xml.OwnerDocument, "PartOfProductDefinitionShape", this, processed));
+			if (mPartOfProductDefinitionShape != null && mPartOfProductDefinitionShape != host)
+				xml.AppendChild((mPartOfProductDefinitionShape as BaseClassIfc).GetXML(xml.OwnerDocument, "PartOfProductDefinitionShape", this, processed));
 		}
 	}
 	public partial class IfcShellBasedSurfaceModel : IfcGeometricRepresentationItem

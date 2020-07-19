@@ -232,15 +232,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mShapeRepresentations[0]);
-			for (int icounter = 1; icounter < mShapeRepresentations.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mShapeRepresentations[icounter]);
-			return str + (mName == "$" ? "),$," : "),'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',") + ParserIfc.LogicalToString(mProductDefinitional)
-				+ "," + ParserSTEP.LinkToString(mPartOfProductDefinitionShape);
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", ShapeRepresentations.Select(x=>x.StepId)) + 
+				(mName == "$" ? "),$," : "),'" + mName + "',") + (mDescription == "$" ? "$," : "'" + mDescription + "',") + 
+				ParserIfc.LogicalToString(mProductDefinitional) + "," + ParserSTEP.ObjToLinkString(mPartOfProductDefinitionShape);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mShapeRepresentations = ParserSTEP.StripListLink(str, ref pos, len);
+			mShapeRepresentations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcShapeModel));
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
 			mProductDefinitional = ParserIfc.StripLogical(str,ref pos, len);

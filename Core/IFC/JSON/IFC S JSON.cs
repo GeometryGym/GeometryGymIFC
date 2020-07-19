@@ -78,8 +78,8 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "ProductDefinitional", mProductDefinitional.ToString());
-			if (mPartOfProductDefinitionShape > 0 && mPartOfProductDefinitionShape != host.mIndex)
-				obj["PartOfProductDefinitionShape"] = mDatabase[mPartOfProductDefinitionShape].getJson(this, options);
+			if (mPartOfProductDefinitionShape != null && mPartOfProductDefinitionShape != host)
+				obj["PartOfProductDefinitionShape"] = mPartOfProductDefinitionShape.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcShapeModel : IfcRepresentation<IfcRepresentationItem>//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))

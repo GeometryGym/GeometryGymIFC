@@ -1266,17 +1266,16 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
 		//INVERSE
-		internal List<IfcProduct> mShapeOfProduct = new List<IfcProduct>();
-		internal List<IfcShapeAspect> mHasShapeAspects = new List<IfcShapeAspect>();
+		internal SET<IfcProduct> mShapeOfProduct = new SET<IfcProduct>();
+		internal SET<IfcShapeAspect> mHasShapeAspects = new SET<IfcShapeAspect>();
 
-		public ReadOnlyCollection<IfcProduct> ShapeOfProduct { get { return new ReadOnlyCollection<IfcProduct>(mShapeOfProduct); } }
-		public ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get { return new ReadOnlyCollection<IfcShapeAspect>(mHasShapeAspects); } }
+		public SET<IfcProduct> ShapeOfProduct { get { return mShapeOfProduct; } }
+		public SET<IfcShapeAspect> HasShapeAspects { get { return mHasShapeAspects; } }
 
 		internal IfcProductDefinitionShape() : base() { }
 		public IfcProductDefinitionShape(IfcShapeModel rep) : base(rep) { }
 		public IfcProductDefinitionShape(IEnumerable<IfcShapeModel> reps) : base(reps) { } 
 		internal IfcProductDefinitionShape(DatabaseIfc db, IfcProductDefinitionShape s) : base(db, s) { }
-		public void AddShapeAspect(IfcShapeAspect aspect) { mHasShapeAspects.Add(aspect); }
 	}
 	[Serializable]
 	public abstract partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc, NamedObjectIfc where Representation : IfcRepresentation<RepresentationItem> where RepresentationItem : IfcRepresentationItem //IFC4 Abstract (IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
@@ -1295,10 +1294,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		protected IfcProductRepresentation() : base() { }
 		protected IfcProductRepresentation(DatabaseIfc db) : base(db) { }
-		[Obsolete("DEPRECATED IFC4", false)]
-		public IfcProductRepresentation(Representation r) : base(r.mDatabase) { mRepresentations.Add(r); }
-		[Obsolete("DEPRECATED IFC4", false)]
-		public IfcProductRepresentation(IEnumerable<Representation> reps) : base(reps.First().mDatabase) { Representations.AddRange(reps); }
+		protected IfcProductRepresentation(Representation r) : base(r.mDatabase) { mRepresentations.Add(r); }
+		protected IfcProductRepresentation(IEnumerable<Representation> reps) : base(reps.First().mDatabase) { Representations.AddRange(reps); }
 		internal IfcProductRepresentation(DatabaseIfc db, IfcProductRepresentation<Representation, RepresentationItem> r) : base(db, r)
 		{
 			mName = r.mName;
@@ -1347,7 +1344,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			return result;
 		}
 	}
-	public interface IfcProductRepresentationSelect : IBaseClassIfc { ReadOnlyCollection<IfcShapeAspect> HasShapeAspects { get; } void AddShapeAspect(IfcShapeAspect aspect); }// 	IfcProductDefinitionShape,	IfcRepresentationMap);
+	public interface IfcProductRepresentationSelect : IBaseClassIfc { SET<IfcShapeAspect> HasShapeAspects { get; } }// 	IfcProductDefinitionShape,	IfcRepresentationMap);
 	public interface IfcProductSelect : IBaseClassIfc //	IfcProduct, IfcTypeProduct);
 	{
 		SET<IfcRelAssignsToProduct> ReferencedBy { get; }
