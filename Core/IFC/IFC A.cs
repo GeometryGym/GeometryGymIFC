@@ -1032,13 +1032,14 @@ namespace GeometryGym.Ifc
 			mTopFlangeSlope = p.mTopFlangeSlope;
 			mCentreOfGravityInY = p.mCentreOfGravityInY;
 		}
-		public IfcAsymmetricIShapeProfileDef(DatabaseIfc db, string name, double bottomFlangeWidth, double overallDepth, double webThickness, double bottomFlangeThickness)
+		public IfcAsymmetricIShapeProfileDef(DatabaseIfc db, string name, double bottomFlangeWidth, double overallDepth, double webThickness, double bottomFlangeThickness, double topFlangeWidth)
 			: base(db, name)
 		{
 			BottomFlangeWidth = bottomFlangeWidth;
 			OverallDepth = overallDepth;
 			WebThickness = webThickness;
 			BottomFlangeThickness = bottomFlangeThickness;
+			TopFlangeWidth = topFlangeWidth;
 		}
 	}
 	[Serializable]
