@@ -85,43 +85,66 @@ namespace GeometryGym.Ifc
 				}
 				if (c == '\\')
 				{
-					if (icounter + 3 < ilast && str[icounter + 2] == '\\')
+					if (icounter + 3 < ilast)
 					{
-						if (str[icounter + 1] == 'S')
+						char c3 = str[icounter + 3], c2 = str[icounter + 2], c1 = str[icounter + 1];
+						if (c2 == '\\')
 						{
-							char o = str[icounter + 3];
-							result += (char)((int)o + 128);
+							if (c1 == 'S')
+							{
+								result += (char)((int)c3 + 128);
+								icounter += 3;
+							}
+							else if (c1 == 'X' && str.Length > icounter + 4)
+							{
+								string s = str.Substring(icounter + 3, 2);
+								Int32 i = Convert.ToInt32(s, 16);
+								//byte[] byteArray = BitConverter.GetBytes(i);
+								//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
+								Encoding wind1252 = Encoding.GetEncoding(1252);
+								string istr = wind1252.GetString(new byte[] { (byte)i });
+								result += istr[0];
+								//c = charArray[0];
+								//result += (char)();
+								//result += c;
+								icounter += 4;
+							}
+							else
+								result += str[icounter];
+						}
+						else if (c3 == '\\' && c2 == '2' && c1 == 'X')
+						{
+							icounter += 4;
+							while (str[icounter] != '\\')
+							{
+								string s = str.Substring(icounter, 4);
+								c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+								//result += (char)();
+								result += c;
+								icounter += 4;
+							}
 							icounter += 3;
 						}
-						else if (str[icounter + 1] == 'X' && str.Length > icounter + 4)
+						else if (c1 == '\\' && c2 == 'X')
 						{
-							string s = str.Substring(icounter + 3, 2);
-							Int32 i = Convert.ToInt32(s, 16);
-							//byte[] byteArray = BitConverter.GetBytes(i);
-							//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
-							Encoding wind1252 = Encoding.GetEncoding(1252);
-							string istr = wind1252.GetString(new byte[] { (byte) i });
-							result += istr[0];
-							//c = charArray[0];
-							//result += (char)();
-							//result += c;
-							icounter += 4;
+							if(c3 == '2')
+							{
+								icounter += 6;
+								while (str[icounter] != '\\')
+								{
+									string s = str.Substring(icounter, 4);
+									c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
+									//result += (char)();
+									result += c;
+									icounter += 4;
+								}
+								icounter += 5;
+							}
+							else
+								result += str[icounter];
 						}
 						else
 							result += str[icounter];
-					}
-					else if (str[icounter + 3] == '\\' && str[icounter + 2] == '2' && str[icounter + 1] == 'X')
-					{
-						icounter += 4;
-						while (str[icounter] != '\\')
-						{
-							string s = str.Substring(icounter, 4);
-							c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
-							//result += (char)();
-							result += c;
-							icounter += 4;
-						}
-						icounter += 3;
 					}
 					else
 						result += str[icounter];
@@ -135,6 +158,21 @@ namespace GeometryGym.Ifc
 			return result;	
 		}
 
+		public static T ParseEnum<T>(string str, string enumName) where T : struct
+		{
+			int start = enumName.Length + 2, end = str.Length - start - 2;
+			if (end < 1)
+				return default(T);
+			return ParseEnum<T>(str.Substring(start, end));
+		}
+		public static T ParseEnum<T>(string str) where T : struct
+		{
+			T result = default(T);
+			if (string.IsNullOrEmpty(str))
+				return result;
+			Enum.TryParse<T>(str, out result);
+			return result;
+		}
 		public static IfcLogicalEnum ParseIFCLogical(string str) 
 		{
 			string s = str.Trim();
@@ -177,7 +215,7 @@ namespace GeometryGym.Ifc
 			if (c == 'T')
 				result = IfcLogicalEnum.TRUE;
 			else if (c == 'F')
-				result = IfcLogicalEnum.TRUE;
+				result = IfcLogicalEnum.FALSE;
 			pos = icounter + 2;
 			return result;
 		}
@@ -199,7 +237,13 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(kw) || !kw.ToUpper().StartsWith("IFC"))
 				return null;
 			str = str.Trim();
-			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dictionary);
+			ConcurrentDictionary<int, BaseClassIfc> dict = dictionary;
+			if(dict == null)
+			{
+				dict = new ConcurrentDictionary<int, BaseClassIfc>();
+				dict[0] = null;
+			}
+			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dict);
 			if (result == null)
 				return null;
 			result.mIndex = stepID;

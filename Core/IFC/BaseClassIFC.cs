@@ -20,10 +20,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections;
-using System.Text;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.IO;
-using System.ComponentModel;
+using System.Text;
 
 using GeometryGym.STEP;
 
@@ -60,7 +61,15 @@ namespace GeometryGym.Ifc
 			else
 				basis.Database.appendObject(this);	
 		}
-		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base() { mGlobalId = e.mGlobalId; db.appendObject(this); db.Factory.mDuplicateMapping.AddObject(e, mIndex);  }
+		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base()
+		{
+			mGlobalId = e.mGlobalId;
+			if (db != null)
+			{
+				db.appendObject(this);
+				db.Factory.mDuplicateMapping.AddObject(e, mIndex);
+			}
+		}
 		protected BaseClassIfc(DatabaseIfc db) : base()
 		{
 			if(db != null)
@@ -111,9 +120,26 @@ namespace GeometryGym.Ifc
 			return base.ToString();
 		}
 
-		internal virtual void changeSchema(ReleaseVersion schema) { }
 		protected void ReplaceDatabase(BaseClassIfc revised)
 		{
+			if(this is IfcRepresentationItem representationItem && revised is IfcRepresentationItem revisedItem)
+			{
+				IfcStyledItem styledItem = representationItem.StyledByItem;
+				if (styledItem != null)
+					styledItem.Item = revisedItem;
+
+				foreach (IfcShapeModel shapeModel in representationItem.mRepresents.ToList())
+				{
+					shapeModel.Items.Remove(representationItem);
+					shapeModel.Items.Add(revisedItem);
+				}
+				IfcPresentationLayerAssignment layerAssignment = representationItem.mLayerAssignment;
+				if (layerAssignment != null)
+				{
+					layerAssignment.AssignedItems.Remove(representationItem);
+					layerAssignment.AssignedItems.Add(revisedItem);
+				}
+			}
 			mDatabase[revised.mIndex] = null;
 			revised.mIndex = mIndex;
 			mDatabase[mIndex] = revised;
@@ -145,9 +171,10 @@ namespace GeometryGym.Ifc
 				Type type = GetType(className);
 				if (type == null)
 					return null;
-				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				if (type.IsAbstract)
 				{
+					if (string.Compare(className, "IfcProductRepresentation", true) == 0)
+						return Construct("IfcProductDefinitionShape");
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
 						return Construct("IfcProfileDef");
 					if (string.Compare(className, "IfcBuildingElement", true) == 0)
@@ -163,6 +190,7 @@ namespace GeometryGym.Ifc
 					else
 						return null;
 				}
+				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				mConstructors.TryAdd(className, constructor);
 			}
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;

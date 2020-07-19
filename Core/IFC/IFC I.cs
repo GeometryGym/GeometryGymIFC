@@ -39,6 +39,46 @@ namespace GeometryGym.Ifc
 		public IfcImageTexture(DatabaseIfc db, bool repeatS, bool repeatT, string urlReference) : base(db, repeatS, repeatT) { UrlReference = urlReference; }
 	}
 	[Serializable]
+	public partial class IfcImpactProtectionDevice : IfcElementComponent
+	{
+		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: OPTIONAL IfcImpactProtectionDeviceTypeSelect;
+		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcImpactProtectionDevice() : base() { }
+		public IfcImpactProtectionDevice(DatabaseIfc db) : base(db) { }
+		public IfcImpactProtectionDevice(DatabaseIfc db, IfcImpactProtectionDevice impactProtectionDevice, DuplicateOptions options) : base(db, impactProtectionDevice, options) { PredefinedType = impactProtectionDevice.PredefinedType; }
+		public IfcImpactProtectionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
+	{
+		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: IfcImpactProtectionDeviceTypeSelect;
+		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcImpactProtectionDeviceType() : base() { }
+		public IfcImpactProtectionDeviceType(DatabaseIfc db, IfcImpactProtectionDeviceType impactProtectionDeviceType, DuplicateOptions options) : base(db, impactProtectionDeviceType, options) { PredefinedType = impactProtectionDeviceType.PredefinedType; }
+		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeSelect predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
+	}
+	[Serializable]
+	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
+	{
+		private IfcLogicalEnum mFixedAxisVertical = IfcLogicalEnum.UNKNOWN; //: OPTIONAL IfcBoolean;
+		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
+
+		public IfcLogicalEnum FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
+		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
+
+		public IfcInclinedReferenceSweptAreaSolid() : base() { }
+		public IfcInclinedReferenceSweptAreaSolid(DatabaseIfc db, IfcInclinedReferenceSweptAreaSolid inclinedReferenceSweptAreaSolid) : base(db, inclinedReferenceSweptAreaSolid)
+		{
+			FixedAxisVertical = inclinedReferenceSweptAreaSolid.FixedAxisVertical;
+			Inclinating = inclinedReferenceSweptAreaSolid.Inclinating;
+		}
+		public IfcInclinedReferenceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcAxisLateralInclination inclinating)
+			: base(sweptArea, directrix) { Inclinating = inclinating; }
+	}
+	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		internal int mMappedTo;// : IfcTessellatedFaceSet; 
@@ -59,66 +99,47 @@ namespace GeometryGym.Ifc
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve 
 	{
 		private IfcCartesianPointList mPoints; // IfcCartesianPointList
-		internal List<IfcSegmentIndexSelect> mSegments = new List<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
+		internal LIST<IfcSegmentIndexSelect> mSegments = new LIST<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
 		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcBoolean
 
 		public IfcCartesianPointList Points { get { return mPoints; } set { mPoints = value; } }
-		public ReadOnlyCollection<IfcSegmentIndexSelect> Segments { get { return new ReadOnlyCollection<IfcSegmentIndexSelect>( mSegments); } }
+		public LIST<IfcSegmentIndexSelect> Segments { get { return mSegments; } }
 		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
 		internal IfcIndexedPolyCurve() : base() { }
 		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
-		public IfcIndexedPolyCurve(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs) : this(pl) { mSegments = segs; }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
 
 		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
-		internal override void changeSchema(ReleaseVersion schema)
-		{
-			base.changeSchema(schema);
-			if (schema < ReleaseVersion.IFC4)
-			{
-				IfcCartesianPointList cpl = Points;
-				IfcCartesianPointList2D cpl2d = cpl as IfcCartesianPointList2D;
-				if (cpl2d != null)
-				{
-					IfcBoundedCurve bc = IfcBoundedCurve.Generate(mDatabase, cpl2d.mCoordList.Select(x=>new Tuple<double,double>(x[0],x[1])), Segments.ToList());
-					int index = bc.mIndex;
-					mDatabase[mIndex] = bc;
-					mDatabase[index] = null;
-					mDatabase[cpl.mIndex] = null;
-				}
-				else
-				{
-					throw new Exception("Not Implemented");
-				}
-			}
-		}
 	}
 	[Serializable]
 	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem //SUPERTYPE OF (ONEOF (IfcIndexedPolygonalFaceWithVoids))
 	{
 		internal List<int> mCoordIndex = new List<int>();// : LIST [3:?] OF IfcPositiveInteger;
 		 //INVERSE
-		internal IfcPolygonalFaceSet mToFaceSet = null;
+		internal SET<IfcPolygonalFaceSet> mToFaceSet = new SET<IfcPolygonalFaceSet>();
 
-		public ReadOnlyCollection<int> CoordIndex { get { return new ReadOnlyCollection<int>( mCoordIndex); } }
-		public IfcPolygonalFaceSet ToFaceSet { get { return mToFaceSet; } set { mToFaceSet = value; } }
+		public List<int> CoordIndex { get { return mCoordIndex; } }
+		public SET<IfcPolygonalFaceSet> ToFaceSet { get { return mToFaceSet; } }
 
 		internal IfcIndexedPolygonalFace() : base() { }
 		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f) : base(db, f) { mCoordIndex.AddRange(f.mCoordIndex); }
 		public IfcIndexedPolygonalFace(DatabaseIfc db, IEnumerable<int> coords) : base(db) { mCoordIndex = coords.ToList(); }
-
-		public void AddCoordIndex(int index) { mCoordIndex.Add(index); }
+		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3) : base(db) { mCoordIndex.Add(c1); mCoordIndex.Add(c2); mCoordIndex.Add(c3); }
+		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3, int c4) : this(db, c1, c2, c3) { mCoordIndex.Add(c4); }
 	}
 	[Serializable]
 	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
 	{
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
-		public ReadOnlyCollection<List<int>> InnerCoordIndices { get { return new ReadOnlyCollection<List<int>>(mInnerCoordIndices); }  }
+		public List<List<int>> InnerCoordIndices { get { return mInnerCoordIndices; }  }
 		internal IfcIndexedPolygonalFaceWithVoids() : base() { }
 		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
-		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<IEnumerable<int>> inners) 
-			: base(db, coords) { mInnerCoordIndices = inners.ToList().ConvertAll(x=>x.ToList()); }
+		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<int> inner) 
+			: base(db, coords) { mInnerCoordIndices.Add(inner.ToList()); }
+		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<List<int>> inners) 
+			: base(db, coords) { mInnerCoordIndices.AddRange(inners); }
 	}
 	[Serializable]
 	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)
@@ -151,7 +172,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcInterceptor() : base() { }
 		internal IfcInterceptor(DatabaseIfc db, IfcInterceptor i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
-		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcInterceptor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcInterceptorType : IfcFlowTreatmentDeviceType
@@ -163,6 +184,11 @@ namespace GeometryGym.Ifc
 		internal IfcInterceptorType(DatabaseIfc db, IfcInterceptorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcInterceptorType(DatabaseIfc db, string name, IfcInterceptorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
+	public interface IfcInterferenceSelect : IBaseClassIfc // SELECT(IfcSpatialElement, IfcElement);
+	{
+		SET<IfcRelInterferesElements> IsInterferedByElements { get; } 
+		SET<IfcRelInterferesElements> InterferesElements { get; } 
+	}
 	[Serializable]
 	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
 	{
@@ -173,12 +199,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcInventory : IfcGroup
 	{
-		internal IfcInventoryTypeEnum mInventoryType;// : IfcInventoryTypeEnum;
+		internal IfcInventoryTypeEnum mPredefinedType;// : IfcInventoryTypeEnum;
 		internal int mJurisdiction;// : IfcActorSelect;
 		internal List<int> mResponsiblePersons = new List<int>();// : SET [1:?] OF IfcPerson;
 		internal int mLastUpdateDate;// : IfcCalendarDate;
 		internal int mCurrentValue;// : OPTIONAL IfcCostValue;
 		internal int mOriginalValue;// : OPTIONAL IfcCostValue;
+
+		public IfcInventoryTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcInventory() : base() { }
 		internal IfcInventory(DatabaseIfc db, IfcInventory i, DuplicateOptions options) : base(db, i, options)
 		{
@@ -192,8 +221,37 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcInventory(DatabaseIfc m, string name) : base(m, name) { }
 	}
-	//ENTITY IfcIrregularTimeSeries
-	//ENTITY IfcIrregularTimeSeriesValue;
+	[Serializable]
+	public partial class IfcIrregularTimeSeries : IfcTimeSeries
+	{
+		private LIST<IfcIrregularTimeSeriesValue> mValues = new LIST<IfcIrregularTimeSeriesValue>(); //: LIST[1:?] OF IfcIrregularTimeSeriesValue;
+
+		public LIST<IfcIrregularTimeSeriesValue> Values { get { return mValues; } set { mValues = value; } }
+
+		public IfcIrregularTimeSeries() : base() { }
+		public IfcIrregularTimeSeries(string name, DateTime startTime, DateTime endTime, IfcTimeSeriesDataTypeEnum timeSeriesDataType, IfcDataOriginEnum dataOrigin, IEnumerable<IfcIrregularTimeSeriesValue> values)
+			: base(values.First().Database, name, startTime, endTime, timeSeriesDataType, dataOrigin)
+		{
+			Values.AddRange(values);
+		}
+	}
+	[Serializable]
+	public partial class IfcIrregularTimeSeriesValue : BaseClassIfc
+	{
+		private DateTime mTimeStamp = DateTime.MinValue; //: IfcDateTime;
+		private LIST<IfcValue> mListValues = new LIST<IfcValue>(); //: LIST[1:?] OF IfcValue;
+
+		public DateTime TimeStamp { get { return mTimeStamp; } set { mTimeStamp = value; } }
+		public LIST<IfcValue> ListValues { get { return mListValues; } set { mListValues = value; } }
+
+		public IfcIrregularTimeSeriesValue() : base() { }
+		public IfcIrregularTimeSeriesValue(DatabaseIfc db, DateTime timeStamp, IEnumerable<IfcValue> listValues)
+			: base(db)
+		{
+			TimeStamp = timeStamp;
+			ListValues.AddRange(listValues);
+		}
+	}
 	[Serializable]
 	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{

@@ -147,10 +147,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSurfaceCurve : IfcCurve //IFC4 Add2
 	{
-		public override Curve Curve() { return Curve3D.Curve(); }
+		public override Curve Curve(double tol) { return Curve3D.Curve(tol); }
 	}
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
 	{
-		internal Transform PositionTransform { get { return (mPosition == 0 ? Transform.Identity : Position.Transform); } }
+		internal Transform PositionTransform() { return (mPosition == 0 ? Transform.Identity : Position.Transform()); }
 	}
 }

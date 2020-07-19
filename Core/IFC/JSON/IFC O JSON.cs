@@ -131,7 +131,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcConstraint>(obj.GetValue("BenchmarkValues", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>AddBenchmark(x));
+			mDatabase.extractJArray<IfcConstraint>(obj.GetValue("BenchmarkValues", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => AddBenchmark(x));
 			JToken token = obj.GetValue("LogicalAggregator", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcLogicalOperatorEnum>(token.Value<string>(), true, out mLogicalAggregator);
@@ -159,6 +159,26 @@ namespace GeometryGym.Ifc
 			if (mObjectiveQualifier != IfcObjectiveEnum.NOTDEFINED)
 				obj["ObjectiveQualifier"] = mObjectiveQualifier.ToString();
 			setAttribute(obj, "UserDefinedQualifier", UserDefinedQualifier);
+		}
+	}
+	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PlacementRelTo", StringComparison.InvariantCultureIgnoreCase) as JToken;
+			if (token != null)
+			{
+				JObject jobj = token as JObject;
+				if (jobj != null)
+					PlacementRelTo = mDatabase.ParseJObject<IfcObjectPlacement>(jobj);
+			}
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPlacementRelTo != null)
+				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, options);
 		}
 	}
 	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)

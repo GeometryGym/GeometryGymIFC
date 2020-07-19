@@ -28,7 +28,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcBeam : IfcBuildingElement
+	public partial class IfcBeam : IfcBuiltElement
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcBeamType : IfcBuildingElementType
+	public partial class IfcBeamType : IfcBuiltElementType
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -121,8 +121,8 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["Operator"] = mOperator.ToString();
-			obj["FirstOperand"] = mDatabase[mFirstOperand].getJson(this, options);
-			obj["SecondOperand"] = mDatabase[mSecondOperand].getJson(this, options);
+			obj["FirstOperand"] = mFirstOperand.getJson(this, options);
+			obj["SecondOperand"] = mSecondOperand.getJson(this, options);
 		}
 	}
 	public abstract partial class IfcBoundaryCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundaryEdgeCondition ,IfcBoundaryFaceCondition ,IfcBoundaryNodeCondition));
@@ -255,6 +255,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
+			JToken token = obj.GetValue("ElevationOfRefHeight", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfRefHeight = token.Value<double>();
+			token = obj.GetValue("ElevationOfTerrain", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				ElevationOfTerrain = token.Value<double>();
 			JObject jobj = obj.GetValue("BuildingAddress", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				BuildingAddress = mDatabase.ParseJObject<IfcPostalAddress>(jobj);
@@ -262,11 +268,15 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mElevationOfRefHeight))
+				obj["ElevationOfRefHeight"] = ElevationOfRefHeight.ToString();
+			if (!double.IsNaN(mElevationOfTerrain))
+				obj["ElevationOfTerrain"] = ElevationOfTerrain.ToString();
 			if (mBuildingAddress != null) 
 				obj["BuildingAddress"] = BuildingAddress.getJson(this, options);
 		}
 	}
-	public partial class IfcBuildingStorey : IfcFacilityPart
+	public partial class IfcBuildingStorey : IfcSpatialStructureElement
 	{
 		internal override void parseJObject(JObject obj)
 		{

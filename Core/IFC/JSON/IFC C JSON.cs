@@ -324,7 +324,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			base.setAttribute(obj, "UsageName", UsageName);
-			obj["HasProperties"] = new JArray(mPropertyIndices.Select(x => mDatabase[x].getJson(this, options)));
+			obj["HasProperties"] = new JArray(mHasProperties.Values.Select(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
@@ -391,7 +391,7 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ConstraintSource = token.Value<string>();
 			CreatingActor = mDatabase.ParseJObject<IfcActorSelect>(obj.GetValue("CreatingActor", StringComparison.InvariantCultureIgnoreCase) as JObject);
-			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			List<IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcExternalReferenceRelationship er in ers)
 				er.RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> rcr = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("PropertiesForConstraint", StringComparison.InvariantCultureIgnoreCase) as JArray);
@@ -411,12 +411,12 @@ namespace GeometryGym.Ifc
 			obj["ConstraintGrade"] = mConstraintGrade.ToString();
 			setAttribute(obj, "ConstraintSource", ConstraintSource);
 
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
 				JArray array = new JArray();
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 					array.Add(r.getJson(this, options));
-				obj["HasExternalReferences"] = array;
+				obj["HasExternalReference"] = array;
 			}
 			if (mPropertiesForConstraint.Count > 0)
 			{
@@ -455,7 +455,6 @@ namespace GeometryGym.Ifc
 		{
 			if (mDatabase.mContext == null) //this as IfcProjectLibrary == null ||
 				mDatabase.mContext = this;
-			base.parseJObject(obj);
 
 			JToken token = obj.GetValue("ObjectType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
@@ -466,20 +465,15 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Phase", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Phase = token.Value<string>();
-			RepresentationContexts.AddRange(mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray));
-			UnitsInContext = mDatabase.ParseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => x.RelatedObjects.Add(this));
 			mDatabase.extractJArray<IfcRelDeclares>(obj.GetValue("Declares", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => x.RelatingContext = this);
+			RepresentationContexts.AddRange(mDatabase.extractJArray<IfcRepresentationContext>(obj.GetValue("RepresentationContexts", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			UnitsInContext = mDatabase.ParseJObject<IfcUnitAssignment>(obj.GetValue("UnitsInContext", StringComparison.InvariantCultureIgnoreCase) as JObject);
 
-
+			base.parseJObject(obj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			base.setJSON(obj, host, options);
-			setAttribute(obj, "ObjectType", ObjectType);
-			setAttribute(obj, "LongName", LongName);
-			setAttribute(obj, "Phase", Phase);
-
 			if (mRepresentationContexts.Count > 0)
 			{
 				JArray array = new JArray() { };
@@ -490,6 +484,11 @@ namespace GeometryGym.Ifc
 			IfcUnitAssignment unitsInContext = UnitsInContext;
 			if (unitsInContext != null)
 				obj["UnitsInContext"] = unitsInContext.getJson(this, options);
+			base.setJSON(obj, host, options);
+			setAttribute(obj, "ObjectType", ObjectType);
+			setAttribute(obj, "LongName", LongName);
+			setAttribute(obj, "Phase", Phase);
+
 			if (mIsDefinedBy.Count > 0 && options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
 				JArray array = new JArray();
@@ -529,6 +528,37 @@ namespace GeometryGym.Ifc
 			obj["ConversionFactor"] = ConversionFactor.getJson(this, options);
 		}
 	}
+	public partial class IfcConveyorSegment : IfcFlowSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcConveyorSegmentTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcConveyorSegmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcConveyorSegmentType : IfcFlowSegmentType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcConveyorSegmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public abstract partial class IfcCoordinateOperation : BaseClassIfc // IFC4 	ABSTRACT SUPERTYPE OF(IfcMapConversion);
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -554,7 +584,38 @@ namespace GeometryGym.Ifc
 				obj["VerticalDatum"] = str;
 		}
 	}
-	public partial class IfcCovering : IfcBuildingElement
+	public partial class IfcCourse : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcCourseTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcCourseTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcCourseType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcCourseTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcCovering : IfcBuiltElement
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -570,7 +631,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcCoveringType : IfcBuildingElementType
+	public partial class IfcCoveringType : IfcBuiltElementType
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -642,18 +703,17 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["Depth"] = Math.Round(mDepth, digits);
-			obj["Width"] = Math.Round(mWidth, digits);
-			obj["WallThickness"] = Math.Round(mWallThickness, digits);
-			obj["Girth"] = Math.Round(mGirth, digits);
+			obj["Depth"] = formatLength(mDepth);
+			obj["Width"] = formatLength(mWidth);
+			obj["WallThickness"] = formatLength(mWallThickness);
+			obj["Girth"] = formatLength(mGirth);
 			if (!double.IsNaN(mInternalFilletRadius) && mInternalFilletRadius > 0)
-				obj["InternalFilletRadius"] = Math.Round(mInternalFilletRadius, digits);
+				obj["InternalFilletRadius"] = formatLength(mInternalFilletRadius);
 			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
 			{
 				if (!double.IsNaN(mCentreOfGravityInX) && mCentreOfGravityInX > 0)
-					obj["CentreOfGravityInX"] = mCentreOfGravityInX;
+					obj["CentreOfGravityInX"] = formatLength(mCentreOfGravityInX);
 			}
 		}
 	}

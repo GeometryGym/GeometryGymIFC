@@ -29,6 +29,38 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcEarthworksCutTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcEarthworksCutTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcEarthworksFill : IfcEarthworksElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcEarthworksFillTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcEarthworksFillTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -50,6 +82,37 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(EdgeStart.GetXML(xml.OwnerDocument, "EdgeStart", this, processed));
 			if(mEdgeEnd != null)
 				xml.AppendChild(mEdgeEnd.GetXML(xml.OwnerDocument, "EdgeEnd", this, processed));
+		}
+	}
+	public partial class IfcElectricFlowTreatmentDevice : IfcFlowTreatmentDevice
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement,IfcCivilElement
@@ -175,10 +238,6 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
-		//protected string mName = "$"; //: OPTIONAL IfcLabel;
-		//private string mDescription = "$"; //: OPTIONAL IfcText;
-		//internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
-		//private List<int> mPropertyIndices = new List<int>();
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -225,13 +284,13 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "HasExternalReferences") == 0)
+				if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
 						IfcExternalReferenceRelationship r = mDatabase.ParseXml<IfcExternalReferenceRelationship>(cn as XmlElement);
 						if (r != null)
-							mHasExternalReferences.Add(r);
+							mHasExternalReference.Add(r);
 					}
 				}
 				else if (string.Compare(name, "HasConstraintRelationships") == 0)
@@ -260,8 +319,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
-			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
-			foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+			XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
+			foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 				element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			if(element.HasChildNodes)
 				xml.AppendChild(element);

@@ -53,6 +53,37 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcPavement : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if(mFlexible != IfcLogicalEnum.UNKNOWN)
+				obj["Flexible"] = mFlexible == IfcLogicalEnum.TRUE ? "TRUE" : "FALSE";
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mFlexible = token.Value<bool>() ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+		}
+	}
+	public partial class IfcPavementType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Flexible"] = mFlexible ? "TRUE" : "FALSE";
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mFlexible = token.Value<bool>();
+		}
+	}
 	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
 	{
 		internal override void parseJObject(JObject obj)
@@ -286,7 +317,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
+	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -315,7 +346,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			jobj = obj.GetValue("Representation", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Representation = mDatabase.ParseJObject<IfcProductRepresentation>(jobj);
+				Representation = mDatabase.ParseJObject<IfcProductDefinitionShape>(jobj);
 
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -334,7 +365,7 @@ namespace GeometryGym.Ifc
 				obj["ObjectPlacement"] = placementObj;
 			if (options.Style != SetJsonOptions.JsonStyle.Repository)
 			{
-				IfcProductRepresentation representation = Representation;
+				IfcProductDefinitionShape representation = Representation;
 				if (representation != null)
 					obj["Representation"] = representation.getJson(this, options);
 			}
@@ -342,7 +373,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -372,7 +403,7 @@ namespace GeometryGym.Ifc
 				obj["HasShapeAspects"] = new JArray(mHasShapeAspects.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
-	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -383,7 +414,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Description = token.Value<string>();
-			Representations.AddRange(mDatabase.extractJArray<IfcRepresentation>(obj.GetValue("Representations", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Representations.AddRange(mDatabase.extractJArray<Representation>(obj.GetValue("Representations", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -410,7 +441,7 @@ namespace GeometryGym.Ifc
 			if (token != null)
 				ProfileName = token.Value<string>();
 			
-			HasExternalReferences.AddRange(mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			HasExternalReference.AddRange(mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			HasProperties.AddRange(mDatabase.extractJArray<IfcProfileProperties>(obj.GetValue("HasProperties", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -422,14 +453,14 @@ namespace GeometryGym.Ifc
 			if (mDatabase == null || mDatabase.Release >= ReleaseVersion.IFC2x3)
 			{
 				JArray jArray = new JArray();
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 				{
 					if (r == host)
 						continue;
 					jArray.Add(r.getJson(this, options));
 				}
 				if (jArray.Count > 0)
-					obj["HasExternalReferences"] = jArray;
+					obj["HasExternalReference"] = jArray;
 
 
 				jArray = new JArray();
@@ -508,7 +539,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray))
+			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.addRelated(this);
@@ -516,7 +547,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			createArray(obj, "HasExternalReferences", HasExternalReferences, this, options);
+			createArray(obj, "HasExternalReference", HasExternalReference, this, options);
 			//if (mHasConstraintRelationships.Count > 0)
 
 		}

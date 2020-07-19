@@ -67,7 +67,7 @@ namespace GeometryGym.Ifc
 						if (closed && icounter + 1 == segments.Length)
 						{
 							if (li != null)
-								li.mIndices.Add(1);
+								li.Add(1);
 							else
 								li = new IfcLineIndex(pcounter, 1);
 						}
@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 						{
 							pts.Add(new Point2d(c.PointAtEnd.X, c.PointAtEnd.Y));
 							if (li != null)
-								li.mIndices.Add(++pcounter);
+								li.Add(++pcounter);
 							else
 								li = new IfcLineIndex(pcounter++, pcounter);
 						}
@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 						if (closed && icounter + 1 == segments.Length)
 						{
 							if (li != null)
-								li.mIndices.Add(0);
+								li.Add(0);
 							else
 								li = new IfcLineIndex(pcounter, 0);
 						}
@@ -128,7 +128,7 @@ namespace GeometryGym.Ifc
 						{
 							pts.Add(c.PointAtEnd);
 							if (li != null)
-								li.mIndices.Add(++pcounter);
+								li.Add(++pcounter);
 							else
 								li = new IfcLineIndex(pcounter++, pcounter);
 						}

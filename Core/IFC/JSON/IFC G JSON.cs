@@ -107,14 +107,16 @@ namespace GeometryGym.Ifc
 			}
 
 			JArray arr = new JArray();
-			foreach (IfcGeometricRepresentationSubContext sub in HasSubContexts)
+			if (!(host is IfcGeometricRepresentationSubContext))
 			{
-				if (sub.mIndex != host.mIndex)
-					arr.Add(sub.getJson(this, options));
+				foreach (IfcGeometricRepresentationSubContext sub in HasSubContexts)
+				{
+					if (sub.mIndex != host.mIndex)
+						arr.Add(sub.getJson(this, options));
+				}
 			}
 			if (arr.Count > 0)
 				obj["HasSubContexts"] = arr;
-
 			if (mHasCoordinateOperation != null)
 				obj["HasCoordinateOperation"] = mHasCoordinateOperation.getJson(this, options);
 		}
@@ -133,6 +135,9 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("UserDefinedTargetView", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				UserDefinedTargetView = token.Value<string>();
+			JObject jobj = obj.GetValue("ParentContext", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ParentContext = mDatabase.ParseJObject<IfcGeometricRepresentationContext>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -166,8 +171,15 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcGrid : IfcProduct
+	public partial class IfcGrid : IfcPositioningElement
 	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			UAxes.AddRange(mDatabase.extractJArray<IfcGridAxis>(obj.GetValue("UAxes", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			VAxes.AddRange(mDatabase.extractJArray<IfcGridAxis>(obj.GetValue("VAxes", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			WAxes.AddRange(mDatabase.extractJArray<IfcGridAxis>(obj.GetValue("WAxes", StringComparison.InvariantCultureIgnoreCase) as JArray));
+		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
@@ -179,6 +191,17 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridAxis : BaseClassIfc
 	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			AxisTag = extractString(obj.GetValue("AxisTag", StringComparison.InvariantCultureIgnoreCase));
+			JObject jobj = obj.GetValue("AxisCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				AxisCurve = mDatabase.ParseJObject<IfcCurve>(jobj);
+			JToken token = obj.GetValue("SameSense", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				SameSense = token.Value<bool>();
+		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);

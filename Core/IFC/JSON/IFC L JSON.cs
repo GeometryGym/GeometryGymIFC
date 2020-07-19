@@ -78,6 +78,25 @@ namespace GeometryGym.Ifc
 				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, options);
 		}
 	}
+	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Directrix"] = Directrix.getJson(this, options);
+			obj["Inclinating"] = Inclinating.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
+			jobj = obj.GetValue("Inclinating", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Inclinating = mDatabase.ParseJObject<IfcAxisLateralInclination>(jobj);
+		}
+	}
 	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		internal override void parseJObject(JObject obj)
@@ -91,6 +110,67 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["Axis"] = Axis.getJson(this, options);
+		}
+	}
+	public partial class IfcLinearPlacementWithInclination : IfcLinearPlacement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Inclinating"] = Inclinating.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Inclinating", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Inclinating = mDatabase.ParseJObject<IfcAxisLateralInclination>(jobj);
+		}
+	}
+	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Span"] = mSpan.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken span = obj.GetValue("Span", StringComparison.InvariantCultureIgnoreCase);
+			if (span != null)
+				mSpan = span.Value<double>();
+		}
+	}
+	public partial class IfcLiquidTerminal : IfcFlowTerminal
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcLiquidTerminalTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcLiquidTerminalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcLiquidTerminalType : IfcFlowTerminalType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcLiquidTerminalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
@@ -112,9 +192,6 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-
-			if (mPlacementRelTo != null)
-				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, options);
 			obj["RelativePlacement"] = mRelativePlacement.getJson(this, options);
 		}
 	}

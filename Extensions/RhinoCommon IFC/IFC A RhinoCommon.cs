@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcAxis2Placement : IBaseClassIfc //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	{
-		Transform Transform { get; }
+		Transform Transform();
 		Plane Plane { get; }
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
@@ -94,7 +94,11 @@ namespace GeometryGym.Ifc
 					Point3d orig = LocationPoint;
 					IfcDirection axis = Axis, refDirection = RefDirection;
 					Vector3d norm = axis == null ? Vector3d.ZAxis : axis.Vector3d;
+					if (norm.IsTiny())
+						norm = Vector3d.ZAxis;
 					Vector3d xaxis = refDirection == null ? Vector3d.XAxis : refDirection.Vector3d;
+					if (xaxis.IsTiny())
+						xaxis = Vector3d.XAxis;
 					Vector3d yAxis = Vector3d.CrossProduct(norm, xaxis);
 					mPlane = new Plane(orig, xaxis, yAxis);
 				}

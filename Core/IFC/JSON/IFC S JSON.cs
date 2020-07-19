@@ -28,6 +28,29 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcSectionedSurface : IfcSurface
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Directrix"] = Directrix.getJson(this, options);
+			obj["CrossSectionPositions"] = new JArray(CrossSectionPositions.Select(x => x.getJson(this, options)));
+			obj["CrossSections"] = new JArray(CrossSections.Select(x => x.getJson(this, options)));
+			obj["FixedAxisVertical"] = mFixedAxisVertical;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
+			CrossSectionPositions.AddRange(mDatabase.extractJArray<IfcDistanceExpression>(obj.GetValue("CrossSectionPositions", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			CrossSections.AddRange(mDatabase.extractJArray<IfcProfileDef>(obj.GetValue("CrossSections", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			JToken fixedAxisVertical = obj.GetValue("FixedAxisVertical", StringComparison.InvariantCultureIgnoreCase);
+			if (fixedAxisVertical != null)
+				mFixedAxisVertical = fixedAxisVertical.Value<bool>();
+		}
+	}
 	public partial class IfcShapeAspect : BaseClassIfc
 	{
 		internal override void parseJObject(JObject obj)
@@ -55,17 +78,79 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "ProductDefinitional", mProductDefinitional.ToString());
-			if (mPartOfProductDefinitionShape > 0 && mPartOfProductDefinitionShape != host.mIndex)
-				obj["PartOfProductDefinitionShape"] = mDatabase[mPartOfProductDefinitionShape].getJson(this, options);
+			if (mPartOfProductDefinitionShape != null && mPartOfProductDefinitionShape != host)
+				obj["PartOfProductDefinitionShape"] = mPartOfProductDefinitionShape.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcShapeModel : IfcRepresentation//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
+	public abstract partial class IfcShapeModel : IfcRepresentation<IfcRepresentationItem>//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			if (mOfShapeAspect != null)
 				obj["OfShapeAspect"] = mOfShapeAspect.getJson(this, options);
+		}
+	}
+	public partial class IfcSign : IfcElementComponent
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcSignTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcSignTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcSignal : IfcFlowTerminal
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcSignalTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcSignalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcSignalType : IfcFlowTerminalType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcSignalTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcSignType : IfcElementComponentType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcSignTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcSimplePropertyTemplate : IfcPropertyTemplate
@@ -126,7 +211,7 @@ namespace GeometryGym.Ifc
 			obj["Name"] = Name.ToString();
 		}
 	}
-	public partial class IfcSlab : IfcBuildingElement
+	public partial class IfcSlab : IfcBuiltElement
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -142,7 +227,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcSlabType : IfcBuildingElementType
+	public partial class IfcSlabType : IfcBuiltElementType
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -639,13 +724,13 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("Side", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcSurfaceSide>(token.Value<string>(), out mSide);
-			mDatabase.extractJArray<IfcSurfaceStyleElementSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addStyle(x));
+		 	mStyles.AddRange(mDatabase.extractJArray<IfcSurfaceStyleElementSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Side"] = mSide.ToString();
-			obj["Styles"] = new JArray(mStyles.ConvertAll(x => mDatabase[x].getJson(this, options)));
+			obj["Styles"] = new JArray(mStyles.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect

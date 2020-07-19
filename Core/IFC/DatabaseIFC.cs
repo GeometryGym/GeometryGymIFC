@@ -32,8 +32,8 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("DEPRECEATED IFC4", false)] IFC2X, [Obsolete("DEPRECEATED IFC4", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
-	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned,Ifc2x3Coordination, Ifc2x3NotAssigned };
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned };
 
 	public class Triple<T>
 	{
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 			mRelease = schema;
 			mModelView = view;
 #if (RHINO || GH)
-			//mModelSIScale = 1 / GGYM.Units.mLengthConversion[(int) GGYM.GGYMRhino.GGRhino.ActiveUnits()];
+			//mModelSIScale = 1 / Utils.mLengthConversion[(int) GeometryGym.GGRhino.GGRhino.ActiveUnits()];
 			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
 			if (doc != null)
 			{
@@ -193,8 +193,12 @@ namespace GeometryGym.Ifc
 			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
-			hdr += "/* author */ ('" + System.Environment.UserName + "'),\r\n";
-			hdr += "/* organization */ ('" + IfcOrganization.Organization + "'),\r\n";
+			IfcPerson person = Factory.Person;
+			hdr += "/* author */ ('" + person.Name + "'),\r\n";
+			string organizationName = Factory.Organization.Name;
+			if (organizationName == "UNKNOWN")
+				organizationName = IfcOrganization.Organization;
+			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
 			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
 			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
 			hdr += "/* authorization */ 'None');\r\n\r\n";
@@ -205,6 +209,8 @@ namespace GeometryGym.Ifc
 				version = "IFC4X1";
 			else if (mRelease == ReleaseVersion.IFC4X2)
 				version = "IFC4X2";
+			else if (mRelease == ReleaseVersion.IFC4X3)
+				version = "IFC4X3RC1";
 			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";
@@ -453,7 +459,7 @@ namespace GeometryGym.Ifc
 					setFileLine(strLine);
 					continue;
 				}
-				if (c == 'E')
+				if (c == 'E' || c == 'H')
 					continue;
 				revised.Add(strLine);
 			}
@@ -472,13 +478,17 @@ namespace GeometryGym.Ifc
 				ParserSTEP.GetKeyWord(str, out ifcID, out kw, out def);
 				if(!string.IsNullOrEmpty(kw))
 				{
-					BaseClassIfc obj = BaseClassIfc.Construct(kw);
-					if (obj != null)
+					try
 					{
-						dictionary[ifcID] = obj;
-						bag.Add(new ConstructorClass(obj, def));
-						this[ifcID] = obj;
+						BaseClassIfc obj = BaseClassIfc.Construct(kw);
+						if (obj != null)
+						{
+							dictionary[ifcID] = obj;
+							bag.Add(new ConstructorClass(obj, def));
+							this[ifcID] = obj;
+						}
 					}
+					catch (Exception) { }
 				}
 			}
 			ReleaseVersion release = Release;
@@ -539,6 +549,8 @@ namespace GeometryGym.Ifc
 					mRelease = ReleaseVersion.IFC4X1;
 				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
 					mRelease = ReleaseVersion.IFC4X2;
+				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
+					mRelease = ReleaseVersion.IFC4X3;
 				else
 					mRelease = ReleaseVersion.IFC4;
 				if (mModelView == ModelView.Ifc2x3Coordination || mModelView == ModelView.Ifc2x3NotAssigned)
@@ -771,9 +783,13 @@ namespace GeometryGym.Ifc
 			if (entity == null)
 				return null;
 			int index = mDuplicateMapping.FindExisting(entity);
-			if(index > 0)
-				return mDatabase[index];
 			BaseClassIfc result = null;
+			if (index > 0)
+			{
+				result = mDatabase[index];
+				if (result != null)
+					return result;
+			}
 			if (!string.IsNullOrEmpty(entity.mGlobalId))
 			{
 				if (mDatabase.mDictionary.TryGetValue(entity.mGlobalId, out result))
@@ -1357,6 +1373,7 @@ namespace GeometryGym.Ifc
 					mPersonOrganization = new IfcPersonAndOrganization(Person, Organization);
 				return mPersonOrganization;
 			}
+			set { mPersonOrganization = value; }
 		}
 		private IfcPerson mPerson = null;
 		internal IfcPerson Person
@@ -1365,25 +1382,25 @@ namespace GeometryGym.Ifc
 			{
 				if (mPerson == null)
 				{
-					mPerson = new IfcPerson(mDatabase, System.Environment.UserName.Replace("'", ""), "", "");
+					mPerson = new IfcPerson(mDatabase, System.Environment.UserName, "", "");
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
-			string str = GGYM.ggAssembly.mOptions.OwnerRole;
-			if (!string.IsNullOrEmpty(str))
-			{
-				IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcRoleEnum>(str, out role))
-				{
-					if (role != IfcRoleEnum.NOTDEFINED)
-						mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
-				}
-				else
-					mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
-			}
+					string str = ggAssembly.mOptions.OwnerRole;
+					if (!string.IsNullOrEmpty(str))
+					{
+						IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
+						if (Enum.TryParse<IfcRoleEnum>(str, out role))
+						{
+							if (role != IfcRoleEnum.NOTDEFINED)
+								mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
+						}
+						else
+							mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
+					}
 #endif
 				}
 				return mPerson;
 			}
-
+			set { mPerson = value; }
 		}
 		private IfcOrganization mOrganization = null;
 		internal IfcOrganization Organization
@@ -1394,12 +1411,15 @@ namespace GeometryGym.Ifc
 					mOrganization = new IfcOrganization(mDatabase, IfcOrganization.Organization);
 				return mOrganization;
 			}
-
+			set
+			{
+				mOrganization = value;
+			}
 		}
 		internal List<IfcOwnerHistory> mOwnerHistories = new List<IfcOwnerHistory>();
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcPersonAndOrganization owner, IfcApplication application, DateTime created)
 		{
-			return OwnerHistory(action, owner, application, null, null, DateTime.MinValue, created);	
+			return OwnerHistory(action, owner, application, null, null, action == IfcChangeActionEnum.NOTDEFINED || action == IfcChangeActionEnum.NOCHANGE ? DateTime.MinValue : created, created);	
 		}
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcPersonAndOrganization owner, IfcApplication application, IfcPersonAndOrganization modifier, IfcApplication modApplication, DateTime modified, DateTime created)
 		{

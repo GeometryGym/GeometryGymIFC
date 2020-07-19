@@ -31,6 +31,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPoint : IfcPoint
 	{
 		public override Point3d Location { get { return new Point3d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
+		public Point2d Location2d() { return new Point2d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY); }
 		internal Point3d Coordinates3d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = value.Z; } }
 		internal Point2d Coordinates2d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = double.NaN; } }
 		internal IfcCartesianPoint(DatabaseIfc m, Point3d pt) : base(m) { Coordinates3d = pt; }
@@ -45,7 +46,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCartesianPointList : IfcGeometricRepresentationItem //IFC4
 	{
-		internal abstract List<Point3d> Points { get; }
+		public abstract List<Point3d> Points();
 	}
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
 	{
@@ -53,29 +54,26 @@ namespace GeometryGym.Ifc
 		{
 			mCoordList = coordList.Select(x => new double[] { x.X, x.Y }).ToArray();
 		}
-		internal override List<Point3d> Points { get { return mCoordList.ToList().ConvertAll(x => new Point3d(x[0], x[1], 0)); } }
+		public override List<Point3d> Points() { return mCoordList.ToList().ConvertAll(x => new Point3d(x[0], x[1], 0)); }
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
 		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Point3d> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.X, x.Y, x.Z }).ToArray(); }
-		internal override List<Point3d> Points { get { return mCoordList.Select(x => new Point3d(x[0], x[1], x[2])).ToList(); } }
+		public override List<Point3d> Points() { return mCoordList.Select(x => new Point3d(x[0], x[1], x[2])).ToList(); } 
 	}
 	public abstract partial class IfcCartesianTransformationOperator
 	{
-		internal Transform Transform
+		public Transform Transform()
 		{
-			get
-			{
-				IfcCartesianPoint cp = LocalOrigin;
-				Point3d p = (cp == null ? Point3d.Origin : cp.Location);
-				return Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
-			}
+			IfcCartesianPoint cp = LocalOrigin;
+			Point3d p = (cp == null ? Point3d.Origin : cp.Location);
+			return Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
 		}
-		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Transform.Identity : Transform.Scale(location, mScale); }
+		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(location, mScale); }
 		protected virtual Transform vecsTransform()
 		{
 			Vector3d vx = new Vector3d(1, 0, 0), vy = new Vector3d(0, 1, 0);
-			Transform tr = Transform.Identity;
+			Transform tr = Rhino.Geometry.Transform.Identity;
 			if (mAxis1 > 0)
 			{
 				vx = Axis1.Vector3d;
@@ -95,7 +93,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator2DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, mScale2, 1); }
+		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, mScale2, 1); }
 	}
 	public partial class IfcCartesianTransformationOperator3D
 	{
@@ -112,7 +110,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator3DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
+		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
@@ -121,7 +119,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircle : IfcConic
 	{
-		public override Curve Curve() { return new ArcCurve(Circle); }
+		public override Curve Curve(double tol) { return new ArcCurve(Circle); }
 		public Circle Circle { get { return new Circle(Plane, mRadius); } }
 	}
 	public partial class IfcCompositeCurveSegment
@@ -131,7 +129,7 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcConic : IfcCurve /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCircle ,IfcEllipse))*/
 	{
-		public Transform Transform { get { return (mPosition > 0 ? Position.Transform : Transform.Translation(0, 0, 0)); } }
+		public Transform Transform { get { return (mPosition > 0 ? Position.Transform() : Transform.Translation(0, 0, 0)); } }
 		public Plane Plane { get { return (mPosition > 0 ? Position.Plane : Plane.WorldXY); } }
 	}
 	public partial class IfcConnectionPointEccentricity
@@ -142,6 +140,12 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
 	{
-		public abstract Curve Curve();
+		public Curve Curve() { return Curve(mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
+		public abstract Curve Curve(double tol);
+
+		internal virtual Plane planeAt(IfcDistanceExpression distanceExpression, bool vertical, double tol)
+		{
+			throw new Exception("PlaneAt DistanceExpression not implemented for " + this.StepClassName);
+		}
 	}
 }

@@ -141,15 +141,15 @@ namespace GeometryGym.Ifc
 				foreach (IfcRelAggregates rags in IsDecomposedBy)
 					element.AppendChild(rags.GetXML(xml.OwnerDocument, "", this, processed));
 			}
-            //if (mHasAssociations.Count > 0)
-            //{
-            //	XmlElement element = xml.OwnerDocument.CreateElement("HasAssociations", mDatabase.mXmlNamespace);
-            //	xml.AppendChild(element);
-            //	foreach (IfcRelAssociates ra in HasAssociations)
-            //		element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
-            //}
-        }
-    }
+			//if (mHasAssociations.Count > 0)
+			//{
+			//	XmlElement element = xml.OwnerDocument.CreateElement("HasAssociations", mDatabase.mXmlNamespace);
+			//	xml.AppendChild(element);
+			//	foreach (IfcRelAssociates ra in HasAssociations)
+			//		element.AppendChild(ra.GetXML(xml.OwnerDocument, "", this, processed));
+			//}
+		}
+	}
 	public partial class IfcObjective : IfcConstraint
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -193,6 +193,57 @@ namespace GeometryGym.Ifc
 				setAttribute(xml, "UserDefinedQualifier", UserDefinedQualifier);
 			}
 
+		}
+	}
+	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PlacementRelTo") == 0)
+					PlacementRelTo = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPlacementRelTo != null)
+				xml.AppendChild(mPlacementRelTo.GetXML(xml.OwnerDocument, "PlacementRelTo", this, processed));
+		}
+	}
+	public partial class IfcOpenCrossProfileDef : IfcProfileDef
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("HorizontalWidths", (mHorizontalWidths ? "true" : "false"));
+			XmlElement element = xml.OwnerDocument.CreateElement("Tags", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			//foreach (IfcLabel o in Tags)
+			//	element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string horizontalWidths = xml.GetAttribute("HorizontalWidths");
+			if (!string.IsNullOrEmpty(horizontalWidths))
+				bool.TryParse(horizontalWidths, out mHorizontalWidths);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Tags") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+			//			IfcLabel o = mDatabase.ParseXml<IfcLabel>(cn as XmlElement);
+			//			if (o != null)
+			//				Tags.Add(o);
+					}
+				}
+			}
 		}
 	}
 	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)

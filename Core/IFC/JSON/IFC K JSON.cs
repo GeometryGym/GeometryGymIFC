@@ -25,28 +25,38 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+using Newtonsoft.Json.Linq;
+
 namespace GeometryGym.Ifc
 {
-	[Serializable]
 	public partial class IfcKerb : IfcBuiltElement
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
-
-		public IfcKerb() : base() { }
-		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
-		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
-		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, bool mountable) : base(host, placement, representation) { }
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Mountable"] = mMountable;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken mountable = obj.GetValue("Mountable", StringComparison.InvariantCultureIgnoreCase);
+			if (mountable != null)
+				mMountable = mountable.Value<bool>();
+		}
 	}
-	[Serializable]
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
-
-		public IfcKerbType() : base() { }
-		public IfcKerbType(DatabaseIfc db, IfcKerbType kerbType, DuplicateOptions options) : base(db, kerbType, options) { Mountable = kerbType.Mountable; }
-		public IfcKerbType(DatabaseIfc db, string name, bool mountable)
-			: base(db, name) { Mountable = mountable; }
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Mountable"] = mMountable;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken mountable = obj.GetValue("Mountable", StringComparison.InvariantCultureIgnoreCase);
+			if (mountable != null)
+				mMountable = mountable.Value<bool>();
+		}
 	}
 }

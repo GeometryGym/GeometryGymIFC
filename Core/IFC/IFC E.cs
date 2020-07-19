@@ -30,6 +30,36 @@ using GeometryGym.STEP;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
+	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	{
+		private IfcEarthworksCutTypeEnum mPredefinedType = IfcEarthworksCutTypeEnum.NOTDEFINED; //: OPTIONAL IfcEarthworksCutTypeEnum;
+		public IfcEarthworksCutTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcEarthworksCut() : base() { }
+		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksCut(DatabaseIfc db, IfcEarthworksCut earthworksCut, DuplicateOptions options) : base(db, earthworksCut, options) { PredefinedType = earthworksCut.PredefinedType; }
+		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcEarthworksElement : IfcBuiltElement
+	{
+		public IfcEarthworksElement() : base() { }
+		public IfcEarthworksElement(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksElement(DatabaseIfc db, IfcEarthworksElement earthworksElement, DuplicateOptions options) : base(db, earthworksElement, options) { }
+		public IfcEarthworksElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcEarthworksFill : IfcEarthworksElement
+	{
+		private IfcEarthworksFillTypeEnum mPredefinedType = IfcEarthworksFillTypeEnum.NOTDEFINED; //: OPTIONAL IfcEarthworksFillTypeEnum;
+		public IfcEarthworksFillTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcEarthworksFill() : base() { }
+		public IfcEarthworksFill(DatabaseIfc db) : base(db) { }
+		public IfcEarthworksFill(DatabaseIfc db, IfcEarthworksFill earthworksFill, DuplicateOptions options) : base(db, earthworksFill, options) { PredefinedType = earthworksFill.PredefinedType; }
+		public IfcEarthworksFill(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
 	public partial class IfcEdge : IfcTopologicalRepresentationItem //SUPERTYPE OF(ONEOF(IfcEdgeCurve, IfcOrientedEdge, IfcSubedge))
 	{
 		internal IfcVertex mEdgeStart, mEdgeEnd;// : IfcVertex;
@@ -81,9 +111,9 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECEATED IFC4
+	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECATED IFC4
 	{
 		internal double mFeatureLength;// OPTIONAL IfcPositiveLengthMeasure; 
 		protected IfcEdgeFeature() : base() { }
@@ -148,7 +178,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricAppliance() : base() { }
 		internal IfcElectricAppliance(DatabaseIfc db, IfcElectricAppliance a, DuplicateOptions options) : base(db, a, options) { mPredefinedType = a.mPredefinedType; }
-		public IfcElectricAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricApplianceType : IfcFlowTerminalType
@@ -168,7 +198,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricDistributionBoard() : base() { }
 		internal IfcElectricDistributionBoard(DatabaseIfc db, IfcElectricDistributionBoard b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcElectricDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricDistributionBoard(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricDistributionBoardType : IfcFlowControllerType
@@ -180,9 +210,9 @@ namespace GeometryGym.Ifc
 		internal IfcElectricDistributionBoardType(DatabaseIfc db, IfcElectricDistributionBoardType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricDistributionBoardType(DatabaseIfc m, string name, IfcElectricDistributionBoardTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECEATED IFC4
+	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECATED IFC4
 	{
 		internal IfcElectricDistributionPointFunctionEnum mDistributionPointFunction;// : IfcElectricDistributionPointFunctionEnum;
 		internal string mUserDefinedFunction = "$";// : OPTIONAL IfcLabel;
@@ -192,7 +222,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricDistributionPoint() : base() { }
 		internal IfcElectricDistributionPoint(DatabaseIfc db, IfcElectricDistributionPoint p, DuplicateOptions options) : base(db, p, options) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
-		public IfcElectricDistributionPoint(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricDistributionPoint(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricFlowStorageDevice : IfcFlowStorageDevice //IFC4
@@ -202,7 +232,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricFlowStorageDevice() : base() { }
 		internal IfcElectricFlowStorageDevice(DatabaseIfc db, IfcElectricFlowStorageDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
-		public IfcElectricFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricFlowStorageDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricFlowStorageDeviceType : IfcFlowStorageDeviceType
@@ -215,6 +245,17 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowStorageDeviceType(DatabaseIfc db, string name, IfcElectricFlowStorageDeviceTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
+	public partial class IfcElectricFlowTreatmentDevice : IfcFlowTreatmentDevice
+	{
+		private IfcElectricFlowTreatmentDeviceTypeEnum mPredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED; //: OPTIONAL IfcElectricFlowTreatmentDeviceTypeEnum;
+		public IfcElectricFlowTreatmentDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcElectricFlowTreatmentDevice() : base() { }
+		public IfcElectricFlowTreatmentDevice(DatabaseIfc db) : base(db) { }
+		public IfcElectricFlowTreatmentDevice(DatabaseIfc db, IfcElectricFlowTreatmentDevice electricFlowTreatmentDevice, DuplicateOptions options) : base(db, electricFlowTreatmentDevice, options) { PredefinedType = electricFlowTreatmentDevice.PredefinedType; }
+		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
 	public partial class IfcElectricGenerator : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcElectricGeneratorTypeEnum mPredefinedType = IfcElectricGeneratorTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricGeneratorTypeEnum;
@@ -222,7 +263,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricGenerator() : base() { }
 		internal IfcElectricGenerator(DatabaseIfc db, IfcElectricGenerator g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; }
-		public IfcElectricGenerator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricGenerator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricGeneratorType : IfcEnergyConversionDeviceType
@@ -234,9 +275,9 @@ namespace GeometryGym.Ifc
 		internal IfcElectricGeneratorType(DatabaseIfc db, IfcElectricGeneratorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricGeneratorType(DatabaseIfc db, string name, IfcElectricGeneratorTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcElectricHeaterType : IfcFlowTerminalType // DEPRECEATED IFC4
+	public partial class IfcElectricHeaterType : IfcFlowTerminalType // DEPRECATED IFC4
 	{
 		internal IfcElectricHeaterTypeEnum mPredefinedType = IfcElectricHeaterTypeEnum.NOTDEFINED;// : IfcElectricHeaterTypeEnum
 		public IfcElectricHeaterTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -253,7 +294,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricMotor() : base() { }
 		internal IfcElectricMotor(DatabaseIfc db, IfcElectricMotor m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
-		public IfcElectricMotor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricMotor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricMotorType : IfcEnergyConversionDeviceType
@@ -273,7 +314,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElectricTimeControl() : base() { }
 		internal IfcElectricTimeControl(DatabaseIfc db, IfcElectricTimeControl c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
-		public IfcElectricTimeControl(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcElectricTimeControl(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcElectricTimeControlType : IfcFlowControllerType
@@ -285,28 +326,28 @@ namespace GeometryGym.Ifc
 		internal IfcElectricTimeControlType(DatabaseIfc db, IfcElectricTimeControlType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcElectricTimeControlType(DatabaseIfc m, string name, IfcElectricTimeControlTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcElectricalBaseProperties // DEPRECEATED IFC4
-	[Obsolete("DEPRECEATED IFC4", false)]
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcElectricalBaseProperties // DEPRECATED IFC4
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcElectricalCircuit : IfcSystem // DEPRECEATED IFC4
+	public partial class IfcElectricalCircuit : IfcSystem // DEPRECATED IFC4
 	{
 		internal IfcElectricalCircuit() : base() { }
 		internal IfcElectricalCircuit(DatabaseIfc db, IfcElectricalCircuit c, DuplicateOptions options) : base(db, c, options) { }
 	}
-	[Obsolete("DEPRECEATED IFC2x2", false)]
+	[Obsolete("DEPRECATED IFC2x2", false)]
 	[Serializable]
-	public partial class IfcElectricalElement : IfcElement  /* DEPRECEATED IFC2x2*/ {  	}
+	public partial class IfcElectricalElement : IfcElement  /* DEPRECATED IFC2x2*/ {  	}
 	[Serializable]
-	public abstract partial class IfcElement : IfcProduct, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement, IfcCivilElement
+	public abstract partial class IfcElement : IfcProduct, IfcInterferenceSelect, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement, IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
 
 		//INVERSE  
 		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedTo = new SET<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
-		internal List<IfcRelInterferesElements> mIsInterferedByElements = new List<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
-		internal List<IfcRelInterferesElements> mInterferesElements = new List<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
+		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
+		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
 		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
@@ -323,11 +364,10 @@ namespace GeometryGym.Ifc
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
 		public ReadOnlyCollection<IfcRelFillsElement> FillsVoids { get { return new ReadOnlyCollection<IfcRelFillsElement>(mFillsVoids); } }
 		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
-		public ReadOnlyCollection<IfcRelInterferesElements> IsInterferedByElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mIsInterferedByElements); } }
-		public ReadOnlyCollection<IfcRelInterferesElements> InterferesElements { get { return new ReadOnlyCollection<IfcRelInterferesElements>(mInterferesElements); } }
+		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
+		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
 		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
-		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>(mReferencedInStructures); } }
-		[Obsolete("DEPRECEATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4", false)]
 		public SET<IfcRelConnectsPortToElement> HasPortsSS { get { return mHasPorts; } }
 		public SET<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
 		public SET<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
@@ -393,7 +433,7 @@ namespace GeometryGym.Ifc
 				rc.RelatingElement = this;
 			}
 		}
-		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductRepresentation r) : base(host, p, r) { }
+		protected IfcElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
 		protected IfcElement(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) 
 			: base(host, null, null)
 		{
@@ -548,85 +588,15 @@ namespace GeometryGym.Ifc
 				mContainedInStructure.RelatedElements.Remove(this);
 				//mContainedInStructure.RelatedElements.Remove(this);
 		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition container, IfcObjectPlacement pl, IfcProductRepresentation r) { return ConstructElement(className, container, pl, r, null); }
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement pl, IfcProductRepresentation r, IfcDistributionSystem system)
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 		{
-			string str = className, definedType = "";
-			if (!string.IsNullOrEmpty(str))
-			{
-				string lower = str.ToLower();
-				if (host.mDatabase.Release < ReleaseVersion.IFC4)
-				{
-					if (lower.StartsWith("ifcshadingdevice"))
-						str = "IfcBuildingElementProxy.ShadingDevice";
-					if (lower.StartsWith("ifcgeographicelement"))
-						str = "IfcBuildingElementProxy.GeographicElement";
-					if (lower.StartsWith("ifccivilelement"))
-						str = "IfcBuildingElementProxy.CivilElement";
-				}
-				string[] fields = str.Split(".".ToCharArray());
-				if (fields.Length > 1)
-				{
-					str = fields[0];
-					definedType = fields[1];
-				}
-			}
-			IfcElement element = null;
-			Type type = Type.GetType("GeometryGym.Ifc." + str);
-			if (type != null)
-			{
-				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation) }, null);
-				if (ctor == null)
-				{
-					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductRepresentation), typeof(IfcDistributionSystem) }, null);
-					if (ctor == null)
-						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
-					else
-						element = ctor.Invoke(new object[] { host, pl, r, system }) as IfcElement;
-				}
-				else
-					element = ctor.Invoke(new object[] { host, pl, r }) as IfcElement;
-			}
+			return ConstructElement(className, host, placement, representation, null);
+		}
+		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
+		{
+			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
 			if (element == null)
-				element = new IfcBuildingElementProxy(host, pl, r);
-
-			if (!string.IsNullOrEmpty(definedType))
-			{
-				if (host.mDatabase.mRelease < ReleaseVersion.IFC4)
-					element.ObjectType = definedType;
-				else
-				{
-					type = element.GetType();
-					PropertyInfo pi = type.GetProperty("PredefinedType");
-					if (pi != null)
-					{
-						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-						if (enumType != null)
-						{
-							FieldInfo fi = enumType.GetField(definedType);
-							if (fi == null)
-							{
-								element.ObjectType = definedType;
-								fi = enumType.GetField("NOTDEFINED");
-							}
-							if (fi != null)
-							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
-								pi.SetValue(element, newEnumValue, null);
-							}
-							else
-								element.ObjectType = definedType;
-						}
-						else
-							element.ObjectType = definedType;
-					}
-					else
-						element.ObjectType = definedType;
-				}
-			}
+				element = new IfcBuildingElementProxy(host, placement, representation);
 			return element;
 		}
 		public void AddMember(IfcStructuralMember m)
@@ -685,8 +655,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	public abstract partial class IfcElementComponent : IfcElement //	ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementPart, IfcDiscreteAccessory, IfcFastener, IfcMechanicalFastener, IfcReinforcingElement, IfcVibrationIsolator))
 	{
 		protected IfcElementComponent() : base() { }
+		protected IfcElementComponent(DatabaseIfc db) : base(db) { }
 		protected IfcElementComponent(DatabaseIfc db, IfcElementComponent c, DuplicateOptions options) : base(db, c, options) { }
-		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation) : base(host,placement,representation) { }
+		protected IfcElementComponent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host,placement,representation) { }
 		protected IfcElementComponent(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]
@@ -695,6 +666,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcElementComponentType() : base() { }
 		protected IfcElementComponentType(DatabaseIfc db, IfcElementComponentType t, DuplicateOptions options) : base(db, t, options) { }
 		protected IfcElementComponentType(DatabaseIfc db) : base(db) { }
+		protected IfcElementComponentType(DatabaseIfc db, string name) : base(db) { Name = name; }
 	}
 	[Serializable]
 	public partial class IfcElementQuantity : IfcQuantitySet
@@ -892,7 +864,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEnergyConversionDevice() : base() { }
 		internal IfcEnergyConversionDevice(DatabaseIfc db, IfcEnergyConversionDevice d, DuplicateOptions options) : base(db, d, options) { }
-		public IfcEnergyConversionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEnergyConversionDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public abstract partial class IfcEnergyConversionDeviceType : IfcDistributionFlowElementType
@@ -903,8 +875,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcEnergyConversionDeviceType(DatabaseIfc db) : base(db) { }
 		protected IfcEnergyConversionDeviceType(DatabaseIfc db, IfcEnergyConversionDeviceType t, DuplicateOptions options) : base(db, t, options) { }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//IfcEnergyProperties // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//IfcEnergyProperties // DEPRECATED IFC4
 	[Serializable]
 	public partial class IfcEngine : IfcEnergyConversionDevice //IFC4
 	{
@@ -913,7 +885,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEngine() : base() { }
 		internal IfcEngine(DatabaseIfc db, IfcEngine e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcEngine(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEngine(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEngineType : IfcEnergyConversionDeviceType
@@ -925,9 +897,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEngineType(DatabaseIfc db, IfcEngineType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcEngineType(DatabaseIfc db, string name, IfcEngineTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcEnvironmentalImpactValue : IfcAppliedValue //DEPRECEATED
+	public partial class IfcEnvironmentalImpactValue : IfcAppliedValue //DEPRECATED
 	{
 		internal string mImpactType;// : IfcLabel;
 		internal IfcEnvironmentalImpactCategoryEnum mEnvCategory = IfcEnvironmentalImpactCategoryEnum.NOTDEFINED;// IfcEnvironmentalImpactCategoryEnum
@@ -935,14 +907,14 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEnvironmentalImpactValue() : base() { }
 		internal IfcEnvironmentalImpactValue(DatabaseIfc db, IfcEnvironmentalImpactValue v) : base(db,v) { mImpactType = v.mImpactType; mEnvCategory = v.mEnvCategory; mUserDefinedCategory = v.mUserDefinedCategory; }
 	}
-	[Obsolete("DEPRECEATED IFC2x2", false)]
+	[Obsolete("DEPRECATED IFC2x2", false)]
 	[Serializable]
 	public partial class IfcEquipmentElement : IfcElement  
 	{
 		internal IfcEquipmentElement() : base() { }
 		internal IfcEquipmentElement(DatabaseIfc db, IfcEquipmentElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcEquipmentStandard : IfcControl 
 	{
@@ -957,7 +929,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEvaporativeCooler() : base() { }
 		internal IfcEvaporativeCooler(DatabaseIfc db, IfcEvaporativeCooler c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
-		public IfcEvaporativeCooler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEvaporativeCooler(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEvaporativeCoolerType : IfcEnergyConversionDeviceType
@@ -977,7 +949,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 		internal IfcEvaporator() : base() { }
 		internal IfcEvaporator(DatabaseIfc db, IfcEvaporator e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcEvaporator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductRepresentation representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcEvaporator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcEvaporatorType : IfcEnergyConversionDeviceType
@@ -996,8 +968,27 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcEventTriggerTypeEnum mEventTriggerType = IfcEventTriggerTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
 		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
+
+		public IfcEventTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcEvent() : base() { }
 		internal IfcEvent(DatabaseIfc db, IfcEvent e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
+	}
+	[Serializable]
+	public partial class IfcEventTime : IfcSchedulingTime
+	{
+		private DateTime mActualDate = DateTime.MinValue; //: OPTIONAL IfcDateTime;
+		private DateTime mEarlyDate = DateTime.MinValue; //: OPTIONAL IfcDateTime;
+		private DateTime mLateDate = DateTime.MinValue; //: OPTIONAL IfcDateTime;
+		private DateTime mScheduleDate = DateTime.MinValue; //: OPTIONAL IfcDateTime;
+
+		public DateTime ActualDate { get { return mActualDate; } set { mActualDate = value; } }
+		public DateTime EarlyDate { get { return mEarlyDate; } set { mEarlyDate = value; } }
+		public DateTime LateDate { get { return mLateDate; } set { mLateDate = value; } }
+		public DateTime ScheduleDate { get { return mScheduleDate; } set { mScheduleDate = value; } }
+
+		public IfcEventTime() : base() { }
+		public IfcEventTime(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcEventType : IfcTypeProcess //IFC4
@@ -1015,9 +1006,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public IfcEventType(DatabaseIfc m, string name, IfcEventTypeEnum t, IfcEventTriggerTypeEnum trigger)
 			: base(m) { Name = name; mPredefinedType = t; mEventTriggerType = trigger; }
 	}
-	[Obsolete("DEPRECEATED IFC4", false)]
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
-	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties   // DEPRECEATED IFC4
+	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties   // DEPRECATED IFC4
 	{
 		internal List<int> mExtendedProperties = new List<int>(); //: SET [1:?] OF IfcProperty
 
@@ -1031,20 +1022,18 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
 	{
-		protected string mName = "$"; //: OPTIONAL IfcLabel;
-		protected string mDescription = "$"; //: OPTIONAL IfcText;
+		protected string mName = ""; //: OPTIONAL IfcLabel;
+		protected string mDescription = ""; //: OPTIONAL IfcText;
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();//: SET [1:?] OF IfcProperty 
-		private List<int> mPropertyIndices = new List<int>();
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public ReadOnlyDictionary<string, IfcProperty> Properties { get { return new ReadOnlyDictionary<string, IfcProperty>( mProperties); } }
 
 		protected override void initialize()
 		{
 			base.initialize();
 			mProperties = new Dictionary<string, IfcProperty>();
-			mPropertyIndices = new List<int>();
 		}
 
 		protected IfcExtendedProperties() : base() { }
@@ -1058,20 +1047,13 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		
 		public void AddProperty(IfcProperty property)
 		{
-			if (property != null && !mProperties.ContainsKey(property.Name))
-			{
+			if (property != null)
 				mProperties[property.Name] = property;
-				if(!mPropertyIndices.Contains(property.Index))
-					mPropertyIndices.Add(property.mIndex);
-			}
 		}
 		public void RemoveProperty(IfcProperty property)
 		{
 			if (property != null)
-			{
 				mProperties.Remove(property.Name);
-				mPropertyIndices.Remove(property.mIndex);
-			}
 		}
 		public IfcProperty this[string name]
 		{
@@ -1088,10 +1070,10 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 	[Serializable]
 	public abstract partial class IfcExternalInformation : BaseClassIfc, IfcResourceObjectSelect // NEW IFC4	ABSTRACT SUPERTYPE OF(ONEOF(IfcClassification, IfcDocumentInformation, IfcLibraryInformation));
 	{ //INVERSE
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		protected IfcExternalInformation() : base() { }
@@ -1101,9 +1083,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -1137,10 +1119,10 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db, IfcExternallyDefinedSurfaceStyle s) : base(db, s) { }
 		public IfcExternallyDefinedSurfaceStyle(DatabaseIfc db) : base(db) { }
 	}
-	//[Obsolete("DEPRECEATED IFC4", false)]
-	//ENTITY IfcExternallyDefinedSymbol // DEPRECEATED IFC4
+	//[Obsolete("DEPRECATED IFC4", false)]
+	//ENTITY IfcExternallyDefinedSymbol // DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcExternallyDefinedTextFont : IfcExternalReference
+	public partial class IfcExternallyDefinedTextFont : IfcExternalReference, IfcTextFontSelect
 	{
 		internal IfcExternallyDefinedTextFont() : base() { }
 		internal IfcExternallyDefinedTextFont(DatabaseIfc db, IfcExternallyDefinedTextFont f) : base(db, f) { }
@@ -1153,14 +1135,14 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
 		private string mName = "";//  : OPTIONAL IfcLabel;
 		//INVERSE  
-		private SET<IfcExternalReferenceRelationship> mHasExternalReferences = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal List<IfcExternalReferenceRelationship> mExternalReferenceForResources = new List<IfcExternalReferenceRelationship>();//	:	SET [0:?] OF IfcExternalReferenceRelationship FOR RelatingReference;
 
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name { get { return mName; } set { mName = value; } } 
-		public SET<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } set { mHasExternalReferences.Clear();  if (value != null) { mHasExternalReferences.CollectionChanged -= mHasExternalReferences_CollectionChanged; mHasExternalReferences = value; mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 		public ReadOnlyCollection<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mExternalReferenceForResources); } }
 
@@ -1171,9 +1153,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		{
 			base.initialize();
 
-			mHasExternalReferences.CollectionChanged += mHasExternalReferences_CollectionChanged;
+			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
-		private void mHasExternalReferences_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
@@ -1203,8 +1185,8 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects.Clear(); if (value != null) { mRelatedResourceObjects.CollectionChanged -= mRelatedResourceObjects_CollectionChanged; mRelatedResourceObjects = value; mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged; } } } 
 
 		//INVERSE
-		public List<IfcExternalReferenceRelationship> HasExternalReferences { get { return mHasExternalReferences; } }
-		internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4
+		public List<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
+		internal List<IfcExternalReferenceRelationship> mHasExternalReference = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
 		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect)); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
@@ -1225,14 +1207,14 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			{
 				foreach (IfcResourceObjectSelect r in e.NewItems)
 				{
-					if (!r.HasExternalReferences.Contains(this))
-						r.HasExternalReferences.Add(this);
+					if (!r.HasExternalReference.Contains(this))
+						r.HasExternalReference.Add(this);
 				} 
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcResourceObjectSelect r in e.OldItems)
-					r.HasExternalReferences.Remove(this);
+					r.HasExternalReference.Remove(this);
 			}
 		}
 	}

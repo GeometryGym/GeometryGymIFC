@@ -80,6 +80,21 @@ namespace GeometryGym.Ifc
 			obj["MappingTarget"] = MappingTarget.getJson(this, options);
 		}
 	}
+	public partial class IfcMarineFacility : IfcFacility
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMarineFacilityTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcMaterial : IfcMaterialDefinition
 	{
 		internal override void parseJObject(JObject obj)
@@ -111,7 +126,48 @@ namespace GeometryGym.Ifc
 				obj["HasRepresentation"] = mHasRepresentation.getJson(this, options);
 		}
 	}
-
+	public partial class IfcMaterialConstituent : IfcMaterialDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
+			JObject jobj = obj.GetValue("Material", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Material = mDatabase.ParseJObject<IfcMaterial>(jobj);
+			JToken token = obj.GetValue("Fraction", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Fraction = token.Value<double>();
+			Category = extractString(obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			setAttribute(obj, "Name", Name);
+			setAttribute(obj, "Description", Description);
+			if (mMaterial > 0)
+				obj["Material"] = Material.getJson(this, options);
+			setAttribute(obj, "Category", Category);
+		}
+	}
+	public partial class IfcMaterialConstituentSet : IfcMaterialDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			mDatabase.extractJArray<IfcMaterialConstituent>(obj.GetValue("MaterialConstituents", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => MaterialConstituents[x.Name] = x);
+			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
+			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["MaterialConstituents"] = new JArray(MaterialConstituents.Values.Select(x => x.getJson(this, options)));
+			setAttribute(obj, "Name", Name);
+			setAttribute(obj, "Description", Description);
+		}
+	}
 	public abstract partial class IfcMaterialDefinition : BaseClassIfc, IfcObjectReferenceSelect, IfcMaterialSelect, IfcResourceObjectSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterial ,IfcMaterialConstituent ,IfcMaterialConstituentSet ,IfcMaterialLayer ,IfcMaterialProfile ,IfcMaterialProfileSet));
 	{
 		internal override void parseJObject(JObject obj)
@@ -185,6 +241,38 @@ namespace GeometryGym.Ifc
 			obj["MaterialLayers"] = new JArray(MaterialLayers.ToList().ConvertAll(x => x.getJson(this, options)));
 			setAttribute(obj, "LayerSetName", Name);
 			setAttribute(obj, "Description", Description);
+		}
+	}
+	public partial class IfcMaterialLayerSetUsage : IfcMaterialUsageDefinition
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("ForLayerSet", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ForLayerSet = mDatabase.ParseJObject<IfcMaterialLayerSet>(jobj);
+			JToken token = obj.GetValue("LayerSetDirection", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcLayerSetDirectionEnum>(token.Value<string>(), true, out mLayerSetDirection);
+			token = obj.GetValue("DirectionSense", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcDirectionSenseEnum>(token.Value<string>(), true, out mDirectionSense);
+			token = obj.GetValue("OffsetFromReferenceLine", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mOffsetFromReferenceLine = token.Value<double>();
+			token = obj.GetValue("ReferenceExtent", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mReferenceExtent = token.Value<double>();
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["ForLayerSet"] = ForLayerSet.getJson(this, options);
+			obj["LayerSetDirection"] = mLayerSetDirection.ToString();
+			obj["DirectionSense"] = mDirectionSense.ToString();
+			obj["OffsetFromReferenceLine"] = mOffsetFromReferenceLine;
+			if(!double.IsNaN(mReferenceExtent))
+			obj["ReferenceExtent"] = mReferenceExtent;
 		}
 	}
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
@@ -342,6 +430,68 @@ namespace GeometryGym.Ifc
 				obj["DataValue"] = DatabaseIfc.extract(mDataValueValue);
 			if (mReferencePath > 0)
 				obj["ReferencePath"] = ReferencePath.getJson(this, options);
+		}
+	}
+	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDevice : IfcBuiltElement
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcMooringDeviceTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcMooringDeviceType : IfcBuiltElementType
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcMooringDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
 }

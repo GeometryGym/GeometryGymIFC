@@ -125,9 +125,13 @@ namespace GeometryGym.Ifc
 					{
 						JProperty jtoken = (JProperty)obj.First;
 						Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
-						if(valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
-							return (T)(IBaseClassIfc)ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString());
-
+						if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
+						{
+							IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
+							if (val != null)
+								return (T)val;
+							return default(T);
+						}
 					}
 					else
 					{

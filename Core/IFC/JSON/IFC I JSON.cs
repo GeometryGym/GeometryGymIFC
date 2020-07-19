@@ -29,6 +29,26 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if(mFixedAxisVertical != IfcLogicalEnum.UNKNOWN)
+			obj["FixedAxisVertical"] = mFixedAxisVertical.ToString();
+			obj["Inclinating"] = Inclinating.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken fixedAxisVertical = obj.GetValue("FixedAxisVertical", StringComparison.InvariantCultureIgnoreCase);
+			if (fixedAxisVertical != null)
+				mFixedAxisVertical = ParserIfc.ParseIFCLogical(fixedAxisVertical.Value<string>());
+			JObject jobj = obj.GetValue("Inclinating", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Inclinating = mDatabase.ParseJObject<IfcAxisLateralInclination>(jobj);
+		}
+	}
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
 	{
 		internal override void parseJObject(JObject obj)
@@ -78,12 +98,12 @@ namespace GeometryGym.Ifc
 					JObject jobj = new JObject();
 					if (ai != null)
 					{
-						jobj["IfcArcIndex"] = ai.mA + " " + ai.mB + " " + ai.mC;
+						jobj["IfcArcIndex"] = ai[0] + " " + ai[1] + " " + ai[2];
 					}
 					else
 					{
 						IfcLineIndex li = seg as IfcLineIndex;
-						jobj["IfcLineIndex"] = string.Join(" ", li.mIndices.ConvertAll(x => x.ToString()));
+						jobj["IfcLineIndex"] = string.Join(" ", li.ConvertAll(x => x.ToString()));
 					}
 					array.Add(jobj);
 				}
@@ -122,18 +142,17 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase == null ? 4 : mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["OverallWidth"] = Math.Round(mOverallWidth, digits);
-			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
-			obj["WebThickness"] = Math.Round(mWebThickness, digits);
-			obj["FlangeThickness"] = Math.Round(mFlangeThickness, digits);
+			obj["OverallWidth"] = formatLength(mOverallWidth);
+			obj["OverallDepth"] = formatLength(mOverallDepth);
+			obj["WebThickness"] = formatLength(mWebThickness);
+			obj["FlangeThickness"] = formatLength(mFlangeThickness);
 			if (!double.IsNaN(mFilletRadius) && mFilletRadius > 0)
-				obj["FilletRadius"] = Math.Round(mFilletRadius, digits);
+				obj["FilletRadius"] = formatLength(mFilletRadius);
 			if (!double.IsNaN(mFlangeEdgeRadius) && mFlangeEdgeRadius > 0)
-				obj["FlangeEdgeRadius"] = Math.Round(mFlangeEdgeRadius, digits);
+				obj["FlangeEdgeRadius"] = formatLength(mFlangeEdgeRadius);
 			if (!double.IsNaN(mFlangeSlope) && mFlangeSlope > 0)
-				obj["FlangeSlope"] = mFlangeSlope;
+				obj["FlangeSlope"] = formatLength(mFlangeSlope);
 		}
 	}
 }

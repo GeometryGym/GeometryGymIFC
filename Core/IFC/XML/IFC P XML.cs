@@ -48,7 +48,35 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(Position.GetXML(xml.OwnerDocument, "Position", this, processed));
 		}
 	}
-
+	public partial class IfcPavement : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mFlexible != IfcLogicalEnum.UNKNOWN)
+				xml.SetAttribute("Flexible", mFlexible == IfcLogicalEnum.TRUE ? "true" : "false");
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string str = xml.GetAttribute("Flexible");
+			if (!string.IsNullOrEmpty(str))
+				mFlexible = bool.Parse(str) ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+		}
+	}
+	public partial class IfcPavementType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Flexible", mFlexible ? "true" : "false");
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			Flexible = bool.Parse(xml.GetAttribute("Flexible"));
+		}
+	}
 	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -460,7 +488,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Name", Name);
 		}
 	}
-	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECEATED IFC4
+	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
 	{
 
 		internal override void ParseXml(XmlElement xml)
@@ -500,7 +528,7 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "ObjectPlacement") == 0)
 					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 				else if (string.Compare(name, "Representation") == 0)
-					Representation = mDatabase.ParseXml<IfcProductRepresentation>(child as XmlElement);
+					Representation = mDatabase.ParseXml<IfcProductDefinitionShape>(child as XmlElement);
 				else if (string.Compare(name, "Placement") == 0)
 					ObjectPlacement = mDatabase.ParseXml<IfcObjectPlacement>(child as XmlElement);
 			}
@@ -521,7 +549,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -561,7 +589,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcProductRepresentation : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -578,7 +606,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcRepresentation r = mDatabase.ParseXml<IfcRepresentation>(cn as XmlElement);
+						Representation r = mDatabase.ParseXml<Representation>(cn as XmlElement);
 						if (r != null)
 							Representations.Add(r);
 					}
@@ -594,7 +622,7 @@ namespace GeometryGym.Ifc
 			{
 				XmlElement element = xml.OwnerDocument.CreateElement("Representations", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcRepresentation rep in Representations)
+				foreach (Representation rep in Representations)
 					element.AppendChild(rep.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 		}
@@ -625,8 +653,8 @@ namespace GeometryGym.Ifc
 
 			if (mDatabase.Release >= ReleaseVersion.IFC2x3)
 			{
-				XmlElement externalReferences = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
-				foreach (IfcExternalReferenceRelationship r in mHasExternalReferences)
+				XmlElement externalReferences = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
+				foreach (IfcExternalReferenceRelationship r in mHasExternalReference)
 				{
 					if (r == host)
 						continue;
@@ -768,7 +796,7 @@ namespace GeometryGym.Ifc
     }
     public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
 	{
-		//internal List<IfcExternalReferenceRelationship> mHasExternalReferences = new List<IfcExternalReferenceRelationship>(); //IFC4 
+		//internal List<IfcExternalReferenceRelationship> mHasExternalReference = new List<IfcExternalReferenceRelationship>(); //IFC4 
 		//internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -776,7 +804,7 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if (string.Compare(name, "HasExternalReferences") == 0)
+				if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -799,11 +827,11 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
             //if (mHasConstraintRelationships.Count > 0)

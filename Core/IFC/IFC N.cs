@@ -65,7 +65,31 @@ namespace GeometryGym.Ifc
 					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0);
 			}
 		}
+		public IfcNamedUnit(IfcDimensionalExponents dimensions, IfcUnitEnum unitType)
+			: base(dimensions.Database) { Dimensions = dimensions; UnitType = unitType; }
 
 		public abstract double SIFactor { get; }
+	}
+	[Serializable]
+	public partial class IfcNavigationElement : IfcBuiltElement
+	{
+		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: OPTIONAL IfcNavigationElementTypeEnum;
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcNavigationElement() : base() { }
+		public IfcNavigationElement(DatabaseIfc db) : base(db) { }
+		public IfcNavigationElement(DatabaseIfc db, IfcNavigationElement navigationElement, DuplicateOptions options) : base(db, navigationElement, options) { PredefinedType = navigationElement.PredefinedType; }
+		public IfcNavigationElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcNavigationElementType : IfcBuiltElementType
+	{
+		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: IfcNavigationElementTypeEnum;
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcNavigationElementType() : base() { }
+		public IfcNavigationElementType(DatabaseIfc db, IfcNavigationElementType navigationElementType, DuplicateOptions options) : base(db, navigationElementType, options) { PredefinedType = navigationElementType.PredefinedType; }
+		public IfcNavigationElementType(DatabaseIfc db, string name, IfcNavigationElementTypeEnum predefinedType)
+			: base(db, name) { PredefinedType = predefinedType; }
 	}
 }

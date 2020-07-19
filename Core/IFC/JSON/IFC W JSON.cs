@@ -29,7 +29,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcWallType : IfcBuildingElementType
+	public partial class IfcWallType : IfcBuiltElementType
 	{
 		internal override void parseJObject(JObject obj)
 		{

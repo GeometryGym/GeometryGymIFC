@@ -23,30 +23,40 @@ using System.Reflection;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using GeometryGym.STEP;
+using System.Xml;
+//using System.Xml.Linq;
+
 
 namespace GeometryGym.Ifc
 {
-	[Serializable]
 	public partial class IfcKerb : IfcBuiltElement
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
-
-		public IfcKerb() : base() { }
-		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
-		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
-		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, bool mountable) : base(host, placement, representation) { }
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string mountable = xml.GetAttribute("Mountable");
+			if (!string.IsNullOrEmpty(mountable))
+				bool.TryParse(mountable, out mMountable);
+		}
 	}
-	[Serializable]
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
-
-		public IfcKerbType() : base() { }
-		public IfcKerbType(DatabaseIfc db, IfcKerbType kerbType, DuplicateOptions options) : base(db, kerbType, options) { Mountable = kerbType.Mountable; }
-		public IfcKerbType(DatabaseIfc db, string name, bool mountable)
-			: base(db, name) { Mountable = mountable; }
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string mountable = xml.GetAttribute("Mountable");
+			if (!string.IsNullOrEmpty(mountable))
+				bool.TryParse(mountable, out mMountable);
+		}
 	}
 }

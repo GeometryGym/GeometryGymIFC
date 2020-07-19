@@ -195,6 +195,141 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
+	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			foreach (IfcAlignment2DCantSegment o in Segments)
+				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
+			xml.SetAttribute("RailHeadDistance", mRailHeadDistance.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute railHeadDistance = xml.Attributes["RailHeadDistance"];
+			if (railHeadDistance != null)
+				double.TryParse(railHeadDistance.Value, out mRailHeadDistance);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcAlignment2DCantSegment o = mDatabase.ParseXml<IfcAlignment2DCantSegment>(cn as XmlElement);
+						if (o != null)
+							Segments.Add(o);
+					}
+				}
+			}
+		}
+	}
+	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("StartDistAlong", mStartDistAlong.ToString());
+			xml.SetAttribute("HorizontalLength", mHorizontalLength.ToString());
+			xml.SetAttribute("StartCantLeft", mStartCantLeft.ToString());
+			if (!double.IsNaN(mEndCantLeft))
+				xml.SetAttribute("EndCantLeft", mEndCantLeft.ToString());
+			xml.SetAttribute("StartCantRight", mStartCantRight.ToString());
+			if (!double.IsNaN(mEndCantRight))
+				xml.SetAttribute("EndCantRight", mEndCantRight.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startDistAlong = xml.GetAttribute("StartDistAlong");
+			if (!string.IsNullOrEmpty(startDistAlong))
+				double.TryParse(startDistAlong, out mStartDistAlong);
+			string horizontalLength = xml.GetAttribute("HorizontalLength");
+			if (!string.IsNullOrEmpty(horizontalLength))
+				double.TryParse(horizontalLength, out mHorizontalLength);
+			string startCantLeft = xml.GetAttribute("StartCantLeft");
+			if (!string.IsNullOrEmpty(startCantLeft))
+				double.TryParse(startCantLeft, out mStartCantLeft);
+			string endCantLeft = xml.GetAttribute("EndCantLeft");
+			if (!string.IsNullOrEmpty(endCantLeft))
+				double.TryParse(endCantLeft, out mEndCantLeft);
+			string startCantRight = xml.GetAttribute("StartCantRight");
+			if (!string.IsNullOrEmpty(startCantRight))
+				double.TryParse(startCantRight, out mStartCantRight);
+			string endCantRight = xml.GetAttribute("EndCantRight");
+			if (!string.IsNullOrEmpty(endCantRight))
+				double.TryParse(endCantRight, out mEndCantRight);
+		}
+	}
+	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mStartRadius))
+				xml.SetAttribute("StartRadius", mStartRadius.ToString());
+			if (!double.IsNaN(mEndRadius))
+				xml.SetAttribute("EndRadius", mEndRadius.ToString());
+			xml.SetAttribute("IsStartRadiusCCW", (mIsStartRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("IsEndRadiusCCW", (mIsEndRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("TransitionCurveType", mTransitionCurveType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startRadius = xml.GetAttribute("StartRadius");
+			if (!string.IsNullOrEmpty(startRadius))
+				double.TryParse(startRadius, out mStartRadius);
+			string endRadius = xml.GetAttribute("EndRadius");
+			if (!string.IsNullOrEmpty(endRadius))
+				double.TryParse(endRadius, out mEndRadius);
+			string isStartRadiusCCW = xml.GetAttribute("IsStartRadiusCCW");
+			if (!string.IsNullOrEmpty(isStartRadiusCCW))
+				bool.TryParse(isStartRadiusCCW, out mIsStartRadiusCCW);
+			string isEndRadiusCCW = xml.GetAttribute("IsEndRadiusCCW");
+			if (!string.IsNullOrEmpty(isEndRadiusCCW))
+				bool.TryParse(isEndRadiusCCW, out mIsEndRadiusCCW);
+			XmlAttribute transitionCurveType = xml.Attributes["TransitionCurveType"];
+			if (transitionCurveType != null)
+				Enum.TryParse<IfcTransitionCurveType>(transitionCurveType.Value, out mTransitionCurveType);
+		}
+	}
+	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mStartRadius))
+				xml.SetAttribute("StartRadius", mStartRadius.ToString());
+			if (!double.IsNaN(mEndRadius))
+				xml.SetAttribute("EndRadius", mEndRadius.ToString());
+			xml.SetAttribute("IsStartRadiusCCW", (mIsStartRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("IsEndRadiusCCW", (mIsEndRadiusCCW ? "true" : "false"));
+			xml.SetAttribute("TransitionCurveType", mTransitionCurveType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string startRadius = xml.GetAttribute("StartRadius");
+			if (!string.IsNullOrEmpty(startRadius))
+				double.TryParse(startRadius, out mStartRadius);
+			string endRadius = xml.GetAttribute("EndRadius");
+			if (!string.IsNullOrEmpty(endRadius))
+				double.TryParse(endRadius, out mEndRadius);
+			string isStartRadiusCCW = xml.GetAttribute("IsStartRadiusCCW");
+			if (!string.IsNullOrEmpty(isStartRadiusCCW))
+				bool.TryParse(isStartRadiusCCW, out mIsStartRadiusCCW);
+			string isEndRadiusCCW = xml.GetAttribute("IsEndRadiusCCW");
+			if (!string.IsNullOrEmpty(isEndRadiusCCW))
+				bool.TryParse(isEndRadiusCCW, out mIsEndRadiusCCW);
+			XmlAttribute transitionCurveType = xml.Attributes["TransitionCurveType"];
+			if (transitionCurveType != null)
+				Enum.TryParse<IfcTransitionCurveType>(transitionCurveType.Value, out mTransitionCurveType);
+		}
+	}
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -221,7 +356,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 
 			if (!double.IsNaN(mStartDistAlong))
-				setAttribute(xml, "StartDistAlong", mStartDistAlong.ToString());
+				setAttribute(xml, "StartDistAlong", formatLength(mStartDistAlong));
 			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcAlignment2DHorizontalSegment s in Segments)
@@ -246,7 +381,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(CurveGeometry.GetXML(xml.OwnerDocument, "CurveGeometry", this, processed));
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
+	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -270,7 +405,63 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("Radius"))
+				Radius = double.Parse(xml.Attributes["Radius"].Value);
+			if (xml.HasAttribute("IsConvex"))
+				IsConvex = bool.Parse(xml.Attributes["IsConvex"].Value);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
 
+			setAttribute(xml, "Radius", formatLength(Radius));
+			setAttribute(xml, "IsConvex", IsConvex.ToString());
+		}
+	}
+	public partial class IfcAlignment2DVerSegParabolicArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("ParabolaConstant"))
+				ParabolaConstant = double.Parse(xml.Attributes["ParabolaConstant"].Value);
+			if (xml.HasAttribute("IsConvex"))
+				IsConvex = bool.Parse(xml.Attributes["IsConvex"].Value);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			setAttribute(xml, "ParabolaConstant", formatLength(ParabolaConstant));
+			setAttribute(xml, "IsConvex", IsConvex.ToString());
+		}
+	}
+	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("StartDistAlong"))
+				StartDistAlong = double.Parse(xml.Attributes["StartDistAlong"].Value);
+			if (xml.HasAttribute("HorizontalLength"))
+				HorizontalLength = double.Parse(xml.Attributes["HorizontalLength"].Value);
+			if (xml.HasAttribute("StartHeight"))
+				StartHeight = double.Parse(xml.Attributes["StartHeight"].Value);
+			if (xml.HasAttribute("StartGradient"))
+				StartGradient = double.Parse(xml.Attributes["StartGradient"].Value);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			setAttribute(xml, "StartDistAlong", formatLength(StartDistAlong));
+			setAttribute(xml, "HorizontalLength", formatLength(HorizontalLength));
+			setAttribute(xml, "StartHeight", formatLength(StartHeight));
+			setAttribute(xml, "StartGradient", StartGradient.ToString());
+		}
 	}
 	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
 	{
@@ -296,6 +487,35 @@ namespace GeometryGym.Ifc
 			if (mVertical != null)
 				xml.AppendChild(Vertical.GetXML(xml.OwnerDocument, "Vertical", this, processed));
 			setAttribute(xml, "Tag", Tag);
+		}
+	}
+	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem //IFC4.1
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcAlignment2DVerticalSegment s = mDatabase.ParseXml<IfcAlignment2DVerticalSegment>(cn as XmlElement);
+						if (s != null)
+							Segments.Add(s);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			foreach (IfcAlignment2DVerticalSegment s in Segments)
+				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
@@ -379,11 +599,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "AppliedValue") == 0)
-				{
 					AppliedValue = mDatabase.ParseXml<IfcAppliedValueSelect>(child as XmlElement);
-					if (mAppliedValueIndex == 0)
-						mAppliedValueValue = extractValue(child.FirstChild);
-				}
 				else if (string.Compare(name, "UnitBasis") == 0)
 					UnitBasis = mDatabase.ParseXml<IfcMeasureWithUnit>(child as XmlElement);
 				else if (string.Compare(name, "Components") == 0)
@@ -395,7 +611,7 @@ namespace GeometryGym.Ifc
 							addComponent(v);
 					}
 				}
-				else if (string.Compare(name, "HasExternalReferences") == 0)
+				else if (string.Compare(name, "HasExternalReference") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
@@ -437,10 +653,14 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if (mAppliedValueIndex > 0 && (host == null || host.mIndex != mAppliedValueIndex))
-				xml.AppendChild(mDatabase[mAppliedValueIndex].GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
-			else if (mAppliedValueValue != null)
-				xml.AppendChild(convert(xml.OwnerDocument, mAppliedValueValue, "AppliedValue", mDatabase.mXmlNamespace));
+			if(mAppliedValue != null && (host == null || host != mAppliedValue))
+			{
+				IfcValue value = mAppliedValue as IfcValue;
+				if(value != null)
+					xml.AppendChild(convert(xml.OwnerDocument, value, "AppliedValue", mDatabase.mXmlNamespace));
+				else
+					xml.AppendChild((mAppliedValue as BaseClassIfc).GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
+			}
 			if (mUnitBasis > 0)
 				xml.AppendChild(UnitBasis.GetXML(xml.OwnerDocument, "UnitBasis", this, processed));
 			//todo
@@ -456,11 +676,11 @@ namespace GeometryGym.Ifc
 					element.AppendChild(v.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 
-			if (mHasExternalReferences.Count > 0)
+			if (mHasExternalReference.Count > 0)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReferences", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("HasExternalReference", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcExternalReferenceRelationship r in HasExternalReferences)
+				foreach (IfcExternalReferenceRelationship r in HasExternalReference)
 					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mHasConstraintRelationships.Count > 0)

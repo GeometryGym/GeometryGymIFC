@@ -75,6 +75,126 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
+	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Segments"] = new JArray(Segments.Select(x => x.getJson(this, options)));
+			obj["RailHeadDistance"] = mRailHeadDistance.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			Segments.AddRange(mDatabase.extractJArray<IfcAlignment2DCantSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			JToken railHeadDistance = obj.GetValue("RailHeadDistance", StringComparison.InvariantCultureIgnoreCase);
+			if (railHeadDistance != null)
+				mRailHeadDistance = railHeadDistance.Value<double>();
+		}
+	}
+	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartDistAlong"] = mStartDistAlong.ToString();
+			obj["HorizontalLength"] = mHorizontalLength.ToString();
+			obj["StartCantLeft"] = mStartCantLeft.ToString();
+			if (!double.IsNaN(mEndCantLeft))
+				obj["EndCantLeft"] = mEndCantLeft.ToString();
+			obj["StartCantRight"] = mStartCantRight.ToString();
+			if (!double.IsNaN(mEndCantRight))
+				obj["EndCantRight"] = mEndCantRight.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken startDistAlong = obj.GetValue("StartDistAlong", StringComparison.InvariantCultureIgnoreCase);
+			if (startDistAlong != null)
+				mStartDistAlong = startDistAlong.Value<double>();
+			JToken horizontalLength = obj.GetValue("HorizontalLength", StringComparison.InvariantCultureIgnoreCase);
+			if (horizontalLength != null)
+				mHorizontalLength = horizontalLength.Value<double>();
+			JToken startCantLeft = obj.GetValue("StartCantLeft", StringComparison.InvariantCultureIgnoreCase);
+			if (startCantLeft != null)
+				mStartCantLeft = startCantLeft.Value<double>();
+			JToken endCantLeft = obj.GetValue("EndCantLeft", StringComparison.InvariantCultureIgnoreCase);
+			if (endCantLeft != null)
+				mEndCantLeft = endCantLeft.Value<double>();
+			JToken startCantRight = obj.GetValue("StartCantRight", StringComparison.InvariantCultureIgnoreCase);
+			if (startCantRight != null)
+				mStartCantRight = startCantRight.Value<double>();
+			JToken endCantRight = obj.GetValue("EndCantRight", StringComparison.InvariantCultureIgnoreCase);
+			if (endCantRight != null)
+				mEndCantRight = endCantRight.Value<double>();
+		}
+	}
+	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mStartRadius))
+				obj["StartRadius"] = mStartRadius.ToString();
+			if (!double.IsNaN(mEndRadius))
+				obj["EndRadius"] = mEndRadius.ToString();
+			obj["IsStartRadiusCCW"] = mIsStartRadiusCCW;
+			obj["IsEndRadiusCCW"] = mIsEndRadiusCCW;
+			obj["TransitionCurveType"] = mTransitionCurveType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken startRadius = obj.GetValue("StartRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (startRadius != null)
+				mStartRadius = startRadius.Value<double>();
+			JToken endRadius = obj.GetValue("EndRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (endRadius != null)
+				mEndRadius = endRadius.Value<double>();
+			JToken isStartRadiusCCW = obj.GetValue("IsStartRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (isStartRadiusCCW != null)
+				mIsStartRadiusCCW = isStartRadiusCCW.Value<bool>();
+			JToken isEndRadiusCCW = obj.GetValue("IsEndRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (isEndRadiusCCW != null)
+				mIsEndRadiusCCW = isEndRadiusCCW.Value<bool>();
+			JToken token = obj.GetValue("TransitionCurveType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTransitionCurveType>(token.Value<string>(), true, out mTransitionCurveType);
+		}
+	}
+	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (!double.IsNaN(mStartRadius))
+				obj["StartRadius"] = mStartRadius.ToString();
+			if (!double.IsNaN(mEndRadius))
+				obj["EndRadius"] = mEndRadius.ToString();
+			obj["IsStartRadiusCCW"] = mIsStartRadiusCCW;
+			obj["IsEndRadiusCCW"] = mIsEndRadiusCCW;
+			obj["TransitionCurveType"] = mTransitionCurveType.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken startRadius = obj.GetValue("StartRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (startRadius != null)
+				mStartRadius = startRadius.Value<double>();
+			JToken endRadius = obj.GetValue("EndRadius", StringComparison.InvariantCultureIgnoreCase);
+			if (endRadius != null)
+				mEndRadius = endRadius.Value<double>();
+			JToken isStartRadiusCCW = obj.GetValue("IsStartRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (isStartRadiusCCW != null)
+				mIsStartRadiusCCW = isStartRadiusCCW.Value<bool>();
+			JToken isEndRadiusCCW = obj.GetValue("IsEndRadiusCCW", StringComparison.InvariantCultureIgnoreCase);
+			if (isEndRadiusCCW != null)
+				mIsEndRadiusCCW = isEndRadiusCCW.Value<bool>();
+			JToken token = obj.GetValue("TransitionCurveType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTransitionCurveType>(token.Value<string>(), true, out mTransitionCurveType);
+		}
+	}
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal override void parseJObject(JObject obj)
@@ -108,7 +228,7 @@ namespace GeometryGym.Ifc
 			obj["CurveGeometry"] = CurveGeometry.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment : BaseClassIfc //IFC4.1
+	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -258,11 +378,7 @@ namespace GeometryGym.Ifc
 				Description = token.Value<string>();
 			JObject jobj = obj.GetValue("AppliedValue", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
 				AppliedValue = mDatabase.ParseJObject<IfcAppliedValueSelect>(jobj);
-				if (mAppliedValueIndex <= 0)
-					mAppliedValueValue = DatabaseIfc.ParseValue(jobj);
-			}
 			jobj = obj.GetValue("UnitBasis", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				UnitBasis = mDatabase.ParseJObject<IfcMeasureWithUnit>(jobj);
@@ -270,7 +386,7 @@ namespace GeometryGym.Ifc
 			mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addComponent(x));
 
 
-			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReferences", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			for (int icounter = 0; icounter < ers.Count; icounter++)
 				ers[icounter].RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> crs = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray);
@@ -293,10 +409,14 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			if (mAppliedValueIndex > 0)
-				obj["AppliedValue"] = mDatabase[mAppliedValueIndex].getJson(this, options);
-			else if (mAppliedValueValue != null)
-				obj["AppliedValue"] = DatabaseIfc.extract(mAppliedValueValue);
+			if (mAppliedValue != null)
+			{
+				IfcValue value = mAppliedValue as IfcValue;
+				if(value != null)
+					obj["AppliedValue"] = DatabaseIfc.extract(value);
+				else
+					obj["AppliedValue"] = mAppliedValue.getJson(this, options);
+			}
 			if (mUnitBasis > 0)
 				obj["UnitBasis"] = UnitBasis.getJson(this, options);
 			//todo
@@ -306,8 +426,8 @@ namespace GeometryGym.Ifc
 				obj["ArithmeticOperator"] = ArithmeticOperator.ToString();
 			if(mComponents.Count > 0)
 				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, options)));
-			if (mHasExternalReferences.Count > 0)
-				obj["HasExternalReferences"] = new JArray(HasExternalReferences.ToList().ConvertAll(x => x.getJson(this, options)));
+			if (mHasExternalReference.Count > 0)
+				obj["HasExternalReference"] = new JArray(HasExternalReference.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mHasConstraintRelationships.Count > 0)
 			{
 				JArray array = new JArray();
@@ -388,31 +508,30 @@ namespace GeometryGym.Ifc
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
-			int digits = mDatabase.mLengthDigits;
 			base.setJSON(obj, host, options);
-			obj["BottomFlangeWidth"] = Math.Round(mBottomFlangeWidth, digits);
-			obj["OverallDepth"] = Math.Round(mOverallDepth, digits);
-			obj["WebThickness"] = Math.Round(mWebThickness, digits);
-			obj["BottomFlangeThickness"] = Math.Round(mBottomFlangeThickness, digits);
+			obj["BottomFlangeWidth"] = formatLength(mBottomFlangeWidth);
+			obj["OverallDepth"] = formatLength(mOverallDepth);
+			obj["WebThickness"] = formatLength(mWebThickness);
+			obj["BottomFlangeThickness"] = formatLength(mBottomFlangeThickness);
 			if (!double.IsNaN(mBottomFlangeFilletRadius) && mBottomFlangeFilletRadius > 0)
-				obj["BottomFlangeFilletRadius"] = Math.Round(mBottomFlangeFilletRadius, digits);
-			obj["TopFlangeWidth"] = Math.Round(mTopFlangeWidth, digits);
+				obj["BottomFlangeFilletRadius"] = formatLength(mBottomFlangeFilletRadius);
+			obj["TopFlangeWidth"] = formatLength(mTopFlangeWidth);
 			if (!double.IsNaN(mTopFlangeThickness) && mTopFlangeThickness > 0)
-				obj["TopFlangeThickness"] = Math.Round(mTopFlangeThickness, digits);
+				obj["TopFlangeThickness"] = formatLength(mTopFlangeThickness);
 			if (!double.IsNaN(mTopFlangeFilletRadius) && mTopFlangeFilletRadius > 0)
-				obj["TopFlangeFilletRadius"] = Math.Round(mTopFlangeFilletRadius, digits);
+				obj["TopFlangeFilletRadius"] = formatLength(mTopFlangeFilletRadius);
 			if (!double.IsNaN(mBottomFlangeEdgeRadius) && mBottomFlangeEdgeRadius > 0)
-				obj["BottomFlangeEdgeRadius"] = Math.Round(mBottomFlangeEdgeRadius, digits);
+				obj["BottomFlangeEdgeRadius"] = formatLength(mBottomFlangeEdgeRadius);
 			if (!double.IsNaN(mBottomFlangeSlope) && mBottomFlangeSlope > 0)
 				obj["BottomFlangeSlope"] = mBottomFlangeSlope;
 			if (!double.IsNaN(mTopFlangeEdgeRadius) && mTopFlangeEdgeRadius > 0)
-				obj["TopFlangeEdgeRadius"] = Math.Round(mTopFlangeEdgeRadius, digits);
+				obj["TopFlangeEdgeRadius"] = formatLength(mTopFlangeEdgeRadius);
 			if (!double.IsNaN(mTopFlangeSlope) && mTopFlangeSlope > 0)
 				obj["TopFlangeSlope"] = mTopFlangeSlope;
 			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
 			{
 				if (!double.IsNaN(mCentreOfGravityInY) && mCentreOfGravityInY > 0)
-					obj["CentreOfGravityInY"] = mCentreOfGravityInY;
+					obj["CentreOfGravityInY"] = formatLength(mCentreOfGravityInY);
 			}
 		}
 	}

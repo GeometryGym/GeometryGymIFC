@@ -29,6 +29,37 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcRail : IfcBuiltElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcRailTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcRailTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
+	public partial class IfcRailType : IfcBuiltElementType
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcRailTypeEnum>(predefinedType.Value, out mPredefinedType);
+		}
+	}
 	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -155,6 +186,22 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("ListPositions", String.Join(" ", mListPositions));
 			if (mInnerReference > 0)
 				xml.AppendChild(InnerReference.GetXML(xml.OwnerDocument, "InnerReference", this, processed));
+		}
+	}
+	public partial class IfcReinforcedSoil : IfcEarthworksElement
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcReinforcedSoilTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
+			if (predefinedType != null)
+				Enum.TryParse<IfcReinforcedSoilTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
 	public partial class IfcReinforcementBarProperties : IfcPreDefinedProperties
@@ -427,6 +474,24 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(mDatabase[mRelatingMaterial].GetXML(xml.OwnerDocument, "RelatingMaterial", this, processed));
 		}
 	}
+	public partial class IfcRelAssociatesProfileDef : IfcRelAssociates
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(RelatingProfileDef.GetXML(xml.OwnerDocument, "RelatingProfileDef", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelatingProfileDef", true) == 0)
+					RelatingProfileDef = mDatabase.ParseXml<IfcProfileDef>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcRelContainedInSpatialStructure : IfcRelConnects
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -693,7 +758,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(RelatedOpeningElement.GetXML(xml.OwnerDocument, "RelatedOpeningElement", this, processed));
 		}
 	}
-	public partial class IfcRepresentation : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
+	public partial class IfcRepresentation<RepresentationItem> : BaseClassIfc, IfcLayeredItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -711,7 +776,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcRepresentationItem ri = mDatabase.ParseXml<IfcRepresentationItem>(cn as XmlElement);
+						RepresentationItem ri = mDatabase.ParseXml<RepresentationItem>(cn as XmlElement);
 						if (ri != null)
 							Items.Add(ri);
 					}
@@ -742,12 +807,11 @@ namespace GeometryGym.Ifc
 			foreach (IfcRepresentationItem item in Items)
 				element.AppendChild(item.GetXML(xml.OwnerDocument, "", this, processed));
 
-			if (mLayerAssignments.Count > 0)
+			if (mLayerAssignment != null)
 			{
-				element = xml.OwnerDocument.CreateElement("LayerAssignments", mDatabase.mXmlNamespace);
+				element = xml.OwnerDocument.CreateElement("LayerAssignment", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcPresentationLayerAssignment pla in mLayerAssignments)
-					element.AppendChild(pla.GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild(mLayerAssignment.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 		}
 	}
@@ -808,12 +872,11 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mLayerAssignments.Count > 0)
+			if (mLayerAssignment != null)
 			{
-				XmlElement element = xml.OwnerDocument.CreateElement("LayerAssignments", mDatabase.mXmlNamespace);
+				XmlElement element = xml.OwnerDocument.CreateElement("LayerAssignment", mDatabase.mXmlNamespace);
 				xml.AppendChild(element);
-				foreach (IfcPresentationLayerAssignment pla in mLayerAssignments)
-					element.AppendChild(pla.GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild(mLayerAssignment.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (mStyledByItem != null)
 			{
@@ -850,7 +913,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECEATED IFC4 renamed
+	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECATED IFC4 renamed
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

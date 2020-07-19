@@ -29,7 +29,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcBeam : IfcBuildingElement
+	public partial class IfcBeam : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcBeamType : IfcBuildingElementType
+	public partial class IfcBeamType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -99,8 +99,8 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Operator", mOperator.ToString().ToLower());
-			xml.AppendChild(mDatabase[mFirstOperand].GetXML(xml.OwnerDocument, "FirstOperand", this, processed));
-			xml.AppendChild(mDatabase[mSecondOperand].GetXML(xml.OwnerDocument, "SecondOperand", this, processed));
+			xml.AppendChild((mFirstOperand as BaseClassIfc).GetXML(xml.OwnerDocument, "FirstOperand", this, processed));
+			xml.AppendChild((mSecondOperand as BaseClassIfc).GetXML(xml.OwnerDocument, "SecondOperand", this, processed));
 		}
 	}
 	public partial class IfcBoundingBox : IfcGeometricRepresentationItem
@@ -146,6 +146,10 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
+			if (xml.HasAttribute("ElevationOfRefHeight"))
+				ElevationOfRefHeight = double.Parse(xml.Attributes["ElevationOfRefHeight"].Value);
+			if (xml.HasAttribute("ElevationOfTerrain"))
+				ElevationOfTerrain = double.Parse(xml.Attributes["ElevationOfTerrain"].Value);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -156,11 +160,15 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mElevationOfRefHeight))
+				xml.SetAttribute("ElevationOfRefHeight", mElevationOfRefHeight.ToString());
+			if (!double.IsNaN(mElevationOfTerrain))
+				xml.SetAttribute("ElevationOfTerrain", mElevationOfTerrain.ToString());
 			if (mBuildingAddress != null) 
 				xml.AppendChild(BuildingAddress.GetXML(xml.OwnerDocument, "BuildingAddress", this, processed));
 		}
 	}
-	public partial class IfcBuildingElementProxy : IfcBuildingElement
+	public partial class IfcBuildingElementProxy : IfcBuiltElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -185,7 +193,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcBuildingElementProxyType : IfcBuildingElementType
+	public partial class IfcBuildingElementProxyType : IfcBuiltElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -200,7 +208,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcBuildingStorey : IfcFacilityPart
+	public partial class IfcBuildingStorey : IfcSpatialStructureElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
