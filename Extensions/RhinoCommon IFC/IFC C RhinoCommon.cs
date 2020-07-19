@@ -142,5 +142,10 @@ namespace GeometryGym.Ifc
 	{
 		public Curve Curve() { return Curve(mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
 		public abstract Curve Curve(double tol);
+
+		internal virtual Plane planeAt(IfcDistanceExpression distanceExpression, bool vertical, double tol)
+		{
+			throw new Exception("PlaneAt DistanceExpression not implemented for " + this.StepClassName);
+		}
 	}
 }

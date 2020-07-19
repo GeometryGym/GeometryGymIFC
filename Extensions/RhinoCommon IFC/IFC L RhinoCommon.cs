@@ -44,8 +44,11 @@ namespace GeometryGym.Ifc
 			IfcDistanceExpression distanceExpression = Distance;
 			IfcCurve curve = PlacementMeasuredAlong;
 			Plane plane = Plane.Unset;
-			if (curve is IfcAlignmentCurve alignmentCurve)
-				plane = alignmentCurve.planeAt(distanceExpression, false, tol);
+			plane = curve.planeAt(distanceExpression, false, tol);
+			if (plane.IsValid)
+				return Rhino.Geometry.Transform.Unset;
+			Vector3d xAxis = Vector3d.CrossProduct(plane.ZAxis, Vector3d.ZAxis);
+			plane = new Plane(plane.Origin, xAxis, plane.ZAxis);
 
 			if (plane.IsValid)
 			{
