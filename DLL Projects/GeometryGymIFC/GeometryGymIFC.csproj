@@ -327,8 +327,8 @@
     <Compile Include="..\..\Core\IFC\STEP\IFC Z STEP.cs">
       <Link>IFC\Core\STEP\IFC Z STEP.cs</Link>
     </Compile>
-    <Compile Include="..\..\Core\IFC\Validate.cs">
-      <Link>MVD\Validate.cs</Link>
+    <Compile Include="..\..\Core\IFC\Validate.cs"> 
+      <Link>IFC\Validate.cs</Link> 
     </Compile>
     <Compile Include="..\..\Core\IFC\XML\BaseClassIFC XML.cs">
       <Link>IFC\XML\BaseClassIFC XML.cs</Link>
