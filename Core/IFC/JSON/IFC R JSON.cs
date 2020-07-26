@@ -663,7 +663,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ContextType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				ContextType = token.Value<string>();
-			RepresentationsInContext.AddRange(mDatabase.extractJArray<IfcRepresentation<IfcRepresentationItem>>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			RepresentationsInContext.AddRange(mDatabase.extractJArray<IfcShapeModel>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

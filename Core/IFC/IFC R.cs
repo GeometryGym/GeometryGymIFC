@@ -670,8 +670,8 @@ namespace GeometryGym.Ifc
 			mRelatingObject = relObject.mIndex;
 			relObject.mIsDecomposedBy.Add(this);
 		}
-		internal IfcRelAggregates(IfcObjectDefinition relObject, IfcObjectDefinition relatedObject) : this(relObject, new List<IfcObjectDefinition>() { relatedObject }) { }
-		internal IfcRelAggregates(IfcObjectDefinition relObject, IEnumerable<IfcObjectDefinition> relatedObjects) : this(relObject)
+		public IfcRelAggregates(IfcObjectDefinition relObject, IfcObjectDefinition relatedObject) : this(relObject, new List<IfcObjectDefinition>() { relatedObject }) { }
+		public IfcRelAggregates(IfcObjectDefinition relObject, IEnumerable<IfcObjectDefinition> relatedObjects) : this(relObject)
 		{
 			foreach (IfcObjectDefinition od in relatedObjects)
 				od.Decomposes = this;
@@ -2182,15 +2182,15 @@ namespace GeometryGym.Ifc
 			get { return mContextOfItems; }
 			set
 			{
-				IfcRepresentation<IfcRepresentationItem> item = this as IfcRepresentation<IfcRepresentationItem>;
-				if (item != null && mContextOfItems != null)
-					mContextOfItems.RepresentationsInContext.Remove(item);
+				IfcShapeModel shapeModel = this as IfcShapeModel;
+				if (shapeModel != null && mContextOfItems != null)
+					mContextOfItems.RepresentationsInContext.Remove(shapeModel);
 				mContextOfItems = value;
-				if (value != null)
+				if (shapeModel != null && value != null)
 				{
-					IfcRepresentation<RepresentationItem> existing = value.RepresentationsInContext.Where(x => x.Index == mIndex).FirstOrDefault() as IfcRepresentation<RepresentationItem>;
+					IfcShapeModel existing = value.RepresentationsInContext.Where(x => x.Index == mIndex).FirstOrDefault();
 					if(existing == null)
-						value.RepresentationsInContext.Add(item);
+						value.RepresentationsInContext.Add(shapeModel);
 					mRepresentationIdentifier = value.ContextIdentifier;
 				}
 			}
@@ -2256,12 +2256,12 @@ namespace GeometryGym.Ifc
 	{
 		internal string mContextIdentifier = "$";// : OPTIONAL IfcLabel;
 		internal string mContextType = "$";// : OPTIONAL IfcLabel; 
-										   //INVERSE
-		[NonSerialized] private SET<IfcRepresentation<IfcRepresentationItem>> mRepresentationsInContext = new SET<IfcRepresentation<IfcRepresentationItem>>();// :	SET OF IfcRepresentation FOR ContextOfItems;
+		//INVERSE
+		[NonSerialized] private SET<IfcShapeModel> mRepresentationsInContext = new SET<IfcShapeModel>();// :	SET OF IfcRepresentation FOR ContextOfItems;
 
 		public string ContextIdentifier { get { return (mContextIdentifier == "$" ? "" : ParserIfc.Decode(mContextIdentifier)); } set { mContextIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string ContextType { get { return (mContextType == "$" ? "" : ParserIfc.Decode(mContextType)); } set { mContextType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcRepresentation<IfcRepresentationItem>> RepresentationsInContext { get { return mRepresentationsInContext; } private set { mRepresentationsInContext = value; } }
+		public SET<IfcShapeModel> RepresentationsInContext { get { return mRepresentationsInContext; } private set { mRepresentationsInContext = value; } }
 
 		protected IfcRepresentationContext() : base() { }
 		protected IfcRepresentationContext(DatabaseIfc db) : base(db) { }

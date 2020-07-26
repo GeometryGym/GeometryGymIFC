@@ -1521,10 +1521,10 @@ namespace GeometryGym.Ifc
 	{ //  ,IfcPerformanceHistory ,IfcPermit ,IfcProjectOrder ,IfcProjectOrderRecord ,IfcScheduleTimeControl ,IfcServiceLife ,IfcSpaceProgram ,IfcTimeSeriesSchedule,IfcWorkControl))
 		internal string mIdentification = "$"; // : OPTIONAL IfcIdentifier; IFC4
 		//INVERSE
-		internal List<IfcRelAssignsToControl> mControls = new List<IfcRelAssignsToControl>();/// : SET OF IfcRelAssignsToControl FOR RelatingControl;
+		internal SET<IfcRelAssignsToControl> mControls = new SET<IfcRelAssignsToControl>();/// : SET OF IfcRelAssignsToControl FOR RelatingControl;
 
 		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcRelAssignsToControl> Controls => new ReadOnlyCollection<IfcRelAssignsToControl>(mControls);
+		public SET<IfcRelAssignsToControl> Controls { get { return mControls; } }
 		protected IfcControl() : base() { }
 		protected IfcControl(DatabaseIfc db, IfcControl c, DuplicateOptions options) : base(db, c, options) { mIdentification = c.mIdentification; }
 		protected IfcControl(DatabaseIfc db) : base(db)

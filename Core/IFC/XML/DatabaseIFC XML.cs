@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class DatabaseIfc
 	{
-		internal bool XMLMandatoryId { get; set; } = false;
+		internal bool XMLMandatoryId { get; set; } 
 		public void ReadXMLFile(string filename)
 		{
 			FileName = filename;

@@ -42,7 +42,7 @@ namespace GeometryGym.STEP
 			set { mFileName = value; if(!string.IsNullOrEmpty(value)) FolderPath = Path.GetDirectoryName(value); }
 		}
 
-		public DatabaseSTEP() { }
+		public DatabaseSTEP() { mNextBlank = 1; }
 
 		private SortedDictionary<int, T> mObjects = new SortedDictionary<int, T>();
 		public int LastKey() { return mObjects.Count == 0 ? 0 : mObjects.Last().Key; }
@@ -78,7 +78,7 @@ namespace GeometryGym.STEP
 		{
 			get;
 			set;
-		} = 1;
+		} 
 		internal int NextBlank()
 		{
 			while (mObjects.ContainsKey(mNextBlank))
@@ -99,8 +99,8 @@ namespace GeometryGym.STEP
 		internal void logParseError(string str) { string error = "XX Error " + str;  if (!mParsingErrors.Contains(error)) mParsingErrors.Add(error); }
 		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
-		public string FolderPath { get; protected set; } = "";
-		internal string PreviousApplication { get; set; } = "";
+		public string FolderPath { get; protected set; } 
+		internal string PreviousApplication { get; set; }
 	}
 }
 

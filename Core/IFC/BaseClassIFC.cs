@@ -122,7 +122,8 @@ namespace GeometryGym.Ifc
 
 		protected void ReplaceDatabase(BaseClassIfc revised)
 		{
-			if(this is IfcRepresentationItem representationItem && revised is IfcRepresentationItem revisedItem)
+			IfcRepresentationItem representationItem = this as IfcRepresentationItem, revisedItem = revised as IfcRepresentationItem;
+			if(representationItem != null && revisedItem != null)
 			{
 				IfcStyledItem styledItem = representationItem.StyledByItem;
 				if (styledItem != null)
@@ -218,10 +219,10 @@ namespace GeometryGym.Ifc
 
 		internal class RepositoryAttributes
 		{
-			internal DateTime Created { get; set; } = DateTime.MinValue;
-			internal DateTime Modified { get; set; } = DateTime.MinValue;
+			internal DateTime Created { get; set; }
+			internal DateTime Modified { get; set; }
 
-			internal RepositoryAttributes() { }
+			internal RepositoryAttributes() { Created = DateTime.MinValue; Modified = DateTime.MinValue; }
 			internal RepositoryAttributes(DateTime created, DateTime modified) { Created = created; Modified = modified; }
 		}
 

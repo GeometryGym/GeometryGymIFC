@@ -1319,8 +1319,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				{
 					if (r != null)
 					{
-						if(this is IfcProductDefinitionShape pds)
-							r.mOfProductRepresentation.Add(pds);
+						IfcProductDefinitionShape productDefinitionShape = this as IfcProductDefinitionShape;
+						if(productDefinitionShape != null)
+							r.mOfProductRepresentation.Add(productDefinitionShape);
 					}
 				}
 			}
@@ -1330,8 +1331,9 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 				{
 					if(r != null)
 					{
-						if(this is IfcProductDefinitionShape pds)
-							r.mOfProductRepresentation.Remove(pds);
+						IfcProductDefinitionShape productDefinitionShape = this as IfcProductDefinitionShape;
+						if(productDefinitionShape != null)
+							r.mOfProductRepresentation.Remove(productDefinitionShape);
 					}
 				}
 			}
@@ -2079,7 +2081,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		private Dictionary<string, IfcPropertyTemplate> mHasPropertyTemplates = new Dictionary<string, IfcPropertyTemplate>();//  : SET [1:?] OF IfcPropertyTemplate;
 
 		//INVERSE
-		internal List<IfcRelDefinesByTemplate> mDefines = new List<IfcRelDefinesByTemplate>();//	:	SET OF IfcRelDefinesByTemplate FOR RelatingTemplate;
+		internal SET<IfcRelDefinesByTemplate> mDefines = new SET<IfcRelDefinesByTemplate>();//	:	SET OF IfcRelDefinesByTemplate FOR RelatingTemplate;
 
 		private ApplicableFilter mApplicableFilter = null;
 
@@ -2094,7 +2096,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			}
 		}
 		public Dictionary<string, IfcPropertyTemplate> HasPropertyTemplates { get { return mHasPropertyTemplates; } }
-		public ReadOnlyCollection<IfcRelDefinesByTemplate> Defines => new ReadOnlyCollection<IfcRelDefinesByTemplate>(mDefines);
+		public SET<IfcRelDefinesByTemplate> Defines { get { return mDefines; } }
 
 		protected override void initialize()
 		{

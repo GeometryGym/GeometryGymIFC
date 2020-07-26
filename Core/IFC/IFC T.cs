@@ -781,6 +781,12 @@ namespace GeometryGym.Ifc
 		internal double mTopXDim;// : IfcPositiveLengthMeasure;
 		internal double mYDim;// : IfcPositiveLengthMeasure;
 		internal double mTopXOffset;// : IfcPositiveLengthMeasure; 
+
+		public double BottomXDim { get { return mBottomXDim; } set { mBottomXDim = value; } }
+		public double TopXDim { get { return mTopXDim; } set { mTopXDim = value; } }
+		public double YDim { get { return mYDim; } set { mYDim = value; } }
+		public double TopXOffset { get { return mTopXOffset; } set { mTopXOffset = value; } }
+
 		internal IfcTrapeziumProfileDef() : base() { }
 		internal IfcTrapeziumProfileDef(DatabaseIfc db, IfcTrapeziumProfileDef p) : base(db, p) { mBottomXDim = p.mBottomXDim; mTopXDim = p.mTopXDim; mYDim = p.mYDim; mTopXOffset = p.mTopXOffset; }
 		public IfcTrapeziumProfileDef(DatabaseIfc db, string name, double bottomXDim, double topXDim, double yDim, double topXOffset) : base(db, name)

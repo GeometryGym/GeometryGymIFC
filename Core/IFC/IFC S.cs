@@ -1397,10 +1397,10 @@ additional types	some additional representation types are given:
 		{
 			public IfcBoundaryNodeCondition BoundaryCondition { get; set; }
 			public IfcStructuralConnectionCondition StructuralConnectionCondition { get; set; }
-			public double SupportedLength { get; set; } = 0;
-			public Tuple<double, double, double> Eccentricity { get; set; } = null;
-			internal IfcAxis2Placement3D ConditionCoordinateSystem { get; set; } = null;
-			public ExtremityAttributes() { }
+			public double SupportedLength { get; set; } 
+			public Tuple<double, double, double> Eccentricity { get; set; }
+			internal IfcAxis2Placement3D ConditionCoordinateSystem { get; set; } 
+			public ExtremityAttributes() { SupportedLength = 0; Eccentricity = null; ConditionCoordinateSystem = null; }
 			public ExtremityAttributes(ExtremityAttributes atts)
 			{
 				if(atts != null)
@@ -2026,11 +2026,13 @@ additional types	some additional representation types are given:
 		{
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
-				if(style is IfcPresentationStyleAssignment presentationStyleAssignment)
+				IfcPresentationStyleAssignment presentationStyleAssignment = style as IfcPresentationStyleAssignment;
+				if(presentationStyleAssignment != null)
 					mStyles.Add(presentationStyleAssignment);
 				else
 				{
-					if(style is IfcPresentationStyle presentationStyle)
+					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
+					if(presentationStyle != null)
 						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle));
 				}
 			}

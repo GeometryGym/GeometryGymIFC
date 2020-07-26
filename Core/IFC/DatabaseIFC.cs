@@ -37,11 +37,10 @@ namespace GeometryGym.Ifc
 
 	public class Triple<T>
 	{
-		public T X { get; set; } = default(T);
-		public T Y { get; set; } = default(T);
-		public T Z { get; set; } = default(T);
-
-		public Triple() { }
+		public T X { get; set; } 
+		public T Y { get; set; }
+		public T Z { get; set; } 
+		public Triple() { X = default(T); Y = default(T); Z = default(T); }
 		public Triple(T x, T y, T z)
 		{
 			X = x;
@@ -59,12 +58,12 @@ namespace GeometryGym.Ifc
 		public void Dispose() { mIsDisposed = true; }
 
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
-		public FormatIfcSerialization Format { get; set; } = FormatIfcSerialization.STEP;
+		public FormatIfcSerialization Format { get; set; } 
 		
 		private FactoryIfc mFactory = null;
 		public FactoryIfc Factory { get { return mFactory; } }
 
-		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); }
+		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
 		public DatabaseIfc(string fileName) : this() { ReadFile(fileName); }
 		public DatabaseIfc(TextReader stream) : this() { ReadFile(stream, 0); }
 		public DatabaseIfc(ModelView view) : this(true, view) { }
@@ -752,15 +751,11 @@ namespace GeometryGym.Ifc
 		private DatabaseIfc mDatabase = null;
 		internal FactoryIfc(DatabaseIfc db) { mDatabase = db; }
 
-	
 		public partial class GenerateOptions
 		{
-			public bool GenerateOwnerHistory { get; set; } = true;
-			public bool AngleUnitsInRadians
-			{
-				get;
-				set;
-			} = true;
+			public bool GenerateOwnerHistory { get; set; } 
+			public bool AngleUnitsInRadians { get; set; }
+			public GenerateOptions() { GenerateOwnerHistory = true; AngleUnitsInRadians = true; }
 		}
 		internal GenerateOptions mOptions = new GenerateOptions();
 		public GenerateOptions Options { get { return mOptions; } }
@@ -1669,11 +1664,11 @@ namespace GeometryGym.Ifc
 
 	public class DuplicateOptions
 	{
-		public bool DuplicateHost { get; set; } = true;
-		public bool DuplicateDownstream { get; set; } = true;
-		public IfcOwnerHistory OwnerHistory { get; set; } = null;
+		public bool DuplicateHost { get; set; } 
+		public bool DuplicateDownstream { get; set; } 
+		public IfcOwnerHistory OwnerHistory { get; set; } 
 
-		public DuplicateOptions() { }
+		public DuplicateOptions() { DuplicateHost = true;  DuplicateDownstream = true; }
 		public DuplicateOptions(DuplicateOptions options)
 		{
 			DuplicateHost = options.DuplicateHost;

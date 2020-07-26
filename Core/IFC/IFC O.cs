@@ -329,14 +329,14 @@ namespace GeometryGym.Ifc
 		private IfcMaterialSelect mMaterialSelectIFC4 = null;
 		internal void setMaterial(IfcMaterialSelect material)
 		{
-			IfcMaterialSelect m = material;
+			IfcMaterialSelect materialSelect = material;
 			if (mDatabase.mRelease < ReleaseVersion.IFC4)
 			{
 				List<IfcProfileDef> profileDefs = new List<IfcProfileDef>();
 				IfcMaterialProfile profile = material as IfcMaterialProfile;
 				if (profile != null)
 				{
-					m = profile.Material;
+					materialSelect = profile.Material;
 					mMaterialSelectIFC4 = profile;
 					IfcProfileDef profileDef = profile.Profile;
 					if(profileDef != null)
@@ -353,7 +353,7 @@ namespace GeometryGym.Ifc
 					}
 					if (profileSet != null)
 					{
-						m = profileSet.PrimaryMaterial();
+						materialSelect = profileSet.PrimaryMaterial();
 						mMaterialSelectIFC4 = profileSet;
 						foreach (IfcMaterialProfile matp in profileSet.MaterialProfiles)
 						{
@@ -391,9 +391,9 @@ namespace GeometryGym.Ifc
 				if (rm != null)
 					rm.RelatedObjects.Remove(this);
 			}
-			if (m != null)
+			if (materialSelect != null)
 			{
-				m.Associate(this);
+				materialSelect.Associate(this);
 			}
 		}
 

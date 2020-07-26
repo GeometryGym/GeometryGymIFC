@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOwnerHistory : BaseClassIfc
 	{
-		protected override string genRepositoryName => IfcDateTime.FormatSTEP(LastModifiedDate == DateTime.MinValue ? CreationDate : LastModifiedDate).Replace("'","") + " " + mChangeAction.ToString();
+		protected override string genRepositoryName { get { return IfcDateTime.FormatSTEP(LastModifiedDate == DateTime.MinValue ? CreationDate : LastModifiedDate).Replace("'", "") + " " + mChangeAction.ToString(); } }
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);

@@ -199,11 +199,11 @@ namespace GeometryGym.Ifc
 	{
 		internal double mValue;
 		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
-		public override Type ValueType => typeof(double);
+		public override Type ValueType { get { return typeof(double); } }
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcDerivedMeasureValue(double value) { mValue = value; }
 		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-		public override string ValueString => Value.ToString();
+		public override string ValueString { get { return Value.ToString(); } }
 	} //(IfcVolumetricFlowRateMeasure,IfcTimeStamp ,IfcThermalTransmittanceMeasure ,IfcThermalResistanceMeasure
 	  //,IfcThermalAdmittanceMeasure ,IfcPressureMeasure ,IfcPowerMeasure ,IfcMassFlowRateMeasure ,IfcMassDensityMeasure ,IfcLinearVelocityMeasure
 	  //,IfcKinematicViscosityMeasure ,IfcIntegerCountRateMeasure ,IfcHeatFluxDensityMeasure ,IfcFrequencyMeasure ,IfcEnergyMeasure ,IfcElectricVoltageMeasure
@@ -245,8 +245,7 @@ namespace GeometryGym.Ifc
 			mMicroSeconds = (int)(sign * (seconds - iSeconds)  * 1e6);
 
 		}
-		internal IfcCompoundPlaneAngleMeasure(int degrees, int minutes, int seconds, int microSeconds)
-			//:base(degrees + minutes/60 + seconds / 60 / 60 + microSeconds / 60 / 60 / 1e-6)
+		public IfcCompoundPlaneAngleMeasure(int degrees, int minutes, int seconds, int microSeconds)
 		{
 			mDegrees = degrees;
 			mMinutes = minutes;
@@ -419,11 +418,11 @@ namespace GeometryGym.Ifc
       //IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
 		internal double mValue;
 		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
-		public override Type ValueType => typeof(double);
+		public override Type ValueType { get { return typeof(double); } }
 		public double Measure { get { return mValue; } set { mValue = value; } }
 		protected IfcMeasureValue(double value) { mValue = value; }
 		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-		public override string ValueString => Value.ToString();
+		public override string ValueString { get { return Value.ToString(); } }
 	}
 	[Serializable]
 	public class IfcAreaMeasure : IfcMeasureValue { public IfcAreaMeasure(double value) : base(value) { } }
@@ -566,7 +565,7 @@ namespace GeometryGym.Ifc
 			string[] fields = str.Split("-".ToCharArray());
 			return new DateTime(int.Parse(fields[0]), int.Parse(fields[1]), int.Parse(fields[2]));
 		}
-		public override string ValueString => FormatSTEP(mDate);
+		public override string ValueString { get { return FormatSTEP(mDate); } }
 	}
 	[Serializable]
 	public partial class IfcDateTime : IfcSimpleValue
@@ -605,7 +604,7 @@ namespace GeometryGym.Ifc
 				return cd;
 			return new IfcDateAndTime(cd, new IfcLocalTime(m, date.Hour, date.Minute, date.Second));
 		}
-		public override string ValueString => FormatSTEP(mDateTime);
+		public override string ValueString { get { return FormatSTEP(mDateTime); } }
 	}
 	[Serializable]
 	public partial class IfcDuration : IfcSimpleValue, IfcTimeOrRatioSelect
@@ -625,8 +624,8 @@ namespace GeometryGym.Ifc
 		public IfcDuration() { }
 		public static string Convert(IfcDuration d) { return (d == null ? "$" : d.ToString()); }
 		public static IfcDuration Convert(string s) { return null; }
-
-		public override string ValueString => "P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S";
+ 
+		public override string ValueString { get { return "P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S"; } }
 		public override string ToString() { return "IFCDURATION('" + ValueString + "'"; }
 		internal double ToSeconds() { return ((((((mYears * 365) + (mMonths * 30) + mDays) * 24) + mHours) * 60) + mMinutes) * 60 + mSeconds; }
 		private void fromSeconds(double seconds) { mYears = mMonths = mDays = mHours = mMinutes = 0; mSeconds = seconds; }
@@ -643,7 +642,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcInteger : IfcSimpleValue
 	{
-		public int Magnitude { get; set; } = 0;
+		public int Magnitude { get; set; }
 		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
 		public override Type ValueType { get { return typeof(int); } }
 		public IfcInteger(int value) { Magnitude = value; }
@@ -654,14 +653,14 @@ namespace GeometryGym.Ifc
 	{
 		public string Label { get; set; }
 		public override object Value { get { return Label; } set { Label = value.ToString(); } }
-		public override Type ValueType => typeof(string);
+		public override Type ValueType { get { return typeof(string); } }
 		public IfcLabel(string value) { Label = value; }
 		public override string ToString() { return "IFCLABEL('" + ParserIfc.Encode(Label) + "')"; }
 	}
 	[Serializable]
 	public partial class IfcLogical : IfcSimpleValue
 	{
-		public IfcLogicalEnum Logical { get; set; } = IfcLogicalEnum.UNKNOWN;
+		public IfcLogicalEnum Logical { get; set; }
 		public override object Value
 		{
 			get { return Logical; }
@@ -685,7 +684,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPositiveInteger : IfcSimpleValue
 	{
-		public int Magnitude { get; set; } = 0;
+		public int Magnitude { get; set; } 
 		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
 		public override Type ValueType { get { return typeof(int); } }
 		public IfcPositiveInteger(int value) { Magnitude = value; }
@@ -781,7 +780,7 @@ namespace GeometryGym.Ifc
 					mValue = value.ToString();
 			}
 		}
-		public override Type ValueType => typeof(Uri);
+		public override Type ValueType { get { return typeof(Uri); } }
 		public IfcURIReference(string value) { mValue = value; }
 		public override string ToString() { return "IFCURIREFERENCE('" + ParserIfc.Encode(mValue) + "')"; }
 	}
@@ -794,7 +793,7 @@ namespace GeometryGym.Ifc
 		public override Type ValueType { get { return typeof(double); } }
 		public IfcSpecularExponent(double value) { mValue = value; }
 		public override string ToString() { return "IFCSPECULAREXPONENT(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-		public override string ValueString => Value.ToString();
+		public override string ValueString { get { return Value.ToString(); } }
 		public double SpecularExponent { get { return mValue; } }
 	}
 	[Serializable]
@@ -805,7 +804,7 @@ namespace GeometryGym.Ifc
 		public override Type ValueType { get { return typeof(double); } }
 		public IfcSpecularRoughness(double value) { mValue = Math.Min(1, Math.Max(0, value)); }
 		public override string ToString() { return "IFCSPECULARROUGHNESS(" + ParserSTEP.DoubleToString(mValue) + ")"; }
-		public override string ValueString => Value.ToString();
+		public override string ValueString { get { return Value.ToString(); } }
 		public double SpecularRoughness { get { return mValue; } }
 	}
 	public interface IfcSizeSelect { } //TYPE IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);  

@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 			return ParserIfc.Encode(filename).Replace("*", "x").Replace(".", "_").Replace("\"", "").Replace("/", "_").Replace("\\", "_").Replace("[", "(").Replace("]", ")").Replace(":", "-").Replace(";", "-").Replace("|", "-").Replace("=", "-").Replace(",", "_").Replace("<", "(").Replace(">", ")");
 		}
 		internal string RepositoryName { get { return removeFileNameIllegal(genRepositoryName); } }
-		protected string RepositoryNameStub => mGlobalId;
+		protected string RepositoryNameStub { get { return mGlobalId; } }
 		protected virtual string genRepositoryName
 		{
 			get
