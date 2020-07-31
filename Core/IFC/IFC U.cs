@@ -84,29 +84,29 @@ namespace GeometryGym.Ifc
 		public IfcUnitAssignment(IfcUnit unit) : base(unit.Database) { Units.Add(unit); }
 		public IfcUnitAssignment(IEnumerable<IfcUnit> units) : base(units.First().Database) { Units.AddRange(units); }
 
+		internal static double scaleSI(Length length)
+		{
+			if (length == Length.Millimetre)
+				return 0.001;
+			else if (length == Length.Centimetre)
+				return 0.01;
+			if (length == Length.Inch)
+				return 0.0254;
+			if (length == Length.Foot)
+				return FeetToMetre;
+
+			return 1;
+		}
 		public IfcUnitAssignment SetUnits(Length length)
 		{
 			Units.Add(mDatabase.Factory.LengthUnit(length));
-			if (length == Length.Millimetre)
-				mDatabase.ScaleSI = 0.001;
-			else if (length == Length.Centimetre)
-				mDatabase.ScaleSI = 0.01;
-			else if (length == Length.Inch)
+			double scale = scaleSI(length);
+			if (length == Length.Inch || length == Length.Foot)
 			{
-				mDatabase.ScaleSI = 0.0254;
 				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.square_foot));
 				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.cubic_foot));
 				//farenheit
 			}
-			else if (length == Length.Foot)
-			{
-				mDatabase.ScaleSI = FeetToMetre;
-				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.square_foot));
-				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.cubic_foot));
-				//farenheit
-			}
-			else
-				mDatabase.ScaleSI = 1;
 			SetUnits();
 			return this;
 		}

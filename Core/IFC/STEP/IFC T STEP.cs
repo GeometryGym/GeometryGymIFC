@@ -676,8 +676,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mStartRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			mEndRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			StartRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			EndRadius = ParserSTEP.StripDouble(str, ref pos, len);
 			mIsStartRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
 			mIsEndRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
 			Enum.TryParse<IfcTransitionCurveType>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mTransitionCurveType);

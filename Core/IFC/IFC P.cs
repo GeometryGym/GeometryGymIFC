@@ -1887,10 +1887,19 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
-		public IfcPropertySet(string name, IfcProperty prop) : base(prop.mDatabase, name) { addProperty(prop); }
-		public IfcPropertySet(string name, IEnumerable<IfcProperty> props) : base(props.First().mDatabase, name) { foreach(IfcProperty p in props) addProperty(p);  }
+		public IfcPropertySet(string name, IfcProperty property) : base(property.mDatabase, name) { addProperty(property); }
+		public IfcPropertySet(string name, IEnumerable<IfcProperty> properties) : base(properties.First().mDatabase, name)
+		{
+			foreach (IfcProperty p in properties)
+				addProperty(p);
+		}
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IfcProperty prop) : base(relatedObject, name) { addProperty(prop); }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IEnumerable<IfcProperty> props) : base(relatedObject, name) { foreach(IfcProperty p in props) addProperty(p);  }
+		public IfcPropertySet(IfcPropertySetTemplate template, IEnumerable<IfcProperty> properties) : this(template.Name, properties)
+		{
+			Description = template.Description;
+
+		}
 		
 		protected override List<T> Extract<T>(Type type)
 		{

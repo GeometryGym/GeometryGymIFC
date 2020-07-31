@@ -395,8 +395,9 @@ namespace GeometryGym.Ifc
 	{
 		internal double mStartDistAlong = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal LIST<IfcAlignment2DHorizontalSegment> mSegments = new LIST<IfcAlignment2DHorizontalSegment>();// : LIST [1:?] OF IfcAlignment2DHorizontalSegment;
-																											   //INVERSE
+	   //INVERSE
 		internal SET<IfcAlignmentCurve> mToAlignmentCurve = new SET<IfcAlignmentCurve>();// : SET[1:?] OF IfcAlignmentCurve FOR Horizontal;
+
 		public double StartDistAlong { get { return double.IsNaN(mStartDistAlong) ? 0 : mStartDistAlong; } set { mStartDistAlong = value; } }
 		public LIST<IfcAlignment2DHorizontalSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public SET<IfcAlignmentCurve> ToAlignmentCurve { get { return mToAlignmentCurve; } set { mToAlignmentCurve = value;  } } 
@@ -408,12 +409,36 @@ namespace GeometryGym.Ifc
 			Segments.AddRange(a.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcAlignment2DHorizontalSegment));
 		}
 		public IfcAlignment2DHorizontal(IEnumerable<IfcAlignment2DHorizontalSegment> segments) : base(segments.First().Database) { mSegments.AddRange(segments); }
+		protected override void initialize()
+		{
+			base.initialize();
+			mSegments.CollectionChanged += mSegments_CollectionChanged;
+		}
+		private void mSegments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcAlignment2DHorizontalSegment segment in e.NewItems)
+					segment.ToHorizontal = this;
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcAlignment2DHorizontalSegment segment in e.OldItems)
+					segment.ToHorizontal = null;
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
 	{
-		internal IfcCurveSegment2D mCurveGeometry;// : IfcCurveSegment2D;
-		public IfcCurveSegment2D CurveGeometry { get { return mCurveGeometry; } set { mCurveGeometry = value; } }
+		private IfcCurveSegment2D mCurveGeometry;// : IfcCurveSegment2D;
+		//INVERSE
+		internal IfcAlignment2DHorizontal mToHorizontal = null;
+
+		public IfcCurveSegment2D CurveGeometry { get { return mCurveGeometry; } set { if (mCurveGeometry != null) mCurveGeometry.mToSegment = null; mCurveGeometry = value; if (value != null) mCurveGeometry.mToSegment = this; } }
+		public IfcAlignment2DHorizontal ToHorizontal { get { return mToHorizontal; } set { mToHorizontal = value; } }
 
 		internal IfcAlignment2DHorizontalSegment() : base() { }
 		internal IfcAlignment2DHorizontalSegment(DatabaseIfc db, IfcAlignment2DHorizontalSegment s) : base(db, s) { CurveGeometry = db.Factory.Duplicate(s.CurveGeometry) as IfcCurveSegment2D; }
