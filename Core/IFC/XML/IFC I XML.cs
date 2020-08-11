@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if(mFixedAxisVertical != IfcLogicalEnum.UNKNOWN)
@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("SelfIntersect"))
 				mSelfIntersect = bool.Parse(xml.Attributes["SelfIntersect"].Value) ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Points.GetXML(xml.OwnerDocument, "Points", this, processed));
@@ -141,7 +141,7 @@ namespace GeometryGym.Ifc
 					FlangeSlope = ParserSTEP.ParseDouble(child.InnerText);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("OverallWidth", mOverallWidth.ToString());

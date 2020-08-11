@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 			if(mDatabase != null)
 			{
 				if (mDatabase.Format == FormatIfcSerialization.XML)
-					return GetXML(new System.Xml.XmlDocument(), "", null, new Dictionary<int, System.Xml.XmlElement>()).OuterXml;
+					return GetXML(new System.Xml.XmlDocument(), "", null, new Dictionary<string, System.Xml.XmlElement>()).OuterXml;
 			}
 			return base.ToString();
 		}

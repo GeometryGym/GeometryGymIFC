@@ -601,6 +601,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
+			if(release < ReleaseVersion.IFC4)
+				mName = ParserSTEP.StripString(str, ref pos, len);
 			mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 		internal override void postParseRelate()

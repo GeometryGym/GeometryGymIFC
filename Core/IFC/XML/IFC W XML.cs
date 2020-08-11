@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcWallTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcWallTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcWallTypeEnum.NOTDEFINED)

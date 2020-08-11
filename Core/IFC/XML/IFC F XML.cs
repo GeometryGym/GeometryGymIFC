@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Bounds", mDatabase.mXmlNamespace);
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("FbsmFaces", mDatabase.mXmlNamespace);
@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Orientation"))
 				mOrientation = bool.Parse(xml.Attributes["Orientation"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Bound.GetXML(xml.OwnerDocument, "Bound", this, processed));
@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Voids", mDatabase.mXmlNamespace);
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 					FixedReference = mDatabase.ParseXml<IfcDirection>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(FixedReference.GetXML(xml.OwnerDocument, "FixedReference", this, processed));

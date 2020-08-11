@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcValveTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcValveTypeEnum.NOTDEFINED)
@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Magnitude"))
 				mMagnitude = double.Parse(xml.Attributes["Magnitude"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Orientation.GetXML(xml.OwnerDocument, "Orientation", this, processed));

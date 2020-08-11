@@ -35,50 +35,49 @@ namespace GeometryGym.Ifc
 	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
 		internal virtual void ParseXml(XmlElement xml) { }
-		internal XmlElement GetXML(XmlDocument doc, string name, BaseClassIfc host, Dictionary<int,XmlElement> processed)
+		internal XmlElement GetXML(XmlDocument doc, string name, BaseClassIfc host, Dictionary<string,XmlElement> processed)
 		{
 			string type = StepClassName;
 			if (string.IsNullOrEmpty(name))
 				name = type;
 
-			if (processed.ContainsKey(mIndex))
+			XmlElement existing = null;
+			string id = xmlId();
+			if (processed.TryGetValue(id, out existing))
 			{
 				if (!mDatabase.XMLMandatoryId)
 				{
-					XmlElement existing = processed[mIndex];
 					if (!existing.HasAttribute("id"))
-                    {
-                        if (existing.Attributes.Count == 0)
-                            existing.SetAttribute("id", "i" + mIndex);
-                    }
+					{
+						XmlAttribute attribute = doc.CreateAttribute("id");
+						attribute.Value = id;
+						existing.Attributes.Prepend(attribute);
+					}
 				}
 				XmlElement xelement = doc.CreateElement(name, mDatabase.mXmlNamespace);
 				XmlAttribute nil = doc.CreateAttribute("xsi", "nil", mDatabase.mXsiNamespace);
 				nil.Value = "true";
 				xelement.SetAttributeNode(nil);
 				
-				xelement.SetAttribute("href", "i" + mIndex);
+				xelement.SetAttribute("href", id);
 				return xelement;
 			}
 			
 			XmlElement element = doc.CreateElement(name, mDatabase.mXmlNamespace);
-			processed[mIndex] = element;
+			processed[id] = element;
 			SetXML(element, host, processed);
 			
 			if(mDatabase.XMLMandatoryId)
 				element.SetAttribute("id", "i" + mIndex);
 			if (string.Compare(name, type) != 0)
 			{
-				element.SetAttribute("type", mDatabase.mXsiNamespace, type);	
-				//XmlAttribute att = doc.CreateAttribute("xsi","type",mDatabase.mXsiNamespace);
-				////att.Prefix = "xsi";
-				////att.LocalName = type;
-				//att.Value = type;
-				//element.SetAttributeNode(att);
+				XmlAttribute typeAttribute = doc.CreateAttribute("type", mDatabase.mXsiNamespace);
+				typeAttribute.Value = type;
+				element.Attributes.Prepend(typeAttribute);
 			}
 			return element;
 		}
-		internal virtual void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal virtual void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			foreach (string str in mComments)
 				xml.AppendChild(xml.OwnerDocument.CreateComment(str));
@@ -95,7 +94,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute(name, val.ToString());
 		}
 		protected string extractString(XmlElement xml, string name) { return (xml.HasAttribute(name) ? xml.Attributes[name].Value : ""); }
-		protected void setChild(XmlElement xml, string name, IEnumerable<IBaseClassIfc> objects, Dictionary<int, XmlElement> processed)
+		protected void setChild(XmlElement xml, string name, IEnumerable<IBaseClassIfc> objects, Dictionary<string, XmlElement> processed)
 		{
 			if (objects == null || objects.Count() == 0)
 				return;
@@ -125,6 +124,18 @@ namespace GeometryGym.Ifc
 			}
 			
 			return null;
+		}
+
+		internal string xmlId()
+		{
+			string id = "";
+			if (this is IfcClassificationReference classificationReference && !string.IsNullOrEmpty(classificationReference.Identification))
+				id = classificationReference.Identification;
+			if(string.IsNullOrEmpty(id))
+				return "i" + StepId;
+			if (char.IsDigit(id[0]))
+				return "_" + id;
+			return id;
 		}
 	}
 }

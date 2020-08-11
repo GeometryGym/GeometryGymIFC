@@ -31,7 +31,7 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcKerb : IfcBuiltElement
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));

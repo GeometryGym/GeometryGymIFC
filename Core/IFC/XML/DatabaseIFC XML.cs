@@ -205,7 +205,7 @@ null, Type.EmptyTypes, null);
 			schemaLocation.Value = mXmlSchema;
 			el.SetAttributeNode(schemaLocation);
 
-			Dictionary<int, XmlElement> processed = new Dictionary<int, XmlElement>();
+			Dictionary<string, XmlElement> processed = new Dictionary<string, XmlElement>();
 			IfcContext context = Context;
 			if (context != null)
 				el.AppendChild(Context.GetXML(doc, "", null, processed));
@@ -213,7 +213,8 @@ null, Type.EmptyTypes, null);
 			List<BaseClassIfc> toProcess = new List<BaseClassIfc>();
 			foreach (BaseClassIfc e in this)
 			{
-				if (!processed.ContainsKey(e.Index))
+				string id = e.xmlId();
+				if (!processed.ContainsKey(id))
 				{
 					if (e is IfcRelationship)
 						el.AppendChild(e.GetXML(doc, "", null, processed));
@@ -222,7 +223,11 @@ null, Type.EmptyTypes, null);
 				}
 			}
 			foreach (BaseClassIfc e in toProcess)
-				el.AppendChild(e.GetXML(doc, "", null, processed));
+			{
+				string id = e.xmlId();
+				if(!processed.ContainsKey(id))
+					el.AppendChild(e.GetXML(doc, "", null, processed));
+			}
 
 			return doc;
 		}

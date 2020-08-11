@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("UnitType"))
 				Enum.TryParse<IfcUnitEnum>(xml.Attributes["UnitType"].Value, true, out mUnitType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mDimensions != null)
@@ -55,7 +55,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcNavigationElement : IfcBuiltElement
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcNavigationElementTypeEnum.NOTDEFINED)
@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcNavigationElementType : IfcBuiltElementType
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());

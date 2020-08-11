@@ -48,7 +48,14 @@ namespace GeometryGym.Ifc
 			Z = z;
 		}
 	}
-	public enum FormatIfcSerialization { STEP, XML, JSON };
+	public enum FormatIfcSerialization
+	{
+		STEP,
+		XML,
+#if (!NOIFCJSON)
+		JSON,
+#endif
+	};
 	public partial class DatabaseIfc : DatabaseSTEP<BaseClassIfc>
 	{
 		internal string id = ParserIfc.EncodeGuid(Guid.NewGuid());
@@ -253,9 +260,11 @@ namespace GeometryGym.Ifc
 		{
 			string lower = fileName.ToLower();
 			if (lower.EndsWith("xml"))
-				return FormatIfcSerialization.XML; 
+				return FormatIfcSerialization.XML;
+#if (!NOIFCJSON)
 			if (lower.EndsWith("json"))
 				return FormatIfcSerialization.JSON;
+#endif
 			return FormatIfcSerialization.STEP;
 		}
 		internal FileStreamIfc getStreamReader(string fileName)
@@ -307,11 +316,8 @@ namespace GeometryGym.Ifc
 				case FormatIfcSerialization.XML:
 					ReadXMLStream(fs.mTextReader);
 					break;
+#if (!NOIFCJSON)
 				case FormatIfcSerialization.JSON:
-#if (NOIFCJSON)
-					logParseError("IfcJSON not enabled!");
-					return;
-#else
 					ReadJSONFile(fs.mTextReader);
 					break;
 #endif
@@ -327,12 +333,14 @@ namespace GeometryGym.Ifc
 			int i = sr.Peek();
 			if (i < 0)
 				return null;
+#if (!NOIFCJSON)
 			if (i == (int)'{')
 			{
 				ReadFile(new FileStreamIfc(FormatIfcSerialization.JSON, sr));
 				return mContext;
 			}
-			else if (i == (int)'<')
+#endif
+			if (i == (int)'<')
 			{
 				ReadFile(new FileStreamIfc(FormatIfcSerialization.XML, sr));
 				return mContext;
@@ -716,8 +724,10 @@ namespace GeometryGym.Ifc
 		{
 			if(format == FormatIfcSerialization.XML)
 				return XmlString();
+#if (!NOIFCJSON)
 			if (format == FormatIfcSerialization.JSON)
 				return JSON().ToString();
+#endif
 			StringWriter stringWriter = new StringWriter();
 			if (WriteSTEP(stringWriter, FileName))
 				return stringWriter.ToString();
@@ -1456,6 +1466,35 @@ namespace GeometryGym.Ifc
 					mOwnerHistoryAdded = new IfcOwnerHistory(PersonOrganization, Application, IfcChangeActionEnum.ADDED);
 				return mOwnerHistoryAdded;
 			}
+		}
+
+		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcRoot original, IfcRoot revision)
+		{
+			IfcOwnerHistory ownerHistory = (original == null ? null : original.OwnerHistory), revised = (revision == null ? null : revision.OwnerHistory);
+			if (ownerHistory == null && original != null)
+				return null;
+			else if (ownerHistory != null && ownerHistory.mDatabase != mDatabase)
+				ownerHistory = Duplicate(ownerHistory) as IfcOwnerHistory;
+			IfcPersonAndOrganization owner = ownerHistory == null ? PersonOrganization : ownerHistory.OwningUser;
+			IfcApplication owningApplication = ownerHistory == null ? Application : ownerHistory.OwningApplication;
+			DateTime created = ownerHistory == null ? DateTime.UtcNow : ownerHistory.CreationDate;
+			IfcPersonAndOrganization modifier = null;
+			if (revised == null)
+				modifier = (action == IfcChangeActionEnum.ADDED ? null : PersonOrganization);
+			else
+			{
+				if (revised.OwningUser.mDatabase == mDatabase)
+					modifier = revised.OwningUser;
+				else
+					modifier = Duplicate(revised.OwningUser) as IfcPersonAndOrganization;
+			}
+			IfcApplication application = null;
+			if (revised == null)
+				application = (action == IfcChangeActionEnum.ADDED ? null : Application);
+			else
+				application = revised.OwningApplication.mDatabase == mDatabase ? revised.OwningApplication : Duplicate(revised.OwningApplication) as IfcApplication;
+			DateTime modified = (revised == null ? (action == IfcChangeActionEnum.ADDED ? DateTime.MinValue : DateTime.Now) : revised.CreationDate);
+			return OwnerHistory(action, owner, owningApplication, modifier, application, modified, created);
 		}
 
 		internal Dictionary<IfcGeometricRepresentationContext.GeometricContextIdentifier, IfcGeometricRepresentationContext> mContexts = new Dictionary<IfcGeometricRepresentationContext.GeometricContextIdentifier, IfcGeometricRepresentationContext>();		

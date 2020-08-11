@@ -256,6 +256,16 @@ namespace GeometryGym.Ifc
 		public IfcElectricFlowTreatmentDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
+	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
+	{
+		private IfcElectricFlowTreatmentDeviceTypeEnum mPredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED; //: IfcElectricFlowTreatmentDeviceTypeEnum;
+		public IfcElectricFlowTreatmentDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcElectricFlowTreatmentDeviceType() : base() { }
+		public IfcElectricFlowTreatmentDeviceType(DatabaseIfc db, string name, IfcElectricFlowTreatmentDeviceTypeEnum predefinedType)
+			: base(db) { Name = name; PredefinedType = predefinedType; }
+	}
+	[Serializable]
 	public partial class IfcElectricGenerator : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcElectricGeneratorTypeEnum mPredefinedType = IfcElectricGeneratorTypeEnum.NOTDEFINED;// OPTIONAL : IfcElectricGeneratorTypeEnum;
@@ -1190,7 +1200,7 @@ namespace GeometryGym.Ifc
 		internal IfcExternalReferenceRelationship() : base() { }
 		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect)); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
-		public IfcExternalReferenceRelationship(IfcExternalReference reference, List<IfcResourceObjectSelect> related)
+		public IfcExternalReferenceRelationship(IfcExternalReference reference, IEnumerable<IfcResourceObjectSelect> related)
 			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; RelatedResourceObjects.AddRange(related); }
 
 		protected override void initialize()

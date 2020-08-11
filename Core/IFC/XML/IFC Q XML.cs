@@ -39,7 +39,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("AreaValue", AreaValue.ToString());
@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("CountValue", CountValue.ToString());
@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("LengthValue", LengthValue.ToString());
@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("TimeValue", TimeValue.ToString());
@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("VolumeValue", VolumeValue.ToString());
@@ -124,7 +124,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("WeightValue", WeightValue.ToString());

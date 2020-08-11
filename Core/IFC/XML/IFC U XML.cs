@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("PredefinedType"))
 				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(xml.Attributes["PredefinedType"].Value,true, out mPredefinedType);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Units", mDatabase.mXmlNamespace);
@@ -108,7 +108,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("FlangeSlope"))
 				mFlangeSlope = double.Parse(xml.Attributes["FlangeSlope"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Depth", mDepth.ToString());

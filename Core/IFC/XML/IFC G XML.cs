@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 					HasCoordinateOperation = mDatabase.ParseXml<IfcCoordinateOperation>(child as XmlElement);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (this as IfcGeometricRepresentationSubContext == null)
@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("UserDefinedTargetView"))
 				UserDefinedTargetView = xml.Attributes["UserDefinedTargetView"].Value;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if(host.StepId != ParentContext.StepId)
@@ -133,7 +133,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Elements", mDatabase.mXmlNamespace);
@@ -170,7 +170,7 @@ namespace GeometryGym.Ifc
 			}
 			return axes;
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			XmlElement uAxes = null, vAxes = null, wAxes = null;
 			if (mUAxes.Count > 0)
@@ -221,7 +221,7 @@ namespace GeometryGym.Ifc
 					bool.TryParse(child.InnerText, out mSameSense);
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if(mAxisTag != "$")
@@ -250,7 +250,7 @@ namespace GeometryGym.Ifc
 				
 			}
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			if (mIsGroupedBy.Count > 0)

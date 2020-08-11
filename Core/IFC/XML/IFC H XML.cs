@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("AgreementFlag"))
 				mAgreementFlag = bool.Parse(xml.Attributes["AgreementFlag"].Value);
 		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<int, XmlElement> processed)
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(BaseSurface.GetXML(xml.OwnerDocument, "BaseSurface", this, processed));

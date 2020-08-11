@@ -97,16 +97,6 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
-	[Serializable]
-	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
-	{
-		private IfcElectricFlowTreatmentDeviceTypeEnum mPredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.NOTDEFINED; //: IfcElectricFlowTreatmentDeviceTypeEnum;
-		public IfcElectricFlowTreatmentDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-
-		public IfcElectricFlowTreatmentDeviceType() : base() { }
-		public IfcElectricFlowTreatmentDeviceType(DatabaseIfc db, string name, IfcElectricFlowTreatmentDeviceTypeEnum predefinedType)
-			: base(db) { Name = name; PredefinedType = predefinedType; }
-	}
 	public partial class IfcElectricFlowTreatmentDeviceType : IfcFlowTreatmentDeviceType
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

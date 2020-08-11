@@ -198,8 +198,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() +
-			",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -547,7 +546,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			if (release != ReleaseVersion.IFC2x3)
+			if (release > ReleaseVersion.IFC2x3)
 			{
 				mName = ParserSTEP.StripString(str, ref pos, len);
 				mDescription = ParserSTEP.StripString(str, ref pos, len);

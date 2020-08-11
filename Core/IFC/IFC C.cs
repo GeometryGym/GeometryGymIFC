@@ -227,7 +227,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcCartesianPointList2D() : base() { }
 		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l) : base(db,l) { mCoordList = l.mCoordList.ToArray(); }
-		public IfcCartesianPointList2D(DatabaseIfc m, IEnumerable<Tuple<double, double>> coordList) : base(m) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2 }).ToArray(); }
+		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Tuple<double, double>> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2 }).ToArray(); }
 	}
 	[Serializable]
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
@@ -237,7 +237,7 @@ namespace GeometryGym.Ifc
 		internal IfcCartesianPointList3D() : base() { }
 		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l) : base(db,l) { mCoordList = l.mCoordList.ToArray(); }
 
-		public IfcCartesianPointList3D(DatabaseIfc m, IEnumerable<Tuple<double, double, double>> coordList) : base(m) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2, x.Item3 }).ToArray(); }
+		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Tuple<double, double, double>> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2, x.Item3 }).ToArray(); }
 	}
 	[Serializable]
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -512,19 +512,25 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		public void Associate(IfcDefinitionSelect related)
+		public IfcRelAssociatesClassification Associate(IfcDefinitionSelect related)
 		{
 			if (mClassificationForObjects.Count == 0)
-				new IfcRelAssociatesClassification(this, related);
+				return new IfcRelAssociatesClassification(this, related);
 			else
-				mClassificationForObjects[0].RelatedObjects.Add(related);
+			{
+				IfcRelAssociatesClassification associates = mClassificationForObjects[0];
+				associates.RelatedObjects.Add(related);
+				return associates;
+			}
 		}
 
-		public IfcClassificationReference FindItem(string identification)
+		public IfcClassificationReference FindItem(string identification, bool prefixHierarchy)
 		{
 			foreach (IfcClassificationReference classificationReference in HasReferences)
 			{
-				IfcClassificationReference result = classificationReference.FindItem(identification);
+				if (prefixHierarchy && !identification.StartsWith(classificationReference.Identification))
+					continue;
+				IfcClassificationReference result = classificationReference.FindItem(identification, prefixHierarchy);
 				if (result != null)
 					return result;
 			}
@@ -669,13 +675,15 @@ namespace GeometryGym.Ifc
 			else if (!mClassificationRefForObjects[0].RelatedObjects.Contains(related))
 				mClassificationRefForObjects[0].RelatedObjects.Add(related);
 		}
-		public IfcClassificationReference FindItem(string identification)
+		public IfcClassificationReference FindItem(string identification, bool prefixHierarchy)
 		{
 			if (string.Compare(identification, Identification, true) == 0)
 				return this;
 			foreach (IfcClassificationReference classificationReference in HasReferences)
 			{
-				IfcClassificationReference result = classificationReference.FindItem(identification);
+				if (prefixHierarchy && !identification.StartsWith(classificationReference.Identification))
+					continue;
+				IfcClassificationReference result = classificationReference.FindItem(identification, prefixHierarchy);
 				if (result != null)
 					return result;
 			}
@@ -691,7 +699,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcClassificationReferenceSelect : IBaseClassIfc { SET<IfcClassificationReference> HasReferences { get; } } // SELECT ( IfcClassificationReference, IfcClassification);
-	public interface IfcClassificationSelect : NamedObjectIfc { IfcClassificationReference FindItem(string identification); } // IFC4 rename IfcClassification,IfcClassificationReference 
+	public interface IfcClassificationSelect : NamedObjectIfc { IfcClassificationReference FindItem(string identification, bool prefixHierarchy); } // IFC4 rename IfcClassification,IfcClassificationReference 
 	[Serializable]
 	public partial class IfcClosedShell : IfcConnectedFaceSet, IfcShell, IfcSolidOrShell
 	{
@@ -959,7 +967,7 @@ namespace GeometryGym.Ifc
 			if (db != null && db.mModelView == ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcCompositeProfileDef : " + db.ModelView.ToString());
 		}
-		public IfcCompositeProfileDef(string name, List<IfcProfileDef> defs) : this(defs[0].mDatabase, name) { mProfiles.AddRange(defs); }
+		public IfcCompositeProfileDef(string name, IEnumerable<IfcProfileDef> profiles) : this(profiles.First().Database, name) { mProfiles.AddRange(profiles); }
 		public IfcCompositeProfileDef(string name, IfcProfileDef p1, IfcProfileDef p2) : this(p1.mDatabase, name) { mProfiles.Add(p1); mProfiles.Add(p2); }
 
 		internal void addProfile(IfcProfileDef profile) { mProfiles.Add(profile); }
