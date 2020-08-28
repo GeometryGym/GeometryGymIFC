@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 		public bool AgreementFlag { get { return mAgreementFlag; } set { mAgreementFlag = value; } }
 
 		internal IfcHalfSpaceSolid() : base() { }
-		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h) : base(db,h) { BaseSurface = db.Factory.Duplicate(h.BaseSurface) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
+		internal IfcHalfSpaceSolid(DatabaseIfc db, IfcHalfSpaceSolid h, DuplicateOptions options) : base(db, h, options) { BaseSurface = db.Factory.Duplicate(h.BaseSurface, options) as IfcSurface; mAgreementFlag = h.mAgreementFlag; }
 		public IfcHalfSpaceSolid(IfcSurface baseSurface, bool agreementFlag) : base(baseSurface.mDatabase) { BaseSurface = baseSurface; AgreementFlag = agreementFlag; }
 	}
 	public interface IfcHatchLineDistanceSelect : IBaseClassIfc { } // SELECT(IfcPositiveLengthMeasure, IfcVector);

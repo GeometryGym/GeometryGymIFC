@@ -70,7 +70,7 @@ namespace GeometryGym.Ifc
 		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
 
 		public IfcInclinedReferenceSweptAreaSolid() : base() { }
-		public IfcInclinedReferenceSweptAreaSolid(DatabaseIfc db, IfcInclinedReferenceSweptAreaSolid inclinedReferenceSweptAreaSolid) : base(db, inclinedReferenceSweptAreaSolid)
+		public IfcInclinedReferenceSweptAreaSolid(DatabaseIfc db, IfcInclinedReferenceSweptAreaSolid inclinedReferenceSweptAreaSolid, DuplicateOptions options) : base(db, inclinedReferenceSweptAreaSolid, options)
 		{
 			FixedAxisVertical = inclinedReferenceSweptAreaSolid.FixedAxisVertical;
 			Inclinating = inclinedReferenceSweptAreaSolid.Inclinating;
@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 		public bool SelfIntersect { get { return mSelfIntersect == IfcLogicalEnum.TRUE; } set { mSelfIntersect = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
 
 		internal IfcIndexedPolyCurve() : base() { }
-		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c) : base(db, c) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
+		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c, DuplicateOptions options) : base(db, c, options) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
 
@@ -124,7 +124,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcPolygonalFaceSet> ToFaceSet { get { return mToFaceSet; } }
 
 		internal IfcIndexedPolygonalFace() : base() { }
-		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f) : base(db, f) { mCoordIndex.AddRange(f.mCoordIndex); }
+		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f, DuplicateOptions options) : base(db, f, options) { mCoordIndex.AddRange(f.mCoordIndex); }
 		public IfcIndexedPolygonalFace(DatabaseIfc db, IEnumerable<int> coords) : base(db) { mCoordIndex = coords.ToList(); }
 		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3) : base(db) { mCoordIndex.Add(c1); mCoordIndex.Add(c2); mCoordIndex.Add(c3); }
 		public IfcIndexedPolygonalFace(DatabaseIfc db, int c1, int c2, int c3, int c4) : this(db, c1, c2, c3) { mCoordIndex.Add(c4); }
@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 		internal List<List<int>> mInnerCoordIndices = new List<List<int>>();// : List[1:?] LIST [3:?] OF IfcPositiveInteger;
 		public List<List<int>> InnerCoordIndices { get { return mInnerCoordIndices; }  }
 		internal IfcIndexedPolygonalFaceWithVoids() : base() { }
-		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f) : base(db, f) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
+		internal IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IfcIndexedPolygonalFaceWithVoids f, DuplicateOptions options) : base(db, f, options) { mInnerCoordIndices.AddRange(f.mInnerCoordIndices); }
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<int> inner) 
 			: base(db, coords) { mInnerCoordIndices.Add(inner.ToList()); }
 		public IfcIndexedPolygonalFaceWithVoids(DatabaseIfc db, IEnumerable<int> coords, IEnumerable<List<int>> inners) 
@@ -193,7 +193,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcIntersectionCurve : IfcSurfaceCurve //IFC4 Add2
 	{
 		internal IfcIntersectionCurve() : base() { }
-		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
+		internal IfcIntersectionCurve(DatabaseIfc db, IfcIntersectionCurve c, DuplicateOptions options) : base(db, c, options) { }
 		internal IfcIntersectionCurve(IfcCurve curve3D, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve3D, p1, p2, cr) { }
 	}
 	[Serializable]
@@ -269,7 +269,7 @@ namespace GeometryGym.Ifc
 		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcIShapeProfileDef() : base() { }
-		internal IfcIShapeProfileDef(DatabaseIfc db, IfcIShapeProfileDef p) : base(db,p) { mOverallWidth = p.mOverallWidth; mOverallDepth = p.mOverallDepth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mFlangeEdgeRadius = p.mFlangeEdgeRadius; mFlangeSlope = p.mFlangeSlope; }
+		internal IfcIShapeProfileDef(DatabaseIfc db, IfcIShapeProfileDef p, DuplicateOptions options) : base(db, p, options) { mOverallWidth = p.mOverallWidth; mOverallDepth = p.mOverallDepth; mWebThickness = p.mWebThickness; mFlangeThickness = p.mFlangeThickness; mFilletRadius = p.mFilletRadius; mFlangeEdgeRadius = p.mFlangeEdgeRadius; mFlangeSlope = p.mFlangeSlope; }
 		public IfcIShapeProfileDef(DatabaseIfc db, string name, double overallWidth, double overallDepth, double webThickness, double flangeThickness)
 			: base(db,name) {  mOverallWidth = overallWidth; mOverallDepth = overallDepth; mWebThickness = webThickness; mFlangeThickness = flangeThickness; }
 

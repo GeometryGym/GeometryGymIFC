@@ -108,10 +108,10 @@ namespace GeometryGym.Ifc
 		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcDerivedProfileDef() : base() { }
-		internal IfcDerivedProfileDef(DatabaseIfc db, IfcDerivedProfileDef p) : base(db, p)
+		internal IfcDerivedProfileDef(DatabaseIfc db, IfcDerivedProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
-			ContainerProfile = db.Factory.Duplicate(p.ContainerProfile) as IfcProfileDef;
-			Operator = db.Factory.Duplicate(p.Operator) as IfcCartesianTransformationOperator2D;
+			ContainerProfile = db.Factory.Duplicate(p.ContainerProfile, options) as IfcProfileDef;
+			Operator = db.Factory.Duplicate(p.Operator, options) as IfcCartesianTransformationOperator2D;
 			mLabel = p.mLabel;
 		}
 		public IfcDerivedProfileDef(IfcProfileDef container, IfcCartesianTransformationOperator2D op, string name) : base(container.mDatabase, name) { ContainerProfile = container; Operator = op; }
@@ -253,7 +253,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcDirection() : base() { }
-		internal IfcDirection(DatabaseIfc db, IfcDirection d) : base(db,d) { mDirectionRatioX = d.mDirectionRatioX; mDirectionRatioY = d.mDirectionRatioY; mDirectionRatioZ = d.mDirectionRatioZ; }
+		internal IfcDirection(DatabaseIfc db, IfcDirection d, DuplicateOptions options) : base(db, d, options) { mDirectionRatioX = d.mDirectionRatioX; mDirectionRatioY = d.mDirectionRatioY; mDirectionRatioZ = d.mDirectionRatioZ; }
 		public IfcDirection(DatabaseIfc db, double x, double y) : base(db) { double length = Math.Sqrt(x * x + y * y); DirectionRatioX = x / length; DirectionRatioY = y / length; DirectionRatioZ = double.NaN; }
 		public IfcDirection(DatabaseIfc db, double x, double y, double z) : base(db) { double length = Math.Sqrt(x * x + y * y +z * z); DirectionRatioX = x / length; DirectionRatioY = y / length; DirectionRatioZ = z / length; }
 
@@ -279,9 +279,9 @@ namespace GeometryGym.Ifc
 		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
 
 		protected IfcDirectrixCurveSweptAreaSolid() : base() { }
-		protected IfcDirectrixCurveSweptAreaSolid(DatabaseIfc db, IfcDirectrixCurveSweptAreaSolid s) : base(db, s)
+		protected IfcDirectrixCurveSweptAreaSolid(DatabaseIfc db, IfcDirectrixCurveSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)
 		{
-			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
+			Directrix = db.Factory.Duplicate(s.Directrix, options) as IfcCurve;
 			mStartParam = s.mStartParam;
 			mEndParam = s.mEndParam;
 		}
@@ -300,7 +300,7 @@ namespace GeometryGym.Ifc
 		public IfcDistanceExpression EndDistance { get { return mEndDistance; } set { mEndDistance = value; } }
 
 		protected IfcDirectrixDistanceSweptAreaSolid() : base() { }
-		protected IfcDirectrixDistanceSweptAreaSolid(DatabaseIfc db, IfcDirectrixDistanceSweptAreaSolid s) : base(db, s)
+		protected IfcDirectrixDistanceSweptAreaSolid(DatabaseIfc db, IfcDirectrixDistanceSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)
 		{
 			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
 			mStartDistance = s.mStartDistance;
@@ -356,7 +356,7 @@ namespace GeometryGym.Ifc
 		public bool AlongHorizontal { get { return mAlongHorizontal; } set { mAlongHorizontal = value; } } 
 
 		internal IfcDistanceExpression() : base() { }
-		internal IfcDistanceExpression(DatabaseIfc db, IfcDistanceExpression e) : base(db, e)
+		internal IfcDistanceExpression(DatabaseIfc db, IfcDistanceExpression e, DuplicateOptions options) : base(db, e, options)
 		{
 			DistanceAlong = e.DistanceAlong;
 			OffsetLateral = e.OffsetLateral;
@@ -365,6 +365,12 @@ namespace GeometryGym.Ifc
 			AlongHorizontal = e.AlongHorizontal;
 		}
 		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = distanceAlong; }
+
+		internal IfcDistanceExpression Duplicate() 
+		{
+			return new IfcDistanceExpression(null, DistanceAlong)
+			{ OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal };
+		}
 	}
 	[Serializable]
 	public partial class IfcDistributionBoard : IfcFlowController

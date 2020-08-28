@@ -383,14 +383,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.BoolToString(mClosed) + ",(#" +
-				string.Join(",#", mFaces.Select(x => x.StepId)) +
-			(mPnIndex.Count == 0 ? "),$" : "),(" + string.Join(",", mPnIndex) + ")");
+			return base.BuildStringSTEP(release) + (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserIfc.LogicalToString(mClosed)) + 
+				",(#" + string.Join(",#", mFaces.Select(x => x.StepId)) + (mPnIndex.Count == 0 ? "),$" : "),(" + string.Join(",", mPnIndex) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mClosed = ParserSTEP.StripBool(str, ref pos, len);
+			mClosed = ParserIfc.StripLogical(str, ref pos, len);
 			mFaces.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=> dictionary[x] as IfcIndexedPolygonalFace));
 			mPnIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 		}

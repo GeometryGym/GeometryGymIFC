@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcManifoldSolidBrep() : base() { }
 		protected IfcManifoldSolidBrep(IfcClosedShell s) : base(s.mDatabase) { Outer = s; }
-		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b) : base(db,b) { Outer = db.Factory.Duplicate( b.Outer) as IfcClosedShell; }
+		protected IfcManifoldSolidBrep(DatabaseIfc db, IfcManifoldSolidBrep b, DuplicateOptions options) : base(db, b, options) { Outer = db.Factory.Duplicate(b.Outer, options) as IfcClosedShell; }
 
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -78,7 +78,7 @@ namespace GeometryGym.Ifc
 		public IfcCartesianTransformationOperator MappingTarget { get { return mDatabase[mMappingTarget] as IfcCartesianTransformationOperator; } set { mMappingTarget = value.mIndex;  } }
 
 		internal IfcMappedItem() : base() { }
-		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i) : base(db,i) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
+		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i, DuplicateOptions options) : base(db, i, options) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
 		public IfcMappedItem(IfcRepresentationMap source, IfcCartesianTransformationOperator target) : base(source.mDatabase) { MappingSource = source; MappingTarget = target; }
 	}
 	[Serializable]
@@ -327,7 +327,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterial RepresentedMaterial { get { return mDatabase[mRepresentedMaterial] as IfcMaterial; } set { mRepresentedMaterial = value.mIndex; if (value.mHasRepresentation != this) value.HasRepresentation = this; } }
 
 		internal IfcMaterialDefinitionRepresentation() : base() { }
-		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r) : base(db, r)
+		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r, DuplicateOptions options) : base(db, r, options)
 		{
 			RepresentedMaterial = db.Factory.Duplicate(r.RepresentedMaterial) as IfcMaterial;
 		}
@@ -986,7 +986,7 @@ namespace GeometryGym.Ifc
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDerivedProfileDef" : base.StepClassName); } }
 		internal IfcMirroredProfileDef() : base() { }
-		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p) : base(db,p) { }
+		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p, DuplicateOptions options) : base(db, p, options) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, null, name) { }
 	}
 	[Serializable]

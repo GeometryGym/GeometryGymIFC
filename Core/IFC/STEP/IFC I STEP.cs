@@ -123,18 +123,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			List<int> inner = mInnerCoordIndices[0];
-			string result = inner[0].ToString();
-			for (int icounter = 1; icounter < inner.Count; icounter++)
-				result += "," + inner[icounter];
-			for (int jcounter = 1; jcounter < mInnerCoordIndices.Count; jcounter++)
-			{
-				inner = mInnerCoordIndices[jcounter];
-				result += "),(" + inner[0];
-				for (int icounter = 1; icounter < inner.Count; icounter++)
-					result += "," + inner[icounter];
-			}
-			return base.BuildStringSTEP(release) + ",((" + result + "))";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mInnerCoordIndices.Select(x=> "(" + string.Join(",", x) + ")")) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

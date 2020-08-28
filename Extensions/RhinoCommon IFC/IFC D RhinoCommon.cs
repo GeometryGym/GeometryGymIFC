@@ -46,5 +46,26 @@ namespace GeometryGym.Ifc
 			mDirectionRatioY = v.Y / len;
 			mDirectionRatioZ = double.NaN;
 		}
+
+		internal static IfcDirection convert(DatabaseIfc db, Vector3d vector)
+		{
+			if (double.IsNaN(vector.Z))
+				return new IfcDirection(db, vector.X, vector.Y);
+			vector.Unitize();
+			double tol = db.Tolerance;
+			if (Math.Abs(vector.X - 1) < tol)
+				return db.Factory.XAxis;
+			if (Math.Abs(vector.Y - 1) < tol)
+				return db.Factory.YAxis;
+			if (Math.Abs(vector.Z - 1) < tol)
+				return db.Factory.ZAxis;
+			if (Math.Abs(vector.X + 1) < tol)
+				return db.Factory.XAxisNegative;
+			if (Math.Abs(vector.Y + 1) < tol)
+				return db.Factory.YAxisNegative;
+			if (Math.Abs(vector.Z + 1) < tol)
+				return db.Factory.ZAxisNegative;
+			return new IfcDirection(db, vector);
+		}
 	}
 }

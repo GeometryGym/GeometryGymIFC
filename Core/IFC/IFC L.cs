@@ -197,7 +197,7 @@ namespace GeometryGym.Ifc
 		internal double mAmbientIntensity;// : OPTIONAL IfcNormalisedRatioMeasure;
 		internal double mIntensity;// : OPTIONAL IfcNormalisedRatioMeasure; 
 		protected IfcLightSource() : base() { }
-		protected IfcLightSource(DatabaseIfc db, IfcLightSource l) : base(db,l) { mName = l.mName; mLightColour = l.mLightColour; mAmbientIntensity = l.mAmbientIntensity; mIntensity = l.mIntensity; }
+		protected IfcLightSource(DatabaseIfc db, IfcLightSource l, DuplicateOptions options) : base(db, l, options) { mName = l.mName; mLightColour = l.mLightColour; mAmbientIntensity = l.mAmbientIntensity; mIntensity = l.mIntensity; }
 	}
 	[Serializable]
 	public partial class IfcLightSourceAmbient : IfcLightSource
@@ -272,7 +272,7 @@ namespace GeometryGym.Ifc
 		public IfcVector Dir { get { return mDatabase[mDir] as IfcVector; } set { mDir = value.mIndex; } }
 
 		internal IfcLine() : base() { }
-		internal IfcLine(DatabaseIfc db, IfcLine l) : base(db, l) { Pnt = db.Factory.Duplicate(l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate(l.Dir) as IfcVector; }
+		internal IfcLine(DatabaseIfc db, IfcLine l, DuplicateOptions options) : base(db, l, options) { Pnt = db.Factory.Duplicate(l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate(l.Dir) as IfcVector; }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 	}
 	public partial interface IfcLinearAxisSelect : IBaseClassIfc { } // SELECT(IfcLinearAxisWithInclination, IfcCurve);
@@ -384,7 +384,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcLineSegment2D : IfcCurveSegment2D  //IFC4x1
 	{
 		internal IfcLineSegment2D() : base() { }
-		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s) : base(db, s) { }
+		internal IfcLineSegment2D(DatabaseIfc db, IfcLineSegment2D s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcLineSegment2D(IfcCartesianPoint start, double startDirection, double length)
 			: base(start, startDirection, length) { }
 	}
@@ -497,7 +497,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcLoop() : base() { }
 		protected IfcLoop(DatabaseIfc db) : base(db) { }
-		protected IfcLoop(DatabaseIfc db, IfcLoop l) : base(db,l) { }
+		protected IfcLoop(DatabaseIfc db, IfcLoop l, DuplicateOptions options) : base(db, l, options) { }
 	}
 	[Serializable]
 	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef
@@ -517,7 +517,7 @@ namespace GeometryGym.Ifc
 		public double CentreOfGravityInY { get { return mCentreOfGravityInY; } set { mCentreOfGravityInY = value; } }
 
 		internal IfcLShapeProfileDef() : base() { }
-		internal IfcLShapeProfileDef(DatabaseIfc db, IfcLShapeProfileDef p) : base(db, p)
+		internal IfcLShapeProfileDef(DatabaseIfc db, IfcLShapeProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
 			mDepth = p.mDepth;
 			mWidth = p.mWidth;

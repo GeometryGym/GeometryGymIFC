@@ -337,7 +337,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+			Axis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearAxisSelect;
 		}
 	}
 	public partial class IfcLinearSpanPlacement : IfcLinearPlacement

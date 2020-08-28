@@ -70,7 +70,7 @@ namespace GeometryGym.Ifc
 		public double Magnitude { get { return mMagnitude; } set { mMagnitude = value; } }
 
 		internal IfcVector() : base() { }
-		internal IfcVector(DatabaseIfc db, IfcVector v) : base(db,v) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
+		internal IfcVector(DatabaseIfc db, IfcVector v, DuplicateOptions options) : base(db, v, options) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
 		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.mDatabase) { Orientation = orientation; Magnitude = magnitude; }
 	}
 	public interface IfcVectorOrDirection : IBaseClassIfc { } // SELECT(IfcDirection, IfcVector);
@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcEdge> mAttachedEdges = new List<IfcEdge>(); // GG attribute
 
 		internal IfcVertex() : base() { }
-		internal IfcVertex(DatabaseIfc db, IfcVertex v) : base(db,v) { }
+		internal IfcVertex(DatabaseIfc db, IfcVertex v, DuplicateOptions options) : base(db, v, options) { }
 		public IfcVertex(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -101,7 +101,8 @@ namespace GeometryGym.Ifc
 		public IfcVertex LoopVertex { get { return mDatabase[mLoopVertex] as IfcVertex; } set { mLoopVertex = value.mIndex; } }
 
 		internal IfcVertexLoop() : base() { }
-		internal IfcVertexLoop(DatabaseIfc db, IfcVertexLoop l) : base(db,l) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
+		internal IfcVertexLoop(DatabaseIfc db, IfcVertexLoop l, DuplicateOptions options) : base(db, l, options) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
+
 	}
 	[Serializable]
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
@@ -110,7 +111,7 @@ namespace GeometryGym.Ifc
 		public IfcPoint VertexGeometry { get { return mDatabase[mVertexGeometry] as IfcPoint; } set { mVertexGeometry = value.mIndex; } }
 		
 		internal IfcVertexPoint() : base() { }
-		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v) : base(db,v) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
+		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v, DuplicateOptions options) : base(db, v, options) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
 		public IfcVertexPoint(IfcPoint p) : base(p.mDatabase) { VertexGeometry = p; }
 
 		protected override List<T> Extract<T>(Type type)

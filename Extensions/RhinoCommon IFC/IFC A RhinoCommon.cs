@@ -75,12 +75,12 @@ namespace GeometryGym.Ifc
 			double angTol = Math.PI / 1800;
 			if (plane.ZAxis.IsParallelTo(Vector3d.ZAxis, angTol) != 1)
 			{
-				Axis = new IfcDirection(db, plane.ZAxis);
-				RefDirection = new IfcDirection(db, plane.XAxis);
+				Axis = IfcDirection.convert(db, plane.ZAxis); 
+				RefDirection = IfcDirection.convert(db, plane.XAxis);
 			}
 			else if (plane.XAxis.IsParallelTo(Vector3d.XAxis, angTol) != 1)
 			{
-				RefDirection = new IfcDirection(db, plane.XAxis);
+				RefDirection = IfcDirection.convert(db, plane.XAxis);
 				Axis = db.Factory.ZAxis;
 			}
 		}

@@ -26,7 +26,6 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
-using System.Collections.Specialized;
 
 namespace GeometryGym.Ifc
 {
@@ -133,7 +132,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<double> mWeightsData = new List<double>();// : LIST [2:?] OF REAL;	
 		internal IfcRationalBezierCurve() : base() { }
-		internal IfcRationalBezierCurve(DatabaseIfc db, IfcRationalBezierCurve c) : base(db, c) { mWeightsData.AddRange(c.mWeightsData); }
+		internal IfcRationalBezierCurve(DatabaseIfc db, IfcRationalBezierCurve c, DuplicateOptions options) : base(db, c, options) { mWeightsData.AddRange(c.mWeightsData); }
 	}
 	[Serializable]
 	public partial class IfcRationalBSplineCurveWithKnots : IfcBSplineCurveWithKnots
@@ -141,7 +140,7 @@ namespace GeometryGym.Ifc
 		internal List<double> mWeightsData = new List<double>();// : LIST [2:?] OF REAL;	
 		public ReadOnlyCollection<double> WeightsData { get { return new ReadOnlyCollection<double>(mWeightsData); } }
 		internal IfcRationalBSplineCurveWithKnots() : base() { }
-		internal IfcRationalBSplineCurveWithKnots(DatabaseIfc db, IfcRationalBSplineCurveWithKnots c) : base(db, c) { mWeightsData.AddRange(c.mWeightsData); }
+		internal IfcRationalBSplineCurveWithKnots(DatabaseIfc db, IfcRationalBSplineCurveWithKnots c, DuplicateOptions options) : base(db, c, options) { mWeightsData.AddRange(c.mWeightsData); }
 
 		public IfcRationalBSplineCurveWithKnots(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec, IEnumerable<double> weights) :
 			base(degree, controlPoints, multiplicities, knots, knotSpec)
@@ -155,7 +154,7 @@ namespace GeometryGym.Ifc
 		internal List<List<double>> mWeightsData = new List<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
 		public ReadOnlyCollection<List<double>> WeightsData { get { return new ReadOnlyCollection<List<double>>(mWeightsData); } }
 		internal IfcRationalBSplineSurfaceWithKnots() : base() { }
-		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s) : base(db, s)
+		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s, DuplicateOptions options) : base(db, s, options)
 		{
 			for (int icounter = 0; icounter < s.mWeightsData.Count; icounter++)
 				mWeightsData.Add(new List<double>(s.mWeightsData[icounter].ToArray()));
@@ -176,7 +175,7 @@ namespace GeometryGym.Ifc
 		public double OuterFilletRadius { get { return mOuterFilletRadius; } set { mOuterFilletRadius = value; } }
 
 		internal IfcRectangleHollowProfileDef() : base() { }
-		internal IfcRectangleHollowProfileDef(DatabaseIfc db, IfcRectangleHollowProfileDef p) : base(db, p) { mWallThickness = p.mWallThickness; mInnerFilletRadius = p.mInnerFilletRadius; mOuterFilletRadius = p.mOuterFilletRadius; }
+		internal IfcRectangleHollowProfileDef(DatabaseIfc db, IfcRectangleHollowProfileDef p, DuplicateOptions options) : base(db, p, options) { mWallThickness = p.mWallThickness; mInnerFilletRadius = p.mInnerFilletRadius; mOuterFilletRadius = p.mOuterFilletRadius; }
 		public IfcRectangleHollowProfileDef(DatabaseIfc m, string name, double xDim, double yDim, double wallThickness)
 			: base(m, name, xDim, yDim) { mWallThickness = wallThickness; }
 	}
@@ -188,7 +187,7 @@ namespace GeometryGym.Ifc
 		public double YDim { get { return mYDim; } set { mYDim = value; } }
 
 		internal IfcRectangleProfileDef() : base() { }
-		internal IfcRectangleProfileDef(DatabaseIfc db, IfcRectangleProfileDef p) : base(db, p) { mXDim = p.mXDim; mYDim = p.mYDim; }
+		internal IfcRectangleProfileDef(DatabaseIfc db, IfcRectangleProfileDef p, DuplicateOptions options) : base(db, p, options) { mXDim = p.mXDim; mYDim = p.mYDim; }
 		public IfcRectangleProfileDef(DatabaseIfc db, string name, double xDim, double yDim) : base(db, name) { mXDim = xDim; mYDim = yDim; }
 		internal override double ProfileDepth { get { return YDim; } }
 		internal override double ProfileWidth { get { return XDim; } }
@@ -202,7 +201,7 @@ namespace GeometryGym.Ifc
 		public double Height { get { return mHeight; } set { mHeight = value; } }
 
 		internal IfcRectangularPyramid() : base() { }
-		internal IfcRectangularPyramid(DatabaseIfc db, IfcRectangularPyramid p) : base(db, p) { mXLength = p.mXLength; mYLength = p.mYLength; mHeight = p.mHeight; }
+		internal IfcRectangularPyramid(DatabaseIfc db, IfcRectangularPyramid p, DuplicateOptions options) : base(db, p, options) { mXLength = p.mXLength; mYLength = p.mYLength; mHeight = p.mHeight; }
 	}
 	[Serializable]
 	public partial class IfcRectangularTrimmedSurface : IfcBoundedSurface
@@ -214,7 +213,7 @@ namespace GeometryGym.Ifc
 		public IfcPlane BasisSurface { get { return mDatabase[mBasisSurface] as IfcPlane; } set { mBasisSurface = value.mIndex; } }
 
 		internal IfcRectangularTrimmedSurface() : base() { }
-		internal IfcRectangularTrimmedSurface(DatabaseIfc db, IfcRectangularTrimmedSurface s) : base(db, s)
+		internal IfcRectangularTrimmedSurface(DatabaseIfc db, IfcRectangularTrimmedSurface s, DuplicateOptions options) : base(db, s, options)
 		{
 			BasisSurface = db.Factory.Duplicate(s.BasisSurface) as IfcPlane;
 			mU1 = s.mU1;
@@ -807,7 +806,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToControl() : base() { }
 		internal IfcRelAssignsToControl(DatabaseIfc db, IfcRelAssignsToControl r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingControl = db.Factory.Duplicate(r.RelatingControl, new DuplicateOptions() { DuplicateDownstream = false }) as IfcControl;
+			RelatingControl = db.Factory.Duplicate(r.RelatingControl, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcControl;
 		}
 		public IfcRelAssignsToControl(IfcControl relControl) : base(relControl.mDatabase) { RelatingControl = relControl;  }
 		public IfcRelAssignsToControl(IfcControl relControl, IfcObjectDefinition relObject) : base(relObject) { RelatingControl = relControl; }
@@ -824,7 +823,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroup() : base() { }
 		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a, DuplicateOptions options) : base(db, a, options)
 		{
-			RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, new DuplicateOptions() { DuplicateDownstream = false }) as IfcGroup;
+			RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcGroup;
 		}
 		public IfcRelAssignsToGroup(IfcGroup relgroup) : base(relgroup.mDatabase) { RelatingGroup = relgroup; }
 		public IfcRelAssignsToGroup(IfcObjectDefinition related, IfcGroup relating) : base(related) { RelatingGroup = relating; }
@@ -855,7 +854,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToProcess() : base() { }
 		internal IfcRelAssignsToProcess(DatabaseIfc db, IfcRelAssignsToProcess r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = false }) as IfcProcess;
+			RelatingProcess = db.Factory.Duplicate(r.RelatingProcess as BaseClassIfc, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcProcess;
 		}
 		public IfcRelAssignsToProcess(IfcProcessSelect relProcess) : base(relProcess.Database) { RelatingProcess = relProcess; }
 		public IfcRelAssignsToProcess(IfcProcessSelect relProcess, IfcObjectDefinition related) : base(related) { RelatingProcess = relProcess; }
@@ -889,7 +888,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToResource() : base() { }
 		internal IfcRelAssignsToResource(DatabaseIfc db, IfcRelAssignsToResource r, DuplicateOptions options) : base(db, r, options)
 		{
-			RelatingResource = db.Factory.Duplicate(r.RelatingResource as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = false }) as IfcResource;
+			RelatingResource = db.Factory.Duplicate(r.RelatingResource as BaseClassIfc, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcResource;
 		}
 		public IfcRelAssignsToResource(IfcResourceSelect relResource) : base(relResource.Database) { RelatingResource = relResource; }
 		public IfcRelAssignsToResource(IfcResourceSelect relResource, IfcObjectDefinition relObject) : base(relObject) { RelatingResource = relResource; }
@@ -1404,7 +1403,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelContainedInSpatialStructure() : base() { }// RelatedElements = new RelatedElementsCollection(this); }
 		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement;
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement;
 			if (options.DuplicateDownstream)
 			{
 				foreach(IfcProduct p  in r.RelatedElements)
@@ -1587,7 +1586,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelDeclares(IfcContext c) : base(c.mDatabase) { mRelatingContext = c; c.mDeclares.Add(this); }
 		internal IfcRelDeclares(DatabaseIfc db, IfcRelDeclares r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
 		{
-			RelatingContext = db.Factory.Duplicate(r.RelatingContext, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext;
+			RelatingContext = db.Factory.Duplicate(r.RelatingContext, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcContext;
 			if (options.DuplicateDownstream)
 				RelatedDefinitions.AddRange(r.RelatedDefinitions.ConvertAll(x => db.Factory.Duplicate(r.mDatabase[x.Index], options) as IfcDefinitionSelect));
 		}
@@ -1978,7 +1977,7 @@ namespace GeometryGym.Ifc
 		{
 			if (options.DuplicateDownstream)
 				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x as BaseClassIfc, options) as IfcProduct));
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement;
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement;
 		}
 		public IfcRelReferencedInSpatialStructure(IfcSpatialElement e) : base(e.mDatabase)
 		{
@@ -2065,7 +2064,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelServicesBuildings(DatabaseIfc db, IfcRelServicesBuildings s, DuplicateOptions options) : base(db, s, options.OwnerHistory)
 		{
 			RelatingSystem = db.Factory.Duplicate(s.RelatingSystem, options) as IfcSystem;
-			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions() { DuplicateDownstream = false }) as IfcSpatialElement));
+			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
 			: base(system.mDatabase) { mRelatingSystem = system.mIndex; mRelatedBuildings.Add(se.mIndex); se.mServicedBySystems.Add(this); }
@@ -2162,7 +2161,7 @@ namespace GeometryGym.Ifc
 		public double ParamLength { get { return mParamLength; } set { mParamLength = value; } }
 
 		internal IfcReparametrisedCompositeCurveSegment() : base() { }
-		internal IfcReparametrisedCompositeCurveSegment(DatabaseIfc db, IfcReparametrisedCompositeCurveSegment s) : base(db, s) { mParamLength = s.mParamLength; }
+		internal IfcReparametrisedCompositeCurveSegment(DatabaseIfc db, IfcReparametrisedCompositeCurveSegment s, DuplicateOptions options) : base(db, s, options) { mParamLength = s.mParamLength; }
 		public IfcReparametrisedCompositeCurveSegment(IfcTransitionCode tc, bool sense, IfcBoundedCurve bc, double paramLength) : base(tc, sense, bc) { mParamLength = paramLength; }
 	}
 	[Serializable]
@@ -2203,17 +2202,17 @@ namespace GeometryGym.Ifc
 		public SET<IfcProductDefinitionShape> OfProductRepresentation { get { return mOfProductRepresentation; } }
 
 		protected IfcRepresentation() : base() { }
-		protected IfcRepresentation(DatabaseIfc db, IfcRepresentation<RepresentationItem> r) : base(db)
+		protected IfcRepresentation(DatabaseIfc db, IfcRepresentation<RepresentationItem> r, DuplicateOptions options) : base(db)
 		{
 			ContextOfItems = db.Factory.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
 
 			mRepresentationIdentifier = r.mRepresentationIdentifier;
 			mRepresentationType = r.mRepresentationType;
-			Items.AddRange(r.Items.ConvertAll(x => db.Factory.Duplicate(x) as RepresentationItem));
+			Items.AddRange(r.Items.Select(x => x.Duplicate(db, options) as RepresentationItem));
 
 			if(r.mLayerAssignment != null)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(r.mLayerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(r.mLayerAssignment, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 		}
@@ -2279,11 +2278,11 @@ namespace GeometryGym.Ifc
 		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
 
 		protected IfcRepresentationItem() : base() { }
-		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i) : base(db, i)
+		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i, DuplicateOptions options) : base(db, i)
 		{
 			if(i.mLayerAssignment != null)
 			{
-				IfcPresentationLayerAssignment la = db.Factory.Duplicate(i.mLayerAssignment, new DuplicateOptions() { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
+				IfcPresentationLayerAssignment la = db.Factory.Duplicate(i.mLayerAssignment, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
 			if (i.mStyledByItem != null)
@@ -2313,6 +2312,18 @@ namespace GeometryGym.Ifc
 				return false;
 			return base.isDuplicate(e, tol);
 		}
+		internal IfcRepresentationItem Duplicate(DatabaseIfc db, DuplicateOptions options)
+		{
+			IfcRepresentationItem result = DuplicateWorker(db, options);
+			if(result != null)
+			{
+				if(mStyledByItem != null)
+					(db.Factory.Duplicate(mStyledByItem) as IfcStyledItem).Item = result;
+				return result;
+			}
+			return db.Factory.Duplicate(this, options) as IfcRepresentationItem;
+		}
+		protected virtual IfcRepresentationItem DuplicateWorker(DatabaseIfc db, DuplicateOptions options) { return null; }
 	}
 	[Serializable]
 	public partial class IfcRepresentationMap : BaseClassIfc, IfcProductRepresentationSelect
@@ -2338,7 +2349,7 @@ namespace GeometryGym.Ifc
 		internal IfcRepresentationMap() : base() { }
 		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m, DuplicateOptions options) : base(db, m)
 		{
-			DuplicateOptions duplicateDownstream = new DuplicateOptions() { DuplicateDownstream = true };
+			DuplicateOptions duplicateDownstream = new DuplicateOptions(options) { DuplicateDownstream = true };
 			MappingOrigin = db.Factory.Duplicate((BaseClassIfc) m.mMappingOrigin, duplicateDownstream) as IfcAxis2Placement;
 			MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation, duplicateDownstream) as IfcShapeModel;
 			if (db.Release > ReleaseVersion.IFC2x3)
@@ -2493,7 +2504,7 @@ namespace GeometryGym.Ifc
 		public double Angle { get { return mAngle; } set { mAngle = value; } }
 
 		internal IfcRevolvedAreaSolid() : base() { }
-		internal IfcRevolvedAreaSolid(DatabaseIfc db, IfcRevolvedAreaSolid s) : base(db, s) { Axis = db.Factory.Duplicate(s.Axis) as IfcAxis1Placement; mAngle = s.mAngle; }
+		internal IfcRevolvedAreaSolid(DatabaseIfc db, IfcRevolvedAreaSolid s, DuplicateOptions options) : base(db, s, options) { Axis = db.Factory.Duplicate(s.Axis) as IfcAxis1Placement; mAngle = s.mAngle; }
 		public IfcRevolvedAreaSolid(IfcProfileDef profile, IfcAxis2Placement3D position, IfcAxis1Placement axis, double angle) : base(profile, position) { Axis = axis; mAngle = angle; }
 	}
 	[Serializable]
@@ -2503,7 +2514,7 @@ namespace GeometryGym.Ifc
 		public IfcProfileDef EndSweptArea { get { return mDatabase[mEndSweptArea] as IfcProfileDef; } set { mEndSweptArea = value.mIndex; } }
 
 		internal IfcRevolvedAreaSolidTapered() : base() { }
-		internal IfcRevolvedAreaSolidTapered(DatabaseIfc db, IfcRevolvedAreaSolidTapered e) : base(db, e) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea) as IfcProfileDef; }
+		internal IfcRevolvedAreaSolidTapered(DatabaseIfc db, IfcRevolvedAreaSolidTapered e, DuplicateOptions options) : base(db, e, options) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea, options) as IfcProfileDef; }
 		public IfcRevolvedAreaSolidTapered(IfcProfileDef start, IfcAxis2Placement3D placement, IfcAxis1Placement axis, double angle, IfcProfileDef end) : base(start, placement, axis, angle) { EndSweptArea = end; }
 	}
 	[Obsolete("DELETED IFC4", false)]
@@ -2527,14 +2538,14 @@ namespace GeometryGym.Ifc
 	{
 		internal double mHeight, mBottomRadius;// : IfcPositiveLengthMeasure;
 		internal IfcRightCircularCone() : base() { }
-		internal IfcRightCircularCone(DatabaseIfc db, IfcRightCircularCone c) : base(db, c) { mHeight = c.mHeight; mBottomRadius = c.mBottomRadius; }
+		internal IfcRightCircularCone(DatabaseIfc db, IfcRightCircularCone c, DuplicateOptions options) : base(db, c, options) { mHeight = c.mHeight; mBottomRadius = c.mBottomRadius; }
 	}
 	[Serializable]
 	public partial class IfcRightCircularCylinder : IfcCsgPrimitive3D
 	{
 		internal double mHeight, mRadius;// : IfcPositiveLengthMeasure;
 		internal IfcRightCircularCylinder() : base() { }
-		internal IfcRightCircularCylinder(DatabaseIfc db, IfcRightCircularCylinder c) : base(db, c) { mHeight = c.mHeight; mRadius = c.mRadius; }
+		internal IfcRightCircularCylinder(DatabaseIfc db, IfcRightCircularCylinder c, DuplicateOptions options) : base(db, c, options) { mHeight = c.mHeight; mRadius = c.mRadius; }
 	}
 	[Serializable]
 	public partial class IfcRoad : IfcFacility
@@ -2665,7 +2676,7 @@ namespace GeometryGym.Ifc
 		internal double mRoundingRadius;// : IfcPositiveLengthMeasure; 
 		public double RoundingRadius { get { return mRoundingRadius; } set { mRoundingRadius = value; } }
 		internal IfcRoundedRectangleProfileDef() : base() { }
-		internal IfcRoundedRectangleProfileDef(DatabaseIfc db, IfcRoundedRectangleProfileDef p) : base(db, p) { mRoundingRadius = p.mRoundingRadius; }
+		internal IfcRoundedRectangleProfileDef(DatabaseIfc db, IfcRoundedRectangleProfileDef p, DuplicateOptions options) : base(db, p, options) { mRoundingRadius = p.mRoundingRadius; }
 		public IfcRoundedRectangleProfileDef(DatabaseIfc db, string name, double xDim, double yDim, double roundingRadius) : base(db, name, xDim, yDim) { mRoundingRadius = roundingRadius; }
 	}
 }

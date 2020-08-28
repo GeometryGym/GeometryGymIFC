@@ -164,9 +164,13 @@ namespace GeometryGym.Ifc
 		{
 			return STEPEntity.GetType(classNameIfc, "Ifc");	
 		}
-		public static BaseClassIfc Construct(string className)
+		public static BaseClassIfc Construct(string ifcClassName)
 		{
 			ConstructorInfo constructor = null;
+			string className = ifcClassName;
+			if (string.Compare(className, "IfcBuildingElement", true) == 0)
+				className = "IfcBuildingElementProxy";
+
 			if (!mConstructors.TryGetValue(className, out constructor))
 			{
 				Type type = GetType(className);
@@ -178,8 +182,6 @@ namespace GeometryGym.Ifc
 						return Construct("IfcProductDefinitionShape");
 					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
 						return Construct("IfcProfileDef");
-					if (string.Compare(className, "IfcBuildingElement", true) == 0)
-						return Construct("IfcBuildingElementProxy");
 					if (string.Compare(className, "IfcReinforcingElement", true) == 0)
 						return Construct("IfcReinforcingBar");
 					if (string.Compare(className, "IfcBuildingElementComponent", true) == 0)

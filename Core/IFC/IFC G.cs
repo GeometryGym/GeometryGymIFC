@@ -99,7 +99,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeometricCurveSet : IfcGeometricSet
 	{
 		internal IfcGeometricCurveSet() : base() { }
-		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s) : base(db,s) { }
+		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcGeometricCurveSet(IfcGeometricSetSelect element) : base(element) { if(element is IfcSurface) throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + mIndex); }
 		public IfcGeometricCurveSet(IEnumerable<IfcGeometricSetSelect> set) : base(set)
 		{
@@ -170,7 +170,7 @@ namespace GeometryGym.Ifc
 		// IFC4 IfcCartesianPointList, IfcTessellatedItem
 		protected IfcGeometricRepresentationItem() : base() { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db) : base(db) { }
-		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i) : base(db,i) { }
+		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i, DuplicateOptions options) : base(db, i, options) { }
 	}
 	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
@@ -211,7 +211,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } set { mElements = value; } }
 
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s) : base(db,s) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x.Index]) as IfcGeometricSetSelect)); }
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x.Index]) as IfcGeometricSetSelect)); }
 		public IfcGeometricSet(IfcGeometricSetSelect element) : base(element.Database) { mElements.Add(element); }
 		public IfcGeometricSet(IEnumerable<IfcGeometricSetSelect> set) : base(set.First().Database) { mElements.AddRange(set); }
 	}

@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcBeam() : base() { }
 		internal IfcBeam(DatabaseIfc db, IfcBeam b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
-		public IfcBeam(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
+		public IfcBeam(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape) { }
 		public IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 		public IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement, arcOrigin,arcAngle) { }
 	}
@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcBezierCurve : IfcBSplineCurve // DEPRECATED IFC4
 	{
 		internal IfcBezierCurve() : base() { }
-		internal IfcBezierCurve(DatabaseIfc db, IfcBezierCurve c) : base(db,c) { }
+		internal IfcBezierCurve(DatabaseIfc db, IfcBezierCurve c, DuplicateOptions options) : base(db, c, options) { }
 	}	
 	[Serializable]
 	public partial class IfcBlobTexture : IfcSurfaceTexture
@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 		public double ZLength { get { return mZLength; } set { mZLength = value; } }
 
 		internal IfcBlock() : base() { }
-		internal IfcBlock(DatabaseIfc db, IfcBlock b) : base(db,b) { mXLength = b.mXLength; mYLength = b.mYLength; mZLength = b.mZLength; }
+		internal IfcBlock(DatabaseIfc db, IfcBlock b, DuplicateOptions options) : base(db, b, options) { mXLength = b.mXLength; mYLength = b.mYLength; mZLength = b.mZLength; }
 		public IfcBlock(IfcAxis2Placement3D position, double x,double y, double z) : base(position) { mXLength = x; mYLength = y; mZLength = z; }
 	}
 	[Serializable]
@@ -146,7 +146,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcBooleanClippingResult : IfcBooleanResult
 	{
 		internal IfcBooleanClippingResult() : base() { }
-		internal IfcBooleanClippingResult(DatabaseIfc db, IfcBooleanClippingResult c) : base(db,c) { }
+		internal IfcBooleanClippingResult(DatabaseIfc db, IfcBooleanClippingResult c, DuplicateOptions options) : base(db, c, options) { }
 		public IfcBooleanClippingResult(IfcBooleanClippingResult bc, IfcHalfSpaceSolid hss) : base(IfcBooleanOperator.DIFFERENCE, bc, hss) { }
 		public IfcBooleanClippingResult(IfcSweptAreaSolid s, IfcHalfSpaceSolid hss) : base(IfcBooleanOperator.DIFFERENCE, s, hss) { }
 	}
@@ -163,7 +163,7 @@ namespace GeometryGym.Ifc
 		public IfcBooleanOperand SecondOperand { get { return mSecondOperand; } set { mSecondOperand = value; } }
 
 		internal IfcBooleanResult() : base() { }
-		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b) : base(db,b)
+		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b, DuplicateOptions options) : base(db, b, options)
 		{
 			mOperator = b.mOperator;
 			FirstOperand = db.Factory.Duplicate(b.FirstOperand) as IfcBooleanOperand;
@@ -197,7 +197,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcBoundaryCurve : IfcCompositeCurveOnSurface
 	{
 		internal IfcBoundaryCurve() : base() { }
-		internal IfcBoundaryCurve(DatabaseIfc db, IfcBoundaryCurve c) : base(db,c) { }
+		internal IfcBoundaryCurve(DatabaseIfc db, IfcBoundaryCurve c, DuplicateOptions options) : base(db, c, options) { }
 		public IfcBoundaryCurve(List<IfcCompositeCurveSegment> segs, IfcSurface surface) : base(segs, surface) { }
 	}
 	[Serializable]
@@ -308,7 +308,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcBoundedCurve() : base() { }
 		protected IfcBoundedCurve(DatabaseIfc db) : base(db) { }
-		protected IfcBoundedCurve(DatabaseIfc db, IfcBoundedCurve c) : base(db,c) { }
+		protected IfcBoundedCurve(DatabaseIfc db, IfcBoundedCurve c, DuplicateOptions options) : base(db, c, options) { }
 
 		public static IfcBoundedCurve Generate(DatabaseIfc db, IEnumerable<Tuple<double,double>> points, List<IfcSegmentIndexSelect> segments)
 		{
@@ -343,7 +343,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcBoundedSurface() : base() { }
 		protected IfcBoundedSurface(DatabaseIfc db) : base(db) { }
-		protected IfcBoundedSurface(DatabaseIfc db, IfcBoundedSurface s) : base(db,s) { }
+		protected IfcBoundedSurface(DatabaseIfc db, IfcBoundedSurface s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public partial class IfcBoundingBox : IfcGeometricRepresentationItem
@@ -357,7 +357,7 @@ namespace GeometryGym.Ifc
 		public double ZDim { get { return mZDim; } set { mZDim = value; } }
 
 		internal IfcBoundingBox() : base() { }
-		internal IfcBoundingBox(DatabaseIfc db, IfcBoundingBox b) : base(db,b) { Corner = db.Factory.Duplicate(b.Corner) as IfcCartesianPoint; mXDim = b.mXDim; mYDim = b.mYDim; mZDim = b.mZDim; }
+		internal IfcBoundingBox(DatabaseIfc db, IfcBoundingBox b, DuplicateOptions options) : base(db, b, options) { Corner = db.Factory.Duplicate(b.Corner) as IfcCartesianPoint; mXDim = b.mXDim; mYDim = b.mYDim; mZDim = b.mZDim; }
 		public IfcBoundingBox(IfcCartesianPoint pt, double xdim, double ydim, double zdim) : base(pt.mDatabase)
 		{
 			//if (mModel.mModelView != ModelView.NotAssigned && mModel.mModelView != ModelView.IFC2x3Coordination)
@@ -375,7 +375,7 @@ namespace GeometryGym.Ifc
 		public IfcBoundingBox Enclosure { get { return mDatabase[mEnclosure] as IfcBoundingBox; } set { mEnclosure = value.mIndex; } }
 
 		internal IfcBoxedHalfSpace() : base() { }
-		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s) : base(db,s) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
+		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s, DuplicateOptions options) : base(db, s, options) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
 	}
 	[Serializable]
 	public partial class IfcBridge : IfcFacility
@@ -413,7 +413,7 @@ namespace GeometryGym.Ifc
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		protected IfcBSplineCurve() : base() { }
-		protected IfcBSplineCurve(DatabaseIfc db, IfcBSplineCurve c) : base(db, c)
+		protected IfcBSplineCurve(DatabaseIfc db, IfcBSplineCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			mDegree = c.mDegree;
 			ControlPointsList.AddRange(c.ControlPointsList.Select(x=>db.Factory.Duplicate(x) as IfcCartesianPoint));
@@ -438,7 +438,7 @@ namespace GeometryGym.Ifc
 		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineCurveWithKnots() : base() { }
-		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c) : base(db, c)
+		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c, DuplicateOptions options) : base(db, c, options)
 		{
 			mKnotMultiplicities.AddRange(c.KnotMultiplicities);
 			mKnots.AddRange(c.Knots);
@@ -471,7 +471,7 @@ namespace GeometryGym.Ifc
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		protected IfcBSplineSurface() : base() { }
-		protected IfcBSplineSurface(DatabaseIfc db, IfcBSplineSurface s) : base(db,s)
+		protected IfcBSplineSurface(DatabaseIfc db, IfcBSplineSurface s, DuplicateOptions options) : base(db, s, options)
 		{
 			mUDegree = s.mUDegree;
 			mVDegree = s.mVDegree;
@@ -510,7 +510,7 @@ namespace GeometryGym.Ifc
 		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineSurfaceWithKnots() : base() { }
-		internal IfcBSplineSurfaceWithKnots(DatabaseIfc db, IfcBSplineSurfaceWithKnots s) : base(db,s)
+		internal IfcBSplineSurfaceWithKnots(DatabaseIfc db, IfcBSplineSurfaceWithKnots s, DuplicateOptions options) : base(db, s, options)
 		{
 			mUMultiplicities = new List<int>(s.mUMultiplicities.ToArray());
 			mVMultiplicities = new List<int>(s.mVMultiplicities.ToArray());

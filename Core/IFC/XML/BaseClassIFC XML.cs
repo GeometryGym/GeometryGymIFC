@@ -129,7 +129,8 @@ namespace GeometryGym.Ifc
 		internal string xmlId()
 		{
 			string id = "";
-			if (this is IfcClassificationReference classificationReference && !string.IsNullOrEmpty(classificationReference.Identification))
+			IfcClassificationReference classificationReference = this as IfcClassificationReference;
+			if (classificationReference != null && !string.IsNullOrEmpty(classificationReference.Identification))
 				id = classificationReference.Identification;
 			if(string.IsNullOrEmpty(id))
 				return "i" + StepId;

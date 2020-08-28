@@ -104,7 +104,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("Axis", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				Axis = mDatabase.ParseJObject<IfcCurve>(token as JObject);
+				Axis = mDatabase.ParseJObject<IfcLinearAxisSelect>(token as JObject);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

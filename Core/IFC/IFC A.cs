@@ -143,7 +143,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcAdvancedBrep() : base() { }
 		public IfcAdvancedBrep(List<IfcAdvancedFace> faces) : base(new IfcClosedShell(faces.ConvertAll(x => (IfcFace)x))) { }
-		internal IfcAdvancedBrep(DatabaseIfc db, IfcAdvancedBrep b) : base(db,b) { }
+		internal IfcAdvancedBrep(DatabaseIfc db, IfcAdvancedBrep b, DuplicateOptions options) : base(db, b, options) { }
 		public IfcAdvancedBrep(IfcClosedShell s) : base(s) { }
 	}
 	[Serializable]
@@ -153,14 +153,14 @@ namespace GeometryGym.Ifc
 		public SET<IfcClosedShell> Voids { get { return mVoids; } }
 
 		internal IfcAdvancedBrepWithVoids() : base() { }
-		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b) : base(db,b) { mVoids.AddRange(b.Voids.ConvertAll(x=> db.Factory.Duplicate(x) as IfcClosedShell)); }
+		internal IfcAdvancedBrepWithVoids(DatabaseIfc db, IfcAdvancedBrepWithVoids b, DuplicateOptions options) : base(db, b, options) { mVoids.AddRange(b.Voids.ConvertAll(x=> db.Factory.Duplicate(x) as IfcClosedShell)); }
 		public IfcAdvancedBrepWithVoids(IfcClosedShell s, IEnumerable<IfcClosedShell> voids) : base(s) { Voids.AddRange(voids); }
 	}
 	[Serializable]
 	public partial class IfcAdvancedFace : IfcFaceSurface
 	{
 		internal IfcAdvancedFace() : base() { }
-		internal IfcAdvancedFace(DatabaseIfc db, IfcAdvancedFace f) : base(db,f) { }
+		internal IfcAdvancedFace(DatabaseIfc db, IfcAdvancedFace f, DuplicateOptions options) : base(db, f, options) { }
 		public IfcAdvancedFace(IfcFaceOuterBound bound, IfcSurface f, bool sense) : base(bound, f, sense) { }
 		public IfcAdvancedFace(List<IfcFaceBound> bounds, IfcSurface f, bool sense) : base(bounds, f, sense) { }
 		public IfcAdvancedFace(IfcFaceOuterBound outer, IfcFaceBound inner, IfcSurface f, bool sense) : base(outer,inner, f, sense) { }
@@ -266,7 +266,7 @@ namespace GeometryGym.Ifc
 		public double RailHeadDistance { get { return mRailHeadDistance; } set { mRailHeadDistance = value; } }
 
 		public IfcAlignment2DCant() : base() { }
-		internal IfcAlignment2DCant(DatabaseIfc db, IfcAlignment2DCant alignment2dCant) : base(db, alignment2dCant)
+		internal IfcAlignment2DCant(DatabaseIfc db, IfcAlignment2DCant alignment2dCant, DuplicateOptions options) : base(db, alignment2dCant, options)
 		{
 			Segments.AddRange(alignment2dCant.Segments.Select(x => db.Factory.Duplicate(x) as IfcAlignment2DCantSegment));
 			RailHeadDistance = alignment2dCant.RailHeadDistance;
@@ -282,7 +282,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignment2DCantSegLine : IfcAlignment2DCantSegment
 	{
 		public IfcAlignment2DCantSegLine() : base() { }
-		internal IfcAlignment2DCantSegLine(DatabaseIfc db, IfcAlignment2DCantSegLine alignment2DCantSegLine) : base(db, alignment2DCantSegLine) { }
+		internal IfcAlignment2DCantSegLine(DatabaseIfc db, IfcAlignment2DCantSegLine alignment2DCantSegLine, DuplicateOptions options) : base(db, alignment2DCantSegLine, options) { }
 		public IfcAlignment2DCantSegLine(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight)
 			: base(db, startDistAlong, horizontalLength, startCantLeft, startCantRight) { }
 	}
@@ -308,7 +308,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcAlignment2DCant> ToCant { get { return mToCant; } set { mToCant = value; } }
 
 		protected IfcAlignment2DCantSegment() : base() { }
-		protected IfcAlignment2DCantSegment(DatabaseIfc db, IfcAlignment2DCantSegment alignment2DCantSegment) : base(db, alignment2DCantSegment)
+		protected IfcAlignment2DCantSegment(DatabaseIfc db, IfcAlignment2DCantSegment alignment2DCantSegment, DuplicateOptions options) : base(db, alignment2DCantSegment, options)
 		{
 			StartDistAlong = alignment2DCantSegment.StartDistAlong;
 			HorizontalLength = alignment2DCantSegment.HorizontalLength;
@@ -342,7 +342,7 @@ namespace GeometryGym.Ifc
 		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
 
 		public IfcAlignment2DCantSegTransition() : base() { }
-		internal IfcAlignment2DCantSegTransition(DatabaseIfc db, IfcAlignment2DCantSegTransition alignment2DCantSegTransition) : base(db, alignment2DCantSegTransition)
+		internal IfcAlignment2DCantSegTransition(DatabaseIfc db, IfcAlignment2DCantSegTransition alignment2DCantSegTransition, DuplicateOptions options) : base(db, alignment2DCantSegTransition, options)
 		{
 			StartRadius = alignment2DCantSegTransition.StartRadius;
 			EndRadius = alignment2DCantSegTransition.EndRadius;
@@ -374,7 +374,7 @@ namespace GeometryGym.Ifc
 		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
 
 		public IfcAlignment2DVerSegTransition() : base() { }
-		internal IfcAlignment2DVerSegTransition(DatabaseIfc db, IfcAlignment2DVerSegTransition alignment2DVerSegTransition) : base(db, alignment2DVerSegTransition)
+		internal IfcAlignment2DVerSegTransition(DatabaseIfc db, IfcAlignment2DVerSegTransition alignment2DVerSegTransition, DuplicateOptions options) : base(db, alignment2DVerSegTransition, options)
 		{
 			StartRadius = alignment2DVerSegTransition.StartRadius;
 			EndRadius = alignment2DVerSegTransition.EndRadius;
@@ -403,7 +403,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcAlignmentCurve> ToAlignmentCurve { get { return mToAlignmentCurve; } set { mToAlignmentCurve = value;  } } 
 
 		internal IfcAlignment2DHorizontal() : base() { }
-		internal IfcAlignment2DHorizontal(DatabaseIfc db, IfcAlignment2DHorizontal a) : base(db, a)
+		internal IfcAlignment2DHorizontal(DatabaseIfc db, IfcAlignment2DHorizontal a, DuplicateOptions options) : base(db, a, options)
 		{
 			mStartDistAlong = a.mStartDistAlong;
 			Segments.AddRange(a.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcAlignment2DHorizontalSegment));
@@ -441,7 +441,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment2DHorizontal ToHorizontal { get { return mToHorizontal; } set { mToHorizontal = value; } }
 
 		internal IfcAlignment2DHorizontalSegment() : base() { }
-		internal IfcAlignment2DHorizontalSegment(DatabaseIfc db, IfcAlignment2DHorizontalSegment s) : base(db, s) { CurveGeometry = db.Factory.Duplicate(s.CurveGeometry) as IfcCurveSegment2D; }
+		internal IfcAlignment2DHorizontalSegment(DatabaseIfc db, IfcAlignment2DHorizontalSegment s, DuplicateOptions options) : base(db, s, options) { CurveGeometry = db.Factory.Duplicate(s.CurveGeometry) as IfcCurveSegment2D; }
 		public IfcAlignment2DHorizontalSegment(IfcCurveSegment2D seg) : base(seg.mDatabase) { CurveGeometry = seg; }
 	}
 	[Serializable]
@@ -457,7 +457,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcAlignment2DSegment() : base() { }
 		protected IfcAlignment2DSegment(DatabaseIfc db) : base(db) { }
-		protected IfcAlignment2DSegment(DatabaseIfc db, IfcAlignment2DSegment s) : base(db, s)
+		protected IfcAlignment2DSegment(DatabaseIfc db, IfcAlignment2DSegment s, DuplicateOptions options) : base(db, s, options)
 		{
 			TangentialContinuity = s.TangentialContinuity;
 			StartTag = s.StartTag;
@@ -474,7 +474,7 @@ namespace GeometryGym.Ifc
 		public bool IsConvex { get { return mIsConvex; } set { mIsConvex = value; } }
 
 		internal IfcAlignment2DVerSegCircularArc() : base() { }
-		internal IfcAlignment2DVerSegCircularArc(DatabaseIfc db, IfcAlignment2DVerSegCircularArc alignment2DVerSegCircularArc) : base(db, alignment2DVerSegCircularArc)
+		internal IfcAlignment2DVerSegCircularArc(DatabaseIfc db, IfcAlignment2DVerSegCircularArc alignment2DVerSegCircularArc, DuplicateOptions options) : base(db, alignment2DVerSegCircularArc, options)
 		{
 			Radius = alignment2DVerSegCircularArc.Radius;
 			IsConvex = alignment2DVerSegCircularArc.IsConvex;
@@ -490,7 +490,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignment2DVerSegLine : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
 		internal IfcAlignment2DVerSegLine() : base() { }
-		internal IfcAlignment2DVerSegLine(DatabaseIfc db, IfcAlignment2DVerSegLine alignment2DVerSegLine) : base(db, alignment2DVerSegLine) { }
+		internal IfcAlignment2DVerSegLine(DatabaseIfc db, IfcAlignment2DVerSegLine alignment2DVerSegLine, DuplicateOptions options) : base(db, alignment2DVerSegLine, options) { }
 		public IfcAlignment2DVerSegLine(DatabaseIfc db, double startDist, double horizontalLength, double startHeight, double startGradient)
 			: base(db, startDist, horizontalLength, startHeight, startGradient) { }
 	}
@@ -504,7 +504,7 @@ namespace GeometryGym.Ifc
 		public bool IsConvex { get { return mIsConvex; } set { mIsConvex = value; } }
 
 		internal IfcAlignment2DVerSegParabolicArc() : base() { }
-		internal IfcAlignment2DVerSegParabolicArc(DatabaseIfc db, IfcAlignment2DVerSegParabolicArc alignment2DVerSegParabolicArc) : base(db, alignment2DVerSegParabolicArc)
+		internal IfcAlignment2DVerSegParabolicArc(DatabaseIfc db, IfcAlignment2DVerSegParabolicArc alignment2DVerSegParabolicArc, DuplicateOptions options) : base(db, alignment2DVerSegParabolicArc, options)
 		{
 			ParabolaConstant = alignment2DVerSegParabolicArc.ParabolaConstant;
 			IsConvex = alignment2DVerSegParabolicArc.IsConvex;
@@ -526,7 +526,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentCurve ToAlignmentCurve { get { return mToAlignmentCurve; } set { mToAlignmentCurve = value; } }// : SET[1:1] OF IfcAlignmentCurve FOR Vertical;
 	
 		internal IfcAlignment2DVertical() : base() { }
-		internal IfcAlignment2DVertical(DatabaseIfc db, IfcAlignment2DVertical a) : base(db, a)
+		internal IfcAlignment2DVertical(DatabaseIfc db, IfcAlignment2DVertical a, DuplicateOptions options) : base(db, a, options)
 		{
 			Segments.AddRange(a.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcAlignment2DVerticalSegment));
 		}
@@ -546,7 +546,7 @@ namespace GeometryGym.Ifc
 		public double StartGradient { get { return mStartGradient; } set { mStartGradient = value; } }
 
 		protected IfcAlignment2DVerticalSegment() : base() { }
-		protected IfcAlignment2DVerticalSegment(DatabaseIfc db, IfcAlignment2DVerticalSegment alignment2DVerticalSegment) : base(db, alignment2DVerticalSegment)
+		protected IfcAlignment2DVerticalSegment(DatabaseIfc db, IfcAlignment2DVerticalSegment alignment2DVerticalSegment, DuplicateOptions options) : base(db, alignment2DVerticalSegment, options)
 		{
 			StartDistAlong = alignment2DVerticalSegment.StartDistAlong;
 			HorizontalLength = alignment2DVerticalSegment.HorizontalLength;
@@ -573,7 +573,7 @@ namespace GeometryGym.Ifc
 		public string Tag { get { return (mTag == "$" ? "" : ParserIfc.Decode(mTag)); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcAlignmentCurve() : base() { }
-		internal IfcAlignmentCurve(DatabaseIfc db, IfcAlignmentCurve c) : base(db, c)
+		internal IfcAlignmentCurve(DatabaseIfc db, IfcAlignmentCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			if (c.mHorizontal != null)
 				Horizontal = db.Factory.Duplicate(c.Horizontal) as IfcAlignment2DHorizontal;
@@ -628,7 +628,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcCurve> InnerBoundaries { get { return mInnerBoundaries; } }
 
 		internal IfcAnnotationFillArea() : base() { }
-		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a) : base(db,a) { OuterBoundary = db.Factory.Duplicate(a.OuterBoundary) as IfcCurve; InnerBoundaries.AddRange(a.InnerBoundaries.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCurve)); }
+		internal IfcAnnotationFillArea(DatabaseIfc db, IfcAnnotationFillArea a, DuplicateOptions options) : base(db, a, options) { OuterBoundary = a.OuterBoundary.Duplicate(db, options) as IfcCurve; InnerBoundaries.AddRange(a.InnerBoundaries.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCurve)); }
 		public IfcAnnotationFillArea(IfcCurve outerBoundary) : base(outerBoundary.mDatabase) { OuterBoundary = outerBoundary; }
 		public IfcAnnotationFillArea(IfcCurve outerBoundary, List<IfcCurve> innerBoundaries) : this(outerBoundary) { InnerBoundaries.AddRange(innerBoundaries); }
 	}
@@ -640,13 +640,13 @@ namespace GeometryGym.Ifc
 		internal IfcGlobalOrLocalEnum  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
 
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
-		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f) : base(db,f) { }
+		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f, DuplicateOptions options) : base(db, f, options) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public abstract partial class IfcAnnotationOccurrence : IfcStyledItem //DEPRECATED IFC4
 	{
-		protected IfcAnnotationOccurrence(DatabaseIfc db, IfcAnnotationOccurrence o) : base(db,o) { }
+		protected IfcAnnotationOccurrence(DatabaseIfc db, IfcAnnotationOccurrence o, DuplicateOptions options) : base(db, o, options) { }
 		protected IfcAnnotationOccurrence() : base() { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
@@ -660,14 +660,14 @@ namespace GeometryGym.Ifc
 		public IfcTextureCoordinate TextureCoordinates { get { return mTextureCoordinates; } set { mTextureCoordinates = value; } }
 
 		internal IfcAnnotationSurface() : base() { } 
-		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a) : base(db, a) { Item = db.Factory.Duplicate(a.Item) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates != null) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
+		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a, DuplicateOptions options) : base(db, a, options) { Item = a.Item.Duplicate(db, options) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates != null) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcAnnotationSurfaceOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcAnnotationSurfaceOccurrence() : base() { }
-		internal IfcAnnotationSurfaceOccurrence(DatabaseIfc db, IfcAnnotationSurfaceOccurrence o) : base(db,o) { }
+		internal IfcAnnotationSurfaceOccurrence(DatabaseIfc db, IfcAnnotationSurfaceOccurrence o, DuplicateOptions options) : base(db, o, options) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -680,7 +680,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcAnnotationTextOccurrence() : base() { }
-		internal IfcAnnotationTextOccurrence(DatabaseIfc db, IfcAnnotationTextOccurrence o) : base(db,o) { }
+		internal IfcAnnotationTextOccurrence(DatabaseIfc db, IfcAnnotationTextOccurrence o, DuplicateOptions options) : base(db, o, options) { }
 	}
 	[Serializable]
 	public partial class IfcApplication : BaseClassIfc, NamedObjectIfc
@@ -938,7 +938,8 @@ namespace GeometryGym.Ifc
 		public IfcCurve OuterCurve { get { return mDatabase[mOuterCurve] as IfcCurve; } set { mOuterCurve = value.mIndex; } }
 
 		internal IfcArbitraryClosedProfileDef() : base() { }
-		internal IfcArbitraryClosedProfileDef(DatabaseIfc db, IfcArbitraryClosedProfileDef p) : base(db, p) { OuterCurve = db.Factory.Duplicate(p.OuterCurve) as IfcCurve; }
+		internal IfcArbitraryClosedProfileDef(DatabaseIfc db, IfcArbitraryClosedProfileDef p, DuplicateOptions options) 
+			: base(db, p, options) { OuterCurve = p.OuterCurve.Duplicate(db, options) as IfcCurve; }
 		public IfcArbitraryClosedProfileDef(string name, IfcCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mOuterCurve = boundedCurve.mIndex; }//if (string.Compare(getKW, mKW) == 0) mModel.mArbProfiles.Add(this); }
 	}
 	[Serializable]
@@ -948,7 +949,7 @@ namespace GeometryGym.Ifc
 		public IfcBoundedCurve Curve { get { return mDatabase[mCurve] as IfcBoundedCurve; } set { mCurve = value.mIndex; } }
 
 		internal IfcArbitraryOpenProfileDef() : base() { }
-		internal IfcArbitraryOpenProfileDef(DatabaseIfc db, IfcArbitraryOpenProfileDef p) : base(db, p) { Curve = db.Factory.Duplicate(p.Curve) as IfcBoundedCurve; }
+		internal IfcArbitraryOpenProfileDef(DatabaseIfc db, IfcArbitraryOpenProfileDef p, DuplicateOptions options) : base(db, p, options) { Curve = p.Curve.Duplicate(db, options) as IfcBoundedCurve; }
 		public IfcArbitraryOpenProfileDef(string name, IfcBoundedCurve boundedCurve) : base(boundedCurve.mDatabase,name) { mCurve = boundedCurve.mIndex; mProfileType = IfcProfileTypeEnum.CURVE; }
 	}
 	[Serializable]
@@ -958,7 +959,10 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcCurve> InnerCurves { get { return new ReadOnlyCollection<IfcCurve>(mInnerCurves.ConvertAll(x => mDatabase[x] as IfcCurve)); } }
 
 		internal IfcArbitraryProfileDefWithVoids() : base() { }
-		internal IfcArbitraryProfileDefWithVoids(DatabaseIfc db, IfcArbitraryProfileDefWithVoids p) : base(db, p) { p.InnerCurves.ToList().ForEach(x => addVoid( db.Factory.Duplicate(x) as IfcCurve)); }
+		internal IfcArbitraryProfileDefWithVoids(DatabaseIfc db, IfcArbitraryProfileDefWithVoids p, DuplicateOptions options) : base(db, p, options) 
+		{ 
+			p.InnerCurves.ToList().ForEach(x => addVoid(x.Duplicate(db, options) as IfcCurve));
+		}
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner.mIndex); }
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IEnumerable<IfcCurve> inner) : base(name, perim) { mInnerCurves.AddRange(inner.Select(x=>x.StepId)); }
 		
@@ -1041,7 +1045,7 @@ namespace GeometryGym.Ifc
 		public double TopFlangeSlope { get { return mTopFlangeSlope; } set { mTopFlangeSlope = value; } }
 
 		internal IfcAsymmetricIShapeProfileDef() : base() { }
-		internal IfcAsymmetricIShapeProfileDef(DatabaseIfc db, IfcAsymmetricIShapeProfileDef p) : base(db, p)
+		internal IfcAsymmetricIShapeProfileDef(DatabaseIfc db, IfcAsymmetricIShapeProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
 			mBottomFlangeWidth = p.mBottomFlangeWidth;
 			mOverallDepth = p.mOverallDepth;
@@ -1093,7 +1097,7 @@ namespace GeometryGym.Ifc
 		public IfcDirection Axis { get { return (mAxis > 0 ? mDatabase[mAxis] as IfcDirection : null); } set { mAxis = (value == null ? 0 : value.mIndex); } }
 		
 		internal IfcAxis1Placement() : base() { }
-		internal IfcAxis1Placement(DatabaseIfc db, IfcAxis1Placement p) : base(db,p) { if(p.mAxis > 0) Axis = db.Factory.Duplicate( p.Axis) as IfcDirection; }
+		internal IfcAxis1Placement(DatabaseIfc db, IfcAxis1Placement p, DuplicateOptions options) : base(db, p, options) { if(p.mAxis > 0) Axis = db.Factory.Duplicate( p.Axis) as IfcDirection; }
 		public IfcAxis1Placement(DatabaseIfc db) : base(db) { }
 		public IfcAxis1Placement(IfcCartesianPoint location) : base(location) { }
 		public IfcAxis1Placement(IfcDirection axis) : base(axis.mDatabase) { Axis = axis; }
@@ -1107,7 +1111,7 @@ namespace GeometryGym.Ifc
 		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
 		
 		internal IfcAxis2Placement2D() : base() { }
-		internal IfcAxis2Placement2D(DatabaseIfc db, IfcAxis2Placement2D p) : base(db, p)
+		internal IfcAxis2Placement2D(DatabaseIfc db, IfcAxis2Placement2D p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mRefDirection != null)
 				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
@@ -1151,7 +1155,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcAxis2Placement3D() : base() { }
-		internal IfcAxis2Placement3D(DatabaseIfc db, IfcAxis2Placement3D p) : base(db, p)
+		internal IfcAxis2Placement3D(DatabaseIfc db, IfcAxis2Placement3D p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mAxis != null)
 				Axis = db.Factory.Duplicate(p.Axis) as IfcDirection;
@@ -1183,6 +1187,6 @@ namespace GeometryGym.Ifc
 
 		protected IfcAxisLateralInclination() : base() { }
 		protected IfcAxisLateralInclination(DatabaseIfc db) : base(db) { }
-		protected IfcAxisLateralInclination(DatabaseIfc db, IfcAxisLateralInclination axisLateralInclination) : base(db, axisLateralInclination) { }
+		protected IfcAxisLateralInclination(DatabaseIfc db, IfcAxisLateralInclination axisLateralInclination, DuplicateOptions options) : base(db, axisLateralInclination, options) { }
 	}
 }

@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcSeamCurve : IfcSurfaceCurve //IFC4 Add2
 	{
 		internal IfcSeamCurve() : base() { }
-		internal IfcSeamCurve(DatabaseIfc db, IfcIntersectionCurve c) : base(db, c) { }
+		internal IfcSeamCurve(DatabaseIfc db, IfcIntersectionCurve c, DuplicateOptions options) : base(db, c, options) { }
 		public IfcSeamCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
@@ -130,7 +130,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
 
 		protected IfcSectionedSolid() : base() { }
-		protected IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s) : base(db, s)
+		protected IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s, DuplicateOptions options) : base(db, s, options)
 		{
 			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
@@ -151,7 +151,7 @@ namespace GeometryGym.Ifc
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
-		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s) : base(db, s)
+		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s, DuplicateOptions options) : base(db, s, options)
 		{
 			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcDistanceExpression));
 			FixedAxisVertical = s.FixedAxisVertical;
@@ -175,7 +175,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcAxis2Placement3D> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if(value != null) mCrossSectionPositions = value; } }
 
 		internal IfcSectionedSpine() : base() { }
-		internal IfcSectionedSpine(DatabaseIfc db, IfcSectionedSpine s) : base(db,s)
+		internal IfcSectionedSpine(DatabaseIfc db, IfcSectionedSpine s, DuplicateOptions options) : base(db, s, options)
 		{
 			SpineCurve = db.Factory.Duplicate(s.SpineCurve) as IfcCompositeCurve;
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
@@ -196,7 +196,7 @@ namespace GeometryGym.Ifc
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		public IfcSectionedSurface() : base() { }
-		internal IfcSectionedSurface(DatabaseIfc db, IfcSectionedSurface s) : base(db, s)
+		internal IfcSectionedSurface(DatabaseIfc db, IfcSectionedSurface s, DuplicateOptions options) : base(db, s, options)
 		{
 			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
 			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcDistanceExpression));
@@ -353,15 +353,16 @@ namespace GeometryGym.Ifc
 	{
 		//INVERSE
 		internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
+		public IfcShapeAspect OfShapeAspect { get { return mOfShapeAspect; } set { mOfShapeAspect = value; } }
 
 		protected IfcShapeModel() : base() { }
 		protected IfcShapeModel(IfcRepresentationItem item) : base(item.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), item) { }
 		protected IfcShapeModel(IfcGeometricRepresentationContext context, IfcRepresentationItem item) : base(context, item) { }
 		protected IfcShapeModel(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> reps) : base(context, reps) { }
-		protected IfcShapeModel(DatabaseIfc db, IfcShapeModel m) : base(db, m)
+		protected IfcShapeModel(DatabaseIfc db, IfcShapeModel m, DuplicateOptions options) : base(db, m, options)
 		{
-#warning todo
-			//internal IfcShapeAspect mOfShapeAspect = null; //:	SET [0:1] OF IfcShapeAspect FOR ShapeRepresentations;
+			if (m.OfShapeAspect != null)
+				OfShapeAspect = db.Factory.Duplicate(m.mOfShapeAspect) as IfcShapeAspect;
 		}
 	}
 	[Serializable]
@@ -388,7 +389,7 @@ additional types	some additional representation types are given:
 	SectionedSpine	cross section based representation of a spine curve and planar cross sections. It can represent a surface or a solid and the interpolations of the between the cross sections is not defined
 	MappedRepresentation*/
 		internal IfcShapeRepresentation() : base() { }
-		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r) : base(db, r) { }
+		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r, DuplicateOptions options) : base(db, r, options) { }
 		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
@@ -419,9 +420,12 @@ additional types	some additional representation types are given:
 		}
 		public IfcShapeRepresentation(IfcShellBasedSurfaceModel surface) : base(surface) { RepresentationType = "SurfaceModel"; }
 		public IfcShapeRepresentation(IfcSurface surface) : base(surface) { RepresentationType = "Surface3D"; }
-		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = "SweptSolid"; }
-		public IfcShapeRepresentation(IfcFixedReferenceSweptAreaSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
-		public IfcShapeRepresentation(IfcSweptDiskSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
+		public IfcShapeRepresentation(IfcExtrudedAreaSolid extrudedAreaSolid) : base(extrudedAreaSolid) { RepresentationType = "SweptSolid"; }
+		public IfcShapeRepresentation(IfcRevolvedAreaSolid revolvedAreaSolid) : base(revolvedAreaSolid) { RepresentationType = "SweptSolid"; }
+		public IfcShapeRepresentation(IfcExtrudedAreaSolidTapered extrudedAreaSolidTapered) : base(extrudedAreaSolidTapered) { RepresentationType = "AdvancedSweptSolid"; }
+		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = "AdvancedSweptSolid"; }
+		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
+		public IfcShapeRepresentation(IfcSectionedSolid sectionedSolid) : base(sectionedSolid) { RepresentationType = "SectionedSolid"; }
 		public IfcShapeRepresentation(IfcSolidModel solid) : base(solid)
 		{
 			//ABSTRACT SUPERTYPE OF (ONEOF(IfcCsgSolid ,IfcManifoldSolidBrep,IfcSweptAreaSolid,IfcSweptDiskSolid))
@@ -446,66 +450,69 @@ additional types	some additional representation types are given:
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcVertexPoint point) : base(context, point) { RepresentationType = "Point"; }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcEdgeCurve edge) : base(context, edge) { RepresentationType = "Curve"; }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcFaceSurface surface) : base(context, surface) { RepresentationType = "Surface"; }
-		internal static IfcShapeRepresentation CreateRepresentation(IfcRepresentationItem ri)
+		internal static IfcShapeRepresentation CreateRepresentation(IfcRepresentationItem representationItem)
 		{
-			if (ri == null)
+			if (representationItem == null)
 				return null;
-			IfcBooleanResult br = ri as IfcBooleanResult;
-			if (br != null)
-				return new IfcShapeRepresentation(br);
-			IfcCurve c = ri as IfcCurve;
-			if (c != null)
-				return new IfcShapeRepresentation(c, ShapeRepresentationType.Curve);
-			IfcCsgPrimitive3D csg = ri as IfcCsgPrimitive3D;
-			if (csg != null)
-				return new IfcShapeRepresentation(csg);
-			IfcCsgSolid csgs = ri as IfcCsgSolid;
-			if (csgs != null)
-				return new IfcShapeRepresentation(csgs);
-			IfcExtrudedAreaSolid eas = ri as IfcExtrudedAreaSolid;
-			if (eas != null)
-				return new IfcShapeRepresentation(eas);
-			IfcFacetedBrep fb = ri as IfcFacetedBrep;
-			if (fb != null)
-				return new IfcShapeRepresentation(fb);
-			IfcFaceBasedSurfaceModel fbs = ri as IfcFaceBasedSurfaceModel;
-			if (fbs != null)
-				return new IfcShapeRepresentation(fbs);
-			IfcFixedReferenceSweptAreaSolid fsas = ri as IfcFixedReferenceSweptAreaSolid;
-			if (fsas != null)
-				return new IfcShapeRepresentation(fsas);
-			IfcGeometricSet gs = ri as IfcGeometricSet;
-			if (gs != null)
-				return new IfcShapeRepresentation(gs);
-			IfcPoint p = ri as IfcPoint;
-			if (p != null)
-				return new IfcShapeRepresentation(p);
-			IfcSectionedSpine ss = ri as IfcSectionedSpine;
-			if (ss != null)
-				return new IfcShapeRepresentation(ss);
-			IfcShellBasedSurfaceModel sbs = ri as IfcShellBasedSurfaceModel;
-			if (sbs != null)
-				return new IfcShapeRepresentation(sbs);
-			IfcSurface s = ri as IfcSurface;
-			if (s != null)
-				return new IfcShapeRepresentation(s);
-			IfcSweptAreaSolid sas = ri as IfcSweptAreaSolid;
-			if (sas != null)
-				return new IfcShapeRepresentation(sas);
-			IfcSweptDiskSolid sds = ri as IfcSweptDiskSolid;
-			if (sds != null)
-				return new IfcShapeRepresentation(sds);
-			IfcAdvancedBrep b = ri as IfcAdvancedBrep;
-			if (b != null)
-				return new IfcShapeRepresentation(b);
-			IfcTessellatedItem ti = ri as IfcTessellatedItem;
-			if (ti != null)
-				return new IfcShapeRepresentation(ti);
-			IfcMappedItem mi = ri as IfcMappedItem;
-			if (mi != null)
-				return new IfcShapeRepresentation(mi);
+			IfcBooleanResult booleanResult = representationItem as IfcBooleanResult;
+			if (booleanResult != null)
+				return new IfcShapeRepresentation(booleanResult);
+			IfcCurve curve = representationItem as IfcCurve;
+			if (curve != null)
+				return new IfcShapeRepresentation(curve, ShapeRepresentationType.Curve);
+			IfcCsgPrimitive3D csgPrimitive = representationItem as IfcCsgPrimitive3D;
+			if (csgPrimitive != null)
+				return new IfcShapeRepresentation(csgPrimitive);
+			IfcCsgSolid csgSolid = representationItem as IfcCsgSolid;
+			if (csgSolid != null)
+				return new IfcShapeRepresentation(csgSolid);
+			IfcExtrudedAreaSolid extrudedAreaSolid = representationItem as IfcExtrudedAreaSolid;
+			if (extrudedAreaSolid != null)
+				return new IfcShapeRepresentation(extrudedAreaSolid);
+			IfcRevolvedAreaSolid revolvedAreaSolid = representationItem as IfcRevolvedAreaSolid;
+			if (revolvedAreaSolid != null)
+				return new IfcShapeRepresentation(revolvedAreaSolid);
+			IfcSweptAreaSolid sweptAreaSolid = representationItem as IfcSweptAreaSolid;
+			if (sweptAreaSolid != null)
+				return new IfcShapeRepresentation(sweptAreaSolid);
+			IfcFacetedBrep facetedBrep = representationItem as IfcFacetedBrep;
+			if (facetedBrep != null)
+				return new IfcShapeRepresentation(facetedBrep);
+			IfcAdvancedBrep advancedBrep = representationItem as IfcAdvancedBrep;
+			if (advancedBrep != null)
+				return new IfcShapeRepresentation(advancedBrep);
+			IfcSolidModel solidModel = representationItem as IfcSolidModel;
+			if (solidModel != null)
+				return new IfcShapeRepresentation(solidModel);
+			IfcFaceBasedSurfaceModel faceBasedSurfaceModel = representationItem as IfcFaceBasedSurfaceModel;
+			if (faceBasedSurfaceModel != null)
+				return new IfcShapeRepresentation(faceBasedSurfaceModel);
+			IfcGeometricSet geometricSet = representationItem as IfcGeometricSet;
+			if (geometricSet != null)
+				return new IfcShapeRepresentation(geometricSet);
+			IfcPoint point = representationItem as IfcPoint;
+			if (point != null)
+				return new IfcShapeRepresentation(point);
+			IfcSectionedSpine sectionedSpine = representationItem as IfcSectionedSpine;
+			if (sectionedSpine != null)
+				return new IfcShapeRepresentation(sectionedSpine);
+			IfcSectionedSolid sectionedSolid = representationItem as IfcSectionedSolid;
+			if (sectionedSolid != null)
+				return new IfcShapeRepresentation(sectionedSolid);
+			IfcShellBasedSurfaceModel shellBasedSurfaceModel = representationItem as IfcShellBasedSurfaceModel;
+			if (shellBasedSurfaceModel != null)
+				return new IfcShapeRepresentation(shellBasedSurfaceModel);
+			IfcSurface surface = representationItem as IfcSurface;
+			if (surface != null)
+				return new IfcShapeRepresentation(surface);
+			IfcTessellatedItem tessellatedItem = representationItem as IfcTessellatedItem;
+			if (tessellatedItem != null)
+				return new IfcShapeRepresentation(tessellatedItem);
+			IfcMappedItem mappedItem = representationItem as IfcMappedItem;
+			if (mappedItem != null)
+				return new IfcShapeRepresentation(mappedItem);
 
-			Trace.WriteLine("XX Error Can't identify " + ri.ToString() + " as shape representation!");
+			Trace.WriteLine("XX Error Can't identify " + representationItem.ToString() + " as shape representation!");
 			return null;
 		}
 	}
@@ -520,7 +527,7 @@ additional types	some additional representation types are given:
 		public ReadOnlyCollection<IfcShell> SbsmBoundary { get { return new ReadOnlyCollection<IfcShell>( mSbsmBoundary.ConvertAll(x => mDatabase[x] as IfcShell)); } }
 
 		internal IfcShellBasedSurfaceModel() : base() { }
-		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m) : base(db,m) { m.mSbsmBoundary.ForEach(x=> addBoundary( db.Factory.Duplicate(m.mDatabase[x]) as IfcShell)); }
+		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m, DuplicateOptions options) : base(db,m, options) { m.mSbsmBoundary.ForEach(x=> addBoundary( db.Factory.Duplicate(m.mDatabase[x], options) as IfcShell)); }
 		public IfcShellBasedSurfaceModel(IfcShell shell) : base(shell.Database) { mSbsmBoundary.Add(shell.Index); }
 		public IfcShellBasedSurfaceModel(List<IfcShell> shells) : base(shells[0].Database) { mSbsmBoundary = shells.ConvertAll(x => x.Index); }
 		
@@ -657,6 +664,7 @@ additional types	some additional representation types are given:
 		}
 		public IfcSite(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
 		public IfcSite(IfcSite host, string name) : base(host, name) { }
+		public IfcSite(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape) { }
 	}
 	[Serializable]
 	public partial class IfcSIUnit : IfcNamedUnit
@@ -764,7 +772,7 @@ additional types	some additional representation types are given:
 	{
 		protected IfcSolidModel() : base() { }
 		protected IfcSolidModel(DatabaseIfc db) : base(db) { }
-		protected IfcSolidModel(DatabaseIfc db, IfcSolidModel p) : base(db,p) { }
+		protected IfcSolidModel(DatabaseIfc db, IfcSolidModel p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	public interface IfcSolidOrShell : IBaseClassIfc { } // SELECT(IfcSolidModel, IfcClosedShell);
 	[Serializable]
@@ -1131,7 +1139,7 @@ additional types	some additional representation types are given:
 		public double Radius { get { return mRadius; } set { mRadius = value; } }
 
 		internal IfcSphere() : base() { }
-		internal IfcSphere(DatabaseIfc db, IfcSphere s) : base(db,s) { mRadius = s.mRadius; }
+		internal IfcSphere(DatabaseIfc db, IfcSphere s, DuplicateOptions options) : base(db, s, options) { mRadius = s.mRadius; }
 		public IfcSphere(IfcAxis2Placement3D position, double radius) : base(position) { Radius = radius; }
 	}
 	[Serializable]
@@ -1140,7 +1148,7 @@ additional types	some additional representation types are given:
 		internal double mRadius;// : IfcPositiveLengthMeasure; 
 		public double Radius { get { return mRadius; } set { mRadius = value; } }
 		internal IfcSphericalSurface() : base() { }
-		internal IfcSphericalSurface(DatabaseIfc db, IfcSphericalSurface s) : base(db,s) { mRadius = s.mRadius; }
+		internal IfcSphericalSurface(DatabaseIfc db, IfcSphericalSurface s, DuplicateOptions options) : base(db, s, options) { mRadius = s.mRadius; }
 		public IfcSphericalSurface(IfcAxis2Placement3D placement, double radius) : base(placement) { Radius = radius; }
 	}
 	[Serializable]
@@ -2006,11 +2014,8 @@ additional types	some additional representation types are given:
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcStyledItem() : base() { }
-		internal IfcStyledItem(DatabaseIfc db, IfcStyledItem i) : base(db, i)
+		internal IfcStyledItem(DatabaseIfc db, IfcStyledItem i, DuplicateOptions options) : base(db, i, options)
 		{
-			//if (i.mItem > 0)
-			//	Item = db.Factory.Duplicate(i.Item) as IfcRepresentationItem;
-
 			foreach(IfcStyleAssignmentSelect style in i.Styles)
 				addStyle(db.Factory.Duplicate(style) as IfcStyleAssignmentSelect);
 			mName = i.mName;
@@ -2077,7 +2082,7 @@ additional types	some additional representation types are given:
 	public partial class IfcStyledRepresentation : IfcStyleModel
 	{
 		internal IfcStyledRepresentation() : base() { }
-		internal IfcStyledRepresentation(DatabaseIfc db, IfcStyledRepresentation r) : base(db, r) { }
+		internal IfcStyledRepresentation(DatabaseIfc db, IfcStyledRepresentation r, DuplicateOptions options) : base(db, r, options) { }
 		public IfcStyledRepresentation(IfcStyledItem ri) : base(ri.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), ri) { }
 		public IfcStyledRepresentation(IEnumerable<IfcStyledItem> reps) : base(reps.First().mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), reps) { }
 		public IfcStyledRepresentation(IfcRepresentationContext context, IfcStyledItem item) : base(context, item) { }
@@ -2106,7 +2111,7 @@ additional types	some additional representation types are given:
 	public abstract partial class IfcStyleModel : IfcRepresentation<IfcStyledItem> //ABSTRACT SUPERTYPE OF(IfcStyledRepresentation)
 	{
 		protected IfcStyleModel() : base() { }
-		protected IfcStyleModel(DatabaseIfc db, IfcStyleModel m) : base(db, m) { }
+		protected IfcStyleModel(DatabaseIfc db, IfcStyleModel m, DuplicateOptions options) : base(db, m, options) { }
 		protected IfcStyleModel(IfcRepresentationContext context, IfcStyledItem styledItem) : base(context, styledItem) { }
 		protected IfcStyleModel(IfcRepresentationContext context, IEnumerable<IfcStyledItem> reps) : base(context, reps) { }
 	}
@@ -2137,14 +2142,14 @@ additional types	some additional representation types are given:
 		public IfcEdge ParentEdge { get { return mDatabase[mParentEdge] as IfcEdge; } set { mParentEdge = value.mIndex; } }
 
 		internal IfcSubedge() : base() { }
-		internal IfcSubedge(DatabaseIfc db, IfcSubedge e) : base(db,e) { ParentEdge = db.Factory.Duplicate(e.ParentEdge) as IfcEdge; }
+		internal IfcSubedge(DatabaseIfc db, IfcSubedge e, DuplicateOptions options) : base(db, e, options) { ParentEdge = db.Factory.Duplicate(e.ParentEdge) as IfcEdge; }
 		public IfcSubedge(IfcVertex v1, IfcVertex v2, IfcEdge e) : base(v1, v2) { mParentEdge = e.mIndex; }
 	}
 	[Serializable]
 	public abstract partial class IfcSurface : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcSurfaceOrFaceSurface  /*	ABSTRACT SUPERTYPE OF (ONEOF(IfcBoundedSurface,IfcElementarySurface,IfcSweptSurface))*/
 	{
 		protected IfcSurface() : base() { }
-		protected IfcSurface(DatabaseIfc db, IfcSurface s) : base(db,s) { }
+		protected IfcSurface(DatabaseIfc db, IfcSurface s, DuplicateOptions options) : base(db, s, options) { }
 		protected IfcSurface(DatabaseIfc db) : base(db) { }
 
 		//INVERSE gg
@@ -2162,7 +2167,7 @@ additional types	some additional representation types are given:
 		public IfcPreferredSurfaceCurveRepresentation MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
 
 		internal IfcSurfaceCurve() : base() { }
-		internal IfcSurfaceCurve(DatabaseIfc db, IfcSurfaceCurve c) : base(db, c)
+		internal IfcSurfaceCurve(DatabaseIfc db, IfcSurfaceCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			Curve3D = db.Factory.Duplicate(c.Curve3D) as IfcCurve;
 			AssociatedGeometry.AddRange(c.AssociatedGeometry.Select(x => db.Factory.Duplicate(x) as IfcPcurve));
@@ -2186,9 +2191,9 @@ additional types	some additional representation types are given:
 		public IfcSurface ReferenceSurface { get { return mDatabase[mReferenceSurface] as IfcSurface; } set { mReferenceSurface = value.mIndex; } }
 
 		internal IfcSurfaceCurveSweptAreaSolid() : base() { }
-		internal IfcSurfaceCurveSweptAreaSolid(DatabaseIfc db, IfcSurfaceCurveSweptAreaSolid s) : base(db, s) 
+		internal IfcSurfaceCurveSweptAreaSolid(DatabaseIfc db, IfcSurfaceCurveSweptAreaSolid s, DuplicateOptions options) : base(db, s, options) 
 		{ 
-			ReferenceSurface = db.Factory.Duplicate(s.ReferenceSurface) as IfcSurface; 
+			ReferenceSurface = db.Factory.Duplicate(s.ReferenceSurface, options) as IfcSurface; 
 		}
 		public IfcSurfaceCurveSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcSurface referenceSurface) 
 			: base(sweptArea, directrix)
@@ -2216,7 +2221,7 @@ additional types	some additional representation types are given:
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcSurfaceOfLinearExtrusion() : base() { }
-		internal IfcSurfaceOfLinearExtrusion(DatabaseIfc db, IfcSurfaceOfLinearExtrusion s) : base(db,s) { ExtrudedDirection = db.Factory.Duplicate(s.ExtrudedDirection) as IfcDirection; mDepth = s.mDepth; }
+		internal IfcSurfaceOfLinearExtrusion(DatabaseIfc db, IfcSurfaceOfLinearExtrusion s, DuplicateOptions options) : base(db, s, options) { ExtrudedDirection = db.Factory.Duplicate(s.ExtrudedDirection) as IfcDirection; mDepth = s.mDepth; }
 		public IfcSurfaceOfLinearExtrusion(IfcProfileDef sweptCurve, IfcAxis2Placement3D position, double depth) : base(sweptCurve, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 	}
 	[Serializable]
@@ -2226,7 +2231,7 @@ additional types	some additional representation types are given:
 		public IfcAxis1Placement AxisPosition { get { return mDatabase[mAxisPosition] as IfcAxis1Placement; } set { mAxisPosition = value.mIndex; } }
 
 		internal IfcSurfaceOfRevolution() : base() { }
-		internal IfcSurfaceOfRevolution(DatabaseIfc db, IfcSurfaceOfRevolution s) : base(db,s) { AxisPosition = db.Factory.Duplicate( s.AxisPosition) as IfcAxis1Placement; }
+		internal IfcSurfaceOfRevolution(DatabaseIfc db, IfcSurfaceOfRevolution s, DuplicateOptions options) : base(db, s, options) { AxisPosition = db.Factory.Duplicate(s.AxisPosition) as IfcAxis1Placement; }
 	}
 	public interface IfcSurfaceOrFaceSurface : IBaseClassIfc { }  // = SELECT (	IfcSurface, IfcFaceSurface, IfcFaceBasedSurfaceModel);
 	[Serializable]
@@ -2401,11 +2406,11 @@ additional types	some additional representation types are given:
 
 		protected IfcSweptAreaSolid() : base() { }
 		protected IfcSweptAreaSolid(DatabaseIfc db) : base(db) { }
-		protected IfcSweptAreaSolid(DatabaseIfc db, IfcSweptAreaSolid s) : base(db, s)
+		protected IfcSweptAreaSolid(DatabaseIfc db, IfcSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)
 		{
-			SweptArea = db.Factory.Duplicate(s.SweptArea) as IfcProfileDef;
+			SweptArea = db.Factory.Duplicate(s.SweptArea, options) as IfcProfileDef;
 			if (s.mPosition > 0)
-				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
+				Position = db.Factory.Duplicate(s.Position, options) as IfcAxis2Placement3D;
 		}
 		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release < ReleaseVersion.IFC4) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
 		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release < ReleaseVersion.IFC4 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
@@ -2428,9 +2433,9 @@ additional types	some additional representation types are given:
 		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
 
 		internal IfcSweptDiskSolid() : base() { }
-		internal IfcSweptDiskSolid(DatabaseIfc db, IfcSweptDiskSolid s) : base(db,s) 
+		internal IfcSweptDiskSolid(DatabaseIfc db, IfcSweptDiskSolid s, DuplicateOptions options) : base(db,s, options) 
 		{ 
-			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve; 
+			Directrix = s.Directrix.Duplicate(db, options) as IfcCurve; 
 			mRadius = s.mRadius; 
 			mInnerRadius = s.mInnerRadius; 
 			mStartParam = s.mStartParam; 
@@ -2444,7 +2449,7 @@ additional types	some additional representation types are given:
 	{
 		internal double mFilletRadius;// : OPTIONAL IfcPositiveLengthMeasure; 
 		internal IfcSweptDiskSolidPolygonal() : base() { }
-		internal IfcSweptDiskSolidPolygonal(DatabaseIfc db, IfcSweptDiskSolidPolygonal p) : base(db,p) { mFilletRadius = p.mFilletRadius; }
+		internal IfcSweptDiskSolidPolygonal(DatabaseIfc db, IfcSweptDiskSolidPolygonal p, DuplicateOptions options) : base(db, p, options) { mFilletRadius = p.mFilletRadius; }
 	}
 	[Serializable]
 	public abstract partial class IfcSweptSurface : IfcSurface /*	ABSTRACT SUPERTYPE OF (ONEOF (IfcSurfaceOfLinearExtrusion ,IfcSurfaceOfRevolution))*/
@@ -2456,9 +2461,9 @@ additional types	some additional representation types are given:
 		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mPosition = (value == null ? 0 : value.mIndex); } }
 
 		protected IfcSweptSurface() : base() { }
-		protected IfcSweptSurface(DatabaseIfc db, IfcSweptSurface s) : base(db,s)
+		protected IfcSweptSurface(DatabaseIfc db, IfcSweptSurface s, DuplicateOptions options) : base(db, s, options)
 		{
-			SweptCurve = db.Factory.Duplicate(s.SweptCurve) as IfcProfileDef;
+			SweptCurve = db.Factory.Duplicate(s.SweptCurve, options) as IfcProfileDef;
 			if(s.mPosition > 0)
 				Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D;
 		}

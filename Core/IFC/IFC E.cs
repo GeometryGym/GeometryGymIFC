@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcEdge() : base() { }
 		protected IfcEdge(DatabaseIfc db) : base(db) { }
-		internal IfcEdge(DatabaseIfc db, IfcEdge e) : base(db, e)
+		internal IfcEdge(DatabaseIfc db, IfcEdge e, DuplicateOptions options) : base(db, e, options)
 		{
 			if(e.mEdgeStart != null)
 				EdgeStart = db.Factory.Duplicate( e.EdgeStart) as IfcVertex;
@@ -102,7 +102,7 @@ namespace GeometryGym.Ifc
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 		
 		internal IfcEdgeCurve() : base() { }
-		internal IfcEdgeCurve(DatabaseIfc db, IfcEdgeCurve e) : base(db,e) { EdgeGeometry = db.Factory.Duplicate(e.EdgeGeometry) as IfcCurve; mSameSense = e.mSameSense; }
+		internal IfcEdgeCurve(DatabaseIfc db, IfcEdgeCurve e, DuplicateOptions options) : base(db, e, options) { EdgeGeometry = db.Factory.Duplicate(e.EdgeGeometry) as IfcCurve; mSameSense = e.mSameSense; }
 		public IfcEdgeCurve(IfcVertexPoint start, IfcVertexPoint end, IfcCurve edge, bool sense) : base(start, end) { mEdgeGeometry = edge.mIndex; mSameSense = sense; }
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -125,7 +125,7 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcOrientedEdge> mEdgeList = new LIST<IfcOrientedEdge>();// LIST [1:?] OF IfcOrientedEdge;
 		public LIST<IfcOrientedEdge> EdgeList { get { return mEdgeList; } }
 		internal IfcEdgeLoop() : base() { }
-		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l) : base(db,l) { mEdgeList.AddRange(l.EdgeList.Select(x => db.Factory.Duplicate(x) as IfcOrientedEdge)); }
+		internal IfcEdgeLoop(DatabaseIfc db, IfcEdgeLoop l, DuplicateOptions options) : base(db, l, options) { mEdgeList.AddRange(l.EdgeList.Select(x => db.Factory.Duplicate(x) as IfcOrientedEdge)); }
 		public IfcEdgeLoop(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge); }
 		public IfcEdgeLoop(IfcOrientedEdge edge1, IfcOrientedEdge edge2) : base(edge1.mDatabase) { mEdgeList.Add(edge1); mEdgeList.Add(edge2); }
 		public IfcEdgeLoop(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { mEdgeList.AddRange(edges); }
@@ -411,13 +411,13 @@ namespace GeometryGym.Ifc
 				int relatingIndex = db.Factory.mDuplicateMapping.FindExisting(relating), relatedIndex = db.Factory.mDuplicateMapping.FindExisting(related);
 				if (relating.mIndex != e.mIndex && relatingIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcRelConnectsElements;
 					rce.RelatedElement = this;
 					rce.RelatingElement = db[relatingIndex] as IfcElement;
 				}
 				else if (related.mIndex != e.mIndex && relatedIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcRelConnectsElements;
 					rce.RelatingElement = this;
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
@@ -598,17 +598,7 @@ namespace GeometryGym.Ifc
 				mContainedInStructure.RelatedElements.Remove(this);
 				//mContainedInStructure.RelatedElements.Remove(this);
 		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
-		{
-			return ConstructElement(className, host, placement, representation, null);
-		}
-		internal static IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
-		{
-			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
-			if (element == null)
-				element = new IfcBuildingElementProxy(host, placement, representation);
-			return element;
-		}
+	
 		public void AddMember(IfcStructuralMember m)
 		{
 			if (m == null)
@@ -636,7 +626,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mPosition = value.mIndex; } }
 
 		protected IfcElementarySurface() : base() { }
-		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s) : base(db,s) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; }
+		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s, DuplicateOptions options) : base(db, s, options) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; }
 		protected IfcElementarySurface(IfcAxis2Placement3D placement) : base(placement.mDatabase) { mPosition = placement.mIndex; }
 	}
 	[Serializable]
@@ -833,7 +823,7 @@ namespace GeometryGym.Ifc
 			string typename = this.GetType().Name;
 			typename = typename.Substring(0, typename.Length - 4);
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], transform)));
-			IfcElement element = IfcElement.ConstructElement(typename, container,null, pds);
+			IfcElement element = container.Database.Factory.ConstructElement(typename, container,null, pds);
 			element.setRelatingType(this);
 			return element;
 		}
@@ -848,7 +838,7 @@ namespace GeometryGym.Ifc
 		public double SemiAxis2 { get { return mSemiAxis2; } set { mSemiAxis2 = value; } }
 
 		internal IfcEllipse() : base() { }
-		internal IfcEllipse(DatabaseIfc db, IfcEllipse e) : base(db,e) { mSemiAxis1 = e.mSemiAxis1; mSemiAxis2 = e.mSemiAxis2; }
+		internal IfcEllipse(DatabaseIfc db, IfcEllipse e, DuplicateOptions options) : base(db, e, options) { mSemiAxis1 = e.mSemiAxis1; mSemiAxis2 = e.mSemiAxis2; }
 		public IfcEllipse(IfcAxis2Placement placement, double axis1, double axis2) : base(placement) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
 		public IfcEllipse(DatabaseIfc db, double axis1, double axis2) : base(db.Factory.Origin2dPlace) { mSemiAxis1 = axis1; mSemiAxis2 = axis2; }
 	}
@@ -862,7 +852,7 @@ namespace GeometryGym.Ifc
 		public double SemiAxis2 { get { return mSemiAxis2; } set { mSemiAxis2 = value; } }
 
 		internal IfcEllipseProfileDef() : base() { }
-		internal IfcEllipseProfileDef(DatabaseIfc db, IfcEllipseProfileDef p) : base(db, p) { mSemiAxis1 = p.mSemiAxis1; mSemiAxis2 = p.mSemiAxis2; }
+		internal IfcEllipseProfileDef(DatabaseIfc db, IfcEllipseProfileDef p, DuplicateOptions options) : base(db, p, options) { mSemiAxis1 = p.mSemiAxis1; mSemiAxis2 = p.mSemiAxis2; }
 		public IfcEllipseProfileDef(DatabaseIfc db, string name, double semiAxis1, double semiAxis2) : base(db, name) { SemiAxis1 = semiAxis1; SemiAxis2 = semiAxis2;  }
 	}
 	[Serializable]
@@ -1263,7 +1253,7 @@ namespace GeometryGym.Ifc
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }
-		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e) : base(db, e) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection) as IfcDirection; mDepth = e.mDepth; }
+		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e, DuplicateOptions options) : base(db, e, options) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection) as IfcDirection; mDepth = e.mDepth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, double depth) : base(prof) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, double depth) : base(prof, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
@@ -1276,7 +1266,7 @@ namespace GeometryGym.Ifc
 		public IfcProfileDef EndSweptArea { get { return mDatabase[mEndSweptArea] as IfcProfileDef; } set { mEndSweptArea = value.mIndex; } }
 
 		internal IfcExtrudedAreaSolidTapered() : base() { }
-		internal IfcExtrudedAreaSolidTapered(DatabaseIfc db, IfcExtrudedAreaSolidTapered e) : base(db,e) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea) as IfcProfileDef; }
+		internal IfcExtrudedAreaSolidTapered(DatabaseIfc db, IfcExtrudedAreaSolidTapered e, DuplicateOptions options) : base(db, e, options) { EndSweptArea = db.Factory.Duplicate(e.EndSweptArea, options) as IfcProfileDef; }
 		public IfcExtrudedAreaSolidTapered(IfcParameterizedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcParameterizedProfileDef end) : base(start, placement, new IfcDirection(start.mDatabase,0,0,1), depth) { EndSweptArea = end; }
 		public IfcExtrudedAreaSolidTapered(IfcDerivedProfileDef start, IfcAxis2Placement3D placement, double depth, IfcDerivedProfileDef end) : base(start, placement,new IfcDirection(start.mDatabase,0,0,1), depth ) { EndSweptArea = end; }
 	}

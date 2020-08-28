@@ -993,7 +993,14 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			RelatedElements.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProduct));
+			foreach(int id in ParserSTEP.StripListLink(str, ref pos, len))
+			{
+				try
+				{
+					RelatedElements.Add(dictionary[id] as IfcProduct);
+				}
+				catch(Exception x) { mDatabase.logParseError("XXX Error in line #" + StepId + " " + StepClassName + " " + x.Message); }
+			}
 			mRelatingStructure = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialElement;
 		}
 		internal override void postParseRelate()

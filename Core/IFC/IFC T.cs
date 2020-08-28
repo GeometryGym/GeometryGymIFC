@@ -347,25 +347,25 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
 	{
-		internal int mCoordinates;// : 	IfcCartesianPointList;
+		internal IfcCartesianPointList mCoordinates;// : 	IfcCartesianPointList;
 
 		// INVERSE
 		internal IfcIndexedColourMap mHasColours = null;// : SET [0:1] OF IfcIndexedColourMap FOR MappedTo;
 		internal List<IfcIndexedTextureMap> mHasTextures = new List<IfcIndexedTextureMap>();// : SET [0:?] OF IfcIndexedTextureMap FOR MappedTo;
 
-		public IfcCartesianPointList Coordinates { get { return mDatabase[mCoordinates] as IfcCartesianPointList; } set { mCoordinates = value.mIndex; } }
+		public IfcCartesianPointList Coordinates { get { return mCoordinates; } set { mCoordinates = value; } }
 		public IfcIndexedColourMap HasColours { get { return mHasColours; } }
 		public ReadOnlyCollection<IfcIndexedTextureMap> HasTextures { get { return new ReadOnlyCollection<IfcIndexedTextureMap>(mHasTextures); } }
 
 		protected IfcTessellatedFaceSet() : base() { }
-		protected IfcTessellatedFaceSet(DatabaseIfc db, IfcTessellatedFaceSet s) : base(db, s) { Coordinates = db.Factory.Duplicate(s.Coordinates) as IfcCartesianPointList; }
-		protected IfcTessellatedFaceSet(IfcCartesianPointList3D pl) : base(pl.mDatabase) { mCoordinates = pl.mIndex; }
+		protected IfcTessellatedFaceSet(DatabaseIfc db, IfcTessellatedFaceSet s, DuplicateOptions options) : base(db, s, options) { Coordinates = db.Factory.Duplicate(s.Coordinates) as IfcCartesianPointList; }
+		protected IfcTessellatedFaceSet(IfcCartesianPointList3D pl) : base(pl.mDatabase) { Coordinates = pl; }
 	}
 	[Serializable]
 	public abstract partial class IfcTessellatedItem : IfcGeometricRepresentationItem //IFC4
 	{
 		protected IfcTessellatedItem() : base() { }
-		protected IfcTessellatedItem(DatabaseIfc db, IfcTessellatedItem i) : base(db, i) { }
+		protected IfcTessellatedItem(DatabaseIfc db, IfcTessellatedItem i, DuplicateOptions options) : base(db, i, options) { }
 		protected IfcTessellatedItem(DatabaseIfc db) : base(db) { }
 	}
 	public interface IfcTextFontSelect : IBaseClassIfc { } // SELECT(IfcPreDefinedTextFont, IfcExternallyDefinedTextFont);
@@ -381,7 +381,7 @@ namespace GeometryGym.Ifc
 		public IfcTextPath Path { get { return mPath; } set { mPath = value; } }
 
 		internal IfcTextLiteral() : base() { }
-		internal IfcTextLiteral(DatabaseIfc db, IfcTextLiteral l) : base(db, l) { mLiteral = l.mLiteral; mPlacement = db.Factory.Duplicate(l.mDatabase[l.mPlacement]).mIndex; mPath = l.mPath; }
+		internal IfcTextLiteral(DatabaseIfc db, IfcTextLiteral l, DuplicateOptions options) : base(db, l, options) { mLiteral = l.mLiteral; mPlacement = db.Factory.Duplicate(l.mDatabase[l.mPlacement]).mIndex; mPath = l.mPath; }
 	}
 	[Serializable]
 	public partial class IfcTextLiteralWithExtent : IfcTextLiteral
@@ -628,13 +628,13 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcTopologicalRepresentationItem() : base() { }
 		protected IfcTopologicalRepresentationItem(DatabaseIfc db) : base(db) { }
-		protected IfcTopologicalRepresentationItem(DatabaseIfc db, IfcTopologicalRepresentationItem i) : base(db, i) { }
+		protected IfcTopologicalRepresentationItem(DatabaseIfc db, IfcTopologicalRepresentationItem i, DuplicateOptions options) : base(db, i, options) { }
 	}
 	[Serializable]
 	public partial class IfcTopologyRepresentation : IfcShapeModel
 	{
 		internal IfcTopologyRepresentation() : base() { }
-		internal IfcTopologyRepresentation(DatabaseIfc db, IfcTopologyRepresentation r) : base(db, r) { }
+		internal IfcTopologyRepresentation(DatabaseIfc db, IfcTopologyRepresentation r, DuplicateOptions options) : base(db, r, options) { }
 		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcConnectedFaceSet fs) : base(context, fs) { RepresentationType = "FaceSet"; }
 		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcEdge e) : base(context, e) { RepresentationType = "Edge"; }
 		public IfcTopologyRepresentation(IfcGeometricRepresentationContext context, IfcFace fs) : base(context, fs) { RepresentationType = "Face"; }
@@ -664,7 +664,7 @@ namespace GeometryGym.Ifc
 		public double MajorRadius { get { return mMajorRadius; } set { mMajorRadius = value; } }
 		public double MinorRadius { get { return mMinorRadius; } set { mMinorRadius = value; } }
 		internal IfcToroidalSurface() : base() { }
-		internal IfcToroidalSurface(DatabaseIfc db, IfcToroidalSurface s) : base(db, s) { mMajorRadius = s.mMajorRadius; mMinorRadius = s.mMinorRadius; }
+		internal IfcToroidalSurface(DatabaseIfc db, IfcToroidalSurface s, DuplicateOptions options) : base(db, s, options) { mMajorRadius = s.mMajorRadius; mMinorRadius = s.mMinorRadius; }
 		public IfcToroidalSurface(IfcAxis2Placement3D placement, double majorRadius, double minorRadius) : base(placement) { MajorRadius = majorRadius; MinorRadius = minorRadius; }
 	}
 	[Serializable]
@@ -734,7 +734,7 @@ namespace GeometryGym.Ifc
 			mIsEndRadiusCCW = isEndCCW;
 			mTransitionCurveType = curveType;
 		}
-		internal IfcTransitionCurveSegment2D(DatabaseIfc db, IfcTransitionCurveSegment2D s) : base(db, s) { mStartRadius = s.mStartRadius; mEndRadius = s.mEndRadius; mIsStartRadiusCCW = s.mIsStartRadiusCCW; mIsEndRadiusCCW = s.mIsEndRadiusCCW; mTransitionCurveType = s.mTransitionCurveType; }
+		internal IfcTransitionCurveSegment2D(DatabaseIfc db, IfcTransitionCurveSegment2D s, DuplicateOptions options) : base(db, s, options) { mStartRadius = s.mStartRadius; mEndRadius = s.mEndRadius; mIsStartRadiusCCW = s.mIsStartRadiusCCW; mIsEndRadiusCCW = s.mIsEndRadiusCCW; mTransitionCurveType = s.mTransitionCurveType; }
 	}
 	[Serializable]
 	public partial class IfcTranslationalStiffnessSelect
@@ -788,7 +788,7 @@ namespace GeometryGym.Ifc
 		public double TopXOffset { get { return mTopXOffset; } set { mTopXOffset = value; } }
 
 		internal IfcTrapeziumProfileDef() : base() { }
-		internal IfcTrapeziumProfileDef(DatabaseIfc db, IfcTrapeziumProfileDef p) : base(db, p) { mBottomXDim = p.mBottomXDim; mTopXDim = p.mTopXDim; mYDim = p.mYDim; mTopXOffset = p.mTopXOffset; }
+		internal IfcTrapeziumProfileDef(DatabaseIfc db, IfcTrapeziumProfileDef p, DuplicateOptions options) : base(db, p, options) { mBottomXDim = p.mBottomXDim; mTopXDim = p.mTopXDim; mYDim = p.mYDim; mTopXOffset = p.mTopXOffset; }
 		public IfcTrapeziumProfileDef(DatabaseIfc db, string name, double bottomXDim, double topXDim, double yDim, double topXOffset) : base(db, name)
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
@@ -815,7 +815,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<int> PnIndex { get { return new ReadOnlyCollection<int>(mPnIndex); } }
 
 		internal IfcTriangulatedFaceSet() : base() { }
-		internal IfcTriangulatedFaceSet(DatabaseIfc db, IfcTriangulatedFaceSet s) : base(db, s)
+		internal IfcTriangulatedFaceSet(DatabaseIfc db, IfcTriangulatedFaceSet s, DuplicateOptions options) : base(db, s, options)
 		{
 			if (s.mNormals.Length > 0)
 				mNormals = s.mNormals.ToArray();
@@ -824,8 +824,8 @@ namespace GeometryGym.Ifc
 			if (s.mNormalIndex.Length > 0)
 				mNormalIndex = s.mNormalIndex.ToArray();
 		}
-		public IfcTriangulatedFaceSet(IfcCartesianPointList3D pl, bool closed, IEnumerable<Tuple<int, int, int>> coords)
-			: base(pl) { setCoordIndex(coords); Closed = closed; }
+		public IfcTriangulatedFaceSet(IfcCartesianPointList3D pl, IEnumerable<Tuple<int, int, int>> coords)
+			: base(pl) { setCoordIndex(coords); }
 
 		internal void setCoordIndex(IEnumerable<Tuple<int, int, int>> coords) { mCoordIndex = coords.ToArray(); }
 	}
@@ -836,12 +836,12 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<int> Flags { get { return new ReadOnlyCollection<int>(mFlags); } }
 
 		internal IfcTriangulatedIrregularNetwork() : base() { }
-		internal IfcTriangulatedIrregularNetwork(DatabaseIfc db, IfcTriangulatedIrregularNetwork s) : base(db, s)
+		internal IfcTriangulatedIrregularNetwork(DatabaseIfc db, IfcTriangulatedIrregularNetwork s, DuplicateOptions options) : base(db, s, options)
 		{
 			mFlags.AddRange(s.mFlags);
 		}
 		public IfcTriangulatedIrregularNetwork(IfcCartesianPointList3D pl, IEnumerable<Tuple<int, int, int>> coords, List<int> flags)
-			: base(pl, false, coords) { mFlags.AddRange(flags); }
+			: base(pl, coords) { mFlags.AddRange(flags); }
 	}
 	[Serializable]
 	public partial class IfcTrimmedCurve : IfcBoundedCurve
@@ -859,7 +859,7 @@ namespace GeometryGym.Ifc
 		public IfcTrimmingPreference MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
 
 		internal IfcTrimmedCurve() : base() { }
-		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c) : base(db,c)
+		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve;
 			mTrim1 = new IfcTrimmingSelect(c.mTrim1.mIfcParameterValue);
@@ -966,7 +966,7 @@ namespace GeometryGym.Ifc
 		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcTShapeProfileDef() : base() { }
-		internal IfcTShapeProfileDef(DatabaseIfc db, IfcTShapeProfileDef p) : base(db, p)
+		internal IfcTShapeProfileDef(DatabaseIfc db, IfcTShapeProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
 			mDepth = p.mDepth;
 			mFlangeWidth = p.mFlangeWidth;
@@ -1015,7 +1015,7 @@ namespace GeometryGym.Ifc
 		public IfcVector SecondRepeatFactor { get { return mDatabase[mSecondRepeatFactor] as IfcVector; } set { mSecondRepeatFactor = value.mIndex; } }
 
 		internal IfcTwoDirectionRepeatFactor() : base() { }
-		internal IfcTwoDirectionRepeatFactor(DatabaseIfc db, IfcTwoDirectionRepeatFactor f) : base(db,f) { SecondRepeatFactor = db.Factory.Duplicate(f.SecondRepeatFactor) as IfcVector; }
+		internal IfcTwoDirectionRepeatFactor(DatabaseIfc db, IfcTwoDirectionRepeatFactor f, DuplicateOptions options) : base(db, f, options) { SecondRepeatFactor = db.Factory.Duplicate(f.SecondRepeatFactor) as IfcVector; }
 	}
 	[Serializable]
 	public partial class IfcTypeObject : IfcObjectDefinition //(IfcTypeProcess, IfcTypeProduct, IfcTypeResource) IFC4 ABSTRACT 
@@ -1204,7 +1204,7 @@ namespace GeometryGym.Ifc
 		internal void IsolateObject(string filename, bool relatedObjects)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
-			IfcTypeObject typeObject = db.Factory.Duplicate(this, new DuplicateOptions() { DuplicateDownstream = true }) as IfcTypeObject;
+			IfcTypeObject typeObject = db.Factory.Duplicate(this, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = true }) as IfcTypeObject;
 			if (relatedObjects)
 			{
 				if (mObjectTypeOf != null)
@@ -1213,7 +1213,7 @@ namespace GeometryGym.Ifc
 						db.Factory.Duplicate(o);
 				}
 				if (HasContext != null)
-					(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
+					(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
 			}
 			else
 			{
@@ -1222,11 +1222,11 @@ namespace GeometryGym.Ifc
 					IfcContext context = mDatabase.Context;
 					if (db.Release > ReleaseVersion.IFC2x3)
 					{
-						IfcProjectLibrary library = new IfcProjectLibrary(db, context.Name) { LongName = context.LongName, GlobalId = context.GlobalId, UnitsInContext = db.Factory.Duplicate(context.UnitsInContext, new DuplicateOptions() { DuplicateDownstream = true }) as IfcUnitAssignment };
+						IfcProjectLibrary library = new IfcProjectLibrary(db, context.Name) { LongName = context.LongName, GlobalId = context.GlobalId, UnitsInContext = db.Factory.Duplicate(context.UnitsInContext, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = true }) as IfcUnitAssignment };
 						library.AddDeclared(typeObject);
 					}
 					else
-						(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions() { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
+						(db.Factory.Duplicate(mDatabase.Context, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = false }) as IfcContext).AddDeclared(typeObject);
 				}
 			}
 			IfcProject project = db.Project;
@@ -1346,7 +1346,7 @@ namespace GeometryGym.Ifc
 			typename = typename.Substring(0, typename.Length - 4);
 			IfcShapeRepresentation sr = new IfcShapeRepresentation(new IfcMappedItem(RepresentationMaps[0], db.Factory.XYPlaneTransformation));
 			IfcProductDefinitionShape pds = new IfcProductDefinitionShape(sr);
-			IfcElement element = IfcElement.ConstructElement(typename, host, new IfcLocalPlacement(host.ObjectPlacement, relativePlacement), pds);
+			IfcElement element = db.Factory.ConstructElement(typename, host, new IfcLocalPlacement(host.ObjectPlacement, relativePlacement), pds);
 			element.setRelatingType(this);
 			foreach (IfcRelNests nests in IsNestedBy)
 			{

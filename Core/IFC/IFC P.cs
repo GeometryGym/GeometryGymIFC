@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		}
 
 		protected IfcParameterizedProfileDef() : base() { }
-		protected IfcParameterizedProfileDef(DatabaseIfc db, IfcParameterizedProfileDef p) : base(db, p)
+		protected IfcParameterizedProfileDef(DatabaseIfc db, IfcParameterizedProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mPosition != null)
 				Position = db.Factory.Duplicate(p.Position) as IfcAxis2Placement2D;
@@ -70,7 +70,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcOrientedEdge> EdgeList { get { return new ReadOnlyCollection<IfcOrientedEdge>(mEdgeList.ConvertAll(x => mDatabase[x] as IfcOrientedEdge)); } }
 
 		internal IfcPath() : base() { }
-		internal IfcPath(DatabaseIfc db, IfcPath p) : base(db, p) { p.EdgeList.ToList().ForEach(x => addEdge(db.Factory.Duplicate(x) as IfcOrientedEdge)); }
+		internal IfcPath(DatabaseIfc db, IfcPath p, DuplicateOptions options) : base(db, p, options) { p.EdgeList.ToList().ForEach(x => addEdge(db.Factory.Duplicate(x) as IfcOrientedEdge)); }
 		public IfcPath(IfcOrientedEdge edge) : base(edge.mDatabase) { mEdgeList.Add(edge.mIndex); }
 		public IfcPath(List<IfcOrientedEdge> edges) : base(edges[0].mDatabase) { edges.ForEach(x => addEdge(x)); }
 		
@@ -107,7 +107,7 @@ namespace GeometryGym.Ifc
 		public IfcCurve ReferenceCurve { get { return mReferenceCurve; } set { mReferenceCurve = value; } }
 
 		internal IfcPcurve() : base() { }
-		internal IfcPcurve(DatabaseIfc db, IfcPcurve c) : base(db, c) { BasisSurface = db.Factory.Duplicate(c.BasisSurface) as IfcSurface; ReferenceCurve = db.Factory.Duplicate(c.ReferenceCurve) as IfcCurve; }
+		internal IfcPcurve(DatabaseIfc db, IfcPcurve c, DuplicateOptions options) : base(db, c, options) { BasisSurface = db.Factory.Duplicate(c.BasisSurface) as IfcSurface; ReferenceCurve = db.Factory.Duplicate(c.ReferenceCurve) as IfcCurve; }
 		public IfcPcurve(IfcSurface basisSurface, IfcCurve referenceCurve) : base(basisSurface.mDatabase) { BasisSurface = basisSurface; ReferenceCurve = referenceCurve; }
 	}
 	[Serializable]
@@ -450,7 +450,7 @@ namespace GeometryGym.Ifc
 		protected IfcPlacement() : base() { }
 		protected IfcPlacement(DatabaseIfc db) : base(db) { Location = db.Factory.Origin; }
 		protected IfcPlacement(IfcCartesianPoint location) : base(location.mDatabase) { Location = location; }
-		protected IfcPlacement(DatabaseIfc db, IfcPlacement p) : base(db, p) { Location = db.Factory.Duplicate(p.Location) as IfcCartesianPoint; }
+		protected IfcPlacement(DatabaseIfc db, IfcPlacement p, DuplicateOptions options) : base(db, p, options) { Location = db.Factory.Duplicate(p.Location) as IfcCartesianPoint; }
 
 		public virtual bool IsXYPlane { get { return Location.isOrigin; } }
 	}
@@ -461,7 +461,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement Placement { get { return mDatabase[mPlacement] as IfcAxis2Placement; } set { mPlacement = value.Index; } }
 
 		internal IfcPlanarBox() : base() { }
-		internal IfcPlanarBox(DatabaseIfc db, IfcPlanarBox b) : base(db, b) { Placement = db.Factory.Duplicate(b.mDatabase[b.mPlacement]) as IfcAxis2Placement; }
+		internal IfcPlanarBox(DatabaseIfc db, IfcPlanarBox b, DuplicateOptions options) : base(db, b, options) { Placement = db.Factory.Duplicate(b.mDatabase[b.mPlacement]) as IfcAxis2Placement; }
 	}
 	[Serializable]
 	public partial class IfcPlanarExtent : IfcGeometricRepresentationItem
@@ -472,13 +472,13 @@ namespace GeometryGym.Ifc
 		public double SizeInX { get { return mSizeInX; } set { mSizeInX = value; } }
 		public double SizeInY { get { return mSizeInY; } set { mSizeInY = value; } }
 		internal IfcPlanarExtent() : base() { }
-		internal IfcPlanarExtent(DatabaseIfc db, IfcPlanarExtent p) : base(db, p) { mSizeInX = p.mSizeInX; mSizeInY = p.mSizeInY; }
+		internal IfcPlanarExtent(DatabaseIfc db, IfcPlanarExtent p, DuplicateOptions options) : base(db, p, options) { mSizeInX = p.mSizeInX; mSizeInY = p.mSizeInY; }
 	}
 	[Serializable]
 	public partial class IfcPlane : IfcElementarySurface
 	{
 		internal IfcPlane() : base() { }
-		internal IfcPlane(DatabaseIfc db, IfcPlane p) : base(db, p) { }
+		internal IfcPlane(DatabaseIfc db, IfcPlane p, DuplicateOptions options) : base(db, p, options) { }
 		public IfcPlane(IfcAxis2Placement3D placement) : base(placement) { }
 	}
 	[Serializable]
@@ -523,7 +523,7 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcPoint() : base() { }
 		protected IfcPoint(DatabaseIfc db) : base(db) { }
-		protected IfcPoint(DatabaseIfc db, IfcPoint p) : base(db, p) { }
+		protected IfcPoint(DatabaseIfc db, IfcPoint p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	[Serializable]
 	public partial class IfcPointOnCurve : IfcPoint
@@ -535,9 +535,9 @@ namespace GeometryGym.Ifc
 		public double PointParameter { get { return mPointParameter; } set { mPointParameter = value; } }
 
 		internal IfcPointOnCurve() : base() { }
-		internal IfcPointOnCurve(DatabaseIfc db, IfcPointOnCurve p) : base(db, p)
+		internal IfcPointOnCurve(DatabaseIfc db, IfcPointOnCurve p, DuplicateOptions options) : base(db, p, options)
 		{
-			BasisCurve = db.Factory.Duplicate(p.BasisCurve) as IfcCurve;
+			BasisCurve = p.BasisCurve.Duplicate(db, options) as IfcCurve;
 			mPointParameter = p.mPointParameter;
 		}
 		public IfcPointOnCurve(DatabaseIfc m, IfcCurve c, double p) : base(m) { mBasisCurve = c.mIndex; mPointParameter = p; }
@@ -551,7 +551,7 @@ namespace GeometryGym.Ifc
 		public IfcSurface BasisSurface { get { return mDatabase[mBasisSurface] as IfcSurface; } set { mBasisSurface = value.mIndex; } }
 
 		internal IfcPointOnSurface() : base() { }
-		internal IfcPointOnSurface(DatabaseIfc db, IfcPointOnSurface p) : base(db, p)
+		internal IfcPointOnSurface(DatabaseIfc db, IfcPointOnSurface p, DuplicateOptions options) : base(db, p, options)
 		{
 			BasisSurface = db.Factory.Duplicate(p.BasisSurface) as IfcSurface;
 			mPointParameterU = p.mPointParameterU;
@@ -569,23 +569,22 @@ namespace GeometryGym.Ifc
 		public IfcBoundedCurve PolygonalBoundary { get { return mDatabase[mPolygonalBoundary] as IfcBoundedCurve; } set { mPolygonalBoundary = value.mIndex; } }
 
 		internal IfcPolygonalBoundedHalfSpace() : base() { }
-		internal IfcPolygonalBoundedHalfSpace(DatabaseIfc db, IfcPolygonalBoundedHalfSpace s) : base(db, s) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; PolygonalBoundary = db.Factory.Duplicate(s.PolygonalBoundary) as IfcBoundedCurve; }
+		internal IfcPolygonalBoundedHalfSpace(DatabaseIfc db, IfcPolygonalBoundedHalfSpace s, DuplicateOptions options) : base(db, s, options) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; PolygonalBoundary = db.Factory.Duplicate(s.PolygonalBoundary) as IfcBoundedCurve; }
 	}
 	[Serializable]
 	public partial class IfcPolygonalFaceSet : IfcTessellatedFaceSet //IFC4A2
 	{
-		internal bool mClosed; // 	OPTIONAL BOOLEAN;
+		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
 		internal LIST<IfcIndexedPolygonalFace> mFaces = new LIST<IfcIndexedPolygonalFace>(); // : LIST [1:?] OF IfcIndexedPolygonalFace;
 		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
-		public bool Closed { get { return mClosed; } set { mClosed = value; } }
+		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public LIST<IfcIndexedPolygonalFace> Faces { get { return mFaces; } }
 		public LIST<int> PnIndex { get { return mPnIndex; } }
 
 		internal IfcPolygonalFaceSet() : base() { }
-		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s) : base(db, s) { Faces.AddRange(s.Faces.Select(x => db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
-		public IfcPolygonalFaceSet(IfcCartesianPointList3D pl, bool closed, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { mClosed = closed; Faces.AddRange(faces); }
-
+		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s, DuplicateOptions options) : base(db, s, options) { Faces.AddRange(s.Faces.Select(x => db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
+		public IfcPolygonalFaceSet(IfcCartesianPointList3D pl, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { Faces.AddRange(faces); }
 
 	}
 	[Serializable]
@@ -599,7 +598,7 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcPolyline() : base() { }
-		internal IfcPolyline(DatabaseIfc db, IfcPolyline p) : base(db, p) { Points.AddRange(p.Points.ConvertAll(x => db.Factory.Duplicate(x) as IfcCartesianPoint)); }
+		internal IfcPolyline(DatabaseIfc db, IfcPolyline p, DuplicateOptions options) : base(db, p, options) { Points.AddRange(p.Points.ConvertAll(x => db.Factory.Duplicate(x) as IfcCartesianPoint)); }
 		public IfcPolyline(IfcCartesianPoint start, IfcCartesianPoint end) : base(start.mDatabase) { mPoints.Add(start); mPoints.Add(end); }
 		public IfcPolyline(IEnumerable<IfcCartesianPoint> pts) : base(pts.First().mDatabase) { Points.AddRange(pts); }
 		public IfcPolyline(DatabaseIfc db, IEnumerable<Tuple<double, double>> points) : base(db) { Points.AddRange(points.Select(x=> new IfcCartesianPoint(db, x.Item1, x.Item2))); }
@@ -612,7 +611,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } set { mPolygon = value; } }
 
 		internal IfcPolyLoop() : base() { }
-		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l) : base(db, l) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
+		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l, DuplicateOptions options) : base(db, l, options) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
 		public IfcPolyLoop(IEnumerable<IfcCartesianPoint> polygon) : base(polygon.First().mDatabase) { mPolygon.AddRange(polygon); }
 		public IfcPolyLoop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3) : base(cp1.mDatabase) { mPolygon.Add(cp1); mPolygon.Add(cp2); mPolygon.Add(cp3); }
 		public IfcPolyLoop(IfcCartesianPoint cp1, IfcCartesianPoint cp2, IfcCartesianPoint cp3, IfcCartesianPoint cp4) : this(cp1, cp2, cp3) { mPolygon.Add(cp4); }
@@ -1094,19 +1093,19 @@ namespace GeometryGym.Ifc
 		protected IfcProduct(DatabaseIfc db, IfcProduct p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mObjectPlacement != null)
-				ObjectPlacement = db.Factory.Duplicate(p.ObjectPlacement) as IfcObjectPlacement;
+				ObjectPlacement = p.mObjectPlacement.Duplicate(db);
 			if (p.mRepresentation != null)
-				Representation = db.Factory.Duplicate(p.Representation) as IfcProductDefinitionShape;
+				Representation = db.Factory.Duplicate(p.Representation, options) as IfcProductDefinitionShape;
 			foreach (IfcRelAssignsToProduct rap in p.mReferencedBy)
 			{
-				IfcRelAssignsToProduct rp = db.Factory.Duplicate(rap, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelAssignsToProduct;
+				IfcRelAssignsToProduct rp = db.Factory.Duplicate(rap, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelAssignsToProduct;
 				foreach (IfcObjectDefinition od in rap.RelatedObjects)
-					rp.RelatedObjects.Add(db.Factory.Duplicate(od, new DuplicateOptions() { DuplicateDownstream = false }) as IfcObjectDefinition);
+					rp.RelatedObjects.Add(db.Factory.Duplicate(od, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcObjectDefinition);
 				rp.RelatingProduct = this;
 			}
 			if (options.DuplicateHost && p.mContainedInStructure != null)
 			{
-				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelContainedInSpatialStructure;
+				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelContainedInSpatialStructure;
 				rcss.RelatedElements.Add(this);
 			}
 		}
@@ -1150,88 +1149,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
-		internal static IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
-		{
-			string str = className, definedType = "";
-			if (!string.IsNullOrEmpty(str))
-			{
-				string lower = str.ToLower();
-				if (host.mDatabase.Release < ReleaseVersion.IFC4)
-				{
-					if (lower.StartsWith("ifcshadingdevice"))
-						str = "IfcBuildingElementProxy.ShadingDevice";
-					if (lower.StartsWith("ifcgeographicelement"))
-						str = "IfcBuildingElementProxy.GeographicElement";
-					if (lower.StartsWith("ifccivilelement"))
-						str = "IfcBuildingElementProxy.CivilElement";
-				}
-				string[] fields = str.Split(".".ToCharArray());
-				if (fields.Length > 1)
-				{
-					str = fields[0];
-					definedType = fields[1];
-				}
-			}
-			IfcProduct product = null;
-			Type type = Type.GetType("GeometryGym.Ifc." + str);
-			if (type != null)
-			{
-				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) }, null);
-				if (ctor == null)
-				{
-					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) }, null);
-					if (ctor == null)
-						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
-					else
-						product = ctor.Invoke(new object[] { host, placement, representation, system }) as IfcProduct;
-				}
-				else
-					product = ctor.Invoke(new object[] { host, placement, representation }) as IfcProduct;
-			}
-			if (product == null)
-				return null;
-
-			if (!string.IsNullOrEmpty(definedType))
-			{
-				if (host.mDatabase.mRelease < ReleaseVersion.IFC4)
-					product.ObjectType = definedType;
-				else
-				{
-					type = product.GetType();
-					PropertyInfo pi = type.GetProperty("PredefinedType");
-					if (pi != null)
-					{
-						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-						if (enumType != null)
-						{
-							FieldInfo fi = enumType.GetField(definedType);
-							if (fi == null)
-							{
-								product.ObjectType = definedType;
-								fi = enumType.GetField("NOTDEFINED");
-							}
-							if (fi != null)
-							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
-								pi.SetValue(product, newEnumValue, null);
-							}
-							else
-								product.ObjectType = definedType;
-						}
-						else
-							product.ObjectType = definedType;
-					}
-					else
-						product.ObjectType = definedType;
-				}
-			}
-			return product;
-		}
-
 		public void AddElement(IfcProduct product)
 		{
 			product.detachFromHost();
@@ -1273,9 +1190,15 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public SET<IfcShapeAspect> HasShapeAspects { get { return mHasShapeAspects; } }
 
 		internal IfcProductDefinitionShape() : base() { }
+		private IfcProductDefinitionShape(IfcProductDefinitionShape shape) : base(shape.Representations) 
+		{ 
+			Name = shape.Name;
+			Description = shape.Description;
+		}
 		public IfcProductDefinitionShape(IfcShapeModel rep) : base(rep) { }
 		public IfcProductDefinitionShape(IEnumerable<IfcShapeModel> reps) : base(reps) { } 
-		internal IfcProductDefinitionShape(DatabaseIfc db, IfcProductDefinitionShape s) : base(db, s) { }
+		internal IfcProductDefinitionShape(DatabaseIfc db, IfcProductDefinitionShape s, DuplicateOptions options) : base(db, s, options) { }
+		internal IfcProductDefinitionShape Duplicate() { return new IfcProductDefinitionShape(this); }
 	}
 	[Serializable]
 	public abstract partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc, NamedObjectIfc where Representation : IfcRepresentation<RepresentationItem> where RepresentationItem : IfcRepresentationItem //IFC4 Abstract (IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape)); //IFC4 Abstract
@@ -1296,11 +1219,11 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		protected IfcProductRepresentation(DatabaseIfc db) : base(db) { }
 		protected IfcProductRepresentation(Representation r) : base(r.mDatabase) { mRepresentations.Add(r); }
 		protected IfcProductRepresentation(IEnumerable<Representation> reps) : base(reps.First().mDatabase) { Representations.AddRange(reps); }
-		internal IfcProductRepresentation(DatabaseIfc db, IfcProductRepresentation<Representation, RepresentationItem> r) : base(db, r)
+		internal IfcProductRepresentation(DatabaseIfc db, IfcProductRepresentation<Representation, RepresentationItem> r, DuplicateOptions options) : base(db, r)
 		{
 			mName = r.mName;
 			mDescription = r.mDescription;
-			Representations.AddRange(r.Representations.ToList().ConvertAll(x => db.Factory.Duplicate(x) as Representation));
+			Representations.AddRange(r.Representations.ToList().ConvertAll(x => db.Factory.Duplicate(x, options) as Representation));
 		}
 
 		protected override void initialize()
@@ -1370,12 +1293,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 		public SET<IfcProfileProperties> HasProperties { get { return mHasProperties; }  set { mHasProperties = value; } }
 
 		protected IfcProfileDef() : base() { }
-		protected IfcProfileDef(DatabaseIfc db, IfcProfileDef p) : base(db, p)
+		protected IfcProfileDef(DatabaseIfc db, IfcProfileDef p, DuplicateOptions options) : base(db, p)
 		{
 			mProfileType = p.mProfileType;
 			mProfileName = p.mProfileName;
 			foreach (IfcProfileProperties pp in p.mHasProperties)
-				(db.Factory.Duplicate(pp) as IfcProfileProperties).ProfileDefinition = this;
+				(db.Factory.Duplicate(pp, options) as IfcProfileProperties).ProfileDefinition = this;
 
 		}
 		public IfcProfileDef(DatabaseIfc db, string name) : base(db)
@@ -1503,12 +1426,12 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 			if (string.IsNullOrEmpty(Name))
 				Name = "UNKNOWN PROJECT";
 		}
-		private IfcProject(string projectNumber, IfcUnitAssignment units) : base(projectNumber, units)
+		internal IfcProject(DatabaseIfc db, string projectNumber, IfcUnitAssignment.Length length) : base(db, projectNumber, length)
 		{
 			if (string.IsNullOrEmpty(Name))
 				Name = "UNKNOWN PROJECT";
 		}
-		private IfcProject(DatabaseIfc db, string projectNumber, IfcUnitAssignment.Length length) : base(db, projectNumber, length)
+		private IfcProject(string projectNumber, IfcUnitAssignment units) : base(projectNumber, units)
 		{
 			if (string.IsNullOrEmpty(Name))
 				Name = "UNKNOWN PROJECT";
@@ -2369,7 +2292,7 @@ null, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(If
 
 			if (p.mContainedInStructure != null)
 			{
-				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, new DuplicateOptions() { DuplicateDownstream = false }) as IfcRelContainedInSpatialStructure;
+				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelContainedInSpatialStructure;
 				rcss.RelatedElements.Add(this);
 			}
 		}

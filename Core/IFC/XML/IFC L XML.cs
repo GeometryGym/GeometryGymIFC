@@ -159,7 +159,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Axis") == 0)
-					Axis = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+					Axis = mDatabase.ParseXml<IfcLinearAxisSelect>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)

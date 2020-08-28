@@ -278,7 +278,7 @@ namespace GeometryGym.Ifc
 		public double FlangeSlope { get { return mFlangeSlope; } set { mFlangeSlope = value; } }
 
 		internal IfcUShapeProfileDef() : base() { }
-		internal IfcUShapeProfileDef(DatabaseIfc db, IfcUShapeProfileDef p) : base(db, p)
+		internal IfcUShapeProfileDef(DatabaseIfc db, IfcUShapeProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
 			mDepth = p.mDepth;
 			mFlangeWidth = p.mFlangeWidth;

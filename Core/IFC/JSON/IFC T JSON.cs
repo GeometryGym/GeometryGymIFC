@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Coordinates"] = mDatabase[mCoordinates].getJson(this, options);
+			obj["Coordinates"] = Coordinates.getJson(this, options);
 			if (mHasColours != null)
 				obj["HasColours"] = mHasColours.getJson(this, options);
 			if (mHasTextures.Count > 0)

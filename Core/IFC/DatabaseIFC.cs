@@ -770,6 +770,124 @@ namespace GeometryGym.Ifc
 		internal GenerateOptions mOptions = new GenerateOptions();
 		public GenerateOptions Options { get { return mOptions; } }
 
+		internal IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+		{
+			return ConstructElement(className, host, placement, representation, null);
+		}
+		internal IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
+		{
+			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
+			if (element == null)
+				element = new IfcBuildingElementProxy(host, placement, representation);
+			return element;
+		}
+		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
+		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
+		{
+			string str = className, definedType = "";
+			if (!string.IsNullOrEmpty(str))
+			{
+				string lower = str.ToLower();
+				if (mDatabase.Release < ReleaseVersion.IFC4)
+				{
+					if (lower.StartsWith("ifcshadingdevice"))
+						str = "IfcBuildingElementProxy.ShadingDevice";
+					if (lower.StartsWith("ifcgeographicelement"))
+						str = "IfcBuildingElementProxy.GeographicElement";
+					if (lower.StartsWith("ifccivilelement"))
+						str = "IfcBuildingElementProxy.CivilElement";
+				}
+				string[] fields = str.Split(".".ToCharArray());
+				if (fields.Length > 1)
+				{
+					str = fields[0];
+					definedType = fields[1];
+				}
+			}
+			if (str.EndsWith("Type"))
+				str = str.Substring(0, str.Length - 4);
+			Type type = Type.GetType("GeometryGym.Ifc." + str, false, true);
+			if (type == null)
+				throw new Exception("XXX Unrecognized Ifc Type for " + className);
+
+			IfcProduct product = construct(type, host, placement, representation, system);
+			if (product == null)
+				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
+			if (!string.IsNullOrEmpty(definedType))
+			{
+				if (mDatabase.mRelease < ReleaseVersion.IFC4)
+					product.ObjectType = definedType;
+				else
+				{
+					type = product.GetType();
+					PropertyInfo pi = type.GetProperty("PredefinedType");
+					if (pi != null)
+					{
+						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
+						if (enumType != null)
+						{
+							FieldInfo fi = enumType.GetField(definedType);
+							if (fi == null)
+							{
+								product.ObjectType = definedType;
+								fi = enumType.GetField("NOTDEFINED");
+							}
+							if (fi != null)
+							{
+								int i = (int)fi.GetValue(enumType);
+								object newEnumValue = Enum.ToObject(enumType, i);
+								pi.SetValue(product, newEnumValue, null);
+							}
+							else
+								product.ObjectType = definedType;
+						}
+						else
+							product.ObjectType = definedType;
+					}
+					else
+						product.ObjectType = definedType;
+				}
+			}
+			return product;
+		}
+		private IfcProduct construct(Type type, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
+		{
+			if (host == null)
+			{
+				IfcProduct product = null;
+				ConstructorInfo constructor = getConstructor(type, new[] { typeof(DatabaseIfc) });
+				if(constructor == null)
+				{
+					constructor = getConstructor(type, new Type[] { });
+					if (constructor == null)
+						return null;
+					product = constructor.Invoke(new object[] { }) as IfcProduct;
+					mDatabase.appendObject(product);
+				}
+				else
+					product = constructor.Invoke(new object[] { mDatabase }) as IfcProduct;
+
+				product.ObjectPlacement = placement;
+				product.Representation = representation;
+				return product;
+			}
+			ConstructorInfo ctor = getConstructor(type, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) });
+			if (ctor == null)
+			{
+				ctor = getConstructor(type, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) });
+				if (ctor == null)
+					return null;
+				else
+					return ctor.Invoke(new object[] { host, placement, representation, system }) as IfcProduct;
+			}
+			else
+				return ctor.Invoke(new object[] { host, placement, representation }) as IfcProduct;
+		}
+		private ConstructorInfo getConstructor(Type type, Type[] arguments)
+		{
+			BindingFlags binding = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+			return type.GetConstructor(binding, null, arguments, null);
+		}
 		public BaseClassIfc Construct(string className)
 		{
 			BaseClassIfc result = BaseClassIfc.Construct(className);
@@ -781,7 +899,7 @@ namespace GeometryGym.Ifc
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
 		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
-		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions() { DuplicateDownstream = true }); }
+		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
 		public BaseClassIfc Duplicate(BaseClassIfc entity, DuplicateOptions options)
 		{
@@ -818,18 +936,19 @@ namespace GeometryGym.Ifc
 		{
 			if (type != null)
 			{
-				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };
+				Type[] types = new Type[] { typeof(DatabaseIfc), type, typeof(DuplicateOptions) };
 				ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
+				if (constructor != null)
+					return constructor.Invoke(new object[] { this.mDatabase, entity, options }) as BaseClassIfc;
+				types = new Type[] { typeof(DatabaseIfc), type, typeof(bool) };
+				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
 					return constructor.Invoke(new object[] { this.mDatabase, entity, options.DuplicateDownstream }) as BaseClassIfc;
 				types = new Type[] { typeof(DatabaseIfc), type };
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
 					return constructor.Invoke(new object[] { this.mDatabase, entity }) as BaseClassIfc;
-				types = new Type[] { typeof(DatabaseIfc), type, typeof(DuplicateOptions) };
-				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
-				if (constructor != null)
-					return constructor.Invoke(new object[] { this.mDatabase, entity, options }) as BaseClassIfc;
+			
 				//return Duplicate(entity, downStream);
 			}
 			return null;
@@ -847,7 +966,7 @@ namespace GeometryGym.Ifc
 				mDuplicateMapping.AddObject(property, result.StepId);
 				return result;
 			}
-			result = Duplicate(property, new DuplicateOptions() { DuplicateDownstream = true }) as IfcProperty;
+			result = Duplicate(property, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcProperty;
 			mProperties[stepString] = result;
 			return result;
 		}
@@ -856,7 +975,7 @@ namespace GeometryGym.Ifc
 			int index = mDuplicateMapping.FindExisting(propertySet);
 			if (index > 0)
 				return mDatabase[index] as IfcPropertySetDefinition;
-			IfcPropertySetDefinition result = Duplicate(propertySet, new DuplicateOptions() { DuplicateDownstream = true }) as IfcPropertySetDefinition, existing = null;
+			IfcPropertySetDefinition result = Duplicate(propertySet, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcPropertySetDefinition, existing = null;
 			string stepString = dictionaryKeyIgnoreId(result);
 			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
 			{
@@ -1705,13 +1824,20 @@ namespace GeometryGym.Ifc
 	{
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; } 
+		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; } 
 
-		public DuplicateOptions() { DuplicateHost = true;  DuplicateDownstream = true; }
+		public DuplicateOptions(double deviationTolerance) 
+		{
+			DeviationTolerance = deviationTolerance; 
+			DuplicateHost = true;  
+			DuplicateDownstream = true; 
+		}
 		public DuplicateOptions(DuplicateOptions options)
 		{
 			DuplicateHost = options.DuplicateHost;
 			DuplicateDownstream = options.DuplicateDownstream;
+			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
 		}
 	}
