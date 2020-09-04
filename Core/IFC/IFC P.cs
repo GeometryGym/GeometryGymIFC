@@ -1805,8 +1805,11 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet s, DuplicateOptions options) : base(db, s, options)
 		{
-			foreach(IfcProperty p in s.HasProperties.Values)
-				addProperty( db.Factory.Duplicate(p));
+			foreach (IfcProperty p in s.HasProperties.Values)
+			{
+				if(!options.IgnoredPropertyNames.Contains(p.Name))
+					addProperty(db.Factory.Duplicate(p));
+			}
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
@@ -1821,7 +1824,6 @@ namespace GeometryGym.Ifc
 		public IfcPropertySet(IfcPropertySetTemplate template, IEnumerable<IfcProperty> properties) : this(template.Name, properties)
 		{
 			Description = template.Description;
-
 		}
 		
 		protected override List<T> Extract<T>(Type type)

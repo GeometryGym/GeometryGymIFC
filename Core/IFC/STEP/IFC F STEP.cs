@@ -26,6 +26,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
+using System.Xml.Serialization;
 
 namespace GeometryGym.Ifc
 {
@@ -33,31 +34,28 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mBounds.Count == 0 ? ",()" : ",(#" + string.Join(",#", Bounds.ConvertAll(x=>x.mIndex)) + ")");
+			return base.BuildStringSTEP(release) + (mBounds.Count == 0 ? ",()" : ",(#" + string.Join(",#", Bounds.ConvertAll(x => x.mIndex)) + ")");
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Bounds.AddRange(ParserSTEP.StripListLink(str, ref pos, str.Length).ConvertAll(x=> dictionary[x] as IfcFaceBound));
+			Bounds.AddRange(ParserSTEP.StripListLink(str, ref pos, str.Length).ConvertAll(x => dictionary[x] as IfcFaceBound));
 		}
 	}
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mFbsmFaces[0]);
-			for (int icounter = 1; icounter < mFbsmFaces.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mFbsmFaces[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mFbsmFaces.Select(x => "#" + x.StepId)) + ")";
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mFbsmFaces = ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2));
+			mFbsmFaces.AddRange(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).Select(x => dictionary[x] as IfcConnectedFaceSet));
 		}
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBound.StepId + "," + ParserSTEP.BoolToString(mOrientation); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Bound = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLoop;
 			mOrientation = ParserSTEP.StripBool(str, ref pos, len);
@@ -66,7 +64,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcFaceSurface : IfcFace, IfcSurfaceOrFaceSurface //SUPERTYPE OF(IfcAdvancedFace)
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mFaceSurface.StepId + "," + ParserSTEP.BoolToString(mSameSense); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			FaceSurface = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurface;
@@ -86,7 +84,7 @@ namespace GeometryGym.Ifc
 			}
 			return str + ")";
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mVoids = ParserSTEP.StripListLink(str, ref pos, len);

@@ -78,15 +78,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
-		private List<int> mFbsmFaces = new List<int>();// : SET [1:?] OF IfcConnectedFaceSet;
-		public ReadOnlyCollection<IfcConnectedFaceSet> FbsmFaces { get { return new ReadOnlyCollection<IfcConnectedFaceSet>( mFbsmFaces.ConvertAll(x =>mDatabase[x] as IfcConnectedFaceSet)); } }
+		private SET<IfcConnectedFaceSet> mFbsmFaces = new SET<IfcConnectedFaceSet>();// : SET [1:?] OF IfcConnectedFaceSet;
+		public SET<IfcConnectedFaceSet> FbsmFaces { get { return mFbsmFaces; } }
 
 		internal IfcFaceBasedSurfaceModel() : base() { }
-		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s, DuplicateOptions options) : base(db, s, options) { s.FbsmFaces.ToList().ForEach(x => addFace( db.Factory.Duplicate(x) as IfcConnectedFaceSet)); }
-		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet faceSet) : base(faceSet.mDatabase) { mFbsmFaces.Add(faceSet.mIndex); }
-		public IfcFaceBasedSurfaceModel(IEnumerable<IfcConnectedFaceSet> faceSets) : base(faceSets.First().mDatabase) { mFbsmFaces.AddRange(faceSets.Select(x=>x.StepId)); }
-
-		internal void addFace(IfcConnectedFaceSet face) { mFbsmFaces.Add(face.mIndex); }
+		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s, DuplicateOptions options) : base(db, s, options) { FbsmFaces.AddRange(s.FbsmFaces.Select(x => db.Factory.Duplicate(x) as IfcConnectedFaceSet)); }
+		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet faceSet) : base(faceSet.mDatabase) { mFbsmFaces.Add(faceSet); }
+		public IfcFaceBasedSurfaceModel(IEnumerable<IfcConnectedFaceSet> faceSets) : base(faceSets.First().mDatabase) { mFbsmFaces.AddRange(faceSets); }
 	}
 	[Serializable]
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))

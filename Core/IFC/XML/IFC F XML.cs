@@ -71,7 +71,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcConnectedFaceSet f = mDatabase.ParseXml<IfcConnectedFaceSet>(cn as XmlElement);
 						if (f != null)
-							addFace(f);
+							mFbsmFaces.Add(f);
 					}
 				}
 			}

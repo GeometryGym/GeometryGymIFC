@@ -833,7 +833,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcTriangulatedIrregularNetwork : IfcTriangulatedFaceSet
 	{
 		internal List<int> mFlags = new List<int>(); // : LIST [1:?] OF IfcInteger;
-		public ReadOnlyCollection<int> Flags { get { return new ReadOnlyCollection<int>(mFlags); } }
+		public List<int> Flags { get { return mFlags; } }
 
 		internal IfcTriangulatedIrregularNetwork() : base() { }
 		internal IfcTriangulatedIrregularNetwork(DatabaseIfc db, IfcTriangulatedIrregularNetwork s, DuplicateOptions options) : base(db, s, options)
@@ -914,7 +914,7 @@ namespace GeometryGym.Ifc
 				}
 
 				// calc center
-				x = (aSlope * bSlope * (pt1[0] - pt3[1]) + bSlope * (pt1[0] + arcInteriorPoint.Item1)
+				x = (aSlope * bSlope * (pt1[1] - pt3[1]) + bSlope * (pt1[0] + arcInteriorPoint.Item1)
 					- aSlope * (arcInteriorPoint.Item1 + pt3[0])) / (2 * (bSlope - aSlope));
 				y = -1 * (x - (pt1[0] + arcInteriorPoint.Item1) / 2) / aSlope + (pt1[1] + arcInteriorPoint.Item2) / 2;
 			}
@@ -1035,7 +1035,16 @@ namespace GeometryGym.Ifc
 
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
 		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
-		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, DuplicateOptions options) : base(db, t, options) { mApplicableOccurrence = t.mApplicableOccurrence; HasPropertySets.AddRange(t.HasPropertySets.ConvertAll(x=> db.Factory.Duplicate(x) as IfcPropertySetDefinition)); }
+		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, DuplicateOptions options) : base(db, t, options) 
+		{ 
+			mApplicableOccurrence = t.mApplicableOccurrence; 
+			foreach(IfcPropertySetDefinition pset in t.HasPropertySets)
+			{
+				IfcPropertySetDefinition duplicatePset = db.Factory.DuplicatePropertySet(pset, options);
+				if (duplicatePset != null)
+					HasPropertySets.Add(duplicatePset);
+			}
+		}
 		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcTypeObject(DatabaseIfc db) : base(db) { Name = "NameNotAssigned"; IfcRelDefinesByType rdt = new IfcRelDefinesByType(this) { Name = Name }; }
 

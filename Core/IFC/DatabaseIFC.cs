@@ -17,18 +17,19 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Reflection;
 using System.IO;
-using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Globalization;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
+
 using GeometryGym.STEP;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
@@ -71,8 +72,8 @@ namespace GeometryGym.Ifc
 		public FactoryIfc Factory { get { return mFactory; } }
 
 		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
-		public DatabaseIfc(string fileName) : this() { ReadFile(fileName); }
-		public DatabaseIfc(TextReader stream) : this() { ReadFile(stream, 0); }
+		public DatabaseIfc(string fileName) : this() { new SerializationIfc(this).ReadFile(fileName); }
+		public DatabaseIfc(TextReader stream) : this() { new SerializationIfc(this).ReadFile(stream); }
 		public DatabaseIfc(ModelView view) : this(true, view) { }
 		public DatabaseIfc(DatabaseIfc db) : this() { mRelease = db.mRelease; mModelView = db.mModelView; Tolerance = db.Tolerance; }
 		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.Ifc2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4X2, view) { }
@@ -188,41 +189,9 @@ namespace GeometryGym.Ifc
 		internal IfcContext mContext = null;
 		
 		internal ConcurrentDictionary<string, BaseClassIfc> mDictionary = new ConcurrentDictionary<string, BaseClassIfc>();
-
 		
 		private string viewDefinition { get { return (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" : (mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned"))); } }
-		internal string getHeaderString(string fileName)
-		{
-			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + viewDefinition + "]'),'2;1');\r\n";
-
-			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
-			DateTime now = DateTime.Now;
-			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
-			IfcPerson person = Factory.Person;
-			hdr += "/* author */ ('" + person.Name + "'),\r\n";
-			string organizationName = Factory.Organization.Name;
-			if (organizationName == "UNKNOWN")
-				organizationName = IfcOrganization.Organization;
-			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
-			hdr += "/* preprocessor_version */ '" + mFactory.ToolkitName  + "',\r\n";
-			hdr += "/* originating_system */ '" + mFactory.ApplicationFullName + "',\r\n";
-			hdr += "/* authorization */ 'None');\r\n\r\n";
-			string version = "IFC4";
-			if (mRelease == ReleaseVersion.IFC2x3)
-				version = "IFC2X3";
-			else if (mRelease == ReleaseVersion.IFC4X1)
-				version = "IFC4X1";
-			else if (mRelease == ReleaseVersion.IFC4X2)
-				version = "IFC4X2";
-			else if (mRelease == ReleaseVersion.IFC4X3)
-				version = "IFC4X3RC1";
-			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
-			hdr += "ENDSEC;\r\n";
-			hdr += "\r\nDATA;";
-			return hdr;
-		}
-		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; } 
+		
 		public static DatabaseIfc ParseString(string str)
 		{
 			if (string.IsNullOrEmpty(str))
@@ -230,14 +199,14 @@ namespace GeometryGym.Ifc
 
 			DatabaseIfc db = new DatabaseIfc(false, ReleaseVersion.IFC4);
 #if (!NOIFCJSON)
-			if(str.StartsWith("{"))
+			if (str.StartsWith("{"))
 			{
 				Newtonsoft.Json.Linq.JObject jobj = Newtonsoft.Json.Linq.JObject.Parse(str);
 				if (str != null)
 					db.ReadJSON(jobj);
 			}
 #endif
-			if(str.StartsWith("<"))
+			if (str.StartsWith("<"))
 			{
 				System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
 				doc.LoadXml(str);
@@ -245,409 +214,15 @@ namespace GeometryGym.Ifc
 			}
 			return db;
 		}
-	
-		internal class FileStreamIfc
-		{
-			internal FormatIfcSerialization mFormat;
-			internal TextReader mTextReader;
-			internal FileStreamIfc(FormatIfcSerialization format, TextReader sr)
-			{
-				mFormat = format;
-				mTextReader = sr;
-			} 
-		}
-		private FormatIfcSerialization detectFormat(string fileName)
-		{
-			string lower = fileName.ToLower();
-			if (lower.EndsWith("xml"))
-				return FormatIfcSerialization.XML;
-#if (!NOIFCJSON)
-			if (lower.EndsWith("json"))
-				return FormatIfcSerialization.JSON;
-#endif
-			return FormatIfcSerialization.STEP;
-		}
-		internal FileStreamIfc getStreamReader(string fileName)
-		{
-			string ext = Path.GetExtension(fileName);
-			FileName = fileName;
-			FolderPath = Path.GetDirectoryName(fileName);
-#if (!NOIFCZIP)
-			if (fileName.ToLower().EndsWith("zip"))
-			{
-				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
-				if (za.Entries.Count != 1)
-				{
-					return null;
-				}
-				string filename = za.Entries[0].Name.ToLower();
-				FormatIfcSerialization fformat = detectFormat(filename);
-				StreamReader str = (fformat == FormatIfcSerialization.STEP ? new StreamReader(za.Entries[0].Open(), Encoding.GetEncoding("windows-1252")) :
-					new StreamReader(za.Entries[0].Open()));
-				return new FileStreamIfc(fformat,str);
-			}
-#endif
-			FormatIfcSerialization format = detectFormat(fileName);
-			StreamReader sr = format == FormatIfcSerialization.STEP ? new StreamReader(fileName, Encoding.GetEncoding("windows-1252")) :
-				new StreamReader(fileName);
-			return new FileStreamIfc(format, sr);
-		}
 
-		internal void ReadFile(string filename)
+		internal void postImport()
 		{
-			if (string.IsNullOrEmpty(filename))
-				return;
-
-			FolderPath = Path.GetDirectoryName(filename);
-			if(filename.ToLower().EndsWith("ifc"))
-				importLines(File.ReadAllLines(filename));
-			else
-				ReadFile(getStreamReader(filename));
-		}
-		internal void ReadFile(FileStreamIfc fs)
-		{
-			if (fs == null)
-				return;
-			CultureInfo current = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
-			switch (fs.mFormat)
+			IfcContext context = Context;
+			if (context != null)
 			{
-				case FormatIfcSerialization.XML:
-					ReadXMLStream(fs.mTextReader);
-					break;
-#if (!NOIFCJSON)
-				case FormatIfcSerialization.JSON:
-					ReadJSONFile(fs.mTextReader);
-					break;
-#endif
-				default:
-					ReadFile(fs.mTextReader, 0);
-					break;
+				context.initializeUnitsAndScales();
+				Factory.IdentifyContexts(context.RepresentationContexts);
 			}
-			Thread.CurrentThread.CurrentCulture = current;
-		}
-
-		private IfcContext ReadFile(TextReader sr, int offset)
-		{
-			int i = sr.Peek();
-			if (i < 0)
-				return null;
-#if (!NOIFCJSON)
-			if (i == (int)'{')
-			{
-				ReadFile(new FileStreamIfc(FormatIfcSerialization.JSON, sr));
-				return mContext;
-			}
-#endif
-			if (i == (int)'<')
-			{
-				ReadFile(new FileStreamIfc(FormatIfcSerialization.XML, sr));
-				return mContext;
-			}
-			else
-			{
-				List<string> lines = new List<string>();
-				string strLine = sr.ReadLine();
-				if (strLine == null)
-					return null;
-				while (strLine != null)
-				{
-					lines.Add(strLine);
-					strLine = sr.ReadLine();
-				}
-			
-				if (offset > 0)
-				{
-					int count = lines.Count; 
-					for(int icounter = 0; icounter< count; icounter++)
-						 lines[icounter] = ParserSTEP.offsetSTEPRecords(lines[icounter], offset);
-				}
-				sr.Close();
-				importLines(lines);
-				return mContext;
-			}
-			
-		}
-		private class ConstructorClass
-		{
-			internal BaseClassIfc Object { get; }
-			internal string DefinitionString { get; }
-			internal ConstructorClass(BaseClassIfc obj, string definition) { Object = obj; DefinitionString = definition; }
-		}
-		internal void importLines(IEnumerable<string> lines)
-		{
-			mRelease = ReleaseVersion.IFC2x3;
-			bool ownerHistory = mFactory.Options.GenerateOwnerHistory;
-			mFactory.Options.GenerateOwnerHistory = false;
-			CultureInfo current = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
-			HashSet<string> toIgnore = new HashSet<string>() { "ISO-10303-21;", "HEADER;", "ENDSEC;", "DATA;", "END-ISO-10303-21;" };
-			
-			List<string> revised = new List<string>();
-			int count = lines.Count();
-			for(int icounter = 0; icounter < count; icounter++)
-			{
-				string strLine = lines.ElementAt(icounter);
-				if (string.IsNullOrEmpty(strLine) || (strLine.Length < 20 && toIgnore.Contains(strLine.ToUpper())))
-					continue;
-				
-				if(!strLine.EndsWith(";"))
-				{
-					int index = strLine.IndexOf("/*");
-					if (index >= 0)
-					{
-						string str2 = "", str3 = strLine;
-						if (index > 0)
-							str2 = strLine.Substring(0, index);
-						int index2 = str3.IndexOf("*/");
-						while (index2 < 0)
-						{
-							if (icounter + 1 < count)
-							{
-								str3 = lines.ElementAt(++icounter);
-								if (string.IsNullOrEmpty(str3))
-									continue;
-								index2 = str3.IndexOf("*/");
-							}
-							else
-								break;
-						}
-						strLine = str2;
-						if (strLine != null && index2 + 2 < str3.Length)
-							strLine += str3.Substring(index2 + 2);
-					}
-					strLine = strLine.Trim();
-					if (string.IsNullOrEmpty(strLine))
-						continue;
-					if (!strLine.EndsWith(");"))
-					{
-						while(icounter+1 < count)
-						{
-							string str = lines.ElementAt(++icounter);
-							if (!string.IsNullOrEmpty(str))
-							{
-								index = str.IndexOf("/*");
-								if (index >= 0)
-								{
-									string str2 = "", str3 = str;
-									if (index > 0)
-										str2 = str3.Substring(0, index);
-									int index2 = str3.IndexOf("*/");
-									while (index2 < 0)
-									{
-										if (icounter + 1 >= count)
-											break;
-										str3 = lines.ElementAt(++icounter);
-										while (string.IsNullOrEmpty(str3))
-										{
-											if (icounter + 1 >= count)
-												break;
-											str3 = lines.ElementAt(++icounter);
-										}
-										index2 = str3.IndexOf("*/");
-									}
-									str = str2;
-									if (!string.IsNullOrEmpty(str3) && index2 + 2 < str3.Length)
-										str += str3.Substring(index2 + 2);
-								}
-								strLine += str;
-								strLine.Trim();
-							}
-							if (strLine.EndsWith(";")) //);
-								break;
-						}
-					}
-				}
-				char c = char.ToUpper(strLine[0]);
-				if (c == 'F')
-				{
-					setFileLine(strLine);
-					continue;
-				}
-				if (c == 'E' || c == 'H')
-					continue;
-				revised.Add(strLine);
-			}
-
-			ConcurrentDictionary<int, BaseClassIfc> dictionary = new ConcurrentDictionary<int, BaseClassIfc>();
-			dictionary[0] = null;
-#if (MULTITHREAD)
-			ConcurrentBag<ConstructorClass> bag = new ConcurrentBag<ConstructorClass>();
-#else
-			List<ConstructorClass> bag = new List<ConstructorClass>();
-#endif
-			foreach(string str in revised)
-			{
-				int ifcID = 0;
-				string kw = "", def  = "";
-				ParserSTEP.GetKeyWord(str, out ifcID, out kw, out def);
-				if(!string.IsNullOrEmpty(kw))
-				{
-					try
-					{
-						BaseClassIfc obj = BaseClassIfc.Construct(kw);
-						if (obj != null)
-						{
-							dictionary[ifcID] = obj;
-							bag.Add(new ConstructorClass(obj, def));
-							this[ifcID] = obj;
-						}
-					}
-					catch (Exception) { }
-				}
-			}
-			ReleaseVersion release = Release;
-#if (qsMULTITHREAD)
-			//properties and materialConstituents
-			ConcurrentBag<string> errors = new ConcurrentBag<string>();
-			Parallel.ForEach(bag, new ParallelOptions { MaxDegreeOfParallelism = 4 }, obj =>
-			{
-				try
-				{
-					int pos = 0;
-					string def = obj.DefinitionString;
-					obj.Object.parse(def, ref pos,release, def.Length, dictionary);
-				}
-				catch (Exception x) { errors.Add("XXX Error in line #" + obj.Object.Index + " " + obj.Object.KeyWord + " " + x.Message); }
-			});
-
-			foreach (string error in errors)
-				logError(error);
-#else
-			List<ConstructorClass> secondPass = new List<ConstructorClass>();
-			foreach (ConstructorClass obj in bag)
-			{
-				try
-				{
-					int pos = 0;
-					string def = obj.DefinitionString;
-					if (obj.Object is IfcPropertySet || obj.Object is IfcMaterialConstituentSet)
-						secondPass.Add(obj);
-					else
-						obj.Object.parse(def, ref pos, release, def.Length, dictionary);
-				}
-				catch (Exception x) { logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
-			}
-			foreach(ConstructorClass obj in secondPass)
-			{
-				try
-				{
-					int pos = 0;
-					string def = obj.DefinitionString;
-					obj.Object.parse(def, ref pos, release, def.Length, dictionary);
-				}
-				catch (Exception x) { logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
-			}
-#endif
-			Thread.CurrentThread.CurrentCulture = current;
-			postParseRelate();
-			postImport();
-			Factory.Options.GenerateOwnerHistory = ownerHistory;
-		}
-		internal bool setFileLine(string line)
-		{
-			string ts = line.Trim().Replace(" ", "");
-			if (ts.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
-					ts.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
-			{
-				if(ts.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
-					mRelease = ReleaseVersion.IFC4X1;
-				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
-					mRelease = ReleaseVersion.IFC4X2;
-				else if(ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
-					mRelease = ReleaseVersion.IFC4X3;
-				else
-					mRelease = ReleaseVersion.IFC4;
-				if (mModelView == ModelView.Ifc2x3Coordination || mModelView == ModelView.Ifc2x3NotAssigned)
-					mModelView = ModelView.Ifc4NotAssigned;
-				return true;
-			}
-			if (ts.StartsWith("FILE_DESCRIPTION", true, System.Globalization.CultureInfo.CurrentCulture))
-			{
-				return true;
-			}
-			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
-			{
-				if (ts.Length > 12)
-				{
-					List<string> fields = ParserSTEP.SplitLineFields(ts.Substring(10, ts.Length - 12));
-					PreviousApplication = fields.Count > 6 ? fields[5].Replace("'", "") : "";
-				}
-				return true;
-			}
-			return false;
-		}
-		//partial void customPostImport();
-		private void postParseRelate()
-		{
-			foreach (BaseClassIfc e in this)
-			{
-				try
-				{
-					e.postParseRelate();
-				}
-				catch (Exception) { }
-			}
-		}
-		private void postImport() 
-		{
-			if (mContext != null)
-			{
-				mContext.initializeUnitsAndScales();
-				mFactory.IdentifyContexts(mContext.RepresentationContexts);
-			}
-			//	customPostImport();
-		}
-		internal BaseClassIfc interpretLine(string line, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			BaseClassIfc result = ParserIfc.ParseLine(line, mRelease, dictionary);
-			if (result == null)
-			{
-				if (line.StartsWith("ISO"))
-					return null;
-				if (setFileLine(line))
-					return null;
-				int ifcID = 0;
-				string kw = "", str = "";
-				ParserSTEP.GetKeyWord(line, out ifcID, out kw, out str);
-				if (string.IsNullOrEmpty(kw) || !kw.ToLower().StartsWith("ifc"))
-					return null;
-
-				return null;
-			}
-			IfcApplication application = result as IfcApplication;
-			if (application != null)
-			{
-				IfcApplication ea = mFactory.mApplication;
-				if (ea != null && ea.mVersion == application.mVersion)
-				{
-					if (string.Compare(ea.ApplicationFullName, application.ApplicationFullName, true) == 0)
-					{
-						if (string.Compare(ea.mApplicationIdentifier, application.mApplicationIdentifier) == 0)
-						{
-							this[ea.mIndex] = null;
-							mFactory.mApplication = application;
-						}
-					}
-				}
-			}
-			
-			IfcGeometricRepresentationContext geometricRepresentationContext = result as IfcGeometricRepresentationContext;
-			if (geometricRepresentationContext != null)
-				Tolerance = geometricRepresentationContext.mPrecision;
-			IfcSIUnit unit = result as IfcSIUnit;
-			if (unit != null)
-			{
-				if (unit.Name == IfcSIUnitName.METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mFactory.mSILength = unit;
-				else if (unit.Name == IfcSIUnitName.SQUARE_METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mFactory.mSIArea = unit;
-				else if (unit.Name == IfcSIUnitName.CUBIC_METRE && unit.Prefix == IfcSIPrefix.NONE)
-					mFactory.mSIVolume = unit;
-			}
-			return result;
 		}
 
 		public bool WriteFile(string filename)
@@ -692,34 +267,8 @@ namespace GeometryGym.Ifc
 			if (zip)
 				za.Dispose();
 #endif
-			return WriteSTEP(sw, FileName);
+			return new SerializationIfcSTEP(this).WriteSTEP(sw, FileName);
 		}
-		public bool WriteSTEP(TextWriter sw, string filename)
-		{
-			FileName = filename;
-			CultureInfo current = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-			sw.Write(getHeaderString(filename) + "\r\n");
-			foreach(BaseClassIfc e in this)
-			{
-				if (e != null)
-				{
-					try
-					{
-						string str = e.StringSTEP();
-						if (!string.IsNullOrEmpty(str))
-							sw.WriteLine(str);
-					}
-					catch(Exception) { }
-				}
-			}
-			sw.Write(getFooterString());
-			sw.Close();
-			Thread.CurrentThread.CurrentUICulture = current;
-
-			return true;
-		}
-
 		public string ToString(FormatIfcSerialization format)
 		{
 			if(format == FormatIfcSerialization.XML)
@@ -729,7 +278,7 @@ namespace GeometryGym.Ifc
 				return JSON().ToString();
 #endif
 			StringWriter stringWriter = new StringWriter();
-			if (WriteSTEP(stringWriter, FileName))
+			if (new SerializationIfcSTEP(this).WriteSTEP(stringWriter, FileName))
 				return stringWriter.ToString();
 			return null;
 		}
@@ -970,12 +519,30 @@ namespace GeometryGym.Ifc
 			mProperties[stepString] = result;
 			return result;
 		}
-		internal IfcPropertySetDefinition Duplicate(IfcPropertySetDefinition propertySet)
+		internal IfcPropertySetDefinition DuplicatePropertySet(IfcPropertySetDefinition propertySet, DuplicateOptions options)
 		{
 			int index = mDuplicateMapping.FindExisting(propertySet);
 			if (index > 0)
 				return mDatabase[index] as IfcPropertySetDefinition;
-			IfcPropertySetDefinition result = Duplicate(propertySet, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcPropertySetDefinition, existing = null;
+			if(options.IgnoredPropertyNames.Count > 0)
+			{
+				IfcPropertySet pset = propertySet as IfcPropertySet;
+				if(pset != null)
+				{
+					bool ignored = true;
+					foreach (IfcProperty property in pset.HasProperties.Values)
+					{
+						if (!options.IgnoredPropertyNames.Contains(property.Name))
+						{
+							ignored = false;
+							break;
+						}
+					}
+					if (ignored)
+						return null;
+				}
+			}
+			IfcPropertySetDefinition result = Duplicate(propertySet, options) as IfcPropertySetDefinition, existing = null;
 			string stepString = dictionaryKeyIgnoreId(result);
 			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
 			{
@@ -1825,7 +1392,9 @@ namespace GeometryGym.Ifc
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; } 
 		public double DeviationTolerance { get; set; }
-		public IfcOwnerHistory OwnerHistory { get; set; } 
+		public IfcOwnerHistory OwnerHistory { get; set; }
+
+		public HashSet<string> IgnoredPropertyNames = new HashSet<string>();
 
 		public DuplicateOptions(double deviationTolerance) 
 		{
@@ -1913,6 +1482,578 @@ namespace GeometryGym.Ifc
 			}
 			return false;
 		}
+
+	}
+
+	internal class SerializationIfc
+	{
+		protected DatabaseIfc mDatabase = null;
+		protected CultureInfo mCachedCulture = null;
+		private bool mCachedOwnerHistoryOption = false;
+
+		internal SerializationIfc(DatabaseIfc db)
+		{
+			mDatabase = db;
+		}
+
+		internal class FileStreamIfc
+		{
+			internal FormatIfcSerialization mFormat;
+			internal TextReader mTextReader;
+			internal FileStreamIfc(FormatIfcSerialization format, TextReader sr)
+			{
+				mFormat = format;
+				mTextReader = sr;
+			}
+		}
+		private FormatIfcSerialization detectFormat(string fileName)
+		{
+			string lower = fileName.ToLower();
+			if (lower.EndsWith("xml"))
+				return FormatIfcSerialization.XML;
+#if (!NOIFCJSON)
+			if (lower.EndsWith("json"))
+				return FormatIfcSerialization.JSON;
+#endif
+			return FormatIfcSerialization.STEP;
+		}
+		internal FileStreamIfc getStreamReader(string fileName)
+		{
+			string ext = Path.GetExtension(fileName);
+			mDatabase.FileName = fileName;
+			mDatabase.FolderPath = Path.GetDirectoryName(fileName);
+#if (!NOIFCZIP)
+			if (fileName.ToLower().EndsWith("zip"))
+			{
+				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
+				if (za.Entries.Count != 1)
+				{
+					return null;
+				}
+				string filename = za.Entries[0].Name.ToLower();
+				FormatIfcSerialization fformat = detectFormat(filename);
+				StreamReader str = (fformat == FormatIfcSerialization.STEP ? new StreamReader(za.Entries[0].Open(), Encoding.GetEncoding("windows-1252")) :
+					new StreamReader(za.Entries[0].Open()));
+				return new FileStreamIfc(fformat, str);
+			}
+#endif
+			FormatIfcSerialization format = detectFormat(fileName);
+			StreamReader sr = format == FormatIfcSerialization.STEP ? new StreamReader(fileName, Encoding.GetEncoding("windows-1252")) :
+				new StreamReader(fileName);
+			return new FileStreamIfc(format, sr);
+		}
+
+		internal void ReadFile(string filename)
+		{
+			if (string.IsNullOrEmpty(filename))
+				return;
+
+			mDatabase.FolderPath = Path.GetDirectoryName(filename);
+			if (filename.ToLower().EndsWith("ifc"))
+				new SerializationIfcSTEP(mDatabase).ReadStepFile(filename);
+			else
+				ReadFile(getStreamReader(filename));
+		}
+		internal void ReadFile(FileStreamIfc fs)
+		{
+			if (fs == null)
+				return;
+
+			switch (fs.mFormat)
+			{
+				case FormatIfcSerialization.XML:
+					initializeImport();
+					mDatabase.ReadXMLStream(fs.mTextReader);
+					finalizeImport();
+					break;
+#if (!NOIFCJSON)
+				case FormatIfcSerialization.JSON:
+					initializeImport();
+					mDatabase.ReadJSONFile(fs.mTextReader);
+					finalizeImport();
+					break;
+#endif
+				default:
+					ReadFile(fs.mTextReader);
+					break;
+			}
+		}
+
+		internal IfcContext ReadFile(TextReader sr)
+		{
+			int i = sr.Peek();
+			if (i < 0)
+				return null;
+#if (!NOIFCJSON)
+			if (i == (int)'{')
+			{
+				ReadFile(new FileStreamIfc(FormatIfcSerialization.JSON, sr));
+				return mDatabase.Context;
+			}
+#endif
+			if (i == (int)'<')
+			{
+				ReadFile(new FileStreamIfc(FormatIfcSerialization.XML, sr));
+				return mDatabase.Context;
+			}
+			new SerializationIfcSTEP(mDatabase).ReadStepStrem(sr);
+			return mDatabase.Context;
+
+		}
+		protected void initializeImport()
+		{
+			mDatabase.Release = ReleaseVersion.IFC2x3;
+			mCachedOwnerHistoryOption = mDatabase.Factory.Options.GenerateOwnerHistory;
+			mDatabase.Factory.Options.GenerateOwnerHistory = false;
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+		}
+		protected void finalizeImport()
+		{
+			Thread.CurrentThread.CurrentCulture = mCachedCulture;
+			postParseRelate();
+			mDatabase.postImport();
+			mDatabase.Factory.Options.GenerateOwnerHistory = mCachedOwnerHistoryOption;
+		}
+		private void postParseRelate()
+		{
+			foreach (BaseClassIfc e in mDatabase)
+			{
+				try
+				{
+					e.postParseRelate();
+				}
+				catch (Exception) { }
+			}
+		}
+	}
+
+	internal partial class SerializationIfcSTEP : SerializationIfc
+	{
+		private BlockingCollection<string> mDataLines = new BlockingCollection<string>();
+		private ConcurrentBag<ConstructorClass> mConstructorsBag = new ConcurrentBag<ConstructorClass>();
+		private ConcurrentBag<ConstructorClass> mPrimitiveConstructors = new ConcurrentBag<ConstructorClass>();
+		private ConcurrentDictionary<int, BaseClassIfc> mDictionary = new ConcurrentDictionary<int, BaseClassIfc>();
+
+		CancellationTokenSource mCancellationTokenSource = new CancellationTokenSource();
+
+		private class ConstructorClass
+		{
+			internal BaseClassIfc Object { get; }
+			private string DefinitionString { get; }
+			internal ConstructorClass(BaseClassIfc obj, string definition) { Object = obj; DefinitionString = definition; }
+	
+			internal void ParseDefinition(ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+			{
+				int pos = 0;
+				Object.parse(DefinitionString, ref pos, release, DefinitionString.Length, dictionary);
+			}
+		}
+
+		protected Dictionary<string,string> mLinesToIgnore = new Dictionary<string, string>() {
+			{ "ISO-10303-21;", "ISO-10303-21;" },
+			{ "HEADER;", "HEADER" },
+			{ "ENDSEC;", "ENDSEC;" },
+			{ "DATA;", "DATA;" },
+			{ "END-ISO-10303-21;", "END-ISO-10303-21;" } };
+
+		internal SerializationIfcSTEP(DatabaseIfc db) : base(db) 
+		{
+			mDictionary[0] = null;
+		}
+
+		public void ReadStepFile(string stepFilePath)
+		{
+			initializeImport();
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading File");
+			using (StreamReader reader = new StreamReader(stepFilePath))
+			{
+				string line = "";
+				while((line = reader.ReadLine()) != null)
+				{
+					string str = line.Trim();
+					if (str.ToUpper().StartsWith("DATA"))
+						break;
+					processFileHeaderLine(str);
+				}
+			}
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading Data");
+
+			ParallelOptions parallelOptions = new ParallelOptions();
+			parallelOptions.CancellationToken = mCancellationTokenSource.Token;
+			parallelOptions.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+
+			try
+			{
+				Parallel.ForEach(File.ReadAllLines(stepFilePath), parallelOptions, x =>
+				{
+					processDataLine(x);
+					parallelOptions.CancellationToken.ThrowIfCancellationRequested();
+				});
+			}
+			catch (OperationCanceledException)
+			{
+				importLines(File.ReadAllLines(stepFilePath));
+				return;
+			}
+			processObjects();
+		}
+		public void ReadStepStrem(TextReader stream)
+		{
+			initializeImport();
+			string line = "";
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading File");
+			while ((line = stream.ReadLine()) != null)
+			{
+				string str = line.Trim();
+				if (line.ToUpper().StartsWith("DATA"))
+					break;
+				processFileHeaderLine(str);
+			}
+
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading Data");
+			List<string> lines = new List<string>();
+			while ((line = stream.ReadLine()) != null)
+			{
+				string str = line.Trim();
+				if (line.ToUpper().StartsWith("ENDSEC"))
+					break;
+				lines.Add(line);
+			}
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed Reading Data Lines");
+			Parallel.ForEach(lines, x => processDataLine(x));
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed Process Data Lines");
+		
+			processObjects();
+		}
+
+		internal void importLines(IEnumerable<string> lines)
+		{
+			initializeImport();
+			mPrimitiveConstructors = new ConcurrentBag<ConstructorClass>();
+			List<string> revised = new List<string>();
+			int count = lines.Count();
+			for (int icounter = 0; icounter < count; icounter++)
+			{
+				string strLine = lines.ElementAt(icounter);
+				if (string.IsNullOrEmpty(strLine) || (strLine.Length < 20 && mLinesToIgnore.ContainsKey(strLine.ToUpper())))
+					continue;
+				strLine = strLine.Trim();
+				if (!strLine.EndsWith(";"))
+				{
+					int index = strLine.IndexOf("/*");
+					if (index >= 0)
+					{
+						string str2 = "", str3 = strLine;
+						if (index > 0)
+							str2 = strLine.Substring(0, index);
+						int index2 = str3.IndexOf("*/");
+						while (index2 < 0)
+						{
+							if (icounter + 1 < count)
+							{
+								str3 = lines.ElementAt(++icounter);
+								if (string.IsNullOrEmpty(str3))
+									continue;
+								index2 = str3.IndexOf("*/");
+							}
+							else
+								break;
+						}
+						strLine = str2;
+						if (strLine != null && index2 + 2 < str3.Length)
+							strLine += str3.Substring(index2 + 2);
+					}
+					strLine = strLine.Trim();
+					if (string.IsNullOrEmpty(strLine))
+						continue;
+					if (!strLine.EndsWith(");"))
+					{
+						while (icounter + 1 < count)
+						{
+							string str = lines.ElementAt(++icounter);
+							if (!string.IsNullOrEmpty(str))
+							{
+								index = str.IndexOf("/*");
+								if (index >= 0)
+								{
+									string str2 = "", str3 = str;
+									if (index > 0)
+										str2 = str3.Substring(0, index);
+									int index2 = str3.IndexOf("*/");
+									while (index2 < 0)
+									{
+										if (icounter + 1 >= count)
+											break;
+										str3 = lines.ElementAt(++icounter);
+										while (string.IsNullOrEmpty(str3))
+										{
+											if (icounter + 1 >= count)
+												break;
+											str3 = lines.ElementAt(++icounter);
+										}
+										index2 = str3.IndexOf("*/");
+									}
+									str = str2;
+									if (!string.IsNullOrEmpty(str3) && index2 + 2 < str3.Length)
+										str += str3.Substring(index2 + 2);
+								}
+								strLine += str;
+								strLine.Trim();
+							}
+							if (strLine.EndsWith(";")) //);
+								break;
+						}
+					}
+				}
+				if (isDataLineOrProcessFileLine(strLine))
+					revised.Add(strLine);
+			}
+
+			Parallel.ForEach(revised, x => processDataLine(x));
+			processObjects();
+		}
+
+		private void processObjects()
+		{
+			ReleaseVersion release = mDatabase.Release;
+
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Processing Objects");
+			Task taskPrimitive = Task.Run(() =>
+			{
+				Parallel.ForEach(mPrimitiveConstructors, x => x.ParseDefinition(release, mDictionary));
+				Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed Primitive Constructors");
+			});
+		
+			foreach (KeyValuePair<int, BaseClassIfc> pair in mDictionary)
+				mDatabase[pair.Key] = pair.Value;
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed set database");
+
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Processing Constructors");
+			List<ConstructorClass> threadSafeConstructors = new List<ConstructorClass>();
+			List<ConstructorClass> firstPass = new List<ConstructorClass>();
+			List<ConstructorClass> secondPass = new List<ConstructorClass>();
+			foreach (ConstructorClass obj in mConstructorsBag)
+			{
+				try
+				{
+					BaseClassIfc o = obj.Object;
+					if (o is IfcPropertySet || o is IfcMaterialConstituentSet)
+						secondPass.Add(obj);
+					else if (o is IfcTessellatedFaceSet || o is IfcPolyLoop || o is IfcFacetedBrep)
+						threadSafeConstructors.Add(obj);
+					else
+						firstPass.Add(obj);
+				}
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+			}
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Executing Constructors");
+			Task taskThreadSafe = Task.Run(() =>
+			{
+				Parallel.ForEach(threadSafeConstructors, x => x.ParseDefinition(release, mDictionary));
+				Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed ThreadSafe");
+			});
+			
+			foreach(ConstructorClass obj in firstPass)
+			{
+				try
+				{
+					parseDefinition(obj, release);
+				}
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+			}
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed FirstPass");
+			firstPass.Clear();
+			foreach (ConstructorClass obj in secondPass)
+			{
+				try
+				{
+					parseDefinition(obj, release);
+				}
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+			}
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed SecondPass");
+			secondPass.Clear();
+			taskThreadSafe.Wait();
+			threadSafeConstructors.Clear();
+			taskPrimitive.Wait();
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Finalizing");
+			finalizeImport();
+			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Finished");
+		}
+	
+		private void parseDefinition(ConstructorClass constructor, ReleaseVersion release)
+		{
+			constructor.ParseDefinition(release, mDictionary);
+			BaseClassIfc obj = constructor.Object;
+			IfcApplication application = obj as IfcApplication;
+			if (application != null)
+			{
+				IfcApplication ea = mDatabase.Factory.mApplication;
+				if (ea != null && ea.mVersion == application.mVersion)
+				{
+					if (string.Compare(ea.ApplicationFullName, application.ApplicationFullName, true) == 0)
+					{
+						if (string.Compare(ea.mApplicationIdentifier, application.mApplicationIdentifier) == 0)
+						{
+							mDatabase[ea.mIndex] = null;
+							mDatabase.Factory.mApplication = application;
+						}
+					}
+				}
+			}
+
+			IfcGeometricRepresentationContext geometricRepresentationContext = obj as IfcGeometricRepresentationContext;
+			if (geometricRepresentationContext != null)
+				mDatabase.Tolerance = geometricRepresentationContext.mPrecision;
+			IfcSIUnit unit = obj as IfcSIUnit;
+			if (unit != null)
+			{
+				if (unit.Name == IfcSIUnitName.METRE && unit.Prefix == IfcSIPrefix.NONE)
+					mDatabase.Factory.mSILength = unit;
+				else if (unit.Name == IfcSIUnitName.SQUARE_METRE && unit.Prefix == IfcSIPrefix.NONE)
+					mDatabase.Factory.mSIArea = unit;
+				else if (unit.Name == IfcSIUnitName.CUBIC_METRE && unit.Prefix == IfcSIPrefix.NONE)
+					mDatabase.Factory.mSIVolume = unit;
+			}
+		}
+
+		private void processDataLine(string line)
+		{
+			if (string.IsNullOrEmpty(line))
+				return;
+			int stepID = 0, pos = 0;
+			string kw = "", def = "";
+			ParserSTEP.GetKeyWord(line, out stepID, out kw, out def);
+			if (!string.IsNullOrEmpty(kw) && kw[0] == 'I')
+			{
+				if (line.Last() != ';')
+					mCancellationTokenSource.Cancel();
+				try
+				{
+					BaseClassIfc obj = BaseClassIfc.Construct(kw);
+					if (obj != null)
+					{
+						obj.mIndex = stepID;
+						mDictionary[stepID] = obj;
+						ConstructorClass constructorClass = new ConstructorClass(obj, def);
+						//Todo add more primitive classes
+						if (obj is IfcCartesianPoint || obj is IfcCartesianPointList || obj is IfcDirection ||
+							obj is IfcIndexedPolygonalFace  || def.IndexOf('#') < 0)
+							mPrimitiveConstructors.Add(constructorClass);
+						else
+							mConstructorsBag.Add(constructorClass);
+					}
+				}
+				catch (Exception) { }
+			}
+		}
+
+		protected bool isDataLineOrProcessFileLine(string trimmedLine)
+		{
+			char c = char.ToUpper(trimmedLine[0]);
+			if (c == 'F')
+			{
+				processFileHeaderLine(trimmedLine);
+				return false;
+			}
+			if (c == 'E' || c == 'H')
+				return false;
+			return c == '#';
+		}
+		internal bool processFileHeaderLine(string line)
+		{
+			string ts = line.Replace(" ", "");
+			if (ts.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
+					ts.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
+			{
+				if (ts.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X1;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X2;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3;
+				else
+					mDatabase.Release = ReleaseVersion.IFC4;
+				if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
+					mDatabase.ModelView = ModelView.Ifc4NotAssigned;
+				return true;
+			}
+			if (ts.StartsWith("FILE_DESCRIPTION", true, System.Globalization.CultureInfo.CurrentCulture))
+			{
+				return true;
+			}
+			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
+			{
+				if (ts.Length > 12)
+				{
+					List<string> fields = ParserSTEP.SplitLineFields(ts.Substring(10, ts.Length - 12));
+					mDatabase.PreviousApplication = fields.Count > 6 ? fields[5].Replace("'", "") : "";
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public bool WriteSTEP(TextWriter sw, string filename)
+		{
+			mDatabase.FileName = filename;
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			sw.Write(getHeaderString(filename) + "\r\n");
+			foreach (BaseClassIfc e in mDatabase)
+			{
+				if (e != null)
+				{
+					try
+					{
+						string str = e.StringSTEP();
+						if (!string.IsNullOrEmpty(str))
+							sw.WriteLine(str);
+					}
+					catch (Exception) { }
+				}
+			}
+			sw.Write(getFooterString());
+			sw.Close();
+			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+
+			return true;
+		}
+		internal string getHeaderString(string fileName)
+		{
+			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + mDatabase.ModelView + "]'),'2;1');\r\n";
+
+			hdr += "FILE_NAME(\r\n";
+			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
+			DateTime now = DateTime.Now;
+			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
+			IfcPerson person = mDatabase.Factory.Person;
+			hdr += "/* author */ ('" + person.Name + "'),\r\n";
+			string organizationName = mDatabase.Factory.Organization.Name;
+			if (organizationName == "UNKNOWN")
+				organizationName = IfcOrganization.Organization;
+			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
+			hdr += "/* preprocessor_version */ '" + mDatabase.Factory.ToolkitName + "',\r\n";
+			hdr += "/* originating_system */ '" + mDatabase.Factory.ApplicationFullName + "',\r\n";
+			hdr += "/* authorization */ 'None');\r\n\r\n";
+			string version = "IFC4";
+			ReleaseVersion release = mDatabase.Release;
+			if (release == ReleaseVersion.IFC2x3)
+				version = "IFC2X3";
+			else if (release == ReleaseVersion.IFC4X1)
+				version = "IFC4X1";
+			else if (release == ReleaseVersion.IFC4X2)
+				version = "IFC4X2";
+			else if (release == ReleaseVersion.IFC4X3)
+				version = "IFC4X3RC1";
+			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
+			hdr += "ENDSEC;\r\n";
+			hdr += "\r\nDATA;";
+			return hdr;
+		}
+		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; }
+
 
 	}
 }

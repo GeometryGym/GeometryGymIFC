@@ -379,7 +379,11 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mCoordinates.StepId; }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { mCoordinates = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPointList; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
+		{
+			//ggBasic.printMessage("Parsing #" + StepId + " on " + System.Threading.Thread.CurrentThread.ManagedThreadId);
+			mCoordinates = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPointList; 
+		}
 	}
 	public partial class IfcTextLiteral : IfcGeometricRepresentationItem //SUPERTYPE OF	(IfcTextLiteralWithExtent)
 	{
@@ -782,53 +786,24 @@ namespace GeometryGym.Ifc
 		{
 			StringBuilder sb = new StringBuilder();
 			if (mNormals.Length == 0)
-				sb.Append( ",$,");
+				sb.Append(",$,");
 			else
-			{
-				double[] normal = mNormals[0];
-				sb.Append( ",((" + ParserSTEP.DoubleToString(normal[0]) + "," + ParserSTEP.DoubleToString(normal[1]) + "," + ParserSTEP.DoubleToString(normal[2]) + ")");
-				for (int icounter = 1; icounter < mNormals.Length; icounter++)
-				{
-					normal = mNormals[icounter];
-					sb.Append( ",(" + ParserSTEP.DoubleToString(normal[0]) + "," + ParserSTEP.DoubleToString(normal[1]) + "," + ParserSTEP.DoubleToString(normal[2]) + ")");
-				}
-				sb.Append("),");
-			}
+				sb.Append(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x[0]) + "," + ParserSTEP.DoubleToString(x[1]) + "," + ParserSTEP.DoubleToString(x[2]) + ")")) + "),");
 			sb.Append( mClosed == IfcLogicalEnum.UNKNOWN ? "$" : ParserSTEP.BoolToString(Closed));
-			Tuple<int, int, int> p = mCoordIndex[0];
-			sb.Append(",((" + p.Item1 + "," + p.Item2 + "," + p.Item3);
-			for (int icounter = 1; icounter < mCoordIndex.Length; icounter++)
-			{
-				p = mCoordIndex[icounter];
-				sb.Append("),(" + p.Item1 + "," + p.Item2 + "," + p.Item3);
-			}
+			sb.Append(",(" + string.Join(",", mCoordIndex.Select(x => "(" + x.Item1 + "," + x.Item2 + "," + x.Item3 + ")")));
 			if (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC4A1)
 			{
 				if (mNormalIndex.Length == 0)
-					sb.Append(")),$");
+					sb.Append("),$");
 				else
-				{
-					p = mNormalIndex[0];
-					sb.Append(")),((" + p.Item1 + "," + p.Item2 + "," + p.Item3);
-					for (int icounter = 1; icounter < mNormalIndex.Length; icounter++)
-					{
-						p = mNormalIndex[icounter];
-						sb.Append("),(" + p.Item1 + "," + p.Item2 + "," + p.Item3);
-					}
-					sb.Append("))");
-				}
+					sb.Append("),(" + string.Join(",", mNormalIndex.Select(x => "(" + x.Item1 + "," + x.Item2 + "," + x.Item3 + ")")) + ")");
 			}
 			else
 			{
 				if (mPnIndex.Count == 0)
-					sb.Append(")),$");
+					sb.Append("),$");
 				else
-				{
-					sb.Append(")),(" + mPnIndex[0]);
-					for (int icounter = 1; icounter < mPnIndex.Count; icounter++)
-						sb.Append("," + mPnIndex[icounter]);
-					sb.Append(")");
-				}
+					sb.Append("),(" + string.Join(",", mPnIndex) + ")");
 			}
 			return base.BuildStringSTEP(release) + sb.ToString();
 		}
@@ -839,13 +814,10 @@ namespace GeometryGym.Ifc
 			if (field.StartsWith("("))
 				mNormals = ParserSTEP.SplitListDoubleTriple(field);
 			mClosed = ParserIfc.StripLogical(str, ref pos, len);
-			field = ParserSTEP.StripField(str, ref pos, len);
-			mCoordIndex = ParserSTEP.SplitListSTPIntTriple(field);
+			mCoordIndex = ParserSTEP.StripListSTPIntTriple(str, ref pos, len);
 			if (release <= ReleaseVersion.IFC4A1)
 			{
-				field = ParserSTEP.StripField(str, ref pos, len);
-				if (field.StartsWith("("))
-					mNormalIndex = ParserSTEP.SplitListSTPIntTriple(field);
+				mNormalIndex = ParserSTEP.StripListSTPIntTriple(str, ref pos, len);
 			}
 			try
 			{
@@ -864,7 +836,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mPnIndex = ParserSTEP.StripListInt(str, ref pos, len);
+			mFlags.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 		}
 	}
 	public partial class IfcTrimmedCurve : IfcBoundedCurve

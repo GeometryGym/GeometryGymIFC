@@ -99,7 +99,7 @@ namespace GeometryGym.STEP
 		internal void logParseError(string str) { string error = "XX Error " + str;  if (!mParsingErrors.Contains(error)) mParsingErrors.Add(error); }
 		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
-		public string FolderPath { get; protected set; } 
+		public string FolderPath { get; set; } 
 		internal string PreviousApplication { get; set; }
 	}
 }

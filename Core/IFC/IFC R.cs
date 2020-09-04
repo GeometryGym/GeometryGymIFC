@@ -2183,15 +2183,10 @@ namespace GeometryGym.Ifc
 			{
 				IfcShapeModel shapeModel = this as IfcShapeModel;
 				if (shapeModel != null && mContextOfItems != null)
-					mContextOfItems.RepresentationsInContext.Remove(shapeModel);
+					mContextOfItems.mRepresentationsInContext.Remove(StepId);
 				mContextOfItems = value;
 				if (shapeModel != null && value != null)
-				{
-					IfcShapeModel existing = value.RepresentationsInContext.Where(x => x.Index == mIndex).FirstOrDefault();
-					if(existing == null)
-						value.RepresentationsInContext.Add(shapeModel);
-					mRepresentationIdentifier = value.ContextIdentifier;
-				}
+					value.mRepresentationsInContext[StepId]= shapeModel;
 			}
 		}
 		public string RepresentationIdentifier { get { return mRepresentationIdentifier; } set { mRepresentationIdentifier = value; } }
@@ -2256,11 +2251,11 @@ namespace GeometryGym.Ifc
 		internal string mContextIdentifier = "$";// : OPTIONAL IfcLabel;
 		internal string mContextType = "$";// : OPTIONAL IfcLabel; 
 		//INVERSE
-		[NonSerialized] private SET<IfcShapeModel> mRepresentationsInContext = new SET<IfcShapeModel>();// :	SET OF IfcRepresentation FOR ContextOfItems;
+		[NonSerialized] internal Dictionary<int, IfcShapeModel> mRepresentationsInContext = new Dictionary<int, IfcShapeModel>();// :	SET OF IfcRepresentation FOR ContextOfItems;
 
 		public string ContextIdentifier { get { return (mContextIdentifier == "$" ? "" : ParserIfc.Decode(mContextIdentifier)); } set { mContextIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string ContextType { get { return (mContextType == "$" ? "" : ParserIfc.Decode(mContextType)); } set { mContextType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcShapeModel> RepresentationsInContext { get { return mRepresentationsInContext; } private set { mRepresentationsInContext = value; } }
+		public IEnumerable<IfcShapeModel> RepresentationsInContext { get { return mRepresentationsInContext.Values; } }
 
 		protected IfcRepresentationContext() : base() { }
 		protected IfcRepresentationContext(DatabaseIfc db) : base(db) { }
