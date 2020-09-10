@@ -279,10 +279,17 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
+			double radius = 0;
 			if (xml.HasAttribute("StartRadius"))
-				double.TryParse(xml.Attributes["StartRadius"].Value, out mStartRadius);
+			{
+				if (double.TryParse(xml.Attributes["StartRadius"].Value, out radius))
+					StartRadius = radius;
+			}
 			if (xml.HasAttribute("EndRadius"))
-				double.TryParse(xml.Attributes["EndRadius"].Value, out mEndRadius);
+			{
+				if (double.TryParse(xml.Attributes["EndRadius"].Value, out radius))
+					EndRadius = radius;
+			}
 			if (xml.HasAttribute("IsStartRadiusCCW"))
 				bool.TryParse(xml.Attributes["IsStartRadiusCCW"].Value, out mIsStartRadiusCCW);
 			if (xml.HasAttribute("IsEndRadiusCCW"))

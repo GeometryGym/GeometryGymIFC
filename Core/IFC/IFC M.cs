@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 		public double Scale { get { return double.IsNaN( mScale) ? 1 : mScale; } set { mScale = value; } }  // OPTIONAL  IfcReal
 
 		internal IfcMapConversion() : base() { }
-		internal IfcMapConversion(DatabaseIfc db, IfcMapConversion c) : base(db,c) { mEastings = c.mEastings; mNorthings = c.mNorthings; mOrthogonalHeight = c.mOrthogonalHeight; mXAxisAbscissa = c.mXAxisAbscissa; mXAxisOrdinate = c.mXAxisOrdinate; mScale = c.mScale; }
+		internal IfcMapConversion(DatabaseIfc db, IfcMapConversion c) : base(db, c) { mEastings = c.mEastings; mNorthings = c.mNorthings; mOrthogonalHeight = c.mOrthogonalHeight; mXAxisAbscissa = c.mXAxisAbscissa; mXAxisOrdinate = c.mXAxisOrdinate; mScale = c.mScale; }
 		public IfcMapConversion(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, double eastings, double northings, double orthogonalHeight)
 			: base(source, target)
 		{

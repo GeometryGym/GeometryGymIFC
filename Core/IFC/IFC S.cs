@@ -653,6 +653,7 @@ additional types	some additional representation types are given:
 		public IfcPostalAddress SiteAddress { get { return mDatabase[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSite() : base() { }
+		internal IfcSite(DatabaseIfc db, IfcSpatialElement spatial, DuplicateOptions options) : base(db, spatial, options) { }
 		internal IfcSite(DatabaseIfc db, IfcSite site, DuplicateOptions options) : base(db, site, options) 
 		{ 
 			mRefLatitude = site.mRefLatitude; 
@@ -1099,6 +1100,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement(DatabaseIfc db) : base(db) { }
 		protected IfcSpatialStructureElement(IfcObjectPlacement pl) : base(pl) { if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name, IfcObjectPlacement pl) : base(host, pl, null) { Name = name; if (pl.mDatabase.mRelease <= ReleaseVersion.IFC2x3) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
+		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialElement e, DuplicateOptions options) : base(db, e, options) { }
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { mCompositionType = e.mCompositionType; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
@@ -1567,8 +1569,8 @@ additional types	some additional representation types are given:
 
 		internal IfcStructuralLoadCase() : base() { }
 		internal IfcStructuralLoadCase(DatabaseIfc db, IfcStructuralLoadCase c, DuplicateOptions options) : base(db, c, options) { mSelfWeightCoefficients = c.mSelfWeightCoefficients; }
-		public IfcStructuralLoadCase(IfcStructuralAnalysisModel model, string name, IfcActionTypeEnum action, IfcActionSourceTypeEnum source)
-			: base(model, name, IfcLoadGroupTypeEnum.LOAD_CASE, action, source) { new IfcRelAssignsToGroup(this) { Name = Name + " Actions", Description = Description }; }
+		public IfcStructuralLoadCase(IfcStructuralAnalysisModel model, string name)
+			: base(model, name, IfcLoadGroupTypeEnum.LOAD_CASE) { new IfcRelAssignsToGroup(this) { Name = Name + " Actions", Description = Description }; }
 	}
 	[Serializable]
 	public partial class IfcStructuralLoadGroup : IfcGroup
@@ -1590,8 +1592,8 @@ additional types	some additional representation types are given:
 
 		internal IfcStructuralLoadGroup() : base() { }
 		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; mActionType = g.mActionType; mActionSource = g.mActionSource; mCoefficient = g.mCoefficient; mPurpose = g.mPurpose; }
-		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type, IfcActionTypeEnum action, IfcActionSourceTypeEnum source)
-			: base(sm.mDatabase, name) { mLoadGroupFor.Add(sm); sm.addLoadGroup(this); mPredefinedType = type; mActionType = action; mActionSource = source; }
+		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type)
+			: base(sm.mDatabase, name) { mLoadGroupFor.Add(sm); sm.addLoadGroup(this); mPredefinedType = type; }
 		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, List<double> factors, List<IfcStructuralLoadGroup> cases, bool ULS)
 			: base(sm.mDatabase, name)
 		{

@@ -648,10 +648,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAggregates : IfcRelDecomposes
 	{
-		internal int mRelatingObject;// : IfcObjectDefinition IFC4 IfcObject
+		internal IfcObjectDefinition mRelatingObject;// : IfcObjectDefinition IFC4 IfcObject
 		internal SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// : SET [1:?] OF IfcObjectDefinition; 
 
-		public IfcObjectDefinition RelatingObject { get { return mDatabase[mRelatingObject] as IfcObjectDefinition; } set { mRelatingObject = value.mIndex; value.mIsDecomposedBy.Add(this); } }
+		public IfcObjectDefinition RelatingObject { get { return mRelatingObject; } set { if (mRelatingObject != null) { mRelatingObject.mIsDecomposedBy.Remove(this);  } mRelatingObject = value; value.mIsDecomposedBy.Add(this); } }
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
 
 		internal IfcRelAggregates() : base() { }
@@ -664,11 +664,8 @@ namespace GeometryGym.Ifc
                     db.Factory.Duplicate(objectDefinition, options);
             }
 		}
-		internal IfcRelAggregates(IfcObjectDefinition relObject) : base(relObject.mDatabase)
-		{
-			mRelatingObject = relObject.mIndex;
-			relObject.mIsDecomposedBy.Add(this);
-		}
+		internal IfcRelAggregates(IfcObjectDefinition relObject) 
+			: base(relObject.mDatabase) { RelatingObject = relObject; }
 		public IfcRelAggregates(IfcObjectDefinition relObject, IfcObjectDefinition relatedObject) : this(relObject, new List<IfcObjectDefinition>() { relatedObject }) { }
 		public IfcRelAggregates(IfcObjectDefinition relObject, IEnumerable<IfcObjectDefinition> relatedObjects) : this(relObject)
 		{
@@ -1359,32 +1356,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelContainedInSpatialStructure : IfcRelConnects
 	{
-		//public class RelatedElementsCollection : ObservableCollection<IfcProduct>
-		//{
-		//	private IfcRelContainedInSpatialStructure mContainer = null;
-		//	internal RelatedElementsCollection(IfcRelContainedInSpatialStructure container) { mContainer = container; }
-
-		//	protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-		//	{
-		//		base.OnCollectionChanged(e);
-		//		if(e.Action == NotifyCollectionChangedAction.Add)
-		//		{
-		//			foreach (IfcProduct p in e.NewItems)
-		//				mContainer.relate(p);
-		//		}
-		//		else if (e.Action == NotifyCollectionChangedAction.Remove)
-		//		{
-		//			foreach (IfcProduct p in e.NewItems)
-		//				mContainer.relate(p);
-		//		}
-		//	}
-
-		//}
-
 		internal SET<IfcProduct> mRelatedElements = new SET<IfcProduct>();// : SET [1:?] OF IfcProduct;
 		private IfcSpatialElement mRelatingStructure = null;//  IfcSpatialElement 
 
-		//	public RelatedElementsCollection RelatedElements { get; } 
 		public SET<IfcProduct> RelatedElements { get { return mRelatedElements; } }
 		public IfcSpatialElement RelatingStructure
 		{

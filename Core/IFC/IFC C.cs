@@ -1706,7 +1706,7 @@ namespace GeometryGym.Ifc
 		public IfcCoordinateReferenceSystem TargetCRS { get { return mDatabase[mTargetCRS] as IfcCoordinateReferenceSystem; } set { mTargetCRS = value.mIndex; } }
 
 		protected IfcCoordinateOperation() : base() { }
-		protected IfcCoordinateOperation(DatabaseIfc db, IfcCoordinateOperation p) : base(db,p) { SourceCRS = db.Factory.Duplicate(p.mDatabase[p.mSourceCRS]) as IfcCoordinateReferenceSystemSelect; TargetCRS = db.Factory.Duplicate(p.TargetCRS) as IfcCoordinateReferenceSystem; }
+		protected IfcCoordinateOperation(DatabaseIfc db, IfcCoordinateOperation p) : base(db, p) { SourceCRS = db.Factory.Duplicate(p.mDatabase[p.mSourceCRS]) as IfcCoordinateReferenceSystemSelect; TargetCRS = db.Factory.Duplicate(p.TargetCRS) as IfcCoordinateReferenceSystem; }
 		protected IfcCoordinateOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target) : base(source.Database) { SourceCRS = source; TargetCRS = target; }
 	}
 	[Serializable]
@@ -2109,12 +2109,16 @@ namespace GeometryGym.Ifc
 	public partial class IfcCurveStyleFont : IfcPresentationItem, IfcCurveStyleFontSelect, NamedObjectIfc
 	{
 		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal List<int> mPatternList = new List<int>();// :  LIST [1:?] OF IfcCurveStyleFontPattern;
+		internal LIST<IfcCurveStyleFontPattern> mPatternList = new LIST<IfcCurveStyleFontPattern>();// :  LIST [1:?] OF IfcCurveStyleFontPattern;
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { if (!string.IsNullOrEmpty(value)) mName = ParserIfc.Encode(value); } }
 
 		internal IfcCurveStyleFont() : base() { }
-		//internal IfcCurveStyleFont(DatabaseIfc db, IfcCurveStyleFont v) : base(db,v) { mName = v.mName; mPatternList = new List<int>(v.mPatternList.ToArray()); }
+		internal IfcCurveStyleFont(DatabaseIfc db, IfcCurveStyleFont f) : base(db, f)
+		{
+			mName = f.mName;
+			mPatternList.AddRange(f.mPatternList.Select(x => db.Factory.Duplicate(x) as IfcCurveStyleFontPattern));
+		}
 	}
 	[Serializable]
 	public partial class IfcCurveStyleFontAndScaling : IfcPresentationItem, IfcCurveFontOrScaledCurveFontSelect
@@ -2132,7 +2136,11 @@ namespace GeometryGym.Ifc
 		internal double mVisibleSegmentLength;// : IfcLengthMeasure;
 		internal double mInvisibleSegmentLength;//: IfcPositiveLengthMeasure;	
 		internal IfcCurveStyleFontPattern() : base() { }
-	//	internal IfcCurveStyleFontPattern(IfcCurveStyleFontPattern i) : base() { mVisibleSegmentLength = i.mVisibleSegmentLength; mInvisibleSegmentLength = i.mInvisibleSegmentLength; }
+		internal IfcCurveStyleFontPattern(DatabaseIfc db, IfcCurveStyleFontPattern p) : base(db, p) 
+		{ 
+			mVisibleSegmentLength = p.mVisibleSegmentLength; 
+			mInvisibleSegmentLength = p.mInvisibleSegmentLength; 
+		}
 	}
 	public interface IfcCurveStyleFontSelect : IfcCurveFontOrScaledCurveFontSelect { } //SELECT (IfcCurveStyleFont ,IfcPreDefinedCurveFont);
 	[Serializable]

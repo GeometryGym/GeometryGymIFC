@@ -718,8 +718,8 @@ namespace GeometryGym.Ifc
 		private bool mIsEndRadiusCCW;// : IfcBoolean;
 		private IfcTransitionCurveType mTransitionCurveType = IfcTransitionCurveType.CLOTHOIDCURVE;
 
-		public double StartRadius { get { return double.IsNaN(mStartRadius) ? double.PositiveInfinity : mStartRadius; } set { mStartRadius = (value < 1e-8 ? double.NaN : value); } }
-		public double EndRadius { get { return double.IsNaN(mEndRadius) ? double.PositiveInfinity : mEndRadius; } set { mEndRadius = (value < 1e-8 ? double.NaN : value); } }
+		public double StartRadius { get { return double.IsNaN(mStartRadius) ? double.PositiveInfinity : mStartRadius; } set { mStartRadius = ((double.IsInfinity(value) || value < 1e-8) ? double.NaN : value); } }
+		public double EndRadius { get { return double.IsNaN(mEndRadius) ? double.PositiveInfinity : mEndRadius; } set { mEndRadius = ((double.IsInfinity(value) || value < 1e-8) ? double.NaN : value); } }
 		public bool IsStartRadiusCCW { get { return mIsStartRadiusCCW; } set { mIsStartRadiusCCW = value; } }
 		public bool IsEndRadiusCCW { get { return mIsEndRadiusCCW; } set { mIsEndRadiusCCW = value; } }
 		public IfcTransitionCurveType TransitionCurveType { get { return mTransitionCurveType; } set { mTransitionCurveType = value; } }
@@ -1391,6 +1391,8 @@ namespace GeometryGym.Ifc
 					definedType = fields[1];
 				}
 			}
+			if (!str.ToLower().EndsWith("Type"))
+				str = str + "Type";
 			IfcTypeProduct result = null;
 			Type type = Type.GetType("GeometryGym.Ifc." + str);
 			if (type != null)

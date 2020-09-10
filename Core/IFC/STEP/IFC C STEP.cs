@@ -1476,15 +1476,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + (mName == "$" ? ",$,(" : ",'" + mName + "',(") + ParserSTEP.LinkToString(mPatternList[0]);
-			for (int icounter = 0; icounter < mPatternList.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mPatternList[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + (mName == "$" ? ",$,(" : ",'" + mName + "',(") +
+				string.Join(",", mPatternList.Select(x => "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
-			mPatternList = ParserSTEP.StripListLink(str, ref pos, len);
+			mPatternList.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcCurveStyleFontPattern));
 		}
 	}
 	public partial class IfcCurveStyleFontAndScaling : IfcPresentationItem, IfcCurveFontOrScaledCurveFontSelect

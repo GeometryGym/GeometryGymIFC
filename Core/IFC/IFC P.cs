@@ -1808,7 +1808,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcProperty p in s.HasProperties.Values)
 			{
 				if(!options.IgnoredPropertyNames.Contains(p.Name))
-					addProperty(db.Factory.Duplicate(p));
+					addProperty(db.Factory.Duplicate(p), 1e-5);
 			}
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
@@ -1834,22 +1834,30 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 		internal override bool isEmpty { get { return mHasProperties.Count == 0; } }
-		public IfcPropertyBoundedValue AddProperty(IfcPropertyBoundedValue property) { addProperty(property); return property; }
-		public IfcPropertyEnumeratedValue AddProperty(IfcPropertyEnumeratedValue property) { addProperty(property); return property; }
-		public IfcPropertyReferenceValue AddProperty(IfcPropertyReferenceValue property) { addProperty(property); return property; }
-		public IfcPropertySingleValue AddProperty(IfcPropertySingleValue property) { addProperty(property); return property; }
-		public IfcPropertyTableValue AddProperty(IfcPropertyTableValue property) { addProperty(property); return property; }
-		internal void addProperty(IfcProperty property)
+		public IfcPropertyBoundedValue AddProperty(IfcPropertyBoundedValue property, double tol) { addProperty(property, tol); return property; }
+		public IfcPropertyEnumeratedValue AddProperty(IfcPropertyEnumeratedValue property) { addProperty(property, 1e-5); return property; }
+		public IfcPropertyReferenceValue AddProperty(IfcPropertyReferenceValue property) { addProperty(property, 1e-5); return property; }
+		public IfcPropertySingleValue AddProperty(IfcPropertySingleValue property) { addProperty(property, 1e-5); return property; }
+		public IfcPropertySingleValue AddProperty(IfcPropertySingleValue property, double tol) { addProperty(property, tol); return property; }
+		public IfcPropertyTableValue AddProperty(IfcPropertyTableValue property, double tol) { addProperty(property, tol); return property; }
+		internal void addProperty(IfcProperty property, double tol)
 		{
 			if (property == null)
 				return;
 			IfcProperty existing = null;
 			if (mHasProperties.TryGetValue(property.Name, out existing))
 			{
-				if (property.isDuplicate(existing, mDatabase.Tolerance))
+				if (property.isDuplicate(existing, tol))
 					return;
 				existing.mPartOfPset.Remove(this);
 			}
+			mHasProperties[property.Name] = property;
+			property.mPartOfPset.Add(this);
+		}
+		internal void addProperty(IfcProperty property)
+		{
+			if (property == null)
+				return;
 			mHasProperties[property.Name] = property;
 			property.mPartOfPset.Add(this);
 		}

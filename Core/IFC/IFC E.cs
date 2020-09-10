@@ -596,7 +596,6 @@ namespace GeometryGym.Ifc
 			base.detachFromHost();
 			if (mContainedInStructure != null)
 				mContainedInStructure.RelatedElements.Remove(this);
-				//mContainedInStructure.RelatedElements.Remove(this);
 		}
 	
 		public void AddMember(IfcStructuralMember m)

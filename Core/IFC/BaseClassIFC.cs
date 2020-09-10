@@ -28,7 +28,6 @@ using System.Text;
 
 using GeometryGym.STEP;
 
-
 namespace GeometryGym.Ifc
 {
 	public class VersionAddedAttribute : Attribute
@@ -120,31 +119,146 @@ namespace GeometryGym.Ifc
 			return base.ToString();
 		}
 
+		protected void Adopt(BaseClassIfc master)
+		{
+			IfcRoot thisRoot = this as IfcRoot, masterRoot = master as IfcRoot;
+			if(thisRoot != null && masterRoot != null)
+			{
+				thisRoot.Name = masterRoot.Name;
+				thisRoot.Description = masterRoot.Description;
+				IfcObjectDefinition thisObjectDefinition = this as IfcObjectDefinition, masterObjectDefinition = master as IfcObjectDefinition;
+				if (thisObjectDefinition != null && masterObjectDefinition != null)
+				{
+					foreach (IfcRelAssigns assigns in masterObjectDefinition.HasAssignments)
+						assigns.RelatedObjects.Add(thisObjectDefinition);
+					foreach (IfcRelAssociates associates in masterObjectDefinition.HasAssociations)
+						associates.RelatedObjects.Add(thisObjectDefinition);
+					if (masterObjectDefinition.HasContext != null)
+						masterObjectDefinition.HasContext.RelatedDefinitions.Add(thisObjectDefinition);
+					IfcObject thisObject = this as IfcObject, masterObject = master as IfcObject;
+					if (thisObject != null && masterObject != null)
+					{
+						if (string.IsNullOrEmpty(thisObject.ObjectType))
+							thisObject.ObjectType = masterObject.ObjectType;
+
+					}
+					else
+					{
+						IfcTypeObject thisTypeObject = this as IfcTypeObject, masterTypeObject = master as IfcTypeObject;
+						if (thisTypeObject != null && masterTypeObject != null)
+						{
+							IfcTypeProduct thisTypeProduct = this as IfcTypeProduct, masterTypeProduct = master as IfcTypeProduct;
+							if (thisTypeProduct != null && masterTypeProduct != null)
+							{
+								thisTypeProduct.Tag = masterTypeProduct.Tag;
+								IfcElementType thisElementType = this as IfcElementType, masterElementType = master as IfcElementType;
+								if (thisElementType != null && masterElementType != null)
+								{
+									thisElementType.ElementType = masterElementType.ElementType;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		protected void ReplaceDatabase(BaseClassIfc revised)
 		{
-			IfcRepresentationItem representationItem = this as IfcRepresentationItem, revisedItem = revised as IfcRepresentationItem;
-			if(representationItem != null && revisedItem != null)
+			IfcRoot thisRoot = this as IfcRoot, revisedRoot = revised as IfcRoot;
+			if (thisRoot != null && revisedRoot != null)
 			{
-				IfcStyledItem styledItem = representationItem.StyledByItem;
-				if (styledItem != null)
-					styledItem.Item = revisedItem;
+				revisedRoot.GlobalId = thisRoot.GlobalId;
+				revisedRoot.OwnerHistory = thisRoot.OwnerHistory;
+				revisedRoot.Name = thisRoot.Name;
+				revisedRoot.Description = thisRoot.Description;
+				IfcObjectDefinition thisObjectDefinition = this as IfcObjectDefinition, revisedObjectDefinition = revised as IfcObjectDefinition;
+				if (thisObjectDefinition != null && revisedObjectDefinition != null)
+				{
+					foreach (IfcRelAggregates rel in thisObjectDefinition.IsDecomposedBy.ToList())
+						rel.RelatingObject = revisedObjectDefinition;
+					foreach (IfcRelNests rel in thisObjectDefinition.IsNestedBy.ToList())
+						rel.RelatingObject = revisedObjectDefinition;
 
-				foreach (IfcShapeModel shapeModel in representationItem.mRepresents.ToList())
-				{
-					shapeModel.Items.Remove(representationItem);
-					shapeModel.Items.Add(revisedItem);
+					foreach (IfcRelAssigns assigns in thisObjectDefinition.HasAssignments.ToList())
+					{
+						assigns.RelatedObjects.Remove(thisObjectDefinition);
+						assigns.RelatedObjects.Add(revisedObjectDefinition);
+					}
+					IfcRelDeclares relDeclares = thisObjectDefinition.HasContext;
+					if (relDeclares != null)
+					{
+						relDeclares.RelatedDefinitions.Remove(thisObjectDefinition);
+						relDeclares.RelatedDefinitions.Add(revisedObjectDefinition);
+					}
+					foreach (IfcRelAssociates associates in thisObjectDefinition.HasAssociations.ToList())
+					{
+						associates.RelatedObjects.Remove(thisObjectDefinition);
+						associates.RelatedObjects.Add(revisedObjectDefinition);
+					}
+					IfcObject thisObject = this as IfcObject, revisedObject = revised as IfcObject;
+					if (thisObject != null && revisedObject != null)
+					{
+						revisedObject.ObjectType = thisObject.ObjectType;
+
+						if (thisObject.mIsTypedBy != null)
+							thisObject.mIsTypedBy.mRelatedObjects.Remove(thisObject);
+						IfcProduct thisProduct = this as IfcProduct, revisedProduct = revised as IfcProduct;
+						if (thisProduct != null && revisedProduct != null)
+						{
+							thisProduct.detachFromHost();
+							IfcElement thisElement = this as IfcElement, revisedElement = revised as IfcElement;
+							if (thisElement != null && revisedElement != null)
+							{
+								revisedElement.Tag = thisElement.Tag;
+							}
+						}
+					}
+					else
+					{
+						IfcTypeObject thisTypeObject = this as IfcTypeObject, revisedTypeObject = revised as IfcTypeObject;
+						if (thisTypeObject != null && revisedTypeObject != null)
+						{
+							IfcTypeProduct thisTypeProduct = this as IfcTypeProduct, revisedTypeProduct = revised as IfcTypeProduct;
+							if (thisTypeProduct != null && revisedTypeProduct != null)
+							{
+								revisedTypeProduct.Tag = thisTypeProduct.Tag;
+								IfcElementType thisElementType = this as IfcElementType, revisedElementType = revised as IfcElementType;
+								if (thisElementType != null && revisedElementType != null)
+								{
+									revisedElementType.ElementType = thisElementType.ElementType;
+								}
+							}
+						}
+					}
 				}
-				IfcPresentationLayerAssignment layerAssignment = representationItem.mLayerAssignment;
-				if (layerAssignment != null)
+			}
+			else
+			{
+				IfcRepresentationItem representationItem = this as IfcRepresentationItem, revisedItem = revised as IfcRepresentationItem;
+				if (representationItem != null && revisedItem != null)
 				{
-					layerAssignment.AssignedItems.Remove(representationItem);
-					layerAssignment.AssignedItems.Add(revisedItem);
+					IfcStyledItem styledItem = representationItem.StyledByItem;
+					if (styledItem != null)
+						styledItem.Item = revisedItem;
+
+					foreach (IfcShapeModel shapeModel in representationItem.mRepresents.ToList())
+					{
+						shapeModel.Items.Remove(representationItem);
+						shapeModel.Items.Add(revisedItem);
+					}
+					IfcPresentationLayerAssignment layerAssignment = representationItem.mLayerAssignment;
+					if (layerAssignment != null)
+					{
+						layerAssignment.AssignedItems.Remove(representationItem);
+						layerAssignment.AssignedItems.Add(revisedItem);
+					}
 				}
 			}
 			mDatabase[revised.mIndex] = null;
 			revised.mIndex = mIndex;
 			mDatabase[mIndex] = revised;
 		}
+		
 		public bool Dispose(bool children)
 		{
 			if (mDatabase == null)

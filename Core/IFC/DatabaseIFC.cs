@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 namespace GeometryGym.Ifc
 { 
 	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
-	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned };
+	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
 	{
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc(TextReader stream) : this() { new SerializationIfc(this).ReadFile(stream); }
 		public DatabaseIfc(ModelView view) : this(true, view) { }
 		public DatabaseIfc(DatabaseIfc db) : this() { mRelease = db.mRelease; mModelView = db.mModelView; Tolerance = db.Tolerance; }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, view == ModelView.Ifc2x3Coordination || view == ModelView.Ifc2x3NotAssigned ? ReleaseVersion.IFC2x3 : ReleaseVersion.IFC4X2, view) { }
+		public DatabaseIfc(bool generate, ModelView view) : this(generate, versionFromModelView(view), view) { }
 		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate, schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
 		private DatabaseIfc(bool generate, ReleaseVersion schema, ModelView view) : this()
 		{
@@ -138,6 +138,19 @@ namespace GeometryGym.Ifc
 		{
 			get { return mModelView; }
 			set { mModelView = value; }
+		}
+	
+		private static ReleaseVersion versionFromModelView(ModelView modelView)
+		{
+			if (modelView == ModelView.Ifc2x3Coordination || modelView == ModelView.Ifc2x3NotAssigned)
+				return ReleaseVersion.IFC2x3;
+			if (modelView == ModelView.Ifc4X1NotAssigned)
+				return ReleaseVersion.IFC4X1;
+			if (modelView == ModelView.Ifc4X2NotAssigned)
+				return ReleaseVersion.IFC4X2;
+			if (modelView == ModelView.Ifc4X3NotAssigned)
+				return ReleaseVersion.IFC4X3;
+			return ReleaseVersion.IFC4A2;
 		}
 		public double Tolerance
 		{
@@ -288,14 +301,14 @@ namespace GeometryGym.Ifc
 		private Dictionary<string, int> mDictionary = new Dictionary<string, int>();
 		internal int FindExisting(BaseClassIfc obj)
 		{
-			if (obj == null)
+			if (obj == null || obj.mDatabase == null)
 				return 0;
 			int result = 0;
 			mDictionary.TryGetValue(key(obj), out result);
 			return result;
 		}
 		internal void AddObject(BaseClassIfc obj, int index) { mDictionary[key(obj)] = index; }
-		private string key(BaseClassIfc obj) { return obj.mDatabase.id + "|" + obj.mIndex; }
+		private string key(BaseClassIfc obj) { return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mIndex; }
 		internal bool Remove(BaseClassIfc obj)
 		{
 			string k = key(obj);
@@ -473,13 +486,37 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
+			if(mDatabase.Release < ReleaseVersion.IFC4X3)
+			{
+				if(mDatabase.Release < ReleaseVersion.IFC4X2)
+				{
+					if(mDatabase.Release < ReleaseVersion.IFC4X1)
+					{
+						if(mDatabase.Release < ReleaseVersion.IFC4)
+						{
+							IfcSpatialZone spatialZone = entity as IfcSpatialZone;
+							if (spatialZone != null)
+							{
+								IfcSite site = new IfcSite(mDatabase, spatialZone, options);
+								NominateDuplicate(entity, site);
+								return site;
+							}
+
+
+						}
+					}
+				}
+			}
+
 			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
 			result = Duplicate(entity, type, options);
-			if (result != null)
-				return result;
-			if(type.IsSubclassOf(typeof(IfcProfileProperties)))
-				return Duplicate(entity, typeof(IfcProfileProperties), options);
-			return null;
+			if (result == null && entity is IfcProfileProperties)
+				result = Duplicate(entity, typeof(IfcProfileProperties), options);
+			if (result == null)
+				return null;
+
+			NominateDuplicate(entity, result);
+			return result;
 		}
 		private BaseClassIfc Duplicate(BaseClassIfc entity, Type type, DuplicateOptions options)
 		{
@@ -497,8 +534,6 @@ namespace GeometryGym.Ifc
 				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
 				if (constructor != null)
 					return constructor.Invoke(new object[] { this.mDatabase, entity }) as BaseClassIfc;
-			
-				//return Duplicate(entity, downStream);
 			}
 			return null;
 		}
