@@ -1014,7 +1014,13 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcProperty> ExtendedProperties { get { return new ReadOnlyCollection<IfcProperty>( mExtendedProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
 
 		internal IfcExtendedMaterialProperties() : base() { }
-		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p) : base(db,p) { p.ExtendedProperties.ToList().ForEach(x=>addProperty( db.Factory.Duplicate(x) as IfcProperty)); mDescription = p.mDescription; mName = p.mName; }
+		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p, DuplicateOptions options) : base(db, p, options) 
+		{ 
+			foreach(IfcProperty prop in p.ExtendedProperties)
+				addProperty( db.Factory.Duplicate(prop));
+			mDescription = p.mDescription;
+			mName = p.mName; 
+		}
 
 		internal void addProperty(IfcProperty property) { mExtendedProperties.Add(property.mIndex); }
 	}
@@ -1037,7 +1043,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(DatabaseIfc db) : base(db) {  }
-		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
+		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p, DuplicateOptions options) : base(db, p, options) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
 		public IfcExtendedProperties(List<IfcProperty> props) : base(props[0].mDatabase)
 		{
 			if (props != null)

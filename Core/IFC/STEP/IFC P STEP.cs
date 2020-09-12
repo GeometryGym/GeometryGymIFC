@@ -876,7 +876,7 @@ namespace GeometryGym.Ifc
 			result += (mDefiningValues.Count > 0 ? ")," : "") + (mDefinedValues.Count > 0 ? "(" + mDefinedValues[0].ToString() : "$,");
 			for (int icounter = 1; icounter < mDefinedValues.Count; icounter++)
 				result += "," + mDefinedValues[icounter].ToString();
-			return result + (mDefinedValues.Count > 0 ? ")" : "") + (mExpression == "$" ? ",$," : ",'" + mExpression + "',") + ParserSTEP.LinkToString(mDefiningUnit) + "," + ParserSTEP.LinkToString(mDefinedUnit) + ",." + mCurveInterpolation.ToString() + ".";
+			return result + (mDefinedValues.Count > 0 ? ")" : "") + (mExpression == "$" ? ",$," : ",'" + mExpression + "',") + ParserSTEP.ObjToLinkString(mDefiningUnit) + "," + ParserSTEP.ObjToLinkString(mDefinedUnit) + ",." + mCurveInterpolation.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -904,8 +904,8 @@ namespace GeometryGym.Ifc
 				}
 			}
 			mExpression = ParserSTEP.StripString(str, ref pos, len);
-			mDefiningUnit = ParserSTEP.StripLink(str, ref pos, len);
-			mDefinedUnit = ParserSTEP.StripLink(str, ref pos, len);
+			mDefiningUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
+			mDefinedUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] != '$')
 				Enum.TryParse<IfcCurveInterpolationEnum>(s.Replace(".", ""), true, out mCurveInterpolation);

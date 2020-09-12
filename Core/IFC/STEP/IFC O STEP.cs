@@ -144,7 +144,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + "," + (mHorizontalWidths ? ".T." : ".F") +
 			",(" + string.Join(",", mWidths.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
 			",(" + string.Join(",", mSlopes.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
-			",(#" + string.Join(",#", mTags.ConvertAll(x => ParserIfc.Encode(x))) + ")";
+			(mTags.Count == 0 ? ",$" : ",(" + string.Join(",", mTags.ConvertAll(x => "'" + ParserIfc.Encode(x) + "'")) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

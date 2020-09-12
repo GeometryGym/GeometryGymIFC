@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 		public double MassDensity { get { return mMassDensity; } set { mMassDensity = value; } } 
 
 		internal IfcGeneralMaterialProperties() : base() { }
-		internal IfcGeneralMaterialProperties(DatabaseIfc db, IfcGeneralMaterialProperties p) : base(db,p) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
+		internal IfcGeneralMaterialProperties(DatabaseIfc db, IfcGeneralMaterialProperties p, DuplicateOptions options) : base(db, p, options) { mMolecularWeight = p.mMolecularWeight; mPorosity = p.mPorosity; mMassDensity = p.mMassDensity; }
 		public IfcGeneralMaterialProperties(IfcMaterial material) : base(material) { }
 	}
 	[Obsolete("DELETED IFC4", false)]
@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 		public double CrossSectionArea { get { return mCrossSectionArea; } set { mCrossSectionArea = value; } }
 
 		internal IfcGeneralProfileProperties() : base() { }
-		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p) : base(db, p) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
+		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p, DuplicateOptions options) : base(db, p, options) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
 	[Serializable]

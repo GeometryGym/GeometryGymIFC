@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 		internal double mPHLevel = double.NaN;  //: 	OPTIONAL IfcPHMeasure;
 		internal double mDissolvedSolidsContent = double.NaN;//: 	OPTIONAL IfcNormalisedRatioMeasure
 		internal IfcWaterProperties() : base() { }
-		internal IfcWaterProperties(DatabaseIfc db, IfcWaterProperties p) : base(db,p)
+		internal IfcWaterProperties(DatabaseIfc db, IfcWaterProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mIsPotable = p.mIsPotable;
 			mHardness = p.mHardness;

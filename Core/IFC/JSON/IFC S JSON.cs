@@ -835,19 +835,13 @@ namespace GeometryGym.Ifc
 				SweptArea = mDatabase.ParseJObject<IfcProfileDef>(jobj);
 			jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
-				JToken token = jobj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
-					mPosition = token.Value<int>();
-				else
-					Position = mDatabase.ParseJObject<IfcAxis2Placement3D>(jobj);
-			}
+				Position = mDatabase.ParseJObject<IfcAxis2Placement3D>(jobj);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["SweptArea"] = SweptArea.getJson(this, options);
-			if (mPosition > 0)
+			if (mPosition != null)
 				obj["Position"] = Position.getJson(this, options);
 		}
 	}

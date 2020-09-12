@@ -650,7 +650,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterialDefinition Material { get { return mMaterial; } set { mMaterial = value; value.HasProperties.Add(this); } }
 
 		internal IfcMaterialProperties() : base() { }
-		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p) : base(db, p) { Material = db.Factory.Duplicate(p.Material) as IfcMaterialDefinition; }
+		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p, DuplicateOptions options) : base(db, p, options) { Material = db.Factory.Duplicate(p.Material, options) as IfcMaterialDefinition; }
 		protected IfcMaterialProperties(IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = this.GetType().Name; Material = mat; }
 		public IfcMaterialProperties(string name, IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = name; Material = mat; }
 		internal IfcMaterialProperties(string name, List<IfcProperty> props, IfcMaterialDefinition mat) : base(props) { Name = name; Material = mat; }
@@ -770,7 +770,7 @@ namespace GeometryGym.Ifc
 		internal double mProtectivePoreRatio = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		internal string mWaterImpermeability = "$";// : OPTIONAL IfcText; 
 		internal IfcMechanicalConcreteMaterialProperties() : base() { }
-		internal IfcMechanicalConcreteMaterialProperties(DatabaseIfc db, IfcMechanicalConcreteMaterialProperties p) : base(db,p)
+		internal IfcMechanicalConcreteMaterialProperties(DatabaseIfc db, IfcMechanicalConcreteMaterialProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mCompressiveStrength = p.mCompressiveStrength;
 			mMaxAggregateSize = p.mMaxAggregateSize;
@@ -824,7 +824,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMechanicalMaterialProperties() : base() { }
 		public IfcMechanicalMaterialProperties(IfcMaterial material) : base(material) { }
-		internal IfcMechanicalMaterialProperties(DatabaseIfc db, IfcMechanicalMaterialProperties p) : base(db,p) { mDynamicViscosity = p.mDynamicViscosity; mYoungModulus = p.mYoungModulus; mShearModulus = p.mShearModulus; mPoissonRatio = p.mPoissonRatio; mThermalExpansionCoefficient = p.mThermalExpansionCoefficient; }
+		internal IfcMechanicalMaterialProperties(DatabaseIfc db, IfcMechanicalMaterialProperties p, DuplicateOptions options) : base(db, p, options) { mDynamicViscosity = p.mDynamicViscosity; mYoungModulus = p.mYoungModulus; mShearModulus = p.mShearModulus; mPoissonRatio = p.mPoissonRatio; mThermalExpansionCoefficient = p.mThermalExpansionCoefficient; }
 		public IfcMechanicalMaterialProperties(IfcMaterial mat, double dynVisc, double youngs, double shear, double poisson, double thermalExp)
 			: base(mat) { mDynamicViscosity = dynVisc; mYoungModulus = youngs; mShearModulus = shear; mPoissonRatio = poisson; mThermalExpansionCoefficient = thermalExp; }
 	}
@@ -847,7 +847,7 @@ namespace GeometryGym.Ifc
 		public List<IfcRelaxation> Relaxations { get { return mRelaxations.ConvertAll(x => mDatabase[x] as IfcRelaxation); } set { mRelaxations = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
 
 		internal IfcMechanicalSteelMaterialProperties() : base() { }
-		internal IfcMechanicalSteelMaterialProperties(DatabaseIfc db, IfcMechanicalSteelMaterialProperties p) : base(db,p)
+		internal IfcMechanicalSteelMaterialProperties(DatabaseIfc db, IfcMechanicalSteelMaterialProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mYieldStress = p.mYieldStress;
 			mUltimateStress = p.mUltimateStress;

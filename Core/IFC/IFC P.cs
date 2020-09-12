@@ -761,14 +761,14 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcPreDefinedProperties() : base() { }
 		protected IfcPreDefinedProperties(DatabaseIfc db) : base(db) { }
-		protected IfcPreDefinedProperties(DatabaseIfc db, IfcPreDefinedProperties p) : base(db, p) { }
+		protected IfcPreDefinedProperties(DatabaseIfc db, IfcPreDefinedProperties p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedPropertySet : IfcPropertySetDefinition // IFC4 ABSTRACT SUPERTYPE OF(ONEOF(IfcDoorLiningProperties,  
 	{ //IfcDoorPanelProperties, IfcPermeableCoveringProperties, IfcReinforcementDefinitionProperties, IfcWindowLiningProperties, IfcWindowPanelProperties))
 		protected IfcPreDefinedPropertySet() : base() { }
 		protected IfcPreDefinedPropertySet(DatabaseIfc db, IfcPreDefinedPropertySet p, DuplicateOptions options) : base(db, p, options) { }
-		protected IfcPreDefinedPropertySet(DatabaseIfc m, string name) : base(m, name) { }
+		protected IfcPreDefinedPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -1386,15 +1386,12 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesProfileProperties mAssociates = null; //GeometryGym attribute
 
 		internal IfcProfileProperties() : base() { }
-		internal IfcProfileProperties(DatabaseIfc db, IfcProfileProperties p) : base(db, p) { ProfileDefinition = db.Factory.Duplicate(p.ProfileDefinition) as IfcProfileDef; }
-		internal IfcProfileProperties(IfcProfileDef p) : base(p == null ? null : p.mDatabase)
+		internal IfcProfileProperties(DatabaseIfc db, IfcProfileProperties p, DuplicateOptions options) : base(db, p, options) { ProfileDefinition = db.Factory.Duplicate(p.ProfileDefinition) as IfcProfileDef; }
+		internal IfcProfileProperties(IfcProfileDef p) : base(p.mDatabase)
 		{
-			if (p != null)
-			{
-				ProfileDefinition = p;
-				if (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4)
-					mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
-			}
+			ProfileDefinition = p;
+			if (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4)
+				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
 		}
 		internal IfcProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props)
 		{
@@ -1533,7 +1530,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcProperty() : base() { }
 		protected IfcProperty(IfcProperty property) : base(property) { Name = property.Name; Description = property.Description; }
-		protected IfcProperty(DatabaseIfc db, IfcProperty p) : base(db, p) { mName = p.mName; mDescription = p.mDescription; }
+		protected IfcProperty(DatabaseIfc db, IfcProperty p, DuplicateOptions options) : base(db, p, options) { mName = p.mName; mDescription = p.mDescription; }
 		protected IfcProperty(DatabaseIfc db, string name) : base(db) { Name = name; }
 
 		internal override bool isDuplicate(BaseClassIfc e, double tol)
@@ -1564,11 +1561,10 @@ namespace GeometryGym.Ifc
 		protected IfcPropertyAbstraction() : base() { }
 		protected IfcPropertyAbstraction(IfcPropertyAbstraction propertyAbstraction) : base(propertyAbstraction.Database) { }
 		protected IfcPropertyAbstraction(DatabaseIfc db) : base(db) { }
-		protected IfcPropertyAbstraction(DatabaseIfc db, IfcPropertyAbstraction p) : base(db, p) { }
+		protected IfcPropertyAbstraction(DatabaseIfc db, IfcPropertyAbstraction p, DuplicateOptions options) : base(db, p) { }
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
 		}
 		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -1605,7 +1601,7 @@ namespace GeometryGym.Ifc
 		public IfcValue SetPointValue { get { return mSetPointValue; } set { mSetPointValue = value; } }
 
 		internal IfcPropertyBoundedValue() : base() { }
-		internal IfcPropertyBoundedValue(DatabaseIfc db, IfcPropertyBoundedValue p) : base(db, p)
+		internal IfcPropertyBoundedValue(DatabaseIfc db, IfcPropertyBoundedValue p, DuplicateOptions options) : base(db, p, options)
 		{
 			mUpperBoundValue = p.mUpperBoundValue;
 			mLowerBoundValue = p.mLowerBoundValue;
@@ -1726,12 +1722,12 @@ namespace GeometryGym.Ifc
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
 
 		internal IfcPropertyEnumeration() : base() { }
-		internal IfcPropertyEnumeration(DatabaseIfc db, IfcPropertyEnumeration p) : base(db, p)
+		internal IfcPropertyEnumeration(DatabaseIfc db, IfcPropertyEnumeration p, DuplicateOptions options) : base(db, p, options)
 		{
 			mName = p.mName;
 			mEnumerationValues.AddRange(p.mEnumerationValues);
 			if (p.mUnit > 0)
-				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit]) as IfcUnit;
+				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit], options) as IfcUnit;
 		}
 		public IfcPropertyEnumeration(DatabaseIfc db, string name, IEnumerable<IfcValue> values) : base(db) { Name = name;  mEnumerationValues.AddRange(values); }
 	}
@@ -1745,11 +1741,11 @@ namespace GeometryGym.Ifc
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = value == null ? 0 : value.Index; } }
 
 		internal IfcPropertyListValue() : base() { }
-		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue p) : base(db, p)
+		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue p, DuplicateOptions options) : base(db, p, options)
 		{
 			mNominalValue.AddRange(p.mNominalValue);
 			if (p.mUnit > 0)
-				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit]) as IfcUnit;
+				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit], options) as IfcUnit;
 		}
 		public IfcPropertyListValue(DatabaseIfc db, string name, IEnumerable<IfcValue> values)
 			: base(db, name) { mNominalValue.AddRange(values); }
@@ -1777,12 +1773,11 @@ namespace GeometryGym.Ifc
 		public IfcObjectReferenceSelect PropertyReference { get { return mDatabase[mPropertyReference] as IfcObjectReferenceSelect; } set { mPropertyReference = (value == null ? 0 : value.Index); } }
 
 		internal IfcPropertyReferenceValue() : base() { }
-		internal IfcPropertyReferenceValue(DatabaseIfc db, IfcPropertyReferenceValue p) : base(db, p)
+		internal IfcPropertyReferenceValue(DatabaseIfc db, IfcPropertyReferenceValue p, DuplicateOptions options) : base(db, p, options)
 		{
 			mUsageName = p.mUsageName;
-#warning todo
-			//if(p.mPropertyReference > 0)
-			//	PropertyReference = db.Factory.Duplicate( p.PropertyReference) as ;
+			if(p.mPropertyReference > 0)
+				PropertyReference = db.Factory.Duplicate(p.PropertyReference as BaseClassIfc, options) as IfcObjectReferenceSelect;
 		}
 		public IfcPropertyReferenceValue(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertyReferenceValue(string name, IfcObjectReferenceSelect obj) : base(obj.Database, name) { PropertyReference = obj; }
@@ -2103,11 +2098,11 @@ namespace GeometryGym.Ifc
 			NominalValue = propertySingleValue.NominalValue;
 			Unit = propertySingleValue.Unit;
 		}
-		internal IfcPropertySingleValue(DatabaseIfc db, IfcPropertySingleValue s) : base(db, s)
+		internal IfcPropertySingleValue(DatabaseIfc db, IfcPropertySingleValue s, DuplicateOptions options) : base(db, s, options)
 		{
 			mNominalValue = s.mNominalValue;
 			if (s.mUnit != null)
-				Unit = db.Factory.Duplicate(s.mUnit) as IfcUnit;
+				Unit = db.Factory.Duplicate(s.mUnit as BaseClassIfc, options) as IfcUnit;
 		}
 		public IfcPropertySingleValue(DatabaseIfc m, string name, IfcValue value) : base(m, name) { mNominalValue = value; }
 		public IfcPropertySingleValue(DatabaseIfc m, string name, bool value) : this(m, name, new IfcBoolean(value)) { }
@@ -2199,7 +2194,7 @@ namespace GeometryGym.Ifc
 		internal IfcCurveInterpolationEnum mCurveInterpolation = IfcCurveInterpolationEnum.NOTDEFINED;// : :	OPTIONAL IfcCurveInterpolationEnum; 
 
 		internal IfcPropertyTableValue() : base() { }
-		internal IfcPropertyTableValue(DatabaseIfc db, IfcPropertyTableValue p) : base(db, p)
+		internal IfcPropertyTableValue(DatabaseIfc db, IfcPropertyTableValue p, DuplicateOptions options) : base(db, p, options)
 		{
 #warning todo
 			//			mDefiningValues.AddRange(p.DefiningValues);
@@ -2213,16 +2208,19 @@ namespace GeometryGym.Ifc
 		internal List<IfcValue> mDefiningValues = new List<IfcValue>();//	 :	OPTIONAL LIST [1:?] OF UNIQUE IfcValue;
 		internal List<IfcValue> mDefinedValues = new List<IfcValue>();//	 :	OPTIONAL LIST [1:?] OF IfcValue;
 		internal string mExpression = "$";// ::	OPTIONAL IfcText; 
-		internal int mDefiningUnit;// : :	OPTIONAL IfcUnit;   
-		internal int mDefinedUnit;// : :	OPTIONAL IfcUnit;
+		internal IfcUnit mDefiningUnit = null;// : :	OPTIONAL IfcUnit;   
+		internal IfcUnit mDefinedUnit = null;// : :	OPTIONAL IfcUnit;
 		internal IfcCurveInterpolationEnum mCurveInterpolation = IfcCurveInterpolationEnum.NOTDEFINED;// : :	OPTIONAL IfcCurveInterpolationEnum; 
 
 		internal IfcPropertyTableValue() : base() { }
-		internal IfcPropertyTableValue(DatabaseIfc db, IfcPropertyTableValue p) : base(db, p)
+		internal IfcPropertyTableValue(DatabaseIfc db, IfcPropertyTableValue p, DuplicateOptions options) : base(db, p, options)
 		{
-#warning todo
-			//			mDefiningValues.AddRange(p.DefiningValues);
-			//		DefinedValues.AddRange(p.DefinedValues);//.ToArray()); mExpression = p.mExpression; mDefiningUnit = p.mDefiningUnit; mDefinedUnit = p.mDefinedUnit; mCurveInterpolation = p.mCurveInterpolation; 
+			mDefiningValues.AddRange(p.mDefiningValues);
+			mDefinedValues.AddRange(p.mDefinedValues);
+			mExpression = p.mExpression;
+			mDefiningUnit = db.Factory.Duplicate(p.mDefiningUnit) as IfcUnit;
+			mDefinedUnit = db.Factory.Duplicate(p.mDefinedUnit) as IfcUnit;
+			//.ToArray()); mExpression = p.mExpression; mDefiningUnit = p.mDefiningUnit; mDefinedUnit = p.mDefinedUnit; mCurveInterpolation = p.mCurveInterpolation; 
 		}
 		public IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }
 	}

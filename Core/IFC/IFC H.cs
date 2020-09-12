@@ -89,7 +89,7 @@ namespace GeometryGym.Ifc
 		internal double mVaporPermeability = double.NaN;//: OPTIONAL IfcVaporPermeabilityMeasure;
 		internal double mMoistureDiffusivity = double.NaN;// : OPTIONAL IfcMoistureDiffusivityMeasure;*/
 		internal IfcHygroscopicMaterialProperties() : base() { }
-		internal IfcHygroscopicMaterialProperties(DatabaseIfc db, IfcHygroscopicMaterialProperties p) : base(db,p)
+		internal IfcHygroscopicMaterialProperties(DatabaseIfc db, IfcHygroscopicMaterialProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mUpperVaporResistanceFactor = p.mUpperVaporResistanceFactor;
 			mLowerVaporResistanceFactor = p.mLowerVaporResistanceFactor;

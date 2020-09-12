@@ -2493,7 +2493,7 @@ namespace GeometryGym.Ifc
 		internal double mThickness, mRibHeight, mRibWidth, mRibSpacing;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcRibPlateDirectionEnum mDirection;// : IfcRibPlateDirectionEnum;*/
 		internal IfcRibPlateProfileProperties() : base() { }
-		internal IfcRibPlateProfileProperties(DatabaseIfc db, IfcRibPlateProfileProperties p) : base(db, p)
+		internal IfcRibPlateProfileProperties(DatabaseIfc db, IfcRibPlateProfileProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mThickness = p.mThickness;
 			mRibHeight = p.mRibHeight;

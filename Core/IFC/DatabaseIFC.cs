@@ -463,6 +463,17 @@ namespace GeometryGym.Ifc
 		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
 		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
+		public IfcAxis2Placement3D DuplicateAxis(IfcAxis2Placement3D placement, DuplicateOptions options)
+		{
+			if (placement == null)
+				return null;
+			int index = mDuplicateMapping.FindExisting(placement);
+			if (index > 0)
+				return mDatabase[index] as IfcAxis2Placement3D;
+			if (placement.IsXYPlane)
+				return XYPlanePlacement;
+			return Duplicate(placement, options) as IfcAxis2Placement3D;
+		}
 		public BaseClassIfc Duplicate(BaseClassIfc entity, DuplicateOptions options)
 		{
 			if (entity == null)

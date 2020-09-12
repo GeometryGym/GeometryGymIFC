@@ -224,7 +224,7 @@ namespace GeometryGym.Ifc
 		public IfcProfileDef EndProfile { get { return mDatabase[mEndProfile] as IfcProfileDef; } set { mStartProfile = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSectionProperties() : base() { }
-		internal IfcSectionProperties(DatabaseIfc db, IfcSectionProperties p) : base(db, p) { mSectionType = p.mSectionType; mStartProfile = db.Factory.Duplicate(p.mDatabase[p.mStartProfile]).mIndex; mEndProfile = db.Factory.Duplicate(p.mDatabase[p.mEndProfile]).mIndex; }
+		internal IfcSectionProperties(DatabaseIfc db, IfcSectionProperties p, DuplicateOptions options) : base(db, p, options) { mSectionType = p.mSectionType; mStartProfile = db.Factory.Duplicate(p.mDatabase[p.mStartProfile]).mIndex; mEndProfile = db.Factory.Duplicate(p.mDatabase[p.mEndProfile]).mIndex; }
 		public IfcSectionProperties(IfcProfileDef startProfile) : base(startProfile.mDatabase) { StartProfile = startProfile; }
 		public IfcSectionProperties(IfcProfileDef startProfile, IfcProfileDef endProfile) : this(startProfile) { SectionType = IfcSectionTypeEnum.TAPERED; EndProfile = endProfile; }
 	}
@@ -246,7 +246,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcReinforcementBarProperties> CrossSectionReinforcementDefinitions { get { return new ReadOnlyCollection<IfcReinforcementBarProperties>( mCrossSectionReinforcementDefinitions.ConvertAll(x => mDatabase[x] as IfcReinforcementBarProperties)); } } 
 
 		internal IfcSectionReinforcementProperties() : base() { }
-		internal IfcSectionReinforcementProperties(DatabaseIfc db, IfcSectionReinforcementProperties p) : base(db,p)
+		internal IfcSectionReinforcementProperties(DatabaseIfc db, IfcSectionReinforcementProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mLongitudinalStartPosition = p.mLongitudinalStartPosition;
 			mLongitudinalEndPosition = p.mLongitudinalEndPosition;
@@ -597,7 +597,7 @@ additional types	some additional representation types are given:
 	{ // IfcPropertyListValue,IfcPropertyReferenceValue,IfcPropertySingleValue,IfcPropertyTableValue)) 
 		protected IfcSimpleProperty() : base() { }
 		protected IfcSimpleProperty(IfcSimpleProperty simpleProperty) : base(simpleProperty) { }
-		protected IfcSimpleProperty(DatabaseIfc db, IfcSimpleProperty p) : base(db, p) { }
+		protected IfcSimpleProperty(DatabaseIfc db, IfcSimpleProperty p, DuplicateOptions options) : base(db, p, options) { }
 		protected IfcSimpleProperty(DatabaseIfc m, string name) : base(m, name) { }
 	}
 	[Serializable]
@@ -1826,7 +1826,7 @@ additional types	some additional representation types are given:
 		public double CentreOfGravityInY { get { return mCentreOfGravityInY; } set { mCentreOfGravityInY = value; } }
 
 		internal IfcStructuralProfileProperties() : base() { }
-		internal IfcStructuralProfileProperties(DatabaseIfc db, IfcStructuralProfileProperties p) : base(db, p)
+		internal IfcStructuralProfileProperties(DatabaseIfc db, IfcStructuralProfileProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mTorsionalConstantX = p.mTorsionalConstantX;
 			mMomentOfInertiaYZ = p.mMomentOfInertiaYZ; 
@@ -1893,7 +1893,7 @@ additional types	some additional representation types are given:
 		public double PlasticShapeFactorZ { get { return mPlasticShapeFactorZ; } set { mPlasticShapeFactorZ = value; } }
 
 		internal IfcStructuralSteelProfileProperties() : base() { }
-		internal IfcStructuralSteelProfileProperties(DatabaseIfc db, IfcStructuralSteelProfileProperties p) : base(db, p) { mShearAreaZ = p.mShearAreaZ; mShearAreaY = p.mShearAreaY; mPlasticShapeFactorY = p.mPlasticShapeFactorY; mPlasticShapeFactorZ = p.mPlasticShapeFactorZ; }
+		internal IfcStructuralSteelProfileProperties(DatabaseIfc db, IfcStructuralSteelProfileProperties p, DuplicateOptions options) : base(db, p, options) { mShearAreaZ = p.mShearAreaZ; mShearAreaY = p.mShearAreaY; mPlasticShapeFactorY = p.mPlasticShapeFactorY; mPlasticShapeFactorZ = p.mPlasticShapeFactorZ; }
 	}
 	[Serializable]
 	public partial class IfcStructuralSurfaceAction : IfcStructuralAction //IFC4 SUPERTYPE OF(IfcStructuralPlanarAction)
@@ -2400,24 +2400,28 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
 	{
-		private int mSweptArea;// : IfcProfileDef;
-		private int mPosition;// : IfcAxis2Placement3D; 	 :	OPTIONAL IFC4
+		private IfcProfileDef mSweptArea;// : IfcProfileDef;
+		private IfcAxis2Placement3D mPosition;// : IfcAxis2Placement3D; 	 :	OPTIONAL IFC4
 
-		public IfcProfileDef SweptArea { get { return mDatabase[mSweptArea] as IfcProfileDef; } set { mSweptArea = value.mIndex; } }
-		public IfcAxis2Placement3D Position { get { return mDatabase[mPosition] as IfcAxis2Placement3D; } set { mPosition = (value == null ? 0 : value.mIndex); } }
+		public IfcProfileDef SweptArea { get { return mSweptArea; } set { mSweptArea = value; } }
+		public IfcAxis2Placement3D Position { get { return mPosition; } set { mPosition = value; } }
 
 		protected IfcSweptAreaSolid() : base() { }
 		protected IfcSweptAreaSolid(DatabaseIfc db) : base(db) { }
 		protected IfcSweptAreaSolid(DatabaseIfc db, IfcSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)
 		{
 			SweptArea = db.Factory.Duplicate(s.SweptArea, options) as IfcProfileDef;
-			if (s.mPosition > 0)
-				Position = db.Factory.Duplicate(s.Position, options) as IfcAxis2Placement3D;
+			if (s.mPosition == null)
+			{
+				if (db.Release < ReleaseVersion.IFC4)
+					s.mPosition = db.Factory.XYPlanePlacement;
+			}
+			else
+				Position = db.Factory.DuplicateAxis(s.Position, options);
 		}
 		protected IfcSweptAreaSolid(IfcProfileDef sweptArea) : base(sweptArea.mDatabase) { SweptArea = sweptArea; if (sweptArea.mDatabase.Release < ReleaseVersion.IFC4) Position = sweptArea.mDatabase.Factory.XYPlanePlacement; }
-		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) : this(prof) { Position = (position == null && mDatabase.Release < ReleaseVersion.IFC4 ? new IfcAxis2Placement3D(mDatabase.Factory.Origin) : position); }
-
-		
+		protected IfcSweptAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position) 
+			: this(prof) { if (position != null) Position = position; }
 	}
 	[Serializable]
 	public partial class IfcSweptDiskSolid : IfcSolidModel
