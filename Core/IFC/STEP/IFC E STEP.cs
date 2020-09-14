@@ -577,19 +577,14 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4)
 				return "";
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingReference) + ",(#" + string.Join(",#", mRelatedResourceObjects.ConvertAll(x=>x.Index)) + ")";
+			return base.BuildStringSTEP(release) + ",#" + mRelatingReference.StepId + ",(#" + string.Join(",#", mRelatedResourceObjects.ConvertAll(x=>x.Index)) + ")";
 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatingReference = ParserSTEP.StripLink(str,ref pos, len);
+			RelatingReference = dictionary[ParserSTEP.StripLink(str,ref pos, len)] as IfcExternalReference;
 			mRelatedResourceObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcResourceObjectSelect));
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			RelatingReference.mExternalReferenceForResources.Add(this);
 		}
 	}
 	public partial class IfcExternalSpatialElement : IfcExternalSpatialStructureElement, IfcSpaceBoundarySelect //NEW IFC4

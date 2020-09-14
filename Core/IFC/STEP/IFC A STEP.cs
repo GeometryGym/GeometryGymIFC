@@ -403,6 +403,20 @@ namespace GeometryGym.Ifc
 			mTag = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
+	public partial class IfcAnnotation : IfcProduct
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3 ? "" : (mPredefinedType == IfcAnnotationTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			if (release > ReleaseVersion.IFC4X2)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+					Enum.TryParse<IfcAnnotationTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+			}
+		}
+	}
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

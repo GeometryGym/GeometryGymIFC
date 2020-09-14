@@ -350,15 +350,24 @@ namespace GeometryGym.Ifc
 			if (!string.IsNullOrEmpty(str))
 			{
 				string lower = str.ToLower();
-				if (mDatabase.Release < ReleaseVersion.IFC4)
+				ReleaseVersion release = mDatabase.Release;
+				if (release < ReleaseVersion.IFC4X1)
 				{
-					if (lower.StartsWith("ifcshadingdevice"))
-						str = "IfcBuildingElementProxy.ShadingDevice";
-					if (lower.StartsWith("ifcgeographicelement"))
-						str = "IfcBuildingElementProxy.GeographicElement";
-					if (lower.StartsWith("ifccivilelement"))
-						str = "IfcBuildingElementProxy.CivilElement";
+					if (lower.StartsWith("ifcfacility"))
+						str = "IfcSite";
+					else if (lower.StartsWith("ifcfacilitypart"))
+						str = "IfcBuilding";
+					else if (release < ReleaseVersion.IFC4)
+					{
+						if (lower.StartsWith("ifcshadingdevice"))
+							str = "IfcBuildingElementProxy.ShadingDevice";
+						if (lower.StartsWith("ifcgeographicelement"))
+							str = "IfcBuildingElementProxy.GeographicElement";
+						if (lower.StartsWith("ifccivilelement"))
+							str = "IfcBuildingElementProxy.CivilElement";
+					}
 				}
+
 				string[] fields = str.Split(".".ToCharArray());
 				if (fields.Length > 1)
 				{

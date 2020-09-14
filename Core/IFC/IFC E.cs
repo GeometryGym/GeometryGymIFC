@@ -1183,10 +1183,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4
 	{
-		private int mRelatingReference;// :	IfcExternalReference;
+		private IfcExternalReference mRelatingReference;// :	IfcExternalReference;
 		private SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
-		public IfcExternalReference RelatingReference { get { return mDatabase[mRelatingReference] as IfcExternalReference; } set { mRelatingReference = value.mIndex; value.mExternalReferenceForResources.Add(this); } }
+		public IfcExternalReference RelatingReference { get { return mRelatingReference as IfcExternalReference; } set { mRelatingReference = value; value.mExternalReferenceForResources.Add(this); } }
 		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects.Clear(); if (value != null) { mRelatedResourceObjects.CollectionChanged -= mRelatedResourceObjects_CollectionChanged; mRelatedResourceObjects = value; mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged; } } } 
 
 		//INVERSE
@@ -1196,12 +1196,11 @@ namespace GeometryGym.Ifc
 		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect)); }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IEnumerable<IfcResourceObjectSelect> related)
-			: base(reference.mDatabase) { mRelatingReference = reference.mIndex; RelatedResourceObjects.AddRange(related); }
+			: base(reference.mDatabase) { RelatingReference = reference; RelatedResourceObjects.AddRange(related); }
 
 		protected override void initialize()
 		{
 			base.initialize();
-
 			mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged;
 		}
 		private void mRelatedResourceObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

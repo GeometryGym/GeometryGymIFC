@@ -594,8 +594,9 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public partial class IfcAnnotation : IfcProduct
-	{    //INVERSE
-		// IfcRelContainedInSpatialStructure ContainedInStructure;
+	{    
+		internal IfcAnnotationTypeEnum mPredefinedType = IfcAnnotationTypeEnum.NOTDEFINED;//: OPTIONAL IfcBeamTypeEnum; IFC4
+		public IfcAnnotationTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcAnnotation() : base() { }
 		public IfcAnnotation(DatabaseIfc db) : base(db) { }

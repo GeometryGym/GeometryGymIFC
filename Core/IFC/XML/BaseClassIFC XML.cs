@@ -130,8 +130,18 @@ namespace GeometryGym.Ifc
 		{
 			string id = "";
 			IfcClassificationReference classificationReference = this as IfcClassificationReference;
-			if (classificationReference != null && !string.IsNullOrEmpty(classificationReference.Identification))
-				id = classificationReference.Identification;
+			if (classificationReference != null)
+			{
+				if (!string.IsNullOrEmpty(classificationReference.Identification))
+				{
+					int i = 0;
+					string str = classificationReference.Identification;
+					if (str[0] == 'i' || str[0] == '_')
+						str = str.Substring(1);
+					if(!int.TryParse(str, out i))
+						id = classificationReference.Identification;
+				}
+			}
 			if(string.IsNullOrEmpty(id))
 				return "i" + StepId;
 			if (char.IsDigit(id[0]))

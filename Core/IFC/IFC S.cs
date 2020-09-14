@@ -1065,7 +1065,7 @@ additional types	some additional representation types are given:
 				return mDecomposes.RelatingObject.FindStructAnalysisModel(false);
 			return null;
 		}
-		public void ReferenceElement(IfcProduct element)
+		public void ReferenceElement(IfcSpatialReferenceSelect element)
 		{
 			if (mReferencesElements.Count > 0)
 				mReferencesElements[0].RelatedElements.Add(element);
@@ -1121,7 +1121,7 @@ additional types	some additional representation types are given:
 		protected IfcSpatialZone() : base() { }
 		protected IfcSpatialZone(DatabaseIfc db, IfcSpatialZone p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; }
 		public IfcSpatialZone(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
-		public IfcSpatialZone(IfcSpatialStructureElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
+		public IfcSpatialZone(IfcSpatialElement host, string name) : base(host, name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception("IFCSpatial Zone only valid in IFC4 or newer!"); }
 	}
 	[Serializable]
 	public partial class IfcSpatialZoneType : IfcSpatialElementType  //IFC4
@@ -2517,11 +2517,16 @@ additional types	some additional representation types are given:
 				rsb.RelatingSystem = this;
 			}
 		}
-		public IfcSystem(DatabaseIfc m, string name) : base(m, name) { }
-		public IfcSystem(IfcSpatialElement e, string name) : base(e.mDatabase, name)
+		public IfcSystem(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcSystem(IfcSpatialElement spatial, string name) : base(spatial.mDatabase, name)
 		{
-			if(!(this is IfcZone && e.mDatabase.Release <= ReleaseVersion.IFC2x3))
-				mServicesBuildings = new IfcRelServicesBuildings(this, e) { Name = name };
+			if (!(this is IfcZone))
+			{
+				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3)
+					mServicesBuildings = new IfcRelServicesBuildings(this, spatial) { Name = name };
+				else
+					spatial.ReferenceElement(this);
+			}
 		}
 		public IfcSystem(IfcSystem system, string name) : base(system.Database, name)
 		{

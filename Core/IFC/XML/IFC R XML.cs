@@ -698,7 +698,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcProduct p = mDatabase.ParseXml<IfcProduct>(cn as XmlElement);
+						IfcSpatialReferenceSelect p = mDatabase.ParseXml<IfcProduct>(cn as XmlElement);
 						if (p != null)
 							RelatedElements.Add(p);
 					}

@@ -651,7 +651,17 @@ namespace GeometryGym.Ifc
 		internal IfcObjectDefinition mRelatingObject;// : IfcObjectDefinition IFC4 IfcObject
 		internal SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// : SET [1:?] OF IfcObjectDefinition; 
 
-		public IfcObjectDefinition RelatingObject { get { return mRelatingObject; } set { if (mRelatingObject != null) { mRelatingObject.mIsDecomposedBy.Remove(this);  } mRelatingObject = value; value.mIsDecomposedBy.Add(this); } }
+		public IfcObjectDefinition RelatingObject 
+		{ 
+			get { return mRelatingObject; } 
+			set 
+			{ 
+				if (mRelatingObject != null) 
+					mRelatingObject.mIsDecomposedBy.Remove(this);
+				mRelatingObject = value;
+				value.mIsDecomposedBy.Add(this); 
+			} 
+		}
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
 
 		internal IfcRelAggregates() : base() { }
@@ -2026,6 +2036,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
+	[Obsolete("DEPRECATED IFC4x3", false)]
 	public partial class IfcRelServicesBuildings : IfcRelConnects
 	{
 		internal int mRelatingSystem;// : IfcSystem;

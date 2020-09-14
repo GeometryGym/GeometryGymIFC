@@ -317,6 +317,22 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Tag", Tag);
 		}
 	}
+	public partial class IfcAnnotation : IfcProduct
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcAnnotationTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcAnnotationTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
 	{
 		internal override void parseJObject(JObject obj)
