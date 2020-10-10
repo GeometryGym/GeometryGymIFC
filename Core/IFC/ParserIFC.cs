@@ -58,6 +58,8 @@ namespace GeometryGym.Ifc
 				}
 				if (c == '\'')
 					result += "\\X\\27"; // Alternative result += "''";
+				else if (c == '\\')
+					result += "\\X\\5C";
 				else
 				{
 					int i = (int)c;

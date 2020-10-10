@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 			public JsonStyle Style = JsonStyle.Default;
 			public bool Local = false;  //Convert to nesting
 			public bool SerializeOwnerHistory = true, SerializeAllGlobalIds = true;
-			public int LengthDigitCount = 4;
+			internal int LengthDigitCount = 4;
 			internal RepositoryAttributes RepositoryAttributes = new RepositoryAttributes();
 			internal ReleaseVersion Version = ReleaseVersion.IFC4X3;
 
@@ -156,16 +156,17 @@ namespace GeometryGym.Ifc
 					options.Encountered.Add(mGlobalId);
 			}
 			obj["type"] = StepClassName;
-			if (common || this is IfcGeometricRepresentationContext || this is NamedObjectIfc)
+			if (common || (options.SerializeAllGlobalIds && !string.IsNullOrEmpty(mGlobalId)) || this is IfcGeometricRepresentationContext || this is NamedObjectIfc)
 			{
 				if (string.IsNullOrEmpty(mGlobalId))
 				{
 					mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
 					options.Encountered.Add(mGlobalId);
 				}
-				if(options.SerializeAllGlobalIds && this as IfcRoot == null)
+				if(options.SerializeAllGlobalIds && !string.IsNullOrEmpty(mGlobalId))
 					obj["id"] = mGlobalId;
 			}
+			
 			setJSON(obj, host, options);
 			if (options.Style == SetJsonOptions.JsonStyle.Repository)
 			{

@@ -42,7 +42,7 @@ namespace GeometryGym.Ifc
 	[Serializable()]
 	public abstract partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
-		internal string mGlobalId = ""; // :	IfcGloballyUniqueId;
+		public string mGlobalId = ""; // :	IfcGloballyUniqueId;
 
 		[NonSerialized] internal DatabaseIfc mDatabase = null;
 
@@ -388,7 +388,6 @@ namespace GeometryGym.Ifc
 					File.SetLastWriteTime(filePath, modified);
 			}
 			catch (Exception) { }
-			
 		}
 	}
 	public partial interface IBaseClassIfc : ISTEPEntity

@@ -485,7 +485,8 @@ namespace GeometryGym.Ifc
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 
 		internal IfcClassification() : base() { }
-		internal IfcClassification(DatabaseIfc db, IfcClassification c) : base(db, c) { mSource = c.mSource; mEdition = c.mEdition; mEditionDate = c.mEditionDate; mName = c.mName; }
+		internal IfcClassification(DatabaseIfc db, IfcClassification c) 
+			: base(db, c) { mSource = c.mSource; mEdition = c.mEdition; mEditionDate = c.mEditionDate; mName = c.mName; mDescription = c.mDescription; mLocation = c.mLocation; mReferenceTokens.AddRange(c.mReferenceTokens); }
 		public IfcClassification(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected override void initialize()
 		{

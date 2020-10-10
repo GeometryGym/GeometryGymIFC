@@ -798,7 +798,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mRelatedObjects.Count == 0)
+			if (release > ReleaseVersion.IFC2x3 || mRelatedObjects.Count == 0)
 				return "";
 			string str = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingProfileProperties) + "," +
 				ParserSTEP.LinkToString(mProfileSectionLocation) + ",";
@@ -1320,7 +1320,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mRelatedElements.Count <= 0)
+			if ((release < ReleaseVersion.IFC4 && RelatingStructure as IfcSpatialStructureElement == null) || mRelatedElements.Count <= 0)
 				return "";
 			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.Select(x => x.Index)) + "),#" + mRelatingStructure;
 		}

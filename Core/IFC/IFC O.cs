@@ -183,7 +183,25 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelNests> IsNestedBy { get { return mIsNestedBy; } set { mIsNestedBy.Clear(); if (value != null) { mIsNestedBy.CollectionChanged -= mIsNestedBy_CollectionChanged; mIsNestedBy = value; mIsNestedBy.CollectionChanged += mIsNestedBy_CollectionChanged; } } }
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
 		public ReadOnlyCollection<IfcRelAggregates> IsDecomposedBy { get { return new ReadOnlyCollection<IfcRelAggregates>(mIsDecomposedBy); } }
-		public IfcRelAggregates Decomposes { get { return mDecomposes; } set { if (mDecomposes != null) mDecomposes.mRelatedObjects.Remove(this); mDecomposes = value; if (value != null && !value.mRelatedObjects.Contains(this)) value.mRelatedObjects.Add(this); } }
+		public IfcRelAggregates Decomposes
+		{
+			get { return mDecomposes; } 
+			set
+			{ 
+				if (mDecomposes != null)
+					mDecomposes.mRelatedObjects.Remove(this);
+				IfcProduct product = this as IfcProduct;
+				if (product != null)
+				{
+					IfcRelContainedInSpatialStructure contained = product.mContainedInStructure;
+					if (contained != null)
+						contained.RelatedElements.Remove(product);
+				}
+				mDecomposes = value; 
+				if (value != null && !value.mRelatedObjects.Contains(this))
+					value.mRelatedObjects.Add(this); 
+			} 
+		}
 		public SET<IfcRelAssociates> HasAssociations { get { return mHasAssociations; } }
 
 		protected IfcObjectDefinition() : base() { }

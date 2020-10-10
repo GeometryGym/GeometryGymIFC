@@ -26,6 +26,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
+using System.Diagnostics;
 
 namespace GeometryGym.Ifc
 {
@@ -1078,6 +1079,7 @@ namespace GeometryGym.Ifc
 
 		public override NamedObjectIfc Relating() { return RelatingProfileDef; }
 	}
+	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
 	public partial class IfcRelAssociatesProfileProperties : IfcRelAssociates //IFC4 DELETED Replaced by IfcRelAssociatesMaterial together with material-profile sets
 	{
@@ -1106,7 +1108,7 @@ namespace GeometryGym.Ifc
 			else
 				mProfileOrientationValue = r.mProfileOrientationValue;
 		}
-		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { if (pp.mDatabase.mRelease > ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
+		public IfcRelAssociatesProfileProperties(IfcProfileProperties pp) : base(pp.mDatabase) { mRelatingProfileProperties = pp.mIndex; }
 		public IfcRelAssociatesProfileProperties(IfcDefinitionSelect related, IfcProfileProperties pp) : base(related) { if (pp.mDatabase.mRelease > ReleaseVersion.IFC2x3) throw new Exception(StepClassName + " Deleted in IFC4"); mRelatingProfileProperties = pp.mIndex; }
 	}
 	[Serializable]
@@ -1644,15 +1646,32 @@ namespace GeometryGym.Ifc
 		public override IfcRoot Relating() { return RelatingPropertyDefinition as IfcRoot; } 
 
 		internal IfcRelDefinesByProperties() : base() { }
-		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) { Name = "NameRelDefinesByProperties"; Description = "DescriptionRelDefinesByProperties"; }
+		private IfcRelDefinesByProperties(DatabaseIfc db) 
+			: base(db) 
+		{
+			if (StepId == 415577)
+				Debug.WriteLine("XX");
+			Name = "NameRelDefinesByProperties";
+			Description = "DescriptionRelDefinesByProperties";
+		}
 		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, DuplicateOptions options) : base(db, d, options.OwnerHistory)
 		{
-			//RelatedObjects = d.RelatedObjects.ConvertAll(x=>db.Factory.Duplicate(x) as IfcObjectDefinition);
+			if (StepId == 415577)
+				Debug.WriteLine("XX");
 			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition as BaseClassIfc, options) as IfcPropertySetDefinition;
 		}
-		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) : base(propertySet.Database) { mRelatingPropertyDefinition = propertySet; propertySet.DefinesOccurrence.Add(this); }
-		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.Add(relatedObject); }
-		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> relatedObjects, IfcPropertySetDefinition propertySet) : this(propertySet) { RelatedObjects.AddRange(relatedObjects); }
+		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) 
+			: base(propertySet.Database) 
+		{
+			if (StepId == 415577)
+				Debug.WriteLine("XX");
+			mRelatingPropertyDefinition = propertySet; 
+			propertySet.DefinesOccurrence.Add(this); 
+		}
+		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet)
+			: this(propertySet) { RelatedObjects.Add(relatedObject); }
+		public IfcRelDefinesByProperties(IEnumerable<IfcObjectDefinition> relatedObjects, IfcPropertySetDefinition propertySet) 
+			: this(propertySet) { RelatedObjects.AddRange(relatedObjects); }
 
 		protected override void initialize()
 		{
@@ -1993,6 +2012,14 @@ namespace GeometryGym.Ifc
 				foreach (IfcSpatialReferenceSelect s in e.OldItems)
 					s.ReferencedInStructures.Remove(this);
 			}
+		}
+		protected override bool DisposeWorker(bool children)
+		{
+			foreach(IfcSpatialReferenceSelect element in RelatedElements)
+				element.ReferencedInStructures.Remove(this);
+
+			RelatingStructure.ReferencesElements.Remove(this);
+			return base.DisposeWorker(children);
 		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]

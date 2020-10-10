@@ -354,39 +354,39 @@ namespace GeometryGym.Ifc
 		private string mTag = "$";// : OPTIONAL IfcIdentifier;
 
 		//INVERSE  
-		internal List<IfcRelFillsElement> mFillsVoids = new List<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
+		internal SET<IfcRelFillsElement> mFillsVoids = new SET<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedTo = new SET<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
 		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
 		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
-		internal List<IfcRelProjectsElement> mHasProjections = new List<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
+		internal SET<IfcRelProjectsElement> mHasProjections = new SET<IfcRelProjectsElement>();// : SET OF IfcRelProjectsElement FOR RelatingElement;
 		//internal List<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new List<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		internal SET<IfcRelConnectsPortToElement> mHasPorts = new SET<IfcRelConnectsPortToElement>();// :	SET OF IfcRelConnectsPortToElement FOR RelatedElement; moved IFC4 to IfcDistributionElement
 		internal SET<IfcRelVoidsElement> mHasOpenings = new SET<IfcRelVoidsElement>(); //: SET [0:?] OF IfcRelVoidsElement FOR RelatingBuildingElement;
 		internal SET<IfcRelConnectsWithRealizingElements> mIsConnectionRealization = new SET<IfcRelConnectsWithRealizingElements>();//	 : 	SET OF IfcRelConnectsWithRealizingElements FOR RealizingElements;
-		internal List<IfcRelSpaceBoundary> mProvidesBoundaries = new List<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
+		internal SET<IfcRelSpaceBoundary> mProvidesBoundaries = new SET<IfcRelSpaceBoundary>();//	 : 	SET OF IfcRelSpaceBoundary FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedFrom = new SET<IfcRelConnectsElements>();//	 : 	SET OF IfcRelConnectsElements FOR RelatedElement;
-		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
+		internal SET<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new SET<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
-		internal List<IfcRelCoversBldgElements> mHasCoverings = new List<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
+		internal SET<IfcRelCoversBldgElements> mHasCoverings = new SET<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
 
-		internal List<IfcRelConnectsStructuralElement> mHasStructuralMember = new List<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
+		internal SET<IfcRelConnectsStructuralElement> mHasStructuralMember = new SET<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
-		public ReadOnlyCollection<IfcRelFillsElement> FillsVoids { get { return new ReadOnlyCollection<IfcRelFillsElement>(mFillsVoids); } }
+		public SET<IfcRelFillsElement> FillsVoids { get { return mFillsVoids; } }
 		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
 		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
-		public ReadOnlyCollection<IfcRelProjectsElement> HasProjections { get { return new ReadOnlyCollection<IfcRelProjectsElement>(mHasProjections); } }
+		public SET<IfcRelProjectsElement> HasProjections { get { return mHasProjections; } }
 		[Obsolete("DEPRECATED IFC4", false)]
 		public SET<IfcRelConnectsPortToElement> HasPortsSS { get { return mHasPorts; } }
 		public SET<IfcRelVoidsElement> HasOpenings { get { return mHasOpenings; } }
 		public SET<IfcRelConnectsWithRealizingElements> IsConnectionRealization { get { return mIsConnectionRealization; } }
-		public ReadOnlyCollection<IfcRelSpaceBoundary> ProvidesBoundaries { get { return new ReadOnlyCollection<IfcRelSpaceBoundary>(mProvidesBoundaries); } }
+		public SET<IfcRelSpaceBoundary> ProvidesBoundaries { get { return mProvidesBoundaries; } }
 		public SET<IfcRelConnectsElements> ConnectedFrom { get { return mConnectedFrom; } }
 		public IfcRelContainedInSpatialStructure ContainedInStructure { get { return mContainedInStructure; } }
-		public ReadOnlyCollection<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return new ReadOnlyCollection<IfcRelConnectsStructuralActivity>(mAssignedStructuralActivity); } }
+		public SET<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return mAssignedStructuralActivity; } }
 
-		public ReadOnlyCollection<IfcRelCoversBldgElements> HasCoverings { get { return new ReadOnlyCollection<IfcRelCoversBldgElements>(mHasCoverings); } }
+		public SET<IfcRelCoversBldgElements> HasCoverings { get { return mHasCoverings; } }
 		//GEOMGYM
 		//List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
@@ -401,7 +401,6 @@ namespace GeometryGym.Ifc
 		{
 			mTag = e.mTag;
 #warning todo finish inverse
-
 			
 			List<IfcRelConnectsElements> rces = e.ConnectedTo.ToList();
 			rces.AddRange(e.ConnectedFrom);
@@ -1152,7 +1151,8 @@ namespace GeometryGym.Ifc
 		public ReadOnlyCollection<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return new ReadOnlyCollection<IfcExternalReferenceRelationship>( mExternalReferenceForResources); } }
 
 		protected IfcExternalReference() : base() { }
-		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) : base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
+		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) 
+			: base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
 		protected IfcExternalReference(DatabaseIfc db) : base(db) { }
 		protected override void initialize()
 		{

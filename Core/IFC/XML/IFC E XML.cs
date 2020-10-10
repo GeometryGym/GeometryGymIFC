@@ -319,22 +319,6 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Identification", Identification);
 			setAttribute(xml, "Name", Name);
-			XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships", mDatabase.mXmlNamespace);
-			foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
-			{
-				if (host.mIndex != r.mIndex)
-					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
-			}
-			if (element.HasChildNodes)
-				xml.AppendChild(element);
-			element = xml.OwnerDocument.CreateElement("ExternalReferenceForResources", mDatabase.mXmlNamespace);
-			foreach (IfcExternalReferenceRelationship r in ExternalReferenceForResources)
-			{
-				if (host.mIndex != r.mIndex)
-					element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
-			}
-			if (element.HasChildNodes)
-				xml.AppendChild(element);
 		}
 	}
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4

@@ -230,8 +230,16 @@ namespace GeometryGym.Ifc
 		public JObject JSON() { return ToJSON(""); }
 		public JObject ToJSON(string filename)
 		{
+			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions() { };
+			return ToJSON(filename, options);
+		}
+		public JObject ToJSON(string filename, BaseClassIfc.SetJsonOptions options)
+		{ 
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");			
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+
+			options.Version = mRelease;
+			options.LengthDigitCount = mLengthDigits;
 
 			JObject ifcFile = new JObject();
 			JObject header = new JObject();
@@ -256,7 +264,6 @@ namespace GeometryGym.Ifc
 
 			JArray data = new JArray();
 			IfcContext context = this.mContext;
-			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions() { LengthDigitCount = mLengthDigits, Version = this.Release };
 			if (context != null)
 			{
 				JObject jcontext = context.getJson(null, options); //null);//

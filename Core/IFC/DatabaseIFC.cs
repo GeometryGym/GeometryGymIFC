@@ -346,44 +346,48 @@ namespace GeometryGym.Ifc
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
-			string str = className, definedType = "";
+			string str = className, definedType = "", enumName = "";
+			ReleaseVersion release = mDatabase.Release;
 			if (!string.IsNullOrEmpty(str))
 			{
-				string lower = str.ToLower();
-				ReleaseVersion release = mDatabase.Release;
-				if (release < ReleaseVersion.IFC4X1)
-				{
-					if (lower.StartsWith("ifcfacility"))
-						str = "IfcSite";
-					else if (lower.StartsWith("ifcfacilitypart"))
-						str = "IfcBuilding";
-					else if (release < ReleaseVersion.IFC4)
-					{
-						if (lower.StartsWith("ifcshadingdevice"))
-							str = "IfcBuildingElementProxy.ShadingDevice";
-						if (lower.StartsWith("ifcgeographicelement"))
-							str = "IfcBuildingElementProxy.GeographicElement";
-						if (lower.StartsWith("ifccivilelement"))
-							str = "IfcBuildingElementProxy.CivilElement";
-					}
-				}
-
 				string[] fields = str.Split(".".ToCharArray());
 				if (fields.Length > 1)
 				{
-					str = fields[0];
+					enumName = str = fields[0];
 					definedType = fields[1];
 				}
 			}
 			if (str.EndsWith("Type"))
 				str = str.Substring(0, str.Length - 4);
+			if (str.EndsWith("TypeEnum"))
+				str = str.Substring(0, str.Length - 8);
 			Type type = Type.GetType("GeometryGym.Ifc." + str, false, true);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
-
+			if (release < ReleaseVersion.IFC4X3)
+			{
+				if (release < ReleaseVersion.IFC4X2)
+				{
+					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
+						type = typeof(IfcBuilding);
+					else if (release < ReleaseVersion.IFC4X1)
+					{
+						if (typeof(IfcFacility).IsAssignableFrom(type))
+							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
+						else if (release < ReleaseVersion.IFC4)
+						{
+							if (typeof(IfcShadingDevice).IsAssignableFrom(type) || typeof(IfcGeographicElement).IsAssignableFrom(type) ||
+								typeof(IfcCivilElement).IsAssignableFrom(type))
+								type = typeof(IfcBuildingElementProxy);
+						}
+					}
+				}
+			}
 			IfcProduct product = construct(type, host, placement, representation, system);
 			if (product == null)
 				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
+			if (string.Compare(str, product.StepClassName, true) != 0)
+				product.ObjectType = className;
 			if (!string.IsNullOrEmpty(definedType))
 			{
 				if (mDatabase.mRelease < ReleaseVersion.IFC4)
@@ -394,26 +398,40 @@ namespace GeometryGym.Ifc
 					PropertyInfo pi = type.GetProperty("PredefinedType");
 					if (pi != null)
 					{
-						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-						if (enumType != null)
+						if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
 						{
-							FieldInfo fi = enumType.GetField(definedType);
-							if (fi == null)
+							MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any,new Type[] { typeof(string) }, null);
+							if (method != null)
 							{
-								product.ObjectType = definedType;
-								fi = enumType.GetField("NOTDEFINED");
+								object o = method.Invoke(null, new object[] { enumName + "(." + definedType + ".)" });
+								if (o != null)
+									pi.SetValue(product, o);
 							}
-							if (fi != null)
+						}
+						else
+						{
+							Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
+							if (enumType != null)
 							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
-								pi.SetValue(product, newEnumValue, null);
+								FieldInfo fi = enumType.GetField(definedType);
+								if (fi == null)
+								{
+									product.ObjectType = definedType;
+									fi = enumType.GetField("USERDEFINED");
+								}
+								if (fi != null)
+								{
+									int i = (int)fi.GetValue(enumType);
+									object newEnumValue = Enum.ToObject(enumType, i);
+
+									pi.SetValue(product, newEnumValue);
+								}
+								else
+									product.ObjectType = definedType;
 							}
 							else
 								product.ObjectType = definedType;
 						}
-						else
-							product.ObjectType = definedType;
 					}
 					else
 						product.ObjectType = definedType;
@@ -464,6 +482,12 @@ namespace GeometryGym.Ifc
 			BaseClassIfc result = BaseClassIfc.Construct(className);
 			if (result == null)
 				return null;
+			if (mDatabase.Release < ReleaseVersion.IFC4 || Options.GenerateOwnerHistory)
+			{
+				IfcRoot root = result as IfcRoot;
+				if (root != null)
+					root.OwnerHistory = OwnerHistoryAdded;
+			}
 			mDatabase[mDatabase.NextBlank()] = result;
 			return result; 
 		}
@@ -487,6 +511,8 @@ namespace GeometryGym.Ifc
 		{
 			if (entity == null)
 				return null;
+			if (entity.mDatabase != null && entity.mDatabase.id == mDatabase.id)
+				return entity;
 			int index = mDuplicateMapping.FindExisting(entity);
 			BaseClassIfc result = null;
 			if (index > 0)
@@ -506,13 +532,23 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-			if(mDatabase.Release < ReleaseVersion.IFC4X3)
+			result = duplicateWorker(entity, options);
+			if (result == null)
+				return null;
+
+			NominateDuplicate(entity, result);
+			return result;
+		}
+		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
+		{
+			BaseClassIfc result = null;
+			if (mDatabase.Release < ReleaseVersion.IFC4X3)
 			{
-				if(mDatabase.Release < ReleaseVersion.IFC4X2)
+				if (mDatabase.Release < ReleaseVersion.IFC4X2)
 				{
-					if(mDatabase.Release < ReleaseVersion.IFC4X1)
+					if (mDatabase.Release < ReleaseVersion.IFC4X1)
 					{
-						if(mDatabase.Release < ReleaseVersion.IFC4)
+						if (mDatabase.Release < ReleaseVersion.IFC4)
 						{
 							IfcSpatialZone spatialZone = entity as IfcSpatialZone;
 							if (spatialZone != null)
@@ -532,10 +568,7 @@ namespace GeometryGym.Ifc
 			result = Duplicate(entity, type, options);
 			if (result == null && entity is IfcProfileProperties)
 				result = Duplicate(entity, typeof(IfcProfileProperties), options);
-			if (result == null)
-				return null;
 
-			NominateDuplicate(entity, result);
 			return result;
 		}
 		private BaseClassIfc Duplicate(BaseClassIfc entity, Type type, DuplicateOptions options)
@@ -576,6 +609,8 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcPropertySetDefinition DuplicatePropertySet(IfcPropertySetDefinition propertySet, DuplicateOptions options)
 		{
+			if (propertySet.Database != null && propertySet.Database.id == mDatabase.id)
+				return propertySet;
 			int index = mDuplicateMapping.FindExisting(propertySet);
 			if (index > 0)
 				return mDatabase[index] as IfcPropertySetDefinition;
@@ -1551,7 +1586,7 @@ namespace GeometryGym.Ifc
 			mDatabase = db;
 		}
 
-		internal class FileStreamIfc
+		internal class FileStreamIfc : IDisposable
 		{
 			internal FormatIfcSerialization mFormat;
 			internal TextReader mTextReader;
@@ -1559,6 +1594,12 @@ namespace GeometryGym.Ifc
 			{
 				mFormat = format;
 				mTextReader = sr;
+			}
+
+			void IDisposable.Dispose()
+			{
+				if (mTextReader != null)
+					mTextReader.Close();
 			}
 		}
 		private FormatIfcSerialization detectFormat(string fileName)
@@ -1607,7 +1648,12 @@ namespace GeometryGym.Ifc
 			if (filename.ToLower().EndsWith("ifc"))
 				new SerializationIfcSTEP(mDatabase).ReadStepFile(filename);
 			else
-				ReadFile(getStreamReader(filename));
+			{
+				using (FileStreamIfc fileStream = getStreamReader(filename))
+				{
+					ReadFile(fileStream);
+				}
+			}
 		}
 		internal void ReadFile(FileStreamIfc fs)
 		{

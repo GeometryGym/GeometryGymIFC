@@ -933,15 +933,15 @@ additional types	some additional representation types are given:
 		private string mLongName = "$";// : OPTIONAL IfcLabel; 
 		//INVERSE
 		internal SET<IfcRelContainedInSpatialStructure> mContainsElements = new SET<IfcRelContainedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
-		internal List<IfcRelServicesBuildings> mServicedBySystems = new List<IfcRelServicesBuildings>();// : SET [0:?] OF IfcRelServicesBuildings FOR RelatedBuildings;	
-		internal List<IfcRelReferencedInSpatialStructure> mReferencesElements = new List<IfcRelReferencedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
+		internal SET<IfcRelServicesBuildings> mServicedBySystems = new SET<IfcRelServicesBuildings>();// : SET [0:?] OF IfcRelServicesBuildings FOR RelatedBuildings;	
+		internal SET<IfcRelReferencedInSpatialStructure> mReferencesElements = new SET<IfcRelReferencedInSpatialStructure>();// : SET [0:?] OF IfcRelReferencedInSpatialStructure FOR RelatingStructure;
 		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
 		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcRelContainedInSpatialStructure> ContainsElements { get { return mContainsElements; } set { mContainsElements.Clear(); if (value != null) { mContainsElements.CollectionChanged -= mContainsElements_CollectionChanged; mContainsElements = value; mContainsElements.CollectionChanged += mContainsElements_CollectionChanged; } } }
-		public ReadOnlyCollection<IfcRelServicesBuildings> ServicedBySystems { get { return new ReadOnlyCollection<IfcRelServicesBuildings>( mServicedBySystems); } }
-		public ReadOnlyCollection<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return new ReadOnlyCollection<IfcRelReferencedInSpatialStructure>( mReferencesElements); } }
+		public SET<IfcRelServicesBuildings> ServicedBySystems { get { return mServicedBySystems; } }
+		public SET<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return mReferencesElements; } }
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
 		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }
 
@@ -1091,7 +1091,7 @@ additional types	some additional representation types are given:
 		SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get; }
 	}
 [Serializable]
-	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
+	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcFacility, IfcFacilityPart, IfcCivilStructureElement))*/
 	{
 		internal IfcElementCompositionEnum mCompositionType = IfcElementCompositionEnum.NOTDEFINED;// : IfcElementCompositionEnum;  IFC4 Optional 
 		public IfcElementCompositionEnum CompositionType { get { return mCompositionType; } set { mCompositionType = value; } }

@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 	[Obsolete("DEPRECATED IFC4", false)]
 	public enum IfcAheadOrBehind { AHEAD, BEHIND }; //OBSELETE IFC4
 	public enum IfcAirTerminalBoxTypeEnum { NOTDEFINED, USERDEFINED, CONSTANTFLOW, VARIABLEFLOWPRESSUREDEPENDANT, VARIABLEFLOWPRESSUREINDEPENDANT };
-	public enum IfcAirTerminalTypeEnum { GRILLE, REGISTER, DIFFUSER, LOUVRE, USERDEFINED, NOTDEFINED, EYEBALL, IRIS, LINEARGRILLE, LINEARDIFFUSER }; //IFC4 DELETED
+	public enum IfcAirTerminalTypeEnum { NOTDEFINED, USERDEFINED, GRILLE, REGISTER, DIFFUSER, LOUVRE, EYEBALL, IRIS, LINEARGRILLE, LINEARDIFFUSER }; //IFC4 DELETED
 	public enum IfcAirToAirHeatRecoveryTypeEnum { NOTDEFINED, USERDEFINED, FIXEDPLATECOUNTERFLOWEXCHANGER, FIXEDPLATECROSSFLOWEXCHANGER, FIXEDPLATEPARALLELFLOWEXCHANGER, ROTARYWHEEL, RUNAROUNDCOILLOOP, HEATPIPE, TWINTOWERENTHALPYRECOVERYLOOPS, THERMOSIPHONSEALEDTUBEHEATEXCHANGERS, THERMOSIPHONCOILTYPEHEATEXCHANGERS };
 	public enum IfcAlarmTypeEnum { NOTDEFINED, USERDEFINED, BELL, BREAKGLASSBUTTON, LIGHT, MANUALPULLBOX, SIREN, WHISTLE, RAILWAYCROCODILE, RAILWAYDETONATOR };
 	public enum IfcAlignmentTypeEnum { NOTDEFINED, USERDEFINED };
@@ -386,8 +386,8 @@ namespace GeometryGym.Ifc
 		{
 			List<Tuple<string, string[]>> result = new List<Tuple<string, string[]>>();
 			Type firstType = typeof(T), secondType = typeof(U);
-			result.Add(new Tuple<string, string[]>(firstType.Name.Substring(3), Enum.GetNames(firstType)));
-			result.Add(new Tuple<string, string[]>(secondType.Name.Substring(3), Enum.GetNames(secondType)));
+			result.Add(new Tuple<string, string[]>(firstType.Name, Enum.GetNames(firstType)));
+			result.Add(new Tuple<string, string[]>(secondType.Name, Enum.GetNames(secondType)));
 			return result;
 		}
 	}
@@ -435,7 +435,7 @@ namespace GeometryGym.Ifc
 		{
 			List<Tuple<string, string[]>> result = base.getConstants();
 			Type thirdType = typeof(V);
-			result.Add(new Tuple<string, string[]>(thirdType.Name.Substring(3), Enum.GetNames(thirdType)));
+			result.Add(new Tuple<string, string[]>(thirdType.Name, Enum.GetNames(thirdType)));
 			return result;
 		}
 	}
@@ -512,8 +512,8 @@ namespace GeometryGym.Ifc
 		{
 			List<Tuple<string, string[]>> result = base.getConstants();
 			Type fourthType = typeof(W), fithType = typeof(X);
-			result.Add(new Tuple<string, string[]>(fourthType.Name.Substring(3), Enum.GetNames(fourthType)));
-			result.Add(new Tuple<string, string[]>(fithType.Name.Substring(3), Enum.GetNames(fithType)));
+			result.Add(new Tuple<string, string[]>(fourthType.Name, Enum.GetNames(fourthType)));
+			result.Add(new Tuple<string, string[]>(fithType.Name, Enum.GetNames(fithType)));
 			return result;
 		}
 	}

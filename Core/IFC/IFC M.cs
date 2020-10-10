@@ -192,14 +192,11 @@ namespace GeometryGym.Ifc
 		
 		internal IfcMaterialConstituent() : base() { }
 		internal IfcMaterialConstituent(DatabaseIfc db, IfcMaterialConstituent m) : base(db, m) { mName = m.mName; mDescription = m.mDescription; Material = db.Factory.Duplicate(m.Material) as IfcMaterial; mFraction = m.mFraction; mCategory = m.mCategory; }
-		public IfcMaterialConstituent(string name, string desc, IfcMaterial mat, double fraction, string category)
+		public IfcMaterialConstituent(string name, IfcMaterial mat)
 			: base(mat.mDatabase)
 		{
 			Name = name;
-			Description = desc;
 			mMaterial = mat.mIndex;
-			mFraction = fraction;
-			Category = category;
 		}
 	}
 	[Serializable]
@@ -223,11 +220,10 @@ namespace GeometryGym.Ifc
 			foreach (IfcMaterialConstituent constituent in m.MaterialConstituents.Values)
 				MaterialConstituents[constituent.Name] = db.Factory.Duplicate(constituent) as IfcMaterialConstituent;
 		}
-		public IfcMaterialConstituentSet(string name, string desc, IEnumerable<IfcMaterialConstituent> materialConstituents)
+		public IfcMaterialConstituentSet(string name, IEnumerable<IfcMaterialConstituent> materialConstituents)
 			: base(materialConstituents.First().Database)
 		{
 			Name = name;
-			Description = desc;
 			foreach (IfcMaterialConstituent constituent in materialConstituents)
 				mMaterialConstituents[constituent.Name] = constituent;
 		}

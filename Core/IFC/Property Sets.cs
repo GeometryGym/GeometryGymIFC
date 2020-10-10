@@ -368,6 +368,18 @@ namespace GeometryGym.Ifc
 		public Pset_BoilerTypeWater(IfcBoiler instance) : base(instance) { }
 		public Pset_BoilerTypeWater(IfcBoilerType type) : base(type) { }
 	}
+	public partial class Pset_BoreholeCommon : IfcPropertySet
+	{
+		public string BoreholeState { set { AddProperty(new IfcPropertySingleValue(mDatabase, "BoreholeState", new IfcIdentifier(value))); } }
+		public double CapDepth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CapDepth", new IfcPositiveLengthMeasure(value))); } }
+		public string CapMaterial { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CapMaterial", new IfcLabel(value))); } }
+		public double FillingDepth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "CapDepth", new IfcPositiveLengthMeasure(value))); } }
+		public string FillingMaterial { set { AddProperty(new IfcPropertySingleValue(mDatabase, "FillingMaterial", new IfcLabel(value))); } }
+		public double GroundwaterDepth { set { AddProperty(new IfcPropertySingleValue(mDatabase, "GroundwaterDepth", new IfcPositiveLengthMeasure(value))); } }
+		public string LiningMaterial { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LiningMaterial", new IfcLabel(value))); } }
+		public double LiningThickness { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LiningThickness", new IfcPositiveLengthMeasure(value))); } }
+		public Pset_BoreholeCommon(IfcBorehole instance) : base(instance) { }
+	}
 	public partial class Pset_BuildingCommon : IfcPropertySet
 	{
 		public string Reference { set {  AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
