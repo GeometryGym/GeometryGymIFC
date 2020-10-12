@@ -72,17 +72,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mEdgeGeometry) + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mEdgeGeometry.StepId + "," + ParserSTEP.BoolToString(mSameSense); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mEdgeGeometry = ParserSTEP.StripLink(str, ref pos, len);
+			EdgeGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			EdgeGeometry.mEdge = this;
 		}
 	}
 	public abstract partial class IfcEdgeFeature : IfcFeatureElementSubtraction //  ABSTRACT SUPERTYPE OF (ONEOF (IfcChamferEdgeFeature , IfcRoundedEdgeFeature)) DEPRECATED IFC4
@@ -329,23 +324,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mMethodOfMeasurement == "$" ? ",$,(#" : ",'" + mMethodOfMeasurement + "',(#") + string.Join(",#", mQuantityIndices) + ")";
+			return base.BuildStringSTEP(release) + (mMethodOfMeasurement == "$" ? ",$,(#" : ",'" + mMethodOfMeasurement + "',(#") + string.Join(",#", mQuantities.Values.Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mMethodOfMeasurement = ParserSTEP.StripString(str, ref pos, len);
-			mQuantityIndices = ParserSTEP.StripListLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (int i in mQuantityIndices)
-			{
-				IfcPhysicalQuantity q = mDatabase[i] as IfcPhysicalQuantity;
-				if (q != null)
-					addQuantity(q);
-			}
+			foreach (IfcPhysicalQuantity quantity in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcPhysicalQuantity))
+				addQuantity(quantity);
 		}
 	}
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))

@@ -118,11 +118,6 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcGeometricProjectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mTargetView);
 			mUserDefinedTargetView = ParserSTEP.StripString(str, ref pos, len);
 		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			ParentContext.HasSubContexts.Add(this);
-		}
 	}
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
 	{

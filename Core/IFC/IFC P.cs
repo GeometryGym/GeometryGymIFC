@@ -649,7 +649,7 @@ namespace GeometryGym.Ifc
 				if (e.IsNestedBy.Count() == 0)
 					new IfcRelNests(e, this);
 				else
-					e.IsNestedBy[0].RelatedObjects.Add(this);
+					e.IsNestedBy.First().RelatedObjects.Add(this);
 			}
 		}
 		protected IfcPort(IfcElementType t) : base(t.mDatabase)
@@ -665,7 +665,7 @@ namespace GeometryGym.Ifc
 					new IfcRelNests(t, this);
 				}
 				else
-					t.IsNestedBy[0].RelatedObjects.Add(this);
+					t.IsNestedBy.First().RelatedObjects.Add(this);
 			}
 		}
 
@@ -1004,8 +1004,8 @@ namespace GeometryGym.Ifc
 		{
 			if (mOperatesOn.Count == 0)
 				new IfcRelAssignsToProcess(this, related);
-			else if (!mOperatesOn[0].mRelatedObjects.Contains(related))
-				mOperatesOn[0].RelatedObjects.Add(related);
+			else if (!mOperatesOn.First().mRelatedObjects.Contains(related))
+				mOperatesOn.First().RelatedObjects.Add(related);
 			else
 				return false;
 			return true;
@@ -1434,14 +1434,14 @@ namespace GeometryGym.Ifc
 				Name = "UNKNOWN PROJECT";
 		}
 
-		public IfcSpatialElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy[0].RelatedObjects[0] as IfcSpatialElement);  }
-		internal IfcSite getSite() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy[0].RelatedObjects[0] as IfcSite); }
+		public IfcSpatialElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSpatialElement);  }
+		internal IfcSite getSite() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSite); }
 		public IfcSite UppermostSite() { return getSite(); }
 		public IfcBuilding UppermostBuilding()
 		{
 			if (mIsDecomposedBy.Count == 0)
 				return null;
-			BaseClassIfc ent = mIsDecomposedBy[0].mRelatedObjects[0];
+			BaseClassIfc ent = mIsDecomposedBy.First().mRelatedObjects.First();
 			IfcBuilding result = ent as IfcBuilding;
 			if (result != null)
 				return result;
@@ -1786,9 +1786,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcPropertySet : IfcPropertySetDefinition
 	{
 		public override string StepClassName { get { return "IfcPropertySet"; } }
-		private Dictionary<string,IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
-
-		public Dictionary<string,IfcProperty> HasProperties { get { return mHasProperties; } }
+		private Dictionary<string, IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
+		public Dictionary<string, IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcPropertySet() : base() { }
 		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
@@ -1988,7 +1987,7 @@ namespace GeometryGym.Ifc
 				if (mDefinesOccurrence.Count == 0)
 					new IfcRelDefinesByProperties(relatedObject, this);
 				else
-					mDefinesOccurrence[0].RelatedObjects.Add(relatedObject);
+					mDefinesOccurrence.First().RelatedObjects.Add(relatedObject);
 			}
 		}
 

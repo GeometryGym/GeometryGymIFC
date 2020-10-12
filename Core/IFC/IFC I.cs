@@ -81,19 +81,19 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
-		internal int mMappedTo;// : IfcTessellatedFaceSet; 
+		internal IfcTessellatedFaceSet mMappedTo;// : IfcTessellatedFaceSet; 
 		internal double mOpacity = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		internal int mColours;// : IfcColourRgbList; 
 		internal List<int> mColourIndex = new List<int>();// : LIST [1:?] OF IfcPositiveInteger;
 
-		public IfcTessellatedFaceSet MappedTo { get { return mDatabase[mMappedTo] as IfcTessellatedFaceSet; } set { mMappedTo = value.mIndex; } }
+		public IfcTessellatedFaceSet MappedTo { get { return mMappedTo; } set { mMappedTo = value; value.HasColours = this; } }
 		public double Opacity { get { return mOpacity; } set { mOpacity = value; } }
 		public IfcColourRgbList Colours { get { return mDatabase[mColours] as IfcColourRgbList; } set { mColours = value.mIndex; } }
 
 		internal IfcIndexedColourMap() : base() { }
 		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
-			: base(fs.mDatabase) { mMappedTo = fs.mIndex; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
+			: base(fs.mDatabase) { MappedTo = fs; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
 	}
 	[Serializable]
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve 
@@ -144,16 +144,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)
 	{
-		internal int mMappedTo = 0;// : IfcTessellatedFaceSet;
-		internal int mTexCoords = 0;// : IfcTextureVertexList;
+		internal IfcTessellatedFaceSet mMappedTo;// : IfcTessellatedFaceSet;
+		internal IfcTextureVertexList mTexCoords;// : IfcTextureVertexList;
 
-		public IfcTessellatedFaceSet MappedTo { get { return mDatabase[mMappedTo] as IfcTessellatedFaceSet; } set { mMappedTo = value.mIndex; } }
-		public IfcTextureVertexList TexCoords { get { return mDatabase[mTexCoords] as IfcTextureVertexList; } set { mTexCoords = value.mIndex; } }
+		public IfcTessellatedFaceSet MappedTo { get { return mMappedTo; } set { mMappedTo = value; mMappedTo.mHasTextures.Add(this); } }
+		public IfcTextureVertexList TexCoords { get { return mTexCoords; } set { mTexCoords = value; } }
 
 		protected IfcIndexedTextureMap() : base() { }
 		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; }
-		//internal IfcIndexedTextureMap(IfcTessellatedFaceSet mappedTo, ifctext) : this(pl, nll, selfIntersect, new List<int>()) { }
-		//internal IfcIndexedTextureMap(IfcCartesianPointList pl, List<IfcSegmentIndexSelect> segs, IfcLogicalEnum selfIntersect) : this(pl, segs, selfIntersect, new List<int>()) { }
 	}
 	[Serializable]
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap

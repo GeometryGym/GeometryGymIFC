@@ -71,11 +71,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMappedItem : IfcRepresentationItem
 	{
-		private int mMappingSource;// : IfcRepresentationMap;
-		private int mMappingTarget;// : IfcCartesianTransformationOperator;
+		private IfcRepresentationMap mMappingSource;// : IfcRepresentationMap;
+		private IfcCartesianTransformationOperator mMappingTarget;// : IfcCartesianTransformationOperator;
 
-		public IfcRepresentationMap MappingSource { get { return mDatabase[mMappingSource] as IfcRepresentationMap; } set { mMappingSource = value.mIndex; value.mMapUsage.Add(this); } }
-		public IfcCartesianTransformationOperator MappingTarget { get { return mDatabase[mMappingTarget] as IfcCartesianTransformationOperator; } set { mMappingTarget = value.mIndex;  } }
+		public IfcRepresentationMap MappingSource { get { return mMappingSource as IfcRepresentationMap; } set { mMappingSource = value; value.mMapUsage.Add(this); } }
+		public IfcCartesianTransformationOperator MappingTarget { get { return mMappingTarget; } set { mMappingTarget = value;  } }
 
 		internal IfcMappedItem() : base() { }
 		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i, DuplicateOptions options) : base(db, i, options) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
@@ -298,7 +298,7 @@ namespace GeometryGym.Ifc
 
 		public void Associate(IfcDefinitionSelect obj)
 		{
-			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
+			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo.First());
 			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
@@ -319,16 +319,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialDefinitionRepresentation :  IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
-		internal int mRepresentedMaterial;// : IfcMaterial;
-		public IfcMaterial RepresentedMaterial { get { return mDatabase[mRepresentedMaterial] as IfcMaterial; } set { mRepresentedMaterial = value.mIndex; if (value.mHasRepresentation != this) value.HasRepresentation = this; } }
+		internal IfcMaterial mRepresentedMaterial;// : IfcMaterial;
+		public IfcMaterial RepresentedMaterial { get { return mRepresentedMaterial; } set { mRepresentedMaterial = value; if (value.mHasRepresentation != this) value.HasRepresentation = this; } }
 
 		internal IfcMaterialDefinitionRepresentation() : base() { }
 		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r, DuplicateOptions options) : base(db, r, options)
 		{
 			RepresentedMaterial = db.Factory.Duplicate(r.RepresentedMaterial) as IfcMaterial;
 		}
-		public IfcMaterialDefinitionRepresentation(IfcStyledRepresentation representation, IfcMaterial mat) : base(representation) { mRepresentedMaterial = mat.mIndex; mat.mHasRepresentation = this; }
-		public IfcMaterialDefinitionRepresentation(IEnumerable<IfcStyledRepresentation> representations, IfcMaterial mat) : base(representations) { mRepresentedMaterial = mat.mIndex; mat.mHasRepresentation = this; }
+		public IfcMaterialDefinitionRepresentation(IfcStyledRepresentation representation, IfcMaterial mat) : base(representation) { RepresentedMaterial = mat; }
+		public IfcMaterialDefinitionRepresentation(IEnumerable<IfcStyledRepresentation> representations, IfcMaterial mat) : base(representations) { RepresentedMaterial = mat; }
 	}
 	[Serializable]
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
@@ -490,7 +490,7 @@ namespace GeometryGym.Ifc
 
 		public void Associate(IfcDefinitionSelect obj)
 		{
-			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
+			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo.First());
 			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
@@ -716,7 +716,7 @@ namespace GeometryGym.Ifc
 		}
 		public void Associate(IfcDefinitionSelect obj)
 		{
-			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo[0]);
+			IfcRelAssociatesMaterial associates = (mAssociatedTo.Count == 0 ? new IfcRelAssociatesMaterial(this) : mAssociatedTo.First());
 			associates.RelatedObjects.Add(obj);
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if (!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }

@@ -582,21 +582,8 @@ namespace GeometryGym.Ifc
 			string field = ParserSTEP.StripField(str, ref pos, len);
 			if (field.StartsWith("."))
 				Enum.TryParse<IfcComplexPropertyTemplateTypeEnum>(field.Replace(".", ""), true, out mTemplateType);
-			mHasPropertyTemplateIndices = ParserSTEP.StripListLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (int i in mHasPropertyTemplateIndices)
-			{
-				try
-				{
-					IfcPropertyTemplate template = mDatabase[i] as IfcPropertyTemplate;
-					mHasPropertyTemplates[template.Name] = template;
-					template.mPartOfComplexTemplate.Add(this);
-				}
-				catch (Exception) { }
-			}
+			foreach (IfcPropertyTemplate propertyTemplate in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcPropertyTemplate))
+				AddPropertyTemplate(propertyTemplate);
 		}
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
@@ -957,12 +944,9 @@ namespace GeometryGym.Ifc
 			mPhase = ParserSTEP.StripString(str, ref pos, len);
 			RepresentationContexts.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcRepresentationContext));
 			mUnitsInContext = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
+
 			if (mDatabase.mContext == null || !(this is IfcProjectLibrary))
 				mDatabase.mContext = this;
-			base.postParseRelate();
 		}
 	}
 	public partial class IfcContextDependentUnit : IfcNamedUnit
@@ -1112,16 +1096,11 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcCoordinateOperation : BaseClassIfc // IFC4 	ABSTRACT SUPERTYPE OF(IfcMapConversion);
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mSourceCRS) + "," + ParserSTEP.LinkToString(mTargetCRS); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mSourceCRS.StepId + ",#" + mTargetCRS.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mSourceCRS = ParserSTEP.StripLink(str, ref pos, len);
-			mTargetCRS = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			SourceCRS.HasCoordinateOperation = this;
+			SourceCRS = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCoordinateReferenceSystemSelect;
+			TargetCRS = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCoordinateReferenceSystem;
 		}
 	}
 	public abstract partial class IfcCoordinateReferenceSystem : BaseClassIfc, IfcCoordinateReferenceSystemSelect  // IFC4 	ABSTRACT SUPERTYPE OF(IfcProjectedCRS);

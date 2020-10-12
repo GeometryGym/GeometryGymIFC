@@ -228,15 +228,9 @@ namespace GeometryGym.Ifc
 		
 		internal void Replace(IfcNamedUnit unit)
 		{
-			for (int icounter = 0; icounter < mUnits.Count; icounter++)
-			{
-				IfcNamedUnit u = mUnits[icounter] as IfcNamedUnit;
-				if (u != null && u.UnitType == unit.UnitType)
-				{
-					mUnits[icounter] = unit;
-					return;
-				}
-			}
+			IfcNamedUnit existing = mUnits.OfType<IfcNamedUnit>().Where(x => x.UnitType == unit.UnitType).FirstOrDefault();
+			if (existing != null)
+				mUnits.Remove(existing);
 			Units.Add(unit);
 		}
 		

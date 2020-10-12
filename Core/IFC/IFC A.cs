@@ -734,7 +734,7 @@ namespace GeometryGym.Ifc
 		internal string mCategory = "$";// : OPTIONAL IfcLabel; IFC4
 		internal string mCondition = "$";// : OPTIONAL IfcLabel; IFC4
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
-		internal List<int> mComponents = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
+		internal LIST<IfcAppliedValue> mComponents = new LIST<IfcAppliedValue>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
 		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
@@ -749,7 +749,7 @@ namespace GeometryGym.Ifc
 		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Condition { get { return (mCondition == "$" ? "" : ParserIfc.Decode(mCondition)); } set { mCondition = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
-		public ReadOnlyCollection<IfcAppliedValue> Components { get { return new ReadOnlyCollection<IfcAppliedValue>( mComponents.ConvertAll(x => mDatabase[x] as IfcAppliedValue)); } }
+		public LIST<IfcAppliedValue> Components { get { return mComponents; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
@@ -781,6 +781,7 @@ namespace GeometryGym.Ifc
 			base.initialize();
 
 			mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged;
+			mComponents.CollectionChanged += mComponents_CollectionChanged;
 		}
 		private void mHasExternalReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -789,15 +790,27 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.NewItems)
-				{
-					if (!r.RelatedResourceObjects.Contains(this))
-						r.RelatedResourceObjects.Add(this);
-				}
+					r.RelatedResourceObjects.Add(this);
 			}
 			if (e.OldItems != null)
 			{
 				foreach (IfcExternalReferenceRelationship r in e.OldItems)
 					r.RelatedResourceObjects.Remove(this);
+			}
+		}
+		private void mComponents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcAppliedValue appliedValue in e.NewItems)
+					appliedValue.mComponentFor.Add(this);
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcAppliedValue appliedValue in e.OldItems)
+					appliedValue.mComponentFor.Remove(this);
 			}
 		}
 
@@ -808,18 +821,14 @@ namespace GeometryGym.Ifc
 				BaseClassIfc value = mAppliedValue as BaseClassIfc;
 				if(value != null)
 					value.Dispose(children);
-				for (int icounter = 0; icounter < mComponents.Count; icounter++)
-				{
-					BaseClassIfc bc = mDatabase[mComponents[icounter]];
-					if (bc != null)
-						bc.Dispose(true);
-				}
+				foreach(IfcAppliedValue appliedValue in mComponents.ToList())
+					appliedValue.Dispose(true);
 			}
 			return base.DisposeWorker(children);
 		}
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
-		internal void addComponent(IfcAppliedValue value) { mComponents.Add(value.mIndex); value.mComponentFor.Add(this); }
+		internal void addComponent(IfcAppliedValue value) { mComponents.Add(value); value.mComponentFor.Add(this); }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]

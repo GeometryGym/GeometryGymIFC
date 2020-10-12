@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Language", Language);
-			if (mReferencedLibrary > 0)
+			if (mReferencedLibrary != null)
 				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, options);
 		}
 	}

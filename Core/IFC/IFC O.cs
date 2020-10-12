@@ -318,7 +318,7 @@ namespace GeometryGym.Ifc
 			{
 				IfcRelNests rn = new IfcRelNests(this, o);
 			}
-			else mIsNestedBy[0].RelatedObjects.Add(o);
+			else mIsNestedBy.First().RelatedObjects.Add(o);
 		}
 		public void AddAggregated(IfcObjectDefinition o)
 		{
@@ -332,7 +332,6 @@ namespace GeometryGym.Ifc
 				mIsDecomposedBy[0].RelatedObjects.Add(o);
 		}
 		
-		internal virtual void relateNested(IfcRelNests n) { mIsNestedBy.Add(n); }
 		
 		internal IfcMaterialSelect RelatedMaterial() { return (mMaterialSelectIFC4 != null ? mMaterialSelectIFC4 : GetMaterialSelect()); }
 		protected virtual IfcMaterialSelect GetMaterialSelect()
@@ -395,18 +394,18 @@ namespace GeometryGym.Ifc
 					}
 					else
 					{
-						if (profileDef.mHasProperties[0].mAssociates == null)
+						if (profileDef.mHasProperties.First().mAssociates == null)
 						{
-							new IfcRelAssociatesProfileProperties(this, profileDef.mHasProperties[0]);
+							new IfcRelAssociatesProfileProperties(this, profileDef.mHasProperties.First());
 						}
 						else
-							profileDef.mHasProperties[0].mAssociates.RelatedObjects.Add(this);
+							profileDef.mHasProperties.First().mAssociates.RelatedObjects.Add(this);
 					}
 				}
 			}
 			for (int icounter = 0; icounter < mHasAssociations.Count; icounter++)
 			{
-				IfcRelAssociatesMaterial rm = mHasAssociations[icounter] as IfcRelAssociatesMaterial;
+				IfcRelAssociatesMaterial rm = mHasAssociations.First() as IfcRelAssociatesMaterial;
 				if (rm != null)
 					rm.RelatedObjects.Remove(this);
 			}
@@ -455,12 +454,12 @@ namespace GeometryGym.Ifc
 				if(typeProduct != null && typeProduct.ObjectTypeOf != null)
 				{
 					SET<IfcObject> related = typeProduct.ObjectTypeOf.RelatedObjects;
-					IfcMaterialLayerSet layerSet = related[0].detectMaterialLayerSet();
+					IfcMaterialLayerSet layerSet = related.First().detectMaterialLayerSet();
 					if (layerSet == null)
 						return null;
 					for(int icounter = 1; icounter < related.Count; icounter++)
 					{
-						IfcMaterialLayerSet set = related[icounter].detectMaterialLayerSet();
+						IfcMaterialLayerSet set = related.First().detectMaterialLayerSet();
 						if (set == null)
 							continue;
 						if (!set.isDuplicate(layerSet, mDatabase.Tolerance))

@@ -50,16 +50,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcMappedItem : IfcRepresentationItem
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mMappingSource) + "," + ParserSTEP.LinkToString(mMappingTarget); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mMappingSource.StepId + ",#" + mMappingTarget.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mMappingSource = ParserSTEP.StripLink(str, ref pos, len);
-			mMappingTarget = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			MappingSource.mMapUsage.Add(this);
+			MappingSource = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRepresentationMap;
+			MappingTarget = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianTransformationOperator;
 		}
 	}
 	public partial class IfcMarineFacility : IfcFacility
@@ -136,16 +131,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRepresentedMaterial); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mRepresentedMaterial.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRepresentedMaterial = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			RepresentedMaterial.mHasRepresentation = this;
+			mRepresentedMaterial = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
 		}
 	}
 	public partial class IfcMaterialLayer : IfcMaterialDefinition

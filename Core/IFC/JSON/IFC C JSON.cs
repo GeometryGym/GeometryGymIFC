@@ -453,7 +453,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parseJObject(JObject obj)
 		{
-			if (mDatabase.mContext == null) //this as IfcProjectLibrary == null ||
+			if (mDatabase.mContext == null || this as IfcProjectLibrary == null)
 				mDatabase.mContext = this;
 
 			JToken token = obj.GetValue("ObjectType", StringComparison.InvariantCultureIgnoreCase);

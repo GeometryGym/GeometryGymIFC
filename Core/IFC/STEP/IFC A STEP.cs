@@ -483,17 +483,10 @@ namespace GeometryGym.Ifc
 			result += "," + ParserSTEP.LinkToString(mUnitBasis) + ",";
 			if (release < ReleaseVersion.IFC4)
 				return result +  (mSSApplicableDate == null ? ",$" : ",#" + mSSApplicableDate.Index) + (mSSFixedUntilDate == null ? ",$" : ",#" + mSSFixedUntilDate.Index);
-			string str = "$";
-			if (mComponents.Count > 0)
-			{
-				result += IfcDate.STEPAttribute(mApplicableDate) + "," + IfcDate.STEPAttribute(mFixedUntilDate);
-				str = "(" + ParserSTEP.LinkToString(mComponents[0]);
-				for (int icounter = 1; icounter < mComponents.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mComponents[icounter]);
-				str += ")";
-			}
+			result += IfcDate.STEPAttribute(mApplicableDate) + "," + IfcDate.STEPAttribute(mFixedUntilDate);
 			result += (mCategory == "$" ? ",$," : ",'" + mCategory + "',") + (mCondition == "$" ? "$," : "'" + mCondition + "',");
-			return result + (mArithmeticOperator == IfcArithmeticOperatorEnum.NONE ? "$," : "." + mArithmeticOperator.ToString() + ".,") + str;
+			return result + (mArithmeticOperator == IfcArithmeticOperatorEnum.NONE ? "$," : "." + mArithmeticOperator.ToString() + ".,")
+				+ (mComponents.Count == 0 ? "$" : "(#" + string.Join(",#", mComponents.Select(x => x.StepId)) + ")"); ;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -519,14 +512,8 @@ namespace GeometryGym.Ifc
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcArithmeticOperatorEnum>(s.Replace(".", ""), true, out mArithmeticOperator);
-				mComponents = ParserSTEP.StripListLink(str, ref pos, len);
+				Components.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcAppliedValue));
 			}
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			foreach (IfcAppliedValue v in Components)
-				v.mComponentFor.Add(this);
 		}
 	}
 	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECATED IFC4

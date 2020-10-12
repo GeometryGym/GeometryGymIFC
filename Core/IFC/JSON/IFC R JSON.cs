@@ -415,10 +415,10 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingElement)
-				obj["RelatingElement"] = mDatabase[mRelatingElement].getJson(this, options);
-			if (host.mIndex != mRelatedStructuralActivity)
-				obj["RelatedStructuralActivity"] = mDatabase[mRelatedStructuralActivity].getJson(this, options);
+			if (host != mRelatingElement)
+				obj["RelatingElement"] = mRelatingElement.getJson(this, options);
+			if (host != mRelatedStructuralActivity)
+				obj["RelatedStructuralActivity"] = mRelatedStructuralActivity.getJson(this, options);
 
 		}
 	}

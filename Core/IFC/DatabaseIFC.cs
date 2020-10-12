@@ -1712,20 +1712,8 @@ namespace GeometryGym.Ifc
 		protected void finalizeImport()
 		{
 			Thread.CurrentThread.CurrentCulture = mCachedCulture;
-			postParseRelate();
 			mDatabase.postImport();
 			mDatabase.Factory.Options.GenerateOwnerHistory = mCachedOwnerHistoryOption;
-		}
-		private void postParseRelate()
-		{
-			foreach (BaseClassIfc e in mDatabase)
-			{
-				try
-				{
-					e.postParseRelate();
-				}
-				catch (Exception) { }
-			}
 		}
 	}
 

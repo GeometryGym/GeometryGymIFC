@@ -707,7 +707,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mItem > 0 && Item != host)
+			if (mItem != null && Item != host)
 				obj["Item"] = Item.getJson(this, options);
 			JArray array = new JArray();
 			foreach (IfcStyleAssignmentSelect style in mStyles)

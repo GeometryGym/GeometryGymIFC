@@ -98,12 +98,7 @@ namespace GeometryGym.Ifc
 		{
 			string result = base.BuildStringSTEP(release) + ",'" + mName + (mVersion == "$" ? "',$," : "','" + mVersion + "',") + ParserSTEP.LinkToString(mPublisher);
 			if (mDatabase.Release < ReleaseVersion.IFC4)
-			{
-				string refs = mHasLibraryReferences.Count > 0 ? "#" + mHasLibraryReferences[0].mIndex : "";
-				for (int icounter = 1; icounter < mHasLibraryReferences.Count; icounter++)
-					refs += ",#" + mHasLibraryReferences[icounter].mIndex;
-				return result + ",$,(" + refs + ")"; //TODO date
-			}
+				return result + ",$,(" + string.Join(",", mHasConstraintRelationships.Select(x=>"#" + x.StepId)) + ")"; 
 			return result + (mVersionDate == "$" ? ",$," : ",'" + mVersionDate + "',") + (mLocation == "$" ? "$," : "'" + mLocation + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -114,22 +109,13 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4)
 			{
 				mVersionDateSS = ParserSTEP.StripLink(str, ref pos, len);
-				mLibraryReference = ParserSTEP.StripListLink(str, ref pos, len);
+				mLibraryReference.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcLibraryReference));
 			}
 			else
 			{
 				mVersionDate = ParserSTEP.StripString(str, ref pos, len);
 				mLocation = ParserSTEP.StripString(str, ref pos, len);
 				mDescription = ParserSTEP.StripString(str, ref pos, len);
-			}
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			if (mDatabase.Release < ReleaseVersion.IFC4)
-			{
-				foreach (int i in mLibraryReference)
-					(mDatabase[i] as IfcLibraryReference).ReferencedLibrary = this;
 			}
 		}
 	}
@@ -141,7 +127,7 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4)
 				return result;
 			return result + (string.IsNullOrEmpty(mDescription) ? ",$," : ",'" + ParserIfc.Encode(mDescription) + "',") +
-				(mLanguage == "$" ? "$," : "'" + mLanguage + "',") + ParserSTEP.LinkToString(mReferencedLibrary);
+				(mLanguage == "$" ? "$," : "'" + mLanguage + "',") + ParserSTEP.ObjToLinkString(mReferencedLibrary);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -150,14 +136,8 @@ namespace GeometryGym.Ifc
 			{
 				mDescription = ParserSTEP.StripString(str, ref pos, len);
 				mLanguage = ParserSTEP.StripString(str, ref pos, len);
-				mReferencedLibrary = ParserSTEP.StripLink(str, ref pos, len);
+				ReferencedLibrary = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLibraryInformation;
 			}
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			if (mDatabase.Release != ReleaseVersion.IFC2x3 && mReferencedLibrary > 0)
-				ReferencedLibrary.mHasLibraryReferences.Add(this);
 		}
 	}
 	public partial class IfcLightDistributionData : BaseClassIfc

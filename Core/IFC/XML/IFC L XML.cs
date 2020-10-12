@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Description", Description);
 			setAttribute(xml, "Language", Language);
-			if (mReferencedLibrary > 0)
+			if (mReferencedLibrary != null)
 				xml.AppendChild(ReferencedLibrary.GetXML(xml.OwnerDocument, "ReferencedLibrary", this, processed));	
 		}
 	}

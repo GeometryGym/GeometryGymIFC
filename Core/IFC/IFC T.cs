@@ -354,7 +354,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcIndexedTextureMap> mHasTextures = new List<IfcIndexedTextureMap>();// : SET [0:?] OF IfcIndexedTextureMap FOR MappedTo;
 
 		public IfcCartesianPointList Coordinates { get { return mCoordinates; } set { mCoordinates = value; } }
-		public IfcIndexedColourMap HasColours { get { return mHasColours; } }
+		public IfcIndexedColourMap HasColours { get { return mHasColours; } set { mHasColours = value; } }
 		public ReadOnlyCollection<IfcIndexedTextureMap> HasTextures { get { return new ReadOnlyCollection<IfcIndexedTextureMap>(mHasTextures); } }
 
 		protected IfcTessellatedFaceSet() : base() { }
@@ -1203,8 +1203,9 @@ namespace GeometryGym.Ifc
 				}
 				else
 				{
+					List<IfcPropertySetDefinition> list = psets.ToList();
 					foreach (int i in r.mListPositions)
-						result.AddRange(psets[i - 1].retrieveReference(ir));
+						result.AddRange(list[i - 1].retrieveReference(ir));
 				}
 				return result;
 			}

@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -93,10 +94,10 @@ namespace GeometryGym.Ifc
 		internal int mVersionDateSS = 0; // 
 		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
 		internal string mDescription = "$";//	 :	OPTIONAL IfcText; //IFC4 Added
-		internal List<int> mLibraryReference = new List<int>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
+		private SET<IfcLibraryReference> mLibraryReference = new SET<IfcLibraryReference>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
 		//INVERSE
-		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
-		internal List<IfcLibraryReference> mHasLibraryReferences = new List<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
+		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
+		internal SET<IfcLibraryReference> mHasLibraryReferences = new SET<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } } 
 		public string Version { get { return (mVersion == "$" ? "" : ParserIfc.Decode(mVersion)); } set { mVersion = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -107,19 +108,44 @@ namespace GeometryGym.Ifc
 		internal IfcLibraryInformation() : base() { }
 		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db,i) { mName = i.mName; mVersion = i.mVersion; if(i.mPublisher > 0) Publisher = db.Factory.Duplicate(i.mDatabase[ i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
 		public IfcLibraryInformation(DatabaseIfc db, string name) : base(db) { Name = name; }
+
+		protected override void initialize()
+		{
+			base.initialize();
+
+			mLibraryReference.CollectionChanged += mLibraryReference_CollectionChanged;
+		}
+		private void mLibraryReference_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcLibraryReference libraryReference in e.NewItems)
+					libraryReference.ReferencedLibrary = this;
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcLibraryReference libraryReference in e.NewItems)
+				{
+					if(libraryReference.ReferencedLibrary == this)
+						libraryReference.ReferencedLibrary = this;
+				}
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcLibraryReference : IfcExternalReference, IfcLibrarySelect
 	{
 		internal string mDescription = ""; //IFC4	 :	OPTIONAL IfcText;
 		internal string mLanguage = "$"; //IFC4	 :	OPTIONAL IfcLanguageId;
-		internal int mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
+		internal IfcLibraryInformation mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
 		//INVERSE
 		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcLibraryInformation ReferencedLibrary { get { return mDatabase[mReferencedLibrary] as IfcLibraryInformation; } set { mReferencedLibrary = (value == null ? 0 : value.mIndex); if (value != null && !value.mHasLibraryReferences.Contains(this)) value.mHasLibraryReferences.Add(this); } }
+		public IfcLibraryInformation ReferencedLibrary { get { return mReferencedLibrary; } set { mReferencedLibrary = value; if (value != null) value.mHasLibraryReferences.Add(this); } }
 
 		internal IfcLibraryReference() : base() { }
 		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db,r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }

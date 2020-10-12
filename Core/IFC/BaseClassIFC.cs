@@ -76,7 +76,6 @@ namespace GeometryGym.Ifc
 		}
 
 		protected virtual void parseFields(List<string> arrFields, ref int ipos) { }
-		internal virtual void postParseRelate() { }
 
 		public List<T> Extract<T>() where T : IBaseClassIfc
 		{

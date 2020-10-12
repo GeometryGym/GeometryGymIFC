@@ -689,7 +689,7 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-			if (this as IfcProjectLibrary == null || mDatabase.mContext == null)
+			if (mDatabase.mContext == null || this as IfcProjectLibrary == null)
 				mDatabase.mContext = this;
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)

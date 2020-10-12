@@ -132,7 +132,7 @@ namespace GeometryGym.Ifc
 			set { mTrueNorth = value; if (value != null) value.DirectionRatioZ = double.NaN; } 
 		}
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
-		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != mIndex) value.SourceCRS = this; } }
+		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != this) value.SourceCRS = this; } }
 		
 		internal IfcGeometricRepresentationContext() : base() { }
 		protected IfcGeometricRepresentationContext(DatabaseIfc db) : base(db) { }

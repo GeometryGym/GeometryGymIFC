@@ -56,22 +56,15 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mMappedTo) + "," + ParserSTEP.DoubleOptionalToString(mOpacity) +"," + ParserSTEP.LinkToString(mColours) + ",(" + mColourIndex[0];
-			for (int icounter = 1; icounter < mColourIndex.Count; icounter++)
-				result += "," + mColourIndex[icounter];
-			return result + ")";
+			return base.BuildStringSTEP(release) + ",#" + mMappedTo.StepId + "," + ParserSTEP.DoubleOptionalToString(mOpacity) + "," + 
+				ParserSTEP.LinkToString(mColours) + ",(" + string.Join(",", mColourIndex) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mMappedTo = ParserSTEP.StripLink(str, ref pos, len);
+			MappedTo = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTessellatedFaceSet;
 			mOpacity = ParserSTEP.StripDouble(str, ref pos, len); // Overrides : OPTIONAL IfcStrippedOptional;
 			mColours = ParserSTEP.StripLink(str, ref pos, len);
 			mColourIndex = ParserSTEP.SplitListSTPIntegers(ParserSTEP.StripField(str, ref pos, len));
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			MappedTo.mHasColours = this;
 		}
 	}
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
@@ -139,13 +132,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mMappedTo = ParserSTEP.StripLink(str, ref pos, len);
-			mTexCoords = ParserSTEP.StripLink(str, ref pos, len);
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			MappedTo.mHasTextures.Add(this);
+			MappedTo = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTessellatedFaceSet;
+			TexCoords = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTextureVertexList;
 		}
 	}
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap

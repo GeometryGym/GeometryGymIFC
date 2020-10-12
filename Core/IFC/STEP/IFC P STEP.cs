@@ -602,13 +602,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			if(release < ReleaseVersion.IFC4)
 				mName = ParserSTEP.StripString(str, ref pos, len);
-			mProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
-		}
-		internal override void postParseRelate()
-		{
-			base.postParseRelate();
-			if(mProfileDefinition != null)
-				ProfileDefinition.mHasProperties.Add(this);
+			ProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 	}
 	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4

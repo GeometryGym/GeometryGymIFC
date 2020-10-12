@@ -863,7 +863,7 @@ additional types	some additional representation types are given:
 		{
 			IfcCovering covering = product as IfcCovering;
 			if (covering != null)
-				mHasCoverings[0].RelatedCoverings.Add(covering);
+				mHasCoverings.First().RelatedCoverings.Add(covering);
 			else
 				base.addProduct(product);
 		}
@@ -986,7 +986,7 @@ additional types	some additional representation types are given:
 			if (mContainsElements.Count == 0)
 				new IfcRelContainedInSpatialStructure(product,this);
 			else
-				mContainsElements[0].RelatedElements.Add(product);
+				mContainsElements.First().RelatedElements.Add(product);
 		}
 
 		protected override void initialize()
@@ -1019,9 +1019,9 @@ additional types	some additional representation types are given:
 		{
 			if (mContainsElements.Count == 0)
 				new IfcRelContainedInSpatialStructure(this);
-			if (mContainsElements[0].RelatedElements.Contains(g))
+			if (mContainsElements.First().RelatedElements.Contains(g))
 				return false;
-			ContainsElements[0].RelatedElements.Add(g);
+			ContainsElements.First().RelatedElements.Add(g);
 			return true;
 		}
 		
@@ -1068,7 +1068,7 @@ additional types	some additional representation types are given:
 		public void ReferenceElement(IfcSpatialReferenceSelect element)
 		{
 			if (mReferencesElements.Count > 0)
-				mReferencesElements[0].RelatedElements.Add(element);
+				mReferencesElements.First().RelatedElements.Add(element);
 			else
 			{
 				new IfcRelReferencedInSpatialStructure(element, this);
@@ -1443,7 +1443,6 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcStructuralItem : IfcProduct, IfcStructuralActivityAssignmentSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralConnection ,IfcStructuralMember))
 	{
-		private int mID = 0; //Geometry Gym
 		//INVERSE
 		internal List<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new List<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 		public ReadOnlyCollection<IfcRelConnectsStructuralActivity> AssignedStructuralActivity { get { return new ReadOnlyCollection<IfcRelConnectsStructuralActivity>(mAssignedStructuralActivity); } }
@@ -1860,19 +1859,19 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralResultGroup : IfcGroup
 	{
 		internal IfcAnalysisTheoryTypeEnum mTheoryType = IfcAnalysisTheoryTypeEnum.NOTDEFINED;// : IfcAnalysisTheoryTypeEnum;
-		internal int mResultForLoadGroup = 0;// : OPTIONAL IfcStructuralLoadGroup;
+		internal IfcStructuralLoadGroup mResultForLoadGroup = null;// : OPTIONAL IfcStructuralLoadGroup;
 		internal bool mIsLinear = false;// : BOOLEAN; 
 		//INVERSE
 		internal IfcStructuralAnalysisModel mResultGroupFor = null;// : SET[0:1] OF IfcStructuralAnalysisModel FOR HasResults;
 
-		public IfcStructuralLoadGroup ResultForLoadGroup { get { return mDatabase[mResultForLoadGroup] as IfcStructuralLoadGroup; } set { mResultForLoadGroup = (value == null ? 0 : value.mIndex); value.mSourceOfResultGroup = this; } }
+		public IfcStructuralLoadGroup ResultForLoadGroup { get { return mResultForLoadGroup; } set { mResultForLoadGroup = value; value.mSourceOfResultGroup = this; } }
 		public IfcStructuralAnalysisModel ResultGroupFor { get { return mResultGroupFor; } set { mResultGroupFor = value; } }
 
 		internal IfcStructuralResultGroup() : base() { }
 		internal IfcStructuralResultGroup(DatabaseIfc db, IfcStructuralResultGroup g, DuplicateOptions options) : base(db, g, options)
 		{
 			mTheoryType = g.mTheoryType;
-			if(g.mResultForLoadGroup > 0)
+			if(g.mResultForLoadGroup != null)
 				ResultForLoadGroup = db.Factory.Duplicate( g.ResultForLoadGroup) as IfcStructuralLoadGroup;
 			mIsLinear = g.mIsLinear;
 		}
@@ -1991,25 +1990,21 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStyledItem : IfcRepresentationItem, NamedObjectIfc
 	{
-		private int mItem;// : OPTIONAL IfcRepresentationItem;
+		private IfcRepresentationItem mItem = null;// : OPTIONAL IfcRepresentationItem;
 		private SET<IfcStyleAssignmentSelect> mStyles = new SET<IfcStyleAssignmentSelect>();// : SET [1:?] OF IfcStyleAssignmentSelect; ifc2x3 IfcPresentationStyleAssignment;
 		private string mName = "$";// : OPTIONAL IfcLabel; 
 
 		public IfcRepresentationItem Item
 		{
-			get { return mDatabase[mItem] as IfcRepresentationItem; }
+			get { return mItem; }
 			set
 			{
-				if (value == null)
-					mItem = 0;
-				else
-				{
-					IfcRepresentationItem item = Item;
-					if (item != null)
-						item.mStyledByItem = null;
-					mItem = value.mIndex;
+				IfcRepresentationItem item = Item;
+				if (item != null)
+					item.mStyledByItem = null;
+				mItem = value;
+				if(value != null)
 					value.mStyledByItem = this;
-				}
 			}
 		}
 		public SET<IfcStyleAssignmentSelect> Styles { get { return mStyles; } }
@@ -2373,10 +2368,11 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSurfaceStyleWithTextures : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
-		internal List<int> mTextures = new List<int>();//: LIST [1:?] OF IfcSurfaceTexture; 
+		internal LIST<IfcSurfaceTexture> mTextures = new LIST<IfcSurfaceTexture>();//: LIST [1:?] OF IfcSurfaceTexture; 
+		public LIST<IfcSurfaceTexture> Textures { get { return mTextures; } }
 		internal IfcSurfaceStyleWithTextures() : base() { }
-		public IfcSurfaceStyleWithTextures(IfcSurfaceTexture texture) : base(texture.mDatabase) { mTextures.Add(texture.mIndex); }
-		public IfcSurfaceStyleWithTextures(List<IfcSurfaceTexture> textures) : base(textures[0].mDatabase) { mTextures = textures.ConvertAll(x => x.mIndex);  }
+		public IfcSurfaceStyleWithTextures(IfcSurfaceTexture texture) : base(texture.mDatabase) { mTextures.Add(texture); }
+		public IfcSurfaceStyleWithTextures(List<IfcSurfaceTexture> textures) : base(textures[0].mDatabase) { mTextures.AddRange(textures);  }
 	}
 	[Serializable]
 	public abstract partial class IfcSurfaceTexture : IfcPresentationItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcBlobTexture ,IfcImageTexture ,IfcPixelTexture));

@@ -95,15 +95,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcEdgeCurve : IfcEdge, IfcCurveOrEdgeCurve
 	{
-		internal int mEdgeGeometry;// IfcCurve;
+		internal IfcCurve mEdgeGeometry;// IfcCurve;
 		internal bool mSameSense = false;// : BOOL;
 
-		public IfcCurve EdgeGeometry { get { return mDatabase[mEdgeGeometry] as IfcCurve; } set { mEdgeGeometry = value.mIndex; } }
+		public IfcCurve EdgeGeometry { get { return mEdgeGeometry; } set { mEdgeGeometry = value; value.mEdge = this; } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 		
 		internal IfcEdgeCurve() : base() { }
 		internal IfcEdgeCurve(DatabaseIfc db, IfcEdgeCurve e, DuplicateOptions options) : base(db, e, options) { EdgeGeometry = db.Factory.Duplicate(e.EdgeGeometry) as IfcCurve; mSameSense = e.mSameSense; }
-		public IfcEdgeCurve(IfcVertexPoint start, IfcVertexPoint end, IfcCurve edge, bool sense) : base(start, end) { mEdgeGeometry = edge.mIndex; mSameSense = sense; }
+		public IfcEdgeCurve(IfcVertexPoint start, IfcVertexPoint end, IfcCurve edge, bool sense) : base(start, end) { EdgeGeometry = edge; mSameSense = sense; }
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -608,7 +608,7 @@ namespace GeometryGym.Ifc
 			else
 			{
 				if (mReferencedBy.Count > 0)
-					mReferencedBy[0].RelatedObjects.Add(m);
+					mReferencedBy.First().RelatedObjects.Add(m);
 				else
 				{
 					new IfcRelAssignsToProduct(m, this);
@@ -672,17 +672,9 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return "IfcElementQuantity"; } }
 		internal string mMethodOfMeasurement = "$";// : OPTIONAL IfcLabel;
 		private Dictionary<string, IfcPhysicalQuantity> mQuantities = new Dictionary<string, IfcPhysicalQuantity>();// : SET [1:?] OF IfcPhysicalQuantity;
-		private List<int> mQuantityIndices = new List<int>();
 
 		public string MethodOfMeasurement { get { return (mMethodOfMeasurement == "$" ? "" : ParserIfc.Decode(mMethodOfMeasurement)); } set { mMethodOfMeasurement = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyDictionary<string, IfcPhysicalQuantity> Quantities { get { return new ReadOnlyDictionary<string, IfcPhysicalQuantity>(mQuantities); } }
-
-		protected override void initialize()
-		{
-			base.initialize();
-			mQuantities = new Dictionary<string, IfcPhysicalQuantity>();
-			mQuantityIndices = new List<int>();
-		}
+		public Dictionary<string, IfcPhysicalQuantity> Quantities { get { return mQuantities; } }
 
 		internal IfcElementQuantity() : base() { }
 		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, DuplicateOptions options) : base(db, q, options) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
@@ -716,9 +708,10 @@ namespace GeometryGym.Ifc
 					}
 					else
 					{
+						List<IfcPhysicalQuantity> quantities = mQuantities.Values.ToList();
 						foreach (int i in reference.mListPositions)
 						{
-							result.Add(mDatabase[mQuantityIndices[i - 1]]);
+							result.Add(quantities[i - 1]);
 						}
 					}
 					return result;
@@ -746,8 +739,9 @@ namespace GeometryGym.Ifc
 				}
 				else
 				{
+					List<IfcPhysicalQuantity> quantities = mQuantities.Values.ToList();
 					foreach (int i in reference.mListPositions)
-						result.AddRange(mDatabase[mQuantityIndices[i - 1]].retrieveReference(ir));
+						result.AddRange(quantities[i - 1].retrieveReference(ir));
 				}
 				return result;
 			}
@@ -766,8 +760,6 @@ namespace GeometryGym.Ifc
 					return;
 			}
 			mQuantities[quantity.Name] = quantity;
-			if (!mQuantityIndices.Contains(quantity.mIndex))
-				mQuantityIndices.Add(quantity.mIndex);
 		}
 
 		public IfcPhysicalQuantity this[string name]
@@ -780,21 +772,11 @@ namespace GeometryGym.Ifc
 				mQuantities.TryGetValue(name, out result);
 				return result;
 			}
-			set
-			{
-				if (string.IsNullOrEmpty(name))
-					return;
-				IfcPhysicalQuantity existing = this[name];
-				if (existing != null)
-					mQuantityIndices.Remove(existing.Index);
-				mQuantities[name] = value;
-				mQuantityIndices.Add(value.Index);
-			}
+			set { addQuantity(value); }
 		}
 		public void SetQuantities(IEnumerable<IfcPhysicalQuantity> quantities)
 		{
 			mQuantities.Clear();
-			mQuantityIndices.Clear();
 			foreach (IfcPhysicalQuantity quantity in quantities)
 				addQuantity(quantity);
 		}

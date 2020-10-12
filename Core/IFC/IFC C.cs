@@ -519,7 +519,7 @@ namespace GeometryGym.Ifc
 				return new IfcRelAssociatesClassification(this, related);
 			else
 			{
-				IfcRelAssociatesClassification associates = mClassificationForObjects[0];
+				IfcRelAssociatesClassification associates = mClassificationForObjects.First();
 				associates.RelatedObjects.Add(related);
 				return associates;
 			}
@@ -673,8 +673,8 @@ namespace GeometryGym.Ifc
 		{
 			if (mClassificationRefForObjects.Count == 0)
 				new IfcRelAssociatesClassification(this, related);
-			else if (!mClassificationRefForObjects[0].RelatedObjects.Contains(related))
-				mClassificationRefForObjects[0].RelatedObjects.Add(related);
+			else if (!mClassificationRefForObjects.First().RelatedObjects.Contains(related))
+				mClassificationRefForObjects.First().RelatedObjects.Add(related);
 		}
 		public IfcClassificationReference FindItem(string identification, bool prefixHierarchy)
 		{
@@ -869,12 +869,11 @@ namespace GeometryGym.Ifc
 	{
 		private string mUsageName = "";// : OPTIONAL IfcLabel;
 		private IfcComplexPropertyTemplateTypeEnum mTemplateType = IfcComplexPropertyTemplateTypeEnum.NOTDEFINED;// : OPTIONAL IfcComplexPropertyTemplateTypeEnum;
-		private List<int> mHasPropertyTemplateIndices = new List<int>(1);//
 		private Dictionary<string, IfcPropertyTemplate> mHasPropertyTemplates = new Dictionary<string, IfcPropertyTemplate>();//  : SET [1:?] OF IfcPropertyTemplate;
 
 		public string UsageName { get { return mUsageName; } set { mUsageName = value; } }
 		public IfcComplexPropertyTemplateTypeEnum TemplateType { get { return mTemplateType; } set { mTemplateType = value; } }
-		public ReadOnlyDictionary<string,IfcPropertyTemplate> HasPropertyTemplates { get { return new ReadOnlyDictionary<string, IfcPropertyTemplate>(mHasPropertyTemplates); } }
+		public Dictionary<string,IfcPropertyTemplate> HasPropertyTemplates { get { return mHasPropertyTemplates; } }
 
 		internal IfcComplexPropertyTemplate() : base() { }
 		public IfcComplexPropertyTemplate(DatabaseIfc db, IfcComplexPropertyTemplate t, DuplicateOptions options) : base(db, t, options)
@@ -886,7 +885,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcComplexPropertyTemplate(DatabaseIfc db, string name) : base(db, name) { }
 
-		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplateIndices.Add(template.mIndex); mHasPropertyTemplates.Add(template.Name, template); template.mPartOfComplexTemplate.Add(this); }
+		public void AddPropertyTemplate(IfcPropertyTemplate template) {  mHasPropertyTemplates.Add(template.Name, template); template.mPartOfComplexTemplate.Add(this); }
 		public IfcPropertyTemplate this[string name]
 		{
 			get
@@ -898,7 +897,7 @@ namespace GeometryGym.Ifc
 				return result;
 			}
 		}
-		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfComplexTemplate.Remove(this); mHasPropertyTemplateIndices.Remove(template.Index); mHasPropertyTemplates.Remove(templateName); } }
+		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfComplexTemplate.Remove(this); mHasPropertyTemplates.Remove(templateName); } }
 	}
 	[Serializable]
 	public partial class IfcCompositeCurve : IfcBoundedCurve
@@ -1417,15 +1416,11 @@ namespace GeometryGym.Ifc
 		{
 			if (mRepresentationContexts.Count > 0)
 			{
-				for (int icounter = 0; icounter < mRepresentationContexts.Count; icounter++)
+				foreach(IfcGeometricRepresentationContext grc in mRepresentationContexts.OfType<IfcGeometricRepresentationContext>())
 				{
-					IfcGeometricRepresentationContext c = mRepresentationContexts[icounter] as IfcGeometricRepresentationContext;
-					if (c != null)
-					{
-						if(!double.IsNaN(c.mPrecision))
-							mDatabase.Tolerance = c.mPrecision;
-						break;
-					}
+					if(!double.IsNaN(grc.mPrecision))
+						mDatabase.Tolerance = grc.mPrecision;
+					break;
 				}
 			}
 			IfcUnitAssignment units = UnitsInContext;
@@ -1453,7 +1448,7 @@ namespace GeometryGym.Ifc
 			{
 				foreach(IfcRelDeclares rd in Declares)
 				{
-					IReadOnlyCollection<IfcDefinitionSelect> ds = rd.RelatedDefinitions;
+					SET<IfcDefinitionSelect> ds = rd.RelatedDefinitions;
 					foreach(IfcDefinitionSelect d in ds)
 					{
 						result.AddRange(d.Extract<T>());
@@ -1542,7 +1537,7 @@ namespace GeometryGym.Ifc
 				throw new Exception("Invalid Model View for IfcActor : " + db.ModelView.ToString());
 		}
 
-		public void Assign(IfcObjectDefinition o) { if (mControls.Count == 0) new IfcRelAssignsToControl(this, o); else mControls[0].RelatedObjects.Add(o); }
+		public void Assign(IfcObjectDefinition o) { if (mControls.Count == 0) new IfcRelAssignsToControl(this, o); else mControls.First().RelatedObjects.Add(o); }
 	}
 	[Serializable]
 	public partial class IfcController : IfcDistributionControlElement //IFC4  
@@ -1700,14 +1695,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcCoordinateOperation : BaseClassIfc // IFC4 	ABSTRACT SUPERTYPE OF(IfcMapConversion);
 	{
-		internal int mSourceCRS;// :	IfcCoordinateReferenceSystemSelect;
-		private int mTargetCRS;// :	IfcCoordinateReferenceSystem;
+		internal IfcCoordinateReferenceSystemSelect mSourceCRS;// :	IfcCoordinateReferenceSystemSelect;
+		private IfcCoordinateReferenceSystem mTargetCRS;// :	IfcCoordinateReferenceSystem;
 
-		public IfcCoordinateReferenceSystemSelect SourceCRS { get { return mDatabase[mSourceCRS] as IfcCoordinateReferenceSystemSelect; } set { mSourceCRS = value.Index; if(value.HasCoordinateOperation != this) value.HasCoordinateOperation = this; } }
-		public IfcCoordinateReferenceSystem TargetCRS { get { return mDatabase[mTargetCRS] as IfcCoordinateReferenceSystem; } set { mTargetCRS = value.mIndex; } }
+		public IfcCoordinateReferenceSystemSelect SourceCRS { get { return mSourceCRS; } set { mSourceCRS = value; if(value.HasCoordinateOperation != this) value.HasCoordinateOperation = this; } }
+		public IfcCoordinateReferenceSystem TargetCRS { get { return mTargetCRS; } set { mTargetCRS = value; } }
 
 		protected IfcCoordinateOperation() : base() { }
-		protected IfcCoordinateOperation(DatabaseIfc db, IfcCoordinateOperation p) : base(db, p) { SourceCRS = db.Factory.Duplicate(p.mDatabase[p.mSourceCRS]) as IfcCoordinateReferenceSystemSelect; TargetCRS = db.Factory.Duplicate(p.TargetCRS) as IfcCoordinateReferenceSystem; }
+		protected IfcCoordinateOperation(DatabaseIfc db, IfcCoordinateOperation p) : base(db, p) { SourceCRS = db.Factory.Duplicate(p.mSourceCRS) as IfcCoordinateReferenceSystemSelect; TargetCRS = db.Factory.Duplicate(p.TargetCRS) as IfcCoordinateReferenceSystem; }
 		protected IfcCoordinateOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target) : base(source.Database) { SourceCRS = source; TargetCRS = target; }
 	}
 	[Serializable]
@@ -1724,7 +1719,7 @@ namespace GeometryGym.Ifc
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string GeodeticDatum { get { return  ParserIfc.Decode(mGeodeticDatum); } set { mGeodeticDatum = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string VerticalDatum { get { return (mVerticalDatum == "$" ? "" : ParserIfc.Decode(mVerticalDatum)); } set { mVerticalDatum = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if (value.mSourceCRS != mIndex) value.SourceCRS = this; } }
+		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; value.SourceCRS = this; } }
 
 		protected IfcCoordinateReferenceSystem() : base() { }
 		protected IfcCoordinateReferenceSystem(DatabaseIfc db, IfcCoordinateReferenceSystem p) : base(db,p) { mName = p.mName; mDescription = p.mDescription; mGeodeticDatum = p.mGeodeticDatum; mVerticalDatum = p.mVerticalDatum; }
