@@ -1462,7 +1462,6 @@ additional types	some additional representation types are given:
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
 		{
-			mID = id;
 			if (id >= 0)
 				Name = id.ToString();
 		}
