@@ -261,16 +261,12 @@ namespace GeometryGym.Ifc
 			mAnchorageSlip = t.mAnchorageSlip;
 			mMinCurvatureRadius = t.mMinCurvatureRadius;
 		}
-		public IfcTendon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, double diam, double area, double forceMeasure, double pretress, double fricCoeff, double anchorSlip, double minCurveRadius)
+		public IfcTendon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcTendon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, double diam, double area)
 			: base(host, placement, representation)
 		{
 			mNominalDiameter = diam;
 			mCrossSectionArea = area;
-			mTensionForce = forceMeasure;
-			mPreStress = pretress;
-			mFrictionCoefficient = fricCoeff;
-			mAnchorageSlip = anchorSlip;
-			mMinCurvatureRadius = minCurveRadius;
 		}
 	}
 	[Serializable]
@@ -302,7 +298,7 @@ namespace GeometryGym.Ifc
 		public IfcTendonConduit() : base() { }
 		public IfcTendonConduit(DatabaseIfc db, IfcTendonConduitTypeEnum predefinedType)
 			: base(db) { PredefinedType = predefinedType; }
-		public IfcTendonConduit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcTendonConduitTypeEnum predefinedType) : base(host, placement, representation) { }
+		public IfcTendonConduit(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcTendonConduitType : IfcReinforcingElementType

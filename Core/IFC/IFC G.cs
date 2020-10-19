@@ -254,7 +254,13 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalStratum() : base() { }
 		protected IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
 		protected IfcGeotechnicalStratum(DatabaseIfc db, IfcGeotechnicalStratum geotechnicalStratum, DuplicateOptions options) : base(db, geotechnicalStratum, options) { }
-		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+			: base(host.Database)
+		{
+			host.AddNested(this);
+			ObjectPlacement = placement;
+			Representation = representation;
+		}
 	}
 	[Serializable]
 	public partial class IfcGrid : IfcPositioningElement

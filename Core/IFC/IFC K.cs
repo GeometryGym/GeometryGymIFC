@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		public IfcKerb() : base() { }
 		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
 		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
-		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, bool mountable) : base(host, placement, representation) { }
+		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcKerbType : IfcBuiltElementType

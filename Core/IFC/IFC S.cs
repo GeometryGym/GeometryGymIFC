@@ -969,22 +969,16 @@ additional types	some additional representation types are given:
 			Name = name;
 			host.AddAggregated(this);
 		}
-		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement)
-		{
-			IfcRelContainedInSpatialStructure rs = new IfcRelContainedInSpatialStructure(this);
-			if (mDatabase.mRelease != ReleaseVersion.IFC2x3)
-			{
-				mContainerCommonPlacement = new IfcLocalPlacement(placement, mDatabase.Factory.XYPlanePlacement);
-				mContainerCommonPlacement.mContainerHost = this;
-			}
-		}
+		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement) { }
 		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 
 		protected override void addProduct(IfcProduct product)
 		{
 			product.detachFromHost();
 			if (mContainsElements.Count == 0)
-				new IfcRelContainedInSpatialStructure(product,this);
+			{
+				new IfcRelContainedInSpatialStructure(product, this);
+			}
 			else
 				mContainsElements.First().RelatedElements.Add(product);
 		}

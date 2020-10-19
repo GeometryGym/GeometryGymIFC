@@ -621,7 +621,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcFurnishingElement() : base() { }
 		internal IfcFurnishingElement(DatabaseIfc db, IfcFurnishingElement e, DuplicateOptions options) : base(db, e, options) { }
-		internal IfcFurnishingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcFurnishingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcFurnishingElementType : IfcElementType //IFC4 DEPRECATED //SUPERTYPE OF (ONEOF (IfcFurnitureType ,IfcSystemFurnitureElementType))

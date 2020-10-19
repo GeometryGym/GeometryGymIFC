@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "ContainerProfile") == 0)
-					ContainerProfile = mDatabase.ParseXml<IfcProfileDef>(child as XmlElement);
+					ParentProfile = mDatabase.ParseXml<IfcProfileDef>(child as XmlElement);
 				else if (string.Compare(name, "Operator") == 0)
 					Operator = mDatabase.ParseXml<IfcCartesianTransformationOperator2D>(child as XmlElement);
 			}
@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(ContainerProfile.GetXML(xml.OwnerDocument, "ContainerProfile", this, processed));
+			xml.AppendChild(ParentProfile.GetXML(xml.OwnerDocument, "ContainerProfile", this, processed));
 			xml.AppendChild(Operator.GetXML(xml.OwnerDocument, "Operator", this, processed));
 			setAttribute(xml, "Label", Label);
 		}

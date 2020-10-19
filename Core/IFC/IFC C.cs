@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 		public IfcCableCarrierFittingTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		internal IfcCableCarrierFitting() : base() { }
 		internal IfcCableCarrierFitting(DatabaseIfc db, IfcCableCarrierFitting f, DuplicateOptions options) : base(db,f, options) { mPredefinedType = f.mPredefinedType; }
-		protected IfcCableCarrierFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+		public IfcCableCarrierFitting(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcCableCarrierFittingType : IfcFlowFittingType
@@ -914,7 +914,8 @@ namespace GeometryGym.Ifc
 			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCompositeCurveSegment));
 			mSelfIntersect = c.mSelfIntersect;
 		}
-		public IfcCompositeCurve(List<IfcCompositeCurveSegment> segs) : base(segs[0].mDatabase) { mSegments.AddRange(segs); }
+		public IfcCompositeCurve(IEnumerable<IfcCompositeCurveSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
+		public IfcCompositeCurve(params IfcCompositeCurveSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
 	}
 	[Serializable]
 	public partial class Ifc2dCompositeCurve : IfcCompositeCurve
@@ -998,6 +999,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcCommunicationsAppliance() : base() { }
 		internal IfcCommunicationsAppliance(DatabaseIfc db, IfcCommunicationsAppliance a, DuplicateOptions options) : base(db,a, options) { mPredefinedType = a.mPredefinedType; }
+		public IfcCommunicationsAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcCommunicationsApplianceType : IfcFlowTerminalType

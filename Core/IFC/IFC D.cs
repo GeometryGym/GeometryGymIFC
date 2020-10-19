@@ -99,22 +99,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDerivedProfileDef : IfcProfileDef
 	{
-		private IfcProfileDef mContainerProfile;// : IfcProfileDef;
+		private IfcProfileDef mParentProfile;// : IfcProfileDef;
 		private IfcCartesianTransformationOperator2D mOperator;// : IfcCartesianTransformationOperator2D;
 		internal string mLabel = "$";// : OPTIONAL IfcLabel;
 
-		public IfcProfileDef ContainerProfile { get { return mContainerProfile; } set { mContainerProfile = value; } }
+		public IfcProfileDef ParentProfile { get { return mParentProfile; } set { mParentProfile = value; } }
 		public IfcCartesianTransformationOperator2D Operator { get { return mOperator; } set { mOperator = value; } }
 		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcDerivedProfileDef() : base() { }
 		internal IfcDerivedProfileDef(DatabaseIfc db, IfcDerivedProfileDef p, DuplicateOptions options) : base(db, p, options)
 		{
-			ContainerProfile = db.Factory.Duplicate(p.ContainerProfile, options) as IfcProfileDef;
+			ParentProfile = db.Factory.Duplicate(p.ParentProfile, options) as IfcProfileDef;
 			Operator = db.Factory.Duplicate(p.Operator, options) as IfcCartesianTransformationOperator2D;
 			mLabel = p.mLabel;
 		}
-		public IfcDerivedProfileDef(IfcProfileDef container, IfcCartesianTransformationOperator2D op, string name) : base(container.mDatabase, name) { ContainerProfile = container; Operator = op; }
+		public IfcDerivedProfileDef(IfcProfileDef container, IfcCartesianTransformationOperator2D op, string name) : base(container.mDatabase, name) { ParentProfile = container; Operator = op; }
 	}
 	[Serializable]
 	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit

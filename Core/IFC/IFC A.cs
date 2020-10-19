@@ -254,6 +254,8 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment() : base() { }
 		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, DuplicateOptions options) 
 			: base(db, alignment, options) { PredefinedType = alignment.PredefinedType; }
+		public IfcAlignment(IfcFacility host, IfcCurve axis) : base(host, axis) { }
+		public IfcAlignment(IfcFacilityPart host, IfcCurve axis) : base(host, axis) { }
 		public IfcAlignment(IfcSite host, IfcCurve axis) : base(host, axis) { }
 	}
 	[Serializable]
@@ -1089,6 +1091,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAudioVisualAppliance() : base() { }
 		internal IfcAudioVisualAppliance(DatabaseIfc db, IfcAudioVisualAppliance a, DuplicateOptions options) : base(db,a, options) { mPredefinedType = a.mPredefinedType; }
+		public IfcAudioVisualAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcAudioVisualApplianceType : IfcFlowTerminalType
