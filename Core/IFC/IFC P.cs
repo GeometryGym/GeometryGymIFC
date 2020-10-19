@@ -716,7 +716,7 @@ namespace GeometryGym.Ifc
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
-		protected IfcPositioningElement(IfcSite host) : base(host.Database) { host.AddElement(this); }
+		protected IfcPositioningElement(IfcSpatialStructureElement host) : base(host.Database) { host.AddElement(this); }
 		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(placement, representation) { }
 		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
@@ -1060,7 +1060,20 @@ namespace GeometryGym.Ifc
 							if (product == null)
 								ObjectPlacement = new IfcLocalPlacement(mDatabase.Factory.XYPlanePlacement);
 							else
-								ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
+							{
+								if (mDatabase.mRelease > ReleaseVersion.IFC2x3)
+								{
+									if (product.mContainerCommonPlacement == null)
+									{
+										ObjectPlacement = mContainerCommonPlacement = new IfcLocalPlacement(ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
+										mContainerCommonPlacement.mContainerHost = product;
+									}
+									else
+										ObjectPlacement = product.mContainerCommonPlacement;
+								}
+								else
+									ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);
+							}
 						}
 					}
 				}

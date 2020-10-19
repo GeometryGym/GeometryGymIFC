@@ -784,6 +784,14 @@ namespace GeometryGym.Ifc
 	//Pset_FurnitureTypeDesk
 	//Pset_FurnitureTypeFileCabinet
 	//Pset_FurnitureTypeTable
+	public partial class Pset_GeotechnicalAssemblyCommon : IfcPropertySet
+	{
+		public string Limitations { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Limitations", new IfcIdentifier(value))); } }
+		public string Methodology { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Methodology", new IfcIdentifier(value))); } }
+		public PEnum_StrataAssemblyPurpose Purpose { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Purpose", new IfcLabel(value.ToString()))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public Pset_GeotechnicalAssemblyCommon(IfcGeotechnicalAssembly instance) : base(instance) { }
+	}
 	//Pset_HeatExchangerTypeCommon
 	//Pset_HeatExchangerTypePlate
 	//Pset_HumidifierPHistory

@@ -36,38 +36,6 @@ namespace GeometryGym.Ifc
 			return new Line(pt, pt + Dir.Vector);
 		}
 	}
-	public partial class IfcLinearPlacement : IfcObjectPlacement
-	{
-		public override Transform Transform()
-		{
-			double tol = mDatabase == null ? 1e-5 : mDatabase.Tolerance;
-			IfcDistanceExpression distanceExpression = Distance;
-			IfcCurve curve = PlacementMeasuredAlong;
-			Plane plane = Plane.Unset;
-			plane = curve.planeAt(distanceExpression, false, tol);
-			if (plane.IsValid)
-			{
-				Vector3d xAxis = Vector3d.CrossProduct(plane.ZAxis, Vector3d.ZAxis);
-				plane = new Plane(plane.Origin, xAxis, plane.ZAxis);
-
-				if (plane.IsValid)
-				{
-					IfcOrientationExpression orientationExpression = Orientation;
-					if (orientationExpression != null)
-					{
-						Vector3d x = orientationExpression.LateralAxisDirection.Vector3d, z = orientationExpression.VerticalAxisDirection.Vector3d;
-						Vector3d y = Vector3d.CrossProduct(z, x);
-						plane = new Plane(plane.Origin, x, y);
-					}
-					return Rhino.Geometry.Transform.ChangeBasis(plane, Plane.WorldXY);
-				}
-			}
-			if (CartesianPosition != null)
-				return CartesianPosition.Transform();
-
-			return Rhino.Geometry.Transform.Unset;
-		}
-	}
 	public partial class IfcLocalPlacement : IfcObjectPlacement
 	{
 		public override Transform Transform()

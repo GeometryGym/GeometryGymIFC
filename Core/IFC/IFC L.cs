@@ -328,7 +328,6 @@ namespace GeometryGym.Ifc
 		internal IfcLinearDimension() : base() { }
 		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
 	}
-	[Serializable]
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
 		private IfcCurve mPlacementMeasuredAlong = null; //: IfcCurve;
@@ -379,7 +378,8 @@ namespace GeometryGym.Ifc
 		public IfcLinearAxisSelect Axis { get { return mAxis; } set { mAxis = value; } }
 
 		protected IfcLinearPositioningElement() : base() { }
-		protected IfcLinearPositioningElement(IfcSite host, IfcCurve axis) : base(host) { Axis = axis; }
+		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
+		protected IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
 		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}
 	[Serializable]

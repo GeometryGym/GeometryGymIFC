@@ -48,7 +48,8 @@ namespace GeometryGym.STEP
 
 		private string getKey(T item)
 		{
-			if (item is IfcRoot root)
+			IfcRoot root = item as IfcRoot;
+			if (root != null)
 				return root.GlobalId;
 			return item.StepId > 0 ? item.StepId.ToString() : item.GetHashCode().ToString();
 		}

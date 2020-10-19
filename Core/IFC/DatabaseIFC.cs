@@ -348,14 +348,13 @@ namespace GeometryGym.Ifc
 		{
 			string str = className, definedType = "", enumName = "";
 			ReleaseVersion release = mDatabase.Release;
-			if (!string.IsNullOrEmpty(str))
+			if (string.IsNullOrEmpty(str))
+				return null;
+			string[] fields = str.Split(".".ToCharArray());
+			if (fields.Length > 1)
 			{
-				string[] fields = str.Split(".".ToCharArray());
-				if (fields.Length > 1)
-				{
-					enumName = str = fields[0];
-					definedType = fields[1];
-				}
+				enumName = str = fields[0];
+				definedType = fields[1];
 			}
 			if (str.EndsWith("Type"))
 				str = str.Substring(0, str.Length - 4);
