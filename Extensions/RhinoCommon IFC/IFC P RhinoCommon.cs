@@ -78,16 +78,6 @@ namespace GeometryGym.Ifc
 				Points = new STEP.LIST<IfcCartesianPoint>(pl.ConvertAll(x => new IfcCartesianPoint(db, x)));
 		}
 	}
-	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
-	{
-		internal Transform PlacementTransform()
-		{
-			IfcObjectPlacement p = ObjectPlacement;
-			if (p == null)
-				return Transform.Identity;
-			return p.Transform();
-		}
-	}
 	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef
 	{  //,IfcCompositeProfileDef ,IfcDerivedProfileDef ,IfcParameterizedProfileDef));  IFC2x3 abstract 
 		internal virtual Transform Transform() { return Rhino.Geometry.Transform.Identity; }

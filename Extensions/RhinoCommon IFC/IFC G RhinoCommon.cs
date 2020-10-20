@@ -27,26 +27,5 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcGridAxis : BaseClassIfc
-	{
-		internal Curve Curve() { return Curve(mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
-		internal Curve Curve(double tol)
-		{
-			Curve c = AxisCurve.Curve(tol);
-			if (c == null)
-				return null;
-			IfcGrid grid = mPartOfU;
-			if (grid == null)
-				grid = mPartOfV;
-			if (grid == null)
-				grid = mPartOfW;
-			if (grid != null)
-				c.Transform(grid.PlacementTransform());
-			return c;
-		}
-	}
-	public partial class IfcGridPlacement : IfcObjectPlacement
-	{
-		public override Transform Transform() { return Rhino.Geometry.Transform.ChangeBasis(PlacementLocation.LocationPlane(mDatabase.Tolerance), Plane.WorldXY);  }
-	}
+	
 }

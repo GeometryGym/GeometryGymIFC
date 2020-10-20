@@ -36,34 +36,4 @@ namespace GeometryGym.Ifc
 			return new Line(pt, pt + Dir.Vector);
 		}
 	}
-	public partial class IfcLocalPlacement : IfcObjectPlacement
-	{
-		public override Transform Transform()
-		{
-			IfcObjectPlacement placementRelTo = PlacementRelTo;
-			IfcAxis2Placement relativePlacement = RelativePlacement;
-			bool identityRelative = relativePlacement == null;
-			if(relativePlacement != null)
-			{
-				if (mDatabase != null && relativePlacement.Plane.IsValid)
-				{
-					Plane plane = relativePlacement.Plane;
-					if (plane.Origin.DistanceTo(Point3d.Origin) < mDatabase.Tolerance && plane.XAxis.IsParallelTo(Vector3d.XAxis) == 1 && plane.YAxis.IsParallelTo(Vector3d.YAxis) == 1)
-						identityRelative = true;
-				}
-				else
-					identityRelative = relativePlacement.IsXYPlane;
-			}
-			if (placementRelTo == null || placementRelTo.isXYPlane)
-			{
-				if (identityRelative)
-					return Rhino.Geometry.Transform.Identity;
-				else
-					return Rhino.Geometry.Transform.ChangeBasis(relativePlacement.Plane,Plane.WorldXY);
-			}
-			if (identityRelative)
-				return placementRelTo.Transform();
-			return placementRelTo.Transform() * Rhino.Geometry.Transform.ChangeBasis(relativePlacement.Plane, Plane.WorldXY);
-		}
-	} 
 }

@@ -27,23 +27,6 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
-	{
-		internal Plane Plane
-		{
-			get
-			{
-				Point3d o = new Point3d(), x = new Point3d(1, 0, 0), y = new Point3d(0, 1, 0);
-				Transform tr = Transform();
-				o.Transform(tr);
-				x.Transform(tr);
-				y.Transform(tr);
-				return new Plane(o, x, y);
-			}
-		}
-		public abstract Transform Transform();
-	}
-
 	public abstract partial class IfcOffsetCurve : IfcCurve
 	{
 		public override Curve Curve(double tol)
