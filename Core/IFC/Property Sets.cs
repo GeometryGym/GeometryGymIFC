@@ -792,6 +792,17 @@ namespace GeometryGym.Ifc
 		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
 		public Pset_GeotechnicalAssemblyCommon(IfcGeotechnicalAssembly instance) : base(instance) { }
 	}
+	public partial class Pset_GeotechnicalStratumCommon : IfcPropertySet
+	{
+		public string Colour { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Colour", new IfcLabel(value))); } }
+		public bool IsTopographic { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsTopographic", new IfcBoolean(value))); } }
+		public double PiezometricHead { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PiezometricHead", new IfcPositiveLengthMeasure(value))); } }
+		public double PiezometricPressure { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PiezometricPressure", new IfcPressureMeasure(value))); } }
+		public string Methodology { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Methodology", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public string Texture { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Texture", new IfcLabel(value))); } }
+		public Pset_GeotechnicalStratumCommon(IfcGeotechnicalStratum instance) : base(instance) { }
+	}
 	//Pset_HeatExchangerTypeCommon
 	//Pset_HeatExchangerTypePlate
 	//Pset_HumidifierPHistory
@@ -1451,6 +1462,19 @@ namespace GeometryGym.Ifc
 	//Pset_TransportElementElevator
 	//Pset_TubeBundleTypeCommon
 	//Pset_TubeBundleTypeFinned
+	public partial class Pset_Uncertainty : IfcPropertySet
+	{
+		public PEnum_UncertaintyBasis Basis { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Basis", new IfcLabel(value.ToString()))); } }
+		public string DescriptionProperty { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Description", new IfcText(value))); } }
+		public double HorizontalUncertainty { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HorizontalUncertainty", new IfcPositiveLengthMeasure(value))); } }
+		public double LinearUncertainty { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LinearUncertainty", new IfcPositiveLengthMeasure(value))); } }
+		public double OrthogonalUncertainty { set { AddProperty(new IfcPropertySingleValue(mDatabase, "OrthogonalUncertainty", new IfcPositiveLengthMeasure(value))); } }
+		public double VerticalUncertainty { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VerticalUncertainty", new IfcPositiveLengthMeasure(value))); } }
+
+		public Pset_Uncertainty(IfcGeotechnicalStratum instance) : base(instance) { }
+		public Pset_Uncertainty(IfcGeotechnicalElement instance) : base(instance) { }
+		public Pset_Uncertainty(IfcGeotechnicalAssembly instance) : base(instance) { }
+	}
 	//Pset_UnitaryControlElementPHistory
 	//Pset_UnitaryControlElementTypeCommon
 	//Pset_UnitaryControlElementTypeIndicatorPanel

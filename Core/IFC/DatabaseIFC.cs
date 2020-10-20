@@ -74,11 +74,14 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
 		public DatabaseIfc(string fileName) : this() { new SerializationIfc(this).ReadFile(fileName); }
 		public DatabaseIfc(TextReader stream) : this() { new SerializationIfc(this).ReadFile(stream); }
-		public DatabaseIfc(ModelView view) : this(true, view) { }
+		public DatabaseIfc(ModelView view) : this(versionFromModelView(view), view) { }
+		public DatabaseIfc(ReleaseVersion schema) : this(schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
 		public DatabaseIfc(DatabaseIfc db) : this() { mRelease = db.mRelease; mModelView = db.mModelView; Tolerance = db.Tolerance; }
-		public DatabaseIfc(bool generate, ModelView view) : this(generate, versionFromModelView(view), view) { }
-		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(generate, schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
-		private DatabaseIfc(bool generate, ReleaseVersion schema, ModelView view) : this()
+		[Obsolete]
+		public DatabaseIfc(bool generate, ModelView view) : this(view) { if(generate) mFactory.initData(); }
+		[Obsolete]
+		public DatabaseIfc(bool generate, ReleaseVersion schema) : this(schema) { if (generate) mFactory.initData(); }
+		private DatabaseIfc(ReleaseVersion schema, ModelView view) : this()
 		{
 			mRelease = schema;
 			mModelView = view;
@@ -91,9 +94,6 @@ namespace GeometryGym.Ifc
 				ToleranceAngleRadians = Math.Min(Math.PI/1800, doc.ModelAngleToleranceRadians);
 			}
 #endif
-			//mFactory.mGeomRepContxt = new IfcGeometricRepresentationContext(this, 3, Tolerance) { ContextType = "Model" };
-			if (generate)
-				mFactory.initData();
 		}
 		public override BaseClassIfc this[int index]
 		{

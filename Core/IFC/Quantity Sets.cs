@@ -106,6 +106,12 @@ namespace GeometryGym.Ifc
 		public Qto_FootingBaseQuantities(IfcFooting instance) : base(instance) { }
 		public Qto_FootingBaseQuantities(IfcFootingType type) : base(type) { }
 	}
+	public partial class Qto_LinearStratumBaseQuantities : IfcElementQuantity
+	{
+		public double Diameter { set { addQuantity(new IfcQuantityLength(mDatabase, "Diameter", value)); } }
+		public double Length { set { addQuantity(new IfcQuantityLength(mDatabase, "Length", value)); } }
+		public Qto_LinearStratumBaseQuantities(IfcGeotechnicalStratum instance) : base(instance) { }
+	}
 	public partial class Qto_ReinforcingElementBaseQuantities : IfcElementQuantity
 	{
 		public double Count { set { addQuantity(new IfcQuantityCount(mDatabase, "Count", value)); } }
