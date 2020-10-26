@@ -37,16 +37,5 @@ namespace GeometryGym.Ifc
 	public partial class IfcVirtualGridIntersection : BaseClassIfc
 	{
 		internal Vector3d OffsetVector { get { return new Vector3d(mOffsetDistances.Item1, mOffsetDistances.Item2, double.IsNaN(mOffsetDistances.Item3) ? 0 : mOffsetDistances.Item3); } }
-		internal Plane LocationPlane(double tol)
-		{
-			Tuple<IfcGridAxis, IfcGridAxis> axes = IntersectingAxes;
-#if (RHINO || GH)
-			Curve c1 = axes.Item1.Curve(tol), c2 = axes.Item2.Curve(tol);
-			CurveIntersections ci = Intersection.CurveCurve(c1, c2, tol, tol);
-			if (ci != null && ci.Count > 0)
-				return new Plane(ci[0].PointA + OffsetVector, Vector3d.ZAxis);
-#endif
-			return Plane.WorldXY;
-		}
 	}
 }

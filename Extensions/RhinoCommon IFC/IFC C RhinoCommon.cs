@@ -119,7 +119,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCircle : IfcConic
 	{
-		public override Curve Curve(double tol) { return new ArcCurve(Circle); }
 		public Circle Circle { get { return new Circle(Plane, mRadius); } }
 	}
 	public partial class IfcCompositeCurveSegment
@@ -137,10 +136,5 @@ namespace GeometryGym.Ifc
 		internal Vector3d Eccentricity { get { return new Vector3d(double.IsNaN(mEccentricityInX) ? 0 : mEccentricityInX, double.IsNaN(mEccentricityInY) ? 0 : mEccentricityInY, double.IsNaN(mEccentricityInZ) ? 0 : mEccentricityInZ); } }
 
 		internal IfcConnectionPointEccentricity(IfcPointOrVertexPoint v, Vector3d ecc) : base(v) { mEccentricityInX = ecc.X; mEccentricityInY = ecc.Y; mEccentricityInZ = ecc.Z; }
-	}
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve ,IfcConic ,IfcLine ,IfcOffsetCurve2D ,IfcOffsetCurve3D,IfcPcurve,IfcClothoid))*/
-	{
-		public Curve Curve() { return Curve(mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
-		public abstract Curve Curve(double tol);
 	}
 }

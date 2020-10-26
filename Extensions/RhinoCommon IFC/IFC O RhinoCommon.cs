@@ -27,11 +27,4 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcOffsetCurve : IfcCurve
-	{
-		public override Curve Curve(double tol)
-		{
-			throw new NotImplementedException();
-		}
-	}
 }

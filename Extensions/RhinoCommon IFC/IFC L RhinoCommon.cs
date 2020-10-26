@@ -29,7 +29,6 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcLine : IfcCurve
 	{
-		public override Curve Curve(double tol) { return new LineCurve(Line()); }
 		public Line Line()
 		{
 			Point3d pt = Pnt.Location;

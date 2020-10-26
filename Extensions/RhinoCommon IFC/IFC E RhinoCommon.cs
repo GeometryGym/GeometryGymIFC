@@ -29,7 +29,6 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcEllipse : IfcConic
 	{
-		public override Curve Curve(double tol) { return Ellipse(true).ToNurbsCurve(); }
 		public Ellipse Ellipse(bool sameSense)
 		{
 			Plane plane = base.Plane;

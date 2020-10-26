@@ -27,14 +27,6 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcBoundedCurve : IfcCurve
-	{
-		public override Curve Curve(double tol)
-		{
-			throw new NotImplementedException();
-		}
-		
-	}
 	public partial class IfcBSplineCurve
 	{
 		protected IfcBSplineCurve(DatabaseIfc m, NurbsCurve nonRationalCurve, bool twoD)
