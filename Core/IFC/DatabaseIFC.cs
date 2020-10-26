@@ -2010,7 +2010,7 @@ namespace GeometryGym.Ifc
 		{
 			if (string.IsNullOrEmpty(line))
 				return;
-			int stepID = 0, pos = 0;
+			int stepID = 0;
 			string kw = "", def = "";
 			ParserSTEP.GetKeyWord(line, out stepID, out kw, out def);
 			if (!string.IsNullOrEmpty(kw) && kw[0] == 'I')
@@ -2031,6 +2031,13 @@ namespace GeometryGym.Ifc
 							mPrimitiveConstructors.Add(constructorClass);
 						else
 							mConstructorsBag.Add(constructorClass);
+
+						IfcRoot root = obj as IfcRoot;
+						if(root != null)
+						{
+							int pos = 0;
+							root.GlobalId = ParserSTEP.StripString(def, ref pos, def.Length);
+						}
 					}
 				}
 				catch (Exception) { }
