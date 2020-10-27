@@ -715,6 +715,23 @@ namespace GeometryGym.Ifc
 		public IfcClosedShell(IEnumerable<IfcFace> faces) : base(faces) { }
 	}
 	[Serializable]
+	public partial class IfcClothoid : IfcCurve
+	{
+		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		private double mClothoidConstant = 0; //: IfcLengthMeasure;
+
+		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+		public double ClothoidConstant { get { return mClothoidConstant; } set { mClothoidConstant = value; } }
+
+		public IfcClothoid() : base() { }
+		public IfcClothoid(IfcAxis2Placement position, double clothoidConstant)
+			: base(position.Database)
+		{
+			Position = position;
+			ClothoidConstant = clothoidConstant;
+		}
+	}
+	[Serializable]
 	public partial class IfcCoil : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcCoilTypeEnum mPredefinedType = IfcCoilTypeEnum.NOTDEFINED;// OPTIONAL : IfcCoilTypeEnum;
@@ -905,7 +922,6 @@ namespace GeometryGym.Ifc
 		}
 		public void Remove(string templateName) { IfcPropertyTemplate template = this[templateName]; if (template != null) { template.mPartOfComplexTemplate.Remove(this); mHasPropertyTemplates.Remove(templateName); } }
 	}
-	[Serializable]
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
 		private LIST<IfcCompositeCurveSegment> mSegments = new LIST<IfcCompositeCurveSegment>();// : LIST [1:?] OF IfcCompositeCurveSegment;
@@ -934,19 +950,17 @@ namespace GeometryGym.Ifc
 		public IfcCompositeCurveOnSurface(List<IfcCompositeCurveSegment> segs,IfcSurface surface) : base(segs) { BasisSurface = surface; }
 	}
 	[Serializable]
-	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
+	public partial class IfcCompositeCurveSegment : IfcSegment 
 	{
-		private IfcTransitionCode mTransition = IfcTransitionCode.CONTINUOUS;// : IfcTransitionCode;
 		private bool mSameSense;// : BOOLEAN;
 		internal IfcCurve mParentCurve;// : IfcCurve;  Really IfcBoundedCurve WR1
 
-		public IfcTransitionCode Transition { get { return mTransition; } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 		public IfcBoundedCurve ParentCurve { get { return mParentCurve as IfcBoundedCurve; } set { mParentCurve = value; } }
 
 		internal IfcCompositeCurveSegment() : base() { }
-		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s, DuplicateOptions options) : base(db, s, options) { mTransition = s.mTransition; mSameSense = s.mSameSense; mParentCurve = db.Factory.Duplicate(s.mParentCurve) as IfcCurve; }
-		public IfcCompositeCurveSegment(IfcTransitionCode tc, bool sense, IfcBoundedCurve bc) : base(bc.mDatabase) { mSameSense = sense; mTransition = tc; ParentCurve = bc; }
+		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s, DuplicateOptions options) : base(db, s, options) { mSameSense = s.mSameSense; mParentCurve = db.Factory.Duplicate(s.mParentCurve) as IfcCurve; }
+		public IfcCompositeCurveSegment(IfcTransitionCode tc, bool sense, IfcBoundedCurve bc) : base(bc.mDatabase, tc) { mSameSense = sense;  ParentCurve = bc; }
 	}
 	[Serializable]
 	public partial class IfcCompositeProfileDef : IfcProfileDef
@@ -2010,7 +2024,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcLinearAxisSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
 	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
-		internal IfcEdgeCurve mEdge = null;
+		//INVERSE GeomGym
+		internal IfcEdgeCurve mOfEdge = null;
+		internal SET<IfcSectionedSolid> mDirectrixOfSectionedSolids = new SET<IfcSectionedSolid>();
+		internal SET<IfcOffsetCurve> mBasisCurveOfOffsets = new SET<IfcOffsetCurve>();
 
 		protected IfcCurve() : base() { }
 		protected IfcCurve(DatabaseIfc db) : base(db) { }
@@ -2053,6 +2070,7 @@ namespace GeometryGym.Ifc
 
 		internal void addBoundary(IfcBoundaryCurve boundary) { mBoundaries.Add(boundary.mIndex); }
 	}
+	public interface IfcCurveMeasureSelect : IBaseClassIfc { } // SELECT(IfcParameterValue, IfcNonNegativeLengthMeasure);
 	public interface IfcCurveOnSurface : IBaseClassIfc { } // SELECT(IfcCompositeCurveOnSurface, IfcPcurve, IfcSurfaceCurve);
 	public interface IfcCurveOrEdgeCurve : IBaseClassIfc { }  // = SELECT (	IfcBoundedCurve, IfcEdgeCurve);
 	[Serializable]

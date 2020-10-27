@@ -51,6 +51,58 @@ namespace GeometryGym.Ifc
 				mFixedAxisVertical = fixedAxisVertical.Value<bool>();
 		}
 	}
+	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Transition"] = mTransition.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("Transition", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcTransitionCode>(token.Value<string>(), true, out mTransition);
+		}
+	}
+	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["BaseCurve"] = BaseCurve.getJson(this, options);
+			obj["Segments"] = new JArray(Segments.Select(x => x.getJson(this, options)));
+			if (EndPoint != null)
+				obj["EndPoint"] = EndPoint.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("BaseCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				BaseCurve = mDatabase.ParseJObject<IfcBoundedCurve>(jobj);
+			Segments.AddRange(mDatabase.extractJArray<IfcReferenceSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				EndPoint = mDatabase.ParseJObject<IfcLinearPlacement>(jobj);
+		}
+	}
+	public partial class IfcSeriesParameterCurve : IfcCurve
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Position"] = Position.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Position = mDatabase.ParseJObject<IfcAxis2Placement>(jobj);
+		}
+	}
 	public partial class IfcShapeAspect : BaseClassIfc
 	{
 		internal override void parseJObject(JObject obj)

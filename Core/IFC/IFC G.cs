@@ -263,6 +263,33 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
+	public partial class IfcGradientCurve : IfcBoundedCurve
+	{
+		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
+		private LIST<IfcReferenceSegment> mSegments = new LIST<IfcReferenceSegment>(); //: LIST[1:?] OF IfcReferenceSegment;
+		private IfcCartesianPoint mEndPoint = null; //: OPTIONAL IfcCartesianPoint;
+		private double mHeight = 0; //: IfcLengthMeasure;
+
+		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
+		public LIST<IfcReferenceSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public IfcCartesianPoint EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
+		public double Height { get { return mHeight; } set { mHeight = value; } }
+
+		public IfcGradientCurve() : base() { }
+		internal IfcGradientCurve(DatabaseIfc db, IfcGradientCurve c, DuplicateOptions options) : base(db, c, options)
+		{
+			mBaseCurve = db.Factory.Duplicate(c.mBaseCurve) as IfcBoundedCurve;
+			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcReferenceSegment));
+			mEndPoint = db.Factory.Duplicate(c.mEndPoint) as IfcCartesianPoint;
+		}
+		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcReferenceSegment> segments)
+			: base(baseCurve.Database)
+		{
+			BaseCurve = baseCurve;
+			Segments.AddRange(segments);
+		}
+	}
+	[Serializable]
 	public partial class IfcGrid : IfcPositioningElement
 	{
 		private LIST<IfcGridAxis> mUAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;

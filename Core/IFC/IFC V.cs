@@ -458,11 +458,30 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcMassMeasure : IfcMeasureValue { public IfcMassMeasure(double value) : base(value) { } }
 	[Serializable]
+	public class IfcNonNegativeLengthMeasure : IfcMeasureValue, IfcCurveMeasureSelect
+	{
+		public IfcNonNegativeLengthMeasure(double value) : base(value) { }
+		internal IfcNonNegativeLengthMeasure(string str) : base(0)
+		{
+			int icounter = 0;
+			for (; icounter < str.Length; icounter++)
+			{
+				Char c = str[icounter];
+				if (char.IsDigit(c))
+					break;
+				if (c == '.')
+					break;
+			}
+			if (!double.TryParse(str.Substring(icounter), out mValue))
+				mValue = 0;
+		}
+	}
+	[Serializable]
 	public partial class IfcNormalisedRatioMeasure : IfcMeasureValue, IfcColourOrFactor { public IfcNormalisedRatioMeasure(double value) : base(Math.Min(1, Math.Max(0, value))) { }  }
 	[Serializable]
 	public class IfcNumericMeasure : IfcMeasureValue { public IfcNumericMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcParameterValue : IfcMeasureValue { public IfcParameterValue(double value) : base(value) { } }
+	public class IfcParameterValue : IfcMeasureValue, IfcCurveMeasureSelect { public IfcParameterValue(double value) : base(value) { } }
 	[Serializable]
 	public class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect { public IfcPlaneAngleMeasure(double value) : base(value) { } }
 	[Serializable]

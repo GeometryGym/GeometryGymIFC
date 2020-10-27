@@ -142,6 +142,45 @@ namespace GeometryGym.Ifc
 				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
+	public partial class IfcGradientCurve : IfcBoundedCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(BaseCurve.GetXML(xml.OwnerDocument, "BaseCurve", this, processed));
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			foreach (IfcReferenceSegment o in Segments)
+				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
+			if (EndPoint != null)
+				xml.AppendChild(EndPoint.GetXML(xml.OwnerDocument, "EndPoint", this, processed));
+			xml.SetAttribute("Height", mHeight.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string height = xml.GetAttribute("Height");
+			if (!string.IsNullOrEmpty(height))
+				double.TryParse(height, out mHeight);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "BaseCurve", true) == 0)
+					BaseCurve = mDatabase.ParseXml<IfcBoundedCurve>(child as XmlElement);
+				else if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcReferenceSegment o = mDatabase.ParseXml<IfcReferenceSegment>(cn as XmlElement);
+						if (o != null)
+							Segments.Add(o);
+					}
+				}
+				else if (string.Compare(name, "EndPoint", true) == 0)
+					EndPoint = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcGrid : IfcPositioningElement
 	{
 		internal override void ParseXml(XmlElement xml)

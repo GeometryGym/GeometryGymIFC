@@ -328,6 +328,13 @@ namespace GeometryGym.Ifc
 		internal IfcLinearDimension() : base() { }
 		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
 	}
+	[Serializable]
+	public abstract partial class IfcLinearElement : IfcProduct
+	{
+		protected IfcLinearElement() : base() { }
+		protected IfcLinearElement(DatabaseIfc db) : base(db) { }
+		protected IfcLinearElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
 		private IfcCurve mPlacementMeasuredAlong = null; //: IfcCurve;

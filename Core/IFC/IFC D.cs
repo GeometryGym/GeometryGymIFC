@@ -343,13 +343,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
 	{
-		internal double mDistanceAlong;// : IfcLengthMeasure;
+		internal IfcCurveMeasureSelect mDistanceAlong;// : IfcCurveMeasureSelect;
 		internal double mOffsetLateral = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mOffsetVertical = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mOffsetLongitudinal = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal bool mAlongHorizontal = false; // IfcBoolean
 
-		public double DistanceAlong { get { return mDistanceAlong; } set { mDistanceAlong = value; } }
+		public IfcCurveMeasureSelect DistanceAlong { get { return mDistanceAlong; } set { mDistanceAlong = value; } }
 		public double OffsetLateral { get { return mOffsetLateral; } set { mOffsetLateral = value; } }
 		public double OffsetVertical { get { return mOffsetVertical; } set { mOffsetVertical = value; } }
 		public double OffsetLongitudinal { get { return mOffsetLongitudinal; } set { mOffsetLongitudinal = value; } }
@@ -364,12 +364,12 @@ namespace GeometryGym.Ifc
 			OffsetLongitudinal = e.OffsetLongitudinal;
 			AlongHorizontal = e.AlongHorizontal;
 		}
-		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = distanceAlong; }
+		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
 
 		internal IfcDistanceExpression Duplicate() 
 		{
-			return new IfcDistanceExpression(null, DistanceAlong)
-			{ OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal };
+			return new IfcDistanceExpression()
+			{ DistanceAlong = DistanceAlong, OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal };
 		}
 	}
 	[Serializable]

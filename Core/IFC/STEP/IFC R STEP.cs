@@ -334,6 +334,23 @@ namespace GeometryGym.Ifc
 			mInnerReference = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
+	public partial class IfcReferenceSegment : IfcSegment
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mStartPlacement.StepId +
+			",#" + mSegmentLength.StepId +
+			",#" + mParentCurve.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			StartPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearPlacement;
+			SegmentLength = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurveMeasureSelect;
+			ParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+		}
+	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcReferencesValueDocument; // DEPRECATED IFC4
 	public partial class IfcReferent : IfcPositioningElement

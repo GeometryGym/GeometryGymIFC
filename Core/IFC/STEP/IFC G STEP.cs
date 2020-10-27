@@ -130,6 +130,22 @@ namespace GeometryGym.Ifc
 			Elements = new SET<IfcGeometricSetSelect>(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
+	public partial class IfcGradientCurve : IfcBoundedCurve
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mBaseCurve.StepId +
+			",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" +
+			(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
+			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcReferenceSegment));
+			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;
+		}
+	}
 	public partial class IfcGrid : IfcPositioningElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

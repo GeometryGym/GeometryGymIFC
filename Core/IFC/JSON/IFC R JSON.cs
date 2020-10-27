@@ -131,6 +131,30 @@ namespace GeometryGym.Ifc
 				obj["InnerReference"] = InnerReference.getJson(this, options);
 		}
 	}
+	public partial class IfcReferenceSegment : IfcSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartPlacement"] = StartPlacement.getJson(this, options);
+			obj["SegmentLength"] = SegmentLength.getJson(this, options);
+			obj["ParentCurve"] = ParentCurve.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("StartPlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				StartPlacement = mDatabase.ParseJObject<IfcLinearPlacement>(jobj);
+			jobj = obj.GetValue("SegmentLength", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				SegmentLength = mDatabase.ParseJObject<IfcCurveMeasureSelect>(jobj);
+			jobj = obj.GetValue("ParentCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ParentCurve = mDatabase.ParseJObject<IfcCurve>(jobj);
+		}
+	}
+
 	public partial class IfcReinforcedSoil : IfcEarthworksElement
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

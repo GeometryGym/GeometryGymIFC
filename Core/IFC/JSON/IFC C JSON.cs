@@ -282,6 +282,25 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Sort", Sort);
 		}
 	}
+	public partial class IfcClothoid : IfcCurve
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Position"] = Position.getJson(this, options);
+			obj["ClothoidConstant"] = mClothoidConstant.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Position = mDatabase.ParseJObject<IfcAxis2Placement>(jobj);
+			JToken clothoidConstant = obj.GetValue("ClothoidConstant", StringComparison.InvariantCultureIgnoreCase);
+			if (clothoidConstant != null)
+				mClothoidConstant = clothoidConstant.Value<double>();
+		}
+	}
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{
 		internal override void parseJObject(JObject obj)
@@ -336,12 +355,11 @@ namespace GeometryGym.Ifc
 			obj["SelfIntersect"] = mSelfIntersect.ToString();
 		}
 	}
-	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
+	public partial class IfcCompositeCurveSegment : IfcSegment
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Transition"] = mTransition.ToString();
 			obj["SameSense"] = mSameSense.ToString();
 			obj["ParentCurve"] = mParentCurve.getJson(this, options);
 		}

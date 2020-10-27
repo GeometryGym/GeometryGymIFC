@@ -112,6 +112,74 @@ namespace GeometryGym.Ifc
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
+	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("Transition", mTransition.ToString().ToLower());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			XmlAttribute transition = xml.Attributes["Transition"];
+			if (transition != null)
+				Enum.TryParse<IfcTransitionCode>(transition.Value, out mTransition);
+		}
+	}
+	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(BaseCurve.GetXML(xml.OwnerDocument, "BaseCurve", this, processed));
+			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+			xml.AppendChild(element);
+			foreach (IfcReferenceSegment o in Segments)
+				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
+			if (EndPoint != null)
+				xml.AppendChild(EndPoint.GetXML(xml.OwnerDocument, "EndPoint", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "BaseCurve", true) == 0)
+					BaseCurve = mDatabase.ParseXml<IfcBoundedCurve>(child as XmlElement);
+				else if (string.Compare(name, "Segments") == 0)
+				{
+					foreach (XmlNode cn in child.ChildNodes)
+					{
+						IfcReferenceSegment o = mDatabase.ParseXml<IfcReferenceSegment>(cn as XmlElement);
+						if (o != null)
+							Segments.Add(o);
+					}
+				}
+				else if (string.Compare(name, "EndPoint", true) == 0)
+					EndPoint = mDatabase.ParseXml<IfcLinearPlacement>(child as XmlElement);
+			}
+		}
+	}
+	public partial class IfcSeriesParameterCurve : IfcCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Position", true) == 0)
+					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcShapeAspect : BaseClassIfc
 	{
 		internal override void ParseXml(XmlElement xml)

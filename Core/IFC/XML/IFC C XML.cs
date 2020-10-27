@@ -413,6 +413,29 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}
+	public partial class IfcClothoid : IfcCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
+			xml.SetAttribute("ClothoidConstant", mClothoidConstant.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string clothoidConstant = xml.GetAttribute("ClothoidConstant");
+			if (!string.IsNullOrEmpty(clothoidConstant))
+				double.TryParse(clothoidConstant, out mClothoidConstant);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Position", true) == 0)
+					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
+			}
+		}
+	}
+
 	public partial class IfcColourRgb : IfcColourSpecification, IfcColourOrFactor
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -543,13 +566,11 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "SelfIntersect", mSelfIntersect.ToString().ToLower());
 		}
 	}
-	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
+	public partial class IfcCompositeCurveSegment : IfcSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			if (xml.HasAttribute("Transition"))
-				Enum.TryParse<IfcTransitionCode>(xml.Attributes["Transition"].Value, true, out mTransition);
 			if (xml.HasAttribute("SameSense"))
 				bool.TryParse(xml.Attributes["SameSense"].Value, out mSameSense);
 
@@ -563,7 +584,6 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("Transition", mTransition.ToString().ToLower());
 			xml.SetAttribute("SameSense", mSameSense.ToString().ToLower());
 			xml.AppendChild(mParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
 		}

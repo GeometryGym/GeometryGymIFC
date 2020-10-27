@@ -460,6 +460,20 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcClothoid : IfcCurve
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mPosition.StepId + "," +
+			ParserSTEP.DoubleOptionalToString(mClothoidConstant);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
+			ClothoidConstant = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcCoil : IfcEnergyConversionDevice //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcCoilTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
@@ -607,14 +621,14 @@ namespace GeometryGym.Ifc
 			mBasisSurface = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
+	public partial class IfcCompositeCurveSegment : IfcSegment
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mTransition.ToString() + ".," + ParserSTEP.BoolToString(mSameSense) + ",#" + mParentCurve.StepId; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.BoolToString(mSameSense) + ",#" + mParentCurve.StepId; }
 
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, str.Length).Replace(".", "");
-			Enum.TryParse<IfcTransitionCode>(s, out mTransition);
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
 			mParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}

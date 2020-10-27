@@ -182,6 +182,35 @@ namespace GeometryGym.Ifc
 			mCrossSectionReinforcementDefinitions = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
+	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + ",." + mTransition.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcTransitionCode>(s.Replace(".", ""), true, out mTransition);
+		}
+	}
+	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mBaseCurve.StepId +
+			",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" +
+			(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
+			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcReferenceSegment));
+			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearPlacement;
+		}
+	}
 	public partial class IfcSensor : IfcDistributionControlElement //IFC4  
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcSensorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
@@ -202,6 +231,22 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcSensorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcSeriesParameterCurve : IfcCurve
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mPosition.StepId +
+			",(" + string.Join(",", mCoefficientsX.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
+			",(" + string.Join(",", mCoefficientsY.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
+			CoefficientsX.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
+			CoefficientsY.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 		}
 	}
 	//ENTITY IfcServiceLife // DEPRECATED IFC4

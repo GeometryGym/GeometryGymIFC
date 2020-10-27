@@ -275,7 +275,36 @@ namespace GeometryGym.Ifc
 				mCrossSectionReinforcementDefinitions.Add(definition.mIndex);
 		}
 	}
+	[Serializable]
+	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
+	{
+		private IfcTransitionCode mTransition = IfcTransitionCode.DISCONTINUOUS; //: IfcTransitionCode;
+		public IfcTransitionCode Transition { get { return mTransition; } set { mTransition = value; } }
+
+		protected IfcSegment() : base() { }
+		protected IfcSegment(DatabaseIfc db, IfcTransitionCode transition)
+			: base(db) { Transition = transition; }
+	}
 	public partial interface IfcSegmentIndexSelect { } //SELECT ( IfcLineIndex, IfcArcIndex);
+	[Serializable]
+	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	{
+		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
+		private LIST<IfcReferenceSegment> mSegments = new LIST<IfcReferenceSegment>(); //: LIST[1:?] OF IfcReferenceSegment;
+		private IfcLinearPlacement mEndPoint = null; //: OPTIONAL IfcLinearPlacement;
+
+		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
+		public LIST<IfcReferenceSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public IfcLinearPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
+
+		public IfcSegmentedReferenceCurve() : base() { }
+		public IfcSegmentedReferenceCurve(DatabaseIfc db, IfcBoundedCurve baseCurve, IEnumerable<IfcReferenceSegment> segments)
+			: base(db)
+		{
+			BaseCurve = baseCurve;
+			Segments.AddRange(segments);
+		}
+	}
 	[Serializable]
 	public partial class IfcSensor : IfcDistributionControlElement //IFC4  
 	{
@@ -300,6 +329,26 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcServiceLife // DEPRECATED IFC4
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
+	[Serializable]
+	public partial class IfcSeriesParameterCurve : IfcCurve
+	{
+		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		private LIST<double> mCoefficientsX = new LIST<double>(); //: LIST[2:?] OF IfcReal;
+		private LIST<double> mCoefficientsY = new LIST<double>(); //: LIST[2:?] OF IfcReal;
+
+		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
+		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+
+		public IfcSeriesParameterCurve() : base() { }
+		public IfcSeriesParameterCurve(IfcAxis2Placement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
+			: base(position.Database)
+		{
+			Position = position;
+			CoefficientsX.AddRange(coefficientsX);
+			CoefficientsY.AddRange(coefficientsY);
+		}
+	}
 	[Serializable]
 	public partial class IfcShadingDevice : IfcBuiltElement
 	{

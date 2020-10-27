@@ -170,7 +170,32 @@ namespace GeometryGym.Ifc
 			obj["Elements"] = array;
 		}
 	}
-
+	public partial class IfcGradientCurve : IfcBoundedCurve
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["BaseCurve"] = BaseCurve.getJson(this, options);
+			obj["Segments"] = new JArray(Segments.Select(x => x.getJson(this, options)));
+			if (EndPoint != null)
+				obj["EndPoint"] = EndPoint.getJson(this, options);
+			obj["Height"] = mHeight.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("BaseCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				BaseCurve = mDatabase.ParseJObject<IfcBoundedCurve>(jobj);
+			Segments.AddRange(mDatabase.extractJArray<IfcReferenceSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				EndPoint = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
+			JToken height = obj.GetValue("Height", StringComparison.InvariantCultureIgnoreCase);
+			if (height != null)
+				mHeight = height.Value<double>();
+		}
+	}
 	public partial class IfcGrid : IfcPositioningElement
 	{
 		internal override void parseJObject(JObject obj)
