@@ -128,6 +128,7 @@ namespace GeometryGym.Ifc
 		public bool IsMilestone { get { return mIsMilestone; } set { mIsMilestone = value; } }
 		public int Priority { get { return mPriority; } set { mPriority = value; } }
 		internal IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
+		public IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTask() : base() { }
 		internal IfcTask(DatabaseIfc db, IfcTask t, DuplicateOptions options) : base(db, t, options)

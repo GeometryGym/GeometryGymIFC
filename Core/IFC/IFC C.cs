@@ -27,6 +27,12 @@ using System.Linq;
 namespace GeometryGym.Ifc
 {
 	[Serializable]
+	public partial class Ifc2dCompositeCurve : IfcCompositeCurve
+	{
+		internal Ifc2dCompositeCurve() : base() { }
+		internal Ifc2dCompositeCurve(DatabaseIfc db, Ifc2dCompositeCurve c, DuplicateOptions options) : base(db, c, options) { }
+	}
+	[Serializable]
 	public partial class IfcCableCarrierFitting : IfcFlowFitting //IFC4
 	{
 		internal IfcCableCarrierFittingTypeEnum mPredefinedType = IfcCableCarrierFittingTypeEnum.NOTDEFINED;// OPTIONAL : IfcCableCarrierFittingTypeEnum;
@@ -916,12 +922,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcCompositeCurve(IEnumerable<IfcCompositeCurveSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
 		public IfcCompositeCurve(params IfcCompositeCurveSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
-	}
-	[Serializable]
-	public partial class Ifc2dCompositeCurve : IfcCompositeCurve
-	{
-		internal Ifc2dCompositeCurve() : base() { }
-		internal Ifc2dCompositeCurve(DatabaseIfc db, Ifc2dCompositeCurve c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Serializable]
 	public partial class IfcCompositeCurveOnSurface : IfcCompositeCurve, IfcCurveOnSurface

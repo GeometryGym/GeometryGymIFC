@@ -949,10 +949,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProcedure : IfcProcess
 	{
-		internal IfcProcedureTypeEnum mProcedureType;// : IfcProcedureTypeEnum;
+		internal IfcProcedureTypeEnum mPredefinedType;// : IfcProcedureTypeEnum;
 		internal string mUserDefinedProcedureType = "$";// : OPTIONAL IfcLabel;
+		
+		public IfcProcedureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcProcedure() : base() { }
-		internal IfcProcedure(DatabaseIfc db, IfcProcedure p, DuplicateOptions options) : base(db, p, options) { mProcedureType = p.mProcedureType; mUserDefinedProcedureType = p.mUserDefinedProcedureType; }
+		internal IfcProcedure(DatabaseIfc db, IfcProcedure p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; mUserDefinedProcedureType = p.mUserDefinedProcedureType; }
 	}
 	[Serializable]
 	public partial class IfcProcedureType : IfcTypeProcess //IFC4

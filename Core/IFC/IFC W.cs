@@ -283,8 +283,11 @@ namespace GeometryGym.Ifc
 		internal List<int> mWorkingTimes = new List<int>();// :	OPTIONAL SET [1:?] OF IfcWorkTime;
 		internal List<int> mExceptionTimes = new List<int>();//	 :	OPTIONAL SET [1:?] OF IfcWorkTime;
 		internal IfcWorkCalendarTypeEnum mPredefinedType = IfcWorkCalendarTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkCalendarTypeEnum 
+		
 		public ReadOnlyCollection<IfcWorkTime> WorkingTimes { get { return new ReadOnlyCollection<IfcWorkTime>(mWorkingTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
 		public ReadOnlyCollection<IfcWorkTime> ExceptionTimes { get { return new ReadOnlyCollection<IfcWorkTime>( mExceptionTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
+		public IfcWorkCalendarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+	
 		internal IfcWorkCalendar() : base() { }
 		internal IfcWorkCalendar(DatabaseIfc db, IfcWorkCalendar c, DuplicateOptions options) : base(db, c, options)
 		{
@@ -343,6 +346,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcWorkPlan : IfcWorkControl
 	{
 		internal IfcWorkPlanTypeEnum mPredefinedType = IfcWorkPlanTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkPlanTypeEnum; IFC4
+		public IfcWorkPlanTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		
 		internal IfcWorkPlan() : base() { }
 		public IfcWorkPlan(DatabaseIfc db) : base(db) { }
 		internal IfcWorkPlan(DatabaseIfc db, IfcWorkPlan p, DuplicateOptions options) : base(db, p, options) { mPredefinedType = p.mPredefinedType; }
@@ -351,6 +356,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcWorkSchedule : IfcWorkControl
 	{
 		internal IfcWorkScheduleTypeEnum mPredefinedType = IfcWorkScheduleTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkScheduleTypeEnum; IFC4
+		public IfcWorkScheduleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcWorkSchedule() : base() { }
 		internal IfcWorkSchedule(DatabaseIfc db) : base(db) { }
 		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }

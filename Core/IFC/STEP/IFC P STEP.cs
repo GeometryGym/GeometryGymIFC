@@ -509,15 +509,20 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcProcedure : IfcProcess
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mDatabase.Release < ReleaseVersion.IFC4 ? ",'" + ParserIfc.Encode(mIdentification) + "'" : "") + ",." + mProcedureType.ToString() + (mUserDefinedProcedureType == "$" ? ".,$" : ".,'" + mUserDefinedProcedureType + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? ",'" + ParserIfc.Encode(mIdentification) + "'" : "") + ",." +
+				mPredefinedType.ToString() + (release < ReleaseVersion.IFC4 ? mUserDefinedProcedureType == "$" ? ".,$" : ".,'" + mUserDefinedProcedureType + "'" : "");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			if(release < ReleaseVersion.IFC4)
 				mIdentification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 
-			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mProcedureType);
-			mUserDefinedProcedureType = ParserSTEP.StripString(str, ref pos, len);
+			Enum.TryParse<IfcProcedureTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
+			if(release < ReleaseVersion.IFC4)
+				mUserDefinedProcedureType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcProcedureType : IfcTypeProcess //IFC4

@@ -245,7 +245,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Source", Source);
 			setAttribute(obj, "Edition", Edition);
-			if(mEditionDate != DateTime.MinValue)
+			if (mEditionDate != DateTime.MinValue)
 				setAttribute(obj, "EditionDate", IfcDate.FormatSTEP(EditionDate));
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
@@ -334,6 +334,16 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			obj["Segments"] = new JArray(Segments.ToList().ConvertAll(x => x.getJson(this, options)));
 			obj["SelfIntersect"] = mSelfIntersect.ToString();
+		}
+	}
+	public partial class IfcCompositeCurveSegment : IfcGeometricRepresentationItem
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Transition"] = mTransition.ToString();
+			obj["SameSense"] = mSameSense.ToString();
+			obj["ParentCurve"] = mParentCurve.getJson(this, options);
 		}
 	}
 	public partial class IfcComplexPropertyTemplate : IfcPropertyTemplate
