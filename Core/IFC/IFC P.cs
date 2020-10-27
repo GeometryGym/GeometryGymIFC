@@ -1831,10 +1831,10 @@ namespace GeometryGym.Ifc
 		}
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IfcProperty prop) : base(relatedObject, name) { addProperty(prop); }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, IEnumerable<IfcProperty> props) : base(relatedObject, name) { foreach(IfcProperty p in props) addProperty(p);  }
-		public IfcPropertySet(IfcPropertySetTemplate template, IEnumerable<IfcProperty> properties) : this(template.Name, properties)
-		{
-			Description = template.Description;
-		}
+		public IfcPropertySet(IfcObjectDefinition relatedObject, string name, params IfcProperty[] properties)
+			: base(relatedObject, name) { foreach (IfcProperty p in properties) addProperty(p); }
+		public IfcPropertySet(IfcPropertySetTemplate template, IEnumerable<IfcProperty> properties) 
+			: this(template.Name, properties) { Description = template.Description; }
 		
 		protected override List<T> Extract<T>(Type type)
 		{

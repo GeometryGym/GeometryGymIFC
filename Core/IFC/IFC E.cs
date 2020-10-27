@@ -98,7 +98,7 @@ namespace GeometryGym.Ifc
 		internal IfcCurve mEdgeGeometry;// IfcCurve;
 		internal bool mSameSense = false;// : BOOL;
 
-		public IfcCurve EdgeGeometry { get { return mEdgeGeometry; } set { mEdgeGeometry = value; value.mEdge = this; } }
+		public IfcCurve EdgeGeometry { get { return mEdgeGeometry; } set { mEdgeGeometry = value; value.mOfEdge = this; } }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 		
 		internal IfcEdgeCurve() : base() { }

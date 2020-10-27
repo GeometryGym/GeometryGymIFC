@@ -642,7 +642,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcOffsetCurve : IfcCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcOffsetCurve2D, IfcOffsetCurve3D, IfcOffsetCurveByDistances))
 	{
 		private IfcCurve mBasisCurve;//: IfcCurve;
-		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
+		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; value.mBasisCurveOfOffsets.Add(this); } }
 
 		protected IfcOffsetCurve() : base() { }
 		protected IfcOffsetCurve(DatabaseIfc db, IfcOffsetCurve c, DuplicateOptions options) : base(db, c, options) { BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve; }

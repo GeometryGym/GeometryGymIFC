@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 		internal IfcCurve mDirectrix;// : IfcCurve;
 		internal LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>();// : LIST [2:?] OF IfcProfileDef;
 
-		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
+		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; value.mDirectrixOfSectionedSolids.Add(this); } }
 		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
 
 		protected IfcSectionedSolid() : base() { }
@@ -282,6 +282,7 @@ namespace GeometryGym.Ifc
 		public IfcTransitionCode Transition { get { return mTransition; } set { mTransition = value; } }
 
 		protected IfcSegment() : base() { }
+		protected IfcSegment(DatabaseIfc db, IfcSegment s, DuplicateOptions options) : base(db, s, options) { Transition = s.Transition; }
 		protected IfcSegment(DatabaseIfc db, IfcTransitionCode transition)
 			: base(db) { Transition = transition; }
 	}

@@ -2185,7 +2185,6 @@ namespace GeometryGym.Ifc
 	public partial class IfcReparametrisedCompositeCurveSegment : IfcCompositeCurveSegment
 	{
 		private double mParamLength;// : IfcParameterValue
-
 		public double ParamLength { get { return mParamLength; } set { mParamLength = value; } }
 
 		internal IfcReparametrisedCompositeCurveSegment() : base() { }
