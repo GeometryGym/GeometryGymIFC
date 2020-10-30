@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(BaseCurve.GetXML(xml.OwnerDocument, "BaseCurve", this, processed));
 			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (IfcReferenceSegment o in Segments)
+			foreach (IfcCurveSegment o in Segments)
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 			if (EndPoint != null)
 				xml.AppendChild(EndPoint.GetXML(xml.OwnerDocument, "EndPoint", this, processed));
@@ -152,7 +152,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcReferenceSegment o = mDatabase.ParseXml<IfcReferenceSegment>(cn as XmlElement);
+						IfcCurveSegment o = mDatabase.ParseXml<IfcCurveSegment>(cn as XmlElement);
 						if (o != null)
 							Segments.Add(o);
 					}
@@ -176,7 +176,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Position", true) == 0)
-					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
+					Position = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
 			}
 		}
 	}

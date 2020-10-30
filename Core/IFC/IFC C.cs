@@ -2074,6 +2074,26 @@ namespace GeometryGym.Ifc
 	public interface IfcCurveOnSurface : IBaseClassIfc { } // SELECT(IfcCompositeCurveOnSurface, IfcPcurve, IfcSurfaceCurve);
 	public interface IfcCurveOrEdgeCurve : IBaseClassIfc { }  // = SELECT (	IfcBoundedCurve, IfcEdgeCurve);
 	[Serializable]
+	public partial class IfcCurveSegment : IfcSegment
+	{
+		private IfcPlacement mStartPlacement = null; //: IfcPlacement;
+		private IfcCurveMeasureSelect mSegmentLength = null; //: IfcCurveMeasureSelect;
+		private IfcCurve mParentCurve = null; //: IfcCurve;
+
+		public IfcPlacement StartPlacement { get { return mStartPlacement; } set { mStartPlacement = value; } }
+		public IfcCurveMeasureSelect SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
+		public IfcCurve ParentCurve { get { return mParentCurve; } set { mParentCurve = value; } }
+
+		public IfcCurveSegment() : base() { }
+		public IfcCurveSegment(DatabaseIfc db, IfcTransitionCode transition, IfcPlacement startPlacement, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
+			: base(db, transition)
+		{
+			StartPlacement = startPlacement;
+			SegmentLength = segmentLength;
+			ParentCurve = parentCurve;
+		}
+	}
+	[Serializable]
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcCircularArcSegment2D, IfcLineSegment2D, IfcTransitionCurveSegment2D))
 	{
 		private IfcCartesianPoint mStartPoint;// : IfcCartesianPoint;

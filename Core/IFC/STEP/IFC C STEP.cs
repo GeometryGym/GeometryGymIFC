@@ -628,7 +628,6 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			string s = ParserSTEP.StripField(str, ref pos, str.Length).Replace(".", "");
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
 			mParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
@@ -1444,6 +1443,23 @@ namespace GeometryGym.Ifc
 			mBasisSurface = ParserSTEP.StripLink(str, ref pos, len);
 			mBoundaries = ParserSTEP.StripListLink(str, ref pos, len);
 			mImplicitOuter = ParserSTEP.StripBool(str, ref pos, len);
+		}
+	}
+	public partial class IfcCurveSegment : IfcSegment
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mStartPlacement.StepId +
+			",#" + mSegmentLength.StepId +
+			",#" + mParentCurve.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			StartPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
+			SegmentLength = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurveMeasureSelect;
+			ParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve

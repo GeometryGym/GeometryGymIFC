@@ -207,7 +207,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
-			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcReferenceSegment));
+			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcCurveSegment));
 			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearPlacement;
 		}
 	}
@@ -244,7 +244,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
+			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
 			CoefficientsX.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 			CoefficientsY.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 		}

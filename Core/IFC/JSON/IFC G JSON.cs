@@ -187,7 +187,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("BaseCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				BaseCurve = mDatabase.ParseJObject<IfcBoundedCurve>(jobj);
-			Segments.AddRange(mDatabase.extractJArray<IfcReferenceSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Segments.AddRange(mDatabase.extractJArray<IfcCurveSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				EndPoint = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);

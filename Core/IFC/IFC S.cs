@@ -291,15 +291,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
 	{
 		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
-		private LIST<IfcReferenceSegment> mSegments = new LIST<IfcReferenceSegment>(); //: LIST[1:?] OF IfcReferenceSegment;
+		private LIST<IfcCurveSegment> mSegments = new LIST<IfcCurveSegment>(); //: LIST[1:?] OF IfcCurveSegment;
 		private IfcLinearPlacement mEndPoint = null; //: OPTIONAL IfcLinearPlacement;
 
 		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
-		public LIST<IfcReferenceSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public LIST<IfcCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcLinearPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcSegmentedReferenceCurve() : base() { }
-		public IfcSegmentedReferenceCurve(DatabaseIfc db, IfcBoundedCurve baseCurve, IEnumerable<IfcReferenceSegment> segments)
+		public IfcSegmentedReferenceCurve(DatabaseIfc db, IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
 			: base(db)
 		{
 			BaseCurve = baseCurve;
@@ -333,16 +333,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSeriesParameterCurve : IfcCurve
 	{
-		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		private IfcPlacement mPosition = null; //: IfcAxis2Placement;
 		private LIST<double> mCoefficientsX = new LIST<double>(); //: LIST[2:?] OF IfcReal;
 		private LIST<double> mCoefficientsY = new LIST<double>(); //: LIST[2:?] OF IfcReal;
 
-		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
 		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
 		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
 
 		public IfcSeriesParameterCurve() : base() { }
-		public IfcSeriesParameterCurve(IfcAxis2Placement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
+		public IfcSeriesParameterCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
 			: base(position.Database)
 		{
 			Position = position;
@@ -1071,17 +1071,24 @@ additional types	some additional representation types are given:
 		
 		protected override List<T> Extract<T>(Type type) 
 		{
+			List<T> result = new List<T>();
 			if (typeof(IfcSpatialElement).IsAssignableFrom(type))
-				return base.Extract<T>(type);
-			List<T> result = new List<T>(); 
-			foreach(IfcRelServicesBuildings rsbs in mServicedBySystems)
-				result.AddRange(rsbs.RelatingSystem.Extract<T>());
-			result.AddRange(base.Extract<T>(type));
-			foreach (IfcRelContainedInSpatialStructure rcss in mContainsElements)
 			{
-				foreach (IfcProduct p in rcss.RelatedElements)
-					result.AddRange(p.Extract<T>());
+				result.AddRange(base.Extract<T>(type));
+				foreach(IfcSpatialElement spatial in mContainsElements.SelectMany(x=>x.RelatedElements).OfType<IfcSpatialElement>())
+					result.AddRange(spatial.Extract<T>());
+				return result;
 			}
+			foreach (IfcRelServicesBuildings servicesBuildings in mServicedBySystems)
+			{
+				if (servicesBuildings.RelatingSystem != null)
+					result.AddRange(servicesBuildings.RelatingSystem.Extract<T>());
+				else
+					Rhino.RhinoApp.WriteLine(servicesBuildings.ToString());
+			}
+			result.AddRange(base.Extract<T>(type));
+			foreach (IfcProduct p in mContainsElements.SelectMany(x => x.RelatedElements))
+				result.AddRange(p.Extract<T>());
 			return result;
 		}
 

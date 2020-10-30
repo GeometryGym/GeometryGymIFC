@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("BaseCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				BaseCurve = mDatabase.ParseJObject<IfcBoundedCurve>(jobj);
-			Segments.AddRange(mDatabase.extractJArray<IfcReferenceSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			Segments.AddRange(mDatabase.extractJArray<IfcCurveSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				EndPoint = mDatabase.ParseJObject<IfcLinearPlacement>(jobj);
@@ -100,7 +100,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				Position = mDatabase.ParseJObject<IfcAxis2Placement>(jobj);
+				Position = mDatabase.ParseJObject<IfcPlacement>(jobj);
 		}
 	}
 	public partial class IfcShapeAspect : BaseClassIfc

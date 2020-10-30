@@ -385,26 +385,6 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
-	public partial class IfcReferenceSegment : IfcSegment
-	{
-		private IfcLinearPlacement mStartPlacement = null; //: IfcLinearPlacement;
-		private IfcCurveMeasureSelect mSegmentLength = null; //: IfcCurveMeasureSelect;
-		private IfcCurve mParentCurve = null; //: IfcCurve;
-
-		public IfcLinearPlacement StartPlacement { get { return mStartPlacement; } set { mStartPlacement = value; } }
-		public IfcCurveMeasureSelect SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
-		public IfcCurve ParentCurve { get { return mParentCurve; } set { mParentCurve = value; } }
-
-		public IfcReferenceSegment() : base() { }
-		public IfcReferenceSegment(DatabaseIfc db, IfcTransitionCode transition, IfcLinearPlacement startPlacement, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
-			: base(db, transition)
-		{
-			StartPlacement = startPlacement;
-			SegmentLength = segmentLength;
-			ParentCurve = parentCurve;
-		}
-	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcReferencesValueDocument; // DEPRECATED IFC4
 	[Serializable]

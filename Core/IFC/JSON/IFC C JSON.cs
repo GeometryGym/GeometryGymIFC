@@ -765,6 +765,29 @@ namespace GeometryGym.Ifc
 				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, options)));
 		}
 	}
+	public partial class IfcCurveSegment : IfcSegment
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["StartPlacement"] = StartPlacement.getJson(this, options);
+			obj["SegmentLength"] = SegmentLength.getJson(this, options);
+			obj["ParentCurve"] = ParentCurve.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("StartPlacement", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				StartPlacement = mDatabase.ParseJObject<IfcPlacement>(jobj);
+			jobj = obj.GetValue("SegmentLength", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				SegmentLength = mDatabase.ParseJObject<IfcCurveMeasureSelect>(jobj);
+			jobj = obj.GetValue("ParentCurve", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				ParentCurve = mDatabase.ParseJObject<IfcCurve>(jobj);
+		}
+	}
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
 	{
 		internal override void parseJObject(JObject obj)

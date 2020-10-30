@@ -1146,6 +1146,30 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	public partial class IfcCurveSegment : IfcSegment
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(StartPlacement.GetXML(xml.OwnerDocument, "StartPlacement", this, processed));
+			//	xml.AppendChild(SegmentLength.GetXML(xml.OwnerDocument, "SegmentLength", this, processed));
+			xml.AppendChild(ParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "StartPlacement", true) == 0)
+					StartPlacement = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
+				else if (string.Compare(name, "SegmentLength", true) == 0)
+					SegmentLength = mDatabase.ParseXml<IfcCurveMeasureSelect>(child as XmlElement);
+				else if (string.Compare(name, "ParentCurve", true) == 0)
+					ParentCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
+		}
+	}
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve
 	{
 		internal override void ParseXml(XmlElement xml)

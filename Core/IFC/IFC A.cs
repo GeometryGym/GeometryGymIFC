@@ -589,7 +589,7 @@ namespace GeometryGym.Ifc
 		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		private double mStartCantRight = 0; //: IfcLengthMeasure;
 		private double mEndCantRight = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private IfcAlignmentCantSegmentTypeEnum mPredefinedType = IfcAlignmentCantSegmentTypeEnum.NOTDEFINED; //: IfcAlignmentCantSegmentTypeEnum;
+		private IfcAlignmentCantSegmentTypeEnum mPredefinedType; //: IfcAlignmentCantSegmentTypeEnum;
 																											  //INVERSE
 		private SET<IfcAlignment2DCant> mToCant = new SET<IfcAlignment2DCant>();
 
@@ -658,7 +658,7 @@ namespace GeometryGym.Ifc
 		private double mEndRadius = 0; //: IfcNonNegativeLengthMeasure;
 		private double mSegmentLength = 0; //: IfcPositiveLengthMeasure;
 		private double mGravityCenterLineHeight = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
-		private IfcAlignmentHorizontalSegmentTypeEnum mPredefinedType = IfcAlignmentHorizontalSegmentTypeEnum.NOTDEFINED; //: IfcAlignmentHorizontalSegmentTypeEnum;
+		private IfcAlignmentHorizontalSegmentTypeEnum mPredefinedType; //: IfcAlignmentHorizontalSegmentTypeEnum;
 																														  //INVERSE
 		private SET<IfcAlignment2DHorizontal> mToHorizontal = new SET<IfcAlignment2DHorizontal>();
 
@@ -713,8 +713,8 @@ namespace GeometryGym.Ifc
 		private double mHorizontalLength = 0; //: IfcPositiveLengthMeasure;
 		private double mStartHeight = 0; //: IfcLengthMeasure;
 		private double mStartGradient = 0; //: IfcRatioMeasure;
-		private IfcAlignmentVerticalSegmentTypeEnum mPredefinedType = IfcAlignmentVerticalSegmentTypeEnum.NOTDEFINED; //: IfcAlignmentVerticalSegmentTypeEnum;
-																													  //INVERSE
+		private IfcAlignmentVerticalSegmentTypeEnum mPredefinedType; //: IfcAlignmentVerticalSegmentTypeEnum;
+		//INVERSE
 		private SET<IfcAlignment2DVertical> mToVertical = new SET<IfcAlignment2DVertical>();
 
 		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
