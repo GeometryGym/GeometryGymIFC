@@ -535,8 +535,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{
 		//INVERSE
-		internal List<IfcRelAssignsToGroup> mIsGroupedBy = new List<IfcRelAssignsToGroup>();// IFC4 SET : IfcRelAssignsToGroup FOR RelatingGroup;
-		public ReadOnlyCollection<IfcRelAssignsToGroup> IsGroupedBy { get { return new ReadOnlyCollection<IfcRelAssignsToGroup>( mIsGroupedBy); } }
+		internal SET<IfcRelAssignsToGroup> mIsGroupedBy = new SET<IfcRelAssignsToGroup>();// IFC4 SET : IfcRelAssignsToGroup FOR RelatingGroup;
+		public SET<IfcRelAssignsToGroup> IsGroupedBy { get { return mIsGroupedBy; } }
 
 		internal IfcGroup() : base() { }
 		internal IfcGroup(DatabaseIfc db, IfcGroup g, DuplicateOptions options) : base(db, g, options)
@@ -557,7 +557,7 @@ namespace GeometryGym.Ifc
 				new IfcRelAssignsToGroup(related, this);
 			}
 			else
-				mIsGroupedBy[0].RelatedObjects.Add(related);
+				mIsGroupedBy.First().RelatedObjects.Add(related);
 		}
 
 		protected override List<T> Extract<T>(Type type)

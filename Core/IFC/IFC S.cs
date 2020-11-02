@@ -1083,8 +1083,6 @@ additional types	some additional representation types are given:
 			{
 				if (servicesBuildings.RelatingSystem != null)
 					result.AddRange(servicesBuildings.RelatingSystem.Extract<T>());
-				else
-					Rhino.RhinoApp.WriteLine(servicesBuildings.ToString());
 			}
 			result.AddRange(base.Extract<T>(type));
 			foreach (IfcProduct p in mContainsElements.SelectMany(x => x.RelatedElements))
@@ -1286,7 +1284,7 @@ additional types	some additional representation types are given:
 				CausedBy = a.CausedBy;
 		}
 		protected IfcStructuralAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item,  IfcStructuralLoad load, IfcTopologyRepresentation location, bool global)
-			: base(item, load, global, lc.IsGroupedBy[0])
+			: base(item, load, global, lc.IsGroupedBy.Count == 0 ? new IfcRelAssignsToGroup(lc) : lc.IsGroupedBy.First())
 		{
 			if (location != null)
 			{

@@ -2062,11 +2062,11 @@ namespace GeometryGym.Ifc
 	[Obsolete("DEPRECATED IFC4x3", false)]
 	public partial class IfcRelServicesBuildings : IfcRelConnects
 	{
-		internal int mRelatingSystem;// : IfcSystem;
-		internal List<int> mRelatedBuildings = new List<int>();// : SET [1:?] OF IfcSpatialElement  ;
+		internal IfcSystem mRelatingSystem;// : IfcSystem;
+		internal SET<IfcSpatialElement> mRelatedBuildings = new SET<IfcSpatialElement>();// : SET [1:?] OF IfcSpatialElement  ;
 
-		public IfcSystem RelatingSystem { get { return mDatabase[mRelatingSystem] as IfcSystem; } set { mRelatingSystem = value.mIndex; value.ServicesBuildings = this; } }
-		public ReadOnlyCollection<IfcSpatialElement> RelatedBuildings { get { return new ReadOnlyCollection<IfcSpatialElement>(mRelatedBuildings.ConvertAll(x => mDatabase[x] as IfcSpatialElement)); } }
+		public IfcSystem RelatingSystem { get { return mRelatingSystem; } set { mRelatingSystem = value; value.ServicesBuildings = this; } }
+		public SET<IfcSpatialElement> RelatedBuildings { get { return mRelatedBuildings; } }
 
 		internal IfcRelServicesBuildings() : base() { }
 		internal IfcRelServicesBuildings(DatabaseIfc db, IfcRelServicesBuildings s, DuplicateOptions options) : base(db, s, options.OwnerHistory)
@@ -2075,11 +2075,11 @@ namespace GeometryGym.Ifc
 			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
-			: base(system.mDatabase) { mRelatingSystem = system.mIndex; mRelatedBuildings.Add(se.mIndex); se.mServicedBySystems.Add(this); }
+			: base(system.mDatabase) { mRelatingSystem = system; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
 
 		internal void addRelated(IfcSpatialElement spatial)
 		{
-			mRelatedBuildings.Add(spatial.mIndex);
+			mRelatedBuildings.Add(spatial);
 			spatial.mServicedBySystems.Add(this);
 		}
 	}

@@ -1195,10 +1195,8 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedBuildings.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingSystem) + ",(" + ParserSTEP.LinkToString(mRelatedBuildings[0]);
-			for (int icounter = 1; icounter < mRelatedBuildings.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mRelatedBuildings[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",#" + mRelatingSystem.StepId + ",(" +
+				string.Join(",", mRelatedBuildings.Select(x => "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

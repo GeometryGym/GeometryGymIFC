@@ -591,7 +591,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mRelatingSystem != host.mIndex)
+			if (mRelatingSystem != host)
 				obj["RelatingSystem"] = RelatingSystem.getJson(this, options);
 			//List<IfcObjectDefinition> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
