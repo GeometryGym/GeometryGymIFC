@@ -671,20 +671,22 @@ namespace GeometryGym.Ifc
 		public SET<IfcAlignment2DHorizontal> ToHorizontal { get { return mToHorizontal; } set { mToHorizontal = value; } }
 
 		public IfcAlignmentHorizontalSegment() : base() { }
-		public IfcAlignmentHorizontalSegment(DatabaseIfc db, double startRadius, double endRadius, double segmentLength)
+		public IfcAlignmentHorizontalSegment(DatabaseIfc db, double startRadius, double endRadius, double segmentLength, IfcAlignmentHorizontalSegmentTypeEnum predefinedType)
 			: base(db)
 		{
 			StartRadius = startRadius;
 			EndRadius = endRadius;
 			SegmentLength = segmentLength;
+			PredefinedType = predefinedType;
 		}
-		public IfcAlignmentHorizontalSegment(IfcAlignmentHorizontal alignmentHorizontal, IfcCurve segment, double startRadius, double endRadius, double segmentLength)
-			: this(alignmentHorizontal.Database, startRadius, endRadius, segmentLength)
+		public IfcAlignmentHorizontalSegment(IfcAlignmentHorizontal alignmentHorizontal, IfcCurveSegment segment, double startRadius, double endRadius, double segmentLength, IfcAlignmentHorizontalSegmentTypeEnum predefinedType)
+			: this(alignmentHorizontal.Database, startRadius, endRadius, segmentLength, predefinedType)
 		{
 			alignmentHorizontal.AddNested(this);
 			if (segment != null)
-				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(segment, ShapeRepresentationType.Curve2D));
+				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(segment.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), segment, ShapeRepresentationType.Curve2D));
 		}
+
 	}
 	[Serializable]
 	public abstract partial class IfcAlignmentSegment : IfcLinearElement
@@ -735,7 +737,19 @@ namespace GeometryGym.Ifc
 			StartGradient = startGradient;
 			PredefinedType = predefinedType;
 		}
-		public IfcAlignmentVerticalSegment(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, double startDistAlong, double horizontalLength, double startHeight, double startGradient, IfcAlignmentVerticalSegmentTypeEnum predefinedType) : base(host, placement, representation) { }
+		public IfcAlignmentVerticalSegment(IfcAlignmentVertical host, IfcLinearPlacement placement, IfcCurveSegment segment, double startDistAlong, double horizontalLength, double startHeight, double startGradient, IfcAlignmentVerticalSegmentTypeEnum predefinedType)
+			: base(host.Database)
+		{
+			host.AddNested(this);
+			ObjectPlacement = placement;
+			if (segment != null)
+				Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(segment.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), segment, ShapeRepresentationType.Curve3D));
+			StartDistAlong = startDistAlong;
+			HorizontalLength = horizontalLength;
+			StartHeight = startHeight;
+			StartGradient = startGradient;
+			PredefinedType = predefinedType;
+		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -1256,6 +1270,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		private int mAxis;//  : OPTIONAL IfcDirection
+
+		public IfcCartesianPoint Location { get { return mLocation as IfcCartesianPoint; } set { mLocation = value; } }
 		public IfcDirection Axis { get { return (mAxis > 0 ? mDatabase[mAxis] as IfcDirection : null); } set { mAxis = (value == null ? 0 : value.mIndex); } }
 		
 		internal IfcAxis1Placement() : base() { }
@@ -1265,11 +1281,13 @@ namespace GeometryGym.Ifc
 		public IfcAxis1Placement(IfcDirection axis) : base(axis.mDatabase) { Axis = axis; }
 		public IfcAxis1Placement(IfcCartesianPoint location, IfcDirection axis) : base(location) { Axis = axis; }
 	}
-	public partial interface IfcAxis2Placement : IBaseClassIfc { bool IsXYPlane { get; } } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
+	public partial interface IfcAxis2Placement : IBaseClassIfc { bool IsXYPlane(double tol); } //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
 	[Serializable]
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{ 
 		private IfcDirection mRefDirection;// : OPTIONAL IfcDirection;
+
+		public IfcCartesianPoint Location { get { return mLocation as IfcCartesianPoint; } set { mLocation = value; } }
 		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
 		
 		internal IfcAxis2Placement2D() : base() { }
@@ -1281,7 +1299,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement2D(DatabaseIfc db) : base(db.Factory.Origin2d) { }
 		public IfcAxis2Placement2D(IfcCartesianPoint location) : base(location) { }
 		
-		public override bool IsXYPlane { get { return base.IsXYPlane && (mRefDirection == null || RefDirection.isXAxis); } }
+		public override bool IsXYPlane(double tol) { return base.IsXYPlane(tol) && (mRefDirection == null || RefDirection.isXAxis); } 
 	}
 	[Serializable]
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement
@@ -1289,6 +1307,7 @@ namespace GeometryGym.Ifc
 		private IfcDirection mAxis = null;// : OPTIONAL IfcDirection;
 		private IfcDirection mRefDirection = null;// : OPTIONAL IfcDirection; 
 
+		public IfcCartesianPoint Location { get { return mLocation as IfcCartesianPoint; } set { mLocation = value; } }
 		public IfcDirection Axis
 		{
 			get { return mAxis; }
@@ -1326,17 +1345,14 @@ namespace GeometryGym.Ifc
 		}
 		public IfcAxis2Placement3D(IfcCartesianPoint location) : base(location) { }
 		public IfcAxis2Placement3D(IfcCartesianPoint location, IfcDirection axis, IfcDirection refDirection) : base(location) { Axis = axis; RefDirection = refDirection; }
-		
-		public override bool IsXYPlane
+
+		public override bool IsXYPlane(double tol)
 		{
-			get
-			{
-				if (mAxis != null && !Axis.isZAxis)
-					return false;
-				if (mRefDirection != null && !RefDirection.isXAxis)
-					return false;
-				return base.IsXYPlane;
-			}
+			if (mAxis != null && !Axis.isZAxis)
+				return false;
+			if (mRefDirection != null && !RefDirection.isXAxis)
+				return false;
+			return base.IsXYPlane(tol);
 		}
 	}
 	[Serializable]

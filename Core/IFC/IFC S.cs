@@ -2566,7 +2566,7 @@ additional types	some additional representation types are given:
 		{
 			if (!(this is IfcZone))
 			{
-				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3)
+				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3_RC1)
 					mServicesBuildings = new IfcRelServicesBuildings(this, spatial) { Name = name };
 				else
 					spatial.ReferenceElement(this);

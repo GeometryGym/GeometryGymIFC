@@ -675,7 +675,7 @@ namespace GeometryGym.Ifc
 				{
 					if (mDatabase.Release < ReleaseVersion.IFC4)
 						return "IfcSystem";
-					if (mDatabase.Release < ReleaseVersion.IFC4X3)
+					if (mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
 						return "IfcBuildingSystem";
 				}
 				return base.StepClassName;

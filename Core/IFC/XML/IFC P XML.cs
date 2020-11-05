@@ -209,13 +209,13 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Location") == 0)
-					Location = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
+					mLocation = mDatabase.ParseXml<IfcPoint>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(Location.GetXML(xml.OwnerDocument, "Location", this, processed));
+			xml.AppendChild(mLocation.GetXML(xml.OwnerDocument, "Location", this, processed));
 		}
 	}
 	public partial class IfcPlanarExtent : IfcGeometricRepresentationItem

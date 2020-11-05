@@ -189,7 +189,12 @@ namespace GeometryGym.Ifc
 		public IfcCartesianPoint(DatabaseIfc db, double x, double y, double z) : base(db) { mCoordinateX = x; mCoordinateY = y; mCoordinateZ = z; }
 
 		internal bool is2D { get { return double.IsNaN(mCoordinateZ); } }
-		internal bool isOrigin { get { double tol = mDatabase.Tolerance; return ((double.IsNaN(mCoordinateX) || Math.Abs(mCoordinateX) < tol) && (double.IsNaN(mCoordinateY) || Math.Abs(mCoordinateY) < tol) && (double.IsNaN(mCoordinateZ) || Math.Abs(mCoordinateZ) < tol)); } }
+		internal override bool isOrigin(double tol) 
+		{
+			return ((double.IsNaN(mCoordinateX) || Math.Abs(mCoordinateX) < tol) && 
+				(double.IsNaN(mCoordinateY) || Math.Abs(mCoordinateY) < tol) && 
+				(double.IsNaN(mCoordinateZ) || Math.Abs(mCoordinateZ) < tol)); 
+		}
 
 		private Tuple<double, double, double> SerializeCoordinates
 		{
@@ -303,7 +308,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcAxis2Placement3D generate()
 		{
-			if (LocalOrigin.isOrigin && (mAxis1 == 0 || Axis1.isXAxis) && (mAxis2 == 0 || Axis2.isYAxis))
+			if (LocalOrigin.isOrigin(mDatabase.Tolerance) && (mAxis1 == 0 || Axis1.isXAxis) && (mAxis2 == 0 || Axis2.isYAxis))
 				return mDatabase.Factory.XYPlanePlacement;
 			return new IfcAxis2Placement3D(LocalOrigin, mAxis3 == 0 ? mDatabase.Factory.ZAxis : Axis3, mAxis1 == 0 ? mDatabase.Factory.XAxis : Axis1);
 		}
@@ -924,10 +929,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCompositeCurve : IfcBoundedCurve
 	{
-		private LIST<IfcCompositeCurveSegment> mSegments = new LIST<IfcCompositeCurveSegment>();// : LIST [1:?] OF IfcCompositeCurveSegment;
+		private LIST<IfcSegment> mSegments = new LIST<IfcSegment>();// : LIST [1:?] OF IfcCompositeCurveSegment;
 		private IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 
-		public LIST<IfcCompositeCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
+		public LIST<IfcSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcLogicalEnum SelfIntersect { get { return mSelfIntersect; } set { mSelfIntersect = value; } }
 
 		internal IfcCompositeCurve() : base() { }
@@ -936,8 +941,8 @@ namespace GeometryGym.Ifc
 			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCompositeCurveSegment));
 			mSelfIntersect = c.mSelfIntersect;
 		}
-		public IfcCompositeCurve(IEnumerable<IfcCompositeCurveSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
-		public IfcCompositeCurve(params IfcCompositeCurveSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
+		public IfcCompositeCurve(IEnumerable<IfcSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
+		public IfcCompositeCurve(params IfcSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
 	}
 	[Serializable]
 	public partial class IfcCompositeCurveOnSurface : IfcCompositeCurve, IfcCurveOnSurface
@@ -2085,11 +2090,18 @@ namespace GeometryGym.Ifc
 		public IfcCurve ParentCurve { get { return mParentCurve; } set { mParentCurve = value; } }
 
 		public IfcCurveSegment() : base() { }
-		public IfcCurveSegment(DatabaseIfc db, IfcTransitionCode transition, IfcPlacement startPlacement, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
-			: base(db, transition)
+		public IfcCurveSegment(IfcTransitionCode transition, IfcPlacement startPlacement, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
+			: base(startPlacement.Database, transition)
 		{
 			StartPlacement = startPlacement;
 			SegmentLength = segmentLength;
+			ParentCurve = parentCurve;
+		}
+		public IfcCurveSegment(IfcTransitionCode transition, IfcPlacement startPlacement, double nonNegativeLength, IfcCurve parentCurve)
+			: base(startPlacement.Database, transition)
+		{
+			StartPlacement = startPlacement;
+			SegmentLength = new IfcNonNegativeLengthMeasure(nonNegativeLength);
 			ParentCurve = parentCurve;
 		}
 	}

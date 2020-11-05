@@ -562,6 +562,7 @@ namespace GeometryGym.Ifc
 		}
 
 		protected IfcObjectPlacement() : base() { }
+		protected IfcObjectPlacement(IfcObjectPlacement placementRelTo) : base(placementRelTo.Database) { PlacementRelTo = placementRelTo; }
 		protected IfcObjectPlacement(DatabaseIfc db) : base(db) { }
 		protected IfcObjectPlacement(DatabaseIfc db, IfcProduct p) : base(db)
 		{
@@ -587,7 +588,7 @@ namespace GeometryGym.Ifc
 		}
 		protected virtual IfcObjectPlacement DuplicateWorker(DatabaseIfc db) { return null; }
 
-		internal virtual bool isXYPlane { get { return false; } }
+		internal virtual bool isXYPlane(double tol) { return false; }
 	}
 	[Serializable]
 	public partial class IfcObjective : IfcConstraint

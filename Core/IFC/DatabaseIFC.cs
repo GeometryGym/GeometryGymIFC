@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
@@ -149,7 +149,7 @@ namespace GeometryGym.Ifc
 			if (modelView == ModelView.Ifc4X2NotAssigned)
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
-				return ReleaseVersion.IFC4X3;
+				return ReleaseVersion.IFC4X3_RC2;
 			return ReleaseVersion.IFC4A2;
 		}
 		public double Tolerance
@@ -363,7 +363,7 @@ namespace GeometryGym.Ifc
 			Type type = Type.GetType("GeometryGym.Ifc." + str, false, true);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
-			if (release < ReleaseVersion.IFC4X3)
+			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				if (release < ReleaseVersion.IFC4X2)
 				{
@@ -502,7 +502,7 @@ namespace GeometryGym.Ifc
 			int index = mDuplicateMapping.FindExisting(placement);
 			if (index > 0)
 				return mDatabase[index] as IfcAxis2Placement3D;
-			if (placement.IsXYPlane)
+			if (placement.IsXYPlane(mDatabase.Tolerance))
 				return XYPlanePlacement;
 			return Duplicate(placement, options) as IfcAxis2Placement3D;
 		}
@@ -541,7 +541,7 @@ namespace GeometryGym.Ifc
 		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
 		{
 			BaseClassIfc result = null;
-			if (mDatabase.Release < ReleaseVersion.IFC4X3)
+			if (mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
 			{
 				if (mDatabase.Release < ReleaseVersion.IFC4X2)
 				{
@@ -2066,8 +2066,11 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X1;
 				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
 					mDatabase.Release = ReleaseVersion.IFC4X2;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture) ||
+					ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3_RC1;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC2", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
 				if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
@@ -2140,8 +2143,10 @@ namespace GeometryGym.Ifc
 				version = "IFC4X1";
 			else if (release == ReleaseVersion.IFC4X2)
 				version = "IFC4X2";
-			else if (release == ReleaseVersion.IFC4X3)
-				version = "IFC4X3RC1";
+			else if (release == ReleaseVersion.IFC4X3_RC1)
+				version = "IFC4X3_RC1";
+			else if (release == ReleaseVersion.IFC4X3_RC2)
+				version = "IFC4X3_RC2";
 			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";

@@ -341,19 +341,23 @@ namespace GeometryGym.Ifc
 		public IfcDiscreteAccessoryType(DatabaseIfc db, string name, IfcDiscreteAccessoryTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
+	public partial class IfcDistanceExpression : IfcPoint
 	{
 		internal IfcCurveMeasureSelect mDistanceAlong;// : IfcCurveMeasureSelect;
 		internal double mOffsetLateral = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mOffsetVertical = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		internal double mOffsetLongitudinal = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		internal bool mAlongHorizontal = false; // IfcBoolean
+		internal IfcCurve mBasisCurve = null;// : IfcCurve
 
 		public IfcCurveMeasureSelect DistanceAlong { get { return mDistanceAlong; } set { mDistanceAlong = value; } }
 		public double OffsetLateral { get { return mOffsetLateral; } set { mOffsetLateral = value; } }
 		public double OffsetVertical { get { return mOffsetVertical; } set { mOffsetVertical = value; } }
 		public double OffsetLongitudinal { get { return mOffsetLongitudinal; } set { mOffsetLongitudinal = value; } }
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		public bool AlongHorizontal { get { return mAlongHorizontal; } set { mAlongHorizontal = value; } } 
+		public IfcCurve BasisCurve { get { return mBasisCurve; } set { mBasisCurve = value; } }
 
 		internal IfcDistanceExpression() : base() { }
 		internal IfcDistanceExpression(DatabaseIfc db, IfcDistanceExpression e, DuplicateOptions options) : base(db, e, options)
@@ -363,13 +367,17 @@ namespace GeometryGym.Ifc
 			OffsetVertical = e.OffsetVertical;
 			OffsetLongitudinal = e.OffsetLongitudinal;
 			AlongHorizontal = e.AlongHorizontal;
+			BasisCurve = e.BasisCurve;
 		}
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
+		public IfcDistanceExpression(IfcCurveMeasureSelect distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = distanceAlong; BasisCurve = basisCurve; }
+		public IfcDistanceExpression(double nonNegativeLength, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(nonNegativeLength); BasisCurve = basisCurve; }
 
 		internal IfcDistanceExpression Duplicate() 
 		{
 			return new IfcDistanceExpression()
-			{ DistanceAlong = DistanceAlong, OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal };
+			{ DistanceAlong = DistanceAlong, OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal, BasisCurve = BasisCurve };
 		}
 	}
 	[Serializable]

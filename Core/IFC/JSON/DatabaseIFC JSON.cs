@@ -26,9 +26,7 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 
-
 using Newtonsoft.Json.Linq;
-
 
 namespace GeometryGym.Ifc
 {
@@ -149,7 +147,7 @@ namespace GeometryGym.Ifc
 								if (point != null)
 								{
 									point.parseJObject(obj);
-									if (point.isOrigin)
+									if (point.isOrigin(Tolerance))
 									{
 										if (point.is2D)
 											result = Factory.Origin2d;
@@ -189,7 +187,7 @@ namespace GeometryGym.Ifc
 										if (placement != null)
 										{
 											placement.parseJObject(obj);
-											if (placement.IsXYPlane)
+											if (placement.IsXYPlane(Tolerance))
 											{
 												result = Factory.XYPlanePlacement;
 												common = true;

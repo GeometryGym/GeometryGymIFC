@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 			if (mPosition != null)
 			{
 				IfcAxis2Placement2D position = Position;
-				if((mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 )|| !position.IsXYPlane)
+				if((mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 )|| !position.IsXYPlane(mDatabase.Tolerance))
 					obj["Position"] = Position.getJson(this, options);
 			}
 		}
@@ -220,13 +220,13 @@ namespace GeometryGym.Ifc
 			{
 				JObject jobj = token as JObject;
 				if (jobj != null)
-					Location = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
+					mLocation = mDatabase.ParseJObject<IfcPoint>(jobj);
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Location"] = Location.getJson(this, options);
+			obj["Location"] = mLocation.getJson(this, options);
 		}
 	}
 	public partial class IfcPolyline : IfcBoundedCurve

@@ -718,7 +718,7 @@ namespace GeometryGym.Ifc
 			string result = base.BuildStringSTEP(release);
 			if (mPredefinedType == null)
 				result += ",$";
-			else if (release < ReleaseVersion.IFC4X3)
+			else if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				string str = mPredefinedType.ValueString();
 				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;
@@ -748,7 +748,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			string result = base.BuildStringSTEP(release);
-			if (release < ReleaseVersion.IFC4X3)
+			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				string str = mPredefinedType.ValueString();
 				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;

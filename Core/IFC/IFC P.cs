@@ -444,15 +444,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
 	{
-		private IfcCartesianPoint mLocation;// : IfcCartesianPoint;
-		public IfcCartesianPoint Location { get { return mLocation; } set { mLocation = value; } }
+		protected IfcPoint mLocation;// : IfcCartesianPoint;  IfcPoint IFC4x3
 
 		protected IfcPlacement() : base() { }
-		protected IfcPlacement(DatabaseIfc db) : base(db) { Location = db.Factory.Origin; }
-		protected IfcPlacement(IfcCartesianPoint location) : base(location.mDatabase) { Location = location; }
-		protected IfcPlacement(DatabaseIfc db, IfcPlacement p, DuplicateOptions options) : base(db, p, options) { Location = db.Factory.Duplicate(p.Location) as IfcCartesianPoint; }
+		protected IfcPlacement(DatabaseIfc db) : base(db) { }
+		protected IfcPlacement(IfcPoint location) : base(location.Database) { mLocation = location; }
+		protected IfcPlacement(DatabaseIfc db, IfcPlacement p, DuplicateOptions options) : base(db, p, options) { mLocation = db.Factory.Duplicate(p.mLocation) as IfcPoint; }
 
-		public virtual bool IsXYPlane { get { return Location.isOrigin; } }
+		public virtual bool IsXYPlane(double tol) { return mLocation.isOrigin(tol); } 
 	}
 	[Serializable]
 	public partial class IfcPlanarBox : IfcPlanarExtent
@@ -524,6 +523,13 @@ namespace GeometryGym.Ifc
 		protected IfcPoint() : base() { }
 		protected IfcPoint(DatabaseIfc db) : base(db) { }
 		protected IfcPoint(DatabaseIfc db, IfcPoint p, DuplicateOptions options) : base(db, p, options) { }
+
+		internal virtual bool isOrigin(double tol) 
+		{ 
+			return false; 
+		} 
+
+
 	}
 	[Serializable]
 	public partial class IfcPointOnCurve : IfcPoint
@@ -712,7 +718,7 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
-	{
+	{   // ABSTRACT SUPERTYPE OF(ONEOF(IfcGrid, IfcLinearPositioningElement, IfcReferent))
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
@@ -1824,6 +1830,8 @@ namespace GeometryGym.Ifc
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
 		public IfcPropertySet(string name, IfcProperty property) : base(property.mDatabase, name) { addProperty(property); }
+		public IfcPropertySet(string name, params IfcProperty[] properties)
+		: base(properties.First().Database, name) { foreach (IfcProperty p in properties) addProperty(p); }
 		public IfcPropertySet(string name, IEnumerable<IfcProperty> properties) : base(properties.First().mDatabase, name)
 		{
 			foreach (IfcProperty p in properties)

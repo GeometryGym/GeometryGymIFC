@@ -247,7 +247,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			if (PredefinedType != null && mDatabase.Release < ReleaseVersion.IFC4X3)
+			if (PredefinedType != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
 			{
 				IfcBridgePartTypeEnum part = IfcBridgePartTypeEnum.NOTDEFINED;
 				if (!PredefinedType.isEnumeration(ref part))
@@ -259,7 +259,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release < ReleaseVersion.IFC4X3)
+			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))

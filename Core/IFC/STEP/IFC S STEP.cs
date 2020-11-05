@@ -184,9 +184,9 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + ",." + mTransition.ToString() + ".";
+			return base.BuildStringSTEP(release) + ",." + mTransition.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -239,8 +239,8 @@ namespace GeometryGym.Ifc
 		{
 			return base.BuildStringSTEP() +
 			",#" + mPosition.StepId +
-			",(" + string.Join(",", mCoefficientsX.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
-			",(" + string.Join(",", mCoefficientsY.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")";
+			",(" + string.Join(",", mCoefficientsX.ConvertAll(x => ParserSTEP.DoubleExponentialString(x))) + ")" +
+			",(" + string.Join(",", mCoefficientsY.ConvertAll(x => ParserSTEP.DoubleExponentialString(x))) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

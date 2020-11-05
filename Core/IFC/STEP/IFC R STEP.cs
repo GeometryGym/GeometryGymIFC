@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRailway : IfcFacility
 	{
-		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacility"; return base.StepClassName; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1) return "IfcFacility"; return base.StepClassName; } }
 	}
 	public partial class IfcRailType : IfcBuiltElementType
 	{
@@ -732,9 +732,10 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (release < ReleaseVersion.IFC4 && string.IsNullOrEmpty(RelatingMaterial.ToString()))
+			string baseString = base.BuildStringSTEP(release);
+			if (string.IsNullOrEmpty(baseString) || (release < ReleaseVersion.IFC4 && string.IsNullOrEmpty(RelatingMaterial.ToString())))
 				return "";
-			return base.BuildStringSTEP(release) + ",#" + mRelatingMaterial;
+			return baseString + ",#" + mRelatingMaterial;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1442,7 +1443,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRoad : IfcFacility
 	{
-		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacility"; return base.StepClassName; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1) return "IfcFacility"; return base.StepClassName; } }
 	}
 	public partial class IfcRoof : IfcBuiltElement
 	{

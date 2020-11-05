@@ -608,7 +608,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcCompositeCurveSegment));
+			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcSegment));
 			mSelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
@@ -1449,16 +1449,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() +
-			",#" + mStartPlacement.StepId +
-			",#" + mSegmentLength.StepId +
-			",#" + mParentCurve.StepId;
+			return base.BuildStringSTEP() + ",#" + mStartPlacement.StepId + "," + mSegmentLength.ToString() + ",#" + mParentCurve.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			StartPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
-			SegmentLength = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurveMeasureSelect;
+			SegmentLength = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
 			ParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
