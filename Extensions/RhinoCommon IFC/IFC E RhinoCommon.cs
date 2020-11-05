@@ -27,14 +27,4 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcEllipse : IfcConic
-	{
-		public Ellipse Ellipse(bool sameSense)
-		{
-			Plane plane = base.Plane;
-			if (!sameSense)
-				plane = new Plane(plane.Origin, plane.XAxis, -plane.YAxis);
-			return new Ellipse(plane, mSemiAxis1, mSemiAxis2);
-		}
-	} 
 }

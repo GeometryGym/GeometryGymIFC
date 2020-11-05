@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.Linq;
 
 using GeometryGym.STEP;
+using System.Runtime.CompilerServices;
 
 namespace GeometryGym.Ifc
 {
@@ -368,22 +369,18 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 
-		private static Dictionary<string, Type> mMeasureValueTypes = null;
-		private static Dictionary<string,Type> MeasureValueTypes
+		private class DictionaryMeasureValueTypes : Dictionary<string,Type>
 		{
-			get
+			internal DictionaryMeasureValueTypes()
 			{
-				if(mMeasureValueTypes == null)
-				{
-					mMeasureValueTypes = new Dictionary<string, Type>();
-					IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
-								  where typeof(IfcMeasureValue).IsAssignableFrom(type) select type;
-					foreach(Type t in types)
-						mMeasureValueTypes[t.Name.ToLower()] = t;
-				}
-				return mMeasureValueTypes;
+				IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
+										  where typeof(IfcMeasureValue).IsAssignableFrom(type)
+										  select type;
+				foreach (Type t in types)
+					base[t.Name.ToLower()] = t;
 			}
 		}
+		private static readonly DictionaryMeasureValueTypes mMeasureValueTypes = new DictionaryMeasureValueTypes();
 		internal static IfcMeasureValue parseMeasureValue(string str)
 		{
 			try
@@ -405,13 +402,9 @@ namespace GeometryGym.Ifc
 					string kw = str.Substring(0, icounter - 1).ToLower();
 					if (kw.All(Char.IsLetter))
 					{
-						Dictionary<string, Type> types = MeasureValueTypes;
-						if (types.ContainsKey(kw))
-						{
-							Type type = types[kw];
-							if (type != null)
-								return extractMeasureValue(type, str.Substring(icounter, len - icounter));
-						}
+						Type type = null;
+						if(mMeasureValueTypes.TryGetValue(kw, out type))
+							return extractMeasureValue(type, str.Substring(icounter, len - icounter));
 					}
 				}
 			}

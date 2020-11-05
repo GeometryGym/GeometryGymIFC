@@ -30,48 +30,25 @@ namespace GeometryGym.Ifc
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector3d : Vector3d.XAxis); } }
-
-		public override Plane Plane
-		{
-			get
-			{
-				Point3d p = LocationPoint;
-				Vector3d xaxis = AxisVector;
-				Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, xaxis);
-				return new Plane(p, xaxis, yAxis);
-			}
-		}
 	}
-	public partial interface IfcAxis2Placement : IBaseClassIfc //SELECT ( IfcAxis2Placement2D, IfcAxis2Placement3D);
-	{
-		Transform Transform();
-		Plane Plane { get; }
-	}
+	
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
 		internal Vector3d DirectionVector { get { return (mRefDirection != null ? RefDirection.Vector3d : Vector3d.XAxis); } }
 
-		internal IfcAxis2Placement2D(DatabaseIfc db, Point2d position, Vector2d dir) : base(db, position)
+		internal IfcAxis2Placement2D(DatabaseIfc db, Point2d position, Vector2d dir) : base(db)
 		{
+			Location = new IfcCartesianPoint(db, position);
 			if (dir.Length > 0 && new Vector3d(dir.X, dir.Y, 0).IsParallelTo(Vector3d.XAxis, Math.PI / 1800) != 1)
 				RefDirection = new IfcDirection(db, dir);
 		}
-		public override Plane Plane
-		{
-			get
-			{
-				Point3d o = LocationPoint;
-				Vector3d xaxis = DirectionVector;
-				Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, xaxis);
-				return new Plane(o, xaxis, yAxis);
-			}
-		}
+	
 	}
 	public partial class IfcAxis2Placement3D
 	{
-		internal Plane mPlane = Plane.Unset; 
-		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db,plane.Origin)
+		public IfcAxis2Placement3D(DatabaseIfc db, Plane plane) : base(db)
 		{
+			Location = new IfcCartesianPoint(db, plane.Origin);
 			double angTol = Math.PI / 1800;
 			if (plane.ZAxis.IsParallelTo(Vector3d.ZAxis, angTol) != 1)
 			{
@@ -82,27 +59,6 @@ namespace GeometryGym.Ifc
 			{
 				RefDirection = IfcDirection.convert(db, plane.XAxis);
 				Axis = db.Factory.ZAxis;
-			}
-		}
-
-		public override Plane Plane
-		{
-			get
-			{
-				if (!mPlane.IsValid)
-				{
-					Point3d orig = LocationPoint;
-					IfcDirection axis = Axis, refDirection = RefDirection;
-					Vector3d norm = axis == null ? Vector3d.ZAxis : axis.Vector3d;
-					if (norm.IsTiny())
-						norm = Vector3d.ZAxis;
-					Vector3d xaxis = refDirection == null ? Vector3d.XAxis : refDirection.Vector3d;
-					if (xaxis.IsTiny())
-						xaxis = Vector3d.XAxis;
-					Vector3d yAxis = Vector3d.CrossProduct(norm, xaxis);
-					mPlane = new Plane(orig, xaxis, yAxis);
-				}
-				return mPlane;
 			}
 		}
 	}

@@ -112,24 +112,10 @@ namespace GeometryGym.Ifc
 	{
 		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
 	}
-	public partial class IfcCompositeCurve : IfcBoundedCurve
-	{
-		
-		
-	}
-	public partial class IfcCircle : IfcConic
-	{
-		public Circle Circle { get { return new Circle(Plane, mRadius); } }
-	}
 	public partial class IfcCompositeCurveSegment
 	{
 		//internal IfcCompositeCurveSegment(DatabaseIfc db, Curve c, bool sense, IfcTransitionCode tc, bool twoD, IfcCartesianPoint optStrt, out IfcCartesianPoint end)
 		//	: this(tc, sense, IfcBoundedCurve.convCurve(db, c, optStrt, twoD, out end)) { }
-	}
-	public abstract partial class IfcConic : IfcCurve /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCircle ,IfcEllipse))*/
-	{
-		public Transform Transform { get { return (mPosition > 0 ? Position.Transform() : Transform.Translation(0, 0, 0)); } }
-		public Plane Plane { get { return (mPosition > 0 ? Position.Plane : Plane.WorldXY); } }
 	}
 	public partial class IfcConnectionPointEccentricity
 	{
