@@ -2648,7 +2648,8 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcRoot(DatabaseIfc db, IfcRoot r, IfcOwnerHistory ownerHistory) : base(db, r)
 		{
-			GlobalId = r.GlobalId;
+			if(db[r.GlobalId] == null)
+				GlobalId = r.GlobalId;
 			if (ownerHistory != null)
 				OwnerHistory = ownerHistory;
 			else if (r.mOwnerHistory != null)

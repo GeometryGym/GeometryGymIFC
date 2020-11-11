@@ -327,7 +327,7 @@ namespace GeometryGym.Ifc
 											  where typeof(IfcDerivedMeasureValue).IsAssignableFrom(type)
 											  select type;
 					foreach (Type t in types)
-						mDerivedMeasureValueTypes.Add(t.Name.ToLower(), t);
+						mDerivedMeasureValueTypes[t.Name.ToLower()] = t;
 				}
 				return mDerivedMeasureValueTypes;
 			}
