@@ -728,6 +728,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcAlignment2DVertical> ToVertical { get { return mToVertical; } set { mToVertical = value; } }
 
 		public IfcAlignmentVerticalSegment() : base() { }
+		public IfcAlignmentVerticalSegment(DatabaseIfc db) : base(db) { }
 		public IfcAlignmentVerticalSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startHeight, double startGradient, IfcAlignmentVerticalSegmentTypeEnum predefinedType)
 			: base(db)
 		{
