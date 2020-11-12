@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDistanceExpression));
+			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
 			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDistanceExpression));
+			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
 			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
 			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
@@ -199,16 +199,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() +
-			",#" + mBaseCurve.StepId +
-			",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" +
-			(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
+			return base.BuildStringSTEP() + ",#" + mBaseCurve.StepId + ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" +
+				(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
 			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcCurveSegment));
-			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearPlacement;
+			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
 		}
 	}
 	public partial class IfcSensor : IfcDistributionControlElement //IFC4  

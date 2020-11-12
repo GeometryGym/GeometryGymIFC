@@ -416,6 +416,7 @@ namespace GeometryGym.Ifc
 		internal IfcCircleProfileDef(DatabaseIfc db, IfcCircleProfileDef c, DuplicateOptions options) : base(db, c, options) { mRadius = c.mRadius; }
 		public IfcCircleProfileDef(DatabaseIfc db, string name, double radius) : base(db,name) { mRadius = radius; }
 	}
+	[Obsolete("DEPRECATED IFC4X3", false)]
 	[Serializable]
 	public partial class IfcCircularArcSegment2D : IfcCurveSegment2D  //IFC4.1
 	{
@@ -2027,7 +2028,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallType(DatabaseIfc m, string name, IfcCurtainWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcLinearAxisSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
 	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
 		//INVERSE GeomGym
 		internal IfcEdgeCurve mOfEdge = null;
@@ -2105,6 +2106,7 @@ namespace GeometryGym.Ifc
 			ParentCurve = parentCurve;
 		}
 	}
+	[Obsolete("DEPRECATED IFC4X3", false)]
 	[Serializable]
 	public abstract partial class IfcCurveSegment2D : IfcBoundedCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcCircularArcSegment2D, IfcLineSegment2D, IfcTransitionCurveSegment2D))
 	{

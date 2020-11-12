@@ -79,6 +79,32 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ZLength", ZLength.ToString());
 		}
 	}
+	public partial class IfcBlossCurve : IfcCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
+			xml.SetAttribute("CurveLength", mCurveLength.ToString());
+			xml.SetAttribute("Radius", mRadius.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string curveLength = xml.GetAttribute("CurveLength");
+			if (!string.IsNullOrEmpty(curveLength))
+				double.TryParse(curveLength, out mCurveLength);
+			string radius = xml.GetAttribute("Radius");
+			if (!string.IsNullOrEmpty(radius))
+				double.TryParse(radius, out mRadius);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Position", true) == 0)
+					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcBooleanResult : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect
 	{
 		internal override void ParseXml(XmlElement xml)

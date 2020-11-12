@@ -180,11 +180,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mPlacesObject.Count == 0 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mPlacementLocation) + "," + ParserSTEP.LinkToString(mPlacementRefDirection)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (mPlacesObject.Count == 0 ? "" : base.BuildStringSTEP(release) + ",#" + mPlacementLocation.StepId + "," + ParserSTEP.ObjToLinkString(mPlacementRefDirection)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mPlacementLocation = ParserSTEP.StripLink(str, ref pos, len);
-			mPlacementRefDirection = ParserSTEP.StripLink(str, ref pos, len);
+			mPlacementLocation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVirtualGridIntersection;
+			mPlacementRefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcGridPlacementDirectionSelect;
 		}
 	}
 }

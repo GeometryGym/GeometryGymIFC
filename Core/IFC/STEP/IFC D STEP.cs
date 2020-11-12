@@ -192,8 +192,8 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			StartDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDistanceExpression;
-			EndDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDistanceExpression;
+			StartDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
+			EndDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
 		}
 	}
 	public partial class IfcDiscreteAccessory : IfcElementComponent
@@ -221,27 +221,24 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDiscreteAccessoryTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistanceExpression : IfcPoint
+	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4X3_RC2 ? this.formatLength((mDistanceAlong as IfcPositiveLengthMeasure).Measure) : mDistanceAlong.ToString()) + "," +
-				ParserSTEP.DoubleOptionalToString(OffsetLateral) + "," + ParserSTEP.DoubleOptionalToString(OffsetVertical) + "," +
-				ParserSTEP.DoubleOptionalToString(mOffsetLongitudinal) + (release < ReleaseVersion.IFC4X3_RC2 ? "," + ParserSTEP.BoolToString(mAlongHorizontal) : ",#" + mBasisCurve.StepId);
+			return base.BuildStringSTEP(release) + "," + formatLength(mDistanceAlong) +
+				(double.IsNaN(mOffsetLateral) ? ",$" : "," + formatLength(OffsetLateral)) +
+				(double.IsNaN(mOffsetVertical) ? ",$" : "," + formatLength(OffsetVertical)) +
+				(double.IsNaN(mOffsetLongitudinal) ? ",$" : "," + formatLength(mOffsetLongitudinal)) + 
+				ParserSTEP.BoolToString(mAlongHorizontal);
+
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			if (release < ReleaseVersion.IFC4X3_RC2)
-				mDistanceAlong = new IfcNonNegativeLengthMeasure(ParserSTEP.StripDouble(str, ref pos, len));
-			else
-				DistanceAlong = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
+			mDistanceAlong = ParserSTEP.StripDouble(str, ref pos, len);
 			OffsetLateral = ParserSTEP.StripDouble(str, ref pos, len);
 			OffsetVertical = ParserSTEP.StripDouble(str, ref pos, len);
 			OffsetLongitudinal = ParserSTEP.StripDouble(str, ref pos, len);
-			if (release < ReleaseVersion.IFC4X3_RC2)
-				mAlongHorizontal = ParserSTEP.StripBool(str, ref pos, len);
-			else
-				mBasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+			mAlongHorizontal = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
 	public partial class IfcDistributionBoard : IfcFlowController

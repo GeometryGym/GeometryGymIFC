@@ -287,41 +287,20 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion version)
 		{
-			return base.BuildStringSTEP(version) + "," + ParserSTEP.ObjToLinkString(mPlacementMeasuredAlong) + "," + ParserSTEP.ObjToLinkString(mDistance) + "," +
-			ParserSTEP.ObjToLinkString(mOrientation) + (version > ReleaseVersion.IFC4X3_RC1 ? ",#" + mRelativePlacement.StepId : "") +
+			return base.BuildStringSTEP(version) + "," + ParserSTEP.ObjToLinkString(mPlacementMeasuredAlong) + "," + ParserSTEP.ObjToLinkString(mDistance) +
+			(version > ReleaseVersion.IFC4X3_RC1 ? ",#" + mRelativePlacement.StepId : (mOrientation == null ? ",$" : ",#" + mOrientation.StepId)) +
 			(mCartesianPosition == null ? ",$" : ",#" + mCartesianPosition.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			PlacementMeasuredAlong = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			Distance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDistanceExpression;
-			Orientation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcOrientationExpression;
+			Distance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
 			if (release > ReleaseVersion.IFC4X3_RC1)
-				RelativePlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearAxis2Placement;
+				RelativePlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2PlacementLinear;
+			else
+				Orientation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcOrientationExpression;
 			CartesianPosition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement3D;
-		}
-	}
-	public partial class IfcLinearAxis2Placement : IfcPlacement
-	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mAxis) + "," + ParserSTEP.ObjToLinkString(mRefDirection); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
-			mRefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
-		}
-	}
-	public partial class IfcLinearPlacementWithInclination : IfcLinearPlacement
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + ",#" + mInclinating.StepId;
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			Inclinating = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxisLateralInclination;
 		}
 	}
 	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
@@ -330,7 +309,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Axis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLinearAxisSelect;
+			Axis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
 	public partial class IfcLinearSpanPlacement : IfcLinearPlacement

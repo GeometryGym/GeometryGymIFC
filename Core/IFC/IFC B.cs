@@ -124,6 +124,26 @@ namespace GeometryGym.Ifc
 		public IfcBlock(IfcAxis2Placement3D position, double x,double y, double z) : base(position) { mXLength = x; mYLength = y; mZLength = z; }
 	}
 	[Serializable]
+	public partial class IfcBlossCurve : IfcCurve
+	{
+		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		private double mCurveLength = 0; //: IfcPositiveLengthMeasure;
+		private double mRadius = 0; //: IfcPositiveLengthMeasure;
+
+		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+		public double CurveLength { get { return mCurveLength; } set { mCurveLength = value; } }
+		public double Radius { get { return mRadius; } set { mRadius = value; } }
+
+		public IfcBlossCurve() : base() { }
+		public IfcBlossCurve(DatabaseIfc db, IfcAxis2Placement position, double curveLength, double radius)
+			: base(db)
+		{
+			Position = position;
+			CurveLength = curveLength;
+			Radius = radius;
+		}
+	}
+	[Serializable]
 	public partial class IfcBoiler : IfcEnergyConversionDevice //IFC4  
 	{
 		internal IfcBoilerTypeEnum mPredefinedType = IfcBoilerTypeEnum.NOTDEFINED;
@@ -306,6 +326,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcBoundedCurve : IfcCurve, IfcCurveOrEdgeCurve  //ABSTRACT SUPERTYPE OF (ONEOF (IfcBSplineCurve ,IfcCompositeCurve ,IfcPolyline ,IfcTrimmedCurve)) IFC4 IfcIndexedPolyCurve IFC4x1 IfcCurveSegment2D IfcAlignment2DHorizontal
 	{
+		//INVERSE
+		internal IfcLinearPositioningElement mPositioningElement = null;// : SET[0:1] OF IfcLinearPositioningElement FOR Axis;
+		public IfcLinearPositioningElement PositioningElement { get { return mPositioningElement; } set { mPositioningElement = value; } }
+
 		protected IfcBoundedCurve() : base() { }
 		protected IfcBoundedCurve(DatabaseIfc db) : base(db) { }
 		protected IfcBoundedCurve(DatabaseIfc db, IfcBoundedCurve c, DuplicateOptions options) : base(db, c, options) { }

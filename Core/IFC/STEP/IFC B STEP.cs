@@ -106,6 +106,22 @@ namespace GeometryGym.Ifc
 			mZLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcBlossCurve : IfcCurve
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) +
+			",#" + mPosition.StepId + "," +
+			ParserSTEP.DoubleOptionalToString(mCurveLength) + "," +
+			ParserSTEP.DoubleOptionalToString(mRadius);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
+			CurveLength = ParserSTEP.StripDouble(str, ref pos, len);
+			Radius = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcBoiler : IfcEnergyConversionDevice //IFC4  
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcBoilerTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }

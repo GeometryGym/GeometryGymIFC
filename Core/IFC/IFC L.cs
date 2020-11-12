@@ -302,53 +302,7 @@ namespace GeometryGym.Ifc
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 	}
 	[Serializable]
-	public partial class IfcLinearAxis2Placement : IfcPlacement
-	{
-		private IfcDirection mAxis = null;// : OPTIONAL IfcDirection;
-		private IfcDirection mRefDirection = null;// : OPTIONAL IfcDirection; 
-
-		public IfcDistanceExpression Location { get { return mLocation as IfcDistanceExpression; } set { mLocation = value; } }
-		public IfcDirection Axis
-		{
-			get { return mAxis; }
-			set
-			{
-				mAxis = value;
-				if (value != null)
-				{
-					if (mRefDirection == null && mDatabase != null)
-						RefDirection = (Math.Abs(value.DirectionRatioX - 1) < 1e-3 ? mDatabase.Factory.YAxis : mDatabase.Factory.XAxis);
-				}
-			}
-		}
-		public IfcDirection RefDirection
-		{
-			get { return mRefDirection; }
-			set
-			{
-				mRefDirection = value;
-				if (value != null)
-				{
-					if (mAxis == null && mDatabase != null)
-						Axis = (Math.Abs(value.DirectionRatioZ - 1) < 1e-3 ? mDatabase.Factory.XAxis : mDatabase.Factory.ZAxis);
-				}
-			}
-		}
-
-		internal IfcLinearAxis2Placement() : base() { }
-		internal IfcLinearAxis2Placement(DatabaseIfc db, IfcLinearAxis2Placement p, DuplicateOptions options) : base(db, p, options)
-		{
-			if (p.mAxis != null)
-				Axis = db.Factory.Duplicate(p.Axis) as IfcDirection;
-			if (p.mRefDirection != null)
-				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
-		}
-		public IfcLinearAxis2Placement(IfcDistanceExpression location) : base(location) { }
-		public IfcLinearAxis2Placement(IfcDistanceExpression location, IfcDirection axis, IfcDirection refDirection) : base(location) { Axis = axis; RefDirection = refDirection; }
-	}
-	public partial interface IfcLinearAxisSelect : IBaseClassIfc { } // SELECT(IfcLinearAxisWithInclination, IfcCurve);
-	[Serializable]
-	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem, IfcLinearAxisSelect
+	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
 		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
@@ -383,36 +337,36 @@ namespace GeometryGym.Ifc
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
 		private IfcCurve mPlacementMeasuredAlong = null; //: IfcCurve;
-		private IfcDistanceExpression mDistance = null; //: IfcDistanceExpression;
+		private IfcPointByDistanceExpression mDistance = null; //: IfcDistanceExpression;
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcOrientationExpression mOrientation = null; //: OPTIONAL IfcOrientationExpression;
-		private IfcLinearAxis2Placement mRelativePlacement; //: IfcLinearAxis2Placement;
+		private IfcAxis2PlacementLinear mRelativePlacement; //: IfcLinearAxis2Placement;
 		private IfcAxis2Placement3D mCartesianPosition = null; //: OPTIONAL IfcAxis2Placement3D;
 
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcCurve PlacementMeasuredAlong { get { return mPlacementMeasuredAlong; } set { mPlacementMeasuredAlong = value; } }
-		[Obsolete("DEPRECATED IFC4x3", false)]
-		public IfcDistanceExpression Distance { get { return mDistance; } set { mDistance = value; } }
+		public IfcPointByDistanceExpression Distance { get { return mDistance; } set { mDistance = value; } }
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcOrientationExpression Orientation { get { return mOrientation; } set { mOrientation = value; } }
-		public IfcLinearAxis2Placement RelativePlacement { get { return mRelativePlacement; } set { mRelativePlacement = value; } }
+		public IfcAxis2PlacementLinear RelativePlacement { get { return mRelativePlacement; } set { mRelativePlacement = value; } }
 		public IfcAxis2Placement3D CartesianPosition { get { return mCartesianPosition; } set { mCartesianPosition = value; } }
 
 		public IfcLinearPlacement() : base() { }
 		internal IfcLinearPlacement(DatabaseIfc db, IfcLinearPlacement linearPlacement) : base(db, linearPlacement)
 		{
 			PlacementMeasuredAlong = db.Factory.Duplicate(linearPlacement.PlacementMeasuredAlong) as IfcCurve;
-			Distance = db.Factory.Duplicate(linearPlacement.Distance) as IfcDistanceExpression;
+			Distance = db.Factory.Duplicate(linearPlacement.Distance) as IfcPointByDistanceExpression;
 			if (linearPlacement.Orientation != null)
 				Orientation = db.Factory.Duplicate(linearPlacement.Orientation) as IfcOrientationExpression;
 			if (linearPlacement.mRelativePlacement != null)
-				RelativePlacement = db.Factory.Duplicate(linearPlacement.RelativePlacement) as IfcLinearAxis2Placement;
+				RelativePlacement = db.Factory.Duplicate(linearPlacement.RelativePlacement) as IfcAxis2PlacementLinear;
 			if (linearPlacement.CartesianPosition != null)
 				CartesianPosition = db.Factory.Duplicate(linearPlacement.CartesianPosition) as IfcAxis2Placement3D;
 		}
-		public IfcLinearPlacement(IfcLinearAxis2Placement p) : base(p.Database) { RelativePlacement = p; }
-		public IfcLinearPlacement(IfcObjectPlacement refPlacement, IfcLinearAxis2Placement p) : base(refPlacement) { RelativePlacement = p; }
+		public IfcLinearPlacement(IfcAxis2PlacementLinear p) : base(p.Database) { RelativePlacement = p; }
+		public IfcLinearPlacement(IfcObjectPlacement refPlacement, IfcAxis2PlacementLinear p) : base(refPlacement) { RelativePlacement = p; }
 		[Obsolete("DEPRECATED IFC4x3", false)]
-		public IfcLinearPlacement(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance)
+		public IfcLinearPlacement(IfcCurve placementMeasuredAlong, IfcPointByDistanceExpression distance)
 			: base(placementMeasuredAlong.Database)
 		{
 			PlacementMeasuredAlong = placementMeasuredAlong;
@@ -420,24 +374,20 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcLinearPlacementWithInclination : IfcLinearPlacement
-	{
-		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
-		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
-
-		public IfcLinearPlacementWithInclination() : base() { }
-		internal IfcLinearPlacementWithInclination(DatabaseIfc db, IfcLinearPlacementWithInclination linearPlacement) : base(db, linearPlacement)
-		{
-			Inclinating = db.Factory.Duplicate(linearPlacement.Inclinating) as IfcAxisLateralInclination;
-		}
-		public IfcLinearPlacementWithInclination(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance, IfcAxisLateralInclination inclinating)
-			: base(placementMeasuredAlong, distance) { Inclinating = inclinating; }
-	}
-	[Serializable]
 	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
-		private IfcLinearAxisSelect mAxis;// : IfcCurve;
-		public IfcLinearAxisSelect Axis { get { return mAxis; } set { mAxis = value; } }
+		private IfcCurve mAxis;// : IfcCurve;
+		public IfcCurve Axis
+		{
+			get { return mAxis; }
+			set
+			{
+				mAxis = value;
+				IfcBoundedCurve boundedCurve = value as IfcBoundedCurve;
+				if (boundedCurve != null)
+					boundedCurve.mPositioningElement = this;
+			}
+		}
 
 		protected IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
@@ -455,7 +405,7 @@ namespace GeometryGym.Ifc
 		{
 			Span = linearSpanPlacement.Span;
 		}
-		public IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcDistanceExpression distance, double span)
+		public IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcPointByDistanceExpression distance, double span)
 			: base(placementMeasuredAlong, distance) { Span = span; }
 	}
 	[Serializable]
@@ -468,6 +418,7 @@ namespace GeometryGym.Ifc
 			return "IFCLINEINDEX((" + string.Join(",", this) + "))";
 		}
 	}
+	[Obsolete("DEPRECATED IFC4X3", false)]
 	[Serializable]
 	public partial class IfcLineSegment2D : IfcCurveSegment2D  //IFC4x1
 	{

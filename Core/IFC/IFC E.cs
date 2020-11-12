@@ -950,7 +950,9 @@ namespace GeometryGym.Ifc
 		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
 
 		public IfcEventTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-
+		public IfcEventTriggerTypeEnum EventTriggerType { get { return mEventTriggerType; } set { mEventTriggerType = value; } }
+		public string UserDefinedEventTriggerType { get { return ParserIfc.Decode(mUserDefinedEventTriggerType); } set { mUserDefinedEventTriggerType = ParserIfc.Encode(value); } }
+		
 		internal IfcEvent() : base() { }
 		internal IfcEvent(DatabaseIfc db, IfcEvent e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
 	}

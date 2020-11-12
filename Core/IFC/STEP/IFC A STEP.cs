@@ -233,88 +233,6 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" + "," +
-			ParserSTEP.DoubleOptionalToString(mRailHeadDistance);
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAlignment2DCantSegment));
-			RailHeadDistance = ParserSTEP.StripDouble(str, ref pos, len);
-		}
-	}
-	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartCantRight) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantRight);
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			StartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
-			HorizontalLength = ParserSTEP.StripDouble(str, ref pos, len);
-			StartCantLeft = ParserSTEP.StripDouble(str, ref pos, len);
-			EndCantLeft = ParserSTEP.StripDouble(str, ref pos, len);
-			StartCantRight = ParserSTEP.StripDouble(str, ref pos, len);
-			EndCantRight = ParserSTEP.StripDouble(str, ref pos, len);
-		}
-	}
-	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartRadius) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndRadius) +
-			(mIsStartRadiusCCW ? ",.T." : ",.F.") +
-			(mIsEndRadiusCCW ? ",.T." : ",.F.") +
-			",." + mTransitionCurveType.ToString() + ".";
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			StartRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			EndRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			IsStartRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
-			IsEndRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
-			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-				Enum.TryParse<IfcTransitionCurveType>(s.Replace(".", ""), true, out mTransitionCurveType);
-		}
-	}
-	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartRadius) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndRadius) + "," +
-			(mIsStartRadiusCCW ? ".T." : ".F") + "," +
-			(mIsEndRadiusCCW ? ".T." : ".F") +
-			",." + mTransitionCurveType.ToString() + ".";
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			StartRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			EndRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			IsStartRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
-			IsEndRadiusCCW = ParserSTEP.StripBool(str, ref pos, len);
-			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (s.StartsWith("."))
-				Enum.TryParse<IfcTransitionCurveType>(s.Replace(".", ""), true, out mTransitionCurveType);
-		}
-	}
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		protected override string BuildStringSTEP()
@@ -394,26 +312,24 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mRailHeadDistance);
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mRailHeadDistance) +
+				(mSegments.Count == 0 ? ",$" : ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.Index)) + ")"); ;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			RailHeadDistance = ParserSTEP.StripDouble(str, ref pos, len);
+			mSegments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAlignmentCantSegment));
 		}
 	}
-	public partial class IfcAlignmentCantSegment : IfcAlignmentSegment
+	public partial class IfcAlignmentCantSegment : IfcAlignmentParameterSegment
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartCantRight) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantRight) +
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
+			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleOptionalToString(mStartCantLeft) + "," +
+			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," + ParserSTEP.DoubleOptionalToString(mStartCantRight) + "," +
+			ParserSTEP.DoubleOptionalToString(mEndCantRight) + "," + ParserSTEP.DoubleOptionalToString(mSmoothingLength) + "," +
 			",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -425,6 +341,7 @@ namespace GeometryGym.Ifc
 			EndCantLeft = ParserSTEP.StripDouble(str, ref pos, len);
 			StartCantRight = ParserSTEP.StripDouble(str, ref pos, len);
 			EndCantRight = ParserSTEP.StripDouble(str, ref pos, len);
+			SmoothingLength = ParserSTEP.StripDouble(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
@@ -447,31 +364,32 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartDistAlong);
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) +
+				(mSegments.Count == 0 ? ",$" : ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.Index)) + ")"); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			StartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
+			mSegments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAlignmentHorizontalSegment));
 		}
 	}
-	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentSegment
+	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartRadius) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndRadius) + "," +
-			ParserSTEP.DoubleOptionalToString(mSegmentLength) + "," +
-			ParserSTEP.DoubleOptionalToString(mGravityCenterLineHeight) +
-			",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," +
+			ParserSTEP.DoubleOptionalToString(mStartRadiusOfCurvature) + "," +
+			ParserSTEP.DoubleOptionalToString(mEndRadiusOfCurvature) + "," + ParserSTEP.DoubleOptionalToString(mSegmentLength) + "," +
+			ParserSTEP.DoubleOptionalToString(mGravityCenterLineHeight) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			StartRadius = ParserSTEP.StripDouble(str, ref pos, len);
-			EndRadius = ParserSTEP.StripDouble(str, ref pos, len);
+			mStartPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;
+			mStartDirection = ParserSTEP.StripDouble(str, ref pos, len);
+			StartRadiusOfCurvature = ParserSTEP.StripDouble(str, ref pos, len);
+			EndRadiusOfCurvature = ParserSTEP.StripDouble(str, ref pos, len);
 			SegmentLength = ParserSTEP.StripDouble(str, ref pos, len);
 			GravityCenterLineHeight = ParserSTEP.StripDouble(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
@@ -479,31 +397,52 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentHorizontalSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public abstract partial class IfcAlignmentSegment : IfcLinearElement
+	public abstract partial class IfcAlignmentParameterSegment : BaseClassIfc
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() +
+			return base.BuildStringSTEP(release) +
 			(string.IsNullOrEmpty(mStartTag) ? ",$" : ",'" + ParserIfc.Encode(mStartTag) + "'") +
 			(string.IsNullOrEmpty(mEndTag) ? ",$" : ",'" + ParserIfc.Encode(mEndTag) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			base.parse(str, ref pos, release, len, dictionary);
 			StartTag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			EndTag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
-	public partial class IfcAlignmentVerticalSegment : IfcAlignmentSegment
+	public partial class IfcAlignmentSegment : IfcLinearElement
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + "," +
-			ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartHeight) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartGradient) +
-			",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP() + ",#" + mGeometricParameters.StepId; 
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			GeometricParameters = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAlignmentParameterSegment;
+		}
+	}
+	public partial class IfcAlignmentVertical : IfcLinearElement
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + (mSegments.Count == 0 ? ",$" : ",(#" + string.Join(",#", mSegments.ConvertAll(x => x.Index)) + ")");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mSegments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAlignmentVerticalSegment));
+		}
+	}
+	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
+			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleOptionalToString(mStartHeight) + "," +
+			ParserSTEP.DoubleToString(mStartGradient) + "," + ParserSTEP.DoubleToString(mEndGradient) +
+			"," + ParserSTEP.DoubleOptionalToString(mRadiusOfCurvature) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -512,6 +451,8 @@ namespace GeometryGym.Ifc
 			HorizontalLength = ParserSTEP.StripDouble(str, ref pos, len);
 			StartHeight = ParserSTEP.StripDouble(str, ref pos, len);
 			StartGradient = ParserSTEP.StripDouble(str, ref pos, len);
+			EndGradient = ParserSTEP.StripDouble(str, ref pos, len);
+			RadiusOfCurvature = ParserSTEP.StripDouble(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcAlignmentVerticalSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
@@ -859,6 +800,16 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mAxis) + "," + ParserSTEP.ObjToLinkString(mRefDirection); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+			mRefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+		}
+	}
+	public partial class IfcAxis2PlacementLinear : IfcPlacement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.ObjToLinkString(mAxis) + "," + ParserSTEP.ObjToLinkString(mRefDirection); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;

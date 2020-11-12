@@ -516,18 +516,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
-		internal int mPlacementLocation;// : IfcVirtualGridIntersection ;
-		internal int mPlacementRefDirection;// : OPTIONAL IfcVirtualGridIntersection;
+		internal IfcVirtualGridIntersection mPlacementLocation;// : IfcVirtualGridIntersection ;
+		internal IfcGridPlacementDirectionSelect mPlacementRefDirection;// : OPTIONAL IfcVirtualGridIntersection; IFC4x3 IfcGridPlacementDirectionSelect
 
-		public IfcVirtualGridIntersection PlacementLocation { get { return mDatabase[mPlacementLocation] as IfcVirtualGridIntersection; } set { mPlacementLocation = value.mIndex; } }
-		public IfcVirtualGridIntersection PlacementRefDirection { get { return mDatabase[mPlacementRefDirection] as IfcVirtualGridIntersection; } set { mPlacementRefDirection = (value == null ? 0 : value.mIndex); } }
+		public IfcVirtualGridIntersection PlacementLocation { get { return mPlacementLocation; } set { mPlacementLocation = value; } }
+		public IfcGridPlacementDirectionSelect PlacementRefDirection { get { return mPlacementRefDirection; } set { mPlacementRefDirection = value; } }
 
 		internal IfcGridPlacement() : base() { }
 		internal IfcGridPlacement(DatabaseIfc db, IfcGridPlacement p) : base(db, p)
 		{
 			PlacementLocation = db.Factory.Duplicate(p.PlacementLocation) as IfcVirtualGridIntersection;
-			if (p.mPlacementRefDirection > 0)
-				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcVirtualGridIntersection;
+			if (p.mPlacementRefDirection != null)
+				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcGridPlacementDirectionSelect;
 		}
 	}
 	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);

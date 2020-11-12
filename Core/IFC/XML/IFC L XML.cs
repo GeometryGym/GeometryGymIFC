@@ -132,24 +132,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcLinearPlacementWithInclination : IfcLinearPlacement
-	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.AppendChild(Inclinating.GetXML(xml.OwnerDocument, "Inclinating", this, processed));
-		}
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "Inclinating", true) == 0)
-					Inclinating = mDatabase.ParseXml<IfcAxisLateralInclination>(child as XmlElement);
-			}
-		}
-	}
 	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -159,7 +141,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Axis") == 0)
-					Axis = mDatabase.ParseXml<IfcLinearAxisSelect>(child as XmlElement);
+					Axis = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)

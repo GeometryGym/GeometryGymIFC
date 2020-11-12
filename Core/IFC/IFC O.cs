@@ -679,15 +679,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
 	{
-		private LIST<IfcDistanceExpression> mOffsetValues = new LIST<IfcDistanceExpression>();// : LIST[1:?] OF IfcDistanceExpression;
+		private LIST<IfcPointByDistanceExpression> mOffsetValues = new LIST<IfcPointByDistanceExpression>();// : LIST[1:?] OF IfcDistanceExpression;
 		private string mTag = "";// : OPTIONAL IfcLabel;
 
-		public LIST<IfcDistanceExpression> OffsetValues { get { return mOffsetValues; } set { mOffsetValues = value; } }
+		public LIST<IfcPointByDistanceExpression> OffsetValues { get { return mOffsetValues; } set { mOffsetValues = value; } }
 		public string Tag { get { return mTag; } set { mTag = value; } }
 
 		internal IfcOffsetCurveByDistances() : base() { }
-		internal IfcOffsetCurveByDistances(DatabaseIfc db, IfcOffsetCurveByDistances c, DuplicateOptions options) : base(db, c, options) { OffsetValues.AddRange(c.OffsetValues.Select(x => db.Factory.Duplicate(x) as IfcDistanceExpression)); Tag = c.Tag; }
-		public IfcOffsetCurveByDistances(IfcCurve basis, IEnumerable<IfcDistanceExpression> offsets) : base(basis) { OffsetValues.AddRange(offsets); }
+		internal IfcOffsetCurveByDistances(DatabaseIfc db, IfcOffsetCurveByDistances c, DuplicateOptions options) : base(db, c, options) { OffsetValues.AddRange(c.OffsetValues.Select(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression)); Tag = c.Tag; }
+		public IfcOffsetCurveByDistances(IfcCurve basis, IEnumerable<IfcPointByDistanceExpression> offsets) : base(basis) { OffsetValues.AddRange(offsets); }
 	}
 
 	[Obsolete("DEPRECATED IFC4", false)]

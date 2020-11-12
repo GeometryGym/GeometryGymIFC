@@ -43,7 +43,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
 			XmlElement element = xml.OwnerDocument.CreateElement("CrossSectionPositions", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (IfcDistanceExpression o in CrossSectionPositions)
+			foreach (IfcPointByDistanceExpression o in CrossSectionPositions)
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 			element = xml.OwnerDocument.CreateElement("CrossSections", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcDistanceExpression o = mDatabase.ParseXml<IfcDistanceExpression>(cn as XmlElement);
+						IfcPointByDistanceExpression o = mDatabase.ParseXml<IfcPointByDistanceExpression>(cn as XmlElement);
 						if (o != null)
 							CrossSectionPositions.Add(o);
 					}
@@ -158,7 +158,7 @@ namespace GeometryGym.Ifc
 					}
 				}
 				else if (string.Compare(name, "EndPoint", true) == 0)
-					EndPoint = mDatabase.ParseXml<IfcLinearPlacement>(child as XmlElement);
+					EndPoint = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
 			}
 		}
 	}

@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
-			CrossSectionPositions.AddRange(mDatabase.extractJArray<IfcDistanceExpression>(obj.GetValue("CrossSectionPositions", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			CrossSectionPositions.AddRange(mDatabase.extractJArray<IfcPointByDistanceExpression>(obj.GetValue("CrossSectionPositions", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			CrossSections.AddRange(mDatabase.extractJArray<IfcProfileDef>(obj.GetValue("CrossSections", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			JToken fixedAxisVertical = obj.GetValue("FixedAxisVertical", StringComparison.InvariantCultureIgnoreCase);
 			if (fixedAxisVertical != null)
@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 			Segments.AddRange(mDatabase.extractJArray<IfcCurveSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				EndPoint = mDatabase.ParseJObject<IfcLinearPlacement>(jobj);
+				EndPoint = mDatabase.ParseJObject<IfcPlacement>(jobj);
 		}
 	}
 	public partial class IfcSeriesParameterCurve : IfcCurve

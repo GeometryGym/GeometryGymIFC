@@ -208,10 +208,10 @@ namespace GeometryGym.Ifc
 				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
 			jobj = obj.GetValue("StartDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				StartDistance = mDatabase.ParseJObject<IfcDistanceExpression>(jobj);
+				StartDistance = mDatabase.ParseJObject<IfcPointByDistanceExpression>(jobj);
 			jobj = obj.GetValue("EndDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				EndDistance = mDatabase.ParseJObject<IfcDistanceExpression>(jobj);
+				EndDistance = mDatabase.ParseJObject<IfcPointByDistanceExpression>(jobj);
 		}
 	}
 	public partial class IfcDistributionBoard : IfcFlowController

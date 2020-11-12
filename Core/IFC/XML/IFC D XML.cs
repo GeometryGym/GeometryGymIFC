@@ -225,9 +225,9 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "Directrix", true) == 0)
 					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
 				else if (string.Compare(name, "StartDistance", true) == 0)
-					StartDistance = mDatabase.ParseXml<IfcDistanceExpression>(child as XmlElement);
+					StartDistance = mDatabase.ParseXml<IfcPointByDistanceExpression>(child as XmlElement);
 				else if (string.Compare(name, "EndDistance", true) == 0)
-					EndDistance = mDatabase.ParseXml<IfcDistanceExpression>(child as XmlElement);
+					EndDistance = mDatabase.ParseXml<IfcPointByDistanceExpression>(child as XmlElement);
 			}
 		}
 	}
