@@ -857,6 +857,7 @@ namespace GeometryGym.Ifc
 		public IfcTrimmingPreference MasterRepresentation { get { return mMasterRepresentation; } set { mMasterRepresentation = value; } }
 
 		internal IfcTrimmedCurve() : base() { }
+		internal IfcTrimmedCurve(DatabaseIfc db) : base(db) { }
 		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve;
@@ -1367,8 +1368,8 @@ namespace GeometryGym.Ifc
 					{
 						IfcDistributionPort newPort = new IfcDistributionPort(element) { FlowDirection = port.FlowDirection, PredefinedType = port.PredefinedType, SystemType = port.SystemType };
 						newPort.ObjectPlacement = new IfcLocalPlacement(element.ObjectPlacement, (port.ObjectPlacement as IfcLocalPlacement).RelativePlacement);
-						for (int dcounter = 0; dcounter < port.mIsDefinedBy.Count; dcounter++)
-							port.mIsDefinedBy[dcounter].RelatedObjects.Add(newPort);
+						foreach (IfcRelDefinesByProperties rdp in port.mIsDefinedBy)
+							rdp.RelatedObjects.Add(newPort);
 					}
 				}
 			}

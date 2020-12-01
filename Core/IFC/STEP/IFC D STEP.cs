@@ -221,26 +221,6 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDiscreteAccessoryTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
-	{
-		protected override string BuildStringSTEP(ReleaseVersion release)
-		{
-			return base.BuildStringSTEP(release) + "," + formatLength(mDistanceAlong) +
-				(double.IsNaN(mOffsetLateral) ? ",$" : "," + formatLength(OffsetLateral)) +
-				(double.IsNaN(mOffsetVertical) ? ",$" : "," + formatLength(OffsetVertical)) +
-				(double.IsNaN(mOffsetLongitudinal) ? ",$" : "," + formatLength(mOffsetLongitudinal)) + 
-				ParserSTEP.BoolToString(mAlongHorizontal);
-
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			mDistanceAlong = ParserSTEP.StripDouble(str, ref pos, len);
-			OffsetLateral = ParserSTEP.StripDouble(str, ref pos, len);
-			OffsetVertical = ParserSTEP.StripDouble(str, ref pos, len);
-			OffsetLongitudinal = ParserSTEP.StripDouble(str, ref pos, len);
-			mAlongHorizontal = ParserSTEP.StripBool(str, ref pos, len);
-		}
-	}
 	public partial class IfcDistributionBoard : IfcFlowController
 	{
 		protected override string BuildStringSTEP()

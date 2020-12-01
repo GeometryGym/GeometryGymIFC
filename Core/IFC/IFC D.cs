@@ -340,39 +340,6 @@ namespace GeometryGym.Ifc
 		internal IfcDiscreteAccessoryType(DatabaseIfc db, IfcDiscreteAccessoryType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcDiscreteAccessoryType(DatabaseIfc db, string name, IfcDiscreteAccessoryTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
-	[Obsolete("DEPRECATED IFC4x3", false)]
-	[Serializable]
-	public partial class IfcDistanceExpression : IfcGeometricRepresentationItem
-	{
-		internal double mDistanceAlong;// : IfcLengthMeasure;
-		internal double mOffsetLateral = double.NaN;// : OPTIONAL IfcLengthMeasure;
-		internal double mOffsetVertical = double.NaN;// : OPTIONAL IfcLengthMeasure;
-		internal double mOffsetLongitudinal = double.NaN;// : OPTIONAL IfcLengthMeasure;
-		internal bool mAlongHorizontal = false; // IfcBoolean
-
-		public double DistanceAlong { get { return mDistanceAlong; } set { mDistanceAlong = value; } }
-		public double OffsetLateral { get { return mOffsetLateral; } set { mOffsetLateral = value; } }
-		public double OffsetVertical { get { return mOffsetVertical; } set { mOffsetVertical = value; } }
-		public double OffsetLongitudinal { get { return mOffsetLongitudinal; } set { mOffsetLongitudinal = value; } }
-		public bool AlongHorizontal { get { return mAlongHorizontal; } set { mAlongHorizontal = value; } }
-
-		internal IfcDistanceExpression() : base() { }
-		internal IfcDistanceExpression(DatabaseIfc db, IfcDistanceExpression e, DuplicateOptions options) : base(db, e, options)
-		{
-			DistanceAlong = e.DistanceAlong;
-			OffsetLateral = e.OffsetLateral;
-			OffsetVertical = e.OffsetVertical;
-			OffsetLongitudinal = e.OffsetLongitudinal;
-			AlongHorizontal = e.AlongHorizontal;
-		}
-		public IfcDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = distanceAlong; }
-
-		internal IfcDistanceExpression Duplicate()
-		{
-			return new IfcDistanceExpression()
-			{ DistanceAlong = DistanceAlong, OffsetLateral = OffsetLateral, OffsetVertical = OffsetVertical, OffsetLongitudinal = OffsetLongitudinal, AlongHorizontal = AlongHorizontal  };
-		}
-	}
 	[Serializable]
 	public partial class IfcDistributionBoard : IfcFlowController
 	{

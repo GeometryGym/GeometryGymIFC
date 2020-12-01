@@ -1638,30 +1638,23 @@ namespace GeometryGym.Ifc
 		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinitionSelect; 
 
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
-		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } set { mRelatingPropertyDefinition = value; } }
+		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } set { mRelatingPropertyDefinition = value; if (value != null) value.DefinesOccurrence.Add(this); } }
 
 		public override IfcRoot Relating() { return RelatingPropertyDefinition as IfcRoot; } 
 
 		internal IfcRelDefinesByProperties() : base() { }
-		private IfcRelDefinesByProperties(DatabaseIfc db) 
-			: base(db) 
+		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) 
 		{
-			if (StepId == 415577)
-				Debug.WriteLine("XX");
 			Name = "NameRelDefinesByProperties";
 			Description = "DescriptionRelDefinesByProperties";
 		}
 		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, DuplicateOptions options) : base(db, d, options.OwnerHistory)
 		{
-			if (StepId == 415577)
-				Debug.WriteLine("XX");
 			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition as BaseClassIfc, options) as IfcPropertySetDefinition;
 		}
 		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) 
 			: base(propertySet.Database) 
 		{
-			if (StepId == 415577)
-				Debug.WriteLine("XX");
 			mRelatingPropertyDefinition = propertySet; 
 			propertySet.DefinesOccurrence.Add(this); 
 		}
@@ -1827,7 +1820,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelInterferesElements : IfcRelConnects
 	{
 		internal int mRelatingElement;// : IfcInterferenceSelect;
-		internal int mRelatedElement;// : IfcElement;
+		internal int mRelatedElement;// : IfcInterferenceSelect;
 		internal int mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
 		internal string mInterferenceType = "$";// : OPTIONAL IfcIdentifier;
 		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
@@ -1938,15 +1931,46 @@ namespace GeometryGym.Ifc
 		private IfcPositioningElement mRelatingPositioningElement = null; //: IfcPositioningElement;
 		private SET<IfcProduct> mRelatedProducts = new SET<IfcProduct>(); //: SET[1:?] OF IfcProduct;
 
-		public IfcPositioningElement RelatingPositioningElement { get { return mRelatingPositioningElement; } set { mRelatingPositioningElement = value; } }
+		public IfcPositioningElement RelatingPositioningElement 
+		{
+			get { return mRelatingPositioningElement; } 
+			set { mRelatingPositioningElement = value; if (value != null) value.Positions.Add(this); }
+		}
 		public SET<IfcProduct> RelatedProducts { get { return mRelatedProducts; } set { mRelatedProducts = value; } }
 
 		public IfcRelPositions() : base() { }
-		public IfcRelPositions(DatabaseIfc db, IfcPositioningElement relatingPositioningElement, IEnumerable<IfcProduct> relatedProducts)
-			: base(db)
+		public IfcRelPositions(IfcPositioningElement relatingPositioningElement, IEnumerable<IfcProduct> relatedProducts)
+			: base(relatingPositioningElement.Database)
 		{
 			RelatingPositioningElement = relatingPositioningElement;
 			RelatedProducts.AddRange(relatedProducts);
+		}
+		public IfcRelPositions(IfcPositioningElement relatingPositioningElement, params IfcProduct[] relatedProducts)
+			: base(relatingPositioningElement.Database)
+		{
+			RelatingPositioningElement = relatingPositioningElement;
+			RelatedProducts.AddRange(relatedProducts);
+		}
+
+		protected override void initialize()
+		{
+			base.initialize();
+			mRelatedProducts.CollectionChanged += mRelatedProducts_CollectionChanged;
+		}
+		private void mRelatedProducts_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcProduct product in e.NewItems)
+					product.PositionedRelativeTo = this; ;
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcProduct product in e.OldItems)
+					product.PositionedRelativeTo = null;
+			}
 		}
 	}
 	[Serializable]
@@ -2601,7 +2625,7 @@ namespace GeometryGym.Ifc
 							if (!mDatabase.mDictionary.ContainsKey(value))
 								mDatabase.mDictionary.TryAdd(value, this);
 						}
-						mGlobalId = value;
+						setGlobalId(value);
 					}
 				}
 			}
@@ -2627,12 +2651,12 @@ namespace GeometryGym.Ifc
 		public virtual string Name { get { return mName; } set { mName = value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 
-		protected IfcRoot() : base() { mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid()); }
+		protected IfcRoot() : base() { setGlobalId(ParserIfc.EncodeGuid(Guid.NewGuid())); }
 		protected IfcRoot(IfcRoot root, bool replace) : base(root, replace)
 		{
 			if (replace)
 			{
-				mGlobalId = root.mGlobalId;
+				setGlobalId(root.mGlobalId);
 				mOwnerHistory = root.mOwnerHistory;
 			}
 			else
@@ -2642,7 +2666,7 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcRoot(DatabaseIfc db) : base(db)
 		{
-			mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
+			setGlobalId(ParserIfc.EncodeGuid(Guid.NewGuid()));
 			if (db.Release < ReleaseVersion.IFC4 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
 				OwnerHistory = db.Factory.OwnerHistoryAdded;
 		}

@@ -16,16 +16,11 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using GeometryGym.STEP;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
-using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
@@ -36,7 +31,7 @@ namespace GeometryGym.Ifc
 		public IfcLaborResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcLaborResource() : base() { }
-		internal IfcLaborResource(DatabaseIfc db, IfcLaborResource r, DuplicateOptions options) : base(db,r, options) { mPredefinedType = r.mPredefinedType; }
+		internal IfcLaborResource(DatabaseIfc db, IfcLaborResource r, DuplicateOptions options) : base(db, r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcLaborResource(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -56,7 +51,7 @@ namespace GeometryGym.Ifc
 		internal IfcTaskDurationEnum mDurationType = IfcTaskDurationEnum.NOTDEFINED;//	IfcTaskDurationEnum; 
 		internal IfcLagTime() : base() { }
 		//internal IfcLagTime(IfcLagTime i) : base(i) { mLagValue = i.mLagValue; mDurationType = i.mDurationType; }
-		internal IfcLagTime(DatabaseIfc db,  IfcTimeOrRatioSelect lag, IfcTaskDurationEnum nature) : base(db) { mLagValue = lag; mDurationType = nature; }
+		internal IfcLagTime(DatabaseIfc db, IfcTimeOrRatioSelect lag, IfcTaskDurationEnum nature) : base(db) { mLagValue = lag; mDurationType = nature; }
 		internal TimeSpan getLag() { return new TimeSpan(0, 0, (int)getSecondsDuration()); }
 		internal double getSecondsDuration() { IfcDuration d = mLagValue as IfcDuration; return (d == null ? 0 : d.ToSeconds()); }
 	}
@@ -95,18 +90,18 @@ namespace GeometryGym.Ifc
 		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
 		internal string mDescription = "$";//	 :	OPTIONAL IfcText; //IFC4 Added
 		private SET<IfcLibraryReference> mLibraryReference = new SET<IfcLibraryReference>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
-		//INVERSE
+																							//INVERSE
 		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 		internal SET<IfcLibraryReference> mHasLibraryReferences = new SET<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
 
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } } 
+		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } }
 		public string Version { get { return (mVersion == "$" ? "" : ParserIfc.Decode(mVersion)); } set { mVersion = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcActorSelect Publisher { get { return mDatabase[mPublisher] as IfcActorSelect; } set { mPublisher = (value == null ? 0 : value.Index); } }
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcLibraryInformation() : base() { }
-		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db,i) { mName = i.mName; mVersion = i.mVersion; if(i.mPublisher > 0) Publisher = db.Factory.Duplicate(i.mDatabase[ i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
+		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db, i) { mName = i.mName; mVersion = i.mVersion; if (i.mPublisher > 0) Publisher = db.Factory.Duplicate(i.mDatabase[i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
 		public IfcLibraryInformation(DatabaseIfc db, string name) : base(db) { Name = name; }
 
 		protected override void initialize()
@@ -128,7 +123,7 @@ namespace GeometryGym.Ifc
 			{
 				foreach (IfcLibraryReference libraryReference in e.NewItems)
 				{
-					if(libraryReference.ReferencedLibrary == this)
+					if (libraryReference.ReferencedLibrary == this)
 						libraryReference.ReferencedLibrary = this;
 				}
 			}
@@ -140,7 +135,7 @@ namespace GeometryGym.Ifc
 		internal string mDescription = ""; //IFC4	 :	OPTIONAL IfcText;
 		internal string mLanguage = "$"; //IFC4	 :	OPTIONAL IfcLanguageId;
 		internal IfcLibraryInformation mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
-		//INVERSE
+														   //INVERSE
 		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
 		public string Description { get { return mDescription; } set { mDescription = value; } }
@@ -148,7 +143,7 @@ namespace GeometryGym.Ifc
 		public IfcLibraryInformation ReferencedLibrary { get { return mReferencedLibrary; } set { mReferencedLibrary = value; if (value != null) value.mHasLibraryReferences.Add(this); } }
 
 		internal IfcLibraryReference() : base() { }
-		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db,r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
+		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db, r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
 		public IfcLibraryReference(DatabaseIfc db) : base(db) { }
 		public IfcLibraryReference(IfcLibraryInformation referenced) : base(referenced.mDatabase) { ReferencedLibrary = referenced; }
 	}
@@ -318,7 +313,7 @@ namespace GeometryGym.Ifc
 			Inclinating = inclinating;
 		}
 
-		
+
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -374,7 +369,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		private IfcCurve mAxis;// : IfcCurve;
 		public IfcCurve Axis
@@ -391,7 +386,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
-		protected IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
+		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
 		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}
 	[Serializable]
@@ -401,7 +396,7 @@ namespace GeometryGym.Ifc
 		public double Span { get { return mSpan; } set { mSpan = value; } }
 
 		public IfcLinearSpanPlacement() : base() { }
-		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement): base(db, linearSpanPlacement)
+		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement) : base(db, linearSpanPlacement)
 		{
 			Span = linearSpanPlacement.Span;
 		}
@@ -465,7 +460,7 @@ namespace GeometryGym.Ifc
 		internal IfcLocalPlacement() : base() { }
 		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
 		{
-			if (p.PlacementRelTo  != null)
+			if (p.PlacementRelTo != null)
 				PlacementRelTo = db.Factory.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
 			RelativePlacement = db.Factory.Duplicate(p.mDatabase[p.mRelativePlacement.Index]) as IfcAxis2Placement;
 		}
@@ -475,7 +470,7 @@ namespace GeometryGym.Ifc
 			if (relativeTo != null)
 				PlacementRelTo = relativeTo;
 		}
-		
+
 		internal override bool isXYPlane(double tol)
 		{
 			IfcLocalPlacement placement = PlacementRelTo as IfcLocalPlacement;
@@ -497,7 +492,7 @@ namespace GeometryGym.Ifc
 		public IfcCoordinatedUniversalTimeOffset Zone { get { return mDatabase[mZone] as IfcCoordinatedUniversalTimeOffset; } set { mZone = (value == null ? 0 : value.mIndex); } }
 		public int DaylightSavingOffset { get { return mDaylightSavingOffset; } set { mDaylightSavingOffset = value; } }
 		internal IfcLocalTime() : base() { }
-		internal IfcLocalTime(DatabaseIfc db, IfcLocalTime t) : base(db,t)
+		internal IfcLocalTime(DatabaseIfc db, IfcLocalTime t) : base(db, t)
 		{
 			mHourComponent = t.mHourComponent;
 			mMinuteComponent = t.mMinuteComponent;
@@ -554,7 +549,7 @@ namespace GeometryGym.Ifc
 			mCentreOfGravityInY = p.mCentreOfGravityInY;
 		}
 		public IfcLShapeProfileDef(DatabaseIfc db, string name, double depth, double width, double thickness)
-			: base(db,name)
+			: base(db, name)
 		{
 			mDepth = depth;
 			mWidth = width;

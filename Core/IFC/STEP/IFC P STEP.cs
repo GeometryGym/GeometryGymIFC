@@ -352,21 +352,28 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPointByDistanceExpression : IfcPoint
 	{
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 ? base.StepClassName : "IFCDISTANCEEXPRESSION"); } }
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," +  mDistanceAlong.ToString() +
+			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4X3_RC2 ? formatLength((mDistanceAlong as IfcNonNegativeLengthMeasure).Measure) :  mDistanceAlong.ToString()) +
 				(double.IsNaN(mOffsetLateral) ? ",$" : "," + formatLength(OffsetLateral)) +
 				(double.IsNaN(mOffsetVertical) ? ",$" : "," + formatLength(OffsetVertical)) +
-				(double.IsNaN(mOffsetLongitudinal) ? ",$" : "," + formatLength(mOffsetLongitudinal)) + 
-				",#" + mBasisCurve.StepId;
+				(double.IsNaN(mOffsetLongitudinal) ? ",$" : "," + formatLength(mOffsetLongitudinal)) +
+				(release < ReleaseVersion.IFC4X3_RC2 ? "," + ParserSTEP.BoolToString(mAlongHorizontal) :  ",#" + mBasisCurve.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			DistanceAlong = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
+			if (release < ReleaseVersion.IFC4X3_RC2)
+				DistanceAlong = new IfcNonNegativeLengthMeasure(ParserSTEP.StripDouble(str, ref pos, len));
+			else
+				DistanceAlong = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
 			OffsetLateral = ParserSTEP.StripDouble(str, ref pos, len);
 			OffsetVertical = ParserSTEP.StripDouble(str, ref pos, len);
 			OffsetLongitudinal = ParserSTEP.StripDouble(str, ref pos, len);
-			mBasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+			if(release < ReleaseVersion.IFC4X3_RC2)
+				mAlongHorizontal = ParserSTEP.StripBool(str, ref pos, len);
+			else
+				mBasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 		}
 	}
 	public partial class IfcPointOnCurve : IfcPoint

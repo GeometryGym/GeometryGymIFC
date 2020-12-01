@@ -81,7 +81,7 @@ namespace GeometryGym.Ifc
 		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { Units.AddRange(u.Units.ConvertAll(x => db.Factory.Duplicate(u.mDatabase[x.Index]) as IfcUnit)); }
 		public IfcUnitAssignment(DatabaseIfc db) : base(db) { }
 		public IfcUnitAssignment(DatabaseIfc db, Length length) : base(db) { SetUnits(length); }
-		public IfcUnitAssignment(IfcUnit unit) : base(unit.Database) { Units.Add(unit); }
+		public IfcUnitAssignment(params IfcUnit[] units) : base(units.First().Database) { Units.AddRange(units); }
 		public IfcUnitAssignment(IEnumerable<IfcUnit> units) : base(units.First().Database) { Units.AddRange(units); }
 
 		internal static double scaleSI(Length length)

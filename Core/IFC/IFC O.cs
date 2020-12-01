@@ -37,7 +37,6 @@ namespace GeometryGym.Ifc
 		internal IfcRelDefinesByObject mIsDeclaredBy = null;
 		internal List<IfcRelDefinesByObject> mDeclares = new List<IfcRelDefinesByObject>();
 		internal IfcRelDefinesByType mIsTypedBy = null;
-		internal List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
 
 		public string ObjectType { get { return mObjectType; } set { mObjectType = value; } }
 		public IfcRelDefinesByType IsTypedBy
@@ -60,7 +59,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		public ReadOnlyCollection<IfcRelDefinesByProperties> IsDefinedBy { get { return new ReadOnlyCollection<IfcRelDefinesByProperties>(mIsDefinedBy); } }
+		public SET<IfcRelDefinesByProperties> IsDefinedBy { get { return mIsDefinedBy; } }
 
 		public IfcTypeObject RelatingType() { return (mIsTypedBy == null ? null : mIsTypedBy.RelatingType); }
 		public void setRelatingType(IfcTypeObject typeObject)
@@ -174,15 +173,16 @@ namespace GeometryGym.Ifc
 		[NonSerialized] internal IfcRelNests mNests = null;//	 :	SET [0:1] OF IfcRelNests FOR RelatedObjects;
 		private SET<IfcRelNests> mIsNestedBy = new SET<IfcRelNests>();//	 :	SET OF IfcRelNests FOR RelatingObject;
 		internal IfcRelDeclares mHasContext = null;// :	SET [0:1] OF IfcRelDeclares FOR RelatedDefinitions; 
-		internal List<IfcRelAggregates> mIsDecomposedBy = new List<IfcRelAggregates>();//	 : 	SET OF IfcRelDecomposes FOR RelatingObject;
+		internal SET<IfcRelAggregates> mIsDecomposedBy = new SET<IfcRelAggregates>();//	 : 	SET OF IfcRelDecomposes FOR RelatingObject;
 		[NonSerialized] internal IfcRelAggregates mDecomposes = null;//	 : 	SET [0:1] OF IfcRelDecomposes FOR RelatedObjects; IFC4  IfcRelAggregates
 		internal SET<IfcRelAssociates> mHasAssociations = new SET<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
+		internal SET<IfcRelDefinesByProperties> mIsDefinedBy = new SET<IfcRelDefinesByProperties>();
 
 		public SET<IfcRelAssigns> HasAssignments { get { return mHasAssignments; } set { mHasAssignments.Clear(); if (value != null) { mHasAssignments.CollectionChanged -= mHasAssignments_CollectionChanged; mHasAssignments = value; mHasAssignments.CollectionChanged += mHasAssignments_CollectionChanged; } } }
 		public IfcRelNests Nests { get { return mNests; } set { if (mNests != null) mNests.mRelatedObjects.Remove(this); mNests = value; if (value != null && !value.mRelatedObjects.Contains(this)) value.mRelatedObjects.Add(this); } }
 		public SET<IfcRelNests> IsNestedBy { get { return mIsNestedBy; } set { mIsNestedBy.Clear(); if (value != null) { mIsNestedBy.CollectionChanged -= mIsNestedBy_CollectionChanged; mIsNestedBy = value; mIsNestedBy.CollectionChanged += mIsNestedBy_CollectionChanged; } } }
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
-		public ReadOnlyCollection<IfcRelAggregates> IsDecomposedBy { get { return new ReadOnlyCollection<IfcRelAggregates>(mIsDecomposedBy); } }
+		public SET<IfcRelAggregates> IsDecomposedBy { get { return mIsDecomposedBy; } }
 		public IfcRelAggregates Decomposes
 		{
 			get { return mDecomposes; } 
@@ -329,7 +329,7 @@ namespace GeometryGym.Ifc
 				new IfcRelAggregates(this, o);
 			}
 			else
-				mIsDecomposedBy[0].RelatedObjects.Add(o);
+				mIsDecomposedBy.First().RelatedObjects.Add(o);
 		}
 		
 		

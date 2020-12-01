@@ -268,11 +268,18 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcMaterialProfileSetUsage : IfcMaterialUsageDefinition //IFC4
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 || AssociatedTo.SelectMany(x => x.mRelatedObjects).Count() == 0 ? "" : base.BuildStringSTEP(release) + ",#" + mForProfileSet.Index + "," + (mCardinalPoint == IfcCardinalPointReference.DEFAULT ? "$" : ((int)mCardinalPoint).ToString()) + "," + ParserSTEP.DoubleOptionalToString(mReferenceExtent)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			if (release < ReleaseVersion.IFC4 || AssociatedTo.SelectMany(x => x.mRelatedObjects).Count() == 0)
+				return "";
+			return base.BuildStringSTEP(release) + ",#" + mForProfileSet.Index + "," + (mCardinalPoint == IfcCardinalPointReference.DEFAULT ? "$" : ((int)mCardinalPoint).ToString()) + "," + ParserSTEP.DoubleOptionalToString(mReferenceExtent);
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			ForProfileSet = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterialProfileSet;
-			CardinalPoint = (IfcCardinalPointReference)ParserSTEP.StripInt(str, ref pos, len);
+			int i = ParserSTEP.StripInt(str, ref pos, len);
+			if(i > 0)
+				CardinalPoint = (IfcCardinalPointReference)i;
 			ReferenceExtent = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}

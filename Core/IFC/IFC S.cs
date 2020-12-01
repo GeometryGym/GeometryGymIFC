@@ -573,15 +573,17 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcShellBasedSurfaceModel : IfcGeometricRepresentationItem
 	{
-		internal List<int> mSbsmBoundary = new List<int>();// : SET [1:?] OF IfcShell; 
-		public ReadOnlyCollection<IfcShell> SbsmBoundary { get { return new ReadOnlyCollection<IfcShell>( mSbsmBoundary.ConvertAll(x => mDatabase[x] as IfcShell)); } }
+		internal SET<IfcShell> mSbsmBoundary = new SET<IfcShell>();// : SET [1:?] OF IfcShell; 
+		public SET<IfcShell> SbsmBoundary { get { return mSbsmBoundary; } }
 
 		internal IfcShellBasedSurfaceModel() : base() { }
-		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m, DuplicateOptions options) : base(db,m, options) { m.mSbsmBoundary.ForEach(x=> addBoundary( db.Factory.Duplicate(m.mDatabase[x], options) as IfcShell)); }
-		public IfcShellBasedSurfaceModel(IfcShell shell) : base(shell.Database) { mSbsmBoundary.Add(shell.Index); }
-		public IfcShellBasedSurfaceModel(List<IfcShell> shells) : base(shells[0].Database) { mSbsmBoundary = shells.ConvertAll(x => x.Index); }
+		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m, DuplicateOptions options) : base(db,m, options)
+		{
+			mSbsmBoundary.AddRange(m.mSbsmBoundary.Select(x => db.Factory.Duplicate(x) as IfcShell));
+		}
+		public IfcShellBasedSurfaceModel(IfcShell shell) : base(shell.Database) { mSbsmBoundary.Add(shell); }
+		public IfcShellBasedSurfaceModel(List<IfcShell> shells) : base(shells[0].Database) { mSbsmBoundary.AddRange(shells); }
 		
-		internal void addBoundary(IfcShell boundary) { mSbsmBoundary.Add(boundary.Index); }
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);

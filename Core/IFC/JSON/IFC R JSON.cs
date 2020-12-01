@@ -672,7 +672,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			if(options.Style == SetJsonOptions.JsonStyle.Repository && string.IsNullOrEmpty(mGlobalId))
-				mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
+				setGlobalId(ParserIfc.EncodeGuid(Guid.NewGuid()));
 			string contextIdentifier = ContextIdentifier;
 			if (!string.IsNullOrEmpty(contextIdentifier))
 				obj["ContextIdentifier"] = contextIdentifier;

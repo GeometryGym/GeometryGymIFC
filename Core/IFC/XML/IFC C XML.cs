@@ -1152,7 +1152,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(StartPlacement.GetXML(xml.OwnerDocument, "StartPlacement", this, processed));
-			//	xml.AppendChild(SegmentLength.GetXML(xml.OwnerDocument, "SegmentLength", this, processed));
+			//xml.AppendChild(SegmentLength.GetXML(xml.OwnerDocument, "SegmentLength", this, processed));
 			xml.AppendChild(ParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
 		}
 		internal override void ParseXml(XmlElement xml)
@@ -1163,6 +1163,8 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "StartPlacement", true) == 0)
 					StartPlacement = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
+				else if (string.Compare(name, "SegmentStart", true) == 0)
+					SegmentStart = mDatabase.ParseXml<IfcCurveMeasureSelect>(child as XmlElement);
 				else if (string.Compare(name, "SegmentLength", true) == 0)
 					SegmentLength = mDatabase.ParseXml<IfcCurveMeasureSelect>(child as XmlElement);
 				else if (string.Compare(name, "ParentCurve", true) == 0)

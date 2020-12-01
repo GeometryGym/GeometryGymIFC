@@ -132,7 +132,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

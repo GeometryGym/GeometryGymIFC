@@ -275,12 +275,12 @@ namespace GeometryGym.Ifc
 			else
 #endif
 				sw = new StreamWriter(FileName);
-
+			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, FileName);
 #if (!NOIFCZIP)
 			if (zip)
 				za.Dispose();
 #endif
-			return new SerializationIfcSTEP(this).WriteSTEP(sw, FileName);
+			return result;
 		}
 		public string ToString(FormatIfcSerialization format)
 		{
@@ -1022,6 +1022,7 @@ namespace GeometryGym.Ifc
 		public IfcSIUnit SIVolume { get { if(mSIVolume == null) mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE); return mSIVolume; } }
 
 		internal IfcDirection mXAxis, mYAxis, mZAxis, mNegXAxis, mNegYAxis, mNegZAxis;
+		internal IfcLine mLineX2d = null;
 
 		public IfcDirection Direction(double x, double y, double z)
 		{
@@ -1050,6 +1051,8 @@ namespace GeometryGym.Ifc
 		public IfcDirection XAxisNegative { get { if (mNegXAxis == null) mNegXAxis = new IfcDirection(mDatabase, -1, 0, 0); return mNegXAxis; } }
 		public IfcDirection YAxisNegative { get { if (mNegYAxis == null) mNegYAxis = new IfcDirection(mDatabase, 0, -1, 0); return mNegYAxis; } }
 		public IfcDirection ZAxisNegative { get { if (mNegZAxis == null) mNegZAxis = new IfcDirection(mDatabase, 0, 0, -1); return mNegZAxis; } }
+
+		public IfcLine LineX2d { get { if (mLineX2d == null) mLineX2d = new IfcLine(Origin2d, new IfcVector(new IfcDirection(mDatabase, 1, 0), 1));  return mLineX2d; } }
 
 		partial void getApplicationFullName(ref string app);
 		partial void getApplicationIdentifier(ref string app);
@@ -1696,7 +1699,7 @@ namespace GeometryGym.Ifc
 				ReadFile(new FileStreamIfc(FormatIfcSerialization.XML, sr));
 				return mDatabase.Context;
 			}
-			new SerializationIfcSTEP(mDatabase).ReadStepStrem(sr);
+			new SerializationIfcSTEP(mDatabase).ReadStepStream(sr);
 			return mDatabase.Context;
 
 		}
@@ -1781,12 +1784,12 @@ namespace GeometryGym.Ifc
 			}
 			catch (OperationCanceledException)
 			{
-				importLines(File.ReadAllLines(stepFilePath));
+				new SerializationIfcSTEP(mDatabase).importLines(File.ReadAllLines(stepFilePath));
 				return;
 			}
 			processObjects();
 		}
-		public void ReadStepStrem(TextReader stream)
+		public void ReadStepStream(TextReader stream)
 		{
 			initializeImport();
 			string line = "";
@@ -1794,6 +1797,15 @@ namespace GeometryGym.Ifc
 			while ((line = stream.ReadLine()) != null)
 			{
 				string str = line.Trim();
+				char c = str.Last();
+				while(c != ';')
+				{
+					line = stream.ReadLine();
+					if (string.IsNullOrEmpty(line))
+						break;
+					str += line.Trim();
+					c = str.Last();
+				}
 				if (line.ToUpper().StartsWith("DATA"))
 					break;
 				processFileHeaderLine(str);
@@ -1804,6 +1816,15 @@ namespace GeometryGym.Ifc
 			while ((line = stream.ReadLine()) != null)
 			{
 				string str = line.Trim();
+				char c = str.Last();
+				while (c != ';')
+				{
+					line = stream.ReadLine();
+					if (string.IsNullOrEmpty(line))
+						break;
+					str += line.Trim();
+					c = str.Last();
+				}
 				if (line.ToUpper().StartsWith("ENDSEC"))
 					break;
 				lines.Add(line);

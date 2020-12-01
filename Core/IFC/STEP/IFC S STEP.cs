@@ -293,12 +293,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mSbsmBoundary[0]);
-			for (int icounter = 1; icounter < mSbsmBoundary.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mSbsmBoundary[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mSbsmBoundary.Select(x=>"#" + x.StepId)) + ")";
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mSbsmBoundary = ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		{ 
+			SbsmBoundary.AddRange( ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).Select(x=>dictionary[x] as IfcShell));
+		}
 	}
 	public partial class IfcSign : IfcElementComponent
 	{

@@ -200,7 +200,7 @@ namespace GeometryGym.Ifc
 								{
 									string id = token.Value<string>();
 									if(!(result is IfcRoot))
-										result.mGlobalId = id;
+										result.setGlobalId(id);
 									mDictionary.TryAdd(id, result);
 								}
 

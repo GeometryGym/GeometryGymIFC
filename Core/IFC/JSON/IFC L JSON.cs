@@ -97,7 +97,7 @@ namespace GeometryGym.Ifc
 				Inclinating = mDatabase.ParseJObject<IfcAxisLateralInclination>(jobj);
 		}
 	}
-	public abstract partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		internal override void parseJObject(JObject obj)
 		{

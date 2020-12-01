@@ -92,4 +92,37 @@ namespace GeometryGym.Ifc
 			obj["FillStyles"] = new JArray(mFillStyles.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
+	public partial class IfcFurniture
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcFurnitureTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcFurnitureTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
+	public partial class IfcFurnitureType 
+	{
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcFurnitureTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcFurnitureTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
+
 }

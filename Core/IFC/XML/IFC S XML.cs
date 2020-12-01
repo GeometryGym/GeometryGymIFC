@@ -236,7 +236,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcShell s = mDatabase.ParseXml<IfcShell>(cn as XmlElement);
 						if (s != null)
-							addBoundary(s);
+							mSbsmBoundary.Add(s);
 					}
 				}
 			}
@@ -246,8 +246,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("SbsmBoundary", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (int i in mSbsmBoundary)
-				element.AppendChild(mDatabase[i].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (IfcShell shell in mSbsmBoundary)
+				element.AppendChild((shell as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcSign : IfcElementComponent

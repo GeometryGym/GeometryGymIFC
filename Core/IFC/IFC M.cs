@@ -572,7 +572,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcMaterialProfileSet(string name, List<IfcMaterialProfile> profiles) : base(profiles[0].mDatabase)
 		{
-			List<IfcProfileDef> defs = new List<IfcProfileDef>(profiles.Count);
 			for (int icounter = 0; icounter < profiles.Count; icounter++)
 			{
 				IfcMaterialProfile mp = profiles[icounter];
@@ -581,11 +580,7 @@ namespace GeometryGym.Ifc
 				else
 					throw new Exception("Material Profile can be assigned to only a single profile set");
 				mMaterialProfiles.Add(mp);
-				if (mp.mProfile != null)
-					defs.Add(mp.mProfile);
 			}
-			if (defs.Count > 0)
-				CompositeProfile = new IfcCompositeProfileDef(name, defs);
 		}
 	}
 	[Serializable]

@@ -37,8 +37,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			ObjectType = extractString(obj.GetValue("ObjectType", StringComparison.InvariantCultureIgnoreCase));
-			foreach (IfcRelDefinesByProperties rdp in mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				rdp.RelatedObjects.Add(this);
+			
 			JObject jobj = obj.GetValue("IsTypedBy", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				IsTypedBy = mDatabase.ParseJObject<IfcRelDefinesByType>(jobj);
@@ -48,16 +47,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "ObjectType", ObjectType);
 			if (mIsTypedBy != null)
-			{
 				obj["IsTypedBy"] = mIsTypedBy.getJson(this, options);
-			}
-			if (mIsDefinedBy.Count > 0 && options.Style != SetJsonOptions.JsonStyle.Repository)
-			{
-				JArray array = new JArray();
-				foreach (IfcRelDefinesByProperties rdp in mIsDefinedBy)
-					array.Add(rdp.getJson(this, options));
-				obj["IsDefinedBy"] = array;
-			}
 		}
 		//internal string mObjectType = "$"; //: OPTIONAL IfcLabel;
 		//								   //INVERSE
@@ -79,6 +69,9 @@ namespace GeometryGym.Ifc
 				ra.RelatingObject = this;
 			foreach (IfcRelAssociates ra in mDatabase.extractJArray<IfcRelAssociates>(obj.GetValue("HasAssociations", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				ra.RelatedObjects.Add(this);
+
+			foreach (IfcRelDefinesByProperties rdp in mDatabase.extractJArray<IfcRelDefinesByProperties>(obj.GetValue("IsDefinedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
+				rdp.RelatedObjects.Add(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -123,6 +116,14 @@ namespace GeometryGym.Ifc
 				foreach (IfcRelAssociates agg in HasAssociations)
 					array.Add(agg.getJson(this, options));
 				obj["HasAssociations"] = array;
+			}
+
+			if (mIsDefinedBy.Count > 0 && options.Style != SetJsonOptions.JsonStyle.Repository)
+			{
+				JArray array = new JArray();
+				foreach (IfcRelDefinesByProperties rdp in mIsDefinedBy)
+					array.Add(rdp.getJson(this, options));
+				obj["IsDefinedBy"] = array;
 			}
 		}
 	}

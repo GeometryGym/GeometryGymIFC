@@ -41,15 +41,7 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "IsTypedBy") == 0)
 					mIsTypedBy = mDatabase.ParseXml<IfcRelDefinesByType>(child as XmlElement);
-				if (string.Compare(name, "IsDefinedBy") == 0)
-				{
-					foreach (XmlNode node in child.ChildNodes)
-					{
-						IfcRelDefinesByProperties rd = mDatabase.ParseXml<IfcRelDefinesByProperties>(node as XmlElement);
-						if (rd != null)
-							rd.RelatedObjects.Add(this);
-					}
-				}
+				
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
@@ -58,13 +50,6 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "ObjectType", ObjectType);
 			if (mIsTypedBy != null)
 				xml.AppendChild(mIsTypedBy.GetXML(xml.OwnerDocument, "IsTypedBy", this, processed));
-			if (mIsDefinedBy.Count > 0)
-			{
-				XmlElement element = xml.OwnerDocument.CreateElement("IsDefinedBy", mDatabase.mXmlNamespace);
-				xml.AppendChild(element);
-				foreach (IfcRelDefinesByProperties rd in IsDefinedBy)
-					element.AppendChild(rd.GetXML(xml.OwnerDocument, "", this, processed));
-			}
 		}
 	}
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
@@ -111,6 +96,15 @@ namespace GeometryGym.Ifc
 							ra.RelatedObjects.Add(this);
 					}
 				}
+				else if (string.Compare(name, "IsDefinedBy") == 0)
+				{
+					foreach (XmlNode node in child.ChildNodes)
+					{
+						IfcRelDefinesByProperties rd = mDatabase.ParseXml<IfcRelDefinesByProperties>(node as XmlElement);
+						if (rd != null)
+							rd.RelatedObjects.Add(this);
+					}
+				}
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
@@ -140,6 +134,13 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 				foreach (IfcRelAggregates rags in IsDecomposedBy)
 					element.AppendChild(rags.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+			if (mIsDefinedBy.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("IsDefinedBy", mDatabase.mXmlNamespace);
+				xml.AppendChild(element);
+				foreach (IfcRelDefinesByProperties rd in mIsDefinedBy)
+					element.AppendChild(rd.GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			//if (mHasAssociations.Count > 0)
 			//{

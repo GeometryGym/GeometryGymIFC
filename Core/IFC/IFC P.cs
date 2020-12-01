@@ -557,10 +557,11 @@ namespace GeometryGym.Ifc
 			OffsetLongitudinal = e.OffsetLongitudinal;
 			BasisCurve = e.BasisCurve;
 		}
-		[Obsolete("DEPRECATED IFC4x3", false)]
-		public IfcPointByDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
 		public IfcPointByDistanceExpression(IfcCurveMeasureSelect distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = distanceAlong; BasisCurve = basisCurve; }
 		public IfcPointByDistanceExpression(double nonNegativeLength, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(nonNegativeLength); BasisCurve = basisCurve; }
+		[Obsolete("DEPRECATED IFC4x3", false)]
+		public IfcPointByDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
+
 
 		internal IfcPointByDistanceExpression Duplicate()
 		{
@@ -756,7 +757,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
 	{   // ABSTRACT SUPERTYPE OF(ONEOF(IfcGrid, IfcLinearPositioningElement, IfcReferent))
+		//INVERSE
+		private SET<IfcRelPositions> mPositions = new SET<IfcRelPositions>();//: SET[0:?] OF IfcRelPositions FOR RelatingPositioningElement; 
 		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
+		public SET<IfcRelPositions> Positions { get { return mPositions; } } 
+
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
 		protected IfcPositioningElement(IfcSpatialStructureElement host) : base(host.Database) { host.AddElement(this); }
@@ -1069,10 +1074,8 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();// :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
-		//[NonSerialized] private IfcRelPositions mPositionedRelativeTo = null; // : SET [0:1] OF IfcRelPositions FOR RelatedProducts;
-		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
-
-
+		[NonSerialized] internal IfcRelPositions mPositionedRelativeTo = null; // : SET [0:1] OF IfcRelPositions FOR RelatedProducts;
+		[NonSerialized] internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 
 		public IfcObjectPlacement ObjectPlacement
 		{
@@ -1128,7 +1131,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public SET<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
-		//public IfcRelPositions PositionedRelativeTo { get { return mPositionedRelativeTo; } set { mPositionedRelativeTo = value; } }
+		public IfcRelPositions PositionedRelativeTo { get { return mPositionedRelativeTo; } set { mPositionedRelativeTo = value; } }
 		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
@@ -1224,7 +1227,7 @@ namespace GeometryGym.Ifc
 		protected virtual void addProduct(IfcProduct product)
 		{
 			if (mIsDecomposedBy.Count > 0)
-				mIsDecomposedBy[0].RelatedObjects.Add(product);
+				mIsDecomposedBy.First().RelatedObjects.Add(product);
 			else
 			{
 				new IfcRelAggregates(this, product);

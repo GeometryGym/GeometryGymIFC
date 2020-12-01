@@ -356,7 +356,7 @@ namespace GeometryGym.Ifc
 			if (placement != null)
 			{
 				if (string.IsNullOrEmpty(placement.mGlobalId))
-					placement.mGlobalId = ParserIfc.EncodeGuid(Guid.NewGuid());
+					placement.setGlobalId(ParserIfc.EncodeGuid(Guid.NewGuid()));
 				placementObj = placement.getJson(this, options);
 			}
 			base.setJSON(obj, host, options);
