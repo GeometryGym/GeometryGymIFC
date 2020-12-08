@@ -194,6 +194,17 @@ namespace GeometryGym.Ifc
 			}
 			internal set { mModelSIScale = value; }
 		}
+		internal double ScaleAngle()
+		{
+			if (mContext == null)
+			{
+				if (!Factory.Options.AngleUnitsInRadians)
+					return Math.PI / 180;
+			}
+			else if (mContext.UnitsInContext != null)
+				return mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
+			return 1;
+		}
 		private double mModelTolerance = 0.0001, mModelSIScale = double.NaN, mModelToleranceAngleRadians = Math.PI / 1800;
 		internal int mLengthDigits = 5;
 		public IfcContext Context { get { return mContext; } }

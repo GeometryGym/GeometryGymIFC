@@ -179,7 +179,6 @@ namespace GeometryGym.Ifc
 			obj["Segments"] = new JArray(Segments.Select(x => x.getJson(this, options)));
 			if (EndPoint != null)
 				obj["EndPoint"] = EndPoint.getJson(this, options);
-			obj["Height"] = mHeight.ToString();
 		}
 		internal override void parseJObject(JObject obj)
 		{
@@ -191,9 +190,6 @@ namespace GeometryGym.Ifc
 			jobj = obj.GetValue("EndPoint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				EndPoint = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
-			JToken height = obj.GetValue("Height", StringComparison.InvariantCultureIgnoreCase);
-			if (height != null)
-				mHeight = height.Value<double>();
 		}
 	}
 	public partial class IfcGrid : IfcPositioningElement

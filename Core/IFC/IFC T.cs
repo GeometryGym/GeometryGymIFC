@@ -356,7 +356,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcTessellatedFaceSet() : base() { }
 		protected IfcTessellatedFaceSet(DatabaseIfc db, IfcTessellatedFaceSet s, DuplicateOptions options) : base(db, s, options) { Coordinates = db.Factory.Duplicate(s.Coordinates) as IfcCartesianPointList; }
-		protected IfcTessellatedFaceSet(IfcCartesianPointList3D pl) : base(pl.mDatabase) { Coordinates = pl; }
+		protected IfcTessellatedFaceSet(IfcCartesianPointList pl) : base(pl.mDatabase) { Coordinates = pl; }
 	}
 	[Serializable]
 	public abstract partial class IfcTessellatedItem : IfcGeometricRepresentationItem //IFC4

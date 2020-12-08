@@ -570,7 +570,7 @@ namespace GeometryGym.Ifc
 		public override Type ValueType { get { return typeof(DateTime); } }
 		public IfcDate(DateTime date) { mDate = date; }
 		public override string ToString() { return "IFCDATE(" + (mDate == DateTime.MinValue ? "$)" : "'" + FormatSTEP(mDate) + "')"); }
-		internal static string FormatSTEP(DateTime date) { return date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day; }
+		public static string FormatSTEP(DateTime date) { return date.Year + (date.Month < 10 ? "-0" : "-") + date.Month + (date.Day < 10 ? "-0" : "-") + date.Day; }
 		internal static string STEPAttribute(DateTime dateTime) { return dateTime == DateTime.MinValue ? "$" : "'" + FormatSTEP(dateTime) + "'"; }
 		internal static DateTime ParseSTEP(string date)
 		{

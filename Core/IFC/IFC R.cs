@@ -1990,10 +1990,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelReferencedInSpatialStructure : IfcRelConnects
 	{
 		internal SET<IfcSpatialReferenceSelect> mRelatedElements = new SET<IfcSpatialReferenceSelect>();// : SET [1:?] OF IfcProduct IFC4x3 IfcSpatialReferenceSelect;
-		private int mRelatingStructure;//  IfcSpatialElement 
+		private IfcSpatialElement mRelatingStructure;//  IfcSpatialElement 
 
 		public SET<IfcSpatialReferenceSelect> RelatedElements { get { return mRelatedElements; } }
-		public IfcSpatialElement RelatingStructure { get { return mDatabase[mRelatingStructure] as IfcSpatialElement; } set { mRelatingStructure = value.mIndex; value.mReferencesElements.Add(this); } }
+		public IfcSpatialElement RelatingStructure { get { return mRelatingStructure; } set { mRelatingStructure = value; value.mReferencesElements.Add(this); } }
 
 		internal IfcRelReferencedInSpatialStructure() : base() { }
 		internal IfcRelReferencedInSpatialStructure(DatabaseIfc db, IfcRelReferencedInSpatialStructure r, DuplicateOptions options) : base(db, r, options.OwnerHistory)
@@ -2004,7 +2004,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRelReferencedInSpatialStructure(IfcSpatialElement e) : base(e.mDatabase)
 		{
-			mRelatingStructure = e.mIndex;
+			RelatingStructure = e;
 			e.mReferencesElements.Add(this);
 		}
 		public IfcRelReferencedInSpatialStructure(IfcSpatialReferenceSelect related, IfcSpatialElement relating) : this(relating)

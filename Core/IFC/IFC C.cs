@@ -2082,21 +2082,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCurveSegment : IfcSegment
 	{
-		private IfcPlacement mStartPlacement = null; //: IfcPlacement;
+		private IfcPlacement mPlacement = null; //: IfcPlacement;
 		private IfcCurveMeasureSelect mSegmentStart = null; //: IfcCurveMeasureSelect;
 		private IfcCurveMeasureSelect mSegmentLength = null; //: IfcCurveMeasureSelect;
 		private IfcCurve mParentCurve = null; //: IfcCurve;
 
-		public IfcPlacement StartPlacement { get { return mStartPlacement; } set { mStartPlacement = value; } }
+		public IfcPlacement Placement { get { return mPlacement; } set { mPlacement = value; } }
 		public IfcCurveMeasureSelect SegmentStart { get { return mSegmentStart; } set { mSegmentStart = value; } }
 		public IfcCurveMeasureSelect SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
 		public IfcCurve ParentCurve { get { return mParentCurve; } set { mParentCurve = value; } }
 
 		public IfcCurveSegment() : base() { }
-		public IfcCurveSegment(IfcTransitionCode transition, IfcPlacement startPlacement, IfcCurveMeasureSelect segmentStart, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
-			: base(startPlacement.Database, transition)
+		public IfcCurveSegment(IfcTransitionCode transition, IfcPlacement placement, IfcCurveMeasureSelect segmentStart, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
+			: base(placement.Database, transition)
 		{
-			StartPlacement = startPlacement;
+			Placement = placement;
 			SegmentStart = segmentStart;
 			SegmentLength = segmentLength;
 			ParentCurve = parentCurve;

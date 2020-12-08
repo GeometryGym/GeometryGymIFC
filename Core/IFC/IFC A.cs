@@ -257,9 +257,26 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcSite host) : base(host) { }
 		public IfcAlignment(IfcFacility host) : base(host) { }
 		public IfcAlignment(IfcFacilityPart host) : base(host) { }
+		protected IfcAlignment(IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcSpatialStructureElement host, IfcCurve axis)
+			:base(host, axis)
+		{
+			if (horizontal != null)
+				AddAggregated(horizontal);
+			if (vertical != null)
+				AddAggregated(vertical);
+			if (cant != null)
+				AddAggregated(cant);
+		}
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcFacility host, IfcCurve axis) : base(host, axis) { }
-		public IfcAlignment(IfcFacilityPart host, IfcCurve axis) : base(host, axis) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcSite host, IfcCurve axis) : base(host, axis) { }
+		public IfcAlignment(IfcFacility host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis) 
+			: this(placement, horizontal, vertical, cant, host, axis) { }
+		public IfcAlignment(IfcFacilityPart host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis) 
+			: this(placement, horizontal, vertical, cant, host, axis) { }
+		public IfcAlignment(IfcSite host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis)
+			: this(placement, horizontal, vertical, cant, host, axis) { }
 	}
 	[Obsolete("DEPRECATED IFC4X3", false)]
 	[Serializable]
@@ -450,10 +467,14 @@ namespace GeometryGym.Ifc
 		public LIST<IfcAlignmentCantSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 
 		public IfcAlignmentCant() : base() { }
-		public IfcAlignmentCant(DatabaseIfc db, double railHeadDistance, IEnumerable<IfcAlignmentCantSegment> segments) : base(db)
+		public IfcAlignmentCant(IfcObjectPlacement placement, double railHeadDistance, IEnumerable<IfcAlignmentCantSegment> segments, IfcGradientCurve verticalCurve, double horizontalStartDistAlong, out IfcSegmentedReferenceCurve segmentedCurve) 
+			: base(placement.Database)
 		{
 			RailHeadDistance = railHeadDistance;
 			Segments.AddRange(segments);
+			List<IfcCurveSegment> curveSegments = Segments.ConvertAll(x => x.generateCurveSegment(horizontalStartDistAlong, railHeadDistance));
+			segmentedCurve = new IfcSegmentedReferenceCurve(verticalCurve, curveSegments);
+			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), segmentedCurve, ShapeRepresentationType.Curve3D));
 		}
 
 		protected override void initialize()
@@ -486,7 +507,7 @@ namespace GeometryGym.Ifc
 		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		private double mStartCantRight = 0; //: IfcLengthMeasure;
 		private double mEndCantRight = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private double mSmoothingLength = 0;//: OPTIONAL IfcPositiveLengthMeasure;
+		private double mSmoothingLength = double.NaN;//: OPTIONAL IfcPositiveLengthMeasure;
 		private IfcAlignmentCantSegmentTypeEnum mPredefinedType; //: IfcAlignmentCantSegmentTypeEnum;
 		//INVERSE
 		private IfcAlignmentCant mToCant = null;
@@ -511,6 +532,35 @@ namespace GeometryGym.Ifc
 			StartCantLeft = startCantLeft;
 			StartCantRight = startCantRight;
 			PredefinedType = predefinedType;
+		}
+
+		public IfcCurveSegment generateCurveSegment(double horizontalStartDistAlong, double railHeadDistance)
+		{
+			if(PredefinedType != IfcAlignmentCantSegmentTypeEnum.LINEARTRANSITION || PredefinedType != IfcAlignmentCantSegmentTypeEnum.CONSTANTCANT)
+				throw new NotImplementedException("XX Not Implemented cant segment " + PredefinedType.ToString());
+			DatabaseIfc db = mDatabase;
+			double tol = db.Tolerance;
+			double yOffset = (StartCantLeft + StartCantRight) / 2;
+			double dz = StartCantRight - StartCantLeft;
+			double theta = Math.Asin(dz / railHeadDistance);
+			double segmentLength = HorizontalLength;
+			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong - horizontalStartDistAlong, yOffset);
+			IfcAxis2Placement3D segmentPlacement = new IfcAxis2Placement3D(startPoint);
+
+			segmentPlacement.Axis = (Math.Abs(dz) > tol ? new IfcDirection(db, 0, -Math.Sin(theta), -Math.Cos(theta)) : db.Factory.ZAxisNegative);
+			if (!double.IsNaN(EndCantLeft) || !double.IsNaN(EndCantRight))
+			{
+				if (Math.Abs(EndCantLeft - StartCantLeft) > tol && Math.Abs(EndCantRight - StartCantRight) > tol)
+				{
+					double endYOffset = (EndCantLeft + EndCantRight) / 2;
+					double deltaY = endYOffset- yOffset;
+					theta = Math.Atan(deltaY / HorizontalLength);
+					segmentPlacement.RefDirection = new IfcDirection(db, Math.Cos(theta), 0, Math.Sin(theta));
+					segmentLength = Math.Sqrt(deltaY * deltaY + HorizontalLength * HorizontalLength);
+				}
+			}
+			IfcLine line = db.Factory.LineX2d;
+			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
 		}
 	}
 	[Serializable]
@@ -549,27 +599,25 @@ namespace GeometryGym.Ifc
 
 		public IfcAlignmentHorizontal() : base() { }
 		public IfcAlignmentHorizontal(DatabaseIfc db) : base(db) { }
-		public IfcAlignmentHorizontal(IfcAlignment alignment, double startDistAlong, IEnumerable<IfcAlignmentHorizontalSegment> segments, out IfcCompositeCurve curveRepresentation) 
-			: base(alignment, null, null) 
+		public IfcAlignmentHorizontal(IfcObjectPlacement placement, double startDistAlong, IEnumerable<IfcAlignmentHorizontalSegment> segments, out IfcCompositeCurve curveRepresentation) 
+			: base(placement.Database) 
 		{
 			StartDistAlong = startDistAlong;
-			ObjectPlacement = alignment.ObjectPlacement;
+			ObjectPlacement = placement;
 			Segments.AddRange(segments);
 			curveRepresentation = new IfcCompositeCurve(segments.Select(x => x.generateCurveSegment(startDistAlong)));
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveRepresentation, ShapeRepresentationType.Curve2D));
 		}
-		public IfcAlignmentHorizontal(IfcAlignment alignment, double startDistAlong, out IfcCompositeCurve curveRepresentation, params IfcAlignmentHorizontalSegment[] segments)
-			: base(alignment, null, null) 
+		public IfcAlignmentHorizontal(IfcObjectPlacement placement, double startDistAlong, out IfcCompositeCurve curveRepresentation, params IfcAlignmentHorizontalSegment[] segments)
+			: base(placement.Database) 
 		{
+			ObjectPlacement = placement;
 			StartDistAlong = startDistAlong;
 			Segments.AddRange(segments); 
 			curveRepresentation = new IfcCompositeCurve(segments.Select(x => x.generateCurveSegment(startDistAlong)));
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveRepresentation, ShapeRepresentationType.Curve2D));
 		}
 		
-		public IfcAlignmentHorizontal(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, List<IfcAlignmentHorizontalSegment> segments)
-			: base(host, placement, representation) { Segments.AddRange(segments); }
-
 		protected override void initialize()
 		{
 			base.initialize();
@@ -649,7 +697,7 @@ namespace GeometryGym.Ifc
 			{
 				parentCurve = new IfcCircle(db, Math.Abs(StartRadiusOfCurvature));
 				if (StartRadiusOfCurvature < 0)
-					length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature * mDatabase.ScaleAngle());
+					length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
 			}
 			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CLOTHOID)
 			{
@@ -701,6 +749,8 @@ namespace GeometryGym.Ifc
 				}
 				parentCurve = new IfcClothoid(db.Factory.Origin2dPlace, clothoidConstant);
 			}
+			else
+				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
 			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
 		}
 	}
@@ -724,7 +774,7 @@ namespace GeometryGym.Ifc
 
 		public IfcAlignmentSegment() : base() { }
 		public IfcAlignmentSegment(DatabaseIfc db) : base(db) { }
-		public IfcAlignmentSegment(IfcLinearElement host, IfcAlignmentParameterSegment geometric ) 
+		public IfcAlignmentSegment(IfcLinearElement host, IfcAlignmentParameterSegment geometric) 
 			: base(host.Database)
 		{
 			host.AddAggregated(this);
@@ -740,14 +790,16 @@ namespace GeometryGym.Ifc
 
 		public IfcAlignmentVertical() : base() { }
 		public IfcAlignmentVertical(DatabaseIfc db) : base(db) { }
-		public IfcAlignmentVertical(IfcAlignment alignment, IEnumerable<IfcAlignmentVerticalSegment> segments, IfcCompositeCurve horizontalCurve, double distAlongHorizontal, out IfcGradientCurve gradientCurve) 
-			: base(alignment, null, null) 
-		{ 
+		public IfcAlignmentVertical(IfcObjectPlacement placement, IEnumerable<IfcAlignmentVerticalSegment> segments, IfcCompositeCurve horizontalCurve, double distAlongHorizontal, out IfcGradientCurve gradientCurve) 
+			: base(placement.Database) 
+		{
+			ObjectPlacement = placement;
 			Segments.AddRange(segments);
 			gradientCurve = new IfcGradientCurve(horizontalCurve, segments.Select(x => x.generateCurveSegment(distAlongHorizontal)));
+			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), gradientCurve, ShapeRepresentationType.Curve3D));
 		}
-		public IfcAlignmentVertical(IfcAlignment alignment, params IfcAlignmentVerticalSegment[] segments)
-			: base(alignment, null, null) { Segments.AddRange(segments); }
+		public IfcAlignmentVertical(IfcObjectPlacement placement, IfcCompositeCurve horizontalCurve, double distAlongHorizontal, out IfcGradientCurve gradientCurve, params IfcAlignmentVerticalSegment[] segments)
+			: this(placement, segments, horizontalCurve, distAlongHorizontal, out gradientCurve) { }
 
 		protected override void initialize()
 		{
@@ -814,24 +866,23 @@ namespace GeometryGym.Ifc
 			double tol = db.Tolerance;
 			double theta = Math.Atan(StartGradient);
 			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong - horizontalStartDistAlong, StartHeight);
-			IfcDirection refDirection = new IfcDirection(db, Math.Sin(theta), Math.Cos(theta));
+			IfcDirection refDirection = new IfcDirection(db, Math.Cos(theta), Math.Sin(theta));
 			IfcAxis2Placement2D axis2Placement2D = new IfcAxis2Placement2D(startPoint) { RefDirection = refDirection };
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
 			{
-				double segmentLength = HorizontalLength/ Math.Cos(theta);
+				double segmentLength = HorizontalLength / Math.Cos(theta);
 				IfcLine line = db.Factory.LineX2d;
 				return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
 			}
-			else if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
+			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
 			{
-				double parametricLength = (Math.Atan(EndGradient) - theta)  * 180 / Math.PI;
+				double parametricLength = (Math.Atan(EndGradient) - theta) / db.ScaleAngle();
 
 				IfcCircle circle = new IfcCircle(db, mRadiusOfCurvature);
 				IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), end = new IfcParameterValue(parametricLength);
 				return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, circle);
-				
 			}
-			return null;
+			throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
 		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]

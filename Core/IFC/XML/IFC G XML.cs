@@ -154,14 +154,10 @@ namespace GeometryGym.Ifc
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 			if (EndPoint != null)
 				xml.AppendChild(EndPoint.GetXML(xml.OwnerDocument, "EndPoint", this, processed));
-			xml.SetAttribute("Height", mHeight.ToString());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string height = xml.GetAttribute("Height");
-			if (!string.IsNullOrEmpty(height))
-				double.TryParse(height, out mHeight);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;

@@ -299,8 +299,8 @@ namespace GeometryGym.Ifc
 		public IfcPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcSegmentedReferenceCurve() : base() { }
-		public IfcSegmentedReferenceCurve(DatabaseIfc db, IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
-			: base(db)
+		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
+			: base(baseCurve.Database)
 		{
 			BaseCurve = baseCurve;
 			Segments.AddRange(segments);

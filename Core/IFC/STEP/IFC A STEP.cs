@@ -327,10 +327,10 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleOptionalToString(mStartCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," + ParserSTEP.DoubleOptionalToString(mStartCantRight) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantRight) + "," + ParserSTEP.DoubleOptionalToString(mSmoothingLength) + "," +
-			",." + mPredefinedType.ToString() + ".";
+			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleToString(mStartCantLeft) + "," +
+			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," + ParserSTEP.DoubleToString(mStartCantRight) + "," +
+			ParserSTEP.DoubleOptionalToString(mEndCantRight) + "," + ParserSTEP.DoubleOptionalToString(mSmoothingLength) + ",." +
+			mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

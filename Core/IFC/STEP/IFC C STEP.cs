@@ -1449,13 +1449,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + ",#" + mStartPlacement.StepId + "," + mSegmentStart.ToString() + "," +
+			return base.BuildStringSTEP() + ",#" + mPlacement.StepId + "," + mSegmentStart.ToString() + "," +
 				mSegmentLength.ToString() + ",#" + mParentCurve.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			StartPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
+			Placement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
 			SegmentStart = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
 			SegmentLength = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;
 			ParentCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;

@@ -125,7 +125,8 @@ namespace GeometryGym.Ifc
 		}
 		protected void ChangeGlobalId(string newGlobalId, string oldGlobalId) 
 		{
-			if(this is IfcObjectDefinition objectDefinition)
+			IfcObjectDefinition objectDefinition = this as IfcObjectDefinition;
+			if(objectDefinition != null)
 			{
 				List<IfcRelDefinesByProperties> isDefinedBy = objectDefinition.mIsDefinedBy.ToList();
 				foreach(IfcRelDefinesByProperties definedBy in isDefinedBy)

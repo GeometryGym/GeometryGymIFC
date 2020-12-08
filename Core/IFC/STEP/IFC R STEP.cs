@@ -1155,7 +1155,7 @@ namespace GeometryGym.Ifc
 		{
 			if ((release < ReleaseVersion.IFC4 && RelatingStructure as IfcSpatialStructureElement == null) || mRelatedElements.Count <= 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mRelatedElements.Select(x => x.Index)) + "),#" + mRelatingStructure;
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mRelatedElements.Select(x => "#" + x.Index)) + "),#" + mRelatingStructure;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

@@ -268,12 +268,10 @@ namespace GeometryGym.Ifc
 		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
 		private LIST<IfcCurveSegment> mSegments = new LIST<IfcCurveSegment>(); //: LIST[1:?] OF IfcCurveSegment;
 		private IfcCartesianPoint mEndPoint = null; //: OPTIONAL IfcCartesianPoint;
-		private double mHeight = 0; //: IfcLengthMeasure;
 
 		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
 		public LIST<IfcCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcCartesianPoint EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
-		public double Height { get { return mHeight; } set { mHeight = value; } }
 
 		public IfcGradientCurve() : base() { }
 		internal IfcGradientCurve(DatabaseIfc db, IfcGradientCurve c, DuplicateOptions options) : base(db, c, options)

@@ -148,9 +148,9 @@ namespace GeometryGym.Ifc
 				str += (mIdentification == "$" ? "'Unknown',$," : "'" + mIdentification + "',$,");
 			else
 				str += (mFamilyName == "$" ? "$," : "'" + mFamilyName + "',") + (mGivenName == "$" ? "$," : "'" + mGivenName + "',");
-			str += (mMiddleNames.Count == 0 ? "$," : "('" + string.Join("','", mMiddleNames) + "'),");
-			str += (mPrefixTitles.Count == 0 ? "$," : "('" + string.Join("','", mPrefixTitles + "'),"));
-			str += (mSuffixTitles.Count == 0 ? "$," : "('" + string.Join("','", mSuffixTitles + "'),"));
+			str += (mMiddleNames.Count == 0 ? "$," : "(" + string.Join(",", mMiddleNames.Select(x=> "'" + x + "'")) + "),");
+			str += (mPrefixTitles.Count == 0 ? "$," : "(" + string.Join(",", mPrefixTitles.Select(x=>"'" + x + "'")) + "),");
+			str += (mSuffixTitles.Count == 0 ? "$," : "(" + string.Join(",", mSuffixTitles.Select(x=>"'" + x + "'")) + "),");
 			str += (Roles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.ConvertAll(x=>x.Index.ToString())) + "),");
 			return str + (Addresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.ConvertAll(x=>x.Index.ToString())) + ")");
 			
