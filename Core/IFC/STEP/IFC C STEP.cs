@@ -464,9 +464,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() +
-			",#" + mPosition.StepId + "," +
-			ParserSTEP.DoubleOptionalToString(mClothoidConstant);
+			return base.BuildStringSTEP() + ",#" + mPosition.StepId + "," + ParserSTEP.DoubleToString(mClothoidConstant);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

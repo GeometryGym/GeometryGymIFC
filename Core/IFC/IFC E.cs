@@ -683,6 +683,7 @@ namespace GeometryGym.Ifc
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcElementQuantity(string name, IfcPhysicalQuantity quantity) : base(quantity.mDatabase, name) { addQuantity(quantity); }
 		public IfcElementQuantity(string name, IEnumerable<IfcPhysicalQuantity> quantities) : base(quantities.First().mDatabase, name) { foreach(IfcPhysicalQuantity q in quantities) addQuantity(q); }
+		public IfcElementQuantity(string name, params IfcPhysicalQuantity[] quantities) : base(quantities.First().mDatabase, name) { foreach(IfcPhysicalQuantity q in quantities) addQuantity(q); }
 		
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference reference)
 		{

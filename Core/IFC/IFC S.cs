@@ -299,11 +299,25 @@ namespace GeometryGym.Ifc
 		public IfcPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcSegmentedReferenceCurve() : base() { }
+		internal IfcSegmentedReferenceCurve(DatabaseIfc db, IfcSegmentedReferenceCurve segmentedReferenceCurve, DuplicateOptions options)
+		: base(db, segmentedReferenceCurve, options)
+		{
+			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve) as IfcBoundedCurve;
+			Segments.AddRange(segmentedReferenceCurve.Segments.Select(x => db.Factory.Duplicate(x, options) as IfcCurveSegment));
+			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint) as IfcPlacement;
+		}
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
 			: base(baseCurve.Database)
 		{
 			BaseCurve = baseCurve;
 			Segments.AddRange(segments);
+		}
+		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentCantSegment> segments, double horizontalStartDistAlong, double railHeadDistance)
+			: base(baseCurve.Database)
+		{
+			BaseCurve = BaseCurve;
+			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(horizontalStartDistAlong, railHeadDistance));
+			Segments.AddRange(curveSegments);
 		}
 	}
 	[Serializable]
@@ -333,7 +347,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSeriesParameterCurve : IfcCurve
 	{
-		private IfcPlacement mPosition = null; //: IfcAxis2Placement;
+		private IfcPlacement mPosition = null; //: IfcPlacement;
 		private LIST<double> mCoefficientsX = new LIST<double>(); //: LIST[2:?] OF IfcReal;
 		private LIST<double> mCoefficientsY = new LIST<double>(); //: LIST[2:?] OF IfcReal;
 
@@ -342,6 +356,13 @@ namespace GeometryGym.Ifc
 		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
 
 		public IfcSeriesParameterCurve() : base() { }
+		internal IfcSeriesParameterCurve(DatabaseIfc db, IfcSeriesParameterCurve seriesParameterCurve, DuplicateOptions options)
+		: base(db, seriesParameterCurve, options)
+		{
+			Position = db.Factory.Duplicate(seriesParameterCurve.Position as BaseClassIfc, options) as IfcPlacement;
+			seriesParameterCurve.mCoefficientsX.AddRange(seriesParameterCurve.mCoefficientsX);
+			seriesParameterCurve.mCoefficientsY.AddRange(seriesParameterCurve.mCoefficientsY);
+		}
 		public IfcSeriesParameterCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
 			: base(position.Database)
 		{
@@ -441,26 +462,34 @@ additional types	some additional representation types are given:
 		internal IfcShapeRepresentation() : base() { }
 		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r, DuplicateOptions options) : base(db, r, options) { }
 		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(context, representation) { RepresentationType = representationType.ToString(); RepresentationIdentifier = context.ContextIdentifier; }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IEnumerable<IfcRepresentationItem> items, ShapeRepresentationType representationType) : base(context, items) { RepresentationType = representationType.ToString(); }
 		public IfcShapeRepresentation(IfcMappedItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
-		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = "AdvancedBrep"; }
-		public IfcShapeRepresentation(IfcAnnotationFillArea area) : base(area.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.PlanSymbol2d), area) { RepresentationType = "FillArea"; }
-		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? "Clipping" : "CSG"; }
-		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = "BoundingBox"; }
-		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = "CSG"; }
-		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) { RepresentationType = "CSG"; }
-		public IfcShapeRepresentation(IfcCurve curve) : base(curve) { RepresentationType = "Curve"; }
+		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = ShapeRepresentationType.AdvancedBrep.ToString(); }
+		public IfcShapeRepresentation(IfcAnnotationFillArea area) : base(area.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.PlanSymbol2d), area) { RepresentationType = ShapeRepresentationType.FillArea.ToString(); }
+		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? ShapeRepresentationType.Clipping.ToString() : ShapeRepresentationType.CSG.ToString(); }
+		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = ShapeRepresentationType.BoundingBox.ToString(); }
+		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
+		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
+		public IfcShapeRepresentation(IfcCurve curve) : base(curve) { RepresentationType = ShapeRepresentationType.Curve.ToString(); }
+		public IfcShapeRepresentation(IfcCurveSegment curveSegment, bool isTwoD) 
+			: base(curveSegment.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment)
+		{
+			IfcCurve parentCurve = curveSegment.ParentCurve;
+			if (parentCurve != null)
+				RepresentationType = isTwoD ? ShapeRepresentationType.Curve2D.ToString() : ShapeRepresentationType.Curve3D.ToString();
+		}
+
 		//should remove above as in 3d?? hierarchy test
-		public IfcShapeRepresentation(IfcFacetedBrep brep) : base(brep) { RepresentationType = "Brep"; }
-		public IfcShapeRepresentation(IfcFaceBasedSurfaceModel surface) : base(surface) { RepresentationType = "SurfaceModel"; }
-		public IfcShapeRepresentation(IfcGeometricSet set) : base(set) { RepresentationType = "GeometricSet"; }
-		public IfcShapeRepresentation(IfcMappedItem item) : base(item) { RepresentationType = "MappedRepresentation"; }
-		public IfcShapeRepresentation(IfcPoint point) : base(point) { RepresentationType = "Point"; }
+		public IfcShapeRepresentation(IfcFacetedBrep brep) : base(brep) { RepresentationType = ShapeRepresentationType.Brep.ToString(); }
+		public IfcShapeRepresentation(IfcFaceBasedSurfaceModel surface) : base(surface) { RepresentationType = ShapeRepresentationType.SurfaceModel.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricSet set) : base(set) { RepresentationType = ShapeRepresentationType.GeometricSet.ToString(); }
+		public IfcShapeRepresentation(IfcMappedItem item) : base(item) { RepresentationType = ShapeRepresentationType.MappedRepresentation.ToString(); }
+		public IfcShapeRepresentation(IfcPoint point) : base(point) { RepresentationType = ShapeRepresentationType.Point.ToString(); }
 		//internal IfcShapeRepresentation(IfcRepresentationMap rm) : base(new IfcMappedItem(rm), "Model", "MappedRepresentation") { }
 		public IfcShapeRepresentation(IfcSectionedSpine spine) : base(spine)
 		{
-			RepresentationType = "SectionedSpine";
+			RepresentationType = ShapeRepresentationType.SectionedSpine.ToString();
 			if (spine.mCrossSections.Count > 0)
 			{
 				IfcProfileDef pd = spine.CrossSections[0];
@@ -468,38 +497,38 @@ additional types	some additional representation types are given:
 					RepresentationType = "Surface3D";
 			}
 		}
-		public IfcShapeRepresentation(IfcShellBasedSurfaceModel surface) : base(surface) { RepresentationType = "SurfaceModel"; }
-		public IfcShapeRepresentation(IfcSurface surface) : base(surface) { RepresentationType = "Surface3D"; }
-		public IfcShapeRepresentation(IfcExtrudedAreaSolid extrudedAreaSolid) : base(extrudedAreaSolid) { RepresentationType = "SweptSolid"; }
-		public IfcShapeRepresentation(IfcRevolvedAreaSolid revolvedAreaSolid) : base(revolvedAreaSolid) { RepresentationType = "SweptSolid"; }
-		public IfcShapeRepresentation(IfcExtrudedAreaSolidTapered extrudedAreaSolidTapered) : base(extrudedAreaSolidTapered) { RepresentationType = "AdvancedSweptSolid"; }
-		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = "AdvancedSweptSolid"; }
-		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = "AdvancedSweptSolid"; }
-		public IfcShapeRepresentation(IfcSectionedSolid sectionedSolid) : base(sectionedSolid) { RepresentationType = "SectionedSolid"; }
+		public IfcShapeRepresentation(IfcShellBasedSurfaceModel surface) : base(surface) { RepresentationType = ShapeRepresentationType.SurfaceModel.ToString(); }
+		public IfcShapeRepresentation(IfcSurface surface) : base(surface) { RepresentationType = ShapeRepresentationType.Surface3D.ToString(); }
+		public IfcShapeRepresentation(IfcExtrudedAreaSolid extrudedAreaSolid) : base(extrudedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }
+		public IfcShapeRepresentation(IfcRevolvedAreaSolid revolvedAreaSolid) : base(revolvedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }
+		public IfcShapeRepresentation(IfcExtrudedAreaSolidTapered extrudedAreaSolidTapered) : base(extrudedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); }
+		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); ; }
+		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); ; }
+		public IfcShapeRepresentation(IfcSectionedSolid sectionedSolid) : base(sectionedSolid) { RepresentationType = ShapeRepresentationType.SectionedSpine.ToString(); }
 		public IfcShapeRepresentation(IfcSolidModel solid) : base(solid)
 		{
 			//ABSTRACT SUPERTYPE OF (ONEOF(IfcCsgSolid ,IfcManifoldSolidBrep,IfcSweptAreaSolid,IfcSweptDiskSolid))
 			IfcCsgSolid cs = solid as IfcCsgSolid;
 			if (cs != null)
-				RepresentationType = "CSG";
+				RepresentationType = ShapeRepresentationType.CSG.ToString(); 
 			else
 			{
 				IfcManifoldSolidBrep msb = solid as IfcManifoldSolidBrep;
 				if (msb != null)
-					RepresentationType = "Brep";
+					RepresentationType = ShapeRepresentationType.Brep.ToString();
 				else
 				{
 					IfcAdvancedBrep ab = solid as IfcAdvancedBrep;
 					if (ab != null)
-						RepresentationType = "AdvancedBrep";
+						RepresentationType = ShapeRepresentationType.AdvancedBrep.ToString(); 
 				}
 			}
 		}
-		public IfcShapeRepresentation(IfcTessellatedItem item) : base(item) { RepresentationType = "Tessellation"; }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcMappedItem> reps) : base(context, reps.ConvertAll(x => (IfcRepresentationItem)x)) { RepresentationType = "MappedRepresentation"; }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcVertexPoint point) : base(context, point) { RepresentationType = "Point"; }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcEdgeCurve edge) : base(context, edge) { RepresentationType = "Curve"; }
-		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcFaceSurface surface) : base(context, surface) { RepresentationType = "Surface"; }
+		public IfcShapeRepresentation(IfcTessellatedItem item) : base(item) { RepresentationType = ShapeRepresentationType.Tessellation.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcMappedItem> reps) : base(context, reps.ConvertAll(x => (IfcRepresentationItem)x)) { RepresentationType = ShapeRepresentationType.MappedRepresentation.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcVertexPoint point) : base(context, point) { RepresentationType = ShapeRepresentationType.Point.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcEdgeCurve edge) : base(context, edge) { RepresentationType = ShapeRepresentationType.Curve.ToString(); }
+		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcFaceSurface surface) : base(context, surface) { RepresentationType = ShapeRepresentationType.Surface.ToString(); }
 		internal static IfcShapeRepresentation CreateRepresentation(IfcRepresentationItem representationItem)
 		{
 			if (representationItem == null)

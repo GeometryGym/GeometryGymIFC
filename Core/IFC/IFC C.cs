@@ -730,6 +730,12 @@ namespace GeometryGym.Ifc
 		public double ClothoidConstant { get { return mClothoidConstant; } set { mClothoidConstant = value; } }
 
 		public IfcClothoid() : base() { }
+		internal IfcClothoid(DatabaseIfc db, IfcClothoid clothoid, DuplicateOptions options)
+			:base(db, clothoid, options)
+		{
+			Position = db.Factory.Duplicate(clothoid.Position as BaseClassIfc, options) as IfcAxis2Placement;
+			ClothoidConstant = clothoid.ClothoidConstant;
+		}
 		public IfcClothoid(IfcAxis2Placement position, double clothoidConstant)
 			: base(position.Database)
 		{
@@ -939,11 +945,16 @@ namespace GeometryGym.Ifc
 		internal IfcCompositeCurve() : base() { }
 		internal IfcCompositeCurve(DatabaseIfc db, IfcCompositeCurve c, DuplicateOptions options) : base(db, c, options)
 		{
-			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCompositeCurveSegment));
+			Segments.AddRange(c.Segments.Select(x => db.Factory.Duplicate(x) as IfcSegment));
 			mSelfIntersect = c.mSelfIntersect;
 		}
 		public IfcCompositeCurve(IEnumerable<IfcSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
 		public IfcCompositeCurve(params IfcSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
+		public IfcCompositeCurve(IEnumerable<IfcAlignmentHorizontalSegment> segments, double startDistAlong) : base(segments.First().Database)
+		{
+			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(startDistAlong));
+			Segments.AddRange(curveSegments);
+		}
 	}
 	[Serializable]
 	public partial class IfcCompositeCurveOnSurface : IfcCompositeCurve, IfcCurveOnSurface
@@ -2028,7 +2039,7 @@ namespace GeometryGym.Ifc
 		public IfcCurtainWallType(DatabaseIfc m, string name, IfcCurtainWallTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
+	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcLinearAxisSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
 	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
 		//INVERSE GeomGym
 		internal IfcEdgeCurve mOfEdge = null;
@@ -2093,6 +2104,14 @@ namespace GeometryGym.Ifc
 		public IfcCurve ParentCurve { get { return mParentCurve; } set { mParentCurve = value; } }
 
 		public IfcCurveSegment() : base() { }
+		internal IfcCurveSegment(DatabaseIfc db, IfcCurveSegment curveSegment, DuplicateOptions options)
+			: base(db, curveSegment, options)
+		{
+			Placement = db.Factory.Duplicate(curveSegment.Placement, options) as IfcPlacement;
+			SegmentStart = curveSegment.SegmentStart;
+			SegmentLength = curveSegment.SegmentLength;
+			ParentCurve = db.Factory.Duplicate(curveSegment.ParentCurve, options) as IfcCurve;
+		}
 		public IfcCurveSegment(IfcTransitionCode transition, IfcPlacement placement, IfcCurveMeasureSelect segmentStart, IfcCurveMeasureSelect segmentLength, IfcCurve parentCurve)
 			: base(placement.Database, transition)
 		{

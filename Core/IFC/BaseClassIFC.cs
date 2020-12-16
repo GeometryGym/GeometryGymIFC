@@ -118,9 +118,7 @@ namespace GeometryGym.Ifc
 								mContainedIn.RelatedElements.Add(product);
 						}
 					}
-
 				}
-				
 			}
 		}
 		protected void ChangeGlobalId(string newGlobalId, string oldGlobalId) 

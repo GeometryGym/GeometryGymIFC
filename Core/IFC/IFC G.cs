@@ -175,7 +175,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
-		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline };// Surface };
+		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline };//, PVI };// Surface };
 
 		internal IfcGeometricRepresentationContext mParentContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
@@ -280,12 +280,18 @@ namespace GeometryGym.Ifc
 			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCurveSegment));
 			mEndPoint = db.Factory.Duplicate(c.mEndPoint) as IfcCartesianPoint;
 		}
-		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
-			: base(baseCurve.Database)
+		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments) : base(baseCurve.Database)
 		{
 			BaseCurve = baseCurve;
 			Segments.AddRange(segments);
 		}
+		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentVerticalSegment> segments, double distAlongHorizontal) : base(baseCurve.Database)
+		{
+			BaseCurve = baseCurve;
+			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(distAlongHorizontal));
+			Segments.AddRange(curveSegments);
+		}
+
 	}
 	[Serializable]
 	public partial class IfcGrid : IfcPositioningElement

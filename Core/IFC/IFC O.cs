@@ -213,7 +213,7 @@ namespace GeometryGym.Ifc
 				//todo
 			}
 		}
-		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, DuplicateOptions options) : base(db, o, options.OwnerHistory)
+		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, DuplicateOptions options) : base(db, o, options)
 		{
 			if (options.DuplicateHost)
 			{

@@ -1705,7 +1705,7 @@ namespace GeometryGym.Ifc
 		protected IfcPropertyDefinition() : base() { }
 		internal IfcPropertyDefinition(DatabaseIfc db) : base(db) { }
 		protected IfcPropertyDefinition(IfcPropertyDefinition propertyDefinition) : base(propertyDefinition, false) {  }
-		protected IfcPropertyDefinition(DatabaseIfc db, IfcPropertyDefinition p, DuplicateOptions options) : base(db, p, options.OwnerHistory)
+		protected IfcPropertyDefinition(DatabaseIfc db, IfcPropertyDefinition p, DuplicateOptions options) : base(db, p, options)
 		{
 			foreach (IfcRelAssociates associates in mHasAssociations)
 			{

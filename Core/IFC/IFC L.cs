@@ -296,8 +296,10 @@ namespace GeometryGym.Ifc
 		internal IfcLine(DatabaseIfc db, IfcLine l, DuplicateOptions options) : base(db, l, options) { Pnt = db.Factory.Duplicate(l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate(l.Dir) as IfcVector; }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 	}
+	[Obsolete("DEPRECATED IFC4X3", false)]
+	public partial interface IfcLinearAxisSelect : IBaseClassIfc { } // SELECT(IfcLinearAxisWithInclination, IfcCurve);
 	[Serializable]
-	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
+	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem, IfcLinearAxisSelect
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
 		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
@@ -327,6 +329,8 @@ namespace GeometryGym.Ifc
 	{
 		protected IfcLinearElement() : base() { }
 		protected IfcLinearElement(DatabaseIfc db) : base(db) { }
+		protected IfcLinearElement(DatabaseIfc db, IfcLinearElement linearElement, DuplicateOptions options)
+		: base(db, linearElement, options) { }
 		protected IfcLinearElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	public partial class IfcLinearPlacement : IfcObjectPlacement
@@ -371,10 +375,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
-		private IfcCurve mAxis;// : IfcCurve;
+		private IfcLinearAxisSelect mAxis;// : IfcCurve;
 		public IfcCurve Axis
 		{
-			get { return mAxis; }
+			get { return mAxis as IfcCurve; }
 			set
 			{
 				mAxis = value;

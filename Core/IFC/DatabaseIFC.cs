@@ -1169,14 +1169,15 @@ namespace GeometryGym.Ifc
 			}
 			set { mPersonOrganization = value; }
 		}
-		private IfcPerson mPerson = null;
+		internal string PersonName() { return System.Environment.UserName; }
+		internal IfcPerson mPerson = null;
 		internal IfcPerson Person
 		{
 			get
 			{
 				if (mPerson == null)
 				{
-					mPerson = new IfcPerson(mDatabase, System.Environment.UserName, "", "");
+					mPerson = new IfcPerson(mDatabase, PersonName(), "", "");
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
 					string str = ggAssembly.mOptions.OwnerRole;
 					if (!string.IsNullOrEmpty(str))
@@ -1196,7 +1197,7 @@ namespace GeometryGym.Ifc
 			}
 			set { mPerson = value; }
 		}
-		private IfcOrganization mOrganization = null;
+		internal IfcOrganization mOrganization = null;
 		internal IfcOrganization Organization
 		{
 			get
@@ -1329,6 +1330,11 @@ namespace GeometryGym.Ifc
 				identifier = "Axis";
 				projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
 			}
+			//else if(nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.PVI)
+			//{
+			//	identifier = "PVI";
+			//	projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
+			//}
 			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox)
 			{
 				projection = IfcGeometricProjectionEnum.MODEL_VIEW;
@@ -1496,6 +1502,7 @@ namespace GeometryGym.Ifc
 		public bool DuplicateDownstream { get; set; } 
 		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; }
+		public bool DuplicateOwnerHistory { get; set; } = true;
 
 		public HashSet<string> IgnoredPropertyNames = new HashSet<string>();
 
@@ -2155,14 +2162,16 @@ namespace GeometryGym.Ifc
 			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + mDatabase.ModelView + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + ParserIfc.Encode(fileName.Replace("\\", "\\\\")) + "',\r\n";
+			hdr += "/* name */ '" + fileName.Replace("\\", "\\\\") + "',\r\n"; //ParserIfc.Encode(fileName.Replace("\\", "\\\\"))
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
-			IfcPerson person = mDatabase.Factory.Person;
-			hdr += "/* author */ ('" + person.Name + "'),\r\n";
-			string organizationName = mDatabase.Factory.Organization.Name;
-			if (organizationName == "UNKNOWN")
-				organizationName = IfcOrganization.Organization;
+			IfcPerson person = mDatabase.Factory.mPerson;
+			string authorName = person == null ? mDatabase.Factory.PersonName() : person.Name;
+			hdr += "/* author */ ('" + authorName + "'),\r\n";
+			string organizationName = IfcOrganization.Organization;
+			IfcOrganization organization = null;
+			if (organization != null)
+				organizationName = organization.Name; 
 			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
 			hdr += "/* preprocessor_version */ '" + mDatabase.Factory.ToolkitName + "',\r\n";
 			hdr += "/* originating_system */ '" + mDatabase.Factory.ApplicationFullName + "',\r\n";

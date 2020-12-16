@@ -352,7 +352,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPointByDistanceExpression : IfcPoint
 	{
-		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 ? base.StepClassName : "IFCDISTANCEEXPRESSION"); } }
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC2 ? "IFCDISTANCEEXPRESSION" : base.StepClassName); } }
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4X3_RC2 ? formatLength((mDistanceAlong as IfcNonNegativeLengthMeasure).Measure) :  mDistanceAlong.ToString()) +
