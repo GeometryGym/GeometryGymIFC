@@ -1005,6 +1005,10 @@ namespace GeometryGym.Ifc
 			mDescription = p.mDescription;
 			mName = p.mName; 
 		}
+		public IfcExtendedMaterialProperties(IfcMaterialDefinition materialDefinition, IEnumerable<IfcProperty> properties) : base(materialDefinition)
+		{
+			mExtendedProperties.AddRange(properties.Select(x => x.StepId));
+		}
 
 		internal void addProperty(IfcProperty property) { mExtendedProperties.Add(property.mIndex); }
 	}

@@ -536,11 +536,13 @@ namespace GeometryGym.Ifc
 	}
 	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);
 	[Serializable]
-	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
+	public partial class IfcGroup : IfcObject, IfcSpatialReferenceSelect //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{
 		//INVERSE
 		internal SET<IfcRelAssignsToGroup> mIsGroupedBy = new SET<IfcRelAssignsToGroup>();// IFC4 SET : IfcRelAssignsToGroup FOR RelatingGroup;
+		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 		public SET<IfcRelAssignsToGroup> IsGroupedBy { get { return mIsGroupedBy; } }
+		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcGroup() : base() { }
 		internal IfcGroup(DatabaseIfc db, IfcGroup g, DuplicateOptions options) : base(db, g, options)
@@ -552,6 +554,23 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public IfcGroup(DatabaseIfc db, string name) : base(db) { Name = name; }
+		public IfcGroup(IfcSpatialElement spatial, string name) : base(spatial.Database) 
+		{
+			Name = name;
+			if (!(this is IfcZone))
+			{
+				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3_RC1)
+				{
+					IfcSystem system = this as IfcSystem;
+					if (system != null)
+					{
+						new IfcRelServicesBuildings(system, spatial) { Name = name };
+					}
+				}
+				else
+					spatial.ReferenceElement(this);
+			}
+		}
 		public IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
 		public void AddRelated(IfcObjectDefinition related)

@@ -229,12 +229,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
 	{ 
 		internal double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [2:2] OF IfcLengthMeasure; 
-
+		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
 		public double[][] CoordList
 		{
 			get { return mCoordList; }
 			set { mCoordList = value; }
 		}
+		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
 
 		internal IfcCartesianPointList2D() : base() { }
 		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
@@ -950,11 +951,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcCompositeCurve(IEnumerable<IfcSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
 		public IfcCompositeCurve(params IfcSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
-		public IfcCompositeCurve(IEnumerable<IfcAlignmentHorizontalSegment> segments, double startDistAlong) : base(segments.First().Database)
-		{
-			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(startDistAlong));
-			Segments.AddRange(curveSegments);
-		}
 	}
 	[Serializable]
 	public partial class IfcCompositeCurveOnSurface : IfcCompositeCurve, IfcCurveOnSurface

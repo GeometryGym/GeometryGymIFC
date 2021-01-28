@@ -708,12 +708,6 @@ namespace GeometryGym.Ifc
 					if (o.Decomposes == this)
 						o.mDecomposes = null;
 				}
-				if (mRelatedObjects.Count == 0)
-				{
-					IfcElementAssembly ea = RelatingObject as IfcElementAssembly;
-					if (ea != null && ea.mIsDecomposedBy.Count <= 1)
-						ea.detachFromHost();
-				}
 			}
 		}
 	}
@@ -824,7 +818,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelAssignsToGroup : IfcRelAssigns   //SUPERTYPE OF(IfcRelAssignsToGroupByFactor)
 	{
 		private IfcGroup mRelatingGroup;// : IfcGroup; 
-		public IfcGroup RelatingGroup { get { return mRelatingGroup; } set { mRelatingGroup = value; value.mIsGroupedBy.Add(this); } }
+		public IfcGroup RelatingGroup { get { return mRelatingGroup; } set { mRelatingGroup = value; if(value != null) value.mIsGroupedBy.Add(this); } }
 
 		public override NamedObjectIfc Relating() { return RelatingGroup; } 
 
@@ -2099,7 +2093,7 @@ namespace GeometryGym.Ifc
 			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
-			: base(system.mDatabase) { mRelatingSystem = system; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
+			: base(system.mDatabase) { mRelatingSystem = system; system.mServicesBuildings = this; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
 
 		internal void addRelated(IfcSpatialElement spatial)
 		{
@@ -2580,7 +2574,7 @@ namespace GeometryGym.Ifc
 		public IfcRoad(DatabaseIfc db) : base(db) { }
 		public IfcRoad(DatabaseIfc db, IfcRoad road, DuplicateOptions options) : base(db, road, options) { }
 		public IfcRoad(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
-		internal IfcRoad(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcRoad(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcRoof : IfcBuiltElement

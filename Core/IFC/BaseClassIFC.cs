@@ -268,6 +268,12 @@ namespace GeometryGym.Ifc
 					foreach (IfcRelNests rel in thisObjectDefinition.IsNestedBy.ToList())
 						rel.RelatingObject = revisedObjectDefinition;
 
+					foreach (IfcRelDefinesByProperties relDefinesByProperties in thisObjectDefinition.mIsDefinedBy.ToList())
+					{
+						relDefinesByProperties.RelatedObjects.Remove(thisObjectDefinition);
+						relDefinesByProperties.RelatedObjects.Add(revisedObjectDefinition);
+					}
+
 					foreach (IfcRelAssigns assigns in thisObjectDefinition.HasAssignments.ToList())
 					{
 						assigns.RelatedObjects.Remove(thisObjectDefinition);
@@ -287,14 +293,20 @@ namespace GeometryGym.Ifc
 					IfcObject thisObject = this as IfcObject, revisedObject = revised as IfcObject;
 					if (thisObject != null && revisedObject != null)
 					{
-						revisedObject.ObjectType = thisObject.ObjectType;
+						if(!string.IsNullOrEmpty(thisObject.ObjectType))
+							revisedObject.ObjectType = thisObject.ObjectType;
 
 						if (thisObject.mIsTypedBy != null)
 							thisObject.mIsTypedBy.mRelatedObjects.Remove(thisObject);
 						IfcProduct thisProduct = this as IfcProduct, revisedProduct = revised as IfcProduct;
 						if (thisProduct != null && revisedProduct != null)
 						{
-							thisProduct.detachFromHost();
+							IfcRelContainedInSpatialStructure containedInSpatialStructure = thisProduct.mContainedInStructure;
+							if (containedInSpatialStructure != null)
+							{
+								containedInSpatialStructure.RelatedElements.Remove(thisProduct);
+								containedInSpatialStructure.RelatedElements.Add(revisedProduct);
+							}
 							IfcElement thisElement = this as IfcElement, revisedElement = revised as IfcElement;
 							if (thisElement != null && revisedElement != null)
 							{

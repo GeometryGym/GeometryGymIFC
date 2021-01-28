@@ -796,21 +796,19 @@ namespace GeometryGym.Ifc
 			ObjectPlacement = placement;
 			Segments.AddRange(segments);
 			List<IfcCurveSegment> curveSegments = new List<IfcCurveSegment>();
-			foreach (IfcAlignmentHorizontalSegment segment in segments)
-				curveSegments.Add(segment.generateCurveSegment(startDistAlong));
+			for(int counter = 0; counter < Segments.Count; counter++)
+			{
+				try
+				{
+					curveSegments.Add(Segments[counter].generateCurveSegment(startDistAlong, counter + 1 < Segments.Count ? Segments[counter + 1] : null));
+				}
+				catch (Exception) { }
+			}
 			curveRepresentation = new IfcCompositeCurve(curveSegments);
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveRepresentation, ShapeRepresentationType.Curve2D));
 		}
 		public IfcAlignmentHorizontal(IfcObjectPlacement placement, double startDistAlong, out IfcCompositeCurve curveRepresentation, params IfcAlignmentHorizontalSegment[] segments)
-			: base(placement.Database) 
-		{
-			ObjectPlacement = placement;
-			StartDistAlong = startDistAlong;
-			Segments.AddRange(segments); 
-			curveRepresentation = new IfcCompositeCurve(segments, startDistAlong);
-			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveRepresentation, ShapeRepresentationType.Curve2D));
-		}
-		
+			:this(placement, startDistAlong, segments, out curveRepresentation) { }		
 		protected override void initialize()
 		{
 			base.initialize();
@@ -883,13 +881,15 @@ namespace GeometryGym.Ifc
 			double startDirection = mStartDirection * (mDatabase == null ? 1 : mDatabase.ScaleAngle());
 			return new Tuple<double, double>(Math.Cos(startDirection), Math.Sin(startDirection));
 		}
-		public IfcCurveSegment generateCurveSegment(double startDistAlong)
+		public IfcCurveSegment generateCurveSegment(double startDistAlong, IfcAlignmentHorizontalSegment nextSegment)
 		{
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;
 			Tuple<double, double> startTangent = StartTangent();
 
-			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(StartPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
+			IfcCartesianPoint startPoint = StartPoint;
+
+			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(startPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
 			IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), length = new IfcNonNegativeLengthMeasure(SegmentLength);
 
 			IfcCurve parentCurve = null;
@@ -953,8 +953,22 @@ namespace GeometryGym.Ifc
 				}
 				parentCurve = new IfcClothoid(db.Factory.Origin2dPlace, clothoidConstant);
 			}
+#if(RHINO || GH)
+			else if(PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.BIQUADRATICPARABOLA)
+			{
+				if(nextSegment == null)
+					throw new NotImplementedException("XX Next Segment required to compute " + PredefinedType.ToString());
+
+				throw new NotImplementedException("XX Not Implemented!");
+
+			//	Plane plane = new Plane();
+			//	nextSegment.StartPoint.Location;
+
+			}
+#endif
+			//else if(PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CUBICPARABOLA)
 			else
-				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
+				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
 			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
 		}
 	}

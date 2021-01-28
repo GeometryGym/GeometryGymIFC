@@ -360,8 +360,8 @@ namespace GeometryGym.Ifc
 		: base(db, seriesParameterCurve, options)
 		{
 			Position = db.Factory.Duplicate(seriesParameterCurve.Position as BaseClassIfc, options) as IfcPlacement;
-			seriesParameterCurve.mCoefficientsX.AddRange(seriesParameterCurve.mCoefficientsX);
-			seriesParameterCurve.mCoefficientsY.AddRange(seriesParameterCurve.mCoefficientsY);
+			CoefficientsX.AddRange(seriesParameterCurve.mCoefficientsX);
+			CoefficientsY.AddRange(seriesParameterCurve.mCoefficientsY);
 		}
 		public IfcSeriesParameterCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
 			: base(position.Database)
@@ -2574,14 +2574,11 @@ additional types	some additional representation types are given:
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcSymbolStyle // IfcPresentationStyleSelect DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcSystem : IfcGroup, IfcSpatialReferenceSelect //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
+	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
-		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
-
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
-		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcSystem() : base() { }
 		internal IfcSystem(DatabaseIfc db, IfcSystem s, DuplicateOptions options) : base(db, s, options)
@@ -2593,16 +2590,7 @@ additional types	some additional representation types are given:
 			}
 		}
 		public IfcSystem(DatabaseIfc db, string name) : base(db, name) { }
-		public IfcSystem(IfcSpatialElement spatial, string name) : base(spatial.mDatabase, name)
-		{
-			if (!(this is IfcZone))
-			{
-				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3_RC1)
-					mServicesBuildings = new IfcRelServicesBuildings(this, spatial) { Name = name };
-				else
-					spatial.ReferenceElement(this);
-			}
-		}
+		public IfcSystem(IfcSpatialElement spatial, string name) : base(spatial, name) { }
 		public IfcSystem(IfcSystem system, string name) : base(system.Database, name)
 		{
 			system.AddAggregated(this);

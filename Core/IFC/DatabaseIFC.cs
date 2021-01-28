@@ -376,13 +376,17 @@ namespace GeometryGym.Ifc
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
 			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
-				if (release < ReleaseVersion.IFC4X2)
+				if (typeof(IfcCourse).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
+				else if (typeof(IfcEarthworksElement).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
+				else if (release < ReleaseVersion.IFC4X2)
 				{
 					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
 						type = typeof(IfcBuilding);
 					else if (release < ReleaseVersion.IFC4X1)
 					{
-						if (typeof(IfcFacility).IsAssignableFrom(type))
+						if (type != typeof(IfcBuilding) && typeof(IfcFacility).IsAssignableFrom(type))
 							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
 						else if (release < ReleaseVersion.IFC4)
 						{
@@ -685,7 +689,6 @@ namespace GeometryGym.Ifc
 			direction = YAxis;
 			direction = ZAxis;
 			IfcAxis2Placement3D pl = this.XYPlanePlacement;
-			//IfcAxis2Placement pl = this.WorldCoordinatePlacement;
 			IfcAxis2Placement2D placement = Origin2dPlace;
 		}
 
@@ -1814,6 +1817,8 @@ namespace GeometryGym.Ifc
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading File");
 			while ((line = stream.ReadLine()) != null)
 			{
+				if (string.IsNullOrEmpty(line))
+					continue;
 				string str = line.Trim();
 				char c = str.Last();
 				while(c != ';')
@@ -2162,7 +2167,7 @@ namespace GeometryGym.Ifc
 			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + mDatabase.ModelView + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + fileName.Replace("\\", "\\\\") + "',\r\n"; //ParserIfc.Encode(fileName.Replace("\\", "\\\\"))
+			hdr += "/* name */ '" + ParserIfc.Encode(fileName) + "',\r\n";
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
 			IfcPerson person = mDatabase.Factory.mPerson;

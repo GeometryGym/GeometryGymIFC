@@ -629,7 +629,7 @@ namespace GeometryGym.Ifc
 		internal IfcPolygonalFaceSet() : base() { }
 		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s, DuplicateOptions options) : base(db, s, options) { Faces.AddRange(s.Faces.Select(x => db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
 		public IfcPolygonalFaceSet(IfcCartesianPointList pl, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { Faces.AddRange(faces); }
-
+		public IfcPolygonalFaceSet(IfcCartesianPointList pl, params IfcIndexedPolygonalFace[] faces) : base(pl) { Faces.AddRange(faces); }
 	}
 	[Serializable]
 	public partial class IfcPolyline : IfcBoundedCurve
