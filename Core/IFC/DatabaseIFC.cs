@@ -1820,12 +1820,14 @@ namespace GeometryGym.Ifc
 				if (string.IsNullOrEmpty(line))
 					continue;
 				string str = line.Trim();
+				if (string.IsNullOrEmpty(str))
+					continue;
 				char c = str.Last();
 				while(c != ';')
 				{
 					line = stream.ReadLine();
 					if (string.IsNullOrEmpty(line))
-						break;
+						continue;
 					str += line.Trim();
 					c = str.Last();
 				}
@@ -1839,18 +1841,20 @@ namespace GeometryGym.Ifc
 			while ((line = stream.ReadLine()) != null)
 			{
 				string str = line.Trim();
+				if (string.IsNullOrEmpty(str))
+					continue;
 				char c = str.Last();
 				while (c != ';')
 				{
 					line = stream.ReadLine();
 					if (string.IsNullOrEmpty(line))
-						break;
+						continue;
 					str += line.Trim();
 					c = str.Last();
 				}
 				if (line.ToUpper().StartsWith("ENDSEC"))
 					break;
-				lines.Add(line);
+				lines.Add(str);
 			}
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed Reading Data Lines");
 			Parallel.ForEach(lines, x => processDataLine(x));
