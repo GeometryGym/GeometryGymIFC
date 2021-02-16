@@ -940,14 +940,6 @@ additional types	some additional representation types are given:
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
 		public IfcSpace(IfcSpatialStructureElement host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 		internal IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-		protected override void addProduct(IfcProduct product)
-		{
-			IfcCovering covering = product as IfcCovering;
-			if (covering != null)
-				mHasCoverings.First().RelatedCoverings.Add(covering);
-			else
-				base.addProduct(product);
-		}
 		public void AddBoundary(IfcRelSpaceBoundary boundary) { mBoundedBy.Add(boundary); }
 	}
 	public partial interface IfcSpaceBoundarySelect : IBaseClassIfc //IFC4 SELECT (	IfcSpace, IfcExternalSpatialElement);
@@ -1052,18 +1044,6 @@ additional types	some additional representation types are given:
 		}
 		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement) { }
 		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-
-		protected override void addProduct(IfcProduct product)
-		{
-			product.detachFromHost();
-			if (mContainsElements.Count == 0)
-			{
-				new IfcRelContainedInSpatialStructure(product, this);
-			}
-			else
-				mContainsElements.First().RelatedElements.Add(product);
-		}
-
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1985,7 +1965,7 @@ additional types	some additional representation types are given:
 		internal IfcStructuralSurfaceAction() : base() { }
 		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, DuplicateOptions options) : base(db, a, options) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
-			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+			: base(lc, item, load,null, global) { mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc,null,load,new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{

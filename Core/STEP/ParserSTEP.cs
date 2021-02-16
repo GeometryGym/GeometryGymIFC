@@ -732,7 +732,10 @@ namespace GeometryGym.STEP
 			progressToNext(s, ref pos, len);
 			return c == 'T';
 		}
-		
+		private static bool isDoubleChar(char c)
+		{
+			return char.IsDigit(c) || c == '.' || c == 'e' || c == 'E' || c == '-' || c == '+';
+		}
 		public static double StripDouble(string s, ref int pos, int len)
 		{
 			int icounter = pos;
@@ -751,7 +754,7 @@ namespace GeometryGym.STEP
 
 			string str = "";
 			char c = s[icounter];
-			while (char.IsDigit(c) || c == '.' || char.ToLower(c) == 'e' || c == '-'  || c == '+')
+			while (isDoubleChar(c))
 			{
 				str += c;
 				if (++icounter == len)
@@ -1292,7 +1295,7 @@ namespace GeometryGym.STEP
 				{
 					string str = "";
 					char c = s[icounter];
-					while (char.IsDigit(c) || c == '.' || c == '-')
+					while (isDoubleChar(c))
 					{
 						str += c;
 						c = s[++icounter];

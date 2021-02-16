@@ -98,40 +98,37 @@ namespace GeometryGym.Ifc
 			if (obj == null)
 				return default(T);
 
+			Type type = null;
+			
 			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
-			if(token != null)
+			if (token != null)
 			{
-				mDictionary.TryGetValue(token.Value<string>(), out result);
-				if (result != null && obj.Count == 1)
+				string hrefId = token.Value<string>();
+				if(mDictionary.TryGetValue(hrefId, out result) && obj.Count == 1)
 					return (T)(IBaseClassIfc)result;
 			}
 			if (result == null)
 			{
-				Type type = null;
-				token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
+				if (type.IsAbstract)
 				{
-					string keyword = token.Value<string>();
-					type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
-				}
-				if (token == null)
-					type = typeof(T);
-				if (type != null)
-				{
-					if (type.IsAbstract)
+					JProperty jtoken = (JProperty)obj.First;
+					Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
+					if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
 					{
-						JProperty jtoken = (JProperty)obj.First;
-						Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
-						if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
-						{
-							IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
-							if (val != null)
-								return (T)val;
-							return default(T);
-						}
+						IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
+						if (val != null)
+							return (T)val;
+						return default(T);
 					}
-					else
+				}
+				else
+				{
+					string hrefId = "";
+					token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+					if (token != null)
+						hrefId = token.Value<string>();
+					if (string.IsNullOrEmpty(hrefId) || !mDictionary.TryGetValue(hrefId, out result))
 					{
 						ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
 		null, Type.EmptyTypes, null);
@@ -196,12 +193,11 @@ namespace GeometryGym.Ifc
 									}
 								}
 								token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-								if (token != null)
+								if (!string.IsNullOrEmpty(hrefId))
 								{
-									string id = token.Value<string>();
-									if(!(result is IfcRoot))
-										result.setGlobalId(id);
-									mDictionary.TryAdd(id, result);
+									if (!(result is IfcRoot))
+										result.setGlobalId(hrefId);
+									mDictionary.TryAdd(hrefId, result);
 								}
 
 								if (common)

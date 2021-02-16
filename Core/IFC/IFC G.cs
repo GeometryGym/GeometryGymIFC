@@ -485,16 +485,6 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-
-		internal override void detachFromHost()
-		{
-			base.detachFromHost();
-			if (mContainedInStructure != null)
-			{
-				mContainedInStructure.RelatedElements.Remove(this);
-				mContainedInStructure = null;
-			}
-		}
 	}
 	[Serializable]
 	public partial class IfcGridAxis : BaseClassIfc, NamedObjectIfc

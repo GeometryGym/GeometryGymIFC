@@ -442,8 +442,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP()
 		{
 			return base.BuildStringSTEP() + ",#" + mStartPoint.mIndex + "," + ParserSTEP.DoubleToString(mStartDirection) + "," +
-			ParserSTEP.DoubleOptionalToString(mStartRadiusOfCurvature) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndRadiusOfCurvature) + "," + ParserSTEP.DoubleOptionalToString(mSegmentLength) + "," +
+			formatLength(mStartRadiusOfCurvature) + "," +
+			formatLength(mEndRadiusOfCurvature) + "," + formatLength(mSegmentLength) + "," +
 			ParserSTEP.DoubleOptionalToString(mGravityCenterLineHeight) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)

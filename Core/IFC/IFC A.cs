@@ -260,6 +260,7 @@ namespace GeometryGym.Ifc
 		protected IfcAlignment(IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcSpatialStructureElement host, IfcCurve axis)
 			:base(host, axis)
 		{
+			ObjectPlacement = placement;
 			if (horizontal != null)
 				AddAggregated(horizontal);
 			if (vertical != null)
@@ -915,7 +916,7 @@ namespace GeometryGym.Ifc
 					clothoidConstant = Math.Sqrt(Math.Abs(StartRadiusOfCurvature) * SegmentLength) * (StartRadiusOfCurvature > 0 ? -1 : 1);
 					start = new IfcParameterValue(-SegmentLength);
 				}
-				else if(Math.Abs(StartRadiusOfCurvature) > Math.Abs(EndRadiusOfCurvature))
+				else if (Math.Abs(StartRadiusOfCurvature) > Math.Abs(EndRadiusOfCurvature))
 				{
 					double offsetLength = SegmentLength / ((StartRadiusOfCurvature / EndRadiusOfCurvature) - 1);
 					if (StartRadiusOfCurvature > 0 && EndRadiusOfCurvature > 0)
@@ -931,7 +932,7 @@ namespace GeometryGym.Ifc
 					else
 					{
 						throw new Exception("Unhandled oppositehand transition!");
-					}	
+					}
 				}
 				else
 				{
@@ -953,20 +954,61 @@ namespace GeometryGym.Ifc
 				}
 				parentCurve = new IfcClothoid(db.Factory.Origin2dPlace, clothoidConstant);
 			}
-#if(RHINO || GH)
-			else if(PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.BIQUADRATICPARABOLA)
+#if (RHINO || GH)
+			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.BIQUADRATICPARABOLA)
 			{
-				if(nextSegment == null)
+				if (nextSegment == null)
 					throw new NotImplementedException("XX Next Segment required to compute " + PredefinedType.ToString());
 
 				throw new NotImplementedException("XX Not Implemented!");
 
-			//	Plane plane = new Plane();
-			//	nextSegment.StartPoint.Location;
+				//	Plane plane = new Plane();
+				//	nextSegment.StartPoint.Location;
 
 			}
+			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CUBICPARABOLA)
+			{
+				if (nextSegment == null)
+					throw new Exception("XX CubicParabola transition requires next segment!");
+				double radius = Math.Abs(StartRadiusOfCurvature) < tol ? EndRadiusOfCurvature : StartRadiusOfCurvature;
+				IfcAxis2Placement2D curvePlacement = db.Factory.Origin2dPlace;
+				double m = 1;
+				Rhino.Geometry.Point3d nextSegmentStart = nextSegment.StartPoint.Location, planePoint = Rhino.Geometry.Point3d.Unset;
+
+				if(Math.Abs(StartRadiusOfCurvature) < tol)
+				{
+					Rhino.Geometry.Plane plane = placement.Plane();
+					plane.RemapToPlaneSpace(nextSegmentStart, out planePoint);
+					start = new IfcParameterValue(0);
+					length = new IfcParameterValue(planePoint.X);
+					
+					m = 1 / (6 * Math.Abs(radius) * planePoint.X);
+					m = Math.Abs(planePoint.Y) / Math.Pow(planePoint.X,3);
+					if (EndRadiusOfCurvature < tol)
+						m = -m;
+					double y = m * Math.Pow(planePoint.X, 3);
+					planePoint.Y = y;
+				}
+				else if (Math.Abs(EndRadiusOfCurvature) < tol)
+				{
+					Rhino.Geometry.Plane plane = nextSegment.Plane();
+					Rhino.Geometry.Point3d startLocation = StartPoint.Location;
+					plane.RemapToPlaneSpace(startLocation, out planePoint);
+
+					start = new IfcParameterValue(planePoint.X);
+					length = new IfcParameterValue(-planePoint.X);
+					m = 1 / (6 * Math.Abs(radius) * -planePoint.X);
+					m = Math.Abs(planePoint.Y) / Math.Pow(-planePoint.X, 3);
+					if (StartRadiusOfCurvature > tol)
+						m = -m;
+					double y = m * Math.Pow(planePoint.X, 3);
+					planePoint.Y = y;
+				}
+				else
+					throw new NotImplementedException("XX CubicParabola with finite start and end radius Not Implemented!");
+				parentCurve = new IfcSeriesParameterCurve(placement, new List<double>() { 0, 1 }, new List<double>() { 0, 0, 0, m }); 
+			}
 #endif
-			//else if(PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CUBICPARABOLA)
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
 			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
@@ -1149,16 +1191,6 @@ namespace GeometryGym.Ifc
 		public IfcAnnotation(DatabaseIfc db) : base(db) { }
 		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a, DuplicateOptions options) : base(db, a, options) { }
 		public IfcAnnotation(IfcProduct host) : base(host.mDatabase) { host.AddElement(this); }
-
-		internal override void detachFromHost()
-		{
-			base.detachFromHost();
-			if (mContainedInStructure != null)
-			{
-				mContainedInStructure.RelatedElements.Remove(this);
-				mContainedInStructure = null;
-			}
-		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]

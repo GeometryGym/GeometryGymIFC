@@ -1217,15 +1217,39 @@ namespace GeometryGym.Ifc
 		public void AddElement(IfcProduct product)
 		{
 			product.detachFromHost();
-			addProduct(product);
-		}
-		internal virtual void detachFromHost()
-		{
-			if (mDecomposes != null)
-				mDecomposes.RelatedObjects.Remove(this);
-		}
-		protected virtual void addProduct(IfcProduct product)
-		{
+			IfcCovering c = product as IfcCovering;
+			if (c != null)
+			{
+				IfcElement element = this as IfcElement;
+				if (element != null)
+				{
+					if (element.mHasCoverings.Count == 0)
+						element.mHasCoverings.Add(new IfcRelCoversBldgElements(element, c));
+					else
+						element.mHasCoverings.First().RelatedCoverings.Add(c);
+					return;
+				}
+				IfcSpace space = this as IfcSpace;
+				if(space != null)
+				{
+					if (space.mHasCoverings.Count == 0)
+						space.mHasCoverings.Add(new IfcRelCoversSpaces(space, c));
+					else
+						space.mHasCoverings.First().RelatedCoverings.Add(c);
+					return;
+				}
+			}
+			IfcSpatialElement spatialElement = this as IfcSpatialElement;
+			if (spatialElement != null)
+			{
+				if (spatialElement.mContainsElements.Count == 0)
+				{
+					new IfcRelContainedInSpatialStructure(product, spatialElement);
+				}
+				else
+					spatialElement.ContainsElements.First().RelatedElements.Add(product);
+				return;
+			}
 			if (mIsDecomposedBy.Count > 0)
 				mIsDecomposedBy.First().RelatedObjects.Add(product);
 			else
@@ -1233,7 +1257,14 @@ namespace GeometryGym.Ifc
 				new IfcRelAggregates(this, product);
 			}
 		}
-		
+		internal void detachFromHost()
+		{
+			if (mDecomposes != null)
+				mDecomposes.RelatedObjects.Remove(this);
+			if (mContainedInStructure != null)
+				mContainedInStructure.RelatedElements.Remove(this);
+		}
+				
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);

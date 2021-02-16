@@ -589,14 +589,7 @@ namespace GeometryGym.Ifc
 			if (mDecomposes != null)
 				return mDecomposes.RelatingObject as IfcProduct;
 			return (mContainedInStructure != null ? mContainedInStructure.RelatingStructure : null);
-		}
-		internal override void detachFromHost()
-		{
-			base.detachFromHost();
-			if (mContainedInStructure != null)
-				mContainedInStructure.RelatedElements.Remove(this);
-		}
-	
+		}	
 		public void AddMember(IfcStructuralMember m)
 		{
 			if (m == null)

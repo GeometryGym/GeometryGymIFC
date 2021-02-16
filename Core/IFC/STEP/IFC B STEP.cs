@@ -309,13 +309,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.IntToString(mKnotMultiplicities[0]);
-			for (int jcounter = 1; jcounter < mKnotMultiplicities.Count; jcounter++)
-				str += "," + ParserSTEP.IntToString(mKnotMultiplicities[jcounter]);
-			str += "),(" + ParserSTEP.DoubleToString(mKnots[0]);
-			for (int jcounter = 1; jcounter < mKnots.Count; jcounter++)
-				str += "," + ParserSTEP.DoubleToString(mKnots[jcounter]);
-			return str + "),." + mKnotSpec.ToString() + ".";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mKnotMultiplicities) + "),("  +
+				string.Join(",", mKnots.Select(x=> ParserSTEP.DoubleToString(x))) + "),." + mKnotSpec.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
