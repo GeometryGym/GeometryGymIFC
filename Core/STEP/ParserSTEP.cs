@@ -1363,11 +1363,25 @@ namespace GeometryGym.STEP
 		{
 			int icounter = pos;
 			string result = "";
-			if (s[icounter++] != '\'')
+			char c = s[icounter++];
+			if (c != '\'')
+			{
+				if(c == 'I')
+				{
+					icounter++;
+					while(s[icounter] != '\'' && icounter + 1 < len)
+						icounter++;
+					result = stripstring(s, ref icounter, len);
+					while (s[icounter] != ')' && icounter + 1 < len)
+						icounter++;
+					pos = icounter + 1;
+					return result;
+				}
 				throw new Exception("Unrecognized format!");
+			}
 			while (icounter < len)
 			{
-				char c = s[icounter];
+				c = s[icounter];
 				if (c == '\'')
 				{
 					if (icounter + 1 < len)
