@@ -135,15 +135,15 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",#" + mBaseCurve.StepId + 
-				(release == ReleaseVersion.IFC4X3_RC2_ ?  ",(#" + string.Join(",#", Segments.ConvertAll(x => x.StepId.ToString())) + ")" : "") +
+				(release == ReleaseVersion.IFC4X3_RC2 ?  ",(#" + string.Join(",#", Segments.ConvertAll(x => x.StepId.ToString())) + ")" : "") +
 				(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			if(release != ReleaseVersion.IFC4X3_RC2_)
+			if(release != ReleaseVersion.IFC4X3_RC2)
 				base.parse(str, ref pos, release, len, dictionary);
 			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
-			if(release == ReleaseVersion.IFC4X3_RC2_)
+			if(release == ReleaseVersion.IFC4X3_RC2)
 				Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcCurveSegment));
 			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
 		}

@@ -624,7 +624,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			if(!(release == ReleaseVersion.IFC4X3_RC2_ && (this is IfcGradientCurve || this is IfcSegmentedReferenceCurve)))
+			if(!(release == ReleaseVersion.IFC4X3_RC2 && (this is IfcGradientCurve || this is IfcSegmentedReferenceCurve)))
 				Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcSegment));
 			mSelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}

@@ -358,7 +358,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if(mDatabase.Release == ReleaseVersion.IFC4X3_RC2_)
+			if(mDatabase.Release == ReleaseVersion.IFC4X3_RC2)
 				obj["Segments"] = new JArray(VerticalSegments.Select(x => x.getJson(this, options)));
 		}
 		internal override void parseJObject(JObject obj)

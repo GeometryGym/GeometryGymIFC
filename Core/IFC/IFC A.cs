@@ -1047,7 +1047,7 @@ namespace GeometryGym.Ifc
 		internal IfcAlignmentVertical(DatabaseIfc db, IfcAlignmentVertical alignmentVertical, DuplicateOptions options)
 			: base(db, alignmentVertical, options)
 		{
-			if(db.Release == ReleaseVersion.IFC4X3_RC2_)
+			if(db.Release == ReleaseVersion.IFC4X3_RC2)
 				mVerticalSegments.AddRange(alignmentVertical.VerticalSegments.Select(x => db.Factory.Duplicate(x, options) as IfcAlignmentVerticalSegment));
 		}
 		public IfcAlignmentVertical(IfcAlignment alignment) 

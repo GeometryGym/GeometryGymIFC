@@ -295,7 +295,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release < ReleaseVersion.IFC4X3_RC2)
+			if (release < ReleaseVersion.IFC4X3_RC3)
 			{
 				PlacementMeasuredAlong = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 				Distance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;

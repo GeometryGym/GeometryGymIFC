@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," + 
 				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," + 
 				ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale) +
-				(release < ReleaseVersion.IFC4X3_RC2 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
+				(release < ReleaseVersion.IFC4X3_RC3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			mXAxisAbscissa = ParserSTEP.StripDouble(str, ref pos, len);
 			mXAxisOrdinate = ParserSTEP.StripDouble(str, ref pos, len);
 			mScale = ParserSTEP.StripDouble(str, ref pos, len);
-			if(release >= ReleaseVersion.IFC4X3_RC2)
+			if(release >= ReleaseVersion.IFC4X3_RC3)
 			{
 				mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
 				mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);

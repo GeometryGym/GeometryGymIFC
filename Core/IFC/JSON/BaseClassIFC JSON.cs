@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 			public bool SerializeOwnerHistory = true, SerializeAllGlobalIds = true;
 			internal int LengthDigitCount = 4;
 			internal RepositoryAttributes RepositoryAttributes = new RepositoryAttributes();
-			internal ReleaseVersion Version = ReleaseVersion.IFC4X3_RC2;
+			internal ReleaseVersion Version = ReleaseVersion.IFC4X3_RC3;
 
 			public SetJsonOptions() { }
 
