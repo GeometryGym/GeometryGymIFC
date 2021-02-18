@@ -66,4 +66,29 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Magnitude", mMagnitude.ToString());
 		}
 	}
+	public partial class IfcVienneseBend
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("QubicTerm", mStartCurvature.ToString());
+			if (!double.IsNaN(mEndCurvature))
+				xml.SetAttribute("QuadraticTerm", mEndCurvature.ToString());
+			if (!double.IsNaN(mGravityCenterHeight))
+				xml.SetAttribute("LinearTerm", mGravityCenterHeight.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string att = xml.GetAttribute("QubicTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mStartCurvature);
+			att = xml.GetAttribute("QuadraticTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mEndCurvature);
+			att = xml.GetAttribute("LinearTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mGravityCenterHeight);
+		}
+	}
 }

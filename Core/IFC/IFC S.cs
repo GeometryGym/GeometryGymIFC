@@ -144,22 +144,32 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid 
 	{
-		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
+		[Obsolete("REVISED IFC4x3", false)]
+		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
+		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositions = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcDistanceExpression;
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
-		public LIST<IfcPointByDistanceExpression> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
+		public LIST<IfcCurveMeasureSelect> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
 		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s, DuplicateOptions options) : base(db, s, options)
 		{
-			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			CrossSectionPositions.AddRange(s.CrossSectionPositions);
+			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
-		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcPointByDistanceExpression> positions, bool fixedAxisVertical)
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcCurveMeasureSelect> positions, bool fixedAxisVertical)
 			: base(directrix, profiles)
 		{
 			CrossSectionPositions.AddRange(positions);
+			FixedAxisVertical = fixedAxisVertical;
+		}
+		[Obsolete("REVISED IFC4x3", false)]
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcPointByDistanceExpression> positions, bool fixedAxisVertical)
+		: base(directrix, profiles)
+		{
+			mCrossSectionPositions_OBSOLETE.AddRange(positions);
 			FixedAxisVertical = fixedAxisVertical;
 		}
 	}
@@ -281,6 +291,9 @@ namespace GeometryGym.Ifc
 		private IfcTransitionCode mTransition = IfcTransitionCode.DISCONTINUOUS; //: IfcTransitionCode;
 		public IfcTransitionCode Transition { get { return mTransition; } set { mTransition = value; } }
 
+		//INVERSE
+			//UsingCurves : SET[1:?] OF IfcCompositeCurve FOR Segments;
+
 		protected IfcSegment() : base() { }
 		protected IfcSegment(DatabaseIfc db, IfcSegment s, DuplicateOptions options) : base(db, s, options) { Transition = s.Transition; }
 		protected IfcSegment(DatabaseIfc db, IfcTransitionCode transition)
@@ -288,14 +301,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcSegmentIndexSelect { } //SELECT ( IfcLineIndex, IfcArcIndex);
 	[Serializable]
-	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	public partial class IfcSegmentedReferenceCurve : IfcCompositeCurve
 	{
 		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
-		private LIST<IfcCurveSegment> mSegments = new LIST<IfcCurveSegment>(); //: LIST[1:?] OF IfcCurveSegment;
 		private IfcPlacement mEndPoint = null; //: OPTIONAL IfcPlacement;
 
 		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
-		public LIST<IfcCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcSegmentedReferenceCurve() : base() { }
@@ -303,21 +314,12 @@ namespace GeometryGym.Ifc
 		: base(db, segmentedReferenceCurve, options)
 		{
 			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve) as IfcBoundedCurve;
-			Segments.AddRange(segmentedReferenceCurve.Segments.Select(x => db.Factory.Duplicate(x, options) as IfcCurveSegment));
 			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint) as IfcPlacement;
 		}
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
-			: base(baseCurve.Database)
+			: base(segments)
 		{
 			BaseCurve = baseCurve;
-			Segments.AddRange(segments);
-		}
-		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentCantSegment> segments, double horizontalStartDistAlong, double railHeadDistance)
-			: base(baseCurve.Database)
-		{
-			BaseCurve = BaseCurve;
-			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(horizontalStartDistAlong, railHeadDistance));
-			Segments.AddRange(curveSegments);
 		}
 	}
 	[Serializable]
@@ -344,33 +346,6 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcServiceLife // DEPRECATED IFC4
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
-	[Serializable]
-	public partial class IfcSeriesParameterCurve : IfcCurve
-	{
-		private IfcPlacement mPosition = null; //: IfcPlacement;
-		private LIST<double> mCoefficientsX = new LIST<double>(); //: LIST[2:?] OF IfcReal;
-		private LIST<double> mCoefficientsY = new LIST<double>(); //: LIST[2:?] OF IfcReal;
-
-		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
-		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
-		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
-
-		public IfcSeriesParameterCurve() : base() { }
-		internal IfcSeriesParameterCurve(DatabaseIfc db, IfcSeriesParameterCurve seriesParameterCurve, DuplicateOptions options)
-		: base(db, seriesParameterCurve, options)
-		{
-			Position = db.Factory.Duplicate(seriesParameterCurve.Position as BaseClassIfc, options) as IfcPlacement;
-			CoefficientsX.AddRange(seriesParameterCurve.mCoefficientsX);
-			CoefficientsY.AddRange(seriesParameterCurve.mCoefficientsY);
-		}
-		public IfcSeriesParameterCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
-			: base(position.Database)
-		{
-			Position = position;
-			CoefficientsX.AddRange(coefficientsX);
-			CoefficientsY.AddRange(coefficientsY);
-		}
-	}
 	[Serializable]
 	public partial class IfcShadingDevice : IfcBuiltElement
 	{
@@ -717,6 +692,21 @@ additional types	some additional representation types are given:
 			mAccessState = s.mAccessState;
 		}
 		public IfcSimplePropertyTemplate(DatabaseIfc db, string name) : base(db,name) { }
+	}
+	[Serializable]
+	public partial class IfcSine : IfcSpiral
+	{
+		private double mSineTerm = 0; //: IfcLengthMeasure;
+		private double mConstant = double.NaN; //: IfcReal;
+
+		public double SineTerm { get { return mSineTerm; } set { mSineTerm = value; } }
+		public double Constant { get { return mConstant; } set { mConstant = value; } }
+
+		public IfcSine() : base() { }
+		internal IfcSine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
+			: base(db, cosine, options) { SineTerm = cosine.CosineTerm; Constant = cosine.Constant; }
+		public IfcSine(IfcAxis2Placement position, double cosineTerm)
+			: base(position) { SineTerm = cosineTerm; }
 	}
 	[Serializable]
 	public partial class IfcSite : IfcSpatialStructureElement
@@ -1212,6 +1202,18 @@ additional types	some additional representation types are given:
 		internal IfcSphericalSurface() : base() { }
 		internal IfcSphericalSurface(DatabaseIfc db, IfcSphericalSurface s, DuplicateOptions options) : base(db, s, options) { mRadius = s.mRadius; }
 		public IfcSphericalSurface(IfcAxis2Placement3D placement, double radius) : base(placement) { Radius = radius; }
+	}
+	[Serializable]
+	public abstract partial class IfcSpiral : IfcCurve
+	{
+		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+
+		public IfcSpiral() : base() { }
+		internal IfcSpiral(DatabaseIfc db, IfcSpiral spiral, DuplicateOptions options)
+			: base(db, spiral, options) { Position = db.Factory.Duplicate(spiral.Position as BaseClassIfc, options) as IfcAxis2Placement; }
+		public IfcSpiral(IfcAxis2Placement position)
+			: base(position.Database) { Position = position; }
 	}
 	[Serializable]
 	public partial class IfcStackTerminal : IfcFlowTerminal //IFC4

@@ -59,6 +59,20 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcHeatExchangerTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcHelmertCurve
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mQuadraticTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mLinearTerm) + "," + ParserSTEP.DoubleOptionalToString(mConstantTerm);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			QuadraticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			LinearTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			ConstantTerm = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcHumidifier : IfcEnergyConversionDevice //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcHumidifierTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }

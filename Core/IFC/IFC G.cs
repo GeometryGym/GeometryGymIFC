@@ -263,35 +263,22 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcGradientCurve : IfcBoundedCurve
+	public partial class IfcGradientCurve : IfcCompositeCurve 
 	{
 		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
-		private LIST<IfcCurveSegment> mSegments = new LIST<IfcCurveSegment>(); //: LIST[1:?] OF IfcCurveSegment;
-		private IfcCartesianPoint mEndPoint = null; //: OPTIONAL IfcCartesianPoint;
+		private IfcPlacement mEndPoint = null; //: OPTIONAL IfcPlacement;
 
 		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
-		public LIST<IfcCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
-		public IfcCartesianPoint EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
+		public IfcPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcGradientCurve() : base() { }
 		internal IfcGradientCurve(DatabaseIfc db, IfcGradientCurve c, DuplicateOptions options) : base(db, c, options)
 		{
 			mBaseCurve = db.Factory.Duplicate(c.mBaseCurve) as IfcBoundedCurve;
-			Segments.AddRange(c.Segments.ConvertAll(x => db.Factory.Duplicate(x) as IfcCurveSegment));
-			mEndPoint = db.Factory.Duplicate(c.mEndPoint) as IfcCartesianPoint;
+			mEndPoint = db.Factory.Duplicate(c.mEndPoint) as IfcPlacement;
 		}
-		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments) : base(baseCurve.Database)
-		{
-			BaseCurve = baseCurve;
-			Segments.AddRange(segments);
-		}
-		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentVerticalSegment> segments, double distAlongHorizontal) : base(baseCurve.Database)
-		{
-			BaseCurve = baseCurve;
-			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(distAlongHorizontal));
-			Segments.AddRange(curveSegments);
-		}
-
+		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
+			: base(segments) { BaseCurve = baseCurve; }
 	}
 	[Serializable]
 	public partial class IfcGrid : IfcPositioningElement

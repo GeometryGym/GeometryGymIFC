@@ -143,6 +143,21 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcVienneseBend
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mStartCurvature) + "," + ParserSTEP.DoubleToString(mEndCurvature) + "," + 
+				ParserSTEP.DoubleToString(mGravityCenterHeight) + "," + ParserSTEP.DoubleToString(mSegmentLength);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			StartCurvature = ParserSTEP.StripDouble(str, ref pos, len);
+			EndCurvature = ParserSTEP.StripDouble(str, ref pos, len);
+			GravityCenterHeight = ParserSTEP.StripDouble(str, ref pos, len);
+			SegmentLength = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcVirtualGridIntersection : BaseClassIfc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

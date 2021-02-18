@@ -451,10 +451,13 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (!double.IsNaN(mStartDistAlong))
 				xml.SetAttribute("StartDistAlong", mStartDistAlong.ToString());
-			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
-			xml.AppendChild(element);
-			foreach (IfcAlignmentHorizontalSegment s in Segments)
-				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+			if (mHorizontalSegments.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+				xml.AppendChild(element);
+				foreach (IfcAlignmentHorizontalSegment s in mHorizontalSegments)
+					element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+			}
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -471,7 +474,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcAlignmentHorizontalSegment s = mDatabase.ParseXml<IfcAlignmentHorizontalSegment>(cn as XmlElement);
 						if (s != null)
-							Segments.Add(s);
+							mHorizontalSegments.Add(s);
 					}
 				}
 			}
@@ -539,7 +542,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mGeometricParameters.GetXML(xml.OwnerDocument, "GeometricParameters", this, processed));
+			xml.AppendChild(mDesignParameters.GetXML(xml.OwnerDocument, "GeometricParameters", this, processed));
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -548,7 +551,7 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "GeometricParameters") == 0)
-					GeometricParameters = mDatabase.ParseXml<IfcAlignmentParameterSegment>(child as XmlElement);
+					DesignParameters = mDatabase.ParseXml<IfcAlignmentParameterSegment>(child as XmlElement);
 			}
 		}
 	}
@@ -557,10 +560,13 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
-			xml.AppendChild(element);
-			foreach (IfcAlignmentVerticalSegment s in Segments)
-				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+			if (mVerticalSegments.Count > 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
+				xml.AppendChild(element);
+				foreach (IfcAlignmentVerticalSegment s in VerticalSegments)
+					element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+			}
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -574,7 +580,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcAlignmentVerticalSegment s = mDatabase.ParseXml<IfcAlignmentVerticalSegment>(cn as XmlElement);
 						if (s != null)
-							Segments.Add(s);
+							mVerticalSegments.Add(s);
 					}
 				}
 			}

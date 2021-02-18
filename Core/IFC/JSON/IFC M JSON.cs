@@ -58,6 +58,10 @@ namespace GeometryGym.Ifc
 				obj["XAxisOrdinate"] = mXAxisOrdinate;
 			if (!double.IsNaN(mScale))
 				obj["Scale"] = mScale;
+			if (!double.IsNaN(mScaleY))
+				obj["ScaleY"] = mScaleY;
+			if (!double.IsNaN(mScaleZ))
+				obj["ScaleZ"] = mScaleZ;
 		}
 	}
 	public partial class IfcMappedItem : IfcRepresentationItem

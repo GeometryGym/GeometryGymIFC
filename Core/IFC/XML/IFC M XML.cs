@@ -64,6 +64,10 @@ namespace GeometryGym.Ifc
 				XAxisOrdinate = double.Parse(xml.Attributes["XAxisOrdinate"].Value);
 			if (xml.HasAttribute("Scale"))
 				Scale = double.Parse(xml.Attributes["Scale"].Value);
+			if (xml.HasAttribute("ScaleY"))
+				ScaleY = double.Parse(xml.Attributes["Scale"].Value);
+			if (xml.HasAttribute("ScaleZ"))
+				ScaleZ = double.Parse(xml.Attributes["Scale"].Value);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -74,6 +78,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "XAxisAbscissa", mXAxisAbscissa);
 			setAttribute(xml, "XAxisOrdinate", mXAxisOrdinate);
 			setAttribute(xml, "Scale", mScale);
+			setAttribute(xml, "ScaleY", mScaleY);
+			setAttribute(xml, "ScaleZ", mScaleZ);
 		}
 	}
 	public partial class IfcMarineFacility : IfcFacility

@@ -79,30 +79,29 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ZLength", ZLength.ToString());
 		}
 	}
-	public partial class IfcBlossCurve : IfcCurve
+	public partial class IfcBlossCurve
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
-			xml.SetAttribute("CurveLength", mCurveLength.ToString());
-			xml.SetAttribute("Radius", mRadius.ToString());
+			xml.SetAttribute("QubicTerm", mQubicTerm.ToString());
+			if(!double.IsNaN(mQuadraticTerm))
+				xml.SetAttribute("QuadraticTerm", mQuadraticTerm.ToString());
+			if(!double.IsNaN(mLinearTerm))
+				xml.SetAttribute("LinearTerm", mLinearTerm.ToString());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string curveLength = xml.GetAttribute("CurveLength");
-			if (!string.IsNullOrEmpty(curveLength))
-				double.TryParse(curveLength, out mCurveLength);
-			string radius = xml.GetAttribute("Radius");
-			if (!string.IsNullOrEmpty(radius))
-				double.TryParse(radius, out mRadius);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "Position", true) == 0)
-					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
-			}
+			string att = xml.GetAttribute("QubicTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mQubicTerm);
+			att = xml.GetAttribute("QuadraticTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mQuadraticTerm);
+			att = xml.GetAttribute("LinearTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mLinearTerm);
 		}
 	}
 	public partial class IfcBooleanResult : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect
