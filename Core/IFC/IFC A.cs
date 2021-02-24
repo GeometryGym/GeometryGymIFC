@@ -698,7 +698,7 @@ namespace GeometryGym.Ifc
 
 		public IfcAlignmentCantSegment() : base() { }
 		internal IfcAlignmentCantSegment(DatabaseIfc db, IfcAlignmentCantSegment alignmentCantSegment, DuplicateOptions options)
-		: base(db, alignmentCantSegment, options)
+			: base(db, alignmentCantSegment, options)
 		{
 			StartDistAlong = alignmentCantSegment.StartDistAlong;
 			HorizontalLength = alignmentCantSegment.HorizontalLength;
@@ -838,7 +838,7 @@ namespace GeometryGym.Ifc
 		private double mStartDirection;// : IfcPlaneAngleMeasure;
 		private double mStartRadiusOfCurvature = 0; //: IfcLengthMeasure;
 		private double mEndRadiusOfCurvature = 0; //: IfcLengthMeasure;
-		private double mSegmentLength = 0; //: IfcPositiveLengthMeasure;
+		private double mSegmentLength = 0; //: IfcNonNegativeLengthMeasure;
 		private double mGravityCenterLineHeight = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
 		private IfcAlignmentHorizontalSegmentTypeEnum mPredefinedType; //: IfcAlignmentHorizontalSegmentTypeEnum;
 																														  //INVERSE

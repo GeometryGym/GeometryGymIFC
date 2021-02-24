@@ -544,8 +544,8 @@ namespace GeometryGym.Ifc
 	{
 		private IfcObjectPlacement mPlacementRelTo = null;// : OPTIONAL IfcObjectPlacement;
 		//INVERSE 
-		internal List<IfcProduct> mPlacesObject = new List<IfcProduct>();// : SET [0:?] OF IfcProduct FOR ObjectPlacement; ifc2x3 [1:?] 
-		internal List<IfcObjectPlacement> mReferencedByPlacements = new List<IfcObjectPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
+		internal SET<IfcProduct> mPlacesObject = new SET<IfcProduct>();// : SET [0:?] OF IfcProduct FOR ObjectPlacement; ifc2x3 [1:?] 
+		internal SET<IfcObjectPlacement> mReferencedByPlacements = new SET<IfcObjectPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
 		internal IfcProduct mContainerHost = null;
 
 		public IfcObjectPlacement PlacementRelTo
@@ -560,6 +560,8 @@ namespace GeometryGym.Ifc
 					value.mReferencedByPlacements.Add(this);
 			}
 		}
+		public SET<IfcProduct> PlacesObject { get { return mPlacesObject; } set { mPlacesObject = value; } }
+		public SET<IfcObjectPlacement> ReferencedByPlacements { get { return mReferencedByPlacements; } set { mReferencedByPlacements = value; } }
 
 		protected IfcObjectPlacement() : base() { }
 		protected IfcObjectPlacement(IfcObjectPlacement placementRelTo) : base(placementRelTo.Database) { PlacementRelTo = placementRelTo; }

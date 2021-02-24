@@ -277,11 +277,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
 	{ 
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mControlElementId == "$" ? ",$" : ",'" + mControlElementId + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? (mControlElementId == "$" ? ",$" : ",'" + mControlElementId + "'") : "");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mControlElementId = ParserSTEP.StripString(str, ref pos, len);
+			if(release < ReleaseVersion.IFC4)
+				mControlElementId = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcDistributionPort : IfcPort

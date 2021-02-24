@@ -98,7 +98,7 @@ namespace GeometryGym.Ifc
 			if (obj == null)
 				return default(T);
 
-			Type type = null;
+			Type type = typeof(T);
 			
 			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
@@ -124,6 +124,13 @@ namespace GeometryGym.Ifc
 				}
 				else
 				{
+					token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
+					if(token != null)
+					{
+						Type nominatedType = Type.GetType("GeometryGym.Ifc." + token.Value<string>(), false, true);
+						if (nominatedType != null)
+							type = nominatedType;
+					}
 					string hrefId = "";
 					token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
 					if (token != null)

@@ -315,7 +315,7 @@ namespace GeometryGym.Ifc
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentCantSegment> segments, double horizontalStartDistAlong, double railHeadDistance)
 			: base(baseCurve.Database)
 		{
-			BaseCurve = BaseCurve;
+			BaseCurve = baseCurve;
 			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(horizontalStartDistAlong, railHeadDistance));
 			Segments.AddRange(curveSegments);
 		}
