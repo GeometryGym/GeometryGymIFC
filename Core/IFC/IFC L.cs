@@ -335,7 +335,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcCurve mPlacementMeasuredAlong = null; //: IfcCurve;
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcPointByDistanceExpression mDistance = null; //: IfcDistanceExpression;
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcOrientationExpression mOrientation = null; //: OPTIONAL IfcOrientationExpression;
@@ -344,6 +346,7 @@ namespace GeometryGym.Ifc
 
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcCurve PlacementMeasuredAlong { get { return mPlacementMeasuredAlong; } set { mPlacementMeasuredAlong = value; } }
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcPointByDistanceExpression Distance { get { return mDistance; } set { mDistance = value; } }
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcOrientationExpression Orientation { get { return mOrientation; } set { mOrientation = value; } }

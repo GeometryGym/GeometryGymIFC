@@ -481,15 +481,14 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcClothoid : IfcCurve
+	public partial class IfcClothoid
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + ",#" + mPosition.StepId + "," + ParserSTEP.DoubleToString(mClothoidConstant);
+			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleToString(mClothoidConstant);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
 			ClothoidConstant = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
@@ -528,8 +527,6 @@ namespace GeometryGym.Ifc
 			mGreen = ParserSTEP.StripDouble(str, ref pos, len);
 			mBlue = ParserSTEP.StripDouble(str, ref pos, len);
 		}
-
-	
 	}
 	public partial class IfcColourRgbList : IfcPresentationItem
 	{
@@ -627,7 +624,8 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcSegment));
+			if(!(release == ReleaseVersion.IFC4X3_RC2 && (this is IfcGradientCurve || this is IfcSegmentedReferenceCurve)))
+				Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcSegment));
 			mSelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
@@ -1148,6 +1146,18 @@ namespace GeometryGym.Ifc
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
 			mGeodeticDatum = ParserSTEP.StripString(str, ref pos, len);
 			mVerticalDatum = ParserSTEP.StripString(str, ref pos, len);
+		}
+	}
+	public partial class IfcCosine
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mCosineTerm) + "," + ParserSTEP.DoubleToString(mConstant);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			CosineTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			Constant = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcCostItem : IfcControl

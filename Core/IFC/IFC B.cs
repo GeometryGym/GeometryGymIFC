@@ -124,24 +124,21 @@ namespace GeometryGym.Ifc
 		public IfcBlock(IfcAxis2Placement3D position, double x,double y, double z) : base(position) { mXLength = x; mYLength = y; mZLength = z; }
 	}
 	[Serializable]
-	public partial class IfcBlossCurve : IfcCurve
+	public partial class IfcBlossCurve : IfcSpiral
 	{
-		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
-		private double mCurveLength = 0; //: IfcPositiveLengthMeasure;
-		private double mRadius = 0; //: IfcPositiveLengthMeasure;
+		private double mQubicTerm = 0; //: IfcLengthMeasure;
+		private double mQuadraticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
 
-		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
-		public double CurveLength { get { return mCurveLength; } set { mCurveLength = value; } }
-		public double Radius { get { return mRadius; } set { mRadius = value; } }
+		public double QubicTerm { get { return mQubicTerm; } set { mQubicTerm = value; } }
+		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
 
 		public IfcBlossCurve() : base() { }
-		public IfcBlossCurve(DatabaseIfc db, IfcAxis2Placement position, double curveLength, double radius)
-			: base(db)
-		{
-			Position = position;
-			CurveLength = curveLength;
-			Radius = radius;
-		}
+		internal IfcBlossCurve(DatabaseIfc db, IfcBlossCurve bloss, DuplicateOptions options)
+			: base(db, bloss, options) { QubicTerm = bloss.QubicTerm; QuadraticTerm = bloss.QuadraticTerm; LinearTerm = bloss.LinearTerm; }
+		public IfcBlossCurve(IfcAxis2Placement position, double qubicTerm)
+			: base(position) { QubicTerm = qubicTerm; }
 	}
 	[Serializable]
 	public partial class IfcBoiler : IfcEnergyConversionDevice //IFC4  
@@ -326,10 +323,6 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcBoundedCurve : IfcCurve, IfcCurveOrEdgeCurve  //ABSTRACT SUPERTYPE OF (ONEOF (IfcBSplineCurve ,IfcCompositeCurve ,IfcPolyline ,IfcTrimmedCurve)) IFC4 IfcIndexedPolyCurve IFC4x1 IfcCurveSegment2D IfcAlignment2DHorizontal
 	{
-		//INVERSE
-		internal IfcLinearPositioningElement mPositioningElement = null;// : SET[0:1] OF IfcLinearPositioningElement FOR Axis;
-		public IfcLinearPositioningElement PositioningElement { get { return mPositioningElement; } set { mPositioningElement = value; } }
-
 		protected IfcBoundedCurve() : base() { }
 		protected IfcBoundedCurve(DatabaseIfc db) : base(db) { }
 		protected IfcBoundedCurve(DatabaseIfc db, IfcBoundedCurve c, DuplicateOptions options) : base(db, c, options) { }

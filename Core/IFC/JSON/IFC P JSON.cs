@@ -255,6 +255,18 @@ namespace GeometryGym.Ifc
 			obj["Polygon"] = new JArray(mPolygon.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
+	public partial class IfcPolynomialCurve : IfcCurve
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			Position = mDatabase.ParseJObject<IfcPlacement>(obj);
+		}
+	}
 	public partial class IfcPresentationLayerAssignment : BaseClassIfc //SUPERTYPE OF	(IfcPresentationLayerWithStyle);
 	{
 		internal override void parseJObject(JObject obj)

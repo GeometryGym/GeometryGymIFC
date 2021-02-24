@@ -142,16 +142,12 @@ namespace GeometryGym.Ifc
 				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcGradientCurve : IfcBoundedCurve
+	public partial class IfcGradientCurve
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(BaseCurve.GetXML(xml.OwnerDocument, "BaseCurve", this, processed));
-			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
-			xml.AppendChild(element);
-			foreach (IfcCurveSegment o in Segments)
-				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 			if (EndPoint != null)
 				xml.AppendChild(EndPoint.GetXML(xml.OwnerDocument, "EndPoint", this, processed));
 		}
@@ -163,17 +159,8 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "BaseCurve", true) == 0)
 					BaseCurve = mDatabase.ParseXml<IfcBoundedCurve>(child as XmlElement);
-				else if (string.Compare(name, "Segments") == 0)
-				{
-					foreach (XmlNode cn in child.ChildNodes)
-					{
-						IfcCurveSegment o = mDatabase.ParseXml<IfcCurveSegment>(cn as XmlElement);
-						if (o != null)
-							Segments.Add(o);
-					}
-				}
 				else if (string.Compare(name, "EndPoint", true) == 0)
-					EndPoint = mDatabase.ParseXml<IfcCartesianPoint>(child as XmlElement);
+					EndPoint = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
 			}
 		}
 	}

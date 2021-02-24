@@ -106,20 +106,18 @@ namespace GeometryGym.Ifc
 			mZLength = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	public partial class IfcBlossCurve : IfcCurve
+	public partial class IfcBlossCurve 
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) +
-			",#" + mPosition.StepId + "," +
-			ParserSTEP.DoubleOptionalToString(mCurveLength) + "," +
-			ParserSTEP.DoubleOptionalToString(mRadius);
+			return base.BuildStringSTEP(release) +	ParserSTEP.DoubleToString(mQubicTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mQuadraticTerm) + "," + ParserSTEP.DoubleOptionalToString(mLinearTerm);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement;
-			CurveLength = ParserSTEP.StripDouble(str, ref pos, len);
-			Radius = ParserSTEP.StripDouble(str, ref pos, len);
+			QubicTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			QuadraticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			LinearTerm = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcBoiler : IfcEnergyConversionDevice //IFC4  

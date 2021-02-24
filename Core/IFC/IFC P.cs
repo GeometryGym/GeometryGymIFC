@@ -669,6 +669,36 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
+	public partial class IfcPolynomialCurve : IfcCurve
+	{
+		private IfcPlacement mPosition = null; //: IfcPlacement;
+		private LIST<double> mCoefficientsX = new LIST<double>(); //: OPTIONAL  LIST[2:?] OF IfcReal;
+		private LIST<double> mCoefficientsY = new LIST<double>(); //: OPTIONAL LIST[2:?] OF IfcReal;
+		private LIST<double> mCoefficientsZ = new LIST<double>();//: OPTIONAL LIST[2:?] OF IfcReal;
+
+		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
+		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
+		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+		public LIST<double> CoefficientsZ { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+
+		public IfcPolynomialCurve() : base() { }
+		internal IfcPolynomialCurve(DatabaseIfc db, IfcPolynomialCurve polynomial, DuplicateOptions options)
+		: base(db, polynomial, options)
+		{
+			Position = db.Factory.Duplicate(polynomial.Position as BaseClassIfc, options) as IfcPlacement;
+			CoefficientsX.AddRange(polynomial.mCoefficientsX);
+			CoefficientsY.AddRange(polynomial.mCoefficientsY);
+			CoefficientsZ.AddRange(polynomial.mCoefficientsZ);
+		}
+		public IfcPolynomialCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
+			: base(position.Database)
+		{
+			Position = position;
+			CoefficientsX.AddRange(coefficientsX);
+			CoefficientsY.AddRange(coefficientsY);
+		}
+	}
+	[Serializable]
 	public abstract partial class IfcPort : IfcProduct
 	{   //INVERSE	
 		internal IfcRelConnectsPortToElement mContainedIn = null;//	 :	SET [0:1] OF IfcRelConnectsPortToElement FOR RelatingPort;
