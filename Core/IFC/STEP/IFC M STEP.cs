@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP() + (mPredefinedType == IfcMarineFacilityTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

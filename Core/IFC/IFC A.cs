@@ -257,6 +257,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcSite host) : base(host) { }
 		public IfcAlignment(IfcFacility host) : base(host) { }
 		public IfcAlignment(IfcFacilityPart host) : base(host) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		protected IfcAlignment(IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcSpatialStructureElement host, IfcCurve axis)
 			:base(host, axis)
 		{
@@ -272,10 +273,13 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcFacility host, IfcCurve axis) : base(host, axis) { }
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcSite host, IfcCurve axis) : base(host, axis) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcFacility host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis) 
 			: this(placement, horizontal, vertical, cant, host, axis) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcFacilityPart host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis) 
 			: this(placement, horizontal, vertical, cant, host, axis) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcSite host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis)
 			: this(placement, horizontal, vertical, cant, host, axis) { }
 	}

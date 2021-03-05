@@ -86,7 +86,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMarineFacility : IfcFacility
 	{
-		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: IfcMarineFacilityTypeEnum;
+		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: OPTIONAL IfcMarineFacilityTypeEnum;
 		public IfcMarineFacilityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcMarineFacility() : base() { }

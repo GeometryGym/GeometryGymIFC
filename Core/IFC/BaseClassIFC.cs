@@ -345,8 +345,9 @@ namespace GeometryGym.Ifc
 								}
 								foreach (IfcRelAssociatesMaterial associates in revisedSpatial.HasAssociations.OfType<IfcRelAssociatesMaterial>().ToList())
 									associates.RelatedObjects.Remove(revisedSpatial);
-								
-								if(revisedSpatial is IfcFacilityPart facilityPart)
+
+								IfcFacilityPart facilityPart = revisedSpatial as IfcFacilityPart;
+								if(facilityPart != null)
 								{
 									IfcFacility facility = revisedSpatial.FindHost<IfcFacility>();
 									if (facility != null)

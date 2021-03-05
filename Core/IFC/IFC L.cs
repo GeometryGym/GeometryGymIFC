@@ -378,7 +378,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		private IfcLinearAxisSelect mAxis;// : IfcCurve;
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcCurve Axis
 		{
 			get { return mAxis as IfcCurve; }
@@ -393,6 +395,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
 		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}

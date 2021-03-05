@@ -81,6 +81,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRailway : IfcFacility
 	{
+		internal IfcRailwayTypeEnum mPredefinedType = IfcRailwayTypeEnum.NOTDEFINED;// OPTIONAL : IfcRailwayTypeEnum
+		public IfcRailwayTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		public IfcRailway() : base() { }
 		public IfcRailway(DatabaseIfc db) : base(db) { }
 		public IfcRailway(DatabaseIfc db, IfcRailway railway, DuplicateOptions options) : base(db, railway, options) { }
@@ -2585,6 +2588,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRoad : IfcFacility
 	{
+		internal IfcRoadTypeEnum mPredefinedType = IfcRoadTypeEnum.NOTDEFINED;// OPTIONAL : IfcRoadTypeEnum
+		public IfcRoadTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		public IfcRoad() : base() { }
 		public IfcRoad(DatabaseIfc db) : base(db) { }
 		public IfcRoad(DatabaseIfc db, IfcRoad road, DuplicateOptions options) : base(db, road, options) { }

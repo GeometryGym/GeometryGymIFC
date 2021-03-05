@@ -483,7 +483,8 @@ namespace GeometryGym.Ifc
 				ctor = getConstructor(type, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) });
 				if (ctor == null)
 				{
-					if (host is IfcElement element)
+					IfcElement element = host as IfcElement;
+					if (element != null)
 					{
 						ctor = getConstructor(type, new[] { typeof(IfcElement), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) });
 						if(ctor != null)
@@ -583,8 +584,6 @@ namespace GeometryGym.Ifc
 								NominateDuplicate(entity, site);
 								return site;
 							}
-
-
 						}
 					}
 				}
