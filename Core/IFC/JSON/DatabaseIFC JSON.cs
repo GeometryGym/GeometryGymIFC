@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 				if (type.IsAbstract)
 				{
 					JProperty jtoken = (JProperty)obj.First;
-					Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
+					Type valueType = BaseClassIfc.GetType(jtoken.Name);
 					if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
 					{
 						IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
@@ -127,7 +127,7 @@ namespace GeometryGym.Ifc
 					token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
 					if(token != null)
 					{
-						Type nominatedType = Type.GetType("GeometryGym.Ifc." + token.Value<string>(), false, true);
+						Type nominatedType = BaseClassIfc.GetType(token.Value<string>());
 						if (nominatedType != null)
 							type = nominatedType;
 					}

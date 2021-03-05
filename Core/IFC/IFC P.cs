@@ -1294,7 +1294,37 @@ namespace GeometryGym.Ifc
 			if (mContainedInStructure != null)
 				mContainedInStructure.RelatedElements.Remove(this);
 		}
-				
+		
+		internal T FindHost<T>() where T : IfcProduct
+		{
+			T result = null;
+			if(mDecomposes != null)
+			{
+				result = mDecomposes.RelatingObject as T;
+				if (result != null)
+					return result;
+				IfcProduct host = mDecomposes.RelatingObject as IfcProduct;
+				if (host != null)
+					return host.FindHost<T>();
+			}	
+			else if(mNests != null)
+			{
+				result = mNests.RelatingObject as T;
+				if (result != null)
+					return result;
+				IfcProduct host = mNests.RelatingObject as IfcProduct;
+				if (host != null)
+					return host.FindHost<T>();
+			}
+			else if(mContainedInStructure != null)
+			{
+				result = mContainedInStructure.RelatingStructure as T;
+				if (result != null)
+					return result;
+				return mContainedInStructure.RelatingStructure.FindHost<T>();
+			}
+			return null;
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);

@@ -259,16 +259,16 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBridgePart : IfcFacilityPart
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (PredefinedType != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
+			if (PredefinedType != null && release < ReleaseVersion.IFC4X3_RC1)
 			{
 				IfcBridgePartTypeEnum part = IfcBridgePartTypeEnum.NOTDEFINED;
 				if (!PredefinedType.isEnumeration(ref part))
 					part = IfcBridgePartTypeEnum.NOTDEFINED;
-				return base.BuildStringSTEP() + (part == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + part.ToString() + ".");
+				return base.BuildStringSTEP(release) + (part == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + part.ToString() + ".");
 			}
-			return base.BuildStringSTEP();
+			return base.BuildStringSTEP(release);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

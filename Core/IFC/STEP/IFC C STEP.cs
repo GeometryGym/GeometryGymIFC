@@ -235,9 +235,30 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + formatLength(x[0]) + "," + formatLength(x[1]) + "," + formatLength(x[2]) + ")")) + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mCoordList.Select(x => "(" + formatLength(x[0]) + "," + formatLength(x[1]) + "," + formatLength(x[2]) + ")")) + ")" + 
+				(release < ReleaseVersion.IFC4X1 ? "" : (mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => "'" + ParserIfc.Encode(x) + "'")) + ")")); 
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { mCoordList = ParserSTEP.SplitListDoubleTriple(str); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			if (release < ReleaseVersion.IFC4X1)
+				mCoordList = ParserSTEP.SplitListDoubleTriple(str);
+			else
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				mCoordList = ParserSTEP.SplitListDoubleTriple(s);
+				s = ParserSTEP.StripField(str, ref pos, len);
+				if (!string.IsNullOrEmpty(s) && s != "$")
+				{
+					List<string> lst = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+					for (int icounter = 0; icounter < lst.Count; icounter++)
+					{
+						string field = lst[icounter];
+						if (field.Length > 2)
+							mTagList.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
+					}
+				}
+			}
+		}
 	}
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
 	{
@@ -489,6 +510,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			ClothoidConstant = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}

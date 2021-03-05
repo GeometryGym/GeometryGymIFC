@@ -398,7 +398,19 @@ namespace GeometryGym.Ifc
 
 		public IfcReferent() : base() { }
 		public IfcReferent(IfcSite host) : base(host) { }
-		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
+			: base(host.Database) 
+		{
+			IfcRelNests nests = host.IsNestedBy.Where(x => x.RelatedObjects.FirstOrDefault() is IfcReferent).FirstOrDefault();
+			if (nests != null)
+				nests.RelatedObjects.Add(this);
+			else
+			{
+				new IfcRelNests(host, this);
+			}
+			ObjectPlacement = placement;
+			Representation = representation;
+		}
 	}
 	[Serializable]
 	public partial class IfcRegularTimeSeries : IfcTimeSeries
@@ -671,8 +683,8 @@ namespace GeometryGym.Ifc
 			RelatingObject = db.Factory.Duplicate(a.RelatingObject, options) as IfcObjectDefinition;
 			if (options.DuplicateDownstream)
             {
-                foreach (IfcObjectDefinition objectDefinition in a.RelatedObjects)
-                    db.Factory.Duplicate(objectDefinition, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+                mRelatedObjects.AddRange(a.RelatedObjects.Select(x=> db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
             }
 		}
 		internal IfcRelAggregates(IfcObjectDefinition relObject) 
@@ -1380,13 +1392,14 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcRelContainedInSpatialStructure() : base() { }// RelatedElements = new RelatedElementsCollection(this); }
-		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) : base(db, r, options)
+		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) 
+			: base(db, r, options)
 		{
 			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement;
 			if (options.DuplicateDownstream)
 			{
-				foreach(IfcProduct p  in r.RelatedElements)
-					db.Factory.Duplicate(p, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcProduct));
 			}
 		}
 		public IfcRelContainedInSpatialStructure(IfcSpatialElement host) : base(host.mDatabase)
@@ -1406,7 +1419,8 @@ namespace GeometryGym.Ifc
 			Description = containerName + " Container for Elements";
 			RelatingStructure = host;
 		}
-		internal IfcRelContainedInSpatialStructure(IfcProduct related, IfcSpatialElement host) : this(host) { RelatedElements.Add(related); }
+		public IfcRelContainedInSpatialStructure(IfcProduct related, IfcSpatialElement host) : this(host) { RelatedElements.Add(related); }
+		public IfcRelContainedInSpatialStructure(IEnumerable<IfcProduct> related, IfcSpatialElement host) :this(host) { RelatedElements.AddRange(related); }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1851,7 +1865,8 @@ namespace GeometryGym.Ifc
 		internal IfcRelNests(DatabaseIfc db, IfcRelNests n, DuplicateOptions options) : base(db, n, options)
 		{
 			RelatingObject = db.Factory.Duplicate(n.RelatingObject, options) as IfcObjectDefinition;
-			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, options) as IfcObjectDefinition));
+			DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject) : base(relatingObject.mDatabase)
 		{

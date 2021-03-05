@@ -371,7 +371,7 @@ namespace GeometryGym.Ifc
 				str = str.Substring(0, str.Length - 4);
 			if (str.EndsWith("TypeEnum"))
 				str = str.Substring(0, str.Length - 8);
-			Type type = Type.GetType("GeometryGym.Ifc." + str, false, true);
+			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
 			if (release < ReleaseVersion.IFC4X3_RC1)
@@ -400,7 +400,8 @@ namespace GeometryGym.Ifc
 			IfcProduct product = construct(type, host, placement, representation, system);
 			if (product == null)
 				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
-			if (string.Compare(str, product.StepClassName, true) != 0)
+			string resultClass = product.StepClassName;
+			if (string.Compare(str, resultClass, true) != 0 && string.Compare(resultClass, "IfcFacilityPart",true) != 0)
 				product.ObjectType = className;
 			if (!string.IsNullOrEmpty(definedType))
 			{
@@ -417,6 +418,8 @@ namespace GeometryGym.Ifc
 							MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any,new Type[] { typeof(string) }, null);
 							if (method != null)
 							{
+								if (!enumName.EndsWith("TypeEnum"))
+									enumName += "TypeEnum";
 								object o = method.Invoke(null, new object[] { enumName + "(." + definedType + ".)" });
 								if (o != null)
 									pi.SetValue(product, o);
@@ -479,7 +482,16 @@ namespace GeometryGym.Ifc
 			{
 				ctor = getConstructor(type, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) });
 				if (ctor == null)
+				{
+					if (host is IfcElement element)
+					{
+						ctor = getConstructor(type, new[] { typeof(IfcElement), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) });
+						if(ctor != null)
+							return ctor.Invoke(new object[] { element, placement, representation }) as IfcProduct;
+					}
 					return null;
+
+				}
 				else
 					return ctor.Invoke(new object[] { host, placement, representation, system }) as IfcProduct;
 			}
@@ -1521,6 +1533,7 @@ namespace GeometryGym.Ifc
 			DuplicateDownstream = options.DuplicateDownstream;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
+			DuplicateOwnerHistory = options.DuplicateOwnerHistory;
 		}
 	}
 	public class ApplicableFilter
@@ -1538,7 +1551,7 @@ namespace GeometryGym.Ifc
 					continue;
 				string[] pair = str.Trim().Split("/".ToCharArray());
 				string typename = (pair == null ? str.Trim() : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
-				Type type = Type.GetType("GeometryGym.Ifc." + typename);
+				Type type = BaseClassIfc.GetType(typename); 
 				if (type == null)
 					continue;
 				mApplicableTypes.Add(new ApplicableType(type, predefined));

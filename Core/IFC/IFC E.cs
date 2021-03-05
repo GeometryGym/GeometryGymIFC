@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 		public IfcEarthworksCut() : base() { }
 		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
 		public IfcEarthworksCut(DatabaseIfc db, IfcEarthworksCut earthworksCut, DuplicateOptions options) : base(db, earthworksCut, options) { PredefinedType = earthworksCut.PredefinedType; }
-		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcEarthworksCut(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcEarthworksElement : IfcBuiltElement

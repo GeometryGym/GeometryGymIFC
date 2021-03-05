@@ -268,6 +268,19 @@ namespace GeometryGym.Ifc
 					foreach (IfcRelNests rel in thisObjectDefinition.IsNestedBy.ToList())
 						rel.RelatingObject = revisedObjectDefinition;
 
+					IfcRelAggregates relAggregates = thisObjectDefinition.Decomposes;
+					if(relAggregates != null)
+					{
+						relAggregates.RelatedObjects.Remove(thisObjectDefinition);
+						relAggregates.RelatedObjects.Add(revisedObjectDefinition);
+					}
+					IfcRelNests relNests = thisObjectDefinition.Nests;
+					if(relNests != null)
+					{
+						relNests.RelatedObjects.Remove(thisObjectDefinition);
+						relNests.RelatedObjects.Add(thisObjectDefinition);
+					}
+
 					foreach (IfcRelDefinesByProperties relDefinesByProperties in thisObjectDefinition.mIsDefinedBy.ToList())
 					{
 						relDefinesByProperties.RelatedObjects.Remove(thisObjectDefinition);
@@ -311,6 +324,35 @@ namespace GeometryGym.Ifc
 							if (thisElement != null && revisedElement != null)
 							{
 								revisedElement.Tag = thisElement.Tag;
+							}
+							IfcSpatialElement thisSpatial = this as IfcSpatialElement, revisedSpatial = revised as IfcSpatialElement;
+							if(thisSpatial != null && revisedSpatial != null)
+							{
+								foreach(IfcRelContainedInSpatialStructure contained in thisSpatial.ContainsElements.ToList())
+									contained.RelatingStructure = revisedSpatial;
+							}
+							else if (revisedSpatial != null && thisElement != null)
+							{
+								if(containedInSpatialStructure != null)
+								{
+									containedInSpatialStructure.RelatedElements.Remove(revisedProduct);
+									containedInSpatialStructure.RelatingStructure.AddAggregated(revisedProduct);
+								}
+								List<IfcProduct> subProducts = thisObjectDefinition.IsDecomposedBy.SelectMany(x => x.RelatedObjects).OfType<IfcProduct>().ToList();
+								if(subProducts.Count > 0)
+								{
+									new IfcRelContainedInSpatialStructure(subProducts, revisedSpatial);
+								}
+								foreach (IfcRelAssociatesMaterial associates in revisedSpatial.HasAssociations.OfType<IfcRelAssociatesMaterial>().ToList())
+									associates.RelatedObjects.Remove(revisedSpatial);
+								
+								if(revisedSpatial is IfcFacilityPart facilityPart)
+								{
+									IfcFacility facility = revisedSpatial.FindHost<IfcFacility>();
+									if (facility != null)
+										facility.AddAggregated(revisedSpatial);
+								}
+
 							}
 						}
 					}
@@ -377,7 +419,14 @@ namespace GeometryGym.Ifc
 
 		public static Type GetType(string classNameIfc)
 		{
-			return STEPEntity.GetType(classNameIfc, "Ifc");	
+			string className = classNameIfc;
+			if (string.Compare(className, "IfcBuildingElement", true) == 0)
+				className = "IfcBuiltElement";
+			else if (string.Compare(className, "IfcBuildingElementType", true) == 0)
+				className = "IfcBuiltElementType";
+			else if (string.Compare(className, "IfcBuildingSystem", true) == 0)
+				className = "IfcBuiltSystem";
+			return STEPEntity.GetType(className, "Ifc");	
 		}
 		public static BaseClassIfc Construct(string ifcClassName)
 		{

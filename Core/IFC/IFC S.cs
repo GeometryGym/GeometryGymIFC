@@ -1017,9 +1017,10 @@ additional types	some additional representation types are given:
 			{
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
 					db.Factory.Duplicate(css, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
-					IfcSystem sys = db.Factory.Duplicate(system, options) as IfcSystem;
+					IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
 					if(system.ServicesBuildings == null)
 					{
 						new IfcRelServicesBuildings(sys, this);
@@ -1367,13 +1368,13 @@ additional types	some additional representation types are given:
 			if(m.mSharedPlacement != null)
 				SharedPlacement = db.Factory.Duplicate(m.SharedPlacement) as IfcObjectPlacement;
 		}
-		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name)
+		public IfcStructuralAnalysisModel(IfcSpatialElement facility, string name, IfcAnalysisModelTypeEnum type) : base(facility, name)
 		{
 			mPredefinedType = type;
 			if (mDatabase.Release < ReleaseVersion.IFC4)
-				SharedPlacement = bldg.ObjectPlacement;
+				SharedPlacement = facility.ObjectPlacement;
 			else
-				SharedPlacement = new IfcLocalPlacement(bldg.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
+				SharedPlacement = new IfcLocalPlacement(facility.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
 		}
 
 		internal void addLoadGroup(IfcStructuralLoadGroup lg) { mLoadedBy.Add(lg.mIndex); lg.mLoadGroupFor.Add(this); }

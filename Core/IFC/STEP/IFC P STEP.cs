@@ -363,7 +363,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			if (release < ReleaseVersion.IFC4X3_RC3)
+			if (release < ReleaseVersion.IFC4X3_RC2)
 				DistanceAlong = new IfcNonNegativeLengthMeasure(ParserSTEP.StripDouble(str, ref pos, len));
 			else
 				DistanceAlong = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcCurveMeasureSelect;

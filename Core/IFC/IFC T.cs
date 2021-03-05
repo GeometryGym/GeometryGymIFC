@@ -1396,7 +1396,7 @@ namespace GeometryGym.Ifc
 			if (!str.ToLower().EndsWith("Type"))
 				str = str + "Type";
 			IfcTypeProduct result = null;
-			Type type = Type.GetType("GeometryGym.Ifc." + str);
+			Type type = BaseClassIfc.GetType(str);
 			if (type != null)
 			{
 				Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "Enum");

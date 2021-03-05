@@ -747,8 +747,10 @@ namespace GeometryGym.Ifc
 		{
 			mPredefinedType = e.mPredefinedType;
 			if (options.DuplicateDownstream)
+			{
 				foreach (IfcRelFillsElement fills in e.HasFillings)
 					mDatabase.Factory.Duplicate(fills, options);
+			}
 		}
 		internal IfcOpeningElement(DatabaseIfc db) : base(db) { }
 		public IfcOpeningElement(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape rep) : base(host.mDatabase)

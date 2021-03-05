@@ -245,7 +245,9 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
 		private double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [3:3] OF IfcLengthMeasure; 
+		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
 		public double[][] CoordList { get { return mCoordList; } set { mCoordList = value; } }
+		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
 		internal IfcCartesianPointList3D() : base() { }
 		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
 
