@@ -52,12 +52,12 @@ namespace GeometryGym.Ifc
 					string[] values = token.Value<string>().Split(" ".ToCharArray());
 					if (values.Length > 0)
 					{
-						mCoordinateX = double.Parse(values[0]);
+						mCoordinateX = double.Parse(values[0], ParserSTEP.NumberFormat);
 						if (values.Length > 1)
 						{
-							mCoordinateY = double.Parse(values[1]);
+							mCoordinateY = double.Parse(values[1], ParserSTEP.NumberFormat);
 							if (values.Length > 2)
-								mCoordinateZ = double.Parse(values[2]);
+								mCoordinateZ = double.Parse(values[2], ParserSTEP.NumberFormat);
 						}
 					}
 				}

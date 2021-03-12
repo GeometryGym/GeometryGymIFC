@@ -745,10 +745,10 @@ namespace GeometryGym.Ifc
 				IfcDerivedMeasureValue dm = mValueComponent as IfcDerivedMeasureValue;
 				if (dm != null)
 					return dm.Measure * sif;
-				if (double.TryParse(mValueComponent.ValueString, out d))
+				if (double.TryParse(mValueComponent.ValueString, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d))
 					return d * sif;
 			}
-			if (double.TryParse(mVal, out d))
+			if (double.TryParse(mVal, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d))
 				return d * sif;
 			return sif;
 		}

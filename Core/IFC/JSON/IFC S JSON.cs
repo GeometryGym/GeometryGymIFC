@@ -828,9 +828,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("Transparency", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Transparency = token.Value<double>();
+			
 			JObject jobj = obj.GetValue("DiffuseColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				DiffuseColour = extractObject<IfcColourOrFactor>(jobj);
@@ -849,15 +847,14 @@ namespace GeometryGym.Ifc
 			jobj = obj.GetValue("SpecularHighlight", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				SpecularHighlight = extractObject<IfcSpecularHighlightSelect>(jobj);
-			token = obj.GetValue("ReflectanceMethod", StringComparison.InvariantCultureIgnoreCase);
+			JToken token = obj.GetValue("ReflectanceMethod", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcReflectanceMethodEnum>(token.Value<string>(), out mReflectanceMethod);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if(!double.IsNaN(mTransparency))
-				obj["Transparency"] = Transparency;
+			
 			setJSON(DiffuseColour, "DiffuseColour", obj, this, options);
 			setJSON(TransmissionColour, "TransmissionColour", obj, this, options);
 			setJSON(DiffuseTransmissionColour, "DiffuseTransmissionColour", obj, this, options);
@@ -887,11 +884,17 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("SurfaceColour", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				SurfaceColour = extractObject<IfcColourRgb>(jobj);
+
+			JToken token = obj.GetValue("Transparency", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Transparency = token.Value<double>();
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["SurfaceColour"] = SurfaceColour.getJson(this, options);
+			if (!double.IsNaN(mTransparency))
+				obj["Transparency"] = Transparency;
 		}
 	}
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/

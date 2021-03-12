@@ -376,9 +376,11 @@ namespace GeometryGym.Ifc
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
 			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
-				if (typeof(IfcCourse).IsAssignableFrom(type))
+				if (string.Compare(str, "IfcBuiltElement", true) == 0)
 					type = typeof(IfcBuildingElementProxy);
-				else if (typeof(IfcEarthworksElement).IsAssignableFrom(type))
+				else if (typeof(IfcCourse).IsAssignableFrom(type) || typeof(IfcEarthworksElement).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
+				else if (typeof(IfcEarthworksCut).IsAssignableFrom(type) || typeof(IfcGeotechnicalStratum).IsAssignableFrom(type))
 					type = typeof(IfcBuildingElementProxy);
 				else if (release < ReleaseVersion.IFC4X2)
 				{
@@ -403,7 +405,7 @@ namespace GeometryGym.Ifc
 			string resultClass = product.StepClassName;
 			if (string.Compare(str, resultClass, true) != 0 && string.Compare(resultClass, "IfcFacilityPart",true) != 0)
 				product.ObjectType = className;
-			if (!string.IsNullOrEmpty(definedType))
+			else if (!string.IsNullOrEmpty(definedType))
 			{
 				if (mDatabase.mRelease < ReleaseVersion.IFC4)
 					product.ObjectType = definedType;

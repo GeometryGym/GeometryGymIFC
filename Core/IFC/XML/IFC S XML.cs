@@ -931,33 +931,13 @@ namespace GeometryGym.Ifc
 				element.AppendChild((style as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
-	{
-		//internal double mTransparency;// : OPTIONAL IfcNormalisedRatioMeasure;
-		//internal IfcColourOrFactor mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
-		//internal IfcSpecularHighlightSelect mSpecularHighlight;// : OPTIONAL 
-		//internal IfcReflectanceMethodEnum mReflectanceMethod = IfcReflectanceMethodEnum.NOTDEFINED;// : IfcReflectanceMethodEnum; 
-
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			if (xml.HasAttribute("Transparency"))
-				mTransparency = double.Parse(xml.Attributes["Transparency"].Value);
-
-		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			if (!double.IsNaN(mTransparency))
-				xml.SetAttribute("Transparency", mTransparency.ToString());
-
-		}
-	}
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
+			if (xml.HasAttribute("Transparency"))
+				mTransparency = double.Parse(xml.Attributes["Transparency"].Value);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -968,6 +948,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
+			if (!double.IsNaN(mTransparency))
+				xml.SetAttribute("Transparency", mTransparency.ToString());
 			xml.AppendChild(SurfaceColour.GetXML(xml.OwnerDocument, "SurfaceColour", this, processed));
 		}
 	}

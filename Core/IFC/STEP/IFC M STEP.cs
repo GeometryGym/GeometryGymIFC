@@ -256,7 +256,7 @@ namespace GeometryGym.Ifc
 			Profile = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			double d = 0;
-			if( double.TryParse(s, out d)) //Was normalizedRatioMeasure
+			if( double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d)) //Was normalizedRatioMeasure
 				Priority =(int)d;
 			mCategory = ParserSTEP.StripString(str, ref pos, len);
 		}

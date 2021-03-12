@@ -663,7 +663,8 @@ namespace GeometryGym.Ifc
 		}
 		public IfcSegmentedReferenceCurve ComputeGeometry(IfcGradientCurve gradientCurve)
 		{
-			IfcSegmentedReferenceCurve result = new IfcSegmentedReferenceCurve(gradientCurve, CantSegments.Select(x => x.generateCurveSegment(RailHeadDistance)));
+			List<IfcCurveSegment> curveSegments = CantSegments.Select(x => x.generateCurveSegment(RailHeadDistance)).ToList();
+			IfcSegmentedReferenceCurve result = new IfcSegmentedReferenceCurve(gradientCurve, curveSegments);
 			result.EndPoint = CantSegments.Last().ComputeEndPlacement(RailHeadDistance);
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve3D));
 			return result;
@@ -719,24 +720,25 @@ namespace GeometryGym.Ifc
 				throw new NotImplementedException("XX Not Implemented cant segment " + PredefinedType.ToString());
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;
-			double dz = StartCantLeft - StartCantRight;
-			double theta = Math.Asin(dz / railHeadDistance);
-			double yOffset = StartCantLeft - (dz / 2);
+			double deltaStartCant = StartCantLeft - StartCantRight;
+			double theta = Math.Asin(deltaStartCant / railHeadDistance);
+			double yOffset = StartCantLeft - (deltaStartCant / 2);
 			double segmentLength = HorizontalLength;
-			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, yOffset);
+			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, yOffset, 0);
 			IfcAxis2Placement3D segmentPlacement = new IfcAxis2Placement3D(startPoint);
 
-			segmentPlacement.Axis = (Math.Abs(dz) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
+			segmentPlacement.RefDirection = (Math.Abs(deltaStartCant) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
+			segmentPlacement.Axis = db.Factory.XAxis;
 			if (!double.IsNaN(EndCantLeft) || !double.IsNaN(EndCantRight))
 			{
 				if (Math.Abs(EndCantLeft - StartCantLeft) > tol && Math.Abs(EndCantRight - StartCantRight) > tol)
 				{
-					double dzEnd = EndCantLeft - EndCantRight;
-					double thetaEnd = Math.Asin(dz / railHeadDistance);
-					double endYOffset = EndCantLeft - (dz / 2);
+					double deltaEndCant = EndCantLeft - EndCantRight;
+					double thetaEnd = Math.Asin(deltaEndCant / railHeadDistance);
+					double endYOffset = EndCantLeft - (deltaEndCant / 2);
 					double deltaY = endYOffset - yOffset;
 					segmentLength = Math.Sqrt(deltaY * deltaY + HorizontalLength * HorizontalLength);
-					segmentPlacement.RefDirection = new IfcDirection(db, HorizontalLength/ segmentLength , deltaY / HorizontalLength, 0);
+					segmentPlacement.Axis = new IfcDirection(db, HorizontalLength/ segmentLength , deltaY / HorizontalLength, 0);
 				}
 			}
 			IfcLine line = db.Factory.LineX2d;
@@ -751,7 +753,7 @@ namespace GeometryGym.Ifc
 			double dz = EndCantLeft - EndCantRight;
 			double theta = Math.Asin(dz / railHeadDistance);
 			double yOffset = EndCantLeft - dz /2;
-			IfcCartesianPoint endPoint = new IfcCartesianPoint(db, StartDistAlong + HorizontalLength, yOffset);
+			IfcCartesianPoint endPoint = new IfcCartesianPoint(db, StartDistAlong + HorizontalLength, yOffset, 0);
 			IfcAxis2Placement3D result = new IfcAxis2Placement3D(endPoint);
 			result.Axis = Math.Abs(dz) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis;
 			//todo calculate end tangent
@@ -1095,7 +1097,8 @@ namespace GeometryGym.Ifc
 	
 		public IfcGradientCurve ComputeGeometry(IfcCompositeCurve horizontalCurve)
 		{
-			IfcGradientCurve result = new IfcGradientCurve(horizontalCurve, VerticalSegments.Select(x => x.generateCurveSegment()));
+			List<IfcCurveSegment> segments = VerticalSegments.Select(x => x.generateCurveSegment()).ToList();
+			IfcGradientCurve result = new IfcGradientCurve(horizontalCurve, segments); 
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve3D));
 			return result;
 		}

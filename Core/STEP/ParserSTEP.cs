@@ -1308,7 +1308,7 @@ namespace GeometryGym.STEP
 						if (icounter == len)
 							break;
 					}
-					doubles.Add(double.Parse(str));
+					doubles.Add(double.Parse(str, NumberFormat));
 					if (icounter == len)
 						break;
 					while (char.IsWhiteSpace(s[icounter]))

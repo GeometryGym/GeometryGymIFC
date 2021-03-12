@@ -890,7 +890,7 @@ namespace GeometryGym.Ifc
 			if (s.StartsWith("("))
 			{
 				List<string> fields = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-				mSelfWeightCoefficients = new Tuple<double,double,double>(double.Parse(fields[0]), double.Parse(fields[1]), double.Parse(fields[2]));
+				mSelfWeightCoefficients = new Tuple<double,double,double>(double.Parse(fields[0], ParserSTEP.NumberFormat), double.Parse(fields[1], ParserSTEP.NumberFormat), double.Parse(fields[2], ParserSTEP.NumberFormat));
 			}
 		}
 	}
@@ -1269,15 +1269,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mTransparency) + "," +
-				ParserIfc.STEPString(mDiffuseColour) + "," + ParserIfc.STEPString(mTransmissionColour) + "," +
-				ParserIfc.STEPString(mDiffuseTransmissionColour) + "," + ParserIfc.STEPString(mReflectionColour) + "," +
-				ParserIfc.STEPString(mSpecularColour) + (mSpecularHighlight == null ? ",$" : "," + mSpecularHighlight.ToString()) + ",." + mReflectanceMethod.ToString() + ".";
+			return base.BuildStringSTEP(release) + "," + ParserIfc.STEPString(mDiffuseColour) + "," + 
+				ParserIfc.STEPString(mTransmissionColour) + "," + ParserIfc.STEPString(mDiffuseTransmissionColour) + "," +
+				ParserIfc.STEPString(mReflectionColour) + "," + ParserIfc.STEPString(mSpecularColour) + 
+				(mSpecularHighlight == null ? ",$" : "," + mSpecularHighlight.ToString()) + ",." + mReflectanceMethod.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mTransparency = ParserSTEP.StripDouble(str, ref pos, len);
 			mDiffuseColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
 			mTransmissionColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
 			mDiffuseTransmissionColour = ParserIfc.parseColourOrFactor(ParserSTEP.StripField(str, ref pos, len), dictionary);
@@ -1287,9 +1286,9 @@ namespace GeometryGym.Ifc
 			if (s != "$")
 			{
 				if (s.StartsWith("IFCSPECULARROUGHNESS"))
-					mSpecularHighlight = new IfcSpecularRoughness(double.Parse(s.Substring(21, s.Length - 22)));
+					mSpecularHighlight = new IfcSpecularRoughness(double.Parse(s.Substring(21, s.Length - 22), ParserSTEP.NumberFormat));
 				else
-					mSpecularHighlight = new IfcSpecularExponent(double.Parse(s.Substring(20, s.Length - 21)));
+					mSpecularHighlight = new IfcSpecularExponent(double.Parse(s.Substring(20, s.Length - 21), ParserSTEP.NumberFormat));
 			}
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if(s.StartsWith("."))
@@ -1298,8 +1297,19 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect //SUPERTYPE OF(IfcSurfaceStyleRendering)
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mSurfaceColour); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mSurfaceColour = ParserSTEP.StripLink(str, ref pos, len); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			IfcSurfaceStyleRendering rendering = this as IfcSurfaceStyleRendering;
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mSurfaceColour) + 
+				(rendering != null || release > ReleaseVersion.IFC2x3 ? "," + ParserSTEP.DoubleOptionalToString(mTransparency) : ""); 
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
+		{
+			mSurfaceColour = ParserSTEP.StripLink(str, ref pos, len); 
+			IfcSurfaceStyleRendering rendering = this as IfcSurfaceStyleRendering;
+			if(rendering != null || release > ReleaseVersion.IFC2x3)
+				mTransparency = ParserSTEP.StripDouble(str, ref pos, len);
+		}
 	}
 	public partial class IfcSurfaceStyleWithTextures : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{

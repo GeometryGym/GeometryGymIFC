@@ -2084,7 +2084,8 @@ additional types	some additional representation types are given:
 		public IfcStyledItem(IfcRepresentationItem item, IEnumerable<IfcStyleAssignmentSelect> styles) : base(item.mDatabase)
 		{
 			Item = item;
-			Styles.AddRange(styles);
+			foreach (IfcStyleAssignmentSelect style in styles)
+				addStyle(style);
 		}
 		internal void addStyle(IfcStyleAssignmentSelect style)
 		{
@@ -2389,12 +2390,10 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
 	{
-		internal double mTransparency = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		private IfcColourOrFactor mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
 		internal IfcSpecularHighlightSelect mSpecularHighlight;// : OPTIONAL 
 		internal IfcReflectanceMethodEnum mReflectanceMethod = IfcReflectanceMethodEnum.NOTDEFINED;// : IfcReflectanceMethodEnum; 
 
-		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
 		public IfcColourOrFactor DiffuseColour { get { return mDiffuseColour; } set { mDiffuseColour = value; } }
 		public IfcColourOrFactor TransmissionColour { get { return mTransmissionColour; } set { mTransmissionColour = value; } }
 		public IfcColourOrFactor DiffuseTransmissionColour { get { return mDiffuseTransmissionColour; } set { mDiffuseTransmissionColour = value; } }
@@ -2406,7 +2405,6 @@ additional types	some additional representation types are given:
 		internal IfcSurfaceStyleRendering() : base() { }
 		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r) : base(db, r)
 		{
-			mTransparency = r.mTransparency;
 			mDiffuseColour = r.mDiffuseColour;
 			mTransmissionColour = r.mTransmissionColour;
 			mDiffuseTransmissionColour = r.mDiffuseTransmissionColour;
@@ -2421,10 +2419,17 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect //SUPERTYPE OF(IfcSurfaceStyleRendering)
 	{
 		private int mSurfaceColour;// : IfcColourRgb;
+		private double mTransparency = double.NaN; // : IfcNormalisedRatioMeasure
+		
 		public IfcColourRgb SurfaceColour { get { return mDatabase[mSurfaceColour] as IfcColourRgb; } set { mSurfaceColour = value.mIndex; } }
+		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
 
 		internal IfcSurfaceStyleShading() : base() { }
-		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) { SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb; }
+		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) 
+		{
+			SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb;
+			mTransparency = s.mTransparency;
+		}
 		public IfcSurfaceStyleShading(IfcColourRgb surfaceColour) : base(surfaceColour.mDatabase) { SurfaceColour = surfaceColour; }
 	}
 	[Serializable]
