@@ -162,7 +162,13 @@ namespace GeometryGym.STEP
 		}
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
 		public static string DoubleToString(double d) { if (double.IsNaN(d) || double.IsInfinity(d)) return "0.0"; return String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d); }
-		public static string DoubleExponentialString(double d) { return String.Format(CultureInfo.InvariantCulture, "{0:0.########E+00}", d); }
+		public static string DoubleExponentialString(double d) 
+		{
+			double abs = Math.Abs(d);
+			if (abs < 1000 && (abs < double.Epsilon || abs > 0.001))
+				return DoubleToString(d);
+			return String.Format(CultureInfo.InvariantCulture, "{0:0.########E+00}", d);
+		}
 		public static string DoubleOptionalToString(double d) { return (double.IsNaN(d) || double.IsInfinity(d) ? "$" : String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d)); }
 		public static string IntToString(int i)
 		{
@@ -732,7 +738,10 @@ namespace GeometryGym.STEP
 			progressToNext(s, ref pos, len);
 			return c == 'T';
 		}
-		
+		private static bool isDoubleChar(char c)
+		{
+			return char.IsDigit(c) || c == '.' || c == 'e' || c == 'E' || c == '-' || c == '+';
+		}
 		public static double StripDouble(string s, ref int pos, int len)
 		{
 			int icounter = pos;
@@ -751,7 +760,7 @@ namespace GeometryGym.STEP
 
 			string str = "";
 			char c = s[icounter];
-			while (char.IsDigit(c) || c == '.' || char.ToLower(c) == 'e' || c == '-'  || c == '+')
+			while (isDoubleChar(c))
 			{
 				str += c;
 				if (++icounter == len)
@@ -1292,14 +1301,14 @@ namespace GeometryGym.STEP
 				{
 					string str = "";
 					char c = s[icounter];
-					while (char.IsDigit(c) || c == '.' || c == '-')
+					while (isDoubleChar(c))
 					{
 						str += c;
 						c = s[++icounter];
 						if (icounter == len)
 							break;
 					}
-					doubles.Add(double.Parse(str));
+					doubles.Add(double.Parse(str, NumberFormat));
 					if (icounter == len)
 						break;
 					while (char.IsWhiteSpace(s[icounter]))
@@ -1360,11 +1369,25 @@ namespace GeometryGym.STEP
 		{
 			int icounter = pos;
 			string result = "";
-			if (s[icounter++] != '\'')
+			char c = s[icounter++];
+			if (c != '\'')
+			{
+				if(c == 'I')
+				{
+					icounter++;
+					while(s[icounter] != '\'' && icounter + 1 < len)
+						icounter++;
+					result = stripstring(s, ref icounter, len);
+					while (s[icounter] != ')' && icounter + 1 < len)
+						icounter++;
+					pos = icounter + 1;
+					return result;
+				}
 				throw new Exception("Unrecognized format!");
+			}
 			while (icounter < len)
 			{
-				char c = s[icounter];
+				c = s[icounter];
 				if (c == '\'')
 				{
 					if (icounter + 1 < len)

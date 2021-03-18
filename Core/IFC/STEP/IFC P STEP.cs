@@ -355,11 +355,11 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC2 ? "IFCDISTANCEEXPRESSION" : base.StepClassName); } }
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4X3_RC2 ? formatLength((mDistanceAlong as IfcNonNegativeLengthMeasure).Measure) :  mDistanceAlong.ToString()) +
+			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4X3_RC3 ? formatLength((mDistanceAlong as IfcNonNegativeLengthMeasure).Measure) :  mDistanceAlong.ToString()) +
 				(double.IsNaN(mOffsetLateral) ? ",$" : "," + formatLength(OffsetLateral)) +
 				(double.IsNaN(mOffsetVertical) ? ",$" : "," + formatLength(OffsetVertical)) +
 				(double.IsNaN(mOffsetLongitudinal) ? ",$" : "," + formatLength(mOffsetLongitudinal)) +
-				(release < ReleaseVersion.IFC4X3_RC2 ? "," + ParserSTEP.BoolToString(mAlongHorizontal) :  ",#" + mBasisCurve.StepId);
+				(release < ReleaseVersion.IFC4X3_RC2 ? "," + ParserSTEP.BoolToString(mAlongHorizontal) : ",#" + mBasisCurve.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -429,6 +429,24 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mPolygon.ConvertAll(x=>x.mIndex)) + ")" ; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mPolygon.AddRange(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcCartesianPoint)); }
+	}
+	public partial class IfcPolynomialCurve : IfcCurve
+	{
+		protected override string BuildStringSTEP()
+		{
+			return base.BuildStringSTEP() +
+			",#" + mPosition.StepId +
+			(mCoefficientsX.Count ==0 ? ",$" :	",(" + string.Join(",", mCoefficientsX.ConvertAll(x => ParserSTEP.DoubleExponentialString(x))) + ")") +
+			(mCoefficientsY.Count == 0 ? ",$" : ",(" + string.Join(",", mCoefficientsY.ConvertAll(x => ParserSTEP.DoubleExponentialString(x))) + ")") +
+			(mCoefficientsZ.Count ==0 ? ",$" : ",(" + string.Join(",", mCoefficientsY.ConvertAll(x => ParserSTEP.DoubleExponentialString(x))) + ")");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			Position = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
+			CoefficientsX.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
+			CoefficientsY.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
+			CoefficientsZ.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
+		}
 	}
 	public partial class IfcPostalAddress : IfcAddress
 	{

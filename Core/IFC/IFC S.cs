@@ -144,22 +144,32 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid 
 	{
-		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
+		[Obsolete("REVISED IFC4x3", false)]
+		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
+		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositions = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcDistanceExpression;
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
-		public LIST<IfcPointByDistanceExpression> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
+		public LIST<IfcCurveMeasureSelect> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
 		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s, DuplicateOptions options) : base(db, s, options)
 		{
-			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			CrossSectionPositions.AddRange(s.CrossSectionPositions);
+			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
-		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcPointByDistanceExpression> positions, bool fixedAxisVertical)
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcCurveMeasureSelect> positions, bool fixedAxisVertical)
 			: base(directrix, profiles)
 		{
 			CrossSectionPositions.AddRange(positions);
+			FixedAxisVertical = fixedAxisVertical;
+		}
+		[Obsolete("REVISED IFC4x3", false)]
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcPointByDistanceExpression> positions, bool fixedAxisVertical)
+		: base(directrix, profiles)
+		{
+			mCrossSectionPositions_OBSOLETE.AddRange(positions);
 			FixedAxisVertical = fixedAxisVertical;
 		}
 	}
@@ -281,6 +291,9 @@ namespace GeometryGym.Ifc
 		private IfcTransitionCode mTransition = IfcTransitionCode.DISCONTINUOUS; //: IfcTransitionCode;
 		public IfcTransitionCode Transition { get { return mTransition; } set { mTransition = value; } }
 
+		//INVERSE
+			//UsingCurves : SET[1:?] OF IfcCompositeCurve FOR Segments;
+
 		protected IfcSegment() : base() { }
 		protected IfcSegment(DatabaseIfc db, IfcSegment s, DuplicateOptions options) : base(db, s, options) { Transition = s.Transition; }
 		protected IfcSegment(DatabaseIfc db, IfcTransitionCode transition)
@@ -288,14 +301,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcSegmentIndexSelect { } //SELECT ( IfcLineIndex, IfcArcIndex);
 	[Serializable]
-	public partial class IfcSegmentedReferenceCurve : IfcBoundedCurve
+	public partial class IfcSegmentedReferenceCurve : IfcCompositeCurve
 	{
 		private IfcBoundedCurve mBaseCurve = null; //: IfcBoundedCurve;
-		private LIST<IfcCurveSegment> mSegments = new LIST<IfcCurveSegment>(); //: LIST[1:?] OF IfcCurveSegment;
 		private IfcPlacement mEndPoint = null; //: OPTIONAL IfcPlacement;
 
 		public IfcBoundedCurve BaseCurve { get { return mBaseCurve; } set { mBaseCurve = value; } }
-		public LIST<IfcCurveSegment> Segments { get { return mSegments; } set { mSegments = value; } }
 		public IfcPlacement EndPoint { get { return mEndPoint; } set { mEndPoint = value; } }
 
 		public IfcSegmentedReferenceCurve() : base() { }
@@ -303,21 +314,12 @@ namespace GeometryGym.Ifc
 		: base(db, segmentedReferenceCurve, options)
 		{
 			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve) as IfcBoundedCurve;
-			Segments.AddRange(segmentedReferenceCurve.Segments.Select(x => db.Factory.Duplicate(x, options) as IfcCurveSegment));
 			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint) as IfcPlacement;
 		}
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
-			: base(baseCurve.Database)
+			: base(segments)
 		{
 			BaseCurve = baseCurve;
-			Segments.AddRange(segments);
-		}
-		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcAlignmentCantSegment> segments, double horizontalStartDistAlong, double railHeadDistance)
-			: base(baseCurve.Database)
-		{
-			BaseCurve = BaseCurve;
-			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(horizontalStartDistAlong, railHeadDistance));
-			Segments.AddRange(curveSegments);
 		}
 	}
 	[Serializable]
@@ -344,33 +346,6 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcServiceLife // DEPRECATED IFC4
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
-	[Serializable]
-	public partial class IfcSeriesParameterCurve : IfcCurve
-	{
-		private IfcPlacement mPosition = null; //: IfcPlacement;
-		private LIST<double> mCoefficientsX = new LIST<double>(); //: LIST[2:?] OF IfcReal;
-		private LIST<double> mCoefficientsY = new LIST<double>(); //: LIST[2:?] OF IfcReal;
-
-		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
-		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
-		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
-
-		public IfcSeriesParameterCurve() : base() { }
-		internal IfcSeriesParameterCurve(DatabaseIfc db, IfcSeriesParameterCurve seriesParameterCurve, DuplicateOptions options)
-		: base(db, seriesParameterCurve, options)
-		{
-			Position = db.Factory.Duplicate(seriesParameterCurve.Position as BaseClassIfc, options) as IfcPlacement;
-			seriesParameterCurve.mCoefficientsX.AddRange(seriesParameterCurve.mCoefficientsX);
-			seriesParameterCurve.mCoefficientsY.AddRange(seriesParameterCurve.mCoefficientsY);
-		}
-		public IfcSeriesParameterCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
-			: base(position.Database)
-		{
-			Position = position;
-			CoefficientsX.AddRange(coefficientsX);
-			CoefficientsY.AddRange(coefficientsY);
-		}
-	}
 	[Serializable]
 	public partial class IfcShadingDevice : IfcBuiltElement
 	{
@@ -719,6 +694,21 @@ additional types	some additional representation types are given:
 		public IfcSimplePropertyTemplate(DatabaseIfc db, string name) : base(db,name) { }
 	}
 	[Serializable]
+	public partial class IfcSine : IfcSpiral
+	{
+		private double mSineTerm = 0; //: IfcLengthMeasure;
+		private double mConstant = double.NaN; //: IfcReal;
+
+		public double SineTerm { get { return mSineTerm; } set { mSineTerm = value; } }
+		public double Constant { get { return mConstant; } set { mConstant = value; } }
+
+		public IfcSine() : base() { }
+		internal IfcSine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
+			: base(db, cosine, options) { SineTerm = cosine.CosineTerm; Constant = cosine.Constant; }
+		public IfcSine(IfcAxis2Placement position, double cosineTerm)
+			: base(position) { SineTerm = cosineTerm; }
+	}
+	[Serializable]
 	public partial class IfcSite : IfcSpatialStructureElement
 	{
 		internal IfcCompoundPlaneAngleMeasure mRefLatitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
@@ -940,14 +930,6 @@ additional types	some additional representation types are given:
 		public IfcSpace(IfcSpatialStructureElement host, string name) : base(host, name) { IfcRelCoversSpaces cs = new IfcRelCoversSpaces(this, null); }
 		public IfcSpace(IfcSpatialStructureElement host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 		internal IfcSpace(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-		protected override void addProduct(IfcProduct product)
-		{
-			IfcCovering covering = product as IfcCovering;
-			if (covering != null)
-				mHasCoverings.First().RelatedCoverings.Add(covering);
-			else
-				base.addProduct(product);
-		}
 		public void AddBoundary(IfcRelSpaceBoundary boundary) { mBoundedBy.Add(boundary); }
 	}
 	public partial interface IfcSpaceBoundarySelect : IBaseClassIfc //IFC4 SELECT (	IfcSpace, IfcExternalSpatialElement);
@@ -1035,9 +1017,10 @@ additional types	some additional representation types are given:
 			{
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
 					db.Factory.Duplicate(css, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
-					IfcSystem sys = db.Factory.Duplicate(system, options) as IfcSystem;
+					IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
 					if(system.ServicesBuildings == null)
 					{
 						new IfcRelServicesBuildings(sys, this);
@@ -1052,18 +1035,6 @@ additional types	some additional representation types are given:
 		}
 		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement) { }
 		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-
-		protected override void addProduct(IfcProduct product)
-		{
-			product.detachFromHost();
-			if (mContainsElements.Count == 0)
-			{
-				new IfcRelContainedInSpatialStructure(product, this);
-			}
-			else
-				mContainsElements.First().RelatedElements.Add(product);
-		}
-
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1234,6 +1205,18 @@ additional types	some additional representation types are given:
 		public IfcSphericalSurface(IfcAxis2Placement3D placement, double radius) : base(placement) { Radius = radius; }
 	}
 	[Serializable]
+	public abstract partial class IfcSpiral : IfcCurve
+	{
+		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
+		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
+
+		public IfcSpiral() : base() { }
+		internal IfcSpiral(DatabaseIfc db, IfcSpiral spiral, DuplicateOptions options)
+			: base(db, spiral, options) { Position = db.Factory.Duplicate(spiral.Position as BaseClassIfc, options) as IfcAxis2Placement; }
+		public IfcSpiral(IfcAxis2Placement position)
+			: base(position.Database) { Position = position; }
+	}
+	[Serializable]
 	public partial class IfcStackTerminal : IfcFlowTerminal //IFC4
 	{
 		internal IfcStackTerminalTypeEnum mPredefinedType = IfcStackTerminalTypeEnum.NOTDEFINED;// OPTIONAL : IfcStackTerminalTypeEnum;
@@ -1385,13 +1368,13 @@ additional types	some additional representation types are given:
 			if(m.mSharedPlacement != null)
 				SharedPlacement = db.Factory.Duplicate(m.SharedPlacement) as IfcObjectPlacement;
 		}
-		public IfcStructuralAnalysisModel(IfcSpatialElement bldg, string name, IfcAnalysisModelTypeEnum type) : base(bldg, name)
+		public IfcStructuralAnalysisModel(IfcSpatialElement facility, string name, IfcAnalysisModelTypeEnum type) : base(facility, name)
 		{
 			mPredefinedType = type;
 			if (mDatabase.Release < ReleaseVersion.IFC4)
-				SharedPlacement = bldg.ObjectPlacement;
+				SharedPlacement = facility.ObjectPlacement;
 			else
-				SharedPlacement = new IfcLocalPlacement(bldg.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
+				SharedPlacement = new IfcLocalPlacement(facility.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
 		}
 
 		internal void addLoadGroup(IfcStructuralLoadGroup lg) { mLoadedBy.Add(lg.mIndex); lg.mLoadGroupFor.Add(this); }
@@ -1985,7 +1968,7 @@ additional types	some additional representation types are given:
 		internal IfcStructuralSurfaceAction() : base() { }
 		internal IfcStructuralSurfaceAction(DatabaseIfc db, IfcStructuralSurfaceAction a, DuplicateOptions options) : base(db, a, options) { mProjectedOrTrue = a.mProjectedOrTrue; mPredefinedType = a.mPredefinedType; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralActivityAssignmentSelect item, IfcStructuralLoad load, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
-			: base(lc, item, load,null, global) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + "added in IFC4"); mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
+			: base(lc, item, load,null, global) { mProjectedOrTrue = projected ? IfcProjectedOrTrueLengthEnum.PROJECTED_LENGTH : IfcProjectedOrTrueLengthEnum.TRUE_LENGTH; mPredefinedType = type; }
 		public IfcStructuralSurfaceAction(IfcStructuralLoadCase lc, IfcStructuralLoad load, IfcFaceSurface extent, bool global, bool projected, IfcStructuralSurfaceActivityTypeEnum type)
 			: base(lc,null,load,new IfcTopologyRepresentation(lc.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Reference), extent), global)
 		{
@@ -2101,7 +2084,8 @@ additional types	some additional representation types are given:
 		public IfcStyledItem(IfcRepresentationItem item, IEnumerable<IfcStyleAssignmentSelect> styles) : base(item.mDatabase)
 		{
 			Item = item;
-			Styles.AddRange(styles);
+			foreach (IfcStyleAssignmentSelect style in styles)
+				addStyle(style);
 		}
 		internal void addStyle(IfcStyleAssignmentSelect style)
 		{
@@ -2406,12 +2390,10 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
 	{
-		internal double mTransparency = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		private IfcColourOrFactor mDiffuseColour, mTransmissionColour, mDiffuseTransmissionColour, mReflectionColour, mSpecularColour;//:	OPTIONAL IfcColourOrFactor;
 		internal IfcSpecularHighlightSelect mSpecularHighlight;// : OPTIONAL 
 		internal IfcReflectanceMethodEnum mReflectanceMethod = IfcReflectanceMethodEnum.NOTDEFINED;// : IfcReflectanceMethodEnum; 
 
-		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
 		public IfcColourOrFactor DiffuseColour { get { return mDiffuseColour; } set { mDiffuseColour = value; } }
 		public IfcColourOrFactor TransmissionColour { get { return mTransmissionColour; } set { mTransmissionColour = value; } }
 		public IfcColourOrFactor DiffuseTransmissionColour { get { return mDiffuseTransmissionColour; } set { mDiffuseTransmissionColour = value; } }
@@ -2423,7 +2405,6 @@ additional types	some additional representation types are given:
 		internal IfcSurfaceStyleRendering() : base() { }
 		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r) : base(db, r)
 		{
-			mTransparency = r.mTransparency;
 			mDiffuseColour = r.mDiffuseColour;
 			mTransmissionColour = r.mTransmissionColour;
 			mDiffuseTransmissionColour = r.mDiffuseTransmissionColour;
@@ -2438,10 +2419,17 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect //SUPERTYPE OF(IfcSurfaceStyleRendering)
 	{
 		private int mSurfaceColour;// : IfcColourRgb;
+		private double mTransparency = double.NaN; // : IfcNormalisedRatioMeasure
+		
 		public IfcColourRgb SurfaceColour { get { return mDatabase[mSurfaceColour] as IfcColourRgb; } set { mSurfaceColour = value.mIndex; } }
+		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
 
 		internal IfcSurfaceStyleShading() : base() { }
-		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) { SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb; }
+		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) 
+		{
+			SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb;
+			mTransparency = s.mTransparency;
+		}
 		public IfcSurfaceStyleShading(IfcColourRgb surfaceColour) : base(surfaceColour.mDatabase) { SurfaceColour = surfaceColour; }
 	}
 	[Serializable]
@@ -2574,14 +2562,11 @@ additional types	some additional representation types are given:
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcSymbolStyle // IfcPresentationStyleSelect DEPRECATED IFC4
 	[Serializable]
-	public partial class IfcSystem : IfcGroup, IfcSpatialReferenceSelect //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
+	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
 	{
 		//INVERSE
 		internal IfcRelServicesBuildings mServicesBuildings = null;// : SET [0:1] OF IfcRelServicesBuildings FOR RelatingSystem  
-		internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
-
 		public IfcRelServicesBuildings ServicesBuildings { get { return mServicesBuildings; } set { mServicesBuildings = value; } }
-		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcSystem() : base() { }
 		internal IfcSystem(DatabaseIfc db, IfcSystem s, DuplicateOptions options) : base(db, s, options)
@@ -2593,16 +2578,7 @@ additional types	some additional representation types are given:
 			}
 		}
 		public IfcSystem(DatabaseIfc db, string name) : base(db, name) { }
-		public IfcSystem(IfcSpatialElement spatial, string name) : base(spatial.mDatabase, name)
-		{
-			if (!(this is IfcZone))
-			{
-				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3_RC1)
-					mServicesBuildings = new IfcRelServicesBuildings(this, spatial) { Name = name };
-				else
-					spatial.ReferenceElement(this);
-			}
-		}
+		public IfcSystem(IfcSpatialElement spatial, string name) : base(spatial, name) { }
 		public IfcSystem(IfcSystem system, string name) : base(system.Database, name)
 		{
 			system.AddAggregated(this);

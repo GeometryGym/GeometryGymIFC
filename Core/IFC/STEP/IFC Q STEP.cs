@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 				if (s.StartsWith("IFCAREAMEASURE"))
 				{
 					s = s.Substring(15, s.Length - 16);
-					double.TryParse(s, out mAreaValue);
+					double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mAreaValue);
 				}
 			}
 			if (release != ReleaseVersion.IFC2x3)
@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 				if (s.StartsWith("IFCCOUNTMEASURE"))
 				{
 					s = s.Substring(16, s.Length - 17);
-					double.TryParse(s, out mCountValue);
+					double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mCountValue);
 				}
 			}
 			if (release != ReleaseVersion.IFC2x3)
@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 				if (s.StartsWith("IFCLENGTHMEASURE"))
 				{
 					s = s.Substring(17, s.Length - 18);
-					double.TryParse(s, out mLengthValue);
+					double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mLengthValue);
 				}
 			}
 			if (release != ReleaseVersion.IFC2x3)
@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			double.TryParse(ParserSTEP.StripField(str, ref pos, len), out mTimeValue);
+			double.TryParse(ParserSTEP.StripField(str, ref pos, len), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mTimeValue);
 			if (release != ReleaseVersion.IFC2x3)
 				mFormula = ParserSTEP.StripString(str, ref pos, len);
 		}
@@ -105,7 +105,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (!double.TryParse(s, out mVolumeValue))
+			if (!double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mVolumeValue))
 			{
 				IfcMeasureValue mv = ParserIfc.parseMeasureValue(s);
 				if (mv != null)
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			if (!double.TryParse(s, out mWeightValue))
+			if (!double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mWeightValue))
 			{
 				IfcMeasureValue mv = ParserIfc.parseMeasureValue(s);
 				if (mv != null)

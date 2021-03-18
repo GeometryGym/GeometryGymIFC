@@ -51,4 +51,29 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("AgreementFlag", mAgreementFlag.ToString().ToLower());
 		}
 	}
+	public partial class IfcHelmertCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("QubicTerm", mQuadraticTerm.ToString());
+			if (!double.IsNaN(mLinearTerm))
+				xml.SetAttribute("QuadraticTerm", mLinearTerm.ToString());
+			if (!double.IsNaN(mConstantTerm))
+				xml.SetAttribute("LinearTerm", mConstantTerm.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string att = xml.GetAttribute("QubicTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mQuadraticTerm);
+			att = xml.GetAttribute("QuadraticTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mLinearTerm);
+			att = xml.GetAttribute("LinearTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mConstantTerm);
+		}
+	}
 }

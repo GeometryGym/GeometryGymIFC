@@ -287,15 +287,19 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion version)
 		{
+			if(version > ReleaseVersion.IFC4X3_RC1)
+			return base.BuildStringSTEP(version) + ",#" + mRelativePlacement.StepId  + (mCartesianPosition == null ? ",$" : ",#" + mCartesianPosition.StepId);
 			return base.BuildStringSTEP(version) + "," + ParserSTEP.ObjToLinkString(mPlacementMeasuredAlong) + "," + ParserSTEP.ObjToLinkString(mDistance) +
-			(version > ReleaseVersion.IFC4X3_RC1 ? ",#" + mRelativePlacement.StepId : (mOrientation == null ? ",$" : ",#" + mOrientation.StepId)) +
-			(mCartesianPosition == null ? ",$" : ",#" + mCartesianPosition.StepId);
+				(mOrientation == null ? ",$" : ",#" + mOrientation.StepId) + (mCartesianPosition == null ? ",$" : ",#" + mCartesianPosition.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			PlacementMeasuredAlong = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			Distance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
+			if (release < ReleaseVersion.IFC4X3_RC3)
+			{
+				PlacementMeasuredAlong = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
+				Distance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
+			}
 			if (release > ReleaseVersion.IFC4X3_RC1)
 				RelativePlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2PlacementLinear;
 			else
@@ -305,16 +309,22 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mAxis == null ? ",$" : ",#" + mAxis.StepId); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? (mAxis == null ? ",$" : ",#" + mAxis.StepId) : "");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			BaseClassIfc axis = dictionary[ParserSTEP.StripLink(str, ref pos, len)];
-			IfcCurve curve = axis as IfcCurve;
-			if(curve != null)
-				Axis = curve;
-			else
-				mAxis = axis as IfcLinearAxisSelect;
+			if (release < ReleaseVersion.IFC4X3_RC3)
+			{
+				BaseClassIfc axis = dictionary[ParserSTEP.StripLink(str, ref pos, len)];
+				IfcCurve curve = axis as IfcCurve;
+				if (curve != null)
+					Axis = curve;
+				else
+					mAxis = axis as IfcLinearAxisSelect;
+			}
 		}
 	}
 	public partial class IfcLinearSpanPlacement : IfcLinearPlacement

@@ -52,12 +52,12 @@ namespace GeometryGym.Ifc
 					string[] values = token.Value<string>().Split(" ".ToCharArray());
 					if (values.Length > 0)
 					{
-						mCoordinateX = double.Parse(values[0]);
+						mCoordinateX = double.Parse(values[0], ParserSTEP.NumberFormat);
 						if (values.Length > 1)
 						{
-							mCoordinateY = double.Parse(values[1]);
+							mCoordinateY = double.Parse(values[1], ParserSTEP.NumberFormat);
 							if (values.Length > 2)
-								mCoordinateZ = double.Parse(values[2]);
+								mCoordinateZ = double.Parse(values[2], ParserSTEP.NumberFormat);
 						}
 					}
 				}
@@ -282,20 +282,16 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Sort", Sort);
 		}
 	}
-	public partial class IfcClothoid : IfcCurve
+	public partial class IfcClothoid 
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Position"] = Position.getJson(this, options);
 			obj["ClothoidConstant"] = mClothoidConstant.ToString();
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JObject jobj = obj.GetValue("Position", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
-				Position = mDatabase.ParseJObject<IfcAxis2Placement>(jobj);
 			JToken clothoidConstant = obj.GetValue("ClothoidConstant", StringComparison.InvariantCultureIgnoreCase);
 			if (clothoidConstant != null)
 				mClothoidConstant = clothoidConstant.Value<double>();
@@ -610,6 +606,25 @@ namespace GeometryGym.Ifc
 			str = VerticalDatum;
 			if (!string.IsNullOrEmpty(str))
 				obj["VerticalDatum"] = str;
+		}
+	}
+	public partial class IfcCosine
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["CosineTerm"] = mCosineTerm.ToString();
+			obj["Constant"] = mConstant.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("CosineTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mCosineTerm = token.Value<double>();
+			token = obj.GetValue("Constant", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mConstant = token.Value<double>();
 		}
 	}
 	public partial class IfcCourse : IfcBuiltElement

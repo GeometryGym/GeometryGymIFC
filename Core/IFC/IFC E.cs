@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 		public IfcEarthworksCut() : base() { }
 		public IfcEarthworksCut(DatabaseIfc db) : base(db) { }
 		public IfcEarthworksCut(DatabaseIfc db, IfcEarthworksCut earthworksCut, DuplicateOptions options) : base(db, earthworksCut, options) { PredefinedType = earthworksCut.PredefinedType; }
-		public IfcEarthworksCut(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcEarthworksCut(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcEarthworksElement : IfcBuiltElement
@@ -589,14 +589,7 @@ namespace GeometryGym.Ifc
 			if (mDecomposes != null)
 				return mDecomposes.RelatingObject as IfcProduct;
 			return (mContainedInStructure != null ? mContainedInStructure.RelatingStructure : null);
-		}
-		internal override void detachFromHost()
-		{
-			base.detachFromHost();
-			if (mContainedInStructure != null)
-				mContainedInStructure.RelatedElements.Remove(this);
-		}
-	
+		}	
 		public void AddMember(IfcStructuralMember m)
 		{
 			if (m == null)
@@ -1004,6 +997,10 @@ namespace GeometryGym.Ifc
 				addProperty( db.Factory.Duplicate(prop));
 			mDescription = p.mDescription;
 			mName = p.mName; 
+		}
+		public IfcExtendedMaterialProperties(IfcMaterialDefinition materialDefinition, IEnumerable<IfcProperty> properties) : base(materialDefinition)
+		{
+			mExtendedProperties.AddRange(properties.Select(x => x.StepId));
 		}
 
 		internal void addProperty(IfcProperty property) { mExtendedProperties.Add(property.mIndex); }

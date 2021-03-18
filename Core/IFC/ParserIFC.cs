@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 				if (c == '\'')
 					result += "\\X\\27"; // Alternative result += "''";
 				else if (c == '\\')
-					result += "\\X\\5C";
+					result += "\\\\";
 				else
 				{
 					int i = (int)c;
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 		{
 			if (string.IsNullOrEmpty(str) || str == "$")
 				return "";
-			int ilast = str.Length - 4, icounter = 0;
+			int ilast = str.Length - 4, icounter = 0, strLength = str.Length;
 			string result = "";
 			while (icounter < ilast)
 			{
@@ -88,7 +88,7 @@ namespace GeometryGym.Ifc
 				}
 				if (c == '\\')
 				{
-					if (icounter + 3 < ilast)
+					if (icounter + 3 < strLength)
 					{
 						char c3 = str[icounter + 3], c2 = str[icounter + 2], c1 = str[icounter + 1];
 						if (c2 == '\\')
@@ -98,7 +98,7 @@ namespace GeometryGym.Ifc
 								result += (char)((int)c3 + 128);
 								icounter += 3;
 							}
-							else if (c1 == 'X' && str.Length > icounter + 4)
+							else if (c1 == 'X' && strLength > icounter + 4)
 							{
 								string s = str.Substring(icounter + 3, 2);
 								Int32 i = Convert.ToInt32(s, 16);
@@ -298,7 +298,7 @@ namespace GeometryGym.Ifc
 				return color;
 			}
 			double ratio = 0;
-			if(double.TryParse(def,out ratio)) 
+			if(double.TryParse(def, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out ratio)) 
 				return new IfcNormalisedRatioMeasure(ratio);
 			return null;
 		}
@@ -354,7 +354,7 @@ namespace GeometryGym.Ifc
 					{
 						Type type = dmvtypes[kw];
 						double val = 0;
-						if (double.TryParse(str.Substring(icounter, len - icounter), out val))
+						if (double.TryParse(str.Substring(icounter, len - icounter), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
 						{
 							Type[] types = new Type[] { typeof(double) };
 							ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -418,7 +418,7 @@ namespace GeometryGym.Ifc
 				if (string.Compare(type.Name,"IfcDescriptiveMeasure",true) == 0)
 					return new IfcDescriptiveMeasure(value);
 				double val = 0;
-				if(double.TryParse(value,out val))
+				if(double.TryParse(value, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
 				{
 					Type[] types = new Type[] { typeof(double) };
 					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -434,7 +434,7 @@ namespace GeometryGym.Ifc
 			if (type.IsSubclassOf(typeof(IfcDerivedMeasureValue)))
 			{
 				double val = 0;
-				if (double.TryParse(value, out val))
+				if (double.TryParse(value, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
 				{
 					Type[] types = new Type[] { typeof(double) };
 					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -485,7 +485,7 @@ namespace GeometryGym.Ifc
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);
 			double d = 0;
-			if (double.TryParse(str, out d))
+			if (double.TryParse(str, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d))
 				return new IfcReal(d);
 			if (str == ".T.")
 				return new IfcBoolean(true);
@@ -526,7 +526,7 @@ namespace GeometryGym.Ifc
 					return new IfcLogical(IfcLogicalEnum.UNKNOWN);
 				}
 				if (string.Compare(name, "IFCREAL") == 0)
-					return new IfcReal(double.Parse(value));
+					return new IfcReal(double.Parse(value, ParserSTEP.NumberFormat));
 				if (string.Compare(name, "IFCTEXT") == 0)
 					return new IfcText(value);
 				if (string.Compare(name, "IFCURIREFERENCE") == 0)
@@ -558,9 +558,9 @@ namespace GeometryGym.Ifc
 			    if(type.IsSubclassOf(typeof(IfcDerivedMeasureValue)))	
 					return extractDerivedMeasureValue(type, value);
 				if (type == typeof(IfcSpecularExponent))
-					return new IfcSpecularExponent(double.Parse(value));
+					return new IfcSpecularExponent(double.Parse(value, ParserSTEP.NumberFormat));
 				if (type == typeof(IfcSpecularRoughness))
-					return new IfcSpecularRoughness(double.Parse(value));
+					return new IfcSpecularRoughness(double.Parse(value, ParserSTEP.NumberFormat));
 			}
 			return null;
 		}

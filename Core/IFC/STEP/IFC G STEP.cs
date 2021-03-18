@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 			if (this as IfcGeometricRepresentationSubContext != null)
 				return base.BuildStringSTEP(release) + ",*,*,*,*";
 
-			return base.BuildStringSTEP(release) + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleOptionalToString(mPrecision)) + ",#" + mWorldCoordinateSystem.Index + "," + ParserSTEP.ObjToLinkString(mTrueNorth);
+			return base.BuildStringSTEP(release) + "," + (mCoordinateSpaceDimension == 0 ? "*" : mCoordinateSpaceDimension.ToString()) + "," + (mPrecision == 0 ? "*" : ParserSTEP.DoubleOptionalToString(mPrecision)) + "," + ParserSTEP.ObjToLinkString(mWorldCoordinateSystem) + "," + ParserSTEP.ObjToLinkString(mTrueNorth);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -130,20 +130,22 @@ namespace GeometryGym.Ifc
 			Elements = new SET<IfcGeometricSetSelect>(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
-	public partial class IfcGradientCurve : IfcBoundedCurve
+	public partial class IfcGradientCurve
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() +
-			",#" + mBaseCurve.StepId +
-			",(#" + string.Join(",#", mSegments.ConvertAll(x => x.StepId.ToString())) + ")" +
-			(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
+			return (release < ReleaseVersion.IFC4X3_RC3 ? "" : base.BuildStringSTEP(release)) + ",#" + mBaseCurve.StepId + 
+				(release == ReleaseVersion.IFC4X3_RC2 ?  ",(#" + string.Join(",#", Segments.ConvertAll(x => x.StepId.ToString())) + ")" : "") +
+				(mEndPoint == null ? ",$" : ",#" + mEndPoint.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
+			if(release != ReleaseVersion.IFC4X3_RC2)
+				base.parse(str, ref pos, release, len, dictionary);
 			BaseCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundedCurve;
-			Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcCurveSegment));
-			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;
+			if(release == ReleaseVersion.IFC4X3_RC2)
+				Segments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcCurveSegment));
+			EndPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlacement;
 		}
 	}
 	public partial class IfcGrid : IfcPositioningElement

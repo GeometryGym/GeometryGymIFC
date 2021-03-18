@@ -335,7 +335,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcCurve mPlacementMeasuredAlong = null; //: IfcCurve;
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcPointByDistanceExpression mDistance = null; //: IfcDistanceExpression;
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcOrientationExpression mOrientation = null; //: OPTIONAL IfcOrientationExpression;
@@ -344,6 +346,7 @@ namespace GeometryGym.Ifc
 
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcCurve PlacementMeasuredAlong { get { return mPlacementMeasuredAlong; } set { mPlacementMeasuredAlong = value; } }
+		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcPointByDistanceExpression Distance { get { return mDistance; } set { mDistance = value; } }
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcOrientationExpression Orientation { get { return mOrientation; } set { mOrientation = value; } }
@@ -375,7 +378,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		private IfcLinearAxisSelect mAxis;// : IfcCurve;
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcCurve Axis
 		{
 			get { return mAxis as IfcCurve; }
@@ -390,6 +395,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
 		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}

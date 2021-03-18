@@ -629,7 +629,7 @@ namespace GeometryGym.Ifc
 		internal IfcPolygonalFaceSet() : base() { }
 		internal IfcPolygonalFaceSet(DatabaseIfc db, IfcPolygonalFaceSet s, DuplicateOptions options) : base(db, s, options) { Faces.AddRange(s.Faces.Select(x => db.Factory.Duplicate(x) as IfcIndexedPolygonalFace)); }
 		public IfcPolygonalFaceSet(IfcCartesianPointList pl, IEnumerable<IfcIndexedPolygonalFace> faces) : base(pl) { Faces.AddRange(faces); }
-
+		public IfcPolygonalFaceSet(IfcCartesianPointList pl, params IfcIndexedPolygonalFace[] faces) : base(pl) { Faces.AddRange(faces); }
 	}
 	[Serializable]
 	public partial class IfcPolyline : IfcBoundedCurve
@@ -666,6 +666,36 @@ namespace GeometryGym.Ifc
 			foreach (IfcCartesianPoint p in Polygon)
 				result.AddRange(p.Extract<T>());
 			return result;
+		}
+	}
+	[Serializable]
+	public partial class IfcPolynomialCurve : IfcCurve
+	{
+		private IfcPlacement mPosition = null; //: IfcPlacement;
+		private LIST<double> mCoefficientsX = new LIST<double>(); //: OPTIONAL  LIST[2:?] OF IfcReal;
+		private LIST<double> mCoefficientsY = new LIST<double>(); //: OPTIONAL LIST[2:?] OF IfcReal;
+		private LIST<double> mCoefficientsZ = new LIST<double>();//: OPTIONAL LIST[2:?] OF IfcReal;
+
+		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
+		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
+		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+		public LIST<double> CoefficientsZ { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+
+		public IfcPolynomialCurve() : base() { }
+		internal IfcPolynomialCurve(DatabaseIfc db, IfcPolynomialCurve polynomial, DuplicateOptions options)
+		: base(db, polynomial, options)
+		{
+			Position = db.Factory.Duplicate(polynomial.Position as BaseClassIfc, options) as IfcPlacement;
+			CoefficientsX.AddRange(polynomial.mCoefficientsX);
+			CoefficientsY.AddRange(polynomial.mCoefficientsY);
+			CoefficientsZ.AddRange(polynomial.mCoefficientsZ);
+		}
+		public IfcPolynomialCurve(IfcPlacement position, IEnumerable<double> coefficientsX, IEnumerable<double> coefficientsY)
+			: base(position.Database)
+		{
+			Position = position;
+			CoefficientsX.AddRange(coefficientsX);
+			CoefficientsY.AddRange(coefficientsY);
 		}
 	}
 	[Serializable]
@@ -1217,15 +1247,39 @@ namespace GeometryGym.Ifc
 		public void AddElement(IfcProduct product)
 		{
 			product.detachFromHost();
-			addProduct(product);
-		}
-		internal virtual void detachFromHost()
-		{
-			if (mDecomposes != null)
-				mDecomposes.RelatedObjects.Remove(this);
-		}
-		protected virtual void addProduct(IfcProduct product)
-		{
+			IfcCovering c = product as IfcCovering;
+			if (c != null)
+			{
+				IfcElement element = this as IfcElement;
+				if (element != null)
+				{
+					if (element.mHasCoverings.Count == 0)
+						element.mHasCoverings.Add(new IfcRelCoversBldgElements(element, c));
+					else
+						element.mHasCoverings.First().RelatedCoverings.Add(c);
+					return;
+				}
+				IfcSpace space = this as IfcSpace;
+				if(space != null)
+				{
+					if (space.mHasCoverings.Count == 0)
+						space.mHasCoverings.Add(new IfcRelCoversSpaces(space, c));
+					else
+						space.mHasCoverings.First().RelatedCoverings.Add(c);
+					return;
+				}
+			}
+			IfcSpatialElement spatialElement = this as IfcSpatialElement;
+			if (spatialElement != null)
+			{
+				if (spatialElement.mContainsElements.Count == 0)
+				{
+					new IfcRelContainedInSpatialStructure(product, spatialElement);
+				}
+				else
+					spatialElement.ContainsElements.First().RelatedElements.Add(product);
+				return;
+			}
 			if (mIsDecomposedBy.Count > 0)
 				mIsDecomposedBy.First().RelatedObjects.Add(product);
 			else
@@ -1233,7 +1287,44 @@ namespace GeometryGym.Ifc
 				new IfcRelAggregates(this, product);
 			}
 		}
+		internal void detachFromHost()
+		{
+			if (mDecomposes != null)
+				mDecomposes.RelatedObjects.Remove(this);
+			if (mContainedInStructure != null)
+				mContainedInStructure.RelatedElements.Remove(this);
+		}
 		
+		internal T FindHost<T>() where T : IfcProduct
+		{
+			T result = null;
+			if(mDecomposes != null)
+			{
+				result = mDecomposes.RelatingObject as T;
+				if (result != null)
+					return result;
+				IfcProduct host = mDecomposes.RelatingObject as IfcProduct;
+				if (host != null)
+					return host.FindHost<T>();
+			}	
+			else if(mNests != null)
+			{
+				result = mNests.RelatingObject as T;
+				if (result != null)
+					return result;
+				IfcProduct host = mNests.RelatingObject as IfcProduct;
+				if (host != null)
+					return host.FindHost<T>();
+			}
+			else if(mContainedInStructure != null)
+			{
+				result = mContainedInStructure.RelatingStructure as T;
+				if (result != null)
+					return result;
+				return mContainedInStructure.RelatingStructure.FindHost<T>();
+			}
+			return null;
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);

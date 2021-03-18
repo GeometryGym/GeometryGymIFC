@@ -81,6 +81,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRailway : IfcFacility
 	{
+		internal IfcRailwayTypeEnum mPredefinedType = IfcRailwayTypeEnum.NOTDEFINED;// OPTIONAL : IfcRailwayTypeEnum
+		public IfcRailwayTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		public IfcRailway() : base() { }
 		public IfcRailway(DatabaseIfc db) : base(db) { }
 		public IfcRailway(DatabaseIfc db, IfcRailway railway, DuplicateOptions options) : base(db, railway, options) { }
@@ -398,7 +401,19 @@ namespace GeometryGym.Ifc
 
 		public IfcReferent() : base() { }
 		public IfcReferent(IfcSite host) : base(host) { }
-		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
+			: base(host.Database) 
+		{
+			IfcRelNests nests = host.IsNestedBy.Where(x => x.RelatedObjects.FirstOrDefault() is IfcReferent).FirstOrDefault();
+			if (nests != null)
+				nests.RelatedObjects.Add(this);
+			else
+			{
+				new IfcRelNests(host, this);
+			}
+			ObjectPlacement = placement;
+			Representation = representation;
+		}
 	}
 	[Serializable]
 	public partial class IfcRegularTimeSeries : IfcTimeSeries
@@ -671,8 +686,8 @@ namespace GeometryGym.Ifc
 			RelatingObject = db.Factory.Duplicate(a.RelatingObject, options) as IfcObjectDefinition;
 			if (options.DuplicateDownstream)
             {
-                foreach (IfcObjectDefinition objectDefinition in a.RelatedObjects)
-                    db.Factory.Duplicate(objectDefinition, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+                mRelatedObjects.AddRange(a.RelatedObjects.Select(x=> db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
             }
 		}
 		internal IfcRelAggregates(IfcObjectDefinition relObject) 
@@ -707,12 +722,6 @@ namespace GeometryGym.Ifc
 				{
 					if (o.Decomposes == this)
 						o.mDecomposes = null;
-				}
-				if (mRelatedObjects.Count == 0)
-				{
-					IfcElementAssembly ea = RelatingObject as IfcElementAssembly;
-					if (ea != null && ea.mIsDecomposedBy.Count <= 1)
-						ea.detachFromHost();
 				}
 			}
 		}
@@ -824,7 +833,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelAssignsToGroup : IfcRelAssigns   //SUPERTYPE OF(IfcRelAssignsToGroupByFactor)
 	{
 		private IfcGroup mRelatingGroup;// : IfcGroup; 
-		public IfcGroup RelatingGroup { get { return mRelatingGroup; } set { mRelatingGroup = value; value.mIsGroupedBy.Add(this); } }
+		public IfcGroup RelatingGroup { get { return mRelatingGroup; } set { mRelatingGroup = value; if(value != null) value.mIsGroupedBy.Add(this); } }
 
 		public override NamedObjectIfc Relating() { return RelatingGroup; } 
 
@@ -1386,13 +1395,14 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcRelContainedInSpatialStructure() : base() { }// RelatedElements = new RelatedElementsCollection(this); }
-		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) : base(db, r, options)
+		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) 
+			: base(db, r, options)
 		{
 			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement;
 			if (options.DuplicateDownstream)
 			{
-				foreach(IfcProduct p  in r.RelatedElements)
-					db.Factory.Duplicate(p, options);
+				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcProduct));
 			}
 		}
 		public IfcRelContainedInSpatialStructure(IfcSpatialElement host) : base(host.mDatabase)
@@ -1412,7 +1422,8 @@ namespace GeometryGym.Ifc
 			Description = containerName + " Container for Elements";
 			RelatingStructure = host;
 		}
-		internal IfcRelContainedInSpatialStructure(IfcProduct related, IfcSpatialElement host) : this(host) { RelatedElements.Add(related); }
+		public IfcRelContainedInSpatialStructure(IfcProduct related, IfcSpatialElement host) : this(host) { RelatedElements.Add(related); }
+		public IfcRelContainedInSpatialStructure(IEnumerable<IfcProduct> related, IfcSpatialElement host) :this(host) { RelatedElements.AddRange(related); }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1857,7 +1868,8 @@ namespace GeometryGym.Ifc
 		internal IfcRelNests(DatabaseIfc db, IfcRelNests n, DuplicateOptions options) : base(db, n, options)
 		{
 			RelatingObject = db.Factory.Duplicate(n.RelatingObject, options) as IfcObjectDefinition;
-			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, options) as IfcObjectDefinition));
+			DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
+			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject) : base(relatingObject.mDatabase)
 		{
@@ -2099,7 +2111,7 @@ namespace GeometryGym.Ifc
 			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
-			: base(system.mDatabase) { mRelatingSystem = system; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
+			: base(system.mDatabase) { mRelatingSystem = system; system.mServicesBuildings = this; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
 
 		internal void addRelated(IfcSpatialElement spatial)
 		{
@@ -2576,11 +2588,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRoad : IfcFacility
 	{
+		internal IfcRoadTypeEnum mPredefinedType = IfcRoadTypeEnum.NOTDEFINED;// OPTIONAL : IfcRoadTypeEnum
+		public IfcRoadTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		public IfcRoad() : base() { }
 		public IfcRoad(DatabaseIfc db) : base(db) { }
 		public IfcRoad(DatabaseIfc db, IfcRoad road, DuplicateOptions options) : base(db, road, options) { }
 		public IfcRoad(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
-		internal IfcRoad(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcRoad(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcRoof : IfcBuiltElement

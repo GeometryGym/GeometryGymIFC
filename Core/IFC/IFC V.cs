@@ -161,6 +161,25 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorType(DatabaseIfc m, string name, IfcVibrationIsolatorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
+	public partial class IfcVienneseBend : IfcBoundedCurve
+	{
+		private double mStartCurvature = 0; //: IfcCurvatureMeasure;
+		private double mEndCurvature = 0; //: IfcCurvatureMeasure;
+		private double mGravityCenterHeight = 0; //: IfcLengthMeasure;
+		private double mSegmentLength = 0; //: IfcLengthMeasure;
+
+		public double StartCurvature { get { return mStartCurvature; } set { mStartCurvature = value; } }
+		public double EndCurvature { get { return mEndCurvature; } set { mEndCurvature = value; } }
+		public double GravityCenterHeight { get { return mGravityCenterHeight; } set { mGravityCenterHeight = value; } }
+		public double SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
+
+		public IfcVienneseBend() : base() { }
+		internal IfcVienneseBend(DatabaseIfc db, IfcVienneseBend bend, DuplicateOptions options)
+			: base(db, bend, options) { StartCurvature = bend.StartCurvature; EndCurvature = bend.EndCurvature; GravityCenterHeight = bend.GravityCenterHeight;  SegmentLength = bend.SegmentLength; }
+		public IfcVienneseBend(DatabaseIfc db, double startCurvature, double endCurvature, double gravityCentreHeight, double segmentLength)
+			: base(db) { StartCurvature = startCurvature; EndCurvature = endCurvature; GravityCenterHeight = gravityCentreHeight; SegmentLength = segmentLength; }
+	}
+	[Serializable]
 	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }
@@ -259,7 +278,7 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(text) || text == "$")
 				return null;
 			double angle = 0;
-			if (double.TryParse(text, out angle))
+			if (double.TryParse(text, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out angle))
 				return new IfcCompoundPlaneAngleMeasure(angle);
 			string str = text.Replace("(", "").Replace(")", "");
 			string[] fields = str.Split(",".ToCharArray());
@@ -472,7 +491,7 @@ namespace GeometryGym.Ifc
 				if (c == '.')
 					break;
 			}
-			if (!double.TryParse(str.Substring(icounter), out mValue))
+			if (!double.TryParse(str.Substring(icounter), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mValue))
 				mValue = 0;
 		}
 	}
@@ -501,7 +520,7 @@ namespace GeometryGym.Ifc
 				if (c == '.')
 					break;
 			}
-			if (!double.TryParse(str.Substring(icounter), out mValue))
+			if (!double.TryParse(str.Substring(icounter), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mValue))
 				mValue = 0;
 		}
 	}
@@ -520,7 +539,7 @@ namespace GeometryGym.Ifc
 				if (c == '.')
 					break;
 			}
-			if (!double.TryParse(str.Substring(icounter), out mValue))
+			if (!double.TryParse(str.Substring(icounter), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mValue))
 				mValue = 0;
 		}
 	}
@@ -608,7 +627,7 @@ namespace GeometryGym.Ifc
 				if (value.Contains("T"))
 				{
 					int hour = int.Parse(value.Substring(11, 2)), min = int.Parse(value.Substring(14, 2));
-					double seconds = double.Parse(value.Substring(17, value.Length - 17));
+					double seconds = double.Parse(value.Substring(17, value.Length - 17), ParserSTEP.NumberFormat);
 					return new DateTime(year, month, day, hour, min, (int)seconds);
 				}
 				return new DateTime(year, month, day);
@@ -745,7 +764,7 @@ namespace GeometryGym.Ifc
 			{
 				DateTime min = DateTime.MinValue;
 				int hour = int.Parse(value.Substring(1, 2)), minute = int.Parse(value.Substring(4, 2));
-				double seconds = double.Parse(value.Substring(7, value.Length - 7));
+				double seconds = double.Parse(value.Substring(7, value.Length - 7), ParserSTEP.NumberFormat);
 				return new DateTime(min.Year, min.Month, min.Day, hour, minute, (int)seconds);
 			}
 			catch (Exception) { }

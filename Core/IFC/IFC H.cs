@@ -62,6 +62,23 @@ namespace GeometryGym.Ifc
 		public IfcHeatExchangerType(DatabaseIfc m, string name, IfcHeatExchangerTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
+	public partial class IfcHelmertCurve : IfcSpiral
+	{
+		private double mQuadraticTerm = 0; //: IfcLengthMeasure;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+
+		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
+
+		public IfcHelmertCurve() : base() { }
+		internal IfcHelmertCurve(DatabaseIfc db, IfcHelmertCurve curve, DuplicateOptions options)
+			: base(db, curve, options) { QuadraticTerm = curve.QuadraticTerm; LinearTerm = curve.LinearTerm; ConstantTerm = curve.ConstantTerm; }
+		public IfcHelmertCurve(IfcAxis2Placement position, double qubicTerm)
+			: base(position) { QuadraticTerm = qubicTerm; }
+	}
+	[Serializable]
 	public partial class IfcHumidifier : IfcEnergyConversionDevice //IFC4
 	{
 		internal IfcHumidifierTypeEnum mPredefinedType = IfcHumidifierTypeEnum.NOTDEFINED;// OPTIONAL : IfcHumidifierTypeEnum;

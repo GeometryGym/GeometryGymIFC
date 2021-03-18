@@ -336,6 +336,24 @@ namespace GeometryGym.Ifc
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
+	public partial class IfcPolynomialCurve : IfcCurve
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "Position", true) == 0)
+					Position = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
+			}
+		}
+	}
 	public partial class IfcPostalAddress : IfcAddress
 	{
 		internal override void ParseXml(XmlElement xml)

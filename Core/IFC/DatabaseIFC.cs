@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
@@ -149,7 +149,7 @@ namespace GeometryGym.Ifc
 			if (modelView == ModelView.Ifc4X2NotAssigned)
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
-				return ReleaseVersion.IFC4X3_RC2;
+				return ReleaseVersion.IFC4X3_RC3;
 			return ReleaseVersion.IFC4A2;
 		}
 		public double Tolerance
@@ -371,18 +371,24 @@ namespace GeometryGym.Ifc
 				str = str.Substring(0, str.Length - 4);
 			if (str.EndsWith("TypeEnum"))
 				str = str.Substring(0, str.Length - 8);
-			Type type = Type.GetType("GeometryGym.Ifc." + str, false, true);
+			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
 			if (release < ReleaseVersion.IFC4X3_RC1)
 			{
-				if (release < ReleaseVersion.IFC4X2)
+				if (string.Compare(str, "IfcBuiltElement", true) == 0)
+					type = typeof(IfcBuildingElementProxy);
+				else if (typeof(IfcCourse).IsAssignableFrom(type) || typeof(IfcEarthworksElement).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
+				else if (typeof(IfcEarthworksCut).IsAssignableFrom(type) || typeof(IfcGeotechnicalStratum).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
+				else if (release < ReleaseVersion.IFC4X2)
 				{
 					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
 						type = typeof(IfcBuilding);
 					else if (release < ReleaseVersion.IFC4X1)
 					{
-						if (typeof(IfcFacility).IsAssignableFrom(type))
+						if (type != typeof(IfcBuilding) && typeof(IfcFacility).IsAssignableFrom(type))
 							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
 						else if (release < ReleaseVersion.IFC4)
 						{
@@ -396,9 +402,10 @@ namespace GeometryGym.Ifc
 			IfcProduct product = construct(type, host, placement, representation, system);
 			if (product == null)
 				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
-			if (string.Compare(str, product.StepClassName, true) != 0)
+			string resultClass = product.StepClassName;
+			if (string.Compare(str, resultClass, true) != 0 && string.Compare(resultClass, "IfcFacilityPart",true) != 0)
 				product.ObjectType = className;
-			if (!string.IsNullOrEmpty(definedType))
+			else if (!string.IsNullOrEmpty(definedType))
 			{
 				if (mDatabase.mRelease < ReleaseVersion.IFC4)
 					product.ObjectType = definedType;
@@ -413,6 +420,8 @@ namespace GeometryGym.Ifc
 							MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any,new Type[] { typeof(string) }, null);
 							if (method != null)
 							{
+								if (!enumName.EndsWith("TypeEnum"))
+									enumName += "TypeEnum";
 								object o = method.Invoke(null, new object[] { enumName + "(." + definedType + ".)" });
 								if (o != null)
 									pi.SetValue(product, o);
@@ -475,7 +484,17 @@ namespace GeometryGym.Ifc
 			{
 				ctor = getConstructor(type, new[] { typeof(IfcObjectDefinition), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape), typeof(IfcDistributionSystem) });
 				if (ctor == null)
+				{
+					IfcElement element = host as IfcElement;
+					if (element != null)
+					{
+						ctor = getConstructor(type, new[] { typeof(IfcElement), typeof(IfcObjectPlacement), typeof(IfcProductDefinitionShape) });
+						if(ctor != null)
+							return ctor.Invoke(new object[] { element, placement, representation }) as IfcProduct;
+					}
 					return null;
+
+				}
 				else
 					return ctor.Invoke(new object[] { host, placement, representation, system }) as IfcProduct;
 			}
@@ -567,8 +586,6 @@ namespace GeometryGym.Ifc
 								NominateDuplicate(entity, site);
 								return site;
 							}
-
-
 						}
 					}
 				}
@@ -685,7 +702,6 @@ namespace GeometryGym.Ifc
 			direction = YAxis;
 			direction = ZAxis;
 			IfcAxis2Placement3D pl = this.XYPlanePlacement;
-			//IfcAxis2Placement pl = this.WorldCoordinatePlacement;
 			IfcAxis2Placement2D placement = Origin2dPlace;
 		}
 
@@ -1518,6 +1534,7 @@ namespace GeometryGym.Ifc
 			DuplicateDownstream = options.DuplicateDownstream;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
+			DuplicateOwnerHistory = options.DuplicateOwnerHistory;
 		}
 	}
 	public class ApplicableFilter
@@ -1535,7 +1552,7 @@ namespace GeometryGym.Ifc
 					continue;
 				string[] pair = str.Trim().Split("/".ToCharArray());
 				string typename = (pair == null ? str.Trim() : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
-				Type type = Type.GetType("GeometryGym.Ifc." + typename);
+				Type type = BaseClassIfc.GetType(typename); 
 				if (type == null)
 					continue;
 				mApplicableTypes.Add(new ApplicableType(type, predefined));
@@ -1814,6 +1831,8 @@ namespace GeometryGym.Ifc
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading File");
 			while ((line = stream.ReadLine()) != null)
 			{
+				if (string.IsNullOrEmpty(line))
+					continue;
 				string str = line.Trim();
 				if (string.IsNullOrEmpty(str))
 					continue;
@@ -2114,6 +2133,8 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC1;
 				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC2", true, CultureInfo.CurrentCulture))
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC3", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
 				if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
@@ -2166,7 +2187,7 @@ namespace GeometryGym.Ifc
 			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + mDatabase.ModelView + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + fileName.Replace("\\", "\\\\") + "',\r\n"; //ParserIfc.Encode(fileName.Replace("\\", "\\\\"))
+			hdr += "/* name */ '" + ParserIfc.Encode(fileName) + "',\r\n";
 			DateTime now = DateTime.Now;
 			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
 			IfcPerson person = mDatabase.Factory.mPerson;
@@ -2192,6 +2213,8 @@ namespace GeometryGym.Ifc
 				version = "IFC4X3_RC1";
 			else if (release == ReleaseVersion.IFC4X3_RC2)
 				version = "IFC4X3_RC2";
+			else if (release == ReleaseVersion.IFC4X3_RC3)
+				version = "IFC4X3_RC3";
 			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";

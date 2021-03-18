@@ -50,13 +50,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
 	{
 		internal double mEastings, mNorthings, mOrthogonalHeight;// :  	IfcLengthMeasure;
-		internal double mXAxisAbscissa = double.NaN, mXAxisOrdinate = double.NaN, mScale = double.NaN;// 	:	OPTIONAL IfcReal;
+		internal double mXAxisAbscissa = double.NaN, mXAxisOrdinate = double.NaN, mScale = double.NaN, mScaleY = double.NaN, mScaleZ = double.NaN;// 	:	OPTIONAL IfcReal;
 		public double Eastings { get { return mEastings; } set { mEastings = value; } }  //IfcLengthMeasure
 		public double Northings { get { return mNorthings; } set { mNorthings = value; } }  //IfcLengthMeasure
 		public double OrthogonalHeight { get { return mOrthogonalHeight; } set { mOrthogonalHeight = value; } }  //IfcLengthMeasure
 		public double XAxisAbscissa { get { return mXAxisAbscissa; } set { mXAxisAbscissa = value; } }  // OPTIONAL  IfcReal
 		public double XAxisOrdinate { get { return mXAxisOrdinate; } set { mXAxisOrdinate = value; } }  // OPTIONAL IfcReal
 		public double Scale { get { return double.IsNaN( mScale) ? 1 : mScale; } set { mScale = value; } }  // OPTIONAL  IfcReal
+		public double ScaleY { get { return double.IsNaN( mScaleY) ? 1 : mScaleY; } set { mScaleY = value; } }  // OPTIONAL  IfcReal
+		public double ScaleZ { get { return double.IsNaN( mScaleZ) ? 1 : mScaleZ; } set { mScaleZ = value; } }  // OPTIONAL  IfcReal
 
 		internal IfcMapConversion() : base() { }
 		internal IfcMapConversion(DatabaseIfc db, IfcMapConversion c) : base(db, c) { mEastings = c.mEastings; mNorthings = c.mNorthings; mOrthogonalHeight = c.mOrthogonalHeight; mXAxisAbscissa = c.mXAxisAbscissa; mXAxisOrdinate = c.mXAxisOrdinate; mScale = c.mScale; }
@@ -84,7 +86,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMarineFacility : IfcFacility
 	{
-		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: IfcMarineFacilityTypeEnum;
+		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: OPTIONAL IfcMarineFacilityTypeEnum;
 		public IfcMarineFacilityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcMarineFacility() : base() { }
@@ -743,10 +745,10 @@ namespace GeometryGym.Ifc
 				IfcDerivedMeasureValue dm = mValueComponent as IfcDerivedMeasureValue;
 				if (dm != null)
 					return dm.Measure * sif;
-				if (double.TryParse(mValueComponent.ValueString, out d))
+				if (double.TryParse(mValueComponent.ValueString, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d))
 					return d * sif;
 			}
-			if (double.TryParse(mVal, out d))
+			if (double.TryParse(mVal, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d))
 				return d * sif;
 			return sif;
 		}

@@ -297,7 +297,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcElementAssembly : IfcElement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mAssemblyPlace.ToString() + ".,." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (mAssemblyPlace == IfcAssemblyPlaceEnum.NOTDEFINED ? ",$," : ",." + mAssemblyPlace.ToString() + ".,") +
+				(release > ReleaseVersion.IFC2x3 && mPredefinedType == IfcElementAssemblyTypeEnum.NOTDEFINED ? "$" : "." + mPredefinedType.ToString() + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

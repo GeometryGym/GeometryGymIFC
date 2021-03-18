@@ -265,7 +265,8 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mStartDistAlong))
 				obj["StartDistAlong"] = mStartDistAlong.ToString();
-			obj["Segments"] = new JArray(Segments.ConvertAll(x => x.getJson(this, options)));
+			if(mHorizontalSegments.Count > 0)
+				obj["Segments"] = new JArray(mHorizontalSegments.ConvertAll(x => x.getJson(this, options)));
 		}
 		internal override void parseJObject(JObject obj)
 		{
@@ -273,7 +274,7 @@ namespace GeometryGym.Ifc
 			JToken startDistAlong = obj.GetValue("StartDistAlong", StringComparison.InvariantCultureIgnoreCase);
 			if (startDistAlong != null)
 				mStartDistAlong = startDistAlong.Value<double>();
-			Segments.AddRange(mDatabase.extractJArray<IfcAlignmentHorizontalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			mHorizontalSegments.AddRange(mDatabase.extractJArray<IfcAlignmentHorizontalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 	}
 	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
@@ -342,14 +343,14 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["GeometricParameters"] = GeometricParameters.getJson(this, options);
+			obj["GeometricParameters"] = DesignParameters.getJson(this, options);
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
 			JObject jobj = obj.GetValue("GeometricParameters", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-				GeometricParameters = mDatabase.ParseJObject<IfcAlignmentParameterSegment>(jobj);
+				DesignParameters = mDatabase.ParseJObject<IfcAlignmentParameterSegment>(jobj);
 		}
 	}
 	public partial class IfcAlignmentVertical : IfcLinearElement
@@ -357,13 +358,14 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Segments"] = new JArray(Segments.ConvertAll(x => x.getJson(this, options)));
+			if(mDatabase.Release == ReleaseVersion.IFC4X3_RC2)
+				obj["Segments"] = new JArray(VerticalSegments.Select(x => x.getJson(this, options)));
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
 			JToken startDistAlong = obj.GetValue("StartDistAlong", StringComparison.InvariantCultureIgnoreCase);
-			Segments.AddRange(mDatabase.extractJArray<IfcAlignmentVerticalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			mVerticalSegments.AddRange(mDatabase.extractJArray<IfcAlignmentVerticalSegment>(obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 	}
 	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment

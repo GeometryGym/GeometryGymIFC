@@ -276,7 +276,13 @@ namespace GeometryGym.Ifc
 			Representation = rep;
 			ObjectPlacement = new IfcLocalPlacement(host.ObjectPlacement, mDatabase.Factory.XYPlanePlacement);	
 		}
-		public IfcFeatureElementSubtraction(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		protected IfcFeatureElementSubtraction(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+			: base(host.Database) 
+		{
+			new IfcRelVoidsElement(host, this);
+			ObjectPlacement = placement;
+			Representation = representation;
+		}
 	}
 	[Serializable]
 	public partial class IfcFillAreaStyle : IfcPresentationStyle, IfcPresentationStyleSelect

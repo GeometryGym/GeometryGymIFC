@@ -625,6 +625,22 @@ namespace GeometryGym.Ifc
 		internal IfcDoor() : base() { }
 		internal IfcDoor(DatabaseIfc db, IfcDoor d, DuplicateOptions options) : base(db, d, options) { mOverallHeight = d.mOverallHeight; mOverallWidth = d.mOverallWidth; mPredefinedType = d.mPredefinedType; mOperationType = d.mOperationType; mUserDefinedOperationType = d.mUserDefinedOperationType; }
 		public IfcDoor(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+
+		internal static IfcDoorTypeOperationEnum ParseDoorTypeOperation(string constant)
+		{
+			IfcDoorTypeOperationEnum result = IfcDoorTypeOperationEnum.NOTDEFINED;
+			if (Enum.TryParse(constant, out result))
+				return result;
+			if (Enum.TryParse(constant.Replace("PANEL", "DOOR"), out result))
+				return result;
+			return IfcDoorTypeOperationEnum.NOTDEFINED;
+		}
+		internal static string SerializeDoorTypeOperation(IfcDoorTypeOperationEnum operation, ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3_RC3)
+				return operation.ToString().Replace("PANEL", "DOOR");
+			return operation.ToString();
+		}
 	}
 	[Serializable]
 	public partial class IfcDoorLiningProperties : IfcPreDefinedPropertySet // IFC2x3 IfcPropertySetDefinition

@@ -98,121 +98,124 @@ namespace GeometryGym.Ifc
 			if (obj == null)
 				return default(T);
 
+			Type type = typeof(T);
+			
 			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
-			if(token != null)
+			if (token != null)
 			{
-				mDictionary.TryGetValue(token.Value<string>(), out result);
-				if (result != null && obj.Count == 1)
+				string hrefId = token.Value<string>();
+				if(mDictionary.TryGetValue(hrefId, out result) && obj.Count == 1)
 					return (T)(IBaseClassIfc)result;
 			}
 			if (result == null)
 			{
-				Type type = null;
+				if (type.IsAbstract)
+				{
+					JProperty jtoken = (JProperty)obj.First;
+					Type valueType = BaseClassIfc.GetType(jtoken.Name);
+					if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
+					{
+						IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
+						if (val != null)
+							return (T)val;
+						return default(T);
+					}
+				}
+
+
 				token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
 				if (token != null)
 				{
-					string keyword = token.Value<string>();
-					type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+					Type nominatedType = BaseClassIfc.GetType(token.Value<string>());
+					if (nominatedType != null)
+						type = nominatedType;
 				}
-				if (token == null)
-					type = typeof(T);
-				if (type != null)
+				string hrefId = "";
+				token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+				if (token != null)
+					hrefId = token.Value<string>();
+				if (string.IsNullOrEmpty(hrefId) || !mDictionary.TryGetValue(hrefId, out result))
 				{
-					if (type.IsAbstract)
+					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+	null, Type.EmptyTypes, null);
+					if (constructor != null)
 					{
-						JProperty jtoken = (JProperty)obj.First;
-						Type valueType = Type.GetType("GeometryGym.Ifc." + jtoken.Name, false, true);
-						if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
+						bool common = false;
+						result = constructor.Invoke(new object[] { }) as BaseClassIfc;
+						if (result != null)
 						{
-							IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
-							if (val != null)
-								return (T)val;
-							return default(T);
-						}
-					}
-					else
-					{
-						ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-		null, Type.EmptyTypes, null);
-						if (constructor != null)
-						{
-							bool common = false;
-							result = constructor.Invoke(new object[] { }) as BaseClassIfc;
-							if (result != null)
-							{
-								result.mDatabase = this;
+							result.mDatabase = this;
 
-								IfcCartesianPoint point = result as IfcCartesianPoint;
-								if (point != null)
+							IfcCartesianPoint point = result as IfcCartesianPoint;
+							if (point != null)
+							{
+								point.parseJObject(obj);
+								if (point.isOrigin(Tolerance))
 								{
-									point.parseJObject(obj);
-									if (point.isOrigin(Tolerance))
+									if (point.is2D)
+										result = Factory.Origin2d;
+									else
+										result = Factory.Origin;
+									common = true;
+								}
+							}
+							else
+							{
+								IfcDirection direction = result as IfcDirection;
+								if (direction != null)
+								{
+									direction.parseJObject(obj);
+									if (!direction.is2D)
 									{
-										if (point.is2D)
-											result = Factory.Origin2d;
-										else
-											result = Factory.Origin;
 										common = true;
+										if (direction.isXAxis)
+											result = Factory.XAxis;
+										else if (direction.isYAxis)
+											result = Factory.YAxis;
+										else if (direction.isZAxis)
+											result = Factory.ZAxis;
+										else if (direction.isXAxisNegative)
+											result = Factory.XAxisNegative;
+										else if (direction.isYAxisNegative)
+											result = Factory.YAxisNegative;
+										else if (direction.isZAxisNegative)
+											result = Factory.ZAxisNegative;
+										else
+											common = false;
 									}
 								}
 								else
 								{
-									IfcDirection direction = result as IfcDirection;
-									if (direction != null)
+									IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
+									if (placement != null)
 									{
-										direction.parseJObject(obj);
-										if (!direction.is2D)
+										placement.parseJObject(obj);
+										if (placement.IsXYPlane(Tolerance))
 										{
+											result = Factory.XYPlanePlacement;
 											common = true;
-											if (direction.isXAxis)
-												result = Factory.XAxis;
-											else if (direction.isYAxis)
-												result = Factory.YAxis;
-											else if (direction.isZAxis)
-												result = Factory.ZAxis;
-											else if (direction.isXAxisNegative)
-												result = Factory.XAxisNegative;
-											else if (direction.isYAxisNegative)
-												result = Factory.YAxisNegative;
-											else if (direction.isZAxisNegative)
-												result = Factory.ZAxisNegative;
-											else
-												common = false;
-										}
-									}
-									else
-									{
-										IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
-										if (placement != null)
-										{
-											placement.parseJObject(obj);
-											if (placement.IsXYPlane(Tolerance))
-											{
-												result = Factory.XYPlanePlacement;
-												common = true;
-											}
 										}
 									}
 								}
-								token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-								if (token != null)
-								{
-									string id = token.Value<string>();
-									if(!(result is IfcRoot))
-										result.setGlobalId(id);
-									mDictionary.TryAdd(id, result);
-								}
-
-								if (common)
-									return (T)(IBaseClassIfc)result;
-
-								int index = NextBlank();
-								this[index] = result;
 							}
+							token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+							if (!string.IsNullOrEmpty(hrefId))
+							{
+								if (!(result is IfcRoot))
+									result.setGlobalId(hrefId);
+								mDictionary.TryAdd(hrefId, result);
+							}
+
+							if (common)
+								return (T)(IBaseClassIfc)result;
+
+							int index = NextBlank();
+							this[index] = result;
 						}
 					}
 				}
+
 			}
 			if(result == null)
 				return default(T);

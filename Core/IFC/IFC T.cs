@@ -874,7 +874,7 @@ namespace GeometryGym.Ifc
 			: this(basis.mDatabase, start,end, senseAgreement,tp) { BasisCurve = basis; }
 		public IfcTrimmedCurve(IfcLine basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
 			: this(basis.mDatabase, start, end, senseAgreement, tp) { BasisCurve = basis; }
-		public IfcTrimmedCurve(IfcSeriesParameterCurve basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
+		public IfcTrimmedCurve(IfcPolynomialCurve basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
 			: this(basis.Database, start, end, senseAgreement, tp) { BasisCurve = basis; }
 		public IfcTrimmedCurve(IfcClothoid basis, IfcTrimmingSelect start, IfcTrimmingSelect end, bool senseAgreement, IfcTrimmingPreference tp)
 			: this(basis.Database, start, end, senseAgreement, tp) { BasisCurve = basis; }
@@ -1396,7 +1396,7 @@ namespace GeometryGym.Ifc
 			if (!str.ToLower().EndsWith("Type"))
 				str = str + "Type";
 			IfcTypeProduct result = null;
-			Type type = Type.GetType("GeometryGym.Ifc." + str);
+			Type type = BaseClassIfc.GetType(str);
 			if (type != null)
 			{
 				Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "Enum");

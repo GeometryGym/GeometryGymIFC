@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 			if (double.IsNaN(vector.Z))
 				return new IfcDirection(db, vector.X, vector.Y);
 			vector.Unitize();
-			double tol = db.Tolerance;
+			double tol = 1e-6;
 			if (Math.Abs(vector.X - 1) < tol)
 				return db.Factory.XAxis;
 			if (Math.Abs(vector.Y - 1) < tol)

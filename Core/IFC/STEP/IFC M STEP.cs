@@ -36,7 +36,13 @@ namespace GeometryGym.Ifc
 	} 
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," + ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," + ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," + 
+				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," + 
+				ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale) +
+				(release < ReleaseVersion.IFC4X3_RC3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -46,6 +52,11 @@ namespace GeometryGym.Ifc
 			mXAxisAbscissa = ParserSTEP.StripDouble(str, ref pos, len);
 			mXAxisOrdinate = ParserSTEP.StripDouble(str, ref pos, len);
 			mScale = ParserSTEP.StripDouble(str, ref pos, len);
+			if(release >= ReleaseVersion.IFC4X3_RC3)
+			{
+				mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
+				mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);
+			}
 		}
 	}
 	public partial class IfcMappedItem : IfcRepresentationItem
@@ -61,7 +72,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + ",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP() + (mPredefinedType == IfcMarineFacilityTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -245,7 +256,7 @@ namespace GeometryGym.Ifc
 			Profile = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			double d = 0;
-			if( double.TryParse(s, out d)) //Was normalizedRatioMeasure
+			if( double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d)) //Was normalizedRatioMeasure
 				Priority =(int)d;
 			mCategory = ParserSTEP.StripString(str, ref pos, len);
 		}

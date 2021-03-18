@@ -229,12 +229,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
 	{ 
 		internal double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [2:2] OF IfcLengthMeasure; 
-
+		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
 		public double[][] CoordList
 		{
 			get { return mCoordList; }
 			set { mCoordList = value; }
 		}
+		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
 
 		internal IfcCartesianPointList2D() : base() { }
 		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
@@ -244,7 +245,9 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
 		private double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [3:3] OF IfcLengthMeasure; 
+		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
 		public double[][] CoordList { get { return mCoordList; } set { mCoordList = value; } }
+		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
 		internal IfcCartesianPointList3D() : base() { }
 		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
 
@@ -721,27 +724,16 @@ namespace GeometryGym.Ifc
 		public IfcClosedShell(IEnumerable<IfcFace> faces) : base(faces) { }
 	}
 	[Serializable]
-	public partial class IfcClothoid : IfcCurve
+	public partial class IfcClothoid : IfcSpiral
 	{
-		private IfcAxis2Placement mPosition = null; //: IfcAxis2Placement;
 		private double mClothoidConstant = 0; //: IfcLengthMeasure;
-
-		public IfcAxis2Placement Position { get { return mPosition; } set { mPosition = value; } }
 		public double ClothoidConstant { get { return mClothoidConstant; } set { mClothoidConstant = value; } }
 
 		public IfcClothoid() : base() { }
 		internal IfcClothoid(DatabaseIfc db, IfcClothoid clothoid, DuplicateOptions options)
-			:base(db, clothoid, options)
-		{
-			Position = db.Factory.Duplicate(clothoid.Position as BaseClassIfc, options) as IfcAxis2Placement;
-			ClothoidConstant = clothoid.ClothoidConstant;
-		}
+			:base(db, clothoid, options) { ClothoidConstant = clothoid.ClothoidConstant; }
 		public IfcClothoid(IfcAxis2Placement position, double clothoidConstant)
-			: base(position.Database)
-		{
-			Position = position;
-			ClothoidConstant = clothoidConstant;
-		}
+			: base(position) { ClothoidConstant = clothoidConstant; }
 	}
 	[Serializable]
 	public partial class IfcCoil : IfcEnergyConversionDevice //IFC4
@@ -950,11 +942,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcCompositeCurve(IEnumerable<IfcSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
 		public IfcCompositeCurve(params IfcSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }
-		public IfcCompositeCurve(IEnumerable<IfcAlignmentHorizontalSegment> segments, double startDistAlong) : base(segments.First().Database)
-		{
-			IEnumerable<IfcCurveSegment> curveSegments = segments.Select(x => x.generateCurveSegment(startDistAlong));
-			Segments.AddRange(curveSegments);
-		}
 	}
 	[Serializable]
 	public partial class IfcCompositeCurveOnSurface : IfcCompositeCurve, IfcCurveOnSurface
@@ -1761,7 +1748,22 @@ namespace GeometryGym.Ifc
 	public interface IfcCoordinateReferenceSystemSelect : IBaseClassIfc // IfcCoordinateReferenceSystem, IfcGeometricRepresentationContext
 	{
 		IfcCoordinateOperation HasCoordinateOperation { get; set; }
-	} 
+	}
+	[Serializable]
+	public partial class IfcCosine : IfcSpiral
+	{
+		private double mCosineTerm = 0; //: IfcLengthMeasure;
+		private double mConstant = double.NaN; //: IfcReal;
+
+		public double CosineTerm { get { return mCosineTerm; } set { mCosineTerm = value; } }
+		public double Constant { get { return mConstant; } set { mConstant = value; } }
+
+		public IfcCosine() : base() { }
+		internal IfcCosine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
+			: base(db, cosine, options) { CosineTerm = cosine.CosineTerm; Constant = cosine.Constant;  }
+		public IfcCosine(IfcAxis2Placement position, double cosineTerm)
+			: base(position) { CosineTerm = cosineTerm; }
+	}
 	[Serializable]
 	public partial class IfcCostItem : IfcControl
 	{
@@ -2040,11 +2042,14 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcCurve : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcLinearAxisSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundedCurve, IfcConic, IfcLine, IfcOffsetCurve2D, IfcOffsetCurve3D, IfcPcurve, IfcClothoid))*/
-	{   //INVERSE GeomGym   IF Adding a new subtype also consider IfcTrimmedCurve constructor
-		//INVERSE GeomGym
-		internal IfcEdgeCurve mOfEdge = null;
+	{   //IF Adding a new subtype also consider IfcTrimmedCurve constructor
+		//INVERSE
+		internal IfcLinearPositioningElement mPositioningElement = null;// : SET[0:1] OF IfcLinearPositioningElement FOR Axis;
+		internal IfcEdgeCurve mOfEdge = null; //INVERSE GeomGym
 		internal SET<IfcSectionedSolid> mDirectrixOfSectionedSolids = new SET<IfcSectionedSolid>();
 		internal SET<IfcOffsetCurve> mBasisCurveOfOffsets = new SET<IfcOffsetCurve>();
+
+		public IfcLinearPositioningElement PositioningElement { get { return mPositioningElement; } set { mPositioningElement = value; } }
 
 		protected IfcCurve() : base() { }
 		protected IfcCurve(DatabaseIfc db) : base(db) { }

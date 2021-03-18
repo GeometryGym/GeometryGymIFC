@@ -66,4 +66,29 @@ namespace GeometryGym.Ifc
 				obj["VertexGeometry"] = VertexGeometry.getJson(this, options);
 		}
 	}
+	public partial class IfcVienneseBend
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["QubicTerm"] = mStartCurvature.ToString();
+			if (double.IsNaN(mEndCurvature))
+				obj["QuadraticTerm"] = mEndCurvature.ToString();
+			if (double.IsNaN(mGravityCenterHeight))
+				obj["Radius"] = mGravityCenterHeight.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("QubicTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mStartCurvature = token.Value<double>();
+			token = obj.GetValue("QuadraticTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mEndCurvature = token.Value<double>();
+			token = obj.GetValue("LinearTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mGravityCenterHeight = token.Value<double>();
+		}
+	}
 }

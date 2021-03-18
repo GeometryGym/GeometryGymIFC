@@ -413,12 +413,11 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}
-	public partial class IfcClothoid : IfcCurve
+	public partial class IfcClothoid 
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
 			xml.SetAttribute("ClothoidConstant", mClothoidConstant.ToString());
 		}
 		internal override void ParseXml(XmlElement xml)
@@ -427,12 +426,6 @@ namespace GeometryGym.Ifc
 			string clothoidConstant = xml.GetAttribute("ClothoidConstant");
 			if (!string.IsNullOrEmpty(clothoidConstant))
 				double.TryParse(clothoidConstant, out mClothoidConstant);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "Position", true) == 0)
-					Position = mDatabase.ParseXml<IfcAxis2Placement>(child as XmlElement);
-			}
 		}
 	}
 
@@ -951,6 +944,25 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 			xml.SetAttribute("GeodeticDatum", GeodeticDatum);
 			setAttribute(xml, "VerticalDatum", VerticalDatum);
+		}
+	}
+	public partial class IfcCosine
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("CosineTerm", mCosineTerm.ToString());
+			xml.SetAttribute("Constant", mConstant.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string att = xml.GetAttribute("CosineTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mCosineTerm);
+			att = xml.GetAttribute("Constant");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mConstant);
 		}
 	}
 	public partial class IfcCourse : IfcBuiltElement
