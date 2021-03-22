@@ -88,7 +88,12 @@ namespace GeometryGym.Ifc
 				}
 				if (c == '\\')
 				{
-					if (icounter + 3 < strLength)
+					if (icounter + 1 < strLength && str[icounter + 1] == '\\')
+					{
+						result += c;
+						icounter++;
+					}
+					else if (icounter + 3 < strLength)
 					{
 						char c3 = str[icounter + 3], c2 = str[icounter + 2], c1 = str[icounter + 1];
 						if (c2 == '\\')
@@ -102,14 +107,9 @@ namespace GeometryGym.Ifc
 							{
 								string s = str.Substring(icounter + 3, 2);
 								Int32 i = Convert.ToInt32(s, 16);
-								//byte[] byteArray = BitConverter.GetBytes(i);
-								//Encoding iso = Encoding..GetEncoding("ISO-8859-1");
-								Encoding wind1252 = Encoding.GetEncoding(1252);
-								string istr = wind1252.GetString(new byte[] { (byte)i });
-								result += istr[0];
-								//c = charArray[0];
-								//result += (char)();
-								//result += c;
+								Byte[] bytes = BitConverter.GetBytes(i);
+								c = Encoding.Unicode.GetChars(bytes)[0];
+								result += c;
 								icounter += 4;
 							}
 							else
@@ -121,8 +121,9 @@ namespace GeometryGym.Ifc
 							while (str[icounter] != '\\')
 							{
 								string s = str.Substring(icounter, 4);
-								c = System.Text.Encoding.Unicode.GetChars(BitConverter.GetBytes(Convert.ToInt32(s, 16)))[0];
-								//result += (char)();
+								Int32 i = Convert.ToInt32(s, 16);
+								Byte[] bytes = BitConverter.GetBytes(i);
+								c = Encoding.Unicode.GetChars(bytes)[0];
 								result += c;
 								icounter += 4;
 							}
@@ -130,7 +131,7 @@ namespace GeometryGym.Ifc
 						}
 						else if (c1 == '\\' && c2 == 'X')
 						{
-							if(c3 == '2')
+							if (c3 == '2')
 							{
 								icounter += 6;
 								while (str[icounter] != '\\')

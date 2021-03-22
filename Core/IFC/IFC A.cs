@@ -727,22 +727,34 @@ namespace GeometryGym.Ifc
 			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, yOffset, 0);
 			IfcAxis2Placement3D segmentPlacement = new IfcAxis2Placement3D(startPoint);
 
-			segmentPlacement.RefDirection = (Math.Abs(deltaStartCant) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
-			segmentPlacement.Axis = db.Factory.XAxis;
-			if (!double.IsNaN(EndCantLeft) || !double.IsNaN(EndCantRight))
+			double endCantLeft = double.IsNaN(EndCantLeft) ? 0 : EndCantLeft, endCantRight = double.IsNaN(EndCantRight) ? 0 : EndCantRight;
+			if (Math.Abs(endCantLeft - StartCantLeft) > tol && Math.Abs(endCantRight - StartCantRight) > tol)
 			{
-				if (Math.Abs(EndCantLeft - StartCantLeft) > tol && Math.Abs(EndCantRight - StartCantRight) > tol)
+				double deltaEndCant = endCantLeft - endCantRight;
+				double thetaEnd = Math.Asin(deltaEndCant / railHeadDistance);
+				double endYOffset = endCantLeft - (deltaEndCant / 2);
+				double deltaY = endYOffset - yOffset;
+				segmentLength = Math.Sqrt(deltaY * deltaY + HorizontalLength * HorizontalLength);
+				double cosAlpha = HorizontalLength / segmentLength, sinAlpha = deltaY / HorizontalLength;
+				double cosTheta = 1, sinTheta = 0;
+				if (Math.Abs(deltaStartCant) > tol)
 				{
-					double deltaEndCant = EndCantLeft - EndCantRight;
-					double thetaEnd = Math.Asin(deltaEndCant / railHeadDistance);
-					double endYOffset = EndCantLeft - (deltaEndCant / 2);
-					double deltaY = endYOffset - yOffset;
-					segmentLength = Math.Sqrt(deltaY * deltaY + HorizontalLength * HorizontalLength);
-					segmentPlacement.Axis = new IfcDirection(db, HorizontalLength/ segmentLength , deltaY / HorizontalLength, 0);
+					cosTheta = Math.Cos(theta);
+					sinTheta = Math.Sin(theta);
 				}
+				segmentPlacement.Axis = new IfcDirection(db, cosTheta * sinAlpha, cosTheta * cosAlpha, sinTheta);
+				segmentPlacement.RefDirection = new IfcDirection(db, cosAlpha, sinAlpha, 0);
+			}
+			else
+			{
+				segmentPlacement.Axis = (Math.Abs(deltaStartCant) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
+				segmentPlacement.RefDirection = db.Factory.XAxis;
 			}
 			IfcLine line = db.Factory.LineX2d;
-			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
+			if(mDesignerOf != null)
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve3D));
+			return curveSegment;
 		}
 		public IfcPlacement ComputeEndPlacement(double railHeadDistance)
 		{
@@ -1015,7 +1027,11 @@ namespace GeometryGym.Ifc
 #endif
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
-			return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
+			if (mDesignerOf != null)
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
+
+			return curveSegment;
 		}
 	}
 	[Serializable]
@@ -1030,10 +1046,12 @@ namespace GeometryGym.Ifc
 
 		protected IfcAlignmentParameterSegment() : base() { }
 		protected IfcAlignmentParameterSegment(DatabaseIfc db, IfcAlignmentParameterSegment alignmentParameterSegment, DuplicateOptions options)
-		: base(db)
-		{
-			StartTag = alignmentParameterSegment.StartTag;
+			: base(db) 
+		{ 
+			StartTag = alignmentParameterSegment.StartTag; 
 			EndTag = alignmentParameterSegment.EndTag;
+			if (mDesignerOf != null)
+				db.Factory.Duplicate(mDesignerOf, options);
 		}
 		protected IfcAlignmentParameterSegment(DatabaseIfc db) : base(db) { }
 	}
@@ -1056,6 +1074,11 @@ namespace GeometryGym.Ifc
 
 		public IfcAlignmentSegment() : base() { }
 		public IfcAlignmentSegment(DatabaseIfc db) : base(db) { }
+		internal IfcAlignmentSegment(DatabaseIfc db, IfcAlignmentSegment alignmentSegment, DuplicateOptions options)
+			: base(db, alignmentSegment, options)
+		{
+			DesignParameters = db.Factory.Duplicate(alignmentSegment.DesignParameters, options) as IfcAlignmentParameterSegment;
+		}
 		public IfcAlignmentSegment(IfcLinearElement host, IfcAlignmentParameterSegment design) 
 			: base(host.Database)
 		{
@@ -1156,11 +1179,12 @@ namespace GeometryGym.Ifc
 			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, StartHeight);
 			IfcDirection refDirection = new IfcDirection(db, Math.Cos(theta), Math.Sin(theta));
 			IfcAxis2Placement2D axis2Placement2D = new IfcAxis2Placement2D(startPoint) { RefDirection = refDirection };
+			IfcCurveSegment curveSegment = null;
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
 			{
 				double segmentLength = HorizontalLength / Math.Cos(theta);
 				IfcLine line = db.Factory.LineX2d;
-				return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
+				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
 			}
 			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
 			{
@@ -1168,7 +1192,7 @@ namespace GeometryGym.Ifc
 
 				IfcCircle circle = new IfcCircle(db, mRadiusOfCurvature);
 				IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), end = new IfcParameterValue(parametricLength);
-				return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, circle);
+				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, circle);
 			}
 			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
 			{
@@ -1176,9 +1200,14 @@ namespace GeometryGym.Ifc
 				IfcPolynomialCurve seriesParameterCurve = new IfcPolynomialCurve(db.Factory.Origin2dPlace, new List<double>() { 0, 1 }, new List<double>() { 0, 0, m });
 				IfcParameterValue start = new IfcParameterValue(StartGradient / (2*m));
 				IfcParameterValue end = new IfcParameterValue(HorizontalLength);
-				return new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, seriesParameterCurve);
+				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, seriesParameterCurve);
 			}
-			throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
+			else
+				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
+
+			if (mDesignerOf != null)
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
+			return curveSegment;
 		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
@@ -1289,12 +1318,18 @@ namespace GeometryGym.Ifc
 			ApplicationDeveloper = new IfcOrganization(db, "Geometry Gym Pty Ltd");
 			try
 			{
-				mVersion =  System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+				Assembly assembly = Assembly.GetEntryAssembly();
+				if (assembly == null)
+					assembly = Assembly.GetCallingAssembly();
+				if (assembly != null)
+				{
+					AssemblyName name = assembly.GetName();
+					mVersion = " v" + name.Version.ToString();
+				}
 			}
 			catch (Exception) { mVersion = "Unknown"; }
 			mApplicationFullName = db.Factory.ApplicationFullName;
 			mApplicationIdentifier = db.Factory.ApplicationIdentifier;
-
 		}
 		internal IfcApplication(DatabaseIfc db, IfcApplication a) : base(db,a)
 		{

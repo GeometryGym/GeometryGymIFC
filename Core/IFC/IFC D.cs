@@ -271,12 +271,12 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid //ABSTRACT SUPERTYPE OF(ONEOF(IfcFixedReferenceSweptAreaSolid, IfcSurfaceCurveSweptAreaSolid))
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
-		private double mStartParam = double.NaN; //: OPTIONAL IfcParameterValue;
-		private double mEndParam = double.NaN; //: OPTIONAL IfcParameterValue;
+		private IfcCurveMeasureSelect mStartParam = null; //: OPTIONAL IfcCurveMeasureSelect IFC4 IfcParameterValue;
+		private IfcCurveMeasureSelect mEndParam = null; //: OPTIONAL IfcCurveMeasureSelect IFC4 IfcParameterValue;
 
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
-		public double StartParam { get { return mStartParam; } set { mStartParam = value; } }
-		public double EndParam { get { return mEndParam; } set { mEndParam = value; } }
+		public IfcCurveMeasureSelect StartParam { get { return mStartParam; } set { mStartParam = value; } }
+		public IfcCurveMeasureSelect EndParam { get { return mEndParam; } set { mEndParam = value; } }
 
 		protected IfcDirectrixCurveSweptAreaSolid() : base() { }
 		protected IfcDirectrixCurveSweptAreaSolid(DatabaseIfc db, IfcDirectrixCurveSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)

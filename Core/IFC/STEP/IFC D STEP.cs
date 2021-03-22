@@ -168,16 +168,40 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",#" + mDirectrix.StepId + "," +
-				(mDatabase.Release < ReleaseVersion.IFC4 ? ParserSTEP.DoubleToString(double.IsNaN(mStartParam) ? 0 : mStartParam) : ParserSTEP.DoubleOptionalToString(mStartParam)) + "," +
-				(mDatabase.Release < ReleaseVersion.IFC4 ? ParserSTEP.DoubleToString(double.IsNaN(mEndParam) ? 0 : mEndParam) : ParserSTEP.DoubleOptionalToString(mEndParam));
+			string parameters = "$,$";
+			if (release < ReleaseVersion.IFC4X3_RC2)
+			{
+				IfcParameterValue startParameter = mStartParam as IfcParameterValue, endParameter = mEndParam as IfcParameterValue;
+				parameters = (startParameter == null ? "$," : ParserSTEP.DoubleToString(startParameter.Measure) + ",") +
+					(endParameter == null ? "$" : ParserSTEP.DoubleToString(endParameter.Measure));
+			}
+			else
+				parameters = (mStartParam == null ? "$," : mStartParam.ToString() + ",") + (mEndParam == null ? "$" : mEndParam.ToString());
+
+			return base.BuildStringSTEP(release) + ",#" + mDirectrix.StepId + "," + parameters;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			StartParam = ParserSTEP.StripDouble(str, ref pos, len);
-			EndParam = ParserSTEP.StripDouble(str, ref pos, len);
+			string field = ParserSTEP.StripField(str, ref pos, len);
+			if (field.StartsWith("I"))
+				mStartParam = ParserIfc.parseMeasureValue(field) as IfcCurveMeasureSelect;
+			else
+			{
+				double d = ParserSTEP.ParseDouble(field);
+				if (!double.IsNaN(d))
+					mStartParam = new IfcParameterValue(d);
+			}
+			field = ParserSTEP.StripField(str, ref pos, len);
+			if (field.StartsWith("I"))
+				mEndParam = ParserIfc.parseMeasureValue(field) as IfcCurveMeasureSelect;
+			else
+			{
+				double d = ParserSTEP.ParseDouble(field);
+				if (!double.IsNaN(d))
+					mEndParam = new IfcParameterValue(d);
+			}
 		}
 	}
 	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid

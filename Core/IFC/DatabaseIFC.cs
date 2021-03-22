@@ -194,7 +194,7 @@ namespace GeometryGym.Ifc
 			}
 			internal set { mModelSIScale = value; }
 		}
-		internal double ScaleAngle()
+		public double ScaleAngle()
 		{
 			if (mContext == null)
 			{
@@ -2221,8 +2221,6 @@ namespace GeometryGym.Ifc
 			return hdr;
 		}
 		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; }
-
-
 	}
 }
 

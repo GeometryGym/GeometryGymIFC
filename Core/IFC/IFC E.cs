@@ -528,7 +528,7 @@ namespace GeometryGym.Ifc
 			}
 			if (e.OldItems != null)
 			{
-				foreach (IfcRelConnectsElements r in e.NewItems)
+				foreach (IfcRelConnectsElements r in e.OldItems)
 					r.RelatingElement = null;
 			}
 		}

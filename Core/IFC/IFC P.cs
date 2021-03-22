@@ -555,7 +555,7 @@ namespace GeometryGym.Ifc
 			OffsetLateral = e.OffsetLateral;
 			OffsetVertical = e.OffsetVertical;
 			OffsetLongitudinal = e.OffsetLongitudinal;
-			BasisCurve = e.BasisCurve;
+			BasisCurve = db.Factory.Duplicate(e.BasisCurve, options) as IfcCurve;
 		}
 		public IfcPointByDistanceExpression(IfcCurveMeasureSelect distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = distanceAlong; BasisCurve = basisCurve; }
 		public IfcPointByDistanceExpression(double nonNegativeLength, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(nonNegativeLength); BasisCurve = basisCurve; }

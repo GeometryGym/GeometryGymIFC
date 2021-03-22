@@ -170,10 +170,15 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["Directrix"] = Directrix.getJson(this, options);
-			if (!double.IsNaN(mStartParam))
-				obj["StartParam"] = mStartParam.ToString();
-			if (!double.IsNaN(mEndParam))
-				obj["EndParam"] = mEndParam.ToString();
+			if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC2)
+			{
+				IfcParameterValue startParameter = mStartParam as IfcParameterValue;
+				if(startParameter != null)
+					obj["StartParam"] = startParameter.Measure.ToString();
+				IfcParameterValue endParameter = mEndParam as IfcParameterValue;
+				if(endParameter != null)
+					obj["EndParam"] = endParameter.Measure.ToString();
+			}
 		}
 		internal override void parseJObject(JObject obj)
 		{
@@ -183,10 +188,10 @@ namespace GeometryGym.Ifc
 				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
 			JToken startParam = obj.GetValue("StartParam", StringComparison.InvariantCultureIgnoreCase);
 			if (startParam != null)
-				mStartParam = startParam.Value<double>();
+				mStartParam = new IfcParameterValue(startParam.Value<double>());
 			JToken endParam = obj.GetValue("EndParam", StringComparison.InvariantCultureIgnoreCase);
 			if (endParam != null)
-				mEndParam = endParam.Value<double>();
+				mEndParam = new	IfcParameterValue(endParam.Value<double>());
 		}
 	}
 	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid

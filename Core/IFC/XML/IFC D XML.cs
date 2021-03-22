@@ -183,20 +183,26 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
-			if (!double.IsNaN(mStartParam))
-				xml.SetAttribute("StartParam", mStartParam.ToString());
-			if (!double.IsNaN(mEndParam))
-				xml.SetAttribute("EndParam", mEndParam.ToString());
+			if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC2)
+			{
+				IfcParameterValue startParameter = mStartParam as IfcParameterValue;
+				if (startParameter != null)
+					xml.SetAttribute("StartParam", startParameter.Measure.ToString());
+				IfcParameterValue endParameter = mEndParam as IfcParameterValue;
+				if (endParameter != null)
+					xml.SetAttribute("EndParam", endParameter.Measure.ToString());
+			}
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
 			string startParam = xml.GetAttribute("StartParam");
-			if (!string.IsNullOrEmpty(startParam))
-				double.TryParse(startParam, out mStartParam);
+			double param = 0;
+			if (!string.IsNullOrEmpty(startParam) && double.TryParse(startParam, out param))
+				mStartParam = new IfcParameterValue(param);
 			string endParam = xml.GetAttribute("EndParam");
-			if (!string.IsNullOrEmpty(endParam))
-				double.TryParse(endParam, out mEndParam);
+			if (!string.IsNullOrEmpty(endParam) && double.TryParse(endParam, out param))
+				mEndParam = new IfcParameterValue(param);
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;

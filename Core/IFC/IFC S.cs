@@ -313,14 +313,11 @@ namespace GeometryGym.Ifc
 		internal IfcSegmentedReferenceCurve(DatabaseIfc db, IfcSegmentedReferenceCurve segmentedReferenceCurve, DuplicateOptions options)
 		: base(db, segmentedReferenceCurve, options)
 		{
-			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve) as IfcBoundedCurve;
-			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint) as IfcPlacement;
+			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve, options) as IfcBoundedCurve;
+			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint, options) as IfcPlacement;
 		}
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
-			: base(segments)
-		{
-			BaseCurve = baseCurve;
-		}
+			: base(segments) { BaseCurve = baseCurve; }
 	}
 	[Serializable]
 	public partial class IfcSensor : IfcDistributionControlElement //IFC4  

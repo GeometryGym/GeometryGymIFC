@@ -275,12 +275,17 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			if (xml.HasAttribute("Location"))
-				Location = xml.Attributes["Location"].Value;
-			if (xml.HasAttribute("Identification"))
-				Identification = xml.Attributes["Identification"].Value;
-			if (xml.HasAttribute("Name"))
-				Name = xml.Attributes["Name"].Value;
+			XmlAttribute attribute = xml.Attributes["Location"];
+			if(attribute != null)
+				Location = attribute.Value;
+			attribute = xml.Attributes["Identification"];
+			if(attribute == null)
+				attribute = xml.Attributes["ItemReference"];
+			if(attribute != null)
+				Identification = attribute.Value;
+			attribute = xml.Attributes["Name"];
+			if(attribute != null)
+				Name = attribute.Value;
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;

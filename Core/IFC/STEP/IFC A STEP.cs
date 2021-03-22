@@ -574,7 +574,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",#" + mApplicationDeveloper.Index + ",'" + mVersion + "','" +
+			return base.BuildStringSTEP(release) + (mApplicationDeveloper != null ? ",#" + mApplicationDeveloper.Index : ",$") + ",'" + mVersion + "','" +
 				(string.IsNullOrEmpty(mApplicationFullName) ? mDatabase.Factory.ApplicationFullName : mApplicationFullName) + "','" +
 				(string.IsNullOrEmpty(mApplicationIdentifier) ? mDatabase.Factory.ApplicationIdentifier : mApplicationIdentifier) + "'";
 		}

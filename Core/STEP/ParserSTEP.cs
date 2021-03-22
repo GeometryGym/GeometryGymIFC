@@ -744,6 +744,8 @@ namespace GeometryGym.STEP
 		}
 		public static double StripDouble(string s, ref int pos, int len)
 		{
+			if (pos >= len)
+				return double.NaN;
 			int icounter = pos;
 			while (char.IsWhiteSpace(s[icounter]))
 			{
@@ -844,7 +846,7 @@ namespace GeometryGym.STEP
 			}
 
 			if (s[icounter++] != '#')
-				throw new Exception("Unrecognized format!");
+				return 0;	
 			string str = "";
 			while (char.IsDigit(s[icounter]))
 			{
