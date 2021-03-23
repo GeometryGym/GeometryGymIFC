@@ -316,19 +316,21 @@ namespace GeometryGym.Ifc
 			return "$";
 		}
 		private static Dictionary<string, Type> mDerivedMeasureValueTypes = null;
+		private static object mDerivedMeasureValueTypesLock = new object();
 		private static Dictionary<string, Type> DerivedMeasureValueTypes
 		{
 			get
 			{
-				if (mDerivedMeasureValueTypes == null)
-				{
-					mDerivedMeasureValueTypes = new Dictionary<string, Type>();
-					IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
-											  where typeof(IfcDerivedMeasureValue).IsAssignableFrom(type)
-											  select type;
-					foreach (Type t in types)
-						mDerivedMeasureValueTypes[t.Name.ToLower()] = t;
-				}
+				lock (mDerivedMeasureValueTypesLock)
+					if (mDerivedMeasureValueTypes == null)
+					{
+						mDerivedMeasureValueTypes = new Dictionary<string, Type>();
+						IEnumerable<Type> types = from type in Assembly.GetCallingAssembly().GetTypes()
+												  where typeof(IfcDerivedMeasureValue).IsAssignableFrom(type)
+												  select type;
+						foreach (Type t in types)
+							mDerivedMeasureValueTypes[t.Name.ToLower()] = t;
+					}
 				return mDerivedMeasureValueTypes;
 			}
 		}
