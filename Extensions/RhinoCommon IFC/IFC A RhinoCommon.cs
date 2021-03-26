@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO; 
@@ -27,6 +28,70 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcAlignmentHorizontal : IfcLinearElement
+	{
+		internal Plane planeAtLength(double length, double tol)
+		{
+			double distAlong = 0;
+			List<IfcAlignmentHorizontalSegment> segments = HorizontalSegments.ToList();
+			for (int icounter = 0; icounter < segments.Count; icounter++)
+			{
+				IfcAlignmentHorizontalSegment segment = segments[icounter];
+				if (distAlong + segment.SegmentLength + tol > length)
+				{
+					Plane plane = segment.PlaneAtLength(length - distAlong, tol);
+					if (plane.IsValid)
+						return plane;
+
+					return Plane.Unset;
+				}
+				distAlong += segment.SegmentLength;
+			}
+			return Plane.Unset;
+		}
+	}
+	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
+	{
+		public Vector2d StartTangent2d()
+		{
+			Tuple<double, double> startTangent = StartTangent();
+			return new Vector2d(startTangent.Item1, startTangent.Item2);
+		}
+		internal Vector3d StartTangent3d() { Tuple<double, double> startTangent = StartTangent(); return new Vector3d(startTangent.Item1, startTangent.Item2, 0); }
+		public Plane Plane()
+		{
+			Point3d origin = StartPoint.Location;
+			Vector3d startTangent = StartTangent3d();
+			Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, startTangent);
+			return new Plane(origin, startTangent, yAxis);
+		}
+		public Plane PlaneAtLength(double length, double tol)
+		{
+			Plane plane = Plane();
+			if (mPredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.LINE)
+			{
+				plane.Origin = plane.Origin + plane.XAxis * length;
+				return plane;
+			}
+			else if (mPredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CIRCULARARC)
+			{
+				Point3d centre = plane.Origin + plane.YAxis * StartRadiusOfCurvature;
+				double angle = length / Math.Abs(StartRadiusOfCurvature);
+				plane.Rotate(angle, new Vector3d(0, 0, StartRadiusOfCurvature > 0 ? 1 : -1), centre);
+				return plane;
+			}
+			throw new NotImplementedException("Plane at length for " + PredefinedType + " not implemented yet!");
+		}
+	}
+	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
+	{
+		public double computeHeight(double distAlong)
+		{
+			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
+				return StartHeight + StartGradient * (distAlong - StartDistAlong);
+			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
+		}
+	}
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector3d : Vector3d.XAxis); } }

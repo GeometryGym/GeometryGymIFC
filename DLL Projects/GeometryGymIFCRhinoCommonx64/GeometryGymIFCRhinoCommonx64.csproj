@@ -7,7 +7,7 @@
     <ProjectGuid>{0E350E61-D5D6-4C9D-BDC8-494F3FF6E5C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GGYM.IFC</RootNamespace>
+    <RootNamespace>GeometryGym</RootNamespace>
     <AssemblyName>GeometryGymIFCRhinoCommonx64</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -53,8 +53,8 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino3dmIO, Version=6.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\lib\net45\Rhino3dmIO.dll</HintPath>
+    <Reference Include="Rhino3dmIO, Version=7.1.20343.1000, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rhino3dmIO.Desktop.7.1.20343.9491\lib\net45\Rhino3dmIO.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -496,12 +496,12 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets" Condition="Exists('..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets')" />
+  <Import Project="..\packages\Rhino3dmIO.Desktop.7.1.20343.9491\build\net45\Rhino3dmIO.Desktop.targets" Condition="Exists('..\packages\Rhino3dmIO.Desktop.7.1.20343.9491\build\net45\Rhino3dmIO.Desktop.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Rhino3dmIO.Desktop.7.0.19064.14335-wip\build\net45\Rhino3dmIO.Desktop.targets'))" />
+    <Error Condition="!Exists('..\packages\Rhino3dmIO.Desktop.7.1.20343.9491\build\net45\Rhino3dmIO.Desktop.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Rhino3dmIO.Desktop.7.1.20343.9491\build\net45\Rhino3dmIO.Desktop.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
