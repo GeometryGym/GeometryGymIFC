@@ -891,7 +891,9 @@ namespace GeometryGym.Ifc
 			{
 				mNominalValue = ParserIfc.parseValue(s);
 				if (mNominalValue == null)
+				{
 					mVal = s;
+				}
 			}
 			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 		}

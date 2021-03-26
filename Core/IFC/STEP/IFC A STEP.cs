@@ -552,13 +552,22 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mFillStyleTarget + ",." + mGlobalOrLocal.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (mFillStyleTarget == null ? ",$" : ",#" + mFillStyleTarget) +
+				(mGlobalOrLocal == null ? ",$" : ",." + mGlobalOrLocal.Value.ToString() + "."); 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			mFillStyleTarget = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPoint;
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
-				Enum.TryParse<IfcGlobalOrLocalEnum>(s.Replace(".", ""), true, out mGlobalOrLocal);
+			{
+				IfcGlobalOrLocalEnum val = IfcGlobalOrLocalEnum.GLOBAL_COORDS;
+				if (Enum.TryParse<IfcGlobalOrLocalEnum>(s.Replace(".", ""), true, out val))
+					mGlobalOrLocal = val;
+			}
 		}
 	}
 	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECATED IFC4

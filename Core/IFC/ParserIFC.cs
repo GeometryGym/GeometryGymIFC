@@ -351,17 +351,20 @@ namespace GeometryGym.Ifc
 				{
 					string kw = str.Substring(0, icounter - 1).ToLower();
 					Dictionary<string, Type> dmvtypes = DerivedMeasureValueTypes;
-					if (dmvtypes.ContainsKey(kw))
+					Type type = null;
+					if(dmvtypes.TryGetValue(kw, out type))
 					{
-						Type type = dmvtypes[kw];
 						double val = 0;
-						if (double.TryParse(str.Substring(icounter, len - icounter), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
+						string measure = str.Substring(icounter, len - icounter);
+						if (double.TryParse(measure, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
 						{
 							Type[] types = new Type[] { typeof(double) };
 							ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
 				null, types, null);
 							if (constructor != null)
 								return constructor.Invoke(new object[] { val }) as IfcDerivedMeasureValue;
+							else
+								return null;
 						}
 					}
 				}

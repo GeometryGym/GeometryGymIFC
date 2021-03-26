@@ -733,7 +733,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcReal : IfcSimpleValue
 	{
 		public double Magnitude { get; set; }
-		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
+		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToDouble(value); } }
 		public override Type ValueType { get { return typeof(double); } }
 		public IfcReal(double value) { Magnitude = value; }
 		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(Magnitude) + ")"; }

@@ -1252,7 +1252,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
 	{
 		internal IfcPoint mFillStyleTarget;// : OPTIONAL IfcPoint;
-		internal IfcGlobalOrLocalEnum  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
+		internal IfcGlobalOrLocalEnum?  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
 
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
 		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f, DuplicateOptions options) : base(db, f, options) { }
