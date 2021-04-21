@@ -84,10 +84,18 @@ namespace GeometryGym.Ifc
 			if (mAxis2 > 0)
 			{
 				vy = Axis2.Vector3d;
-				tr.M01 = vy.X;
-				tr.M11 = vy.Y;
-				tr.M21 = vy.Z;
 			}
+			else
+			{
+				IfcCartesianTransformationOperator2D placement2D = this as IfcCartesianTransformationOperator2D;
+				if(placement2D != null)
+				{
+					vy = Vector3d.CrossProduct(Vector3d.ZAxis, vx);
+				}
+			}
+			tr.M01 = vy.X;
+			tr.M11 = vy.Y;
+			tr.M21 = vy.Z;
 			return tr;
 		}
 	}

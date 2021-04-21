@@ -80,6 +80,10 @@ namespace GeometryGym.Ifc
 				plane.Rotate(angle, new Vector3d(0, 0, StartRadiusOfCurvature > 0 ? 1 : -1), centre);
 				return plane;
 			}
+			else if (mPredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CLOTHOID)
+			{
+
+			}
 			throw new NotImplementedException("Plane at length for " + PredefinedType + " not implemented yet!");
 		}
 	}
