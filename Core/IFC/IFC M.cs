@@ -646,7 +646,7 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialProperties(DatabaseIfc db, IfcMaterialProperties p, DuplicateOptions options) : base(db, p, options) { Material = db.Factory.Duplicate(p.Material, options) as IfcMaterialDefinition; }
 		protected IfcMaterialProperties(IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = this.GetType().Name; Material = mat; }
 		public IfcMaterialProperties(string name, IfcMaterialDefinition mat) : base(mat.mDatabase) { Name = name; Material = mat; }
-		internal IfcMaterialProperties(string name, List<IfcProperty> props, IfcMaterialDefinition mat) : base(props) { Name = name; Material = mat; }
+		internal IfcMaterialProperties(string name, IEnumerable<IfcProperty> props, IfcMaterialDefinition mat) : base(props) { Name = name; Material = mat; }
 	}
 	[Serializable]
 	public partial class IfcMaterialRelationship : IfcResourceLevelRelationship //IFC4

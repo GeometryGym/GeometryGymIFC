@@ -2254,7 +2254,12 @@ namespace GeometryGym.Ifc
 				la.AssignedItems.Add(this);
 			}
 		}
-		protected IfcRepresentation(IfcRepresentationContext context) : base(context.mDatabase) { ContextOfItems = context; RepresentationIdentifier = context.ContextIdentifier; }
+		protected IfcRepresentation(IfcRepresentationContext context) : base(context.mDatabase) 
+		{ 
+			ContextOfItems = context; 
+			RepresentationIdentifier = context.ContextIdentifier;
+			RepresentationType = context.ContextType; 
+		}
 		protected IfcRepresentation(IfcRepresentationContext context, RepresentationItem item) : this(context) { mItems.Add(item); }
 		protected IfcRepresentation(IfcRepresentationContext context, IEnumerable<RepresentationItem> items) : this(context) { Items.AddRange(items); }
 		protected override void initialize()
@@ -2302,7 +2307,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcRepresentationContext() : base() { }
 		protected IfcRepresentationContext(DatabaseIfc db) : base(db) { }
-		protected IfcRepresentationContext(DatabaseIfc db, IfcRepresentationContext c) : base(db, c) { mContextIdentifier = c.mContextIdentifier; mContextType = c.mContextType; }
+		protected IfcRepresentationContext(DatabaseIfc db, IfcRepresentationContext c, DuplicateOptions options) : base(db, c) { mContextIdentifier = c.mContextIdentifier; mContextType = c.mContextType; }
 	}
 	[Serializable]
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/

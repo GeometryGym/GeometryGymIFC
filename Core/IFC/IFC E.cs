@@ -986,24 +986,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties   // DEPRECATED IFC4
 	{
-		internal List<int> mExtendedProperties = new List<int>(); //: SET [1:?] OF IfcProperty
-
-		public ReadOnlyCollection<IfcProperty> ExtendedProperties { get { return new ReadOnlyCollection<IfcProperty>( mExtendedProperties.ConvertAll(x => mDatabase[x] as IfcProperty)); } }
-
 		internal IfcExtendedMaterialProperties() : base() { }
-		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p, DuplicateOptions options) : base(db, p, options) 
-		{ 
-			foreach(IfcProperty prop in p.ExtendedProperties)
-				addProperty( db.Factory.Duplicate(prop));
-			mDescription = p.mDescription;
-			mName = p.mName; 
-		}
-		public IfcExtendedMaterialProperties(IfcMaterialDefinition materialDefinition, IEnumerable<IfcProperty> properties) : base(materialDefinition)
-		{
-			mExtendedProperties.AddRange(properties.Select(x => x.StepId));
-		}
-
-		internal void addProperty(IfcProperty property) { mExtendedProperties.Add(property.mIndex); }
+		internal IfcExtendedMaterialProperties(DatabaseIfc db, IfcExtendedMaterialProperties p, DuplicateOptions options) : base(db, p, options) { }
+		public IfcExtendedMaterialProperties(string name, IEnumerable<IfcProperty> properties, IfcMaterialDefinition materialDefinition) 
+			: base(name, properties, materialDefinition) { } 
 	}
 	[Serializable]
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction, NamedObjectIfc //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
@@ -1024,11 +1010,16 @@ namespace GeometryGym.Ifc
 
 		protected IfcExtendedProperties() : base() { }
 		protected IfcExtendedProperties(DatabaseIfc db) : base(db) {  }
-		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p, DuplicateOptions options) : base(db, p, options) { mName = p.mName; mDescription = p.mDescription; p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));   }
-		public IfcExtendedProperties(List<IfcProperty> props) : base(props[0].mDatabase)
+		protected IfcExtendedProperties(DatabaseIfc db, IfcExtendedProperties p, DuplicateOptions options) : base(db, p, options) 
+		{ 
+			mName = p.mName; 
+			mDescription = p.mDescription;
+			p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));  
+		}
+		public IfcExtendedProperties(IEnumerable<IfcProperty> properties) : base(properties.First().mDatabase)
 		{
-			if (props != null)
-				props.ForEach(x => AddProperty(x));
+			foreach(IfcProperty property in properties)
+				AddProperty(property);
 		}
 		
 		public void AddProperty(IfcProperty property)

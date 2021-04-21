@@ -315,11 +315,15 @@ namespace GeometryGym.Ifc
 			if (obj == null || obj.mDatabase == null)
 				return 0;
 			int result = 0;
-			mDictionary.TryGetValue(key(obj), out result);
+			string keyValue = key(obj);
+			mDictionary.TryGetValue(keyValue, out result);
 			return result;
 		}
 		internal void AddObject(BaseClassIfc obj, int index) { mDictionary[key(obj)] = index; }
-		private string key(BaseClassIfc obj) { return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mIndex; }
+		private string key(BaseClassIfc obj) 
+		{ 
+			return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mIndex; 
+		}
 		internal bool Remove(BaseClassIfc obj)
 		{
 			string k = key(obj);
@@ -382,10 +386,14 @@ namespace GeometryGym.Ifc
 					type = typeof(IfcBuildingElementProxy);
 				else if (typeof(IfcEarthworksCut).IsAssignableFrom(type) || typeof(IfcGeotechnicalStratum).IsAssignableFrom(type))
 					type = typeof(IfcBuildingElementProxy);
+				else if (typeof(IfcPavement).IsAssignableFrom(type))
+					type = typeof(IfcBuildingElementProxy);
 				else if (release < ReleaseVersion.IFC4X2)
 				{
 					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
 						type = typeof(IfcBuilding);
+					else if (typeof(IfcBearing).IsAssignableFrom(type))
+						type = typeof(IfcBuildingElementProxy);
 					else if (release < ReleaseVersion.IFC4X1)
 					{
 						if (type != typeof(IfcBuilding) && typeof(IfcFacility).IsAssignableFrom(type))
@@ -590,8 +598,15 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-
-			Type type = Type.GetType("GeometryGym.Ifc." + entity.GetType().Name, false, true);
+			string typeName = entity.GetType().Name;
+			Type type = Type.GetType("GeometryGym.Ifc." + typeName, false, true);
+			if (type == null)
+			{
+				typeName = entity.StepClassName;
+				type = Type.GetType("GeometryGym.Ifc." + typeName, false, true);
+				if (type == null)
+					throw new Exception("Unrecongnized ifc type " + typeName);
+			}
 			result = Duplicate(entity, type, options);
 			if (result == null && entity is IfcProfileProperties)
 				result = Duplicate(entity, typeof(IfcProfileProperties), options);
@@ -1311,9 +1326,15 @@ namespace GeometryGym.Ifc
 				return result;
 			string type = nature.ToString();
 			int dimension = 3;
+			IfcContext context = mDatabase.Context;
+			if(context != null)
+			{
+				result = context.RepresentationContexts.OfType<IfcGeometricRepresentationContext>().Where(x => string.Compare(x.ContextType, type, true) == 0).FirstOrDefault();
+				if (result != null)
+					return result;
+			}
 
 			result = new IfcGeometricRepresentationContext(mDatabase, dimension, mDatabase.Tolerance) { ContextType = type };
-			IfcContext context = mDatabase.Context;
 			if (context != null && !context.RepresentationContexts.Contains(result))
 				context.RepresentationContexts.Add(result);
 			mContexts.Add(nature, result);
@@ -1515,7 +1536,9 @@ namespace GeometryGym.Ifc
 	public class DuplicateOptions
 	{
 		public bool DuplicateHost { get; set; } 
-		public bool DuplicateDownstream { get; set; } 
+		public bool DuplicateDownstream { get; set; }
+		public bool DuplicateProperties { get; set; } = true;
+		public bool DuplicateAssociations { get; set; } = true;
 		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; }
 		public bool DuplicateOwnerHistory { get; set; } = true;
@@ -1532,6 +1555,8 @@ namespace GeometryGym.Ifc
 		{
 			DuplicateHost = options.DuplicateHost;
 			DuplicateDownstream = options.DuplicateDownstream;
+			DuplicateAssociations = options.DuplicateAssociations;
+			DuplicateProperties = options.DuplicateProperties;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
 			DuplicateOwnerHistory = options.DuplicateOwnerHistory;
@@ -1809,6 +1834,7 @@ namespace GeometryGym.Ifc
 			parallelOptions.CancellationToken = mCancellationTokenSource.Token;
 			parallelOptions.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
 
+			bool aborted = false;
 			try
 			{
 				Parallel.ForEach(File.ReadAllLines(stepFilePath), parallelOptions, x =>
@@ -1818,6 +1844,10 @@ namespace GeometryGym.Ifc
 				});
 			}
 			catch (OperationCanceledException)
+			{
+				aborted = true;
+			}
+			if (aborted)
 			{
 				new SerializationIfcSTEP(mDatabase).importLines(File.ReadAllLines(stepFilePath));
 				return;
@@ -2137,19 +2167,40 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
-				if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
-					mDatabase.ModelView = ModelView.Ifc4NotAssigned;
+				if (mDatabase.Release > ReleaseVersion.IFC2x3)
+				{
+					if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
+						mDatabase.ModelView = ModelView.Ifc4NotAssigned;
+				}
 				return true;
 			}
 			if (ts.StartsWith("FILE_DESCRIPTION", true, System.Globalization.CultureInfo.CurrentCulture))
 			{
+				int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
+				if (pos1 > 1 && pos2 > pos1)
+				{
+					string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
+					List<string> fields = ParserSTEP.SplitLineFields(str);
+					if(fields.Count > 0)
+					{
+						string modelView = fields[0].ToLower();
+						if (modelView.Contains("coordination"))
+							mDatabase.ModelView = ModelView.Ifc2x3Coordination;
+						else if (modelView.Contains("referenceview"))
+							mDatabase.ModelView = ModelView.Ifc4Reference;
+						else if (modelView.Contains("designtransfer"))
+							mDatabase.ModelView = ModelView.Ifc4DesignTransfer;
+					}
+				}
 				return true;
 			}
 			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
 			{
-				if (ts.Length > 12)
+				int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
+				if (pos1 > 1 && pos2 > pos1)
 				{
-					List<string> fields = ParserSTEP.SplitLineFields(ts.Substring(10, ts.Length - 12));
+					string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
+					List<string> fields = ParserSTEP.SplitLineFields(str);
 					mDatabase.PreviousApplication = fields.Count > 6 ? fields[5].Replace("'", "") : "";
 				}
 				return true;
@@ -2184,7 +2235,14 @@ namespace GeometryGym.Ifc
 		}
 		internal string getHeaderString(string fileName)
 		{
-			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + mDatabase.ModelView + "]'),'2;1');\r\n";
+			string modelView = mDatabase.ModelView.ToString();
+			if (mDatabase.ModelView == ModelView.Ifc2x3Coordination)
+				modelView = "CoordinationView_V2.0";
+			else if (mDatabase.ModelView == ModelView.Ifc4Reference)
+				modelView = "ReferenceView_V1.2";
+			else if (mDatabase.ModelView == ModelView.Ifc4DesignTransfer)
+				modelView = "DesignTransferView_V1.1";
+			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + modelView + "]'),'2;1');\r\n";
 
 			hdr += "FILE_NAME(\r\n";
 			hdr += "/* name */ '" + ParserIfc.Encode(fileName) + "',\r\n";

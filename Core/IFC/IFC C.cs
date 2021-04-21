@@ -217,6 +217,13 @@ namespace GeometryGym.Ifc
 				return new Tuple<double, double, double>(x, y, z);
 			}
 		}
+		internal void Scale(double scaleFactor)
+		{
+			mCoordinateX *= scaleFactor;
+			mCoordinateY *= scaleFactor;
+			if (!is2D)
+				mCoordinateZ *= scaleFactor;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcCartesianPointList : IfcGeometricRepresentationItem //IFC4 // SUPERTYPE OF(IfcCartesianPointList2D, IfcCartesianPointList3D)
@@ -1399,15 +1406,9 @@ namespace GeometryGym.Ifc
 			mObjectType = c.mObjectType;
 			mLongName = c.mLongName;
 			mPhase = c.mPhase;
-			RepresentationContexts.AddRange(c.RepresentationContexts.ConvertAll(x => db.Factory.Duplicate(x) as IfcRepresentationContext));
+			RepresentationContexts.AddRange(c.RepresentationContexts.ConvertAll(x => db.Factory.Duplicate(x, options) as IfcRepresentationContext));
 			if (c.mUnitsInContext > 0)
 				UnitsInContext = db.Factory.Duplicate(c.UnitsInContext) as IfcUnitAssignment;
-
-			foreach (IfcRelDefinesByProperties rdp in c.mIsDefinedBy)
-			{
-				IfcRelDefinesByProperties drdp = db.Factory.Duplicate(rdp) as IfcRelDefinesByProperties;
-				drdp.RelatedObjects.Add(this);
-			}
 		}
 		protected IfcContext(string name, IfcUnitAssignment units) : this(units.Database, name)
 		{
@@ -1728,14 +1729,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcCoordinateReferenceSystem : BaseClassIfc, IfcCoordinateReferenceSystemSelect, NamedObjectIfc  // IFC4 	ABSTRACT SUPERTYPE OF(IfcProjectedCRS);
 	{
-		internal string mName = "$";//	:	OPTIONAL IfcLabel;
-		internal string mDescription = "$";//	:	OPTIONAL IfcText;
-		internal string mGeodeticDatum; //	: OPTIONAL IfcIdentifier;
-		internal string mVerticalDatum = "$";	//:	OPTIONAL IfcIdentifier;
+		internal string mName;//	:	OPTIONAL IfcLabel;
+		internal string mDescription = "";//	:	OPTIONAL IfcText;
+		internal string mGeodeticDatum = ""; //	: OPTIONAL IfcIdentifier;
+		internal string mVerticalDatum = "";	//:	OPTIONAL IfcIdentifier;
 		//INVERSE
 		private IfcCoordinateOperation mHasCoordinateOperation = null;
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = string.IsNullOrEmpty(value) ? "Unknown" :  ParserIfc.Encode(value); } }
+		public string Name { get { return mName; } set { mName = string.IsNullOrEmpty(value) ? "Unknown" :  value; } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string GeodeticDatum { get { return  ParserIfc.Decode(mGeodeticDatum); } set { mGeodeticDatum = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string VerticalDatum { get { return (mVerticalDatum == "$" ? "" : ParserIfc.Decode(mVerticalDatum)); } set { mVerticalDatum = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }

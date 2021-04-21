@@ -236,6 +236,8 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			foreach (IfcRelAssignsToGroup rag in mDatabase.extractJArray<IfcRelAssignsToGroup>(obj.GetValue("IsGroupedBy", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				rag.RelatingGroup = this;
+			foreach (IfcRelReferencedInSpatialStructure rss in mDatabase.extractJArray<IfcRelReferencedInSpatialStructure>(obj.GetValue("ReferencedInStructures", StringComparison.InvariantCultureIgnoreCase) as JArray))
+				rss.RelatedElements.Add(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

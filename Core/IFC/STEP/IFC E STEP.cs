@@ -509,17 +509,22 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mExtendedProperties[0]);
-			for (int icounter = 1; icounter < mExtendedProperties.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mExtendedProperties[icounter]);
-			return str + (mDescription == "$" ? "),$,'" : "),'" + mDescription + "','") + mName + "'";
+			if (mProperties.Count == 0)
+				return "";
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mProperties.Values.Select(x => x.StepId)) + 
+				(string.IsNullOrEmpty(mDescription) ? "),$,'" : "),'" + ParserIfc.Encode(mDescription) + "','") + ParserIfc.Encode(mName) + "'";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mExtendedProperties = ParserSTEP.StripListLink(str, ref pos, len);
-			mDescription = ParserSTEP.StripString(str, ref pos, len);
-			mName = ParserSTEP.StripString(str, ref pos, len);
+			foreach (int i in ParserSTEP.StripListLink(str, ref pos, len))
+			{
+				IfcProperty property = dictionary[i] as IfcProperty;
+				if (property != null)
+					mProperties[property.Name] = property;
+			}
+			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public abstract partial class IfcExtendedProperties : IfcPropertyAbstraction //IFC4 ABSTRACT SUPERTYPE OF (ONEOF (IfcMaterialProperties,IfcProfileProperties))
@@ -531,14 +536,14 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4)
 				return base.BuildStringSTEP(release);
 			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserIfc.Encode(mName) + "',") 
-				+ (string.IsNullOrEmpty(mDescription) ? "$,(#" : "'" + mDescription + "',(#") + string.Join(",#", mProperties.Values.Select(x=>x.StepId)) + ")";
+				+ (string.IsNullOrEmpty(mDescription) ? "$,(#" : "'" + ParserIfc.Encode(mDescription) + "',(#") + string.Join(",#", mProperties.Values.Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			if (release > ReleaseVersion.IFC2x3)
 			{
-				mName = ParserSTEP.StripString(str, ref pos, len);
-				mDescription = ParserSTEP.StripString(str, ref pos, len);
+				mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 				foreach (int i in ParserSTEP.StripListLink(str, ref pos, len))
 				{
 					IfcProperty property = dictionary[i] as IfcProperty;

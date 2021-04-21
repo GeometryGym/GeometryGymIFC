@@ -95,15 +95,9 @@ namespace GeometryGym.Ifc
 			}
 
 		}
-		protected IfcObject(DatabaseIfc db, IfcObject o, DuplicateOptions options) : base(db, o, options)//, bool downStream) : base(db, o, downStream)
+		protected IfcObject(DatabaseIfc db, IfcObject o, DuplicateOptions options) : base(db, o, options)
 		{
 			mObjectType = o.mObjectType;
-			foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
-			{
-				IfcPropertySetDefinition pset = db.Factory.DuplicatePropertySet(rdp.RelatingPropertyDefinition, options);
-				if(pset != null)
-					pset.RelateObjectDefinition(this);
-			}
 			
 			if(o.mIsTypedBy != null)
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, options) as IfcRelDefinesByType;
@@ -229,12 +223,24 @@ namespace GeometryGym.Ifc
 				if (mHasContext != null)
 					(db.Factory.Duplicate(mHasContext, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelDeclares).RelatedDefinitions.Add(this);	
 			}
-			foreach (IfcRelAssociates associates in o.mHasAssociations)
+			if (options.DuplicateAssociations)
 			{
-				IfcRelAssociates dup = db.Factory.Duplicate(associates, new DuplicateOptions(options) { DuplicateDownstream = true }) as IfcRelAssociates;
-				dup.RelatedObjects.Add(this);
+				foreach (IfcRelAssociates associates in o.mHasAssociations)
+				{
+					IfcRelAssociates dup = db.Factory.Duplicate(associates, new DuplicateOptions(options) { DuplicateDownstream = true }) as IfcRelAssociates;
+					dup.RelatedObjects.Add(this);
+				}
 			}
-			if(options.DuplicateDownstream)
+			if (options.DuplicateProperties)
+			{
+				foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
+				{
+					IfcPropertySetDefinition pset = db.Factory.DuplicatePropertySet(rdp.RelatingPropertyDefinition, options);
+					if (pset != null)
+						pset.RelateObjectDefinition(this);
+				}
+			}
+			if (options.DuplicateDownstream)
 			{
 				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
 					mDatabase.Factory.Duplicate(rag, options);
@@ -312,24 +318,33 @@ namespace GeometryGym.Ifc
 
 		public void AddNested(IfcObjectDefinition o)
 		{
-			if (o.mNests != null)
-				o.mNests.RelatedObjects.Remove(o);
+			o.removeFromExistingHost();
 			if (mIsNestedBy.Count() == 0)
 			{
 				IfcRelNests rn = new IfcRelNests(this, o);
 			}
-			else mIsNestedBy.First().RelatedObjects.Add(o);
+			else 
+				mIsNestedBy.First().RelatedObjects.Add(o);
 		}
 		public void AddAggregated(IfcObjectDefinition o)
 		{
-			if (o.mDecomposes != null)
-				o.mDecomposes.mRelatedObjects.Remove(o);
+			o.removeFromExistingHost();
 			if (mIsDecomposedBy.Count == 0)
 			{
 				new IfcRelAggregates(this, o);
 			}
 			else
 				mIsDecomposedBy.First().RelatedObjects.Add(o);
+		}
+		private void removeFromExistingHost()
+		{
+			if (mDecomposes != null)
+				mDecomposes.mRelatedObjects.Remove(this);
+			if (mNests != null)
+				mNests.mRelatedObjects.Remove(this);
+			IfcProduct product = this as IfcProduct;
+			if (product != null && product.mContainedInStructure != null)
+				product.mContainedInStructure.RelatedElements.Remove(product);
 		}
 		
 		

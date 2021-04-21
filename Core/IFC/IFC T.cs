@@ -1038,12 +1038,15 @@ namespace GeometryGym.Ifc
 		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
 		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, DuplicateOptions options) : base(db, t, options) 
 		{ 
-			mApplicableOccurrence = t.mApplicableOccurrence; 
-			foreach(IfcPropertySetDefinition pset in t.HasPropertySets)
+			mApplicableOccurrence = t.mApplicableOccurrence;
+			if (options.DuplicateProperties)
 			{
-				IfcPropertySetDefinition duplicatePset = db.Factory.DuplicatePropertySet(pset, options);
-				if (duplicatePset != null)
-					HasPropertySets.Add(duplicatePset);
+				foreach (IfcPropertySetDefinition pset in t.HasPropertySets)
+				{
+					IfcPropertySetDefinition duplicatePset = db.Factory.DuplicatePropertySet(pset, options);
+					if (duplicatePset != null)
+						HasPropertySets.Add(duplicatePset);
+				}
 			}
 		}
 		[Obsolete("DEPRECATED IFC4", false)]

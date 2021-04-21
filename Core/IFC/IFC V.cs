@@ -278,10 +278,11 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(text) || text == "$")
 				return null;
 			double angle = 0;
-			if (double.TryParse(text, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out angle))
-				return new IfcCompoundPlaneAngleMeasure(angle);
+			
 			string str = text.Replace("(", "").Replace(")", "");
 			string[] fields = str.Split(",".ToCharArray());
+			if (fields.Length == 1 && double.TryParse(text, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out angle))
+				return new IfcCompoundPlaneAngleMeasure(angle);
 			if (fields.Length >= 3)
 			{
 				int degrees = 0, minutes = 0, seconds = 0, microSeconds = 0;

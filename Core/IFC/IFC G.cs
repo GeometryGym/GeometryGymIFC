@@ -136,7 +136,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcGeometricRepresentationContext() : base() { }
 		protected IfcGeometricRepresentationContext(DatabaseIfc db) : base(db) { }
-		internal IfcGeometricRepresentationContext(DatabaseIfc db, IfcGeometricRepresentationContext c) : base(db, c)
+		internal IfcGeometricRepresentationContext(DatabaseIfc db, IfcGeometricRepresentationContext c, DuplicateOptions options) : base(db, c, options)
 		{
 			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
 			mPrecision = c.mPrecision;
@@ -145,8 +145,14 @@ namespace GeometryGym.Ifc
 			if (c.mTrueNorth != null)
 				TrueNorth = db.Factory.Duplicate(c.TrueNorth) as IfcDirection;
 
-			foreach (IfcGeometricRepresentationSubContext sc in mHasSubContexts)
-				db.Factory.Duplicate(sc);
+			if (options.DuplicateDownstream)
+			{
+				foreach (IfcGeometricRepresentationSubContext sc in c.mHasSubContexts)
+					db.Factory.Duplicate(sc, options);
+			}
+
+			if (c.mHasCoordinateOperation != null)
+				db.Factory.Duplicate(c.mHasCoordinateOperation, options);
 		}
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
@@ -188,9 +194,9 @@ namespace GeometryGym.Ifc
 		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcGeometricRepresentationSubContext() : base() { }
-		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s) : base(db, s)
+		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s, DuplicateOptions options) : base(db, s, options)
 		{
-			ParentContext = db.Factory.Duplicate(s.ParentContext) as IfcGeometricRepresentationContext;
+			ParentContext = db.Factory.Duplicate(s.ParentContext, options) as IfcGeometricRepresentationContext;
 
 			mTargetScale = s.mTargetScale;
 			mTargetView = s.mTargetView;
