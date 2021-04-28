@@ -263,7 +263,10 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 			: base(host.Database)
 		{
-			host.AddNested(this);
+			if (host is IfcSpatialElement spatialElement)
+				spatialElement.AddElement(this);
+			else
+				host.AddNested(this);
 			ObjectPlacement = placement;
 			Representation = representation;
 		}

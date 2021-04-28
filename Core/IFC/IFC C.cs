@@ -649,16 +649,19 @@ namespace GeometryGym.Ifc
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 
 		internal IfcClassificationReference() : base() { }
-		internal IfcClassificationReference(DatabaseIfc db, IfcClassificationReference r) : base(db, r)
+		internal IfcClassificationReference(DatabaseIfc db, IfcClassificationReference r, DuplicateOptions options) : base(db, r)
 		{
-			if(db.Release < ReleaseVersion.IFC4)
+			if (options.DuplicateHost)
 			{
-				IfcClassification classification =	r.ReferencedClassification();
-				if (classification != null)
-					ReferencedSource = db.Factory.Duplicate(classification) as IfcClassification;
+				if (db.Release < ReleaseVersion.IFC4)
+				{
+					IfcClassification classification = r.ReferencedClassification();
+					if (classification != null)
+						ReferencedSource = db.Factory.Duplicate(classification) as IfcClassification;
+				}
+				else
+					ReferencedSource = db.Factory.Duplicate(r.ReferencedSource) as IfcClassificationReferenceSelect;
 			}
-			else
-				ReferencedSource = db.Factory.Duplicate(r.ReferencedSource) as IfcClassificationReferenceSelect;
 			mDescription = r.mDescription;
 			mSort = r.mSort;
 		}
@@ -693,10 +696,19 @@ namespace GeometryGym.Ifc
 		}
 		public void Associate(IfcDefinitionSelect related)
 		{
-			if (mClassificationRefForObjects.Count == 0)
+			IfcRelAssociatesClassification associates = mClassificationRefForObjects.FirstOrDefault();
+			if (associates == null)
 				new IfcRelAssociatesClassification(this, related);
-			else if (!mClassificationRefForObjects.First().RelatedObjects.Contains(related))
-				mClassificationRefForObjects.First().RelatedObjects.Add(related);
+			else if (!associates.RelatedObjects.Contains(related))
+				associates.RelatedObjects.Add(related);
+		}
+		public void Relate(IfcResourceObjectSelect resource)
+		{
+			IfcExternalReferenceRelationship reference = mExternalReferenceForResources.FirstOrDefault();
+			if (reference == null)
+				new IfcExternalReferenceRelationship(this, resource);
+			else if (!reference.RelatedResourceObjects.Contains(resource))
+				reference.RelatedResourceObjects.Add(resource);
 		}
 		public IfcClassificationReference FindItem(string identification, bool prefixHierarchy)
 		{
@@ -1245,7 +1257,7 @@ namespace GeometryGym.Ifc
 			return base.DisposeWorker(children);
 		}
 
-		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
+		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { } // mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcConstraintAggregationRelationship; // DEPRECATED IFC4

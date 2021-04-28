@@ -2489,7 +2489,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial interface IfcResourceObjectSelect : IBaseClassIfc //IFC4 SELECT (	IfcPropertyAbstraction, IfcPhysicalQuantity, IfcAppliedValue, 
 	{   //IfcContextDependentUnit, IfcConversionBasedUnit, IfcProfileDef, IfcActorRole, IfcApproval, IfcConstraint, IfcTimeSeries, IfcMaterialDefinition, IfcPerson, IfcPersonAndOrganization, IfcOrganization, IfcExternalReference, IfcExternalInformation););
-		SET<IfcExternalReferenceRelationship> HasExternalReference { get; set; }
+		SET<IfcExternalReferenceRelationship> HasExternalReference { get; }
 		void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship);
 	}
 	public interface IfcResourceSelect : IBaseClassIfc // SELECT(IfcResource, IfcTypeResource)

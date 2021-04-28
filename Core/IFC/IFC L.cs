@@ -393,11 +393,11 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		protected IfcLinearPositioningElement() : base() { }
+		public IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
-		protected IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
+		internal IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
 	}
 	[Serializable]
 	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
