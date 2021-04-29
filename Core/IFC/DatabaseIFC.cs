@@ -359,22 +359,14 @@ namespace GeometryGym.Ifc
 			return element;
 		}
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
+		
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
-			string str = className, definedType = "", enumName = "";
+			string str = className, predefinedTypeConstant = "", enumName = "";
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			string[] fields = str.Split(".".ToCharArray());
-			if (fields.Length > 1)
-			{
-				enumName = str = fields[0];
-				definedType = fields[1];
-			}
-			if (str.EndsWith("Type"))
-				str = str.Substring(0, str.Length - 4);
-			if (str.EndsWith("TypeEnum"))
-				str = str.Substring(0, str.Length - 8);
+			str = identifyClass(str, out predefinedTypeConstant, out enumName);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -413,58 +405,31 @@ namespace GeometryGym.Ifc
 			string resultClass = product.StepClassName;
 			if (string.Compare(str, resultClass, true) != 0 && string.Compare(resultClass, "IfcFacilityPart",true) != 0)
 				product.ObjectType = className;
-			else if (!string.IsNullOrEmpty(definedType))
+			else if (!string.IsNullOrEmpty(predefinedTypeConstant))
 			{
-				if (mDatabase.mRelease < ReleaseVersion.IFC4)
-					product.ObjectType = definedType;
-				else
-				{
-					type = product.GetType();
-					PropertyInfo pi = type.GetProperty("PredefinedType");
-					if (pi != null)
-					{
-						if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
-						{
-							MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any,new Type[] { typeof(string) }, null);
-							if (method != null)
-							{
-								if (!enumName.EndsWith("TypeEnum"))
-									enumName += "TypeEnum";
-								object o = method.Invoke(null, new object[] { enumName + "(." + definedType + ".)" });
-								if (o != null)
-									pi.SetValue(product, o);
-							}
-						}
-						else
-						{
-							Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-							if (enumType != null)
-							{
-								FieldInfo fi = enumType.GetField(definedType);
-								if (fi == null)
-								{
-									product.ObjectType = definedType;
-									fi = enumType.GetField("USERDEFINED");
-								}
-								if (fi != null)
-								{
-									int i = (int)fi.GetValue(enumType);
-									object newEnumValue = Enum.ToObject(enumType, i);
-
-									pi.SetValue(product, newEnumValue);
-								}
-								else
-									product.ObjectType = definedType;
-							}
-							else
-								product.ObjectType = definedType;
-						}
-					}
-					else
-						product.ObjectType = definedType;
-				}
+				SetPredefinedType(product, predefinedTypeConstant, enumName);
 			}
 			return product;
+		}
+		internal IfcConstructionResource ConstructResource(string className)
+		{
+			string str = className, predefinedTypeConstant = "", enumName = "";
+			ReleaseVersion release = mDatabase.Release;
+			if (string.IsNullOrEmpty(str))
+				return null;
+			str = identifyClass(str, out predefinedTypeConstant, out enumName);
+			Type type = BaseClassIfc.GetType(str);
+			if (type == null)
+				throw new Exception("XXX Unrecognized Ifc Type for " + className);
+			IfcConstructionResource resource = BaseClassIfc.Construct(str) as IfcConstructionResource;
+			mDatabase.appendObject(resource);
+			if (resource == null)
+				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
+			if (!string.IsNullOrEmpty(predefinedTypeConstant))
+			{
+				SetPredefinedType(resource, predefinedTypeConstant, enumName);
+			}
+			return resource;
 		}
 		private IfcProduct construct(Type type, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
@@ -528,6 +493,75 @@ namespace GeometryGym.Ifc
 			mDatabase[mDatabase.NextBlank()] = result;
 			return result; 
 		}
+		private void SetPredefinedType(IfcObject obj, string predefinedTypeConstant, string enumName)
+		{
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
+				obj.ObjectType = predefinedTypeConstant;
+			else
+			{
+				Type type = obj.GetType();
+				PropertyInfo pi = type.GetProperty("PredefinedType");
+				if (pi != null)
+				{
+					if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
+					{
+						MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
+						if (method != null)
+						{
+							if (!enumName.EndsWith("TypeEnum"))
+								enumName += "TypeEnum";
+							object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
+							if (o != null)
+								pi.SetValue(obj, o);
+						}
+					}
+					else
+					{
+						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
+						if (enumType != null)
+						{
+							FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+							if (fi == null)
+							{
+								obj.ObjectType = predefinedTypeConstant;
+								fi = enumType.GetField("USERDEFINED");
+							}
+							if (fi != null)
+							{
+								int i = (int)fi.GetValue(enumType);
+								object newEnumValue = Enum.ToObject(enumType, i);
+
+								pi.SetValue(obj, newEnumValue);
+							}
+							else
+								obj.ObjectType = predefinedTypeConstant;
+						}
+						else
+							obj.ObjectType = predefinedTypeConstant;
+					}
+				}
+				else
+					obj.ObjectType = predefinedTypeConstant;
+			}
+		}
+		private string identifyClass(string className, out string predefinedTypeConstant, out string enumName)
+		{
+			predefinedTypeConstant = "";
+			enumName = "";
+			string typeName = className;
+			string[] fields = className.Split(".".ToCharArray());
+			if (fields.Length > 1)
+			{
+				enumName = typeName = fields[0];
+				predefinedTypeConstant = fields[1];
+			}
+			if (typeName.EndsWith("Type"))
+				typeName = typeName.Substring(0, typeName.Length - 4);
+			if (typeName.EndsWith("TypeEnum"))
+				typeName = typeName.Substring(0, typeName.Length - 8);
+			return typeName;
+		}
+		
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
 		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
@@ -2018,7 +2052,7 @@ namespace GeometryGym.Ifc
 				try
 				{
 					BaseClassIfc o = obj.Object;
-					if (o is IfcPropertySet || o is IfcMaterialConstituentSet)
+					if (o is IfcPropertySet || o is IfcMaterialConstituentSet || o is IfcPropertySetTemplate)
 						secondPass.Add(obj);
 					else if (o is IfcTessellatedFaceSet || o is IfcPolyLoop || o is IfcFacetedBrep)
 						threadSafeConstructors.Add(obj);

@@ -2210,7 +2210,11 @@ namespace GeometryGym.Ifc
 		public IfcPropertySetTemplate(string name, IfcPropertyTemplate propertyTemplate) : this(propertyTemplate.mDatabase, name) { AddPropertyTemplate(propertyTemplate); }
 		public IfcPropertySetTemplate(string name, IEnumerable<IfcPropertyTemplate> propertyTemplates) : base(propertyTemplates.First().mDatabase, name) { foreach(IfcPropertyTemplate propertyTemplate in propertyTemplates) AddPropertyTemplate(propertyTemplate); }
 		
-		public void AddPropertyTemplate(IfcPropertyTemplate template) { mHasPropertyTemplates[template.Name] = template; template.mPartOfPsetTemplate.Add(this); }
+		public void AddPropertyTemplate(IfcPropertyTemplate template) 
+		{ 
+			mHasPropertyTemplates[template.Name] = template;
+			template.mPartOfPsetTemplate.Add(this);
+		}
 		public IfcPropertyTemplate this[string name]
 		{
 			get
