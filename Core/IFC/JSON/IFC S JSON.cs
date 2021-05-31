@@ -28,6 +28,31 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcSecondOrderPolynomialSpiral
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["QuadraticTerm"] = mQuadraticTerm.ToString();
+			if (double.IsNaN(mLinearTerm))
+				obj["LinearTerm"] = mLinearTerm.ToString();
+			if (double.IsNaN(mConstantTerm))
+				obj["ConstantTerm"] = mConstantTerm.ToString();
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JToken token = obj.GetValue("QuadraticTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mLinearTerm = token.Value<double>();
+			token = obj.GetValue("LinearTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mConstantTerm = token.Value<double>();
+			token = obj.GetValue("ConstantTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mConstantTerm = token.Value<double>();
+		}
+	}
 	public partial class IfcSectionedSurface : IfcSurface
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

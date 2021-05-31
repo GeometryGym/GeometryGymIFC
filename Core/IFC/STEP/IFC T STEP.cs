@@ -561,6 +561,22 @@ namespace GeometryGym.Ifc
 			mThermalConductivity = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcThirdOrderPolynomialSpiral
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mQubicTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mQuadraticTerm) + "," + ParserSTEP.DoubleOptionalToString(mLinearTerm) + "," + 
+			ParserSTEP.DoubleOptionalToString(mConstantTerm);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			QubicTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			QuadraticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			LinearTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			ConstantTerm = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcTimePeriod : BaseClassIfc // IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mStart + "','" + mFinish + "'"; }

@@ -243,6 +243,35 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Coordinates.GetXML(xml.OwnerDocument, "Coordinates", this, processed));
 		}
 	}
+	public partial class IfcThirdOrderPolynomialSpiral
+	{
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("QubicTerm", mQubicTerm.ToString());
+			if (!double.IsNaN(mQuadraticTerm))
+				xml.SetAttribute("QuadraticTerm", mQuadraticTerm.ToString());
+			if (!double.IsNaN(mLinearTerm))
+				xml.SetAttribute("LinearTerm", mLinearTerm.ToString());
+			if (!double.IsNaN(mConstantTerm))
+				xml.SetAttribute("LinearTerm", mConstantTerm.ToString());
+		}
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			string att = xml.GetAttribute("QubicTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mQubicTerm);
+			att = xml.GetAttribute("QuadraticTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mQuadraticTerm);
+			att = xml.GetAttribute("LinearTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mLinearTerm);
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mConstantTerm);
+		}
+	}
 	public partial class IfcTrackElement : IfcBuiltElement
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)

@@ -1164,6 +1164,21 @@ namespace GeometryGym.Ifc
 					referenceRelationship.RelatedResourceObjects.Add(related);
 			}
 		}
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcExternalReference externalReference = e as IfcExternalReference;
+			if (externalReference == null || !base.isDuplicate(e, tol))
+				return false;
+
+			if (string.Compare(Location, externalReference.Location, true) != 0)
+				return false;
+			if (string.Compare(Name, externalReference.Name, true) != 0)
+				return false;
+			if (string.Compare(Identification, externalReference.Identification, true) != 0)
+				return false;
+			return true;
+		}
 	}
 	[Serializable]
 	public partial class IfcExternalReferenceRelationship : IfcResourceLevelRelationship //IFC4

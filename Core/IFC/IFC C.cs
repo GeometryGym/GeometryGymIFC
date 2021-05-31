@@ -559,6 +559,20 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcClassification classification = e as IfcClassification;
+			if (classification == null || !base.isDuplicate(e, tol))
+				return false;
+
+			if (string.Compare(Location, classification.Location, true) != 0)
+				return false;
+			if (string.Compare(Name, classification.Name, true) != 0)
+				return false;
+			if (string.Compare(Edition, classification.Edition, true) != 0)
+				return false;
+			return true;
+		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -731,6 +745,19 @@ namespace GeometryGym.Ifc
 			if (classificationReference != null)
 				return classificationReference.ReferencedClassification();
 			return classificationReferenceSelect as IfcClassification; 
+		}
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcClassificationReference classificationReference = e as IfcClassificationReference;
+			if (classificationReference == null || !base.isDuplicate(e, tol))
+				return false;
+			if(mReferencedSource != null && classificationReference.ReferencedSource != null)
+			{
+				if (!(mReferencedSource as BaseClassIfc).isDuplicate(classificationReference.ReferencedSource as BaseClassIfc, tol))
+					return false;
+			}
+
+			return true;
 		}
 	}
 	public interface IfcClassificationReferenceSelect : IBaseClassIfc { SET<IfcClassificationReference> HasReferences { get; } } // SELECT ( IfcClassificationReference, IfcClassification);
@@ -1421,6 +1448,11 @@ namespace GeometryGym.Ifc
 			RepresentationContexts.AddRange(c.RepresentationContexts.ConvertAll(x => db.Factory.Duplicate(x, options) as IfcRepresentationContext));
 			if (c.mUnitsInContext > 0)
 				UnitsInContext = db.Factory.Duplicate(c.UnitsInContext) as IfcUnitAssignment;
+			if(options.DuplicateDownstream)
+			{
+				foreach(IfcRelDeclares declares in c.Declares)
+					db.Factory.Duplicate(declares, options);
+			}
 		}
 		protected IfcContext(string name, IfcUnitAssignment units) : this(units.Database, name)
 		{
@@ -1563,11 +1595,19 @@ namespace GeometryGym.Ifc
 		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcRelAssignsToControl> Controls { get { return mControls; } }
 		protected IfcControl() : base() { }
-		protected IfcControl(DatabaseIfc db, IfcControl c, DuplicateOptions options) : base(db, c, options) { mIdentification = c.mIdentification; }
+		protected IfcControl(DatabaseIfc db, IfcControl c, DuplicateOptions options) : base(db, c, options)
+		{ 
+			mIdentification = c.mIdentification;
+			if (options.DuplicateDownstream)
+			{
+				foreach (IfcRelAssignsToControl controls in mControls)
+					db.Factory.Duplicate(controls, options);
+			}
+		}
 		protected IfcControl(DatabaseIfc db) : base(db)
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
-				throw new Exception("Invalid Model View for IfcActor : " + db.ModelView.ToString());
+				throw new Exception("Invalid Model View for IfcControl : " + db.ModelView.ToString());
 		}
 
 		public void Assign(IfcObjectDefinition o) { if (mControls.Count == 0) new IfcRelAssignsToControl(this, o); else mControls.First().RelatedObjects.Add(o); }

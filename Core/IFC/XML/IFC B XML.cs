@@ -79,31 +79,6 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ZLength", ZLength.ToString());
 		}
 	}
-	public partial class IfcBlossCurve
-	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.SetAttribute("QubicTerm", mQubicTerm.ToString());
-			if(!double.IsNaN(mQuadraticTerm))
-				xml.SetAttribute("QuadraticTerm", mQuadraticTerm.ToString());
-			if(!double.IsNaN(mLinearTerm))
-				xml.SetAttribute("LinearTerm", mLinearTerm.ToString());
-		}
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			string att = xml.GetAttribute("QubicTerm");
-			if (!string.IsNullOrEmpty(att))
-				double.TryParse(att, out mQubicTerm);
-			att = xml.GetAttribute("QuadraticTerm");
-			if (!string.IsNullOrEmpty(att))
-				double.TryParse(att, out mQuadraticTerm);
-			att = xml.GetAttribute("LinearTerm");
-			if (!string.IsNullOrEmpty(att))
-				double.TryParse(att, out mLinearTerm);
-		}
-	}
 	public partial class IfcBooleanResult : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect
 	{
 		internal override void ParseXml(XmlElement xml)

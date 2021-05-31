@@ -2019,10 +2019,10 @@ namespace GeometryGym.Ifc
 			RelatingStructure = e;
 			e.mReferencesElements.Add(this);
 		}
-		public IfcRelReferencedInSpatialStructure(IfcSpatialReferenceSelect related, IfcSpatialElement relating) : this(relating)
-		{
-			RelatedElements.Add(related);
-		}
+		public IfcRelReferencedInSpatialStructure(IfcSpatialReferenceSelect related, IfcSpatialElement relating)
+			: this(relating) { RelatedElements.Add(related); }
+		public IfcRelReferencedInSpatialStructure(IEnumerable<IfcSpatialReferenceSelect> related, IfcSpatialElement relating) 
+			: this(relating) { RelatedElements.AddRange(related); }
 
 		protected override void initialize()
 		{
@@ -2069,6 +2069,7 @@ namespace GeometryGym.Ifc
 		public IfcProcess RelatingProcess { get { return mDatabase[mRelatingProcess] as IfcProcess; } set { mRelatingProcess = value.mIndex; value.mIsPredecessorTo.Add(this); } }
 		public IfcProcess RelatedProcess { get { return mDatabase[mRelatedProcess] as IfcProcess; } set { mRelatedProcess = value.mIndex; value.mIsSuccessorFrom.Add(this); } }
 		public IfcLagTime TimeLag { get { return mDatabase[mTimeLag] as IfcLagTime; } set { mTimeLag = (value == null ? 0 : value.mIndex); } }
+		public IfcSequenceEnum SequenceType { get { return mSequenceType; } set { mSequenceType = value; } }
 
 		internal IfcRelSequence() : base() { }
 		internal IfcRelSequence(DatabaseIfc db, IfcRelSequence s, DuplicateOptions options) : base(db, s, options)
@@ -2083,15 +2084,6 @@ namespace GeometryGym.Ifc
 		{
 			mRelatingProcess = rg.mIndex;
 			mRelatedProcess = rd.mIndex;
-		}
-
-		internal IfcProcess getPredecessor() { return mDatabase[mRelatingProcess] as IfcProcess; }
-		internal IfcProcess getSuccessor() { return mDatabase[mRelatedProcess] as IfcProcess; }
-		internal TimeSpan getLag()
-		{
-			if (mDatabase.mRelease < ReleaseVersion.IFC4) return new TimeSpan(0, 0, (int)mTimeLag);
-			IfcLagTime lt = mDatabase[(int)mTimeLag] as IfcLagTime;
-			return (lt == null ? new TimeSpan(0, 0, 0) : lt.getLag());
 		}
 	}
 	[Serializable]
@@ -2183,11 +2175,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelVoidsElement : IfcRelDecomposes // Ifc2x3 IfcRelConnects
 	{
-		private int mRelatingBuildingElement;// : IfcElement;
-		private int mRelatedOpeningElement;// : IfcFeatureElementSubtraction; 
+		private IfcElement mRelatingBuildingElement;// : IfcElement;
+		private IfcFeatureElementSubtraction mRelatedOpeningElement;// : IfcFeatureElementSubtraction; 
 
-		public IfcElement RelatingBuildingElement { get { return mDatabase[mRelatingBuildingElement] as IfcElement; } set { mRelatingBuildingElement = value.mIndex; if(!value.mHasOpenings.Contains(this)) value.mHasOpenings.Add(this); } }
-		public IfcFeatureElementSubtraction RelatedOpeningElement { get { return mDatabase[mRelatedOpeningElement] as IfcFeatureElementSubtraction; } set { mRelatedOpeningElement = value.mIndex; value.mVoidsElement = this; } }
+		public IfcElement RelatingBuildingElement { get { return mRelatingBuildingElement; } set { mRelatingBuildingElement = value; if(!value.mHasOpenings.Contains(this)) value.mHasOpenings.Add(this); } }
+		public IfcFeatureElementSubtraction RelatedOpeningElement { get { return mRelatedOpeningElement; } set { mRelatedOpeningElement = value; if(value != null) value.mVoidsElement = this; } }
 
 		internal IfcRelVoidsElement() : base() { }
 		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, DuplicateOptions options) : base(db, v, options)
@@ -2195,7 +2187,7 @@ namespace GeometryGym.Ifc
 			RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, options) as IfcFeatureElementSubtraction;
 		}
 		public IfcRelVoidsElement(IfcElement host, IfcFeatureElementSubtraction fes)
-			: base(host.mDatabase) { mRelatingBuildingElement = host.mIndex; host.mHasOpenings.Add(this); mRelatedOpeningElement = fes.mIndex; fes.mVoidsElement = this; }
+			: base(host.mDatabase) { RelatingBuildingElement = host; RelatedOpeningElement = fes; }
 	}
 	[Serializable]
 	public partial class IfcReparametrisedCompositeCurveSegment : IfcCompositeCurveSegment

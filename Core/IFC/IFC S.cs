@@ -121,6 +121,23 @@ namespace GeometryGym.Ifc
 		public IfcSeamCurve(IfcCurve curve, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : base(curve, p1, p2, cr) { }
 	}
 	[Serializable]
+	public partial class IfcSecondOrderPolynomialSpiral : IfcSpiral
+	{
+		private double mQuadraticTerm = 0; //: IfcLengthMeasure;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+
+		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
+
+		public IfcSecondOrderPolynomialSpiral() : base() { }
+		internal IfcSecondOrderPolynomialSpiral(DatabaseIfc db, IfcSecondOrderPolynomialSpiral curve, DuplicateOptions options)
+			: base(db, curve, options) { QuadraticTerm = curve.QuadraticTerm; LinearTerm = curve.LinearTerm; ConstantTerm = curve.ConstantTerm; }
+		public IfcSecondOrderPolynomialSpiral(IfcAxis2Placement position, double qubicTerm)
+			: base(position) { QuadraticTerm = qubicTerm; }
+	}
+	[Serializable]
 	public abstract partial class IfcSectionedSolid : IfcSolidModel
 	{
 		internal IfcCurve mDirectrix;// : IfcCurve;
@@ -146,10 +163,10 @@ namespace GeometryGym.Ifc
 	{
 		[Obsolete("REVISED IFC4x3", false)]
 		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
-		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositions = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcDistanceExpression;
+		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcDistanceExpression;
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
-		public LIST<IfcCurveMeasureSelect> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
+		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
@@ -159,7 +176,7 @@ namespace GeometryGym.Ifc
 			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
-		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcCurveMeasureSelect> positions, bool fixedAxisVertical)
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcAxis2PlacementLinear> positions, bool fixedAxisVertical)
 			: base(directrix, profiles)
 		{
 			CrossSectionPositions.AddRange(positions);
@@ -570,6 +587,8 @@ additional types	some additional representation types are given:
 			Trace.WriteLine("XX Error Can't identify " + representationItem.ToString() + " as shape representation!");
 			return null;
 		}
+
+
 	}
 	public partial interface IfcShell : IBaseClassIfc  // SELECT(IfcClosedShell, IfcOpenShell);
 	{
@@ -1022,9 +1041,26 @@ additional types	some additional representation types are given:
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
 					IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
-					if(system.ServicesBuildings == null)
+					if(sys.ServicesBuildings == null)
 					{
 						new IfcRelServicesBuildings(sys, this);
+					}
+				}
+				foreach (var reference in e.ReferencesElements)
+				{
+					List<IfcSystem> systems = new List<IfcSystem>();
+					foreach (var related in reference.RelatedElements)
+					{
+						if (related is IfcSystem system)
+						{
+							IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
+							if (sys.ReferencedInStructures.Count == 0)
+								systems.Add(sys);
+						}
+					}
+					if (systems.Count > 0)
+					{
+						new IfcRelReferencedInSpatialStructure(systems, this) { GlobalId = reference.GlobalId, Name = reference.Name };
 					}
 				}
 			}

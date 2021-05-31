@@ -523,6 +523,25 @@ namespace GeometryGym.Ifc
 		internal IfcThermalMaterialProperties() : base() { }
 		internal IfcThermalMaterialProperties(DatabaseIfc db, IfcThermalMaterialProperties p, DuplicateOptions options) : base(db, p, options) { mSpecificHeatCapacity = p.mSpecificHeatCapacity; mBoilingPoint = p.mBoilingPoint; mFreezingPoint = p.mFreezingPoint; mThermalConductivity = p.mThermalConductivity; }
 	}
+	[Serializable]
+	public partial class IfcThirdOrderPolynomialSpiral : IfcSpiral
+	{
+		private double mQubicTerm = 0; //: IfcLengthMeasure;
+		private double mQuadraticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+
+		public double QubicTerm { get { return mQubicTerm; } set { mQubicTerm = value; } }
+		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
+
+		public IfcThirdOrderPolynomialSpiral() : base() { }
+		internal IfcThirdOrderPolynomialSpiral(DatabaseIfc db, IfcThirdOrderPolynomialSpiral bloss, DuplicateOptions options)
+			: base(db, bloss, options) { QubicTerm = bloss.QubicTerm; QuadraticTerm = bloss.QuadraticTerm; LinearTerm = bloss.LinearTerm; }
+		public IfcThirdOrderPolynomialSpiral(IfcAxis2Placement position, double qubicTerm)
+			: base(position) { QubicTerm = qubicTerm; }
+	}
 	public interface IfcTimeOrRatioSelect { } // IFC4 	IfcRatioMeasure, IfcDuration	
 	[Serializable]
 	public partial class IfcTimePeriod : BaseClassIfc // IFC4
@@ -1259,6 +1278,55 @@ namespace GeometryGym.Ifc
 			}
 		
 			db.WriteFile(filename);
+		}
+
+		internal void SetPredefinedType(string predefinedTypeConstant, string enumName)
+		{
+			IfcElementType elementType = this as IfcElementType;
+			Type type = GetType();
+			PropertyInfo pi = type.GetProperty("PredefinedType");
+			if (pi != null)
+			{
+				if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
+				{
+					MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
+					if (method != null)
+					{
+						if (!enumName.EndsWith("TypeEnum"))
+							enumName += "TypeEnum";
+						object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
+						if (o != null)
+							pi.SetValue(this, o);
+					}
+				}
+				else
+				{
+					Type enumType = pi.PropertyType;
+					if (enumType != null)
+					{
+						FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+						if (fi == null)
+						{
+							if (elementType != null)
+								elementType.ElementType = predefinedTypeConstant;
+							fi = enumType.GetField("USERDEFINED");
+						}
+						if (fi != null)
+						{
+							int i = (int)fi.GetValue(enumType);
+							object newEnumValue = Enum.ToObject(enumType, i);
+
+							pi.SetValue(this, newEnumValue);
+						}
+						else if (elementType != null)
+							elementType.ElementType = predefinedTypeConstant;
+					}
+					else if (elementType != null)
+						elementType.ElementType = predefinedTypeConstant;
+				}
+			}
+			else if (elementType != null)
+				elementType.ElementType = predefinedTypeConstant;
 		}
 	}
 	[Serializable]

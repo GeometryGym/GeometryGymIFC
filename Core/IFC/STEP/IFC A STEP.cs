@@ -388,13 +388,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAlignmentCantSegment : IfcAlignmentParameterSegment
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
 			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleToString(mStartCantLeft) + "," +
 			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," + ParserSTEP.DoubleToString(mStartCantRight) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantRight) + "," + ParserSTEP.DoubleOptionalToString(mSmoothingLength) + ",." +
-			mPredefinedType.ToString() + ".";
+			ParserSTEP.DoubleOptionalToString(mEndCantRight) + (release == ReleaseVersion.IFC4X3_RC3 ? ",$" : "") + 
+			",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -405,7 +405,8 @@ namespace GeometryGym.Ifc
 			EndCantLeft = ParserSTEP.StripDouble(str, ref pos, len);
 			StartCantRight = ParserSTEP.StripDouble(str, ref pos, len);
 			EndCantRight = ParserSTEP.StripDouble(str, ref pos, len);
-			SmoothingLength = ParserSTEP.StripDouble(str, ref pos, len);
+			if(release == ReleaseVersion.IFC4X3_RC3)
+				ParserSTEP.StripDouble(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);

@@ -366,7 +366,7 @@ namespace GeometryGym.Ifc
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = identifyClass(str, out predefinedTypeConstant, out enumName);
+			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant, out enumName);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -407,7 +407,7 @@ namespace GeometryGym.Ifc
 				product.ObjectType = className;
 			else if (!string.IsNullOrEmpty(predefinedTypeConstant))
 			{
-				SetPredefinedType(product, predefinedTypeConstant, enumName);
+				product.SetPredefinedType(predefinedTypeConstant, enumName);
 			}
 			return product;
 		}
@@ -417,7 +417,7 @@ namespace GeometryGym.Ifc
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = identifyClass(str, out predefinedTypeConstant, out enumName);
+			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant, out enumName);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -427,7 +427,7 @@ namespace GeometryGym.Ifc
 				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 			if (!string.IsNullOrEmpty(predefinedTypeConstant))
 			{
-				SetPredefinedType(resource, predefinedTypeConstant, enumName);
+				resource.SetPredefinedType(predefinedTypeConstant, enumName);
 			}
 			return resource;
 		}
@@ -493,74 +493,7 @@ namespace GeometryGym.Ifc
 			mDatabase[mDatabase.NextBlank()] = result;
 			return result; 
 		}
-		private void SetPredefinedType(IfcObject obj, string predefinedTypeConstant, string enumName)
-		{
-			if (mDatabase.mRelease < ReleaseVersion.IFC4)
-				obj.ObjectType = predefinedTypeConstant;
-			else
-			{
-				Type type = obj.GetType();
-				PropertyInfo pi = type.GetProperty("PredefinedType");
-				if (pi != null)
-				{
-					if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
-					{
-						MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
-						if (method != null)
-						{
-							if (!enumName.EndsWith("TypeEnum"))
-								enumName += "TypeEnum";
-							object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
-							if (o != null)
-								pi.SetValue(obj, o);
-						}
-					}
-					else
-					{
-						Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "TypeEnum");
-						if (enumType != null)
-						{
-							FieldInfo fi = enumType.GetField(predefinedTypeConstant);
-							if (fi == null)
-							{
-								obj.ObjectType = predefinedTypeConstant;
-								fi = enumType.GetField("USERDEFINED");
-							}
-							if (fi != null)
-							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
-
-								pi.SetValue(obj, newEnumValue);
-							}
-							else
-								obj.ObjectType = predefinedTypeConstant;
-						}
-						else
-							obj.ObjectType = predefinedTypeConstant;
-					}
-				}
-				else
-					obj.ObjectType = predefinedTypeConstant;
-			}
-		}
-		private string identifyClass(string className, out string predefinedTypeConstant, out string enumName)
-		{
-			predefinedTypeConstant = "";
-			enumName = "";
-			string typeName = className;
-			string[] fields = className.Split(".".ToCharArray());
-			if (fields.Length > 1)
-			{
-				enumName = typeName = fields[0];
-				predefinedTypeConstant = fields[1];
-			}
-			if (typeName.EndsWith("Type"))
-				typeName = typeName.Substring(0, typeName.Length - 4);
-			if (typeName.EndsWith("TypeEnum"))
-				typeName = typeName.Substring(0, typeName.Length - 8);
-			return typeName;
-		}
+		
 		
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
@@ -584,8 +517,19 @@ namespace GeometryGym.Ifc
 				return null;
 			if (entity.mDatabase != null && entity.mDatabase.id == mDatabase.id)
 				return entity;
-			int index = mDuplicateMapping.FindExisting(entity);
 			BaseClassIfc result = null;
+			IfcClassification classification = entity as IfcClassification;
+			if(classification != null)
+				result = findExisting<IfcClassification>(classification);
+			else
+			{
+				IfcClassificationReference classificationReference = entity as IfcClassificationReference;
+				if (classificationReference != null)
+					result = findExisting<IfcClassificationReference>(classificationReference);
+			}
+			if (result != null)
+				return result;
+			int index = mDuplicateMapping.FindExisting(entity);
 			if (index > 0)
 			{
 				result = mDatabase[index];
@@ -609,6 +553,18 @@ namespace GeometryGym.Ifc
 
 			NominateDuplicate(entity, result);
 			return result;
+		}
+		private T findExisting<T>(T obj) where T : BaseClassIfc
+		{
+			foreach (T existing in mDatabase.OfType<T>())
+			{
+				if (existing.isDuplicate(obj, 1e-3))
+				{
+					NominateDuplicate(obj, existing);
+					return existing;
+				}
+			}
+			return null;
 		}
 		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
 		{
@@ -1211,7 +1167,7 @@ namespace GeometryGym.Ifc
 			get
 			{
 				if (mApplication == null)
-					mApplication = new IfcApplication(mDatabase);
+					mApplication = IfcApplication.Construct(mDatabase);
 				return mApplication;
 			}
 			set
@@ -1435,6 +1391,10 @@ namespace GeometryGym.Ifc
 				projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
 				identifier = "Row";
 			}
+			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Body_Fallback)
+			{
+				identifier = "Body-Fallback";
+			}
 			if (context == null)
 				context = GeometricRepresentationContext(IfcGeometricRepresentationContext.GeometricContextIdentifier.Model);
 			result = new IfcGeometricRepresentationSubContext(context, projection ) { ContextIdentifier = identifier };
@@ -1573,6 +1533,7 @@ namespace GeometryGym.Ifc
 		public bool DuplicateDownstream { get; set; }
 		public bool DuplicateProperties { get; set; } = true;
 		public bool DuplicateAssociations { get; set; } = true;
+		public bool DuplicateRepresentation { get; set; } = true;
 		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; }
 		public bool DuplicateOwnerHistory { get; set; } = true;

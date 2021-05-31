@@ -615,10 +615,10 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingBuildingElement)
-				obj["RelatingBuildingElement"] = mDatabase[mRelatingBuildingElement].getJson(this, options);
-			if (host.mIndex != mRelatedOpeningElement)
-				obj["RelatedOpeningElement"] = mDatabase[mRelatedOpeningElement].getJson(this, options);
+			if (host != mRelatingBuildingElement)
+				obj["RelatingBuildingElement"] = mRelatingBuildingElement.getJson(this, options);
+			if (host != mRelatedOpeningElement)
+				obj["RelatedOpeningElement"] = mRelatedOpeningElement.getJson(this, options);
 		}
 	}
 	public partial class IfcRepresentation<RepresentationItem> : BaseClassIfc, IfcLayeredItem where RepresentationItem : IfcRepresentationItem // Abstract IFC4 ,SUPERTYPE OF (ONEOF(IfcShapeModel,IfcStyleModel));

@@ -58,15 +58,15 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if(mFlexible != IfcLogicalEnum.UNKNOWN)
-				obj["Flexible"] = mFlexible == IfcLogicalEnum.TRUE ? "TRUE" : "FALSE";
+			if (mPredefinedType != IfcPavementTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				mFlexible = token.Value<bool>() ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+				Enum.TryParse<IfcPavementTypeEnum>(token.Value<string>(), out mPredefinedType);
 		}
 	}
 	public partial class IfcPavementType : IfcBuiltElementType
@@ -74,14 +74,16 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["Flexible"] = mFlexible ? "TRUE" : "FALSE";
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Enum.TryParse<IfcPavementTypeEnum>(token.Value<string>(), out mPredefinedType);
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("Flexible", StringComparison.InvariantCultureIgnoreCase);
+			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				mFlexible = token.Value<bool>();
+				Enum.TryParse<IfcPavementTypeEnum>(token.Value<string>(), out mPredefinedType);
 		}
 	}
 	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect

@@ -64,26 +64,28 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + (mFlexible == IfcLogicalEnum.UNKNOWN ? ",$" : (mFlexible == IfcLogicalEnum.TRUE ? ",.T." : ",.F."));
+			return base.BuildStringSTEP() + (mPredefinedType == IfcPavementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			string field = ParserSTEP.StripField(str, ref pos, len);
-			if (field[0] == '.')
-				mFlexible = field[1] == 'T' ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s[0] == '.')
+				Enum.TryParse<IfcPavementTypeEnum>(s.Substring(1, s.Length - 2), out mPredefinedType);
 		}
 	}
 	public partial class IfcPavementType : IfcBuiltElementType
 	{
 		protected override string BuildStringSTEP()
 		{
-			return base.BuildStringSTEP() + (mFlexible ? ",.T." : ",.F."); 
+			return base.BuildStringSTEP() +  ",." + mPredefinedType.ToString() + "."; 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Flexible = ParserSTEP.StripBool(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s[0] == '.')
+				Enum.TryParse<IfcPavementTypeEnum>(s.Substring(1, s.Length - 2), out mPredefinedType);
 		}
 	}
 	public partial class IfcPerformanceHistory : IfcControl
@@ -658,14 +660,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mMapProjection == "$" ? ",$," : ",'" + mMapProjection + "',") +
-				(mMapZone == "$" ? "$," : "'" + mMapZone + "',") + ParserSTEP.LinkToString(mMapUnit);
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty( mMapProjection) ? ",$," : ",'" + ParserIfc.Encode( mMapProjection) + "',") +
+				(string.IsNullOrEmpty( mMapZone) ? "$," : "'" + ParserIfc.Encode(mMapZone) + "',") + ParserSTEP.LinkToString(mMapUnit);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mMapProjection = ParserSTEP.StripString(str, ref pos, len);
-			mMapZone = ParserSTEP.StripString(str, ref pos, len);
+			mMapProjection = ParserIfc.Decode( ParserSTEP.StripString(str, ref pos, len));
+			mMapZone = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mMapUnit = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}

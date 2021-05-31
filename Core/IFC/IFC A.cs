@@ -679,7 +679,6 @@ namespace GeometryGym.Ifc
 		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		private double mStartCantRight = 0; //: IfcLengthMeasure;
 		private double mEndCantRight = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private double mSmoothingLength = double.NaN;//: OPTIONAL IfcPositiveLengthMeasure;
 		private IfcAlignmentCantSegmentTypeEnum mPredefinedType; //: IfcAlignmentCantSegmentTypeEnum;
 
 		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
@@ -688,7 +687,6 @@ namespace GeometryGym.Ifc
 		public double EndCantLeft { get { return mEndCantLeft; } set { mEndCantLeft = value; } }
 		public double StartCantRight { get { return mStartCantRight; } set { mStartCantRight = value; } }
 		public double EndCantRight { get { return mEndCantRight; } set { mEndCantRight = value; } }
-		public double SmoothingLength { get { return mSmoothingLength; } set { mSmoothingLength = value; } }
 		public IfcAlignmentCantSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcAlignmentCantSegment() : base() { }
@@ -701,7 +699,6 @@ namespace GeometryGym.Ifc
 			EndCantLeft = alignmentCantSegment.EndCantLeft;
 			StartCantRight = alignmentCantSegment.StartCantRight;
 			EndCantRight = alignmentCantSegment.EndCantRight;
-			SmoothingLength = alignmentCantSegment.SmoothingLength;
 			PredefinedType = alignmentCantSegment.PredefinedType;
 		}
 		public IfcAlignmentCantSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight, IfcAlignmentCantSegmentTypeEnum predefinedType)
@@ -773,6 +770,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
+	[Obsolete("DEPRECATED IFC4X3", false)]
 	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
 	{
 		internal IfcAlignment2DHorizontal mHorizontal = null;// : OPTIONAL IfcAlignment2DHorizontal;
@@ -800,10 +798,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAlignmentHorizontal : IfcLinearElement
 	{
+		[Obsolete("Removed IFC4x3RC4", false)]
 		private double mStartDistAlong = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		[Obsolete("Interim during IFC4x3RC2", false)]
 		private LIST<IfcAlignmentHorizontalSegment> mHorizontalSegments = new LIST<IfcAlignmentHorizontalSegment>(); //: LIST [1:?] OF IfcAlignmentHorizontalSegment; 
 	
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
 		public IEnumerable<IfcAlignmentHorizontalSegment> HorizontalSegments
 		{
@@ -905,7 +905,7 @@ namespace GeometryGym.Ifc
 			IfcCartesianPoint startPoint = StartPoint;
 
 			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(startPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
-			IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), length = new IfcNonNegativeLengthMeasure(SegmentLength);
+			IfcParameterValue start = new IfcParameterValue(0), end = new IfcParameterValue(SegmentLength);
 
 			IfcCurve parentCurve = null;
 			if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.LINE)
@@ -916,7 +916,7 @@ namespace GeometryGym.Ifc
 			{
 				parentCurve = new IfcCircle(db, Math.Abs(StartRadiusOfCurvature));
 				if (StartRadiusOfCurvature < 0)
-					length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
+					end = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
 			}
 			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CLOTHOID)
 			{
@@ -936,12 +936,12 @@ namespace GeometryGym.Ifc
 					if (StartRadiusOfCurvature > 0 && EndRadiusOfCurvature > 0)
 					{
 						clothoidConstant = Math.Sqrt(StartRadiusOfCurvature * offsetLength);
-						start = new IfcNonNegativeLengthMeasure(offsetLength);
+						start = new IfcParameterValue(offsetLength);
 					}
 					else if (StartRadiusOfCurvature < 0 && EndRadiusOfCurvature < 0)
 					{
 						clothoidConstant = -Math.Sqrt(-StartRadiusOfCurvature * offsetLength);
-						start = new IfcNonNegativeLengthMeasure(offsetLength);
+						start = new IfcParameterValue(offsetLength);
 					}
 					else
 					{
@@ -969,7 +969,7 @@ namespace GeometryGym.Ifc
 				parentCurve = new IfcClothoid(db.Factory.Origin2dPlace, clothoidConstant);
 			}
 #if (RHINO || GH)
-			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.BIQUADRATICPARABOLA)
+			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.HELMERTCURVE)
 			{
 				if (nextSegment == null)
 					throw new NotImplementedException("XX Next Segment required to compute " + PredefinedType.ToString());
@@ -996,7 +996,7 @@ namespace GeometryGym.Ifc
 					Rhino.Geometry.Plane plane = placement.Plane();
 					plane.RemapToPlaneSpace(nextSegmentStart, out planePoint);
 					start = new IfcParameterValue(0);
-					length = new IfcParameterValue(planePoint.X);
+					end = new IfcParameterValue(planePoint.X);
 					
 					m = 1 / (6 * Math.Abs(radius) * planePoint.X);
 					m = Math.Abs(planePoint.Y) / Math.Pow(planePoint.X,3);
@@ -1012,7 +1012,7 @@ namespace GeometryGym.Ifc
 					plane.RemapToPlaneSpace(startLocation, out planePoint);
 
 					start = new IfcParameterValue(planePoint.X);
-					length = new IfcParameterValue(-planePoint.X);
+					end = new IfcParameterValue(-planePoint.X);
 					m = 1 / (6 * Math.Abs(radius) * -planePoint.X);
 					m = Math.Abs(planePoint.Y) / Math.Pow(-planePoint.X, 3);
 					if (StartRadiusOfCurvature > tol)
@@ -1027,7 +1027,7 @@ namespace GeometryGym.Ifc
 #endif
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
-			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, end, parentCurve);
 			if (mDesignerOf != null)
 				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
 
@@ -1313,9 +1313,40 @@ namespace GeometryGym.Ifc
 		public string Name { get { return ApplicationFullName; } set { ApplicationFullName = value; } }
 
 		internal IfcApplication() : base() { }
-		internal IfcApplication(DatabaseIfc db) : base(db)
+		private IfcApplication(DatabaseIfc db) : base(db) { }
+		internal IfcApplication(DatabaseIfc db, IfcApplication a) : base(db,a)
 		{
-			ApplicationDeveloper = new IfcOrganization(db, "Geometry Gym Pty Ltd");
+			ApplicationDeveloper = db.Factory.Duplicate(a.ApplicationDeveloper) as IfcOrganization;
+			mVersion = a.mVersion;
+			mApplicationFullName = a.mApplicationFullName;
+			mApplicationIdentifier = a.mApplicationIdentifier;
+		}
+		public static IfcApplication Construct(IfcOrganization developer, string version, string fullName, string identifier)
+		{
+			DatabaseIfc db = developer.Database;
+			if(db != null)
+			{
+				IfcApplication existing = SeekExisting(db, version, fullName, identifier);
+				if (existing != null)
+					return existing;
+			}
+			IfcApplication result = new IfcApplication(db);
+			result.ApplicationDeveloper = developer; 
+			result.Version = version; 
+			result.ApplicationFullName = fullName; 
+			result.ApplicationIdentifier = identifier;
+			return result;
+		}
+		public static IfcApplication Construct(DatabaseIfc db)
+		{
+			IfcOrganization applicationDeveloper = new IfcOrganization(db, "Geometry Gym Pty Ltd");
+			string version = IdentifyVersion();
+			string applicationFullName = db.Factory.ApplicationFullName;
+			string applicationIdentifier = db.Factory.ApplicationIdentifier;
+			return Construct(applicationDeveloper, version, applicationFullName, applicationIdentifier);
+		}
+		public static string IdentifyVersion()
+		{
 			try
 			{
 				Assembly assembly = Assembly.GetEntryAssembly();
@@ -1324,21 +1355,24 @@ namespace GeometryGym.Ifc
 				if (assembly != null)
 				{
 					AssemblyName name = assembly.GetName();
-					mVersion = " v" + name.Version.ToString();
+					return " v" + name.Version.ToString();
 				}
 			}
-			catch (Exception) { mVersion = "Unknown"; }
-			mApplicationFullName = db.Factory.ApplicationFullName;
-			mApplicationIdentifier = db.Factory.ApplicationIdentifier;
+			catch (Exception) { }
+			return "Unknown"; 
 		}
-		internal IfcApplication(DatabaseIfc db, IfcApplication a) : base(db,a)
-		{
-			ApplicationDeveloper = db.Factory.Duplicate(a.ApplicationDeveloper) as IfcOrganization;
-			mVersion = a.mVersion;
-			mApplicationFullName = a.mApplicationFullName;
-			mApplicationIdentifier = a.mApplicationIdentifier;
+		internal IfcApplication SeekExisting(DatabaseIfc db) { return SeekExisting(db, Version, ApplicationFullName, ApplicationIdentifier); }
+		internal static IfcApplication SeekExisting(DatabaseIfc db, string version, string fullName, string identifier)
+		{ 
+			foreach (IfcApplication application in db.OfType<IfcApplication>())
+			{
+				if (string.Compare(identifier, application.ApplicationIdentifier, true) == 0)
+					return application;
+				if (string.Compare(application.ApplicationFullName, fullName, true) == 0 && string.Compare(application.Version, version, true) == 0)
+					return application;
+			}
+			return null;
 		}
-		public IfcApplication(IfcOrganization developer, string version, string fullName, string identifier) :base(developer.mDatabase) { ApplicationDeveloper = developer; Version = version; ApplicationFullName = fullName; ApplicationIdentifier = identifier; }
 	}
 	[Serializable]
 	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc

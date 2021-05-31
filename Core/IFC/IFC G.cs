@@ -181,7 +181,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
-		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline };//, PVI };// Surface };
+		public enum SubContextIdentifier { Axis, Body, BoundingBox, FootPrint, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline, Body_Fallback };//, // Surface };
 
 		internal IfcGeometricRepresentationContext mParentContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;

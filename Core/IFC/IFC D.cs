@@ -289,6 +289,15 @@ namespace GeometryGym.Ifc
 			: base(sweptArea) { Directrix = directrix; }
 	}
 	[Serializable]
+	public partial class IfcDirectrixDerivedReferenceSweptAreaSolid : IfcFixedReferenceSweptAreaSolid //IFC4.3
+	{
+		internal IfcDirectrixDerivedReferenceSweptAreaSolid() : base() { }
+		internal IfcDirectrixDerivedReferenceSweptAreaSolid(DatabaseIfc db, IfcFixedReferenceSweptAreaSolid s, DuplicateOptions options) 
+			: base(db, s, options) { }
+		public IfcDirectrixDerivedReferenceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcDirection reference)
+			: base(sweptArea, directrix, reference) { }
+	}
+	[Serializable]
 	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;

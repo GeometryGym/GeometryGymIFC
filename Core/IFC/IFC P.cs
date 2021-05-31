@@ -79,23 +79,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPavement : IfcBuiltElement
 	{
-		private IfcLogicalEnum mFlexible = IfcLogicalEnum.UNKNOWN; //: OPTIONAL IfcBoolean;
-		public IfcLogicalEnum Flexible { get { return mFlexible; } set { mFlexible = value; } }
+		private IfcPavementTypeEnum mPredefinedType = IfcPavementTypeEnum.NOTDEFINED; //: OPTIONAL IfcPavementTypeEnum;
+		public IfcPavementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcPavement() : base() { }
 		public IfcPavement(DatabaseIfc db) : base(db) { }
-		public IfcPavement(DatabaseIfc db, IfcPavement pavement, DuplicateOptions options) : base(db, pavement, options) { Flexible = pavement.Flexible; }
+		public IfcPavement(DatabaseIfc db, IfcPavement pavement, DuplicateOptions options) : base(db, pavement, options) { PredefinedType = pavement.PredefinedType; }
 		public IfcPavement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcPavementType : IfcBuiltElementType
 	{
-		private bool mFlexible = false; //: IfcBoolean;
-		public bool Flexible { get { return mFlexible; } set { mFlexible = value; } }
+		private IfcPavementTypeEnum mPredefinedType = IfcPavementTypeEnum.NOTDEFINED; //: IfcPavementTypeEnum;
+		public IfcPavementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcPavementType() : base() { }
-		public IfcPavementType(DatabaseIfc db, IfcPavementType pavementType, DuplicateOptions options) : base(db, pavementType, options) { Flexible = pavementType.Flexible; }
-		public IfcPavementType(DatabaseIfc db, string name, bool flexible) : base(db, name) { Flexible = flexible; }
+		public IfcPavementType(DatabaseIfc db, IfcPavementType pavementType, DuplicateOptions options) : base(db, pavementType, options) { PredefinedType = pavementType.PredefinedType; }
+		public IfcPavementType(DatabaseIfc db, string name, IfcPavementTypeEnum type) : base(db, name) { PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcPcurve : IfcCurve, IfcCurveOnSurface
@@ -1189,7 +1189,7 @@ namespace GeometryGym.Ifc
 		{
 			if (p.mObjectPlacement != null)
 				ObjectPlacement = p.mObjectPlacement.Duplicate(db);
-			if (p.mRepresentation != null)
+			if (options.DuplicateRepresentation && p.mRepresentation != null)
 				Representation = db.Factory.Duplicate(p.Representation, options) as IfcProductDefinitionShape;
 			foreach (IfcRelAssignsToProduct rap in p.mReferencedBy)
 			{
@@ -1610,12 +1610,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4
 	{
-		internal string mMapProjection = "$";// :	OPTIONAL IfcIdentifier;
-		internal string mMapZone = "$";// : OPTIONAL IfcIdentifier 
+		internal string mMapProjection = "";// :	OPTIONAL IfcIdentifier;
+		internal string mMapZone = "";// : OPTIONAL IfcIdentifier 
 		internal int mMapUnit = 0;// :	OPTIONAL IfcNamedUnit;
 
-		public string MapProjection { get { return (mMapProjection == "$" ? "" : ParserIfc.Decode(mMapProjection)); } set { mMapProjection = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string MapZone { get { return (mMapZone == "$" ? "" : ParserIfc.Decode(mMapZone)); } set { mMapZone = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string MapProjection { get { return mMapProjection; } set { mMapProjection = ParserIfc.Encode(value); } }
+		public string MapZone { get { return mMapZone; } set { mMapZone = value; } }
 		public IfcNamedUnit MapUnit { get { return mDatabase[mMapUnit] as IfcNamedUnit; } set { mMapUnit = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcProjectedCRS() : base() { }

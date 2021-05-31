@@ -244,9 +244,8 @@ namespace GeometryGym.Ifc
 				mCoordList = ParserSTEP.SplitListDoubleTriple(str);
 			else
 			{
+				mCoordList = ParserSTEP.StripListTripleDouble(str, ref pos, len).ToArray();
 				string s = ParserSTEP.StripField(str, ref pos, len);
-				mCoordList = ParserSTEP.SplitListDoubleTriple(s);
-				s = ParserSTEP.StripField(str, ref pos, len);
 				if (!string.IsNullOrEmpty(s) && s != "$")
 				{
 					List<string> lst = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
@@ -584,7 +583,7 @@ namespace GeometryGym.Ifc
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s[0] == '.')
-					mPredefinedType = (IfcColumnTypeEnum)Enum.Parse(typeof(IfcColumnTypeEnum), s.Substring(1, s.Length - 2));
+					Enum.TryParse<IfcColumnTypeEnum>(s.Substring(1, s.Length - 2), out mPredefinedType);
 			}
 		}
 	}
@@ -596,7 +595,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
-				mPredefinedType = (IfcColumnTypeEnum)Enum.Parse(typeof(IfcColumnTypeEnum), s.Substring(1, s.Length - 2));
+				Enum.TryParse<IfcColumnTypeEnum>(s.Substring(1, s.Length - 2), out mPredefinedType);
 		}
 	}
 	public partial class IfcComplexProperty : IfcProperty
@@ -1160,7 +1159,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mName) + "'," + (string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserIfc.Encode(mDescription) + "',") +
-				(string.IsNullOrEmpty(mGeodeticDatum) ? "$" : "'" + ParserIfc.Encode(mGeodeticDatum) + "'") + (string.IsNullOrEmpty(mVerticalDatum) ? ",$" : "','" + ParserIfc.Encode(mVerticalDatum + "'"));
+				(string.IsNullOrEmpty(mGeodeticDatum) ? "$" : "'" + ParserIfc.Encode(mGeodeticDatum) + "'") + (string.IsNullOrEmpty(mVerticalDatum) ? ",$" : ",'" + ParserIfc.Encode(mVerticalDatum) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

@@ -70,31 +70,6 @@ namespace GeometryGym.Ifc
 			obj["ZLength"] = ZLength.ToString();
 		}
 	}
-	public partial class IfcBlossCurve 
-	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
-		{
-			base.setJSON(obj, host, options);
-			obj["QubicTerm"] = mQubicTerm.ToString();
-			if(double.IsNaN(mQuadraticTerm))
-				obj["QuadraticTerm"] = mQuadraticTerm.ToString();
-			if(double.IsNaN(mLinearTerm))
-				obj["Radius"] = mLinearTerm.ToString();
-		}
-		internal override void parseJObject(JObject obj)
-		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("QubicTerm", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				mQubicTerm = token.Value<double>();
-			token = obj.GetValue("QuadraticTerm", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				mQuadraticTerm = token.Value<double>();
-			token = obj.GetValue("LinearTerm", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				mLinearTerm = token.Value<double>();
-		}
-	}
 	public partial class IfcBoiler : IfcEnergyConversionDevice
 	{
 		internal override void parseJObject(JObject obj)

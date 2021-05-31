@@ -200,8 +200,6 @@ namespace GeometryGym.Ifc
 			obj["StartCantRight"] = mStartCantRight.ToString();
 			if (!double.IsNaN(mEndCantRight))
 				obj["EndCantRight"] = mEndCantRight.ToString();
-			if (!double.IsNaN(mSmoothingLength))
-				obj["SmoothingLength"] = mSmoothingLength.ToString();
 			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 		internal override void parseJObject(JObject obj)
@@ -225,9 +223,6 @@ namespace GeometryGym.Ifc
 			JToken endCantRight = obj.GetValue("EndCantRight", StringComparison.InvariantCultureIgnoreCase);
 			if (endCantRight != null)
 				mEndCantRight = endCantRight.Value<double>();
-			JToken smoothingLength = obj.GetValue("SmoothingLength", StringComparison.InvariantCultureIgnoreCase);
-			if (smoothingLength != null)
-				mSmoothingLength = smoothingLength.Value<double>();
 			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);

@@ -356,8 +356,6 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("StartCantRight", mStartCantRight.ToString());
 			if (!double.IsNaN(mEndCantRight))
 				xml.SetAttribute("EndCantRight", mEndCantRight.ToString());
-			if (!double.IsNaN(mSmoothingLength))
-				xml.SetAttribute("SmoothingLength", mSmoothingLength.ToString());
 			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 		internal override void ParseXml(XmlElement xml)
@@ -381,9 +379,6 @@ namespace GeometryGym.Ifc
 			string endCantRight = xml.GetAttribute("EndCantRight");
 			if (!string.IsNullOrEmpty(endCantRight))
 				double.TryParse(endCantRight, out mEndCantRight);
-			string smoothingLength = xml.GetAttribute("SmoothingLength");
-			if (!string.IsNullOrEmpty(smoothingLength))
-				double.TryParse(smoothingLength, out mSmoothingLength);
 			XmlAttribute predefinedType = xml.Attributes["PredefinedType"];
 			if (predefinedType != null)
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(predefinedType.Value, out mPredefinedType);

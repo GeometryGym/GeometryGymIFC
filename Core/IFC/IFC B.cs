@@ -124,23 +124,6 @@ namespace GeometryGym.Ifc
 		public IfcBlock(IfcAxis2Placement3D position, double x,double y, double z) : base(position) { mXLength = x; mYLength = y; mZLength = z; }
 	}
 	[Serializable]
-	public partial class IfcBlossCurve : IfcSpiral
-	{
-		private double mQubicTerm = 0; //: IfcLengthMeasure;
-		private double mQuadraticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
-
-		public double QubicTerm { get { return mQubicTerm; } set { mQubicTerm = value; } }
-		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
-		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
-
-		public IfcBlossCurve() : base() { }
-		internal IfcBlossCurve(DatabaseIfc db, IfcBlossCurve bloss, DuplicateOptions options)
-			: base(db, bloss, options) { QubicTerm = bloss.QubicTerm; QuadraticTerm = bloss.QuadraticTerm; LinearTerm = bloss.LinearTerm; }
-		public IfcBlossCurve(IfcAxis2Placement position, double qubicTerm)
-			: base(position) { QubicTerm = qubicTerm; }
-	}
-	[Serializable]
 	public partial class IfcBoiler : IfcEnergyConversionDevice //IFC4  
 	{
 		internal IfcBoilerTypeEnum mPredefinedType = IfcBoilerTypeEnum.NOTDEFINED;

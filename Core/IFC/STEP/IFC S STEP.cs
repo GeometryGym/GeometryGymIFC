@@ -98,6 +98,20 @@ namespace GeometryGym.Ifc
 			mUserDefinedDataOrigin = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
+	public partial class IfcSecondOrderPolynomialSpiral
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mQuadraticTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mLinearTerm) + "," + ParserSTEP.DoubleOptionalToString(mConstantTerm);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			QuadraticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			LinearTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			ConstantTerm = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcSectionedSolid : IfcSolidModel
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -116,7 +130,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? ",(#" + string.Join(",#", mCrossSectionPositions_OBSOLETE.ConvertAll(x => x.Index)) : 
-				",(" + string.Join(",", CrossSectionPositions.Select(x=>x.ToString()))) + (mFixedAxisVertical ? "),.T." : "),$");	
+				",(" + string.Join(",", CrossSectionPositions.Select(x=>"#" + x.StepId))) + (mFixedAxisVertical ? "),.T." : "),$");	
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -124,10 +138,7 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4X3_RC3)
 				mCrossSectionPositions_OBSOLETE.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
 			else
-			{
-				string field = ParserSTEP.StripField(str, ref pos, len);
-				//CrossSectionPositions.AddRange()
-			}
+				mCrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
 			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}

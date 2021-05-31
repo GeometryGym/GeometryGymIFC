@@ -53,15 +53,15 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mFlexible != IfcLogicalEnum.UNKNOWN)
-				xml.SetAttribute("Flexible", mFlexible == IfcLogicalEnum.TRUE ? "true" : "false");
+			if (mPredefinedType != IfcPavementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string str = xml.GetAttribute("Flexible");
+			string str = xml.GetAttribute("PredefinedType");
 			if (!string.IsNullOrEmpty(str))
-				mFlexible = bool.Parse(str) ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
+				Enum.TryParse<IfcPavementTypeEnum>(str, out mPredefinedType);
 		}
 	}
 	public partial class IfcPavementType : IfcBuiltElementType
@@ -69,12 +69,14 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("Flexible", mFlexible ? "true" : "false");
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			Flexible = bool.Parse(xml.GetAttribute("Flexible"));
+			string str = xml.GetAttribute("PredefinedType");
+			if (!string.IsNullOrEmpty(str))
+				Enum.TryParse<IfcPavementTypeEnum>(str, out mPredefinedType);
 		}
 	}
 	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect

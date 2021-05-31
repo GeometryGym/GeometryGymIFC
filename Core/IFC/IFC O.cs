@@ -159,6 +159,57 @@ namespace GeometryGym.Ifc
 			}
 			return result;
 		}
+		internal void SetPredefinedType(string predefinedTypeConstant, string enumName)
+		{
+			if (mDatabase.mRelease < ReleaseVersion.IFC4)
+				ObjectType = predefinedTypeConstant;
+			else
+			{
+				Type type = GetType();
+				PropertyInfo pi = type.GetProperty("PredefinedType");
+				if (pi != null)
+				{
+					if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
+					{
+						MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
+						if (method != null)
+						{
+							if (!enumName.EndsWith("TypeEnum"))
+								enumName += "TypeEnum";
+							object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
+							if (o != null)
+								pi.SetValue(this, o);
+						}
+					}
+					else
+					{
+						Type enumType = pi.PropertyType;
+						if (enumType != null)
+						{
+							FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+							if (fi == null)
+							{
+								ObjectType = predefinedTypeConstant;
+								fi = enumType.GetField("USERDEFINED");
+							}
+							if (fi != null)
+							{
+								int i = (int)fi.GetValue(enumType);
+								object newEnumValue = Enum.ToObject(enumType, i);
+
+								pi.SetValue(this, newEnumValue);
+							}
+							else
+								ObjectType = predefinedTypeConstant;
+						}
+						else
+							ObjectType = predefinedTypeConstant;
+					}
+				}
+				else
+					ObjectType = predefinedTypeConstant;
+			}
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
@@ -1023,7 +1074,10 @@ namespace GeometryGym.Ifc
 		internal IfcOwnerHistory(DatabaseIfc db, IfcOwnerHistory o) : base(db, o)
 		{
 			OwningUser = db.Factory.Duplicate(o.OwningUser) as IfcPersonAndOrganization;
-			OwningApplication = db.Factory.Duplicate(o.OwningApplication) as IfcApplication;
+
+			OwningApplication = o.OwningApplication.SeekExisting(db);
+			if(OwningApplication == null)
+				OwningApplication = new IfcApplication(db, o.OwningApplication);
 			mState = o.mState;
 			mChangeAction = o.mChangeAction;
 			mLastModifiedDate = o.mLastModifiedDate;
