@@ -210,6 +210,72 @@ namespace GeometryGym.Ifc
 					ObjectType = predefinedTypeConstant;
 			}
 		}
+
+		public void MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
+		{
+			material = null;
+			profile = null;
+
+			if (mIsTypedBy != null)
+			{
+				IfcTypeObject t = mIsTypedBy.RelatingType;
+				if (t != null)
+					t.MaterialProfile(out material, out profile);
+			}
+			if (profile != null)
+				return;
+			instanceMaterialProfile(out material, out profile);
+		}
+		internal void instanceMaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
+		{
+			profile = null;
+			material = null;
+			IfcMaterialSelect ms = GetMaterialSelect();
+			if (ms != null)
+			{
+				IfcMaterialProfile mp = ms as IfcMaterialProfile;
+				if (mp == null)
+				{
+					IfcMaterialProfileSetUsage msu = ms as IfcMaterialProfileSetUsage;
+					if (msu != null)
+					{
+						IfcMaterialProfileSet ps = msu.ForProfileSet;
+						if (ps != null)
+							mp = ps.MaterialProfiles[0];
+					}
+				}
+				if (mp != null)
+				{
+					material = mp.Material;
+					profile = mp.Profile;
+					return;
+				}
+				IfcMaterial m = ms as IfcMaterial;
+				if (m != null)
+					material = m;
+				else
+				{
+					IfcMaterialList list = ms as IfcMaterialList;
+					if (list != null)
+						material = list.Materials[0];
+				}
+			}
+			if (profile == null)
+			{
+				foreach (IfcRelAssociates ra in HasAssociations)
+				{
+					IfcRelAssociatesProfileProperties rap = ra as IfcRelAssociatesProfileProperties;
+					if (rap != null)
+						profile = rap.RelatingProfileProperties.ProfileDefinition;
+				}
+			}
+			if (profile == null)
+			{
+				IfcProduct product = this as IfcProduct;
+				if (product != null)
+					profile = product.sweptProfileFromReprepesentation();
+			}
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))

@@ -175,6 +175,19 @@ namespace GeometryGym.Ifc
 			mFirstOperand = first;
 			mSecondOperand = second;
 		}
+
+		internal IfcProfileDef underlyingSweptProfile()
+		{
+			if (mOperator == IfcBooleanOperator.DIFFERENCE)
+			{
+				IfcBooleanOperand first = FirstOperand;
+				if (first is IfcSweptAreaSolid s)
+					return s.SweptArea;
+				else if (first is IfcBooleanResult boolean)
+					return boolean.underlyingSweptProfile();
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public partial class IfcBorehole : IfcGeotechnicalAssembly

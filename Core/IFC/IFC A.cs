@@ -905,7 +905,7 @@ namespace GeometryGym.Ifc
 			IfcCartesianPoint startPoint = StartPoint;
 
 			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(startPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
-			IfcParameterValue start = new IfcParameterValue(0), end = new IfcParameterValue(SegmentLength);
+			IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), length = new IfcNonNegativeLengthMeasure(SegmentLength);
 
 			IfcCurve parentCurve = null;
 			if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.LINE)
@@ -916,7 +916,7 @@ namespace GeometryGym.Ifc
 			{
 				parentCurve = new IfcCircle(db, Math.Abs(StartRadiusOfCurvature));
 				if (StartRadiusOfCurvature < 0)
-					end = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
+					length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
 			}
 			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CLOTHOID)
 			{
@@ -936,12 +936,12 @@ namespace GeometryGym.Ifc
 					if (StartRadiusOfCurvature > 0 && EndRadiusOfCurvature > 0)
 					{
 						clothoidConstant = Math.Sqrt(StartRadiusOfCurvature * offsetLength);
-						start = new IfcParameterValue(offsetLength);
+						start = new IfcNonNegativeLengthMeasure(offsetLength);
 					}
 					else if (StartRadiusOfCurvature < 0 && EndRadiusOfCurvature < 0)
 					{
 						clothoidConstant = -Math.Sqrt(-StartRadiusOfCurvature * offsetLength);
-						start = new IfcParameterValue(offsetLength);
+						start = new IfcNonNegativeLengthMeasure(offsetLength);
 					}
 					else
 					{
@@ -996,8 +996,8 @@ namespace GeometryGym.Ifc
 					Rhino.Geometry.Plane plane = placement.Plane();
 					plane.RemapToPlaneSpace(nextSegmentStart, out planePoint);
 					start = new IfcParameterValue(0);
-					end = new IfcParameterValue(planePoint.X);
-					
+					length = new IfcParameterValue(planePoint.X);
+
 					m = 1 / (6 * Math.Abs(radius) * planePoint.X);
 					m = Math.Abs(planePoint.Y) / Math.Pow(planePoint.X,3);
 					if (EndRadiusOfCurvature < tol)
@@ -1012,7 +1012,7 @@ namespace GeometryGym.Ifc
 					plane.RemapToPlaneSpace(startLocation, out planePoint);
 
 					start = new IfcParameterValue(planePoint.X);
-					end = new IfcParameterValue(-planePoint.X);
+					length = new IfcParameterValue(-planePoint.X);
 					m = 1 / (6 * Math.Abs(radius) * -planePoint.X);
 					m = Math.Abs(planePoint.Y) / Math.Pow(-planePoint.X, 3);
 					if (StartRadiusOfCurvature > tol)
@@ -1027,7 +1027,7 @@ namespace GeometryGym.Ifc
 #endif
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
-			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, end, parentCurve);
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
 			if (mDesignerOf != null)
 				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
 

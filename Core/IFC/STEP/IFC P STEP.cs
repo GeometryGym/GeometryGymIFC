@@ -660,6 +660,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if (release < ReleaseVersion.IFC4)
+				return "";
 			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty( mMapProjection) ? ",$," : ",'" + ParserIfc.Encode( mMapProjection) + "',") +
 				(string.IsNullOrEmpty( mMapZone) ? "$," : "'" + ParserIfc.Encode(mMapZone) + "',") + ParserSTEP.LinkToString(mMapUnit);
 		}

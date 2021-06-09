@@ -1332,6 +1332,21 @@ namespace GeometryGym.Ifc
 				result.AddRange(mRepresentation.Extract<T>());
 			return result;
 		}
+
+		internal IfcProfileDef sweptProfileFromReprepesentation()
+		{
+			IfcProductDefinitionShape productRepresentation = Representation;
+			if (productRepresentation != null)
+			{
+				foreach (IfcShapeModel shape in productRepresentation.Representations)
+				{
+					IfcProfileDef result = shape.sweptProfileFromReprepesentation();
+					if (result != null)
+						return result;
+				}
+			}
+			return null;
+		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcProductsOfCombustionProperties	 // DEPRECATED IFC4

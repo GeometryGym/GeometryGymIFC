@@ -1152,7 +1152,7 @@ namespace GeometryGym.Ifc
 			IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
 			return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
 		}
-		internal void MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
+		internal bool MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
 		{
 			material = null;
 			profile = null;
@@ -1179,7 +1179,7 @@ namespace GeometryGym.Ifc
 					{
 						material = mp.Material;
 						profile = mp.Profile;
-						return;
+						return true;
 					}
 					IfcMaterial m = ms as IfcMaterial;
 					if (m != null)
@@ -1193,6 +1193,34 @@ namespace GeometryGym.Ifc
 						profile = profileProperties.ProfileDefinition;
 				}
 			}
+			if (profile != null)
+				return true;
+				IfcRelDefinesByType rbt = ObjectTypeOf;
+			if (rbt != null)
+			{
+				List<IfcElement> relatedElements = rbt.RelatedObjects.OfType<IfcElement>().ToList();
+				if (relatedElements.Count > 0)
+				{
+					relatedElements[0].instanceMaterialProfile(out material, out profile);
+					if (profile == null)
+						return false;
+
+					IfcMaterial mat = null;
+					IfcProfileDef prof = null;
+					double tol = 1e-5;
+					foreach (IfcElement el in relatedElements.Skip(1))
+					{
+						el.instanceMaterialProfile(out mat, out prof);
+						if (prof == null || !prof.isDuplicate(profile, tol))
+							return false;
+						if (mat == null)
+							material = null;
+						else if (material != null && !material.isDuplicate(mat, tol))
+							material = null;
+					}
+				}
+			}
+			return profile != null;
 		}
 		internal override List<IBaseClassIfc> retrieveReference(IfcReference r)
 		{
@@ -1368,7 +1396,8 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, DuplicateOptions options) : base(db, t, options)
 		{
-			RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap));
+			if(options.DuplicateRepresentation)
+				RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap));
 			mTag = t.mTag;
 		}
 		public IfcTypeProduct(DatabaseIfc db) : base(db) {  }

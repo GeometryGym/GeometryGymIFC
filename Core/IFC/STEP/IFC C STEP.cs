@@ -887,8 +887,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			//if ifc2x3
-			//else
+			if (release < ReleaseVersion.IFC4)
+				return base.BuildStringSTEP(release) + (mSuppliers.Count == 0 ? ",$" : ",(#" + string.Join(",#", mSuppliers.ConvertAll(x => x.Index)) + "),") +
+					(mUsageRatio == null ? ",$" : "," + mUsageRatio.ToString());
 			return base.BuildStringSTEP(release) + (mPredefinedType == IfcConstructionMaterialResourceTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -896,7 +897,8 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			if (release < ReleaseVersion.IFC4)
 			{
-
+				mSuppliers.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcActorSelect));
+				UsageRatio = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len)) as IfcRatioMeasure;
 			}
 			else
 			{

@@ -428,6 +428,24 @@ namespace GeometryGym.Ifc
 			if (m.OfShapeAspect != null)
 				OfShapeAspect = db.Factory.Duplicate(m.mOfShapeAspect) as IfcShapeAspect;
 		}
+
+		internal IfcProfileDef sweptProfileFromReprepesentation()
+		{
+			if (Items.Count != 1)
+				return null;
+
+			IfcRepresentationItem item = Items.First();
+			IfcSweptAreaSolid sweptAreaSolid = item as IfcSweptAreaSolid;
+			if (sweptAreaSolid != null)
+				return sweptAreaSolid.SweptArea;
+			IfcBooleanResult booleanResult = item as IfcBooleanResult;
+			if (booleanResult != null)
+				return booleanResult.underlyingSweptProfile();
+			IfcMappedItem mappedItem = item as IfcMappedItem;
+			if (mappedItem != null)
+				return mappedItem.MappingSource.MappedRepresentation.sweptProfileFromReprepesentation();
+			return null;
+		}
 	}
 	[Serializable]
 	public partial class IfcShapeRepresentation : IfcShapeModel

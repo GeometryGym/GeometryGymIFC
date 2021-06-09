@@ -37,7 +37,9 @@ namespace GeometryGym.Ifc
 	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
-		{ 
+		{
+			if (release < ReleaseVersion.IFC4)
+				return "";
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," + 
 				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," + 
 				ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale) +

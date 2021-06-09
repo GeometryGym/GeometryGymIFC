@@ -1316,9 +1316,16 @@ namespace GeometryGym.Ifc
 	public partial class IfcConstructionMaterialResource : IfcConstructionResource
 	{
 		internal IfcConstructionMaterialResourceTypeEnum mPredefinedType = IfcConstructionMaterialResourceTypeEnum.NOTDEFINED;// OPTIONAL : IfcConstructionMaterialResourceTypeEnum; 
+		[Obsolete("DEPRECATED IFC4", false)]
+		internal SET<IfcActorSelect> mSuppliers = new SET<IfcActorSelect>(); //: 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
+		[Obsolete("DEPRECATED IFC4", false)]
+		internal IfcRatioMeasure mUsageRatio = null; //: 	OPTIONAL IfcRatioMeasure; ifc2x3
+
 		public IfcConstructionMaterialResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		//Suppliers	 : 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
-		//UsageRatio	 : 	OPTIONAL IfcRatioMeasure; ifc2x3
+		[Obsolete("DEPRECATED IFC4", false)]
+		public SET<IfcActorSelect> Suppliers { get { return mSuppliers; } set { mSuppliers = value; } } //: 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
+		[Obsolete("DEPRECATED IFC4", false)]
+		public IfcRatioMeasure UsageRatio { get { return mUsageRatio; } set { mUsageRatio = value; } } //: 	OPTIONAL IfcRatioMeasure; ifc2x3
 		internal IfcConstructionMaterialResource() : base() { }
 		internal IfcConstructionMaterialResource(DatabaseIfc db, IfcConstructionMaterialResource r, DuplicateOptions options) : base(db,r, options) { mPredefinedType = r.mPredefinedType; }
 		public IfcConstructionMaterialResource(DatabaseIfc db) : base(db) { }
