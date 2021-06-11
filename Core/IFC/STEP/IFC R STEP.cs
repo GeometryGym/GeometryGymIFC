@@ -561,6 +561,16 @@ namespace GeometryGym.Ifc
 			// parse bending
 		}
 	}
+	public partial class IfcRelAdheresToElement 
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + RelatingElement.StepId + ",#" + RelatedSurfaceFeature.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
+			RelatedSurfaceFeature = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurfaceFeature;
+		}
+	}
 	public partial class IfcRelAggregates : IfcRelDecomposes
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

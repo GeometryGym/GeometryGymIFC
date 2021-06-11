@@ -259,6 +259,27 @@ namespace GeometryGym.Ifc
 
 	//ENTITY IfcServiceLife // DEPRECATED IFC4
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
+	public partial class IfcSeventhOrderPolynomialSpiral
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ParserSTEP.DoubleToString(mSepticTerm) + "," + ParserSTEP.DoubleOptionalToString(mSexticTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mQuinticTerm) + "," + ParserSTEP.DoubleOptionalToString(mQuarticTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mQuadraticTerm) + "," + ParserSTEP.DoubleOptionalToString(mLinearTerm) + "," +
+			ParserSTEP.DoubleOptionalToString(mConstantTerm);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			SepticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			SexticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			QuinticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			QuarticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			CubicTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			QuadraticTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			LinearTerm = ParserSTEP.StripDouble(str, ref pos, len);
+			ConstantTerm = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcShadingDevice : IfcBuiltElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcShadingDeviceTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }

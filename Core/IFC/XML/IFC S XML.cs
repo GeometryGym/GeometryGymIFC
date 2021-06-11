@@ -320,8 +320,11 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Enumerators") == 0)
 				{
-					if(child.HasChildNodes)
+					if (child.HasChildNodes)
+					{
 						Enumerators = mDatabase.ParseXml<IfcPropertyEnumeration>(child.ChildNodes[0] as XmlElement);
+						Enumerators.Name = extractString(child as XmlElement, "Name");
+					}
 					else
 						Enumerators = mDatabase.ParseXml<IfcPropertyEnumeration>(child as XmlElement);
 				}

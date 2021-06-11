@@ -325,7 +325,7 @@ namespace GeometryGym.Ifc
 		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
 	}
 	[Serializable]
-	public abstract partial class IfcLinearElement : IfcProduct
+	public partial class IfcLinearElement : IfcProduct
 	{
 		protected IfcLinearElement() : base() { }
 		protected IfcLinearElement(DatabaseIfc db) : base(db) { }

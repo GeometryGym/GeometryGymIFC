@@ -1104,7 +1104,7 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		[NonSerialized] internal IfcRelContainedInSpatialStructure mContainedInStructure = null;
 		[NonSerialized] internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();// :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
-		[NonSerialized] internal IfcRelPositions mPositionedRelativeTo = null; // : SET [0:1] OF IfcRelPositions FOR RelatedProducts;
+		[NonSerialized] internal SET<IfcRelPositions> mPositionedRelativeTo = new SET<IfcRelPositions>(); // : SET [0:?] OF IfcRelPositions FOR RelatedProducts;
 		[NonSerialized] internal SET<IfcRelReferencedInSpatialStructure> mReferencedInStructures = new SET<IfcRelReferencedInSpatialStructure>();//  : 	SET OF IfcRelReferencedInSpatialStructure FOR RelatedElements;
 
 		public IfcObjectPlacement ObjectPlacement
@@ -1161,7 +1161,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public SET<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
-		public IfcRelPositions PositionedRelativeTo { get { return mPositionedRelativeTo; } set { mPositionedRelativeTo = value; } }
+		public SET<IfcRelPositions> PositionedRelativeTo { get { return mPositionedRelativeTo; } set { mPositionedRelativeTo = value; } }
 		public SET<IfcRelReferencedInSpatialStructure> ReferencedInStructures { get { return mReferencedInStructures; } }
 
 		internal IfcObjectPlacement mContainerCommonPlacement = null; //GeometryGym common Placement reference for aggregated items
@@ -1813,6 +1813,12 @@ namespace GeometryGym.Ifc
 		protected IfcPropertyDefinition(IfcPropertyDefinition propertyDefinition) : base(propertyDefinition, false) {  }
 		protected IfcPropertyDefinition(DatabaseIfc db, IfcPropertyDefinition p, DuplicateOptions options) : base(db, p, options)
 		{
+			if (options.DuplicateHost && p.HasContext != null)
+			{
+				IfcContext context = db.Factory.Duplicate(p.HasContext.RelatingContext, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcContext;
+				context.AddDeclared(this);
+			}
+				
 			foreach (IfcRelAssociates associates in mHasAssociations)
 			{
 				IfcRelAssociates dup = db.Factory.Duplicate(associates, options) as IfcRelAssociates;

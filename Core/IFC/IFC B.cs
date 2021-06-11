@@ -181,10 +181,12 @@ namespace GeometryGym.Ifc
 			if (mOperator == IfcBooleanOperator.DIFFERENCE)
 			{
 				IfcBooleanOperand first = FirstOperand;
-				if (first is IfcSweptAreaSolid s)
-					return s.SweptArea;
-				else if (first is IfcBooleanResult boolean)
-					return boolean.underlyingSweptProfile();
+				IfcSweptAreaSolid sweptAreaSolid = first as IfcSweptAreaSolid;
+				if(sweptAreaSolid != null)
+					return sweptAreaSolid.SweptArea;
+				IfcBooleanResult booleanResult = first as IfcBooleanResult;
+				if(booleanResult != null)
+					return booleanResult.underlyingSweptProfile();
 			}
 			return null;
 		}

@@ -903,9 +903,9 @@ namespace GeometryGym.Ifc
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
-				if(string.Compare(name, "IfcLabel-wrapper") == 0)
+				if(string.Compare(name, "IfcLabel-wrapper", true) == 0)
 					mEnumerationValues.Add(new IfcLabel(child.InnerText));
-				else if (string.Compare(name, "EnumerationValues") == 0)
+				else if (string.Compare(name, "EnumerationValues", true) == 0)
 				{
 					foreach (XmlNode node in child.ChildNodes)
 					{

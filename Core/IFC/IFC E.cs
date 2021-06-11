@@ -368,7 +368,8 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRelConnectsStructuralActivity> mAssignedStructuralActivity = new SET<IfcRelConnectsStructuralActivity>();//: 	SET OF IfcRelConnectsStructuralActivity FOR RelatingElement;
 
 		internal SET<IfcRelCoversBldgElements> mHasCoverings = new SET<IfcRelCoversBldgElements>();// : SET OF IfcRelCoversBldgElements FOR RelatingBuildingElement; DEL IFC4
-
+		internal SET<IfcRelAdheresToElement> mHasSurfaceFeatures = new SET<IfcRelAdheresToElement>();// : SET OF IfcRelAdheresToElement FOR RelatingElement;
+																									 // 
 		internal SET<IfcRelConnectsStructuralElement> mHasStructuralMember = new SET<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
 		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }

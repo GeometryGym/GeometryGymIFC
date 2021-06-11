@@ -537,10 +537,10 @@ namespace GeometryGym.Ifc
 		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
 
 		public IfcThirdOrderPolynomialSpiral() : base() { }
-		internal IfcThirdOrderPolynomialSpiral(DatabaseIfc db, IfcThirdOrderPolynomialSpiral bloss, DuplicateOptions options)
-			: base(db, bloss, options) { QubicTerm = bloss.QubicTerm; QuadraticTerm = bloss.QuadraticTerm; LinearTerm = bloss.LinearTerm; }
-		public IfcThirdOrderPolynomialSpiral(IfcAxis2Placement position, double qubicTerm)
-			: base(position) { QubicTerm = qubicTerm; }
+		internal IfcThirdOrderPolynomialSpiral(DatabaseIfc db, IfcThirdOrderPolynomialSpiral spiral, DuplicateOptions options)
+			: base(db, spiral, options) { QubicTerm = spiral.QubicTerm; QuadraticTerm = spiral.QuadraticTerm; LinearTerm = spiral.LinearTerm; ConstantTerm = spiral.ConstantTerm; }
+		public IfcThirdOrderPolynomialSpiral(IfcAxis2Placement position, double cubicTerm)
+			: base(position) { QubicTerm = cubicTerm; }
 	}
 	public interface IfcTimeOrRatioSelect { } // IFC4 	IfcRatioMeasure, IfcDuration	
 	[Serializable]

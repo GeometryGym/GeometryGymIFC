@@ -161,25 +161,6 @@ namespace GeometryGym.Ifc
 		public IfcVibrationIsolatorType(DatabaseIfc m, string name, IfcVibrationIsolatorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
-	public partial class IfcVienneseBend : IfcBoundedCurve
-	{
-		private double mStartCurvature = 0; //: IfcCurvatureMeasure;
-		private double mEndCurvature = 0; //: IfcCurvatureMeasure;
-		private double mGravityCenterHeight = 0; //: IfcLengthMeasure;
-		private double mSegmentLength = 0; //: IfcLengthMeasure;
-
-		public double StartCurvature { get { return mStartCurvature; } set { mStartCurvature = value; } }
-		public double EndCurvature { get { return mEndCurvature; } set { mEndCurvature = value; } }
-		public double GravityCenterHeight { get { return mGravityCenterHeight; } set { mGravityCenterHeight = value; } }
-		public double SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
-
-		public IfcVienneseBend() : base() { }
-		internal IfcVienneseBend(DatabaseIfc db, IfcVienneseBend bend, DuplicateOptions options)
-			: base(db, bend, options) { StartCurvature = bend.StartCurvature; EndCurvature = bend.EndCurvature; GravityCenterHeight = bend.GravityCenterHeight;  SegmentLength = bend.SegmentLength; }
-		public IfcVienneseBend(DatabaseIfc db, double startCurvature, double endCurvature, double gravityCentreHeight, double segmentLength)
-			: base(db) { StartCurvature = startCurvature; EndCurvature = endCurvature; GravityCenterHeight = gravityCentreHeight; SegmentLength = segmentLength; }
-	}
-	[Serializable]
 	public partial class IfcVirtualElement : IfcElement
 	{
 		internal IfcVirtualElement() : base() { }

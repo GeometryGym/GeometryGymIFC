@@ -361,6 +361,43 @@ namespace GeometryGym.Ifc
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcServiceLifeFactor // DEPRECATED IFC4
 	[Serializable]
+	public partial class IfcSeventhOrderPolynomialSpiral : IfcSpiral
+	{
+		private double mSepticTerm = 0; //: IfcLengthMeasure;
+		private double mSexticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mQuinticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mQuarticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mCubicTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mQuadraticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+
+		public double SepticTerm { get { return mSepticTerm; } set { mSepticTerm = value; } }
+		public double SexticTerm { get { return mSexticTerm; } set { mSexticTerm = value; } }
+		public double QuinticTerm { get { return mQuinticTerm; } set { mQuinticTerm = value; } }
+		public double QuarticTerm { get { return mQuarticTerm; } set { mQuarticTerm = value; } }
+		public double CubicTerm { get { return mCubicTerm; } set { mCubicTerm = value; } }
+		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
+
+		public IfcSeventhOrderPolynomialSpiral() : base() { }
+		internal IfcSeventhOrderPolynomialSpiral(DatabaseIfc db, IfcSeventhOrderPolynomialSpiral spiral, DuplicateOptions options)
+			: base(db, spiral, options) 
+		{
+			SepticTerm = spiral.SepticTerm;
+			SexticTerm = spiral.SexticTerm;
+			QuinticTerm = spiral.QuinticTerm;
+			QuarticTerm = spiral.QuarticTerm; 
+			CubicTerm = spiral.CubicTerm; 
+			QuadraticTerm = spiral.QuadraticTerm; 
+			LinearTerm = spiral.LinearTerm;
+			ConstantTerm = spiral.ConstantTerm;
+		}
+		public IfcSeventhOrderPolynomialSpiral(IfcAxis2Placement position, double septicTerm)
+			: base(position) { SepticTerm = septicTerm; }
+	}
+	[Serializable]
 	public partial class IfcShadingDevice : IfcBuiltElement
 	{
 		internal IfcShadingDeviceTypeEnum mPredefinedType = IfcShadingDeviceTypeEnum.NOTDEFINED;//: OPTIONAL IfcShadingDeviceTypeEnum; 
@@ -1069,7 +1106,8 @@ additional types	some additional representation types are given:
 					List<IfcSystem> systems = new List<IfcSystem>();
 					foreach (var related in reference.RelatedElements)
 					{
-						if (related is IfcSystem system)
+						IfcSystem system = related as IfcSystem;
+						if (related != null)
 						{
 							IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
 							if (sys.ReferencedInStructures.Count == 0)
@@ -2321,6 +2359,10 @@ additional types	some additional representation types are given:
 	{
 		private IfcSurfaceFeatureTypeEnum mPredefinedType = IfcSurfaceFeatureTypeEnum.NOTDEFINED; //: OPTIONAL IfcSurfaceFeatureTypeEnum;
 		public IfcSurfaceFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		//INVERSE
+		internal IfcRelAdheresToElement mAdheresToElement = null;
+		public IfcRelAdheresToElement AdheresToElement { get { return mAdheresToElement; } set { mAdheresToElement = value; } }
 
 		public IfcSurfaceFeature() : base() { }
 		public IfcSurfaceFeature(DatabaseIfc db) : base(db) { }

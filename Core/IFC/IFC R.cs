@@ -662,6 +662,24 @@ namespace GeometryGym.Ifc
 		public IfcReinforcingMeshType(DatabaseIfc db, string name, IfcReinforcingMeshTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
+	public partial class IfcRelAdheresToElement : IfcRelDecomposes 
+	{
+		private IfcElement mRelatingElement;// : IfcElement;
+		private IfcSurfaceFeature mRelatedSurfaceFeature;// : IfcSurfaceFeature; 
+
+		public IfcElement RelatingElement { get { return mRelatingElement; } set { mRelatingElement = value; if (!value.mHasSurfaceFeatures.Contains(this)) value.mHasSurfaceFeatures.Add(this); } }
+		public IfcSurfaceFeature RelatedSurfaceFeature { get { return mRelatedSurfaceFeature; } set { mRelatedSurfaceFeature = value; if (value != null) value.mAdheresToElement = this; } }
+
+		internal IfcRelAdheresToElement() : base() { }
+		internal IfcRelAdheresToElement(DatabaseIfc db, IfcRelAdheresToElement r, DuplicateOptions options) : base(db, r, options)
+		{
+			RelatingElement = db.Factory.Duplicate(r.RelatingElement) as IfcElement;
+			RelatedSurfaceFeature = db.Factory.Duplicate(r.RelatedSurfaceFeature, options) as IfcSurfaceFeature;
+		}
+		public IfcRelAdheresToElement(IfcElement host, IfcSurfaceFeature fes)
+			: base(host.mDatabase) { RelatingElement = host; RelatedSurfaceFeature = fes; }
+	}
+	[Serializable]
 	public partial class IfcRelAggregates : IfcRelDecomposes
 	{
 		internal IfcObjectDefinition mRelatingObject;// : IfcObjectDefinition IFC4 IfcObject
@@ -1976,7 +1994,7 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcProduct product in e.NewItems)
-					product.PositionedRelativeTo = this; ;
+					product.PositionedRelativeTo.Add(this); ;
 			}
 			if (e.OldItems != null)
 			{
@@ -2184,6 +2202,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelVoidsElement() : base() { }
 		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, DuplicateOptions options) : base(db, v, options)
 		{
+			RelatingBuildingElement = db.Factory.Duplicate(v.RelatingBuildingElement) as IfcElement;
 			RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, options) as IfcFeatureElementSubtraction;
 		}
 		public IfcRelVoidsElement(IfcElement host, IfcFeatureElementSubtraction fes)
