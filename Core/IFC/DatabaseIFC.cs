@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3, IFC4X3_RC4 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
