@@ -153,6 +153,18 @@ namespace GeometryGym.Ifc
 
 			if (c.mHasCoordinateOperation != null)
 				db.Factory.Duplicate(c.mHasCoordinateOperation, options);
+
+			IfcGeometricRepresentationSubContext subContext = this as IfcGeometricRepresentationSubContext;
+			if (subContext == null)
+			{
+				IfcGeometricRepresentationContext.GeometricContextIdentifier id = IfcGeometricRepresentationContext.GeometricContextIdentifier.Model;
+				if (Enum.TryParse<IfcGeometricRepresentationContext.GeometricContextIdentifier>(ContextType, out id))
+				{
+					db.Factory.mContexts[id] = this;
+				}
+				if (db.Context != null)
+					db.Context.RepresentationContexts.Add(this);
+			}
 		}
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
 		{
@@ -196,11 +208,26 @@ namespace GeometryGym.Ifc
 		internal IfcGeometricRepresentationSubContext() : base() { }
 		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s, DuplicateOptions options) : base(db, s, options)
 		{
-			ParentContext = db.Factory.Duplicate(s.ParentContext, options) as IfcGeometricRepresentationContext;
+			IfcGeometricRepresentationContext parent = s.ParentContext;
+			if (parent != null)
+			{
+				IfcGeometricRepresentationContext.GeometricContextIdentifier contextId = IfcGeometricRepresentationContext.GeometricContextIdentifier.Model;
+				if (Enum.TryParse<IfcGeometricRepresentationSubContext.GeometricContextIdentifier>(s.ContextType, out contextId))
+				{
+					IfcGeometricRepresentationContext existing = null;
+					if (db.Factory.mContexts.TryGetValue(contextId, out existing))
+						ParentContext = existing;
+				}
+			}
+			if(ParentContext == null)
+				ParentContext = db.Factory.Duplicate(s.ParentContext, options) as IfcGeometricRepresentationContext;
 
 			mTargetScale = s.mTargetScale;
 			mTargetView = s.mTargetView;
 			mUserDefinedTargetView = s.mUserDefinedTargetView;
+			IfcGeometricRepresentationSubContext.SubContextIdentifier id = IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis;
+			if (Enum.TryParse<IfcGeometricRepresentationSubContext.SubContextIdentifier>(ContextIdentifier, out id))
+				db.Factory.mSubContexts[id] = this;
 		}
 		public IfcGeometricRepresentationSubContext(IfcGeometricRepresentationContext container, IfcGeometricProjectionEnum view)
 			: base(container.mDatabase)

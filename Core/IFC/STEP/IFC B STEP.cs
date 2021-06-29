@@ -87,12 +87,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBlobTexture : IfcSurfaceTexture
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mRasterFormat + "'," + ParserSTEP.BoolToString(mRasterCode); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			return base.BuildStringSTEP(release) + ",'" + mRasterFormat + "','" + mRasterCode + "'"; 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRasterFormat = ParserSTEP.StripString(str, ref pos, len);
-			mRasterCode = ParserSTEP.StripBool(str, ref pos, len);
+			mRasterCode = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
 	public partial class IfcBlock : IfcCsgPrimitive3D

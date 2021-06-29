@@ -2253,7 +2253,19 @@ namespace GeometryGym.Ifc
 		protected IfcRepresentation() : base() { }
 		protected IfcRepresentation(DatabaseIfc db, IfcRepresentation<RepresentationItem> r, DuplicateOptions options) : base(db)
 		{
-			ContextOfItems = db.Factory.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
+			IfcGeometricRepresentationSubContext subContext = r.ContextOfItems as IfcGeometricRepresentationSubContext;
+			if(subContext != null)
+			{
+				IfcGeometricRepresentationSubContext.SubContextIdentifier id = IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis;
+				if (Enum.TryParse<IfcGeometricRepresentationSubContext.SubContextIdentifier>(subContext.ContextIdentifier, out id))
+				{
+					IfcGeometricRepresentationSubContext sub = null;
+					if (db.Factory.mSubContexts.TryGetValue(id, out sub))
+						ContextOfItems = sub;
+				}
+			}
+			if(ContextOfItems == null)
+				ContextOfItems = db.Factory.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
 
 			mRepresentationIdentifier = r.mRepresentationIdentifier;
 			mRepresentationType = r.mRepresentationType;
@@ -2653,8 +2665,7 @@ namespace GeometryGym.Ifc
 						{
 							BaseClassIfc obj = null;
 							mDatabase.mDictionary.TryRemove(mGlobalId, out obj);
-							if (!mDatabase.mDictionary.ContainsKey(value))
-								mDatabase.mDictionary.TryAdd(value, this);
+							mDatabase.mDictionary[value] = this;
 						}
 						setGlobalId(value);
 					}

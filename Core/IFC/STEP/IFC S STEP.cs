@@ -128,15 +128,32 @@ namespace GeometryGym.Ifc
 	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
-		{ 
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? ",(#" + string.Join(",#", mCrossSectionPositions_OBSOLETE.ConvertAll(x => x.Index)) : 
-				",(" + string.Join(",", CrossSectionPositions.Select(x=>"#" + x.StepId))) + (mFixedAxisVertical ? "),.T." : "),$");	
+		{
+			string result = base.BuildStringSTEP(release);
+			if (release < ReleaseVersion.IFC4X3_RC3)
+				result += ",(#" + string.Join(",#", mCrossSectionPositions_OBSOLETE.ConvertAll(x => x.Index));
+			else if (release == ReleaseVersion.IFC4X3_RC3)
+				result += ",(#" + string.Join(",#", mCrossSectionPositionMeasures_OBSOLETE.ConvertAll(x => x.ToString()));
+			else
+				result += ",(" + string.Join(",", CrossSectionPositions.Select(x => "#" + x.StepId));
+			return result + (mFixedAxisVertical ? "),.T." : "),$");	
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			if (release < ReleaseVersion.IFC4X3_RC3)
 				mCrossSectionPositions_OBSOLETE.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
+			else if (release == ReleaseVersion.IFC4X3_RC3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				string[] fields = s.Substring(1, s.Length - 2).Split(",".ToCharArray());
+				foreach (string field in fields)
+				{
+					IfcCurveMeasureSelect measure = ParserIfc.parseMeasureValue(field.Trim()) as IfcCurveMeasureSelect;
+					if (measure != null)
+						mCrossSectionPositionMeasures_OBSOLETE.Add(measure);
+				}
+			}
 			else
 				mCrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
 			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);

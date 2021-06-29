@@ -462,6 +462,7 @@ namespace GeometryGym.STEP
 						if (c == '\'')
 						{
 							result.Add(str);
+							str = "";
 							break;
 						}
 						str += c;

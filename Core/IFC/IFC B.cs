@@ -106,9 +106,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcBlobTexture : IfcSurfaceTexture
 	{
 		internal string mRasterFormat;// : IfcIdentifier;
-		internal bool mRasterCode;// : BOOLEAN;	
+		internal string mRasterCode;// : IfcBinary;	
 		internal IfcBlobTexture() : base() { }
-		//internal IfcBlobTexture(IfcBlobTexture i) : base(i) { mRasterFormat = i.mRasterFormat; mRasterCode = i.mRasterCode; }
+		internal IfcBlobTexture(DatabaseIfc db, IfcBlobTexture t, DuplicateOptions options)
+			: base(db, t, options) { mRasterFormat = t.mRasterFormat;  mRasterCode = t.mRasterCode; }
 	}
 	[Serializable]
 	public partial class IfcBlock : IfcCsgPrimitive3D

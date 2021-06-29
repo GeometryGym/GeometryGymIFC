@@ -909,7 +909,7 @@ namespace GeometryGym.Ifc
 		public int Plies { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Plies", new IfcInteger(value))); } }
 		public double MoistureContent { set { AddProperty(new IfcPropertySingleValue(mDatabase, "MoistureContent", new IfcPositiveRatioMeasure(value))); } }
 		public double DimensionalChangeCoefficient { set { AddProperty(new IfcPropertySingleValue(mDatabase, "DimensionalChangeCoefficient", new IfcPositiveRatioMeasure(value))); } }
-		public double ThicknessSwelling { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThicknessSwelling	", new IfcPositiveRatioMeasure(value))); } }
+		public double ThicknessSwelling { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThicknessSwelling", new IfcPositiveRatioMeasure(value))); } }
 		public Pset_MaterialWood(IfcMaterialDefinition material) : base(material) { }
 	}
 	public partial class Pset_MaterialWoodBasedBeam : IfcMaterialProperties

@@ -161,9 +161,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid 
 	{
-		[Obsolete("REVISED IFC4x3", false)]
+		[Obsolete("REVISED IFC4x3RC4", false)]
 		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
-		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcDistanceExpression;
+		[Obsolete("REVISED IFC4x3RC4", false)]
+		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositionMeasures_OBSOLETE = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcCurveMeasureSelect;
+		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
 		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
@@ -174,6 +176,7 @@ namespace GeometryGym.Ifc
 		{
 			CrossSectionPositions.AddRange(s.CrossSectionPositions);
 			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			mCrossSectionPositionMeasures_OBSOLETE.AddRange(s.mCrossSectionPositionMeasures_OBSOLETE);
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
 		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcAxis2PlacementLinear> positions, bool fixedAxisVertical)
@@ -2551,11 +2554,21 @@ additional types	some additional representation types are given:
 		public bool RepeatT { get { return mRepeatT; } set { mRepeatT = value; } }
 		public string Mode { get { return (mMode == "$" ? "" : ParserIfc.Decode(mMode)); } set { mMode = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcCartesianTransformationOperator2D TextureTransform { get { return mDatabase[mTextureTransform] as IfcCartesianTransformationOperator2D; } set { mTextureTransform = (value == null ? 0 : value.mIndex); } }
-		public ReadOnlyCollection<string> Parameters { get { return new ReadOnlyCollection<string>( mParameter.ConvertAll(x => ParserIfc.Decode(x))); } }
+		public ReadOnlyCollection<string> Parameter { get { return new ReadOnlyCollection<string>( mParameter.ConvertAll(x => ParserIfc.Decode(x))); } }
 
 		protected IfcSurfaceTexture() : base() { }
 		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t) : base(db,t) { mRepeatS = t.mRepeatS; mRepeatT = t.mRepeatT; mMode = t.mMode; mTextureTransform = t.mTextureTransform; }
 		protected IfcSurfaceTexture(DatabaseIfc db,bool repeatS, bool repeatT) : base(db) { mRepeatS = repeatS; mRepeatT = repeatT; }
+		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t, DuplicateOptions options)
+			: base(db, t) 
+		{ 
+			mRepeatS = t.mRepeatS; 
+			mRepeatT = t.mRepeatT; 
+			mMode = t.mMode;
+			if (t.mTextureTransform > 0)
+				TextureTransform = db.Factory.Duplicate(t.TextureTransform, options) as IfcCartesianTransformationOperator2D;
+			mParameter.AddRange(t.mParameter);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/

@@ -110,7 +110,7 @@ namespace GeometryGym.Ifc
 				{
 					if (mDictionary.ContainsKey(root.GlobalId))
 						root.Guid = Guid.NewGuid();
-					mDictionary.TryAdd(root.GlobalId, value);
+					mDictionary[root.GlobalId] = value;
 				}
 				base[index] = value;
 				if(value != null)
@@ -149,7 +149,7 @@ namespace GeometryGym.Ifc
 			if (modelView == ModelView.Ifc4X2NotAssigned)
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
-				return ReleaseVersion.IFC4X3_RC3;
+				return ReleaseVersion.IFC4X3_RC4;
 			return ReleaseVersion.IFC4A2;
 		}
 		public double Tolerance
@@ -1401,7 +1401,7 @@ namespace GeometryGym.Ifc
 			mSubContexts.Add(nature, result);
 			return result;
 		}
-		private Dictionary<IfcGeometricRepresentationSubContext.SubContextIdentifier, IfcGeometricRepresentationSubContext> mSubContexts = new Dictionary<IfcGeometricRepresentationSubContext.SubContextIdentifier, IfcGeometricRepresentationSubContext>();		
+		internal Dictionary<IfcGeometricRepresentationSubContext.SubContextIdentifier, IfcGeometricRepresentationSubContext> mSubContexts = new Dictionary<IfcGeometricRepresentationSubContext.SubContextIdentifier, IfcGeometricRepresentationSubContext>();		
 		public IfcCartesianPoint Origin
 		{
 			get
@@ -2160,11 +2160,21 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
 				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC3", true, CultureInfo.CurrentCulture))
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
 				if (mDatabase.Release > ReleaseVersion.IFC2x3)
 				{
-					if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
+					if (mDatabase.Release == ReleaseVersion.IFC4X1)
+						mDatabase.ModelView = ModelView.Ifc4X1NotAssigned;
+					else if (mDatabase.Release == ReleaseVersion.IFC4X2)
+						mDatabase.ModelView = ModelView.Ifc4X2NotAssigned;
+					else if(mDatabase.Release > ReleaseVersion.IFC4X2)
+					{
+						mDatabase.ModelView = ModelView.Ifc4X3NotAssigned;
+					}
+					else if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
 						mDatabase.ModelView = ModelView.Ifc4NotAssigned;
 				}
 				return true;
@@ -2268,6 +2278,8 @@ namespace GeometryGym.Ifc
 				version = "IFC4X3_RC2";
 			else if (release == ReleaseVersion.IFC4X3_RC3)
 				version = "IFC4X3_RC3";
+			else if (release == ReleaseVersion.IFC4X3_RC4)
+				version = "IFC4X3_RC4";
 			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
 			hdr += "ENDSEC;\r\n";
 			hdr += "\r\nDATA;";

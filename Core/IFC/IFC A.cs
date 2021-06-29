@@ -824,12 +824,11 @@ namespace GeometryGym.Ifc
 			if(alignmentHorizontal.mHorizontalSegments.Count > 0)
 				mHorizontalSegments.AddRange(alignmentHorizontal.mHorizontalSegments.Select(x => db.Factory.Duplicate(x, options) as IfcAlignmentHorizontalSegment));
 		}
-		public IfcAlignmentHorizontal(IfcAlignment alignment, double startDistAlong) 
+		public IfcAlignmentHorizontal(IfcAlignment alignment) 
 			: base(alignment.Database) 
 		{
 			alignment.AddNested(this);
 			ObjectPlacement = alignment.ObjectPlacement;
-			StartDistAlong = startDistAlong;
 		}
 			
 		public IfcCompositeCurve ComputeGeometry()
@@ -1027,7 +1026,7 @@ namespace GeometryGym.Ifc
 #endif
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
-			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, placement, start, length, parentCurve);
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTSAMEGRADIENTSAMECURVATURE, placement, start, length, parentCurve);
 			if (mDesignerOf != null)
 				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
 
@@ -1179,12 +1178,13 @@ namespace GeometryGym.Ifc
 			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, StartHeight);
 			IfcDirection refDirection = new IfcDirection(db, Math.Cos(theta), Math.Sin(theta));
 			IfcAxis2Placement2D axis2Placement2D = new IfcAxis2Placement2D(startPoint) { RefDirection = refDirection };
+			IfcTransitionCode transitionCode = IfcTransitionCode.CONTSAMEGRADIENTSAMECURVATURE;
 			IfcCurveSegment curveSegment = null;
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
 			{
 				double segmentLength = HorizontalLength / Math.Cos(theta);
 				IfcLine line = db.Factory.LineX2d;
-				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
+				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
 			}
 			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
 			{
@@ -1192,7 +1192,7 @@ namespace GeometryGym.Ifc
 
 				IfcCircle circle = new IfcCircle(db, mRadiusOfCurvature);
 				IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), end = new IfcParameterValue(parametricLength);
-				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, circle);
+				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, start, end, circle);
 			}
 			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
 			{
@@ -1200,7 +1200,7 @@ namespace GeometryGym.Ifc
 				IfcPolynomialCurve seriesParameterCurve = new IfcPolynomialCurve(db.Factory.Origin2dPlace, new List<double>() { 0, 1 }, new List<double>() { 0, 0, m });
 				IfcParameterValue start = new IfcParameterValue(StartGradient / (2*m));
 				IfcParameterValue end = new IfcParameterValue(HorizontalLength);
-				curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, axis2Placement2D, start, end, seriesParameterCurve);
+				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, start, end, seriesParameterCurve);
 			}
 			else
 				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
