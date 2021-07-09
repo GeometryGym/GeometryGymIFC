@@ -781,7 +781,10 @@ namespace GeometryGym.Ifc
 				return "";
 			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", CfsFaces.ConvertAll(x => x.Index)) + ")";
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { CfsFaces.AddRange(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcFace)); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
+		{
+			List<int> stepIds = ParserSTEP.StripListLink(str, ref pos, len);
+			CfsFaces.AddRange(stepIds.ConvertAll(x => dictionary[x] as IfcFace)); }
 	}
 	public partial class IfcConnectionCurveGeometry : IfcConnectionGeometry
 	{

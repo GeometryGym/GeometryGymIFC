@@ -123,11 +123,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return (mElements.Count == 0 ? "" : base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mElements.ConvertAll(x => x.Index)) + ")");
+			return (mElements.Count == 0 ? "" : base.BuildStringSTEP(release) + ",(" + string.Join(",", mElements.ConvertAll(x => "#" + x.Index)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			Elements = new SET<IfcGeometricSetSelect>(ParserSTEP.SplitListLinks(str.Substring(1, str.Length - 2)).ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
+			List<int> stepIds = ParserSTEP.StripListLink(str, ref pos, len);
+			Elements.AddRange(stepIds.ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
 	public partial class IfcGradientCurve
