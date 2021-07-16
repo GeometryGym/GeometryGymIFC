@@ -2069,6 +2069,7 @@ namespace GeometryGym.Ifc
 		public IfcProcess RelatingProcess { get { return mDatabase[mRelatingProcess] as IfcProcess; } set { mRelatingProcess = value.mIndex; value.mIsPredecessorTo.Add(this); } }
 		public IfcProcess RelatedProcess { get { return mDatabase[mRelatedProcess] as IfcProcess; } set { mRelatedProcess = value.mIndex; value.mIsSuccessorFrom.Add(this); } }
 		public IfcLagTime TimeLag { get { return mDatabase[mTimeLag] as IfcLagTime; } set { mTimeLag = (value == null ? 0 : value.mIndex); } }
+		public IfcSequenceEnum SequenceType { get { return mSequenceType; } set { mSequenceType = value; } }
 
 		internal IfcRelSequence() : base() { }
 		internal IfcRelSequence(DatabaseIfc db, IfcRelSequence s, DuplicateOptions options) : base(db, s, options)

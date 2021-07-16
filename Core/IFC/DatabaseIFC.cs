@@ -1874,6 +1874,8 @@ namespace GeometryGym.Ifc
 				if (string.IsNullOrEmpty(line))
 					continue;
 				string str = line.Trim();
+				if (str.StartsWith("/*"))
+					str = str.Substring(str.IndexOf("*/") + 2);
 				if (string.IsNullOrEmpty(str))
 					continue;
 				char c = str.Last();
@@ -1895,6 +1897,8 @@ namespace GeometryGym.Ifc
 			while ((line = stream.ReadLine()) != null)
 			{
 				string str = line.Trim();
+				if (str.StartsWith("/*"))
+					str = str.Substring(str.IndexOf("*/") + 2);
 				if (string.IsNullOrEmpty(str))
 					continue;
 				char c = str.Last();
