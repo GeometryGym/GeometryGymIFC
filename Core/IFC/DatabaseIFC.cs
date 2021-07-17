@@ -26,6 +26,7 @@ using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 using GeometryGym.STEP;
 using System.Diagnostics;
@@ -287,11 +288,47 @@ namespace GeometryGym.Ifc
 #endif
 				sw = new StreamWriter(FileName);
 			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, FileName);
+			sw.Close();
 #if (!NOIFCZIP)
 			if (zip)
 				za.Dispose();
 #endif
 			return result;
+		}
+		public bool WriteStream(Stream stream, string filename)
+		{
+			if (filename.EndsWith(".xml"))
+			{
+				return WriteXml(new XmlTextWriter(stream, Encoding.UTF8));
+			}
+#if (!NOIFCJSON)
+			else if (filename.EndsWith(".json"))
+			{
+				var jsonObject = ToJSON(string.Empty);
+				var sw = new StreamWriter(stream);
+				sw.Write(jsonObject.ToString(Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonConverter[0]));
+				return true;
+			}
+#endif
+#if (!NOIFCZIP)
+			else if (filename.EndsWith(".ifczip"))
+			{
+				var za = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create, true);
+				var zae = za.CreateEntry(Path.GetFileNameWithoutExtension(filename) + ".ifc");
+				var sw = new StreamWriter(zae.Open());
+				bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, filename);
+				sw.Close();
+				za.Dispose();
+				return result;
+			}
+#endif
+			else
+			{
+				var sw = new StreamWriter(stream);
+				bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, filename);
+				sw.Flush();
+				return result;
+			}
 		}
 		public string ToString(FormatIfcSerialization format)
 		{
@@ -303,7 +340,10 @@ namespace GeometryGym.Ifc
 #endif
 			StringWriter stringWriter = new StringWriter();
 			if (new SerializationIfcSTEP(this).WriteSTEP(stringWriter, FileName))
+			{
+				stringWriter.Close();
 				return stringWriter.ToString();
+			}
 			return null;
 		}
 	}
@@ -1859,6 +1899,8 @@ namespace GeometryGym.Ifc
 				if (string.IsNullOrEmpty(line))
 					continue;
 				string str = line.Trim();
+				if (str.StartsWith("/*"))
+					str = str.Substring(str.IndexOf("*/") + 2);
 				if (string.IsNullOrEmpty(str))
 					continue;
 				char c = str.Last();
@@ -1880,6 +1922,8 @@ namespace GeometryGym.Ifc
 			while ((line = stream.ReadLine()) != null)
 			{
 				string str = line.Trim();
+				if (str.StartsWith("/*"))
+					str = str.Substring(str.IndexOf("*/") + 2);
 				if (string.IsNullOrEmpty(str))
 					continue;
 				char c = str.Last();
@@ -2233,7 +2277,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 			sw.Write(getFooterString());
-			sw.Close();
+			//sw.Close();
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
 
 			return true;

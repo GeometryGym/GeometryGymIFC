@@ -1059,6 +1059,9 @@ namespace GeometryGym.Ifc
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
 		public SET<IfcRelAssignsToProcess> OperatesOn { get { return mOperatesOn; } }
 
+		public ReadOnlyCollection<IfcRelSequence> IsPredecessorTo { get { return new ReadOnlyCollection<IfcRelSequence>(mIsPredecessorTo); } }
+		public ReadOnlyCollection<IfcRelSequence> IsSuccessorFrom { get { return new ReadOnlyCollection<IfcRelSequence>(mIsSuccessorFrom); } }
+
 		protected IfcProcess() : base() { }
 		protected IfcProcess(DatabaseIfc db, IfcProcess p, DuplicateOptions options ) : base(db, p, options)
 		{

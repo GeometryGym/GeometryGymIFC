@@ -127,7 +127,7 @@ namespace GeometryGym.Ifc
 		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
 		public bool IsMilestone { get { return mIsMilestone; } set { mIsMilestone = value; } }
 		public int Priority { get { return mPriority; } set { mPriority = value; } }
-		internal IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
+		public IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
 		public IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTask() : base() { }
