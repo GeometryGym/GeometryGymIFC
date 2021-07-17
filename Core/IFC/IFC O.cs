@@ -289,9 +289,9 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRelAssociates> mHasAssociations = new SET<IfcRelAssociates>();//	 : 	SET OF IfcRelAssociates FOR RelatedObjects;
 		internal SET<IfcRelDefinesByProperties> mIsDefinedBy = new SET<IfcRelDefinesByProperties>();
 
-		public SET<IfcRelAssigns> HasAssignments { get { return mHasAssignments; } set { mHasAssignments.Clear(); if (value != null) { mHasAssignments.CollectionChanged -= mHasAssignments_CollectionChanged; mHasAssignments = value; mHasAssignments.CollectionChanged += mHasAssignments_CollectionChanged; } } }
+		public SET<IfcRelAssigns> HasAssignments { get { return mHasAssignments; } }
 		public IfcRelNests Nests { get { return mNests; } set { if (mNests != null) mNests.mRelatedObjects.Remove(this); mNests = value; if (value != null && !value.mRelatedObjects.Contains(this)) value.mRelatedObjects.Add(this); } }
-		public SET<IfcRelNests> IsNestedBy { get { return mIsNestedBy; } set { mIsNestedBy.Clear(); if (value != null) { mIsNestedBy.CollectionChanged -= mIsNestedBy_CollectionChanged; mIsNestedBy = value; mIsNestedBy.CollectionChanged += mIsNestedBy_CollectionChanged; } } }
+		public SET<IfcRelNests> IsNestedBy { get { return mIsNestedBy; } }
 		public IfcRelDeclares HasContext { get { return mHasContext; } set { mHasContext = value; } }
 		public SET<IfcRelAggregates> IsDecomposedBy { get { return mIsDecomposedBy; } }
 		public IfcRelAggregates Decomposes
@@ -692,8 +692,8 @@ namespace GeometryGym.Ifc
 					value.mReferencedByPlacements.Add(this);
 			}
 		}
-		public SET<IfcProduct> PlacesObject { get { return mPlacesObject; } set { mPlacesObject = value; } }
-		public SET<IfcObjectPlacement> ReferencedByPlacements { get { return mReferencedByPlacements; } set { mReferencedByPlacements = value; } }
+		public SET<IfcProduct> PlacesObject { get { return mPlacesObject; } }
+		public SET<IfcObjectPlacement> ReferencedByPlacements { get { return mReferencedByPlacements; } }
 
 		protected IfcObjectPlacement() : base() { }
 		protected IfcObjectPlacement(IfcObjectPlacement placementRelTo) : base(placementRelTo.Database) { PlacementRelTo = placementRelTo; }
@@ -936,7 +936,7 @@ namespace GeometryGym.Ifc
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public LIST<IfcActorRole> Roles { get { return mRoles; } }
 		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		private static string mOrganization;
@@ -1007,7 +1007,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcOrganization> mRelatedOrganizations = new SET<IfcOrganization>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
 		public IfcOrganization RelatingOrganization { get { return mDatabase[mRelatingOrganization] as IfcOrganization; } set { mRelatingOrganization = value.mIndex; } }
-		public SET<IfcOrganization> RelatedOrganizations { get { return mRelatedOrganizations; } set { mRelatedOrganizations.Clear(); if (value != null) { mRelatedOrganizations.CollectionChanged -= mRelatedOrganizations_CollectionChanged; mRelatedOrganizations = value; mRelatedOrganizations.CollectionChanged += mRelatedOrganizations_CollectionChanged; } } }
+		public SET<IfcOrganization> RelatedOrganizations { get { return mRelatedOrganizations; } }
 
 		internal IfcOrganizationRelationship() : base() { }
 		internal IfcOrganizationRelationship(DatabaseIfc db, IfcOrganizationRelationship r) : base(db, r) { RelatingOrganization = db.Factory.Duplicate(r.RelatingOrganization) as IfcOrganization; RelatedOrganizations.AddRange(r.mRelatedOrganizations.ConvertAll(x => db.Factory.Duplicate(x.Database[x.Index]) as IfcOrganization)); }

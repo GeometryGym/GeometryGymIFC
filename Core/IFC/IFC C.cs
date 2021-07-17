@@ -1123,7 +1123,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcConnectedFaceSet : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcClosedShell ,IfcOpenShell))
 	{
 		internal SET<IfcFace> mCfsFaces = new SET<IfcFace>();// : SET [1:?] OF IfcFace;
-		public SET<IfcFace> CfsFaces { get { return mCfsFaces; } set { if (value == null) mCfsFaces.Clear(); else mCfsFaces = value; } }
+		public SET<IfcFace> CfsFaces { get { return mCfsFaces; } }
 
 		internal IfcConnectedFaceSet() : base() { }
 		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c, DuplicateOptions options) : base(db, c, options) { CfsFaces.AddRange(c.CfsFaces.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFace)); }
@@ -1233,7 +1233,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcResourceConstraintRelationship> mPropertiesForConstraint = new List<IfcResourceConstraintRelationship>();//	 :	SET OF IfcResourceConstraintRelationship FOR RelatingConstraint;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //ggc
 		internal List<IfcRelAssociatesConstraint> mConstraintForObjects = new List<IfcRelAssociatesConstraint>();// gg	 :	SET [0:?] OF IfcRelAssociatesConstraint FOR RelatedResourceObjects;
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public List<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		protected IfcConstraint() : base() { }
@@ -1323,7 +1323,7 @@ namespace GeometryGym.Ifc
 
 		public IfcConstructionMaterialResourceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		[Obsolete("DEPRECATED IFC4", false)]
-		public SET<IfcActorSelect> Suppliers { get { return mSuppliers; } set { mSuppliers = value; } } //: 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
+		public SET<IfcActorSelect> Suppliers { get { return mSuppliers; } } //: 	OPTIONAL SET[1:?] OF IfcActorSelect; ifc2x3
 		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcRatioMeasure UsageRatio { get { return mUsageRatio; } set { mUsageRatio = value; } } //: 	OPTIONAL IfcRatioMeasure; ifc2x3
 		internal IfcConstructionMaterialResource() : base() { }
@@ -1422,7 +1422,7 @@ namespace GeometryGym.Ifc
 		public string ObjectType { get { return mObjectType == "$" ? "" : ParserIfc.Decode(mObjectType); } set { mObjectType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Phase { get { return (mPhase == "$" ? "" : ParserIfc.Decode(mPhase)); } set { mPhase = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcRepresentationContext> RepresentationContexts { get { return mRepresentationContexts; } set { mRepresentationContexts.Clear(); if (value != null) mRepresentationContexts = value; } }
+		public SET<IfcRepresentationContext> RepresentationContexts { get { return mRepresentationContexts; } }
 		public IfcUnitAssignment UnitsInContext
 		{
 			get { return mDatabase[mUnitsInContext] as IfcUnitAssignment; }
@@ -1583,7 +1583,7 @@ namespace GeometryGym.Ifc
 
 		public string Name { get { return mName; } set { mName = value; } }
 		//INVERSE
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference = value; } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 
 		public IfcContextDependentUnit() : base() { }
 		public IfcContextDependentUnit(IfcDimensionalExponents dimensions, IfcUnitEnum unitType, string name)
@@ -1653,7 +1653,7 @@ namespace GeometryGym.Ifc
 									  //INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }

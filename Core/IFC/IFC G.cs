@@ -241,7 +241,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
 	{
 		private SET<IfcGeometricSetSelect> mElements = new SET<IfcGeometricSetSelect>(); //SET [1:?] OF IfcGeometricSetSelect; 
-		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } set { mElements = value; } }
+		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } }
 
 		internal IfcGeometricSet() : base() { }
 		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x.Index]) as IfcGeometricSetSelect)); }

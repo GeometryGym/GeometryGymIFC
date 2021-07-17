@@ -1592,7 +1592,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcDefinitionSelect> mRelatedDefinitions = new SET<IfcDefinitionSelect>();// :	SET [1:?] OF IfcDefinitionSelect; 
 
 		public IfcContext RelatingContext { get { return mRelatingContext; } set { mRelatingContext = value; if (!value.mDeclares.Contains(this)) value.mDeclares.Add(this); } }
-		public SET<IfcDefinitionSelect> RelatedDefinitions { get { return mRelatedDefinitions; } set { mRelatedDefinitions.Clear(); if (value != null) { mRelatedDefinitions = value; } } }
+		public SET<IfcDefinitionSelect> RelatedDefinitions { get { return mRelatedDefinitions; } }
 
 		internal IfcRelDeclares() : base() { }
 		internal IfcRelDeclares(IfcContext c) : base(c.mDatabase) { mRelatingContext = c; c.mDeclares.Add(this); }
@@ -1781,7 +1781,7 @@ namespace GeometryGym.Ifc
 		internal SET<IfcObject> mRelatedObjects = new SET<IfcObject>();// : SET [1:?] OF IfcObject;
 		private IfcTypeObject mRelatingType = null;// : IfcTypeObject  
 
-		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } set { mRelatedObjects.Clear(); if (value != null) { mRelatedObjects.CollectionChanged -= mRelatedObjects_CollectionChanged; mRelatedObjects = value; mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged; } } }
+		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } }
 		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; if(value != null) value.mObjectTypeOf = this; } }
 
 		public override IfcRoot Relating() { return RelatingType; } 
@@ -1966,7 +1966,7 @@ namespace GeometryGym.Ifc
 			get { return mRelatingPositioningElement; } 
 			set { mRelatingPositioningElement = value; if (value != null) value.Positions.Add(this); }
 		}
-		public SET<IfcProduct> RelatedProducts { get { return mRelatedProducts; } set { mRelatedProducts = value; } }
+		public SET<IfcProduct> RelatedProducts { get { return mRelatedProducts; } }
 
 		public IfcRelPositions() : base() { }
 		public IfcRelPositions(IfcPositioningElement relatingPositioningElement, IEnumerable<IfcProduct> relatedProducts)
@@ -1999,7 +1999,7 @@ namespace GeometryGym.Ifc
 			if (e.OldItems != null)
 			{
 				foreach (IfcProduct product in e.OldItems)
-					product.PositionedRelativeTo = null;
+					product.PositionedRelativeTo.Clear();
 			}
 		}
 	}
@@ -2245,7 +2245,7 @@ namespace GeometryGym.Ifc
 		}
 		public string RepresentationIdentifier { get { return mRepresentationIdentifier; } set { mRepresentationIdentifier = value; } }
 		public string RepresentationType { get { return mRepresentationType; } set { mRepresentationType = value; } }
-		public SET<RepresentationItem> Items { get { return mItems; } set { mItems.Clear(); if (value != null) { mItems.CollectionChanged -= mItems_CollectionChanged; mItems = value; mItems.CollectionChanged += mItems_CollectionChanged; } } }
+		public SET<RepresentationItem> Items { get { return mItems; } }
 
 		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
 		public SET<IfcProductDefinitionShape> OfProductRepresentation { get { return mOfProductRepresentation; } }
@@ -2449,7 +2449,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>(); //: SET[1:?] OF IfcResourceObjectSelect;
 		private IfcApproval mRelatingApproval = null; //: IfcApproval;
 
-		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects = value; } }
+		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } }
 		public IfcApproval RelatingApproval { get { return mRelatingApproval; } set { mRelatingApproval = value; } }
 
 		public IfcResourceApprovalRelationship() : base() { }

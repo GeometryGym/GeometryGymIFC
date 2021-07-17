@@ -175,17 +175,22 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcSectionedSurface : IfcSurface
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + ",#" + mDirectrix.StepId +
-			",(#" + string.Join(",#", mCrossSectionPositions.ConvertAll(x => x.StepId.ToString())) + ")" +
-			",(#" + string.Join(",#", mCrossSections.ConvertAll(x => x.StepId.ToString())) + ")" + "," +
-			(mFixedAxisVertical ? ".T." : ".F");
+			string result = base.BuildStringSTEP(release) + ",#" + mDirectrix.StepId;
+			if (release < ReleaseVersion.IFC4X3_RC4)
+				result += ",(#" + string.Join(",#", mCrossSectionPositions_OBSOLETE.ConvertAll(x => x.StepId.ToString())) + ")";
+			else
+				result += ",(#" + string.Join(",#", mCrossSectionPositions.ConvertAll(x => x.StepId.ToString())) + ")";
+			return result + ",(#" + string.Join(",#", mCrossSections.ConvertAll(x => x.StepId.ToString())) + ")" + "," + (mFixedAxisVertical ? ".T." : ".F");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
+			if(release < ReleaseVersion.IFC4X3_RC4)
+				mCrossSectionPositions_OBSOLETE.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
+			else
+				CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
 			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
 			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}

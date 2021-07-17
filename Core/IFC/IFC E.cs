@@ -1051,7 +1051,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		protected IfcExternalInformation() : base() { }
@@ -1120,7 +1120,7 @@ namespace GeometryGym.Ifc
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name { get { return mName; } set { mName = value; } } 
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 		public SET<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return mExternalReferenceForResources; } }
 
@@ -1188,7 +1188,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
 		public IfcExternalReference RelatingReference { get { return mRelatingReference as IfcExternalReference; } set { mRelatingReference = value; value.mExternalReferenceForResources.Add(this); } }
-		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } set { mRelatedResourceObjects.Clear(); if (value != null) { mRelatedResourceObjects.CollectionChanged -= mRelatedResourceObjects_CollectionChanged; mRelatedResourceObjects = value; mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged; } } } 
+		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } } 
 
 		//INVERSE
 		public List<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }

@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
 		private SET<IfcFaceBound> mBounds = new SET<IfcFaceBound>();// : SET [1:?] OF IfcFaceBound;
-		public SET<IfcFaceBound> Bounds { get { return mBounds; } set { mBounds.Clear(); if (value != null) mBounds = value; } }
+		public SET<IfcFaceBound> Bounds { get { return mBounds; } }
 
 		internal IfcFace() : base() { }
 		internal IfcFace(DatabaseIfc db, IfcFace f, DuplicateOptions options) : base(db, f, options) { Bounds.AddRange(f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound)); }
@@ -332,7 +332,7 @@ namespace GeometryGym.Ifc
 		private double mTilingScale = 0; //: IfcPositiveRatioMeasure;
 
 		public LIST<IfcVector> TilingPattern { get { return mTilingPattern; } set { mTilingPattern = value; } }
-		public SET<IfcStyledItem> Tiles { get { return mTiles; } set { mTiles = value; } }
+		public SET<IfcStyledItem> Tiles { get { return mTiles; } }
 		public double TilingScale { get { return mTilingScale; } set { mTilingScale = value; } }
 
 		public IfcFillAreaStyleTiles() : base() { }

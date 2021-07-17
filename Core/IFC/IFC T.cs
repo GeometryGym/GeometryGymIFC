@@ -568,7 +568,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear(); if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
 
 		protected IfcTimeSeries() : base() { }
@@ -1046,7 +1046,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelDefinesByType mObjectTypeOf = null;
 
 		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } set { mApplicableOccurrence = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public SET<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets; } set { mHasPropertySets.Clear(); if (value != null) { mHasPropertySets.CollectionChanged -= mHasPropertySets_CollectionChanged; mHasPropertySets = value; mHasPropertySets.CollectionChanged += mHasPropertySets_CollectionChanged; } } }
+		public SET<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets; } }
 		public IfcRelDefinesByType ObjectTypeOf { get { return mObjectTypeOf; } }
 		//GeomGym
 		internal IfcMaterialProfileSet mTapering = null;

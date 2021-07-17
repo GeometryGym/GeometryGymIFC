@@ -75,7 +75,7 @@ namespace GeometryGym.Ifc
 		public enum Length { Metre, Centimetre, Millimetre, Foot, Inch };
 
 		private SET<IfcUnit> mUnits = new SET<IfcUnit>();// : SET [1:?] OF IfcUnit; 
-		public SET<IfcUnit> Units { get { return mUnits; } set { mUnits = value; } }
+		public SET<IfcUnit> Units { get { return mUnits; } }
 
 		internal IfcUnitAssignment() : base() { }
 		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { Units.AddRange(u.Units.ConvertAll(x => db.Factory.Duplicate(u.mDatabase[x.Index]) as IfcUnit)); }

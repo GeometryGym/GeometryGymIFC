@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
-			CrossSectionPositions.AddRange(mDatabase.extractJArray<IfcPointByDistanceExpression>(obj.GetValue("CrossSectionPositions", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			CrossSectionPositions.AddRange(mDatabase.extractJArray<IfcAxis2PlacementLinear>(obj.GetValue("CrossSectionPositions", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			CrossSections.AddRange(mDatabase.extractJArray<IfcProfileDef>(obj.GetValue("CrossSections", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			JToken fixedAxisVertical = obj.GetValue("FixedAxisVertical", StringComparison.InvariantCultureIgnoreCase);
 			if (fixedAxisVertical != null)

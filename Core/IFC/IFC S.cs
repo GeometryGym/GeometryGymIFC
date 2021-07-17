@@ -161,7 +161,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcSectionedSolidHorizontal : IfcSectionedSolid 
 	{
-		[Obsolete("REVISED IFC4x3RC4", false)]
+		[Obsolete("REVISED IFC4x3RC3", false)]
 		internal LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>();// : LIST [2:?] OF IfcDistanceExpression;
 		[Obsolete("REVISED IFC4x3RC4", false)]
 		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositionMeasures_OBSOLETE = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcCurveMeasureSelect;
@@ -216,12 +216,14 @@ namespace GeometryGym.Ifc
 	public partial class IfcSectionedSurface : IfcSurface
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
-		private LIST<IfcPointByDistanceExpression> mCrossSectionPositions = new LIST<IfcPointByDistanceExpression>(); //: LIST[2:?] OF IfcDistanceExpression;
+		[Obsolete("REVISED IFC4x3RC4", false)]
+		private LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>(); //: LIST[2:?] OF IfcDistanceExpression;
+		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
 		private LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>(); //: LIST[2:?] OF IfcProfileDef;
 		private bool mFixedAxisVertical = false; //: IfcBoolean;
 
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
-		public LIST<IfcPointByDistanceExpression> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions = value; } }
+		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions = value; } }
 		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections = value; } }
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
@@ -229,15 +231,26 @@ namespace GeometryGym.Ifc
 		internal IfcSectionedSurface(DatabaseIfc db, IfcSectionedSurface s, DuplicateOptions options) : base(db, s, options)
 		{
 			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
-			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x => db.Factory.Duplicate(x) as IfcAxis2PlacementLinear));
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
+
+		public IfcSectionedSurface(IfcCurve directrix, IEnumerable<IfcAxis2PlacementLinear> crossSectionPositions, IEnumerable<IfcProfileDef> crossSections, bool fixedAxisVertical)
+				: base(directrix.Database)
+		{
+			Directrix = directrix;
+			CrossSectionPositions.AddRange(crossSectionPositions);
+			CrossSections.AddRange(crossSections);
+			FixedAxisVertical = fixedAxisVertical;
+		}
+		[Obsolete("REVISED IFC4x3RC4", false)]
 		public IfcSectionedSurface(IfcCurve directrix, IEnumerable<IfcPointByDistanceExpression> crossSectionPositions, IEnumerable<IfcProfileDef> crossSections, bool fixedAxisVertical)
 			: base(directrix.Database)
 		{
 			Directrix = directrix;
-			CrossSectionPositions.AddRange(crossSectionPositions);
+			mCrossSectionPositions_OBSOLETE.AddRange(crossSectionPositions);
 			CrossSections.AddRange(crossSections);
 			FixedAxisVertical = fixedAxisVertical;
 		}
@@ -1080,7 +1093,7 @@ additional types	some additional representation types are given:
 		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
 
 		public string LongName { get { return mLongName; } set { mLongName = value; } }
-		public SET<IfcRelContainedInSpatialStructure> ContainsElements { get { return mContainsElements; } set { mContainsElements.Clear(); if (value != null) { mContainsElements.CollectionChanged -= mContainsElements_CollectionChanged; mContainsElements = value; mContainsElements.CollectionChanged += mContainsElements_CollectionChanged; } } }
+		public SET<IfcRelContainedInSpatialStructure> ContainsElements { get { return mContainsElements; } }
 		public SET<IfcRelServicesBuildings> ServicedBySystems { get { return mServicedBySystems; } }
 		public SET<IfcRelReferencedInSpatialStructure> ReferencesElements { get { return mReferencesElements; } }
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }

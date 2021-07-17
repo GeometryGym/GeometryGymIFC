@@ -68,7 +68,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
 			XmlElement element = xml.OwnerDocument.CreateElement("CrossSectionPositions", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (IfcPointByDistanceExpression o in CrossSectionPositions)
+			foreach (IfcAxis2PlacementLinear o in CrossSectionPositions)
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 			element = xml.OwnerDocument.CreateElement("CrossSections", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
@@ -91,7 +91,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcPointByDistanceExpression o = mDatabase.ParseXml<IfcPointByDistanceExpression>(cn as XmlElement);
+						IfcAxis2PlacementLinear o = mDatabase.ParseXml<IfcAxis2PlacementLinear>(cn as XmlElement);
 						if (o != null)
 							CrossSectionPositions.Add(o);
 					}

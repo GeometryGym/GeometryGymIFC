@@ -239,8 +239,8 @@ namespace GeometryGym.Ifc
 		private SET<IfcMaterialProperties> mHasProperties = new SET<IfcMaterialProperties>();
 		[NonSerialized] internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
 
-		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } set { mAssociatedTo.Clear(); if (value != null) { mAssociatedTo.CollectionChanged -= mAssociatedTo_CollectionChanged; mAssociatedTo =value; mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged; } } }
-		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } set { mHasExternalReference.Clear();  if (value != null) { mHasExternalReference.CollectionChanged -= mHasExternalReference_CollectionChanged; mHasExternalReference = value; mHasExternalReference.CollectionChanged += mHasExternalReference_CollectionChanged; } } }
+		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } }
+		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
 		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
 
@@ -456,7 +456,7 @@ namespace GeometryGym.Ifc
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
 
 		public ReadOnlyCollection<IfcMaterial> Materials { get { return new ReadOnlyCollection<IfcMaterial>( mMaterials.ConvertAll(x =>mDatabase[x] as IfcMaterial)); } }
-		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } set { mAssociatedTo.Clear(); if (value != null) { mAssociatedTo.CollectionChanged -= mAssociatedTo_CollectionChanged; mAssociatedTo =value; mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged; } } }
+		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } }
 
 		public string Name { get { return "MaterialList"; } }
 		public IfcMaterial PrimaryMaterial() {  return mDatabase[mMaterials[0]] as IfcMaterial; }
@@ -676,7 +676,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcMaterialUsageDefinition : BaseClassIfc, IfcMaterialSelect // ABSTRACT SUPERTYPE OF(ONEOF(IfcMaterialLayerSetUsage, IfcMaterialProfileSetUsage));
 	{   //INVERSE 
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
-		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } set { mAssociatedTo.Clear(); if (value != null) { mAssociatedTo.CollectionChanged -= mAssociatedTo_CollectionChanged; mAssociatedTo =value; mAssociatedTo.CollectionChanged += mAssociatedTo_CollectionChanged; } } }
+		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } }
 
 		public abstract string Name { get; }
 		public abstract IfcMaterial PrimaryMaterial();
