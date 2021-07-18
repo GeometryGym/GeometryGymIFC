@@ -193,32 +193,16 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = "";
-			if (mWorkingTimes.Count > 0)
-			{
-				str += ",(" + ParserSTEP.LinkToString(mWorkingTimes[0]);
-				for (int icounter = 1; icounter < mWorkingTimes.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mWorkingTimes[icounter]);
-				str += "),";
-			}
-			else
-				str += ",$,";
-			if (mExceptionTimes.Count > 0)
-			{
-				str += "(" + ParserSTEP.LinkToString(mExceptionTimes[0]);
-				for (int icounter = 1; icounter < mExceptionTimes.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mExceptionTimes[icounter]);
-				str += "),.";
-			}
-			else
-				str += "$,.";
-			return base.BuildStringSTEP(release) + str + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP(release) +
+				(mWorkingTimes.Count == 0 ? ".,$," : ".,(" + string.Join(",", mWorkingTimes.Select(x => "#" + x.StepId)) + "),") +
+				(mExceptionTimes.Count == 0 ? "$," : "(" + string.Join(",", mWorkingTimes.Select(x => "#" + x.StepId)) + "),") +
+				(mPredefinedType == IfcWorkCalendarTypeEnum.NOTDEFINED ? "$" : "." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mWorkingTimes = ParserSTEP.StripListLink(str, ref pos, len);
-			mExceptionTimes = ParserSTEP.StripListLink(str, ref pos, len);
+			mWorkingTimes.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcWorkTime));
+			mExceptionTimes.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcWorkTime));
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcWorkCalendarTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);

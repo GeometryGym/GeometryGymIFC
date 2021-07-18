@@ -155,8 +155,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRationalBSplineSurfaceWithKnots : IfcBSplineSurfaceWithKnots
 	{
-		internal List<List<double>> mWeightsData = new List<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
-		public ReadOnlyCollection<List<double>> WeightsData { get { return new ReadOnlyCollection<List<double>>(mWeightsData); } }
+		internal LIST<List<double>> mWeightsData = new LIST<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
+		public LIST<List<double>> WeightsData { get { return new LIST<List<double>>(mWeightsData); } }
 		internal IfcRationalBSplineSurfaceWithKnots() : base() { }
 		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s, DuplicateOptions options) : base(db, s, options)
 		{
@@ -166,7 +166,8 @@ namespace GeometryGym.Ifc
 		public IfcRationalBSplineSurfaceWithKnots(int uDegree, int vDegree, IEnumerable<IEnumerable<IfcCartesianPoint>> controlPoints, IEnumerable<int> uMultiplicities, IEnumerable<int> vMultiplicities, IEnumerable<double> uKnots, IEnumerable<double> vKnots, IfcKnotType type, List<List<double>> weights)
 			: base(uDegree, vDegree, controlPoints, uMultiplicities, vMultiplicities, uKnots, vKnots, type)
 		{
-			mWeightsData.AddRange(weights);
+			foreach(List<double> list in weights)
+				mWeightsData.Add(list);
 		}
 	}
 	[Serializable]
@@ -271,13 +272,13 @@ namespace GeometryGym.Ifc
 	{
 		internal string mTypeIdentifier = "$", mAttributeIdentifier = "$"; //:	OPTIONAL IfcIdentifier;
 		internal string mInstanceName = "$"; //:OPTIONAL IfcLabel;
-		internal List<int> mListPositions = new List<int>();//	 :	OPTIONAL LIST [1:?] OF INTEGER;
+		internal LIST<int> mListPositions = new LIST<int>();//	 :	OPTIONAL LIST [1:?] OF INTEGER;
 		private int mInnerReference = 0;//	 :	OPTIONAL IfcReference;
 
 		public string TypeIdentifier { get { return (mTypeIdentifier == "$" ? "" : ParserIfc.Decode(mTypeIdentifier)); } set { mTypeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string AttributeIdentifier { get { return (mAttributeIdentifier == "$" ? "" : ParserIfc.Decode(mAttributeIdentifier)); } set { mAttributeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string InstanceName { get { return (mInstanceName == "$" ? "" : ParserIfc.Decode(mInstanceName)); } set { mInstanceName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<int> ListPositions { get { return new ReadOnlyCollection<int>(mListPositions); } }
+		public LIST<int> ListPositions { get { return mListPositions; } }
 		public IfcReference InnerReference { get { return mDatabase[mInnerReference] as IfcReference; } set { mInnerReference = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcReference() : base() { }
@@ -801,8 +802,6 @@ namespace GeometryGym.Ifc
 			set { mTimeForTask = value == null ? 0 : value.mIndex; if (value != null) value.mScheduleTimeControlAssigned = this; }
 		}
 		internal IfcWorkControl WorkControl { get { return mRelatingControl as IfcWorkControl; } }
-
-		internal new ReadOnlyCollection<IfcTask> RelatedObjects { get { return new ReadOnlyCollection<IfcTask>(base.RelatedObjects.Cast<IfcTask>().ToList()); } }
 
 		internal IfcRelAssignsTasks() : base() { }
 		internal IfcRelAssignsTasks(DatabaseIfc db, IfcRelAssignsTasks r, DuplicateOptions options) : base(db, r, options) { if (r.mTimeForTask > 0) TimeForTask = db.Factory.Duplicate(r.TimeForTask, options) as IfcScheduleTimeControl; }
@@ -1646,19 +1645,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelDefinesByObject : IfcRelDefines
 	{
-		internal List<int> mRelatedObjects = new List<int>();// : SET [1:?] OF IfcObject;
-		internal int mRelatingObject;// : IfcObject  
+		internal SET<IfcObject> mRelatedObjects = new SET<IfcObject>();// : SET [1:?] OF IfcObject;
+		internal IfcObject mRelatingObject;// : IfcObject  
 
-		public ReadOnlyCollection<IfcObject> RelatedObjects { get { return new ReadOnlyCollection<IfcObject>(mRelatedObjects.ConvertAll(x => mDatabase[x] as IfcObject)); } }
-		public IfcObject RelatingObject { get { return mDatabase[mRelatingObject] as IfcObject; } set { mRelatingObject = value.mIndex; } }
+		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } }
+		public IfcObject RelatingObject { get { return mRelatingObject; } set { mRelatingObject = value; if (value != null) { value.mIsDeclaredBy = this; } } }
 
 		public override IfcRoot Relating() { return RelatingObject; } 
 
 		internal IfcRelDefinesByObject() : base() { }
-		internal IfcRelDefinesByObject(DatabaseIfc db, IfcRelDefinesByObject r, DuplicateOptions options) : base(db, r, options) { r.RelatedObjects.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, options) as IfcObject)); RelatingObject = db.Factory.Duplicate(r.RelatingObject, options) as IfcObject; }
-		public IfcRelDefinesByObject(IfcObject relObj) : base(relObj.mDatabase) { mRelatingObject = relObj.mIndex; relObj.mIsDeclaredBy = this; }
-
-		internal void addRelated(IfcObject obj) { mRelatedObjects.Add(obj.mIndex); obj.mIsDeclaredBy = this; }
+		internal IfcRelDefinesByObject(DatabaseIfc db, IfcRelDefinesByObject r, DuplicateOptions options) : base(db, r, options)
+		{ 
+			RelatedObjects.AddRange(r.RelatedObjects.Select(x=> db.Factory.Duplicate(x, options) as IfcObject)); 
+			RelatingObject = db.Factory.Duplicate(r.RelatingObject, options) as IfcObject; 
+		}
+		public IfcRelDefinesByObject(IfcObject relObj) : base(relObj.mDatabase) { RelatingObject = relObj; }
 	}
 	[Serializable]
 	public partial class IfcRelDefinesByProperties : IfcRelDefines

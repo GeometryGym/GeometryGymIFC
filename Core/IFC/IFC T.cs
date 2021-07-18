@@ -33,25 +33,28 @@ namespace GeometryGym.Ifc
 	public partial class IfcTable : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, NamedObjectIfc
 	{
 		internal string mName = "$"; //:	OPTIONAL IfcLabel;
-		private List<int> mRows = new List<int>();// OPTIONAL LIST [1:?] OF IfcTableRow;
-		private List<int> mColumns = new List<int>();// :	OPTIONAL LIST [1:?] OF IfcTableColumn;
+		private LIST<IfcTableRow> mRows = new LIST<IfcTableRow>();// OPTIONAL LIST [1:?] OF IfcTableRow;
+		private LIST<IfcTableColumn> mColumns = new LIST<IfcTableColumn>();// :	OPTIONAL LIST [1:?] OF IfcTableColumn;
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcTableRow> Rows { get { return new ReadOnlyCollection<IfcTableRow>(mRows.ConvertAll(x => mDatabase[x] as IfcTableRow)); } }
-		public ReadOnlyCollection<IfcTableColumn> Columns { get { return new ReadOnlyCollection<IfcTableColumn>(mColumns.ConvertAll(x => mDatabase[x] as IfcTableColumn)); } }
+		public LIST<IfcTableRow> Rows { get { return mRows; } }
+		public LIST<IfcTableColumn> Columns { get { return mColumns; } }
 
 		internal IfcTable() : base() { }
 		public IfcTable(DatabaseIfc db) : base(db) { }
-		internal IfcTable(DatabaseIfc db, IfcTable t) : base(db) { mName = t.mName; t.Rows.ToList().ForEach(x => addRow(db.Factory.Duplicate(t) as IfcTableRow)); t.Columns.ToList().ForEach(x => addColumn(db.Factory.Duplicate(x) as IfcTableColumn)); }
-		public IfcTable(string name, List<IfcTableRow> rows, List<IfcTableColumn> cols) : base(rows == null || rows.Count == 0 ? cols[0].mDatabase : rows[0].mDatabase)
+		internal IfcTable(DatabaseIfc db, IfcTable t) : base(db) 
+		{ 
+			mName = t.mName;
+			mRows.AddRange(t.Rows.Select(x=> db.Factory.Duplicate(x) as IfcTableRow));
+			mColumns.AddRange(t.Columns.Select(x => db.Factory.Duplicate(x) as IfcTableColumn)); 
+		}
+		public IfcTable(string name, IEnumerable<IfcTableRow> rows, IEnumerable<IfcTableColumn> cols) 
+			: base(rows == null || rows.Count() == 0 ? cols.First().mDatabase : rows.First().mDatabase)
 		{
 			Name = name.Replace("'", "");
-			rows.ForEach(x => addRow(x));
-			cols.ForEach(x => addColumn(x));
+			mRows.AddRange(rows);
+			mColumns.AddRange(cols);
 		}
-
-		internal void addRow(IfcTableRow row) { mRows.Add(row.mIndex); }
-		internal void addColumn(IfcTableColumn column) { mColumns.Add(column.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcTableColumn : BaseClassIfc, NamedObjectIfc
@@ -75,10 +78,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTableRow : BaseClassIfc
 	{
-		internal List<IfcValue> mRowCells = new List<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
+		internal LIST<IfcValue> mRowCells = new LIST<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
 		internal bool mIsHeading = false; //:	:	OPTIONAL BOOLEAN;
 
-		public ReadOnlyCollection<IfcValue> RowCells { get { return new ReadOnlyCollection<IfcValue>(mRowCells); } }
+		public LIST<IfcValue> RowCells { get { return mRowCells; } }
 		public bool IsHeading { get { return mIsHeading; } set { mIsHeading = value; } }
 
 		internal IfcTableRow() : base() { }
@@ -121,7 +124,7 @@ namespace GeometryGym.Ifc
 		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum IFC4
 		//INVERSE
-		internal List<IfcRelAssignsTasks> mOwningControls = new List<IfcRelAssignsTasks>(); //gg
+		internal SET<IfcRelAssignsTasks> mOwningControls = new SET<IfcRelAssignsTasks>(); //gg
 
 		public string Status { get { return mStatus; } set { mStatus = value; } }
 		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
@@ -348,11 +351,11 @@ namespace GeometryGym.Ifc
 
 		// INVERSE
 		internal IfcIndexedColourMap mHasColours = null;// : SET [0:1] OF IfcIndexedColourMap FOR MappedTo;
-		internal List<IfcIndexedTextureMap> mHasTextures = new List<IfcIndexedTextureMap>();// : SET [0:?] OF IfcIndexedTextureMap FOR MappedTo;
+		internal SET<IfcIndexedTextureMap> mHasTextures = new SET<IfcIndexedTextureMap>();// : SET [0:?] OF IfcIndexedTextureMap FOR MappedTo;
 
 		public IfcCartesianPointList Coordinates { get { return mCoordinates; } set { mCoordinates = value; } }
 		public IfcIndexedColourMap HasColours { get { return mHasColours; } set { mHasColours = value; } }
-		public ReadOnlyCollection<IfcIndexedTextureMap> HasTextures { get { return new ReadOnlyCollection<IfcIndexedTextureMap>(mHasTextures); } }
+		public SET<IfcIndexedTextureMap> HasTextures { get { return mHasTextures; } }
 
 		protected IfcTessellatedFaceSet() : base() { }
 		protected IfcTessellatedFaceSet(DatabaseIfc db, IfcTessellatedFaceSet s, DuplicateOptions options) : base(db, s, options) { Coordinates = db.Factory.Duplicate(s.Coordinates) as IfcCartesianPointList; }
@@ -454,14 +457,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcTextureCoordinate : IfcPresentationItem  //ABSTRACT SUPERTYPE OF(ONEOF(IfcIndexedTextureMap, IfcTextureCoordinateGenerator, IfcTextureMap))
 	{
-		internal List<int> mMaps = new List<int>();// : LIST [1:?] OF IfcSurfaceTexture
-		public ReadOnlyCollection<IfcSurfaceTexture> Maps { get { return new ReadOnlyCollection<IfcSurfaceTexture>(mMaps.ConvertAll(x => mDatabase[x] as IfcSurfaceTexture)); } }
+		internal LIST<IfcSurfaceTexture> mMaps = new LIST<IfcSurfaceTexture>();// : LIST [1:?] OF IfcSurfaceTexture
+		public LIST<IfcSurfaceTexture> Maps { get { return mMaps; } }
 
 		internal IfcTextureCoordinate() : base() { }
-		internal IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c) : base(db, c) { c.Maps.ToList().ForEach(x => addMap(db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
-		public IfcTextureCoordinate(IEnumerable<IfcSurfaceTexture> maps) : base(maps.First().Database) { mMaps.AddRange(maps.Select(x => x.mIndex)); }
-
-		internal void addMap(IfcSurfaceTexture map) { mMaps.Add(map.mIndex); }
+		internal IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c) : base(db, c) { Maps.AddRange(c.Maps.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
+		public IfcTextureCoordinate(IEnumerable<IfcSurfaceTexture> maps) : base(maps.First().Database) { mMaps.AddRange(maps); }
 	}
 	[Serializable]
 	public partial class IfcTextureCoordinateGenerator : IfcTextureCoordinate
@@ -563,13 +564,13 @@ namespace GeometryGym.Ifc
 		internal IfcDataOriginEnum mDataOrigin = IfcDataOriginEnum.NOTDEFINED;// : IfcDataOriginEnum;
 		internal string mUserDefinedDataOrigin = "$";// : OPTIONAL IfcLabel;
 		internal int mUnit;// : OPTIONAL IfcUnit; 
-						   //INVERSE
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		protected IfcTimeSeries() : base() { }
 		//protected IfcTimeSeries(DatabaseIfc db, IfcTimeSeries i)
@@ -821,15 +822,15 @@ namespace GeometryGym.Ifc
 	{
 		internal double[][] mNormals = new double[0][];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
 		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
-		internal Tuple<int, int, int>[] mCoordIndex = new Tuple<int, int, int>[0];// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
-		internal Tuple<int, int, int>[] mNormalIndex = new Tuple<int, int, int>[0];// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
-		internal List<int> mPnIndex = new List<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
+		internal LIST<Tuple<int, int, int>> mCoordIndex = new LIST<Tuple<int, int, int>>();// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
+		internal LIST<Tuple<int, int, int>> mNormalIndex = new LIST<Tuple<int, int, int>>();// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
+		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
 		public double[][] Normals { get { return mNormals; } set { mNormals = value; } }
 		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
-		public ReadOnlyCollection<Tuple<int, int, int>> CoordIndex { get { return new ReadOnlyCollection<Tuple<int, int, int>>(mCoordIndex); } }
-		public ReadOnlyCollection<Tuple<int, int, int>> NormalIndex { get { return new ReadOnlyCollection<Tuple<int, int, int>>(mNormalIndex); } }
-		public ReadOnlyCollection<int> PnIndex { get { return new ReadOnlyCollection<int>(mPnIndex); } }
+		public LIST<Tuple<int, int, int>> CoordIndex { get { return mCoordIndex; } }
+		public LIST<Tuple<int, int, int>> NormalIndex { get { return mNormalIndex; } }
+		public LIST<int> PnIndex { get { return mPnIndex; } }
 
 		internal IfcTriangulatedFaceSet() : base() { }
 		internal IfcTriangulatedFaceSet(DatabaseIfc db, IfcTriangulatedFaceSet s, DuplicateOptions options) : base(db, s, options)
@@ -837,14 +838,12 @@ namespace GeometryGym.Ifc
 			if (s.mNormals.Length > 0)
 				mNormals = s.mNormals.ToArray();
 			mClosed = s.mClosed;
-			mCoordIndex = s.mCoordIndex.ToArray();
-			if (s.mNormalIndex.Length > 0)
-				mNormalIndex = s.mNormalIndex.ToArray();
+			mCoordIndex.AddRange(s.mCoordIndex);
+			if (s.mNormalIndex.Count > 0)
+				mNormalIndex.AddRange(s.mNormalIndex);
 		}
 		public IfcTriangulatedFaceSet(IfcCartesianPointList3D pl, IEnumerable<Tuple<int, int, int>> coords)
-			: base(pl) { setCoordIndex(coords); }
-
-		internal void setCoordIndex(IEnumerable<Tuple<int, int, int>> coords) { mCoordIndex = coords.ToArray(); }
+			: base(pl) { CoordIndex.AddRange(coords); }
 	}
 	[Serializable]
 	public partial class IfcTriangulatedIrregularNetwork : IfcTriangulatedFaceSet

@@ -166,10 +166,9 @@ namespace GeometryGym.Ifc
 					{
 						IfcConstraint constraint = mDatabase.ParseXml<IfcConstraint>(cn as XmlElement);
 						if (constraint != null)
-							AddBenchmark(constraint);
+							mBenchmarkValues.Add(constraint);
 					}
 				}
-
 			}
 			if (xml.HasAttribute("LogicalAggregator"))
 				Enum.TryParse<IfcLogicalOperatorEnum>(xml.Attributes["LogicalAggregator"].Value, true, out mLogicalAggregator);

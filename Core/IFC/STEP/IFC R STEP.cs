@@ -201,7 +201,8 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mWeightsData = ParserSTEP.StripListListDouble(str, ref pos, len);
+			foreach (var weights in ParserSTEP.StripListListDouble(str, ref pos, len))
+				mWeightsData.Add(weights);
 		}
 	}
 	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
@@ -344,7 +345,7 @@ namespace GeometryGym.Ifc
 			mInstanceName = ParserSTEP.StripString(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("("))
-				mListPositions = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2)).ConvertAll(x => int.Parse(x));
+				mListPositions.AddRange(ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2)).ConvertAll(x => int.Parse(x)));
 			mInnerReference = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
@@ -1008,16 +1009,12 @@ namespace GeometryGym.Ifc
 		{
 			if (mRelatedObjects.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mRelatedObjects[0]);
-			for (int icounter = 1; icounter < mRelatedObjects.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mRelatedObjects[icounter]);
-			return str + ")," + ParserSTEP.LinkToString(mRelatingObject);
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mRelatedObjects.Select(x => "#" + x.StepId)) + "),#" + mRelatingObject.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			foreach (IfcObject o in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcObject))
-				addRelated(o);
+			RelatedObjects.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcObject));
 			RelatingObject = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObject;
 		}
 	}

@@ -58,22 +58,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release);
-			if (mBenchmarkValues.Count > 0)
-			{
-				str += ",(" + ParserSTEP.LinkToString(mBenchmarkValues[0]);
-				for (int icounter = 1; icounter < mBenchmarkValues.Count; icounter++)
-					str += "," + ParserSTEP.LinkToString(mBenchmarkValues[icounter]);
-				str += "),";
-			}
-			else
-				str += ",$,";
-			return str + (mLogicalAggregator != IfcLogicalOperatorEnum.NONE ? "." + mLogicalAggregator.ToString() + ".,." : "$,.") + mObjectiveQualifier + (mUserDefinedQualifier == "$" ? ".,$" : ".,'" + mUserDefinedQualifier + "'");
+			return base.BuildStringSTEP(release) + (mBenchmarkValues.Count == 0 ? ",$," : ",(" + string.Join(",", mBenchmarkValues.Select(x=>"#" + x.StepId)) + "),") +
+				(mLogicalAggregator != IfcLogicalOperatorEnum.NONE ? "." + mLogicalAggregator.ToString() + ".,." : "$,.") + mObjectiveQualifier + (mUserDefinedQualifier == "$" ? ".,$" : ".,'" + mUserDefinedQualifier + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mBenchmarkValues = ParserSTEP.StripListLink(str, ref pos, len);
+			mBenchmarkValues.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcConstraint));
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcLogicalOperatorEnum>(s.Replace(".", ""), true, out mLogicalAggregator);

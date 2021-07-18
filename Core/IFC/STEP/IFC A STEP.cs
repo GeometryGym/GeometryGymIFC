@@ -742,15 +742,12 @@ namespace GeometryGym.Ifc
 		{
 			if (mInnerCurves.Count == 0)
 				return base.BuildStringSTEP(release);
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mInnerCurves[0]);
-			for (int icounter = 1; icounter < mInnerCurves.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mInnerCurves[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mInnerCurves.Select(x => "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mInnerCurves = ParserSTEP.StripListLink(str, ref pos, len);
+			mInnerCurves.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcCurve));
 		}
 	}
 	public partial class IfcAsset : IfcGroup

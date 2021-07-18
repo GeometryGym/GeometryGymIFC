@@ -159,9 +159,9 @@ namespace GeometryGym.Ifc
 		private List<string> mMiddleNames = new List<string>(), mPrefixTitles = new List<string>(), mSuffixTitles = new List<string>();// : OPTIONAL LIST [1:?] OF IfcLabel;
 		private LIST<IfcActorRole> mRoles = new LIST<IfcActorRole>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
 		private LIST<IfcAddress> mAddresses = new LIST<IfcAddress>();//: OPTIONAL LIST [1:?] OF IfcAddress; 
-																	 //INVERSE
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string FamilyName { get { return (mFamilyName == "$" ? "" : ParserIfc.Decode(mFamilyName)); } set { mFamilyName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -172,7 +172,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcActorRole> Roles { get { return mRoles; } }
 		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		public string Name { get { return (string.IsNullOrEmpty(GivenName) ? (string.IsNullOrEmpty(FamilyName) ? Identification : FamilyName) : GivenName + (string.IsNullOrEmpty(FamilyName) ? "" : " " + FamilyName)); } }
 
@@ -230,16 +230,16 @@ namespace GeometryGym.Ifc
 		private IfcPerson mThePerson = null;// : IfcPerson;
 		private IfcOrganization mTheOrganization = null;// : IfcOrganization;
 		private LIST<IfcActorRole> mRoles = new LIST<IfcActorRole>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
-																	 //INVERSE
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
 		public IfcPerson ThePerson { get { return mThePerson; } set { mThePerson = value; } }
 		public IfcOrganization TheOrganization { get { return mTheOrganization; } set { mTheOrganization = value; } }
 		public LIST<IfcActorRole> Roles { get { return mRoles; } set { mRoles = value; } }
 
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		public string Name { get { return TheOrganization.Name + " " + ThePerson.Name; } }
 
@@ -992,10 +992,10 @@ namespace GeometryGym.Ifc
 	{
 		private string mName = "$";// : OPTIONAL IfcLabel;		
 		//INVERSE
-		internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
+		internal SET<IfcStyledItem> mStyledItems = new SET<IfcStyledItem>();
 
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcStyledItem> StyledItems { get { return new ReadOnlyCollection<IfcStyledItem>(mStyledItems); } }
+		public SET<IfcStyledItem> StyledItems { get { return mStyledItems; } }
 
 		protected IfcPresentationStyle() : base() { }
 		protected IfcPresentationStyle(DatabaseIfc db) : base(db) { }
@@ -1010,10 +1010,10 @@ namespace GeometryGym.Ifc
 	{
 		internal List<int> mStyles = new List<int>();// : SET [1:?] OF IfcPresentationStyleSelect; 
 		//INVERSE
-		internal List<IfcStyledItem> mStyledItems = new List<IfcStyledItem>();
+		internal SET<IfcStyledItem> mStyledItems = new SET<IfcStyledItem>();
 
 		public ReadOnlyCollection<IfcPresentationStyleSelect> Styles { get { return new ReadOnlyCollection<IfcPresentationStyleSelect>(mStyles.ConvertAll(x => mDatabase[x] as IfcPresentationStyleSelect)); } }
-		public ReadOnlyCollection<IfcStyledItem> StyledItems { get { return new ReadOnlyCollection<IfcStyledItem>(mStyledItems); } }
+		public SET<IfcStyledItem> StyledItems { get { return mStyledItems; } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
 		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(s.mDatabase[x]).Index)); }
@@ -1051,16 +1051,15 @@ namespace GeometryGym.Ifc
 		internal string mIdentification = "";// :OPTIONAL IfcIdentifier;
 		internal string mLongDescription = "";//: OPTIONAL IfcText; 
 		//INVERSE
-		internal List<IfcRelSequence> mIsPredecessorTo = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatingProcess; 
-		internal List<IfcRelSequence> mIsSuccessorFrom = new List<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
+		internal SET<IfcRelSequence> mIsPredecessorTo = new SET<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatingProcess; 
+		internal SET<IfcRelSequence> mIsSuccessorFrom = new SET<IfcRelSequence>();// : SET [0:?] OF IfcRelSequence FOR RelatedProcess;
 		internal SET<IfcRelAssignsToProcess> mOperatesOn = new SET<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
 		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+		public SET<IfcRelSequence> IsPredecessorTo { get { return mIsPredecessorTo; } }
+		public SET<IfcRelSequence> IsSuccessorFrom { get { return mIsSuccessorFrom; } }
 		public SET<IfcRelAssignsToProcess> OperatesOn { get { return mOperatesOn; } }
-
-		public ReadOnlyCollection<IfcRelSequence> IsPredecessorTo { get { return new ReadOnlyCollection<IfcRelSequence>(mIsPredecessorTo); } }
-		public ReadOnlyCollection<IfcRelSequence> IsSuccessorFrom { get { return new ReadOnlyCollection<IfcRelSequence>(mIsSuccessorFrom); } }
 
 		protected IfcProcess() : base() { }
 		protected IfcProcess(DatabaseIfc db, IfcProcess p, DuplicateOptions options ) : base(db, p, options)
@@ -1693,14 +1692,14 @@ namespace GeometryGym.Ifc
 		internal string mName; //: IfcIdentifier;
 		internal string mDescription = "$"; //: OPTIONAL IfcText;
 		//INVERSE
-		internal List<IfcPropertySet> mPartOfPset = new List<IfcPropertySet>();//	:	SET OF IfcPropertySet FOR HasProperties;
-		internal List<IfcPropertyDependencyRelationship> mPropertyForDependance = new List<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependingProperty;
-		internal List<IfcPropertyDependencyRelationship> mPropertyDependsOn = new List<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependantProperty;
-		internal List<IfcComplexProperty> mPartOfComplex = new List<IfcComplexProperty>();//	:	SET OF IfcComplexProperty FOR HasProperties;
+		internal SET<IfcPropertySet> mPartOfPset = new SET<IfcPropertySet>();//	:	SET OF IfcPropertySet FOR HasProperties;
+		internal SET<IfcPropertyDependencyRelationship> mPropertyForDependance = new SET<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependingProperty;
+		internal SET<IfcPropertyDependencyRelationship> mPropertyDependsOn = new SET<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependantProperty;
+		internal SET<IfcComplexProperty> mPartOfComplex = new SET<IfcComplexProperty>();//	:	SET OF IfcComplexProperty FOR HasProperties;
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = string.IsNullOrEmpty(value) ? "Unknown" : ParserIfc.Encode(value); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcPropertySet> PartOfPset { get { return new ReadOnlyCollection<IfcPropertySet>(mPartOfPset); } }
+		public SET<IfcPropertySet> PartOfPset { get { return mPartOfPset; } }
 
 		protected IfcProperty() : base() { }
 		protected IfcProperty(IfcProperty property) : base(property) { Name = property.Name; Description = property.Description; }
@@ -1728,10 +1727,10 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
 	{ //INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
-
+		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>(mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
+
 		protected IfcPropertyAbstraction() : base() { }
 		protected IfcPropertyAbstraction(IfcPropertyAbstraction propertyAbstraction) : base(propertyAbstraction.Database) { }
 		protected IfcPropertyAbstraction(DatabaseIfc db) : base(db) { }
@@ -1914,18 +1913,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPropertyListValue : IfcSimpleProperty
 	{
-		private List<IfcValue> mNominalValue = new List<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
-		private int mUnit;// : OPTIONAL IfcUnit; 
+		private LIST<IfcValue> mNominalValue = new LIST<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
+		private IfcUnit mUnit;// : OPTIONAL IfcUnit; 
 
-		public ReadOnlyCollection<IfcValue> NominalValue { get { return new ReadOnlyCollection<IfcValue>(mNominalValue); } }
-		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = value == null ? 0 : value.Index; } }
+		public LIST<IfcValue> NominalValue { get { return mNominalValue; } }
+		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
 
 		internal IfcPropertyListValue() : base() { }
 		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue p, DuplicateOptions options) : base(db, p, options)
 		{
 			mNominalValue.AddRange(p.mNominalValue);
-			if (p.mUnit > 0)
-				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit], options) as IfcUnit;
+			if (p.mUnit != null)
+				Unit = db.Factory.Duplicate(p.mUnit as BaseClassIfc, options) as IfcUnit;
 		}
 		public IfcPropertyListValue(DatabaseIfc db, string name, IEnumerable<IfcValue> values)
 			: base(db, name) { mNominalValue.AddRange(values); }
@@ -2146,11 +2145,11 @@ namespace GeometryGym.Ifc
 	{ // IfcFluidFlowProperties,IfcPropertySet, IfcServiceLifeFactor, IfcSoundProperties ,IfcSoundValue ,IfcSpaceThermalLoadProperties ))
 		//INVERSE
 		internal SET<IfcTypeObject> mDefinesType = new SET<IfcTypeObject>();// :	SET OF IfcTypeObject FOR HasPropertySets; IFC4change
-		internal List<IfcRelDefinesByTemplate> mIsDefinedBy = new List<IfcRelDefinesByTemplate>();//IsDefinedBy	 :	SET OF IfcRelDefinesByTemplate FOR RelatedPropertySets;
+		internal SET<IfcRelDefinesByTemplate> mIsDefinedBy = new SET<IfcRelDefinesByTemplate>();//IsDefinedBy	 :	SET OF IfcRelDefinesByTemplate FOR RelatedPropertySets;
 		private SET<IfcRelDefinesByProperties> mDefinesOccurrence = new SET<IfcRelDefinesByProperties>(); //:	SET [0:1] OF IfcRelDefinesByProperties FOR RelatingPropertyDefinition;
 		
 		public SET<IfcTypeObject> DefinesType { get { return mDefinesType; } }
-		public ReadOnlyCollection<IfcRelDefinesByTemplate> IsDefinedBy { get { return new ReadOnlyCollection<IfcRelDefinesByTemplate>(mIsDefinedBy); } }
+		public SET<IfcRelDefinesByTemplate> IsDefinedBy { get { return mIsDefinedBy; } }
 		public SET<IfcRelDefinesByProperties> DefinesOccurrence { get { return mDefinesOccurrence; } }
 
 		protected IfcPropertySetDefinition() : base() { }
@@ -2322,7 +2321,7 @@ namespace GeometryGym.Ifc
 
 		public bool SetValueOrDuplicate(IfcValue val, IfcObjectDefinition obj)
 		{
-			IfcPropertySet pset = (mPartOfPset.Count == 1 ? mPartOfPset[0] : null);
+			IfcPropertySet pset = (mPartOfPset.Count == 1 ? mPartOfPset.First() : null);
 			if(pset != null && mPartOfComplex.Count == 0)
 			{
 				int count = pset.DefinesOccurrence.SelectMany(x => x.RelatedObjects).Count() + pset.DefinesType.Count;

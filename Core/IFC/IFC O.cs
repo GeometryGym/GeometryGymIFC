@@ -727,20 +727,27 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcObjective : IfcConstraint
 	{
-		internal List<int> mBenchmarkValues = new List<int>();//	 :	OPTIONAL LIST [1:?] OF IfcConstraint;
+		internal LIST<IfcConstraint> mBenchmarkValues = new LIST<IfcConstraint>();//	 :	OPTIONAL LIST [1:?] OF IfcConstraint;
 		internal IfcLogicalOperatorEnum mLogicalAggregator = IfcLogicalOperatorEnum.NONE;// : OPTIONAL IfcLogicalOperatorEnum;
 		internal IfcObjectiveEnum mObjectiveQualifier = IfcObjectiveEnum.NOTDEFINED;// : 	IfcObjectiveEnum
 		internal string mUserDefinedQualifier = "$"; //	:	OPTIONAL IfcLabel;
 
-		public ReadOnlyCollection<IfcConstraint> BenchmarkValues { get { return new ReadOnlyCollection<IfcConstraint>( mBenchmarkValues.ConvertAll(x => mDatabase[x] as IfcConstraint)); } }
+		public LIST<IfcConstraint> BenchmarkValues { get { return mBenchmarkValues; } }
 		public IfcLogicalOperatorEnum LogicalAggregator { get { return mLogicalAggregator; } set { mLogicalAggregator = value; } }
 		public IfcObjectiveEnum ObjectiveQualifier { get { return mObjectiveQualifier; } set { mObjectiveQualifier = value; } }
 		public string UserDefinedQualifier { get { return (mUserDefinedQualifier == "$" ? "" : ParserIfc.Decode(mUserDefinedQualifier)); } set { mUserDefinedQualifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcObjective() : base() { }
-		internal IfcObjective(DatabaseIfc db, IfcObjective o) : base(db,o) { o.BenchmarkValues.ToList().ForEach(x=>AddBenchmark( db.Factory.Duplicate(x) as IfcConstraint)); mLogicalAggregator = o.mLogicalAggregator;  mObjectiveQualifier = o.mObjectiveQualifier; mUserDefinedQualifier = o.mUserDefinedQualifier; }
+		internal IfcObjective(DatabaseIfc db, IfcObjective o) : base(db,o) 
+		{
+			mBenchmarkValues.AddRange(o.BenchmarkValues.Select(x=> db.Factory.Duplicate(x) as IfcConstraint)); 
+			mLogicalAggregator = o.mLogicalAggregator;  
+			mObjectiveQualifier = o.mObjectiveQualifier;
+			mUserDefinedQualifier = o.mUserDefinedQualifier; 
+		
+		}
 		public IfcObjective(IfcConstraint benchmark, string name, IfcConstraintEnum constraint, IfcObjectiveEnum qualifier)
-		 	: base(benchmark.mDatabase, name, constraint) { AddBenchmark(benchmark); mObjectiveQualifier = qualifier; }
+		 	: base(benchmark.mDatabase, name, constraint) { mBenchmarkValues.Add(benchmark); mObjectiveQualifier = qualifier; }
 		public IfcObjective(DatabaseIfc db, string name, IfcConstraintEnum constraint, IfcObjectiveEnum qualifier)
 		 	: base(db, name, constraint) { mObjectiveQualifier = qualifier; }
 
@@ -748,17 +755,11 @@ namespace GeometryGym.Ifc
 		{
 			if (children)
 			{
-				for (int icounter = 0; icounter < mBenchmarkValues.Count; icounter++)
-				{
-					BaseClassIfc bc = mDatabase[mBenchmarkValues[icounter]];
-					if (bc != null)
-						bc.Dispose(true);
-				}
+				foreach(IfcConstraint benchMark in mBenchmarkValues.ToList())
+					benchMark.Dispose(true);
 			}
 			return base.DisposeWorker(children);
 		}
-
-		public void AddBenchmark(IfcConstraint benchmark) { mBenchmarkValues.Add(benchmark.mIndex); }
 	}
 	public interface IfcObjectReferenceSelect : IBaseClassIfc // SELECT (IfcMaterialDefinition, IfcPerson, IfcOrganization, IfcPersonAndOrganization, IfcExternalReference, IfcTimeSeries, IfcAddress, IfcAppliedValue, IfcTable);
 	{
@@ -869,10 +870,10 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcOpeningElementTypeEnum mPredefinedType = IfcOpeningElementTypeEnum.NOTDEFINED;// :	OPTIONAL IfcOpeningElementTypeEnum; //IFC4
 		//INVERSE
-		internal List<IfcRelFillsElement> mHasFillings = new List<IfcRelFillsElement>();
+		internal SET<IfcRelFillsElement> mHasFillings = new SET<IfcRelFillsElement>();
 
 		public IfcOpeningElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public ReadOnlyCollection<IfcRelFillsElement> HasFillings { get { return new ReadOnlyCollection<IfcRelFillsElement>( mHasFillings); } }
+		public SET<IfcRelFillsElement> HasFillings { get { return mHasFillings; } }
 
 		internal IfcOpeningElement() : base() { }
 		internal IfcOpeningElement(DatabaseIfc db, IfcOpeningElement e, DuplicateOptions options) : base(db, e, options)
@@ -925,7 +926,7 @@ namespace GeometryGym.Ifc
 		private LIST<IfcAddress> mAddresses = new LIST<IfcAddress>();//: OPTIONAL LIST [1:?] OF IfcAddress; 
 		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
-		internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
 		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name
@@ -937,7 +938,7 @@ namespace GeometryGym.Ifc
 		public LIST<IfcActorRole> Roles { get { return mRoles; } }
 		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		private static string mOrganization;
 		public static string Organization

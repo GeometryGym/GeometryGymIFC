@@ -852,7 +852,6 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcArbitraryProfileDefWithVoids : IfcArbitraryClosedProfileDef
 	{
-		//private List<int> mInnerCurves = new List<int>();// : SET [1:?] OF IfcCurve;
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -865,7 +864,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcCurve c = mDatabase.ParseXml<IfcCurve>(cn as XmlElement);
 						if (c != null)
-							addVoid(c);
+							mInnerCurves.Add(c);
 					}
 				}
 			}

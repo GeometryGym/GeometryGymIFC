@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcTableRow r = mDatabase.ParseXml<IfcTableRow>(node as XmlElement);
 						if (r != null)
-							addRow(r);
+							mRows.Add(r);
 					}
 				}
 				else if (string.Compare(name, "Columns") == 0)
@@ -54,7 +54,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcTableColumn c = mDatabase.ParseXml<IfcTableColumn>(node as XmlElement);
 						if (c != null)
-							addColumn(c);
+							mColumns.Add(c);
 					}
 				}
 			}
@@ -378,18 +378,14 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("CoordIndex"))
 			{
 				string[] fields = xml.Attributes["CoordIndex"].Value.Split(" ".ToCharArray());
-				mCoordIndex = new Tuple<int, int, int>[fields.Length / 3];
-				int pos = 0;
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					mCoordIndex[pos++] = new Tuple<int, int, int>(int.Parse(fields[icounter]), int.Parse(fields[icounter + 1]), int.Parse(fields[icounter + 2]));
+					mCoordIndex.Add(new Tuple<int, int, int>(int.Parse(fields[icounter]), int.Parse(fields[icounter + 1]), int.Parse(fields[icounter + 2])));
 			}
 			if (xml.HasAttribute("CoordIndex"))
 			{
 				string[] fields = xml.Attributes["CoordIndex"].Value.Split(" ".ToCharArray());
-				mCoordIndex = new Tuple<int, int, int>[fields.Length / 3];
-				int pos = 0;
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					mCoordIndex[pos++] = new Tuple<int, int, int>(int.Parse(fields[icounter]), int.Parse(fields[icounter + 1]), int.Parse(fields[icounter + 2]));
+					mCoordIndex.Add(new Tuple<int, int, int>(int.Parse(fields[icounter]), int.Parse(fields[icounter + 1]), int.Parse(fields[icounter + 2])));
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
@@ -401,17 +397,17 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("Closed", (mClosed == IfcLogicalEnum.TRUE).ToString().ToLower());
 			Tuple<int, int, int> coord = mCoordIndex[0];
 			string coords = coord.Item1 + " " + coord.Item2 + " " + coord.Item3;
-			for (int icounter = 1; icounter < mCoordIndex.Length; icounter++)
+			for (int icounter = 1; icounter < mCoordIndex.Count; icounter++)
 			{
 				coord = mCoordIndex[icounter];
 				coords += " " + coord.Item1 + " " + coord.Item2 + " " + coord.Item3;
 			}
 			xml.SetAttribute("CoordIndex", coords);
-			if (mNormalIndex != null && mNormalIndex.Length > 0)
+			if (mNormalIndex != null && mNormalIndex.Count > 0)
 			{
 				Tuple<int, int, int> normal = mNormalIndex[0];
 				string normals = normal.Item1 + " " + normal.Item2 + " " + normal.Item3;
-				for (int icounter = 1; icounter < mNormalIndex.Length; icounter++)
+				for (int icounter = 1; icounter < mNormalIndex.Count; icounter++)
 				{
 					normal = mCoordIndex[icounter];
 					normals += " " + normal.Item1 + " " + normal.Item2 + " " + normal.Item3;

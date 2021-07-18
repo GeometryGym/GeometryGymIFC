@@ -114,7 +114,7 @@ namespace GeometryGym.Ifc
 				InstanceName = token.Value<string>();
 			JArray array = obj.GetValue("ListPositions", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				mListPositions = array.ToList().ConvertAll(x => x.Value<int>());
+				mListPositions.AddRange(array.Select(x => x.Value<int>()));
 			JObject jobj = obj.GetValue("InnerReference", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
 				InnerReference = mDatabase.ParseJObject<IfcReference>(jobj);

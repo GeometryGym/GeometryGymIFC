@@ -280,25 +280,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcWorkCalendar : IfcControl //IFC4
 	{
-		internal List<int> mWorkingTimes = new List<int>();// :	OPTIONAL SET [1:?] OF IfcWorkTime;
-		internal List<int> mExceptionTimes = new List<int>();//	 :	OPTIONAL SET [1:?] OF IfcWorkTime;
+		internal SET<IfcWorkTime> mWorkingTimes = new SET<IfcWorkTime>();// :	OPTIONAL SET [1:?] OF IfcWorkTime;
+		internal SET<IfcWorkTime> mExceptionTimes = new SET<IfcWorkTime>();//	 :	OPTIONAL SET [1:?] OF IfcWorkTime;
 		internal IfcWorkCalendarTypeEnum mPredefinedType = IfcWorkCalendarTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWorkCalendarTypeEnum 
 		
-		public ReadOnlyCollection<IfcWorkTime> WorkingTimes { get { return new ReadOnlyCollection<IfcWorkTime>(mWorkingTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
-		public ReadOnlyCollection<IfcWorkTime> ExceptionTimes { get { return new ReadOnlyCollection<IfcWorkTime>( mExceptionTimes.ConvertAll(x => mDatabase[x] as IfcWorkTime)); } }
+		public SET<IfcWorkTime> WorkingTimes { get { return mWorkingTimes; } }
+		public SET<IfcWorkTime> ExceptionTimes { get { return mExceptionTimes; } }
 		public IfcWorkCalendarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 	
 		internal IfcWorkCalendar() : base() { }
 		internal IfcWorkCalendar(DatabaseIfc db, IfcWorkCalendar c, DuplicateOptions options) : base(db, c, options)
 		{
-			c.WorkingTimes.ToList().ForEach(x => addWorkingTime( db.Factory.Duplicate(x) as IfcWorkTime));
-			c.ExceptionTimes.ToList().ForEach(x=>addExceptionTimes( db.Factory.Duplicate(x) as IfcWorkTime));
+			mWorkingTimes.AddRange(c.WorkingTimes.Select(x => db.Factory.Duplicate(x) as IfcWorkTime));
+			mExceptionTimes.AddRange(c.ExceptionTimes.Select(x=>db.Factory.Duplicate(x) as IfcWorkTime));
 			mPredefinedType = c.mPredefinedType;
 		}
-		internal IfcWorkCalendar(DatabaseIfc db, string name, IfcWorkCalendarTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
-		
-		internal void addWorkingTime(IfcWorkTime time) { mWorkingTimes.Add(time.mIndex); }
-		internal void addExceptionTimes(IfcWorkTime time) { mExceptionTimes.Add(time.mIndex); }
+		public IfcWorkCalendar(DatabaseIfc db, string name, IfcWorkCalendarTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public abstract partial class IfcWorkControl : IfcControl //ABSTRACT SUPERTYPE OF(ONEOF(IfcWorkPlan, IfcWorkSchedule))

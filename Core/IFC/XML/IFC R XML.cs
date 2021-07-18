@@ -168,7 +168,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("InstanceName"))
 				InstanceName = xml.Attributes["InstanceName"].Value;
 			if (xml.HasAttribute("ListPositions"))
-				mListPositions = xml.Attributes["ListPositions"].Value.Split(" ".ToCharArray()).ToList().ConvertAll(x => int.Parse(x));
+				mListPositions.AddRange(xml.Attributes["ListPositions"].Value.Split(" ".ToCharArray()).Select(x => int.Parse(x)));
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;

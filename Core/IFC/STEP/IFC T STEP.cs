@@ -33,35 +33,16 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string s = "";
-			if (mRows.Count == 0)
-				s = "$";
-			else
-			{
-				s = "(" + ParserSTEP.LinkToString(mRows[0]);
-				for (int icounter = 1; icounter < mRows.Count; icounter++)
-					s += "," + ParserSTEP.LinkToString(mRows[icounter]);
-				s += ")";
-			}
+			string s = base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + (mRows.Count == 0 ? "$" : "(" + string.Join(",", mRows.Select(x => "#" + x.StepId)) + ")");
 			if (release != ReleaseVersion.IFC2x3)
-			{
-				if (mColumns.Count == 0)
-					s += ",$";
-				else
-				{
-					s += ",(" + ParserSTEP.LinkToString(mColumns[0]);
-					for (int icounter = 1; icounter < mColumns.Count; icounter++)
-						s += "," + ParserSTEP.LinkToString(mColumns[icounter]);
-					s += ")";
-				}
-			}
-			return base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + s;
+				s += (mColumns.Count == 0 ? ",$" : "(" + string.Join(",", mColumns.Select(x=>"#" + x.StepId)) + ")");
+			return s;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
-			mRows = ParserSTEP.StripListLink(str, ref pos, len);
-			mColumns = ParserSTEP.StripListLink(str, ref pos, len);
+			mRows.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcTableRow));
+			mColumns.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcTableColumn));
 		}
 	}
 	public partial class IfcTableColumn : BaseClassIfc
@@ -486,14 +467,14 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcTextStyleWithBoxCharacteristics; // DEPRECATED IFC4
 	public abstract partial class IfcTextureCoordinate : IfcPresentationItem  //ABSTRACT SUPERTYPE OF(ONEOF(IfcIndexedTextureMap, IfcTextureCoordinateGenerator, IfcTextureMap))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release)
-		{
-			string result = base.BuildStringSTEP(release) + ",(#" + mMaps[0];
-			for (int icounter = 1; icounter < mMaps.Count; icounter++)
-				result += ",#" + mMaps[icounter];
-			return result + ")";
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",", mMaps.Select(x => "#" + x.StepId)) + ")"; 
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) { mMaps = ParserSTEP.StripListLink(str, ref pos, len); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
+		{ 
+			mMaps.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcSurfaceTexture));
+		}
 	}
 	public partial class IfcTextureCoordinateGenerator : IfcTextureCoordinate
 	{
@@ -810,7 +791,7 @@ namespace GeometryGym.Ifc
 			sb.Append(",(" + string.Join(",", mCoordIndex.Select(x => "(" + x.Item1 + "," + x.Item2 + "," + x.Item3 + ")")));
 			if (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC4A1)
 			{
-				if (mNormalIndex.Length == 0)
+				if (mNormalIndex.Count == 0)
 					sb.Append("),$");
 				else
 					sb.Append("),(" + string.Join(",", mNormalIndex.Select(x => "(" + x.Item1 + "," + x.Item2 + "," + x.Item3 + ")")) + ")");
@@ -831,15 +812,15 @@ namespace GeometryGym.Ifc
 			if (field.StartsWith("("))
 				mNormals = ParserSTEP.SplitListDoubleTriple(field);
 			mClosed = ParserIfc.StripLogical(str, ref pos, len);
-			mCoordIndex = ParserSTEP.StripListSTPIntTriple(str, ref pos, len);
+			mCoordIndex.AddRange(ParserSTEP.StripListSTPIntTriple(str, ref pos, len));
 			if (release <= ReleaseVersion.IFC4A1)
 			{
-				mNormalIndex = ParserSTEP.StripListSTPIntTriple(str, ref pos, len);
+				mNormalIndex.AddRange(ParserSTEP.StripListSTPIntTriple(str, ref pos, len));
 			}
 			try
 			{
 				if (pos < len)
-					mPnIndex = ParserSTEP.StripListInt(str, ref pos, len);
+					mPnIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 			}
 			catch (Exception) { }
 		}
