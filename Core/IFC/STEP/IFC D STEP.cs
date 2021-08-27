@@ -204,22 +204,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + ",#" + mDirectrix.StepId +
-			(mStartDistance == null ? ",$" : ",#" + mStartDistance.StepId) +
-			(mEndDistance == null ? ",$" : ",#" + mEndDistance.StepId);
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			StartDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
-			EndDistance = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPointByDistanceExpression;
-		}
-	}
 	public partial class IfcDiscreteAccessory : IfcElementComponent
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDiscreteAccessoryTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }

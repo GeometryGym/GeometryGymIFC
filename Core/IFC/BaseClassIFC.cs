@@ -64,6 +64,8 @@ namespace GeometryGym.Ifc
 			IfcRelAggregates mDecomposes = null;
 			IfcRelNests mNests = null;
 			IfcRelContainedInSpatialStructure mContainedIn = null;
+			IfcRelDefinesByType mDefinesByType = null;
+
 			internal GlobalIdChangeManager(BaseClassIfc obj)
 			{
 				mObject = obj;
@@ -84,6 +86,9 @@ namespace GeometryGym.Ifc
 					IfcObject o = mObject as IfcObject;
 					if (o != null)
 					{
+						mDefinesByType = o.IsTypedBy;
+						if (mDefinesByType != null)
+							mDefinesByType.RelatedObjects.Remove(o);
 						IfcProduct product = objectDefinition as IfcProduct;
 						if (product != null)
 						{
@@ -111,6 +116,8 @@ namespace GeometryGym.Ifc
 					IfcObject obj = mObject as IfcObject;
 					if (obj != null)
 					{
+						if (mDefinesByType != null)
+							mDefinesByType.RelatedObjects.Add(obj);
 						IfcProduct product = objectDefinition as IfcProduct;
 						if (product != null)
 						{

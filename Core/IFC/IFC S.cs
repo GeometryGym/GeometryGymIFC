@@ -125,7 +125,7 @@ namespace GeometryGym.Ifc
 	{
 		private double mQuadraticTerm = 0; //: IfcLengthMeasure;
 		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
 
 		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }
 		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
@@ -788,16 +788,18 @@ additional types	some additional representation types are given:
 	public partial class IfcSine : IfcSpiral
 	{
 		private double mSineTerm = 0; //: IfcLengthMeasure;
-		private double mConstant = double.NaN; //: IfcReal;
+		private double mLinearTerm = double.NaN; //: OPTIONAL IfcReal;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
 
 		public double SineTerm { get { return mSineTerm; } set { mSineTerm = value; } }
-		public double Constant { get { return mConstant; } set { mConstant = value; } }
+		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
 
 		public IfcSine() : base() { }
-		internal IfcSine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
-			: base(db, cosine, options) { SineTerm = cosine.CosineTerm; Constant = cosine.Constant; }
-		public IfcSine(IfcAxis2Placement position, double cosineTerm)
-			: base(position) { SineTerm = cosineTerm; }
+		internal IfcSine(DatabaseIfc db, IfcSine sine, DuplicateOptions options)
+			: base(db, sine, options) { SineTerm = sine.SineTerm; LinearTerm = sine.LinearTerm; ConstantTerm = sine.ConstantTerm; }
+		public IfcSine(IfcAxis2Placement position, double sineTerm)
+			: base(position) { SineTerm = sineTerm; }
 	}
 	[Serializable]
 	public partial class IfcSite : IfcSpatialStructureElement
@@ -805,12 +807,14 @@ additional types	some additional representation types are given:
 		internal IfcCompoundPlaneAngleMeasure mRefLatitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
 		internal IfcCompoundPlaneAngleMeasure mRefLongitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
 		internal double mRefElevation = double.NaN;// : OPTIONAL IfcLengthMeasure;
+		[Obsolete("DEPRECATED IFC4", false)]
 		internal string mLandTitleNumber = "$";// : OPTIONAL IfcLabel;
 		internal int mSiteAddress;// : OPTIONAL IfcPostalAddress; 
 
 		public IfcCompoundPlaneAngleMeasure RefLatitude { get { return mRefLatitude; } set { mRefLatitude = value; } }
 		public IfcCompoundPlaneAngleMeasure RefLongitude { get { return mRefLongitude; } set { mRefLongitude = value; } }
 		public double RefElevation { get { return mRefElevation; } set { mRefElevation = value; } }
+		[Obsolete("DEPRECATED IFC4", false)]
 		public string LandTitleNumber { get { return (mLandTitleNumber == "$" ? "" : ParserIfc.Decode(mLandTitleNumber)); } set { mLandTitleNumber = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcPostalAddress SiteAddress { get { return mDatabase[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
 
@@ -826,6 +830,7 @@ additional types	some additional representation types are given:
 				SiteAddress = db.Factory.Duplicate(site.SiteAddress) as IfcPostalAddress; 
 		}
 		public IfcSite(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
+		public IfcSite(string name, IfcObjectPlacement placement) : base(placement) { Name = name; }
 		public IfcSite(IfcSite host, string name) : base(host, name) { }
 		public IfcSite(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape) { }
 	}

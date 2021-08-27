@@ -614,7 +614,8 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["CosineTerm"] = mCosineTerm.ToString();
-			obj["Constant"] = mConstant.ToString();
+			if(!double.IsNaN(mConstantTerm))
+				obj["ConstantTerm"] = mConstantTerm.ToString();
 		}
 		internal override void parseJObject(JObject obj)
 		{
@@ -624,7 +625,7 @@ namespace GeometryGym.Ifc
 				mCosineTerm = token.Value<double>();
 			token = obj.GetValue("Constant", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				mConstant = token.Value<double>();
+				mConstantTerm = token.Value<double>();
 		}
 	}
 	public partial class IfcCourse : IfcBuiltElement

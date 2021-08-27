@@ -29,26 +29,6 @@ using Newtonsoft.Json.Linq;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
-	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
-		{
-			base.setJSON(obj, host, options);
-			if(mFixedAxisVertical != IfcLogicalEnum.UNKNOWN)
-			obj["FixedAxisVertical"] = mFixedAxisVertical.ToString();
-			obj["Inclinating"] = Inclinating.getJson(this, options);
-		}
-		internal override void parseJObject(JObject obj)
-		{
-			base.parseJObject(obj);
-			JToken fixedAxisVertical = obj.GetValue("FixedAxisVertical", StringComparison.InvariantCultureIgnoreCase);
-			if (fixedAxisVertical != null)
-				mFixedAxisVertical = ParserIfc.ParseIFCLogical(fixedAxisVertical.Value<string>());
-			JObject jobj = obj.GetValue("Inclinating", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
-				Inclinating = mDatabase.ParseJObject<IfcAxisLateralInclination>(jobj);
-		}
-	}
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
 	{
 		internal override void parseJObject(JObject obj)

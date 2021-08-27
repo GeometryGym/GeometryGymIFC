@@ -530,7 +530,7 @@ namespace GeometryGym.Ifc
 		private double mQubicTerm = 0; //: IfcLengthMeasure;
 		private double mQuadraticTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		private double mLinearTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
-		private double mConstantTerm = double.NaN; //: OPTIONAL IfcReal;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
 
 		public double QubicTerm { get { return mQubicTerm; } set { mQubicTerm = value; } }
 		public double QuadraticTerm { get { return mQuadraticTerm; } set { mQuadraticTerm = value; } }

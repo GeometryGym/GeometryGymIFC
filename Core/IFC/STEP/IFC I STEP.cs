@@ -38,20 +38,6 @@ namespace GeometryGym.Ifc
 			mUrlReference = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
-	{
-		protected override string BuildStringSTEP()
-		{
-			return base.BuildStringSTEP() + (mFixedAxisVertical == IfcLogicalEnum.UNKNOWN ? ",$" : ( mFixedAxisVertical == IfcLogicalEnum.TRUE ? ",.T." : ",.F")) +
-			",#" + mInclinating.StepId;
-		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
-		{
-			base.parse(str, ref pos, release, len, dictionary);
-			FixedAxisVertical = ParserIfc.StripLogical(str, ref pos, len);
-			Inclinating = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxisLateralInclination;
-		}
-	}
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

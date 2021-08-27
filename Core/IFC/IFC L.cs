@@ -327,11 +327,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcLinearElement : IfcProduct
 	{
-		protected IfcLinearElement() : base() { }
-		protected IfcLinearElement(DatabaseIfc db) : base(db) { }
+		public IfcLinearElement() : base() { }
+		public IfcLinearElement(DatabaseIfc db) : base(db) { }
 		protected IfcLinearElement(DatabaseIfc db, IfcLinearElement linearElement, DuplicateOptions options)
 		: base(db, linearElement, options) { }
-		protected IfcLinearElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcLinearElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	public partial class IfcLinearPlacement : IfcObjectPlacement
 	{
@@ -470,9 +470,7 @@ namespace GeometryGym.Ifc
 		internal IfcLocalPlacement() : base() { }
 		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
 		{
-			if (p.PlacementRelTo != null)
-				PlacementRelTo = db.Factory.Duplicate(p.PlacementRelTo) as IfcObjectPlacement;
-			RelativePlacement = db.Factory.Duplicate(p.mDatabase[p.mRelativePlacement.Index]) as IfcAxis2Placement;
+			RelativePlacement = db.Factory.Duplicate(p.mRelativePlacement) as IfcAxis2Placement;
 		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)

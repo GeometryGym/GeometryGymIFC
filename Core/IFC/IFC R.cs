@@ -401,6 +401,16 @@ namespace GeometryGym.Ifc
 		public double RestartDistance { get { return mRestartDistance; } set { mRestartDistance = value; } }
 
 		public IfcReferent() : base() { }
+		public IfcReferent(IfcAlignment alignment) : base(alignment.Database)
+		{
+			IfcRelNests relNests = alignment.IsNestedBy.Where(x => x.RelatedObjects.FirstOrDefault() is IfcReferent).FirstOrDefault();
+			if (relNests != null)
+				relNests.RelatedObjects.Add(this);
+			else
+			{
+				new IfcRelNests(alignment, this);
+			}
+		}
 		public IfcReferent(IfcSite host) : base(host) { }
 		public IfcReferent(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
 			: base(host.Database) 
@@ -666,19 +676,46 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelAdheresToElement : IfcRelDecomposes 
 	{
 		private IfcElement mRelatingElement;// : IfcElement;
-		private IfcSurfaceFeature mRelatedSurfaceFeature;// : IfcSurfaceFeature; 
+		private SET<IfcSurfaceFeature> mRelatedSurfaceFeatures = new SET<IfcSurfaceFeature>();// : SET [1:?] OF IfcSurfaceFeature; 
 
 		public IfcElement RelatingElement { get { return mRelatingElement; } set { mRelatingElement = value; if (!value.mHasSurfaceFeatures.Contains(this)) value.mHasSurfaceFeatures.Add(this); } }
-		public IfcSurfaceFeature RelatedSurfaceFeature { get { return mRelatedSurfaceFeature; } set { mRelatedSurfaceFeature = value; if (value != null) value.mAdheresToElement = this; } }
+		public SET<IfcSurfaceFeature> RelatedSurfaceFeatures { get { return mRelatedSurfaceFeatures; } }
 
 		internal IfcRelAdheresToElement() : base() { }
 		internal IfcRelAdheresToElement(DatabaseIfc db, IfcRelAdheresToElement r, DuplicateOptions options) : base(db, r, options)
 		{
 			RelatingElement = db.Factory.Duplicate(r.RelatingElement) as IfcElement;
-			RelatedSurfaceFeature = db.Factory.Duplicate(r.RelatedSurfaceFeature, options) as IfcSurfaceFeature;
+			RelatedSurfaceFeatures.AddRange(r.mRelatedSurfaceFeatures.Select(x=> db.Factory.Duplicate(x, options) as IfcSurfaceFeature));
 		}
 		public IfcRelAdheresToElement(IfcElement host, IfcSurfaceFeature fes)
-			: base(host.mDatabase) { RelatingElement = host; RelatedSurfaceFeature = fes; }
+			: base(host.mDatabase) { RelatingElement = host; RelatedSurfaceFeatures.Add(fes); }
+
+		protected override void initialize()
+		{
+			base.initialize();
+			mRelatedSurfaceFeatures.CollectionChanged += mRelatedSurfaceFeatures_CollectionChanged;
+		}
+		private void mRelatedSurfaceFeatures_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcSurfaceFeature o in e.NewItems)
+				{
+					if (o.AdheresToElement != this)
+						o.AdheresToElement = this;
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcSurfaceFeature o in e.OldItems)
+				{
+					if (o.AdheresToElement == this)
+						o.mAdheresToElement = null;
+				}
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcRelAggregates : IfcRelDecomposes
@@ -1852,12 +1889,14 @@ namespace GeometryGym.Ifc
 		internal int mRelatingElement;// : IfcInterferenceSelect;
 		internal int mRelatedElement;// : IfcInterferenceSelect;
 		internal int mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
+		internal IfcSpatialZone mInterferenceSpace = null;// : OPTIONAL IfcSpatialZone;
 		internal string mInterferenceType = "$";// : OPTIONAL IfcIdentifier;
 		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 
 		public IfcInterferenceSelect RelatingElement { get { return mDatabase[mRelatingElement] as IfcInterferenceSelect; } set { mRelatingElement = value.StepId; value.InterferesElements.Add(this); } }
 		public IfcInterferenceSelect RelatedElement { get { return mDatabase[mRelatedElement] as IfcInterferenceSelect; } set { mRelatedElement = value.StepId; value.IsInterferedByElements.Add(this); } }
 		public IfcConnectionGeometry InterferenceGeometry { get { return mDatabase[mInterferenceGeometry] as IfcConnectionGeometry; } set { mInterferenceGeometry = value == null ? 0 : value.mIndex; } }
+		public IfcSpatialZone InterferenceSpace { get { return mInterferenceSpace; } set { mInterferenceSpace = value; } }
 		public string InterferenceType { get { return (mInterferenceType == "$" ? "" : ParserIfc.Decode(mInterferenceType)); } set { mInterferenceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
 
@@ -1868,6 +1907,8 @@ namespace GeometryGym.Ifc
 			RelatedElement = db.Factory.Duplicate(r.RelatedElement as BaseClassIfc, options) as IfcInterferenceSelect;
 			if (r.mInterferenceGeometry > 0)
 				InterferenceGeometry = db.Factory.Duplicate(r.InterferenceGeometry, options) as IfcConnectionGeometry;
+			if (r.InterferenceSpace != null)
+				InterferenceSpace = db.Factory.Duplicate(r.InterferenceSpace, options) as IfcSpatialZone;
 			mInterferenceType = r.mInterferenceType;
 			mImpliedOrder = r.mImpliedOrder;
 		}

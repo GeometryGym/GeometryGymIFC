@@ -1403,7 +1403,6 @@ namespace GeometryGym.Ifc
 	//Pset_SpaceThermalLoad
 	//Pset_SpaceThermalLoadPHistory
 	//Pset_SpaceThermalPHistory
-	//
 	public partial class Pset_SpaceThermalRequirements : IfcPropertySet
 	{
 		public double SpaceTemperature { set { AddProperty(new IfcPropertySingleValue(mDatabase, "SpaceTemperature", new IfcThermodynamicTemperatureMeasure(value))); } }
@@ -1431,6 +1430,12 @@ namespace GeometryGym.Ifc
 		public Pset_SpaceThermalRequirements(IfcZone instance) : base(instance) { }
 	}
 	//Pset_SpatialZoneCommon
+	public partial class Pset_Stationing : IfcPropertySet
+	{
+		public double IncomingStation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IncomingStation", new IfcLengthMeasure(value))); } }
+		public double Station { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Station", new IfcLengthMeasure(value))); } }
+		public Pset_Stationing(IfcReferent instance) : base(instance) { }
+	}
 	//Pset_StackTerminalTypeCommon
 	//Pset_StairCommon
 	//Pset_StairFlightCommon

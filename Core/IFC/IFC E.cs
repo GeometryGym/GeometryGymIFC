@@ -1015,7 +1015,7 @@ namespace GeometryGym.Ifc
 		{ 
 			mName = p.mName; 
 			mDescription = p.mDescription;
-			p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.Duplicate(x) as IfcProperty));  
+			p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.DuplicateProperty(x)));  
 		}
 		public IfcExtendedProperties(IEnumerable<IfcProperty> properties) : base(properties.First().mDatabase)
 		{

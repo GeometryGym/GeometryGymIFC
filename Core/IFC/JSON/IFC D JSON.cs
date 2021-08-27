@@ -194,31 +194,6 @@ namespace GeometryGym.Ifc
 				mEndParam = new	IfcParameterValue(endParam.Value<double>());
 		}
 	}
-	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
-	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
-		{
-			base.setJSON(obj, host, options);
-			obj["Directrix"] = Directrix.getJson(this, options);
-			if (StartDistance != null)
-				obj["StartDistance"] = StartDistance.getJson(this, options);
-			if (EndDistance != null)
-				obj["EndDistance"] = EndDistance.getJson(this, options);
-		}
-		internal override void parseJObject(JObject obj)
-		{
-			base.parseJObject(obj);
-			JObject jobj = obj.GetValue("Directrix", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
-				Directrix = mDatabase.ParseJObject<IfcCurve>(jobj);
-			jobj = obj.GetValue("StartDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
-				StartDistance = mDatabase.ParseJObject<IfcPointByDistanceExpression>(jobj);
-			jobj = obj.GetValue("EndDistance", StringComparison.InvariantCultureIgnoreCase) as JObject;
-			if (jobj != null)
-				EndDistance = mDatabase.ParseJObject<IfcPointByDistanceExpression>(jobj);
-		}
-	}
 	public partial class IfcDistributionBoard : IfcFlowController
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

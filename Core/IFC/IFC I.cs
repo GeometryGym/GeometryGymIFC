@@ -61,24 +61,6 @@ namespace GeometryGym.Ifc
 			: base(db, name) { PredefinedType = predefinedType; }
 	}
 	[Serializable]
-	public partial class IfcInclinedReferenceSweptAreaSolid : IfcDirectrixDistanceSweptAreaSolid
-	{
-		private IfcLogicalEnum mFixedAxisVertical = IfcLogicalEnum.UNKNOWN; //: OPTIONAL IfcBoolean;
-		private IfcAxisLateralInclination mInclinating = null; //: IfcAxisLateralInclination;
-
-		public IfcLogicalEnum FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
-		public IfcAxisLateralInclination Inclinating { get { return mInclinating; } set { mInclinating = value; } }
-
-		public IfcInclinedReferenceSweptAreaSolid() : base() { }
-		public IfcInclinedReferenceSweptAreaSolid(DatabaseIfc db, IfcInclinedReferenceSweptAreaSolid inclinedReferenceSweptAreaSolid, DuplicateOptions options) : base(db, inclinedReferenceSweptAreaSolid, options)
-		{
-			FixedAxisVertical = inclinedReferenceSweptAreaSolid.FixedAxisVertical;
-			Inclinating = inclinedReferenceSweptAreaSolid.Inclinating;
-		}
-		public IfcInclinedReferenceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix, IfcAxisLateralInclination inclinating)
-			: base(sweptArea, directrix) { Inclinating = inclinating; }
-	}
-	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
 		internal IfcTessellatedFaceSet mMappedTo;// : IfcTessellatedFaceSet; 

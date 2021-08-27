@@ -154,6 +154,10 @@ namespace GeometryGym.Ifc
 	{
 		private double mCoordinateX = 0, mCoordinateY = double.NaN, mCoordinateZ = double.NaN;
 
+		public double CoordinateX { get { return mCoordinateX; } set { mCoordinateX = value; } }
+		public double CoordinateY { get { return mCoordinateY; } set { mCoordinateY = value; } }
+		public double CoordinateZ { get { return mCoordinateZ; } set { mCoordinateZ = value; } }
+
 		public LIST<double> Coordinates
 		{
 			get
@@ -883,7 +887,7 @@ namespace GeometryGym.Ifc
 		public ReadOnlyDictionary<string, IfcProperty> HasProperties { get { return new ReadOnlyDictionary<string, IfcProperty>(mHasProperties); } }
 
 		internal IfcComplexProperty() : base() { }
-		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p, DuplicateOptions options) : base(db, p, options) { mUsageName = p.mUsageName; foreach(IfcProperty prop in p.HasProperties.Values) addProperty( db.Factory.Duplicate(prop)); }
+		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p, DuplicateOptions options) : base(db, p, options) { mUsageName = p.mUsageName; foreach(IfcProperty prop in p.HasProperties.Values) addProperty( db.Factory.DuplicateProperty(prop)); }
 		public IfcComplexProperty(DatabaseIfc m, string name, string usageName) : base(m, name) { UsageName = usageName; }
 		public IfcComplexProperty(DatabaseIfc m, string name, string usageName, IEnumerable<IfcProperty> properties) : this(m, name, usageName) { foreach (IfcProperty p in properties) addProperty(p); }
 		
@@ -1813,14 +1817,14 @@ namespace GeometryGym.Ifc
 	public partial class IfcCosine : IfcSpiral
 	{
 		private double mCosineTerm = 0; //: IfcLengthMeasure;
-		private double mConstant = double.NaN; //: IfcReal;
+		private double mConstantTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
 
 		public double CosineTerm { get { return mCosineTerm; } set { mCosineTerm = value; } }
-		public double Constant { get { return mConstant; } set { mConstant = value; } }
+		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
 
 		public IfcCosine() : base() { }
 		internal IfcCosine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
-			: base(db, cosine, options) { CosineTerm = cosine.CosineTerm; Constant = cosine.Constant;  }
+			: base(db, cosine, options) { CosineTerm = cosine.CosineTerm; ConstantTerm = cosine.ConstantTerm;  }
 		public IfcCosine(IfcAxis2Placement position, double cosineTerm)
 			: base(position) { CosineTerm = cosineTerm; }
 	}

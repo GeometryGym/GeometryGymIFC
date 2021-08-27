@@ -360,18 +360,24 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("CosineTerm", mSineTerm.ToString());
-			xml.SetAttribute("Constant", mConstant.ToString());
+			xml.SetAttribute("SineTerm", mSineTerm.ToString());
+			if(!double.IsNaN(mLinearTerm))
+				xml.SetAttribute("LinearTerm", mLinearTerm.ToString());
+			if(!double.IsNaN(mConstantTerm))
+				xml.SetAttribute("ConstantTerm", mConstantTerm.ToString());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string att = xml.GetAttribute("CosineTerm");
+			string att = xml.GetAttribute("SineTerm");
 			if (!string.IsNullOrEmpty(att))
 				double.TryParse(att, out mSineTerm);
-			att = xml.GetAttribute("Constant");
+			att = xml.GetAttribute("LinearTerm");
 			if (!string.IsNullOrEmpty(att))
-				double.TryParse(att, out mConstant);
+				double.TryParse(att, out mLinearTerm);
+			att = xml.GetAttribute("ConstantTerm");
+			if (!string.IsNullOrEmpty(att))
+				double.TryParse(att, out mConstantTerm);
 		}
 	}
 	public partial class IfcSite : IfcSpatialStructureElement

@@ -952,7 +952,8 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("CosineTerm", mCosineTerm.ToString());
-			xml.SetAttribute("Constant", mConstant.ToString());
+			if(double.IsNaN(mConstantTerm))
+				xml.SetAttribute("ConstantTerm", mConstantTerm.ToString());
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -962,7 +963,7 @@ namespace GeometryGym.Ifc
 				double.TryParse(att, out mCosineTerm);
 			att = xml.GetAttribute("Constant");
 			if (!string.IsNullOrEmpty(att))
-				double.TryParse(att, out mConstant);
+				double.TryParse(att, out mConstantTerm);
 		}
 	}
 	public partial class IfcCourse : IfcBuiltElement

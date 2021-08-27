@@ -211,32 +211,6 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
-	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.AppendChild(Directrix.GetXML(xml.OwnerDocument, "Directrix", this, processed));
-			if (StartDistance != null)
-				xml.AppendChild(StartDistance.GetXML(xml.OwnerDocument, "StartDistance", this, processed));
-			if (EndDistance != null)
-				xml.AppendChild(EndDistance.GetXML(xml.OwnerDocument, "EndDistance", this, processed));
-		}
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "Directrix", true) == 0)
-					Directrix = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
-				else if (string.Compare(name, "StartDistance", true) == 0)
-					StartDistance = mDatabase.ParseXml<IfcPointByDistanceExpression>(child as XmlElement);
-				else if (string.Compare(name, "EndDistance", true) == 0)
-					EndDistance = mDatabase.ParseXml<IfcPointByDistanceExpression>(child as XmlElement);
-			}
-		}
-	}
 	public partial class IfcDistributionBoard : IfcFlowController
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)

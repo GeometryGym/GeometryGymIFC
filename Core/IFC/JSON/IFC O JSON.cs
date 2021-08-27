@@ -290,7 +290,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["OwningUser"] = OwningUser.getJson(this, options);
+			if(OwningUser != null)
+				obj["OwningUser"] = OwningUser.getJson(this, options);
 			obj["OwningApplication"] = OwningApplication.getJson(this, options);
 			if (mState != IfcStateEnum.NOTDEFINED)
 				obj["State"] = mState.ToString();

@@ -663,7 +663,10 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 		
-		internal IfcProperty Duplicate(IfcProperty property)
+		public T DuplicateProperty<T>(T property) where T : IfcProperty { return duplicateProperty(property) as T; }
+		public IfcPropertySingleValue DuplicatePropertySingleValue(IfcPropertySingleValue property) { return duplicateProperty(property) as IfcPropertySingleValue; }
+		public IfcProperty DuplicateProperty(IfcProperty property) { return duplicateProperty(property); }
+		private IfcProperty duplicateProperty(IfcProperty property)
 		{
 			int index = mDuplicateMapping.FindExisting(property);
 			if (index > 0)
@@ -682,10 +685,16 @@ namespace GeometryGym.Ifc
 		internal IfcPropertySetDefinition DuplicatePropertySet(IfcPropertySetDefinition propertySet, DuplicateOptions options)
 		{
 			if (propertySet.Database != null && propertySet.Database.id == mDatabase.id)
-				return propertySet;
-			int index = mDuplicateMapping.FindExisting(propertySet);
-			if (index > 0)
-				return mDatabase[index] as IfcPropertySetDefinition;
+			{
+				if(options.CommonPropertySets)
+					return propertySet;
+			}
+			if (options.CommonPropertySets)
+			{
+				int index = mDuplicateMapping.FindExisting(propertySet);
+				if (index > 0)
+					return mDatabase[index] as IfcPropertySetDefinition;
+			}
 			if(options.IgnoredPropertyNames.Count > 0)
 			{
 				IfcPropertySet pset = propertySet as IfcPropertySet;
@@ -704,7 +713,10 @@ namespace GeometryGym.Ifc
 						return null;
 				}
 			}
-			IfcPropertySetDefinition result = Duplicate(propertySet, options) as IfcPropertySetDefinition, existing = null;
+			if (!options.CommonPropertySets && propertySet is IfcPropertySet propSet && propertySet.Database != null && propertySet.Database.id == mDatabase.id)
+				return new IfcPropertySet(mDatabase, propSet, options);
+
+			IfcPropertySetDefinition existing = null, result = result = Duplicate(propertySet, options) as IfcPropertySetDefinition;
 			string stepString = dictionaryKeyIgnoreId(result);
 			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
 			{
@@ -1572,6 +1584,7 @@ namespace GeometryGym.Ifc
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; }
 		public bool DuplicateProperties { get; set; } = true;
+		public bool CommonPropertySets { get; set; } = true;
 		public bool DuplicateAssociations { get; set; } = true;
 		public bool DuplicateRepresentation { get; set; } = true;
 		public double DeviationTolerance { get; set; }
@@ -1592,9 +1605,13 @@ namespace GeometryGym.Ifc
 			DuplicateDownstream = options.DuplicateDownstream;
 			DuplicateAssociations = options.DuplicateAssociations;
 			DuplicateProperties = options.DuplicateProperties;
+			CommonPropertySets = options.CommonPropertySets;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
 			DuplicateOwnerHistory = options.DuplicateOwnerHistory;
+
+			foreach(string propertyName in options.IgnoredPropertyNames)
+				IgnoredPropertyNames.Add(propertyName);
 		}
 	}
 	public class ApplicableFilter
@@ -1907,6 +1924,8 @@ namespace GeometryGym.Ifc
 				while(c != ';')
 				{
 					line = stream.ReadLine();
+					if (line == null)
+						break;
 					if (string.IsNullOrEmpty(line))
 						continue;
 					str += line.Trim();
@@ -2163,11 +2182,35 @@ namespace GeometryGym.Ifc
 						else
 							mConstructorsBag.Add(constructorClass);
 
+						int pos = 0;
 						IfcRoot root = obj as IfcRoot;
 						if(root != null)
 						{
-							int pos = 0;
 							root.GlobalId = ParserSTEP.StripString(def, ref pos, def.Length);
+						}
+						else
+						{
+							IfcProperty property = obj as IfcProperty;
+							if(property != null)
+								property.Name = ParserSTEP.StripString(def, ref pos, def.Length);
+							else
+							{
+								IfcPropertyTemplate propertyTemplate = obj as IfcPropertyTemplate;
+								if(propertyTemplate != null)
+									propertyTemplate.Name = ParserSTEP.StripString(def, ref pos, def.Length);
+								else
+								{
+									IfcPhysicalQuantity quantity = obj as IfcPhysicalQuantity;
+									if(quantity != null)
+										quantity.Name = ParserSTEP.StripString(def, ref pos, def.Length);
+									else
+									{
+										IfcMaterialConstituent materialConstituent = obj as IfcMaterialConstituent;
+										if(materialConstituent != null)
+											materialConstituent.Name = ParserSTEP.StripString(def, ref pos, def.Length);
+									}
+								}
+							}
 						}
 					}
 				}

@@ -99,7 +99,8 @@ namespace GeometryGym.STEP
 		public IEnumerator<T> GetEnumerator() { return mDictionary.Values.GetEnumerator(); }
 		public bool Remove(T item) 
 		{
-			if (mDictionary.Remove(getKey(item)))
+			string key = getKey(item);
+			if (mDictionary.Remove(key))
 			{
 				if(CollectionChanged != null)
 					CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));

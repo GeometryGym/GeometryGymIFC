@@ -298,27 +298,6 @@ namespace GeometryGym.Ifc
 			: base(sweptArea, directrix, reference) { }
 	}
 	[Serializable]
-	public abstract partial class IfcDirectrixDistanceSweptAreaSolid : IfcSweptAreaSolid
-	{
-		private IfcCurve mDirectrix = null; //: IfcCurve;
-		private IfcPointByDistanceExpression mStartDistance = null; //: OPTIONAL IfcDistanceExpression;
-		private IfcPointByDistanceExpression mEndDistance = null; //: OPTIONAL IfcDistanceExpression;
-
-		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
-		public IfcPointByDistanceExpression StartDistance { get { return mStartDistance; } set { mStartDistance = value; } }
-		public IfcPointByDistanceExpression EndDistance { get { return mEndDistance; } set { mEndDistance = value; } }
-
-		protected IfcDirectrixDistanceSweptAreaSolid() : base() { }
-		protected IfcDirectrixDistanceSweptAreaSolid(DatabaseIfc db, IfcDirectrixDistanceSweptAreaSolid s, DuplicateOptions options) : base(db, s, options)
-		{
-			Directrix = db.Factory.Duplicate(s.Directrix) as IfcCurve;
-			mStartDistance = s.mStartDistance;
-			mEndDistance = s.mEndDistance;
-		}
-		protected IfcDirectrixDistanceSweptAreaSolid(IfcProfileDef sweptArea, IfcCurve directrix)
-			: base(sweptArea) { Directrix = directrix; }
-	}
-	[Serializable]
 	public partial class IfcDiscreteAccessory : IfcElementComponent
 	{
 		internal IfcDiscreteAccessoryTypeEnum mPredefinedType = IfcDiscreteAccessoryTypeEnum.NOTDEFINED;// : OPTIONAL IfcDiscreteAccessoryTypeEnum;

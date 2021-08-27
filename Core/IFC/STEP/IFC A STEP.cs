@@ -429,13 +429,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) +
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC4 ? "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) : "") +
 				(release == ReleaseVersion.IFC4X3_RC2 ? (mHorizontalSegments.Count == 0 ? ",$" : ",(#" + string.Join(",#", mHorizontalSegments.ConvertAll(x => x.Index)) + ")") : ""); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			StartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
+			if(release < ReleaseVersion.IFC4X3_RC4)
+				StartDistAlong = ParserSTEP.StripDouble(str, ref pos, len);
 			if(pos < len && release < ReleaseVersion.IFC4X3_RC3)
 				mHorizontalSegments.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAlignmentHorizontalSegment));
 		}

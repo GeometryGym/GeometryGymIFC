@@ -564,12 +564,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRelAdheresToElement 
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + RelatingElement.StepId + ",#" + RelatedSurfaceFeature.StepId; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + ",#" + RelatingElement.StepId + ",(" + string.Join(",", RelatedSurfaceFeatures.Select(x=>"#" +x.StepId)) + ")";
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
-			RelatedSurfaceFeature = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurfaceFeature;
+			RelatedSurfaceFeatures.AddRange(ParserSTEP.StripListLink(str,ref pos, len).Select(x=> dictionary[x] as IfcSurfaceFeature));
 		}
 	}
 	public partial class IfcRelAggregates : IfcRelDecomposes
@@ -1098,7 +1101,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingElement) + "," + ParserSTEP.LinkToString(mRelatedElement) + "," +
-				ParserSTEP.LinkToString(mInterferenceGeometry) + (mInterferenceType == "$" ? ",$," : ",'" + mInterferenceType + "',") + ParserIfc.LogicalToString(mImpliedOrder);
+				ParserSTEP.LinkToString(mInterferenceGeometry) + (release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) :"") + 
+				(mInterferenceType == "$" ? ",$," : ",'" + mInterferenceType + "',") + ParserIfc.LogicalToString(mImpliedOrder);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1106,6 +1110,8 @@ namespace GeometryGym.Ifc
 			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			RelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			mInterferenceGeometry = ParserSTEP.StripLink(str, ref pos, len);
+			if (release > ReleaseVersion.IFC4X3_RC3)
+				mInterferenceSpace = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialZone;
 			mInterferenceType = ParserSTEP.StripString(str, ref pos, len);
 			mImpliedOrder = ParserIfc.StripLogical(str, ref pos, len);
 		}

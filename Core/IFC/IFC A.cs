@@ -674,7 +674,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignmentCantSegment : IfcAlignmentParameterSegment
 	{
 		private double mStartDistAlong = 0; //: IfcLengthMeasure;
-		private double mHorizontalLength = 0; //: IfcPositiveLengthMeasure;
+		private double mHorizontalLength = 0; //: IfcNonNegativeLengthMeasure;
 		private double mStartCantLeft = 0; //: IfcLengthMeasure;
 		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
 		private double mStartCantRight = 0; //: IfcLengthMeasure;
@@ -833,13 +833,14 @@ namespace GeometryGym.Ifc
 			
 		public IfcCompositeCurve ComputeGeometry()
 		{
+			double startDistAlong = (double.IsNaN(StartDistAlong) ? 0 : StartDistAlong);
 			List<IfcCurveSegment> curveSegments = new List<IfcCurveSegment>();
 			List<IfcAlignmentHorizontalSegment> horizontalSegments = HorizontalSegments.ToList();
 			for (int counter = 0; counter < horizontalSegments.Count; counter++)
 			{
 				try
 				{
-					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(StartDistAlong, counter + 1 < horizontalSegments.Count ? horizontalSegments[counter + 1] : null));
+					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(startDistAlong, counter + 1 < horizontalSegments.Count ? horizontalSegments[counter + 1] : null));
 				}
 				catch (Exception) { }
 			}
@@ -980,7 +981,6 @@ namespace GeometryGym.Ifc
 
 			}
 #endif
-#if(RHCOMM)
 			else if (PredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CUBIC)
 			{
 				if (nextSegment == null)
@@ -988,42 +988,37 @@ namespace GeometryGym.Ifc
 				double radius = Math.Abs(StartRadiusOfCurvature) < tol ? EndRadiusOfCurvature : StartRadiusOfCurvature;
 				IfcAxis2Placement2D curvePlacement = db.Factory.Origin2dPlace;
 				double m = 1;
-				Rhino.Geometry.Point3d nextSegmentStart = nextSegment.StartPoint.Location, planePoint = Rhino.Geometry.Point3d.Unset;
 
+				IfcCartesianPoint nextSegmentStart = nextSegment.StartPoint;
+				double s = 0, t = 0;
+				
 				if(Math.Abs(StartRadiusOfCurvature) < tol)
 				{
-					Rhino.Geometry.Plane plane = placement.Plane();
-					plane.RemapToPlaneSpace(nextSegmentStart, out planePoint);
+					placement.RemapToParameter(nextSegmentStart.CoordinateX, nextSegmentStart.CoordinateY, out s, out t);
 					start = new IfcParameterValue(0);
-					length = new IfcParameterValue(planePoint.X);
+					length = new IfcParameterValue(s);
 
-					m = 1 / (6 * Math.Abs(radius) * planePoint.X);
-					m = Math.Abs(planePoint.Y) / Math.Pow(planePoint.X,3);
+					m = Math.Abs(t) / Math.Pow(s,3);
 					if (EndRadiusOfCurvature < tol)
 						m = -m;
-					double y = m * Math.Pow(planePoint.X, 3);
-					planePoint.Y = y;
 				}
 				else if (Math.Abs(EndRadiusOfCurvature) < tol)
 				{
-					Rhino.Geometry.Plane plane = nextSegment.Plane();
-					Rhino.Geometry.Point3d startLocation = StartPoint.Location;
-					plane.RemapToPlaneSpace(startLocation, out planePoint);
+					Tuple<double,double> nextSegmentDirection = nextSegment.StartTangent();
+					curvePlacement = new IfcAxis2Placement2D(nextSegmentStart);
+					curvePlacement.RefDirection = new IfcDirection(db, nextSegmentDirection.Item1, nextSegmentDirection.Item2);
 
-					start = new IfcParameterValue(planePoint.X);
-					length = new IfcParameterValue(-planePoint.X);
-					m = 1 / (6 * Math.Abs(radius) * -planePoint.X);
-					m = Math.Abs(planePoint.Y) / Math.Pow(-planePoint.X, 3);
+					curvePlacement.RemapToParameter(StartPoint.CoordinateX, StartPoint.CoordinateY, out s, out t);
+					start = new IfcParameterValue(s);
+					length = new IfcParameterValue(-s);
+					m = Math.Abs(t) / Math.Pow(-s, 3);
 					if (StartRadiusOfCurvature > tol)
 						m = -m;
-					double y = m * Math.Pow(planePoint.X, 3);
-					planePoint.Y = y;
 				}
 				else
 					throw new NotImplementedException("XX CubicParabola with finite start and end radius Not Implemented!");
-				parentCurve = new IfcPolynomialCurve(placement, new List<double>() { 0, 1 }, new List<double>() { 0, 0, 0, m }); 
+				parentCurve = new IfcPolynomialCurve(curvePlacement, new List<double>() { 0, 1 }, new List<double>() { 0, 0, 0, m }); 
 			}
-#endif
 			else
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
 			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTSAMEGRADIENTSAMECURVATURE, placement, start, length, parentCurve);
@@ -1032,6 +1027,8 @@ namespace GeometryGym.Ifc
 
 			return curveSegment;
 		}
+
+
 	}
 	[Serializable]
 	public abstract partial class IfcAlignmentParameterSegment : BaseClassIfc
@@ -1129,11 +1126,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
 	{
 		private double mStartDistAlong = 0; //: IfcLengthMeasure;
-		private double mHorizontalLength = 0; //: IfcPositiveLengthMeasure;
+		private double mHorizontalLength = 0; //: IfcNonNegativeLengthMeasure;
 		private double mStartHeight = 0; //: IfcLengthMeasure;
 		private double mStartGradient = 0; //: IfcRatioMeasure;
 		internal double mEndGradient;// : IfcRatioMeasure; 
-		internal double mRadiusOfCurvature = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mRadiusOfCurvature = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		private IfcAlignmentVerticalSegmentTypeEnum mPredefinedType; //: IfcAlignmentVerticalSegmentTypeEnum;
 
 		public double StartDistAlong { get { return mStartDistAlong; } set { mStartDistAlong = value; } }
@@ -1787,6 +1784,20 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement2D(IfcCartesianPoint location) : base(location) { }
 		
 		public override bool IsXYPlane(double tol) { return base.IsXYPlane(tol) && (mRefDirection == null || RefDirection.isXAxis); } 
+	
+		public void RemapToParameter(double pointX, double pointY, out double s, out double t)
+		{
+			IfcCartesianPoint location = Location;
+			double vx = pointX - location.CoordinateX, vy = pointY - location.CoordinateY;
+			IfcDirection refDirection = RefDirection;
+			double refX = refDirection.DirectionRatioX, refY = refDirection.DirectionRatioY;
+			double refLength = Math.Sqrt(refX * refX + refY * refY);
+			refX = refX / refLength;
+			refY = refY / refLength;
+
+			s = (refX * vx) + (refY * vy);
+			t = (refX * -vy) + (refY * vx); 
+		}
 	}
 	[Serializable]
 	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement

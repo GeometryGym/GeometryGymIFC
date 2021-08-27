@@ -528,8 +528,6 @@ namespace GeometryGym.Ifc
 		{ 
 			return false; 
 		} 
-
-
 	}
 	[Serializable]
 	public partial class IfcPointByDistanceExpression : IfcPoint
@@ -794,7 +792,11 @@ namespace GeometryGym.Ifc
 
 		protected IfcPositioningElement() : base() { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
-		protected IfcPositioningElement(IfcSpatialStructureElement host) : base(host.Database) { host.AddElement(this); }
+		protected IfcPositioningElement(IfcSpatialStructureElement host) : base(host.Database) 
+		{ 
+			host.AddElement(this);
+			ObjectPlacement = new IfcLocalPlacement(host.ObjectPlacement, mDatabase.Factory.RootPlacementPlane);
+		}
 		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(placement, representation) { }
 		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
@@ -954,7 +956,8 @@ namespace GeometryGym.Ifc
 		internal IfcPresentationLayerWithStyle() : base() { }
 		internal IfcPresentationLayerWithStyle(DatabaseIfc db, IfcPresentationLayerWithStyle l, DuplicateOptions options) : base(db, l, options) { mLayerOn = l.mLayerOn; mLayerFrozen = l.mLayerFrozen; mLayerBlocked = l.mLayerBlocked; l.LayerStyles.ToList().ForEach(x => addLayerStyle(db.Factory.Duplicate(x) as IfcPresentationStyle)); }
 
-		internal IfcPresentationLayerWithStyle(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcPresentationLayerWithStyle(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcPresentationLayerWithStyle(string name, IfcPresentationStyle style) : base(style.Database, name) { mLayerStyles.Add(style.mIndex); }
 		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, IfcPresentationStyle style) : base(name, item) { mLayerStyles.Add(style.mIndex); }
 		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, List<IfcPresentationStyle> styles) : base(name, item) { styles.ForEach(x => addLayerStyle(x)); }
 		public IfcPresentationLayerWithStyle(string name, List<IfcLayeredItem> items, List<IfcPresentationStyle> styles) : base(name, items) { styles.ForEach(x => addLayerStyle(x)); }
@@ -1868,8 +1871,8 @@ namespace GeometryGym.Ifc
 		internal IfcPropertyDependencyRelationship() : base() { }
 		internal IfcPropertyDependencyRelationship(DatabaseIfc db, IfcPropertyDependencyRelationship p) : base(db, p)
 		{
-			DependingProperty = db.Factory.Duplicate(p.DependingProperty) as IfcProperty;
-			DependantProperty = db.Factory.Duplicate(p.DependantProperty) as IfcProperty;
+			DependingProperty = db.Factory.DuplicateProperty(p.DependingProperty);
+			DependantProperty = db.Factory.DuplicateProperty(p.DependantProperty);
 			mExpression = p.mExpression;
 		}
 		internal IfcPropertyDependencyRelationship(IfcProperty depending, IfcProperty dependant)
@@ -1894,19 +1897,20 @@ namespace GeometryGym.Ifc
 	public partial class IfcPropertyEnumeration : IfcPropertyAbstraction, NamedObjectIfc
 	{
 		internal string mName;//	 :	IfcLabel;
-		internal List<IfcValue> mEnumerationValues = new List<IfcValue>();// :	LIST [1:?] OF UNIQUE IfcValue
-		internal int mUnit; //	 :	OPTIONAL IfcUnit;
+		internal LIST<IfcValue> mEnumerationValues = new LIST<IfcValue>();// :	LIST [1:?] OF UNIQUE IfcValue
+		internal IfcUnit mUnit; //	 :	OPTIONAL IfcUnit;
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "Unknown" : ParserIfc.Encode(value)); } }
-		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
+		public LIST<IfcValue> EnumerationValues { get { return mEnumerationValues; } }
+		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
 
 		internal IfcPropertyEnumeration() : base() { }
 		internal IfcPropertyEnumeration(DatabaseIfc db, IfcPropertyEnumeration p, DuplicateOptions options) : base(db, p, options)
 		{
 			mName = p.mName;
 			mEnumerationValues.AddRange(p.mEnumerationValues);
-			if (p.mUnit > 0)
-				Unit = db.Factory.Duplicate(p.mDatabase[p.mUnit], options) as IfcUnit;
+			if (p.mUnit != null)
+				Unit = db.Factory.Duplicate((BaseClassIfc)p.mUnit, options) as IfcUnit;
 		}
 		public IfcPropertyEnumeration(DatabaseIfc db, string name, IEnumerable<IfcValue> values) : base(db) { Name = name;  mEnumerationValues.AddRange(values); }
 	}
@@ -1981,7 +1985,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcProperty p in s.HasProperties.Values)
 			{
 				if(!options.IgnoredPropertyNames.Contains(p.Name))
-					addProperty(db.Factory.Duplicate(p), 1e-5);
+					addProperty(db.Factory.DuplicateProperty(p), 1e-5);
 			}
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }

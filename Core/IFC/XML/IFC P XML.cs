@@ -926,8 +926,8 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(element);
 			foreach (IfcValue val in mEnumerationValues)
 				element.AppendChild(convert(xml.OwnerDocument, val, "", mDatabase.mXmlNamespace));
-			if (mUnit > 0)
-				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mUnit != null)
+				xml.AppendChild(((BaseClassIfc) mUnit).GetXML(xml.OwnerDocument, "Unit", this, processed));
 		}
 	}
 	public partial class IfcPropertySet : IfcPropertySetDefinition

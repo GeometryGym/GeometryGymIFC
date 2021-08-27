@@ -100,14 +100,25 @@ namespace GeometryGym.Ifc
 
 			Type type = typeof(T);
 			
+			string hrefId = "";
 			BaseClassIfc result = null;
 			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 			{
-				string hrefId = token.Value<string>();
-				if(mDictionary.TryGetValue(hrefId, out result) && obj.Count == 1)
+				hrefId = token.Value<string>();
+				if (mDictionary.TryGetValue(hrefId, out result) && obj.Count == 1)
 					return (T)(IBaseClassIfc)result;
 			}
+			if(string.IsNullOrEmpty(hrefId))
+			{
+				token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
+				if (token != null)
+				{
+					hrefId = token.Value<string>();
+					mDictionary.TryGetValue(hrefId, out result);
+				}
+			}
+
 			if (result == null)
 			{
 				if (type.IsAbstract)
@@ -131,10 +142,6 @@ namespace GeometryGym.Ifc
 					if (nominatedType != null)
 						type = nominatedType;
 				}
-				string hrefId = "";
-				token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
-					hrefId = token.Value<string>();
 				if (string.IsNullOrEmpty(hrefId) || !mDictionary.TryGetValue(hrefId, out result))
 				{
 					ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -146,6 +153,8 @@ namespace GeometryGym.Ifc
 						if (result != null)
 						{
 							result.mDatabase = this;
+							if(!string.IsNullOrEmpty(hrefId))
+								mDictionary[hrefId] = result;
 
 							IfcCartesianPoint point = result as IfcCartesianPoint;
 							if (point != null)

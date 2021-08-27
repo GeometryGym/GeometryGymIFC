@@ -277,17 +277,23 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["CosineTerm"] = mSineTerm.ToString();
-			obj["Constant"] = mConstant.ToString();
+			if(!double.IsNaN(mLinearTerm))
+				obj["LinearTerm"] = mLinearTerm.ToString();
+			if(!double.IsNaN(mConstantTerm))
+				obj["ConstantTerm"] = mConstantTerm.ToString();
 		}
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			JToken token = obj.GetValue("CosineTerm", StringComparison.InvariantCultureIgnoreCase);
+			JToken token = obj.GetValue("SineTerm", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				mSineTerm = token.Value<double>();
-			token = obj.GetValue("Constant", StringComparison.InvariantCultureIgnoreCase);
+			token = obj.GetValue("LinearTerm", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				mConstant = token.Value<double>();
+				mLinearTerm = token.Value<double>();
+			token = obj.GetValue("ConstantTerm", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mConstantTerm = token.Value<double>();
 		}
 	}
 	public partial class IfcSlab : IfcBuiltElement

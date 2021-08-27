@@ -789,17 +789,15 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string s = base.BuildStringSTEP(release) + ",'" + mName + "',(" + mEnumerationValues[0].ToString();
-			for (int icounter = 1; icounter < mEnumerationValues.Count; icounter++)
-				s += "," + mEnumerationValues[icounter].ToString();
-			return s + ")," + ParserSTEP.LinkToString(mUnit);
+			return base.BuildStringSTEP(release) + ",'" + mName + "',(" + string.Join(",", mEnumerationValues.Select(x => x.ToString())) +
+				(mUnit == null ? "),$" : "),#" + mUnit.ToString());
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			mEnumerationValues = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2)).ConvertAll(x => ParserIfc.parseValue(x));
-			mUnit = ParserSTEP.StripLink(str, ref pos, len);
+			mEnumerationValues.AddRange(ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2)).ConvertAll(x => ParserIfc.parseValue(x)));
+			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 		}
 	}
 	public partial class IfcPropertyListValue : IfcSimpleProperty
