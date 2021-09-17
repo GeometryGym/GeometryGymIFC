@@ -1621,7 +1621,13 @@ namespace GeometryGym.Ifc
 				throw new Exception("Invalid Model View for IfcControl : " + db.ModelView.ToString());
 		}
 
-		public void Assign(IfcObjectDefinition o) { if (mControls.Count == 0) new IfcRelAssignsToControl(this, o); else mControls.First().RelatedObjects.Add(o); }
+		public void Assign(IfcObjectDefinition o) 
+		{ 
+			if (mControls.Count == 0) 
+				new IfcRelAssignsToControl(this, o); 
+			else 
+				mControls.First().RelatedObjects.Add(o); 
+		}
 	}
 	[Serializable]
 	public partial class IfcController : IfcDistributionControlElement //IFC4  

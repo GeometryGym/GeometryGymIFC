@@ -53,11 +53,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DEPRECATED IFC4
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mDateComponent) + "," + ParserSTEP.LinkToString(mTimeComponent); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mDateComponent.StepId + ",#" + mTimeComponent.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mDateComponent = ParserSTEP.StripLink(str, ref pos, len);
-			mTimeComponent = ParserSTEP.StripLink(str, ref pos, len);
+			mDateComponent = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCalendarDate;
+			mTimeComponent = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLocalTime;
 		}
 	}
 	//ENTITY IfcDefinedSymbol  // DEPRECATED IFC4
@@ -364,7 +364,7 @@ namespace GeometryGym.Ifc
 			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			if (release < ReleaseVersion.IFC4)
-				mDocumentReferences = ParserSTEP.StripListLink(str, ref pos, len);
+				DocumentReferences.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcDocumentReference));
 			else
 				mLocation = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mPurpose = ParserSTEP.StripString(str, ref pos, len);
@@ -372,7 +372,7 @@ namespace GeometryGym.Ifc
 			mScope = ParserSTEP.StripString(str, ref pos, len);
 			mRevision = ParserSTEP.StripString(str, ref pos, len);
 			mDocumentOwner = ParserSTEP.StripLink(str, ref pos, len);
-			mEditors = ParserSTEP.StripListLink(str, ref pos, len);
+			Editors.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcActorSelect));
 			mCreationTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 			mLastRevisionTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 			if (release < ReleaseVersion.IFC4)

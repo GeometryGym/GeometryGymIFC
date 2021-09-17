@@ -235,7 +235,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcMaterialLayer>(obj.GetValue("MaterialLayers", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addMaterialLayer(x));
+			MaterialLayers.AddRange(mDatabase.extractJArray<IfcMaterialLayer>(obj.GetValue("MaterialLayers", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			LayerSetName = extractString(obj.GetValue("LayerSetName", StringComparison.InvariantCultureIgnoreCase));
 			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
 		}

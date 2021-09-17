@@ -643,11 +643,76 @@ namespace GeometryGym.Ifc
 		public override Type ValueType { get { return typeof(double); } }
 
 		public IfcDuration() { }
+		public IfcDuration(TimeSpan timeSpan) { mDays = timeSpan.Days; mHours = timeSpan.Hours; mMinutes = timeSpan.Minutes; mSeconds = timeSpan.Seconds;  }
 		public static string Convert(IfcDuration d) { return (d == null ? "$" : d.ToString()); }
-		public static IfcDuration Convert(string s) { return null; }
+		public static IfcDuration Convert(string s) 
+		{
+			IfcDuration duration = new IfcDuration();
+			if (string.IsNullOrEmpty(s))
+				return duration;
+			int stringLength = s.Length;
+			bool inTime = false;
+			for(int icounter = 1; icounter < stringLength; icounter++)
+			{
+				char c = s[icounter];
+				if (c == 'T')
+				{
+					inTime = true;
+					continue;
+				}
+				string str = "";
+				while(char.IsDigit(c) || c == '.')
+				{
+					str += c;
+					c = s[++icounter];
+				}
+				
+				if(!string.IsNullOrEmpty(str)) 
+				{
+					if(c== 'S')
+					{
+						double d = 0;
+						if (double.TryParse(str, out d))
+							duration.Seconds = d;
+					}
+					else
+					{
+						int i = 0;
+						if(int.TryParse(str, out i))
+						{
+							if (c == 'Y')
+								duration.Years = i;
+							else if (c == 'M')
+							{
+								if (inTime)
+									duration.Minutes = i;
+								else
+									duration.Months = i;
+							}
+							else if (c == 'D')
+								duration.Days = i;
+							else if (c == 'H')
+								duration.Hours = i;
+						}
+					}
+				}
+			}
+			return duration;
+		} 
  
-		public override string ValueString { get { return "P" + mYears + "Y" + mMonths + "M" + mDays + "DT" + mHours + "H" + mMinutes + "M" + mSeconds.ToString(ParserSTEP.NumberFormat) + "S"; } }
-		public override string ToString() { return "IFCDURATION('" + ValueString + "'"; }
+		public override string ValueString 
+		{ 
+			get 
+			{
+				string result = "P" + (mYears > 0 ? mYears + "Y" : "") + (mMonths > 0 ? mMonths + "M" : "") + (mDays > 0 ? mDays + "D" : "");
+				if(mHours > 0 || mMinutes > 0 || mSeconds > 0)
+					result += ("T" + (mHours > 0 ? mHours + "H" : "") + (mMinutes>0 ? mMinutes + "M" : "") + (mSeconds > 0 ? mSeconds.ToString(ParserSTEP.NumberFormat) + "S" : ""));
+				if (result.Length == 1)
+					return "PT0S";
+				return result;
+			} 
+		}
+		public override string ToString() { return "IFCDURATION('" + ValueString + "')"; }
 		internal double ToSeconds() { return ((((((mYears * 365) + (mMonths * 30) + mDays) * 24) + mHours) * 60) + mMinutes) * 60 + mSeconds; }
 		private void fromSeconds(double seconds) { mYears = mMonths = mDays = mHours = mMinutes = 0; mSeconds = seconds; }
 	}

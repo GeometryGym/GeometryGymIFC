@@ -833,14 +833,18 @@ namespace GeometryGym.Ifc
 			
 		public IfcCompositeCurve ComputeGeometry()
 		{
-			double startDistAlong = (double.IsNaN(StartDistAlong) ? 0 : StartDistAlong);
+			double tol = mDatabase.Tolerance;
 			List<IfcCurveSegment> curveSegments = new List<IfcCurveSegment>();
 			List<IfcAlignmentHorizontalSegment> horizontalSegments = HorizontalSegments.ToList();
-			for (int counter = 0; counter < horizontalSegments.Count; counter++)
+			if (horizontalSegments.Count == 0)
+				return null;
+			int segmentCount = horizontalSegments.Count;
+			for (int counter = 0; counter < segmentCount; counter++)
 			{
 				try
 				{
-					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(startDistAlong, counter + 1 < horizontalSegments.Count ? horizontalSegments[counter + 1] : null));
+					IfcAlignmentHorizontalSegment nextSegment = counter + 1 < segmentCount ? horizontalSegments[counter + 1] : null; 
+					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(nextSegment));
 				}
 				catch (Exception) { }
 			}
@@ -896,7 +900,7 @@ namespace GeometryGym.Ifc
 			double startDirection = mStartDirection * (mDatabase == null ? 1 : mDatabase.ScaleAngle());
 			return new Tuple<double, double>(Math.Cos(startDirection), Math.Sin(startDirection));
 		}
-		public IfcCurveSegment generateCurveSegment(double startDistAlong, IfcAlignmentHorizontalSegment nextSegment)
+		internal IfcCurveSegment generateCurveSegment(IfcAlignmentHorizontalSegment nextSegment)
 		{
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;

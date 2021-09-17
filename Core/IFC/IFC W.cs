@@ -308,12 +308,15 @@ namespace GeometryGym.Ifc
 		internal DateTime mStartTime;// : IfcDateTime;
 		internal DateTime mFinishTime = DateTime.MinValue;// : OPTIONAL IfcDateTime;  IFC4
 		internal double mSSDuration = 0, mSSTotalFloat = 0; //: 	OPTIONAL IfcTimeMeasure; 
-		internal int mSSCreationDate, mSSStartTime; //: 	IfcDateTimeSelect;
-		internal int mSSFinishTime; //: OPTIONAL IfcDateTimeSelect;
+		internal IfcDateTimeSelect mSSCreationDate, mSSStartTime; //: 	IfcDateTimeSelect;
+		internal IfcDateTimeSelect mSSFinishTime; //: OPTIONAL IfcDateTimeSelect;
 		internal IfcWorkControlTypeEnum mWorkControlType = IfcWorkControlTypeEnum.NOTDEFINED;//	 : 	OPTIONAL IfcWorkControlTypeEnum; IFC2x3
 		internal string mUserDefinedControlType = "$";//	 : 	OPTIONAL IfcLabel;
 
+		public DateTime CreationDate { get { return mCreationDate; } set { mCreationDate = value; } }
 		public SET<IfcPerson> Creators { get { return mCreators; } } 
+		public DateTime StartTime { get { return mStartTime; } set { mStartTime = value; } }
+		public DateTime FinishTime { get { return mFinishTime; } set { mFinishTime = value; } }
 		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcWorkControl() : base() { mCreationDate = DateTime.Now; mStartTime = DateTime.Now; }
@@ -323,7 +326,7 @@ namespace GeometryGym.Ifc
 			mStartTime = DateTime.Now;
 			if (db.Release < ReleaseVersion.IFC4)
 			{
-				mSSCreationDate = new IfcCalendarDate(db, DateTime.Now).StepId;
+				mSSCreationDate = new IfcCalendarDate(db, DateTime.Now);
 				mSSStartTime = mSSCreationDate;
 			}
 		}
@@ -337,7 +340,49 @@ namespace GeometryGym.Ifc
 			mFinishTime = c.mFinishTime;
 		}
 	
-		internal DateTime getStart() { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? (mDatabase[mSSStartTime] as IfcDateTimeSelect).DateTime : DateTime.MinValue); }
+		internal DateTime getStart()
+		{
+			if (mStartTime != DateTime.MinValue)
+				return mStartTime;
+			if (mSSStartTime != null)
+				return mSSStartTime.DateTime;
+			return DateTime.MinValue;
+		}
+		public Tuple<DateTime, DateTime> ComputeAndSetScheduledStartFinishTimes()
+		{
+			DateTime scheduledStart = DateTime.MaxValue, scheduledFinish = DateTime.MinValue;
+			List<IfcWorkControl> subControls = IsDecomposedBy.SelectMany(x => x.RelatedObjects).OfType<IfcWorkControl>().ToList();
+			subControls.AddRange(IsNestedBy.SelectMany(x => x.RelatedObjects).OfType<IfcWorkControl>());
+			foreach (IfcWorkControl workControl in subControls)
+			{
+				Tuple<DateTime, DateTime> startFinish = workControl.ComputeAndSetScheduledStartFinishTimes();
+				if (startFinish.Item1 != DateTime.MinValue && startFinish.Item1 < scheduledStart)
+					scheduledStart = startFinish.Item1;
+				if (startFinish.Item2 > scheduledFinish)
+					scheduledFinish = startFinish.Item2;
+			}
+			foreach(IfcTask task in Controls.SelectMany(x=>x.RelatedObjects).OfType<IfcTask>())
+			{
+				Tuple<DateTime, DateTime> startFinish = task.computeScheduleStartFinish();
+				if (startFinish.Item1 != DateTime.MinValue && startFinish.Item1 < scheduledStart)
+					scheduledStart = startFinish.Item1;
+				if (startFinish.Item2 > scheduledFinish)
+					scheduledFinish = startFinish.Item2;
+			}
+			if (mDatabase.Release > ReleaseVersion.IFC2x3)
+			{
+				mStartTime = scheduledStart;
+				mFinishTime = scheduledFinish;
+			}
+			else
+			{
+				if (scheduledStart > DateTime.MinValue)
+					mSSStartTime = new IfcDateAndTime(mDatabase, scheduledStart);
+				if (scheduledFinish > DateTime.MinValue)
+					mSSFinishTime = new IfcDateAndTime(mDatabase, scheduledFinish);
+			}
+			return new Tuple<DateTime, DateTime>(scheduledStart, scheduledFinish);
+		}
 	}
 	[Serializable]
 	public partial class IfcWorkPlan : IfcWorkControl
@@ -356,7 +401,8 @@ namespace GeometryGym.Ifc
 		public IfcWorkScheduleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcWorkSchedule() : base() { }
-		internal IfcWorkSchedule(DatabaseIfc db) : base(db) { }
+		public IfcWorkSchedule(DatabaseIfc db) : base(db) { }
+		public IfcWorkSchedule(IfcWorkPlan workPlan) : base(workPlan.Database) { workPlan.AddAggregated(this); }
 		internal IfcWorkSchedule(DatabaseIfc db, IfcWorkSchedule s, DuplicateOptions options) : base(db, s, options) { mPredefinedType = s.mPredefinedType; }
 	}
 	[Serializable]
@@ -371,7 +417,7 @@ namespace GeometryGym.Ifc
 		public DateTime Finish { get { return mFinish; } set { mFinish = value; } }
 
 		internal IfcWorkTime() : base() { }
-		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t) : base(db,t) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
+		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t, DuplicateOptions options) : base(db, t, options) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
 		public IfcWorkTime(DatabaseIfc db) : base(db) { }
 	}
 }

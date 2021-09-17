@@ -76,9 +76,9 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("WallThickness", mWallThickness.ToString());
-			if (double.IsNaN(mInnerFilletRadius))
+			if (!double.IsNaN(mInnerFilletRadius))
 				xml.SetAttribute("InnerFilletRadius", mInnerFilletRadius.ToString());
-			if (double.IsNaN(mOuterFilletRadius))
+			if (!double.IsNaN(mOuterFilletRadius))
 				xml.SetAttribute("OuterFilletRadius", mOuterFilletRadius.ToString());
 		}
 	}
@@ -453,8 +453,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if(host.mIndex != mRelatingLibrary)
-				xml.AppendChild(mDatabase[mRelatingLibrary].GetXML(xml.OwnerDocument, "RelatingLibrary", this, processed));
+			if(host != mRelatingLibrary)
+				xml.AppendChild((mRelatingLibrary as BaseClassIfc).GetXML(xml.OwnerDocument, "RelatingLibrary", this, processed));
 		}
 	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates

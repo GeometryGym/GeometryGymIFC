@@ -259,14 +259,14 @@ namespace GeometryGym.Ifc
 			Identification = extractString(obj.GetValue("Idenfification", StringComparison.InvariantCultureIgnoreCase));
 			Name = extractString(obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase));
 			Description = extractString(obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase));
-			mDatabase.extractJArray<IfcDocumentReference>(obj.GetValue("DocumentReferences", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addReference(x));
+			DocumentReferences.AddRange(mDatabase.extractJArray<IfcDocumentReference>(obj.GetValue("DocumentReferences", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			Location = extractString(obj.GetValue("Location", StringComparison.InvariantCultureIgnoreCase));
 			Purpose = extractString(obj.GetValue("Purpose", StringComparison.InvariantCultureIgnoreCase));
 			Revision = extractString(obj.GetValue("Revision", StringComparison.InvariantCultureIgnoreCase));
 			JObject jobj = obj["DocumentOwner"] as JObject;
 			if (jobj != null)
 				DocumentOwner = mDatabase.ParseJObject<IfcActorSelect>(jobj);
-			mDatabase.extractJArray<IfcActorSelect>(obj.GetValue("Editors", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addEditor(x));
+			Editors.AddRange(mDatabase.extractJArray<IfcActorSelect>(obj.GetValue("Editors", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			JToken token = obj.GetValue("CreationTime");
 			if(token != null)
 				CreationTime = DateTime.Parse(token.Value<string>());
@@ -299,7 +299,7 @@ namespace GeometryGym.Ifc
 			if(mDocumentOwner > 0)
 				obj["DocumentOwner"] = mDatabase[mDocumentOwner].getJson(this, options);
 			if(mEditors.Count > 0)
-				obj["Editors"] = new JArray(mEditors.ToList().ConvertAll(x => mDatabase[x].getJson(this, options)));
+				obj["Editors"] = new JArray(mEditors.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mCreationTime != DateTime.MinValue)
 				obj["CreationTime"] = IfcDateTime.FormatSTEP(CreationTime);
 			if (mLastRevisionTime != DateTime.MinValue)

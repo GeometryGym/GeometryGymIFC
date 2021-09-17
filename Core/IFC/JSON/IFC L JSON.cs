@@ -112,7 +112,7 @@ namespace GeometryGym.Ifc
 			obj["Axis"] = Axis.getJson(this, options);
 		}
 	}
-	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	internal partial class IfcLinearSpanPlacement : IfcLinearPlacement
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

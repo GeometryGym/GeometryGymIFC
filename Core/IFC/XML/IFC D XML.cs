@@ -290,7 +290,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Revision"))
 				Scope = xml.Attributes["Revision"].Value;
 			if (xml.HasAttribute("ElectronicFormat"))
-				ElectronicFormat = xml.Attributes["RevisioElectronicFormatn"].Value;
+				ElectronicFormat = xml.Attributes["ElectronicFormat"].Value;
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;

@@ -305,7 +305,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("LayerBlocked", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcLogicalEnum>(token.Value<string>(), true, out mLayerBlocked);
-			mDatabase.extractJArray<IfcPresentationStyle>(obj.GetValue("LayerStyles", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addLayerStyle(x));
+			LayerStyles.AddRange(mDatabase.extractJArray<IfcPresentationStyle>(obj.GetValue("LayerStyles", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

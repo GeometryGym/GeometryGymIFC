@@ -677,7 +677,7 @@ namespace GeometryGym.Ifc
 		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
 		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
 		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
-		public LIST<double> CoefficientsZ { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
+		public LIST<double> CoefficientsZ { get { return mCoefficientsZ; } set { mCoefficientsZ = value; } }
 
 		public IfcPolynomialCurve() : base() { }
 		internal IfcPolynomialCurve(DatabaseIfc db, IfcPolynomialCurve polynomial, DuplicateOptions options)
@@ -901,7 +901,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcPresentationLayerAssignment(DatabaseIfc db, string name) : base(db) { Name = name; }
 		public IfcPresentationLayerAssignment(string name, IfcLayeredItem item) : this(item.Database, name) { mAssignedItems.Add(item); }
-		public IfcPresentationLayerAssignment(string name, List<IfcLayeredItem> items) : this(items[0].Database, name) { mAssignedItems.AddRange(items); }
+		public IfcPresentationLayerAssignment(string name, IEnumerable<IfcLayeredItem> items) : this(items.First().Database, name) { mAssignedItems.AddRange(items); }
 
 		protected override void initialize()
 		{
@@ -946,25 +946,29 @@ namespace GeometryGym.Ifc
 		internal IfcLogicalEnum mLayerOn = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		internal IfcLogicalEnum mLayerFrozen = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 		internal IfcLogicalEnum mLayerBlocked = IfcLogicalEnum.UNKNOWN;// LOGICAL;
-		internal List<int> mLayerStyles = new List<int>();// SET OF IfcPresentationStyleSelect; IFC4 IfcPresentationStyle
+		internal SET<IfcPresentationStyle> mLayerStyles = new SET<IfcPresentationStyle>();// SET OF IfcPresentationStyleSelect; IFC4 IfcPresentationStyle
 
 		public IfcLogicalEnum LayerOn { get { return mLayerOn; } set { mLayerOn = value; } }
 		public IfcLogicalEnum LayerFrozen { get { return mLayerFrozen; } set { mLayerFrozen = value; } }
 		public IfcLogicalEnum LayerBlocked { get { return mLayerBlocked; } set { mLayerBlocked = value; } }
-		public ReadOnlyCollection<IfcPresentationStyle> LayerStyles { get { return new ReadOnlyCollection<IfcPresentationStyle>(mLayerStyles.ConvertAll(x => mDatabase[x] as IfcPresentationStyle)); } }
+		public SET<IfcPresentationStyle> LayerStyles { get { return mLayerStyles; } }
 
 		internal IfcPresentationLayerWithStyle() : base() { }
-		internal IfcPresentationLayerWithStyle(DatabaseIfc db, IfcPresentationLayerWithStyle l, DuplicateOptions options) : base(db, l, options) { mLayerOn = l.mLayerOn; mLayerFrozen = l.mLayerFrozen; mLayerBlocked = l.mLayerBlocked; l.LayerStyles.ToList().ForEach(x => addLayerStyle(db.Factory.Duplicate(x) as IfcPresentationStyle)); }
+		internal IfcPresentationLayerWithStyle(DatabaseIfc db, IfcPresentationLayerWithStyle l, DuplicateOptions options) : base(db, l, options) 
+		{ 
+			mLayerOn = l.mLayerOn; 
+			mLayerFrozen = l.mLayerFrozen; 
+			mLayerBlocked = l.mLayerBlocked; 
+			LayerStyles.AddRange(l.LayerStyles.Select(x=>db.Factory.Duplicate(x) as IfcPresentationStyle)); 
+		}
 
 		public IfcPresentationLayerWithStyle(DatabaseIfc db, string name) : base(db, name) { }
-		public IfcPresentationLayerWithStyle(string name, IfcPresentationStyle style) : base(style.Database, name) { mLayerStyles.Add(style.mIndex); }
-		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, IfcPresentationStyle style) : base(name, item) { mLayerStyles.Add(style.mIndex); }
-		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, List<IfcPresentationStyle> styles) : base(name, item) { styles.ForEach(x => addLayerStyle(x)); }
-		public IfcPresentationLayerWithStyle(string name, List<IfcLayeredItem> items, List<IfcPresentationStyle> styles) : base(name, items) { styles.ForEach(x => addLayerStyle(x)); }
-		public IfcPresentationLayerWithStyle(string name, List<IfcLayeredItem> items, IfcPresentationStyle style) : base(name, items) { mLayerStyles.Add(style.mIndex); }
+		public IfcPresentationLayerWithStyle(string name, IfcPresentationStyle style) : base(style.Database, name) { LayerStyles.Add(style); }
+		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, IfcPresentationStyle style) : base(name, item) { LayerStyles.Add(style); }
+		public IfcPresentationLayerWithStyle(string name, IfcLayeredItem item, IEnumerable<IfcPresentationStyle> styles) : base(name, item) { LayerStyles.AddRange(styles); }
+		public IfcPresentationLayerWithStyle(string name, IEnumerable<IfcLayeredItem> items, IEnumerable<IfcPresentationStyle> styles) : base(name, items) { LayerStyles.AddRange(styles); }
+		public IfcPresentationLayerWithStyle(string name, IEnumerable<IfcLayeredItem> items, IfcPresentationStyle style) : base(name, items) { LayerStyles.Add(style); }
 	
-		internal void addLayerStyle(IfcPresentationStyle style) { mLayerStyles.Add(style.mIndex); }
-
 		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcPresentationLayerWithStyle a = e as IfcPresentationLayerWithStyle;
@@ -2176,18 +2180,15 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal bool IsInstancePropertySet
+		public bool IsInstancePropertySet()
 		{
-			get
+			foreach (IfcRelDefinesByTemplate dbt in IsDefinedBy)
 			{
-				foreach (IfcRelDefinesByTemplate dbt in mIsDefinedBy)
-				{
-					if (dbt.RelatingTemplate.TemplateType == IfcPropertySetTemplateTypeEnum.PSET_OCCURRENCEDRIVEN)
-						return true;
-				}
-				//Check context declared
-				return false;
+				if (dbt.RelatingTemplate.TemplateType == IfcPropertySetTemplateTypeEnum.PSET_OCCURRENCEDRIVEN)
+					return true;
 			}
+			//Check context declared
+			return false;
 		}
 		internal virtual bool isEmpty { get { return false; } }
 	}

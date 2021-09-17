@@ -147,10 +147,11 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild((Axis as BaseClassIfc).GetXML(xml.OwnerDocument, "Axis", this, processed));
+			if(Axis != null)
+				xml.AppendChild((Axis as BaseClassIfc).GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
-	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	internal partial class IfcLinearSpanPlacement
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

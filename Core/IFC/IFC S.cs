@@ -110,7 +110,12 @@ namespace GeometryGym.Ifc
 		public string UserDefinedDataOrigin { get { return (mUserDefinedDataOrigin == "$" ? "" : ParserIfc.Decode(mName)); } set { mUserDefinedDataOrigin = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		protected IfcSchedulingTime() : base() { }
-		protected IfcSchedulingTime(DatabaseIfc db, IfcSchedulingTime t) : base(db,t) { mName = t.mName; mDataOrigin = t.mDataOrigin; mUserDefinedDataOrigin = t.mUserDefinedDataOrigin; }
+		protected IfcSchedulingTime(DatabaseIfc db, IfcSchedulingTime t, DuplicateOptions options) : base(db,t) 
+		{
+			mName = t.mName; 
+			mDataOrigin = t.mDataOrigin; 
+			mUserDefinedDataOrigin = t.mUserDefinedDataOrigin;
+		}
 		protected IfcSchedulingTime(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -2497,6 +2502,9 @@ additional types	some additional representation types are given:
 	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect
 	{
 		internal double mRefractionIndex = double.NaN, mDispersionFactor = double.NaN;//	 :	OPTIONAL IfcReal;
+		public double RefractionIndex { get { return mRefractionIndex; } set { mRefractionIndex = value; } }
+		public double DispersionFactor { get { return mDispersionFactor; } set { mDispersionFactor = value; } }
+
 		internal IfcSurfaceStyleRefraction() : base() { }
 		public IfcSurfaceStyleRefraction(DatabaseIfc db) : base(db) { }
 		internal IfcSurfaceStyleRefraction(DatabaseIfc db, IfcSurfaceStyleRefraction s) : base(db, s)

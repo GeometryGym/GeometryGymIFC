@@ -1079,7 +1079,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelAssociatesDocument : IfcRelAssociates
 	{
 		internal int mRelatingDocument;// : IfcDocumentSelect; 
-		public IfcDocumentSelect RelatingDocument { get { return mDatabase[mRelatingDocument] as IfcDocumentSelect; } set { mRelatingDocument = value.Index; value.Associate(this); } }
+		public IfcDocumentSelect RelatingDocument { get { return mDatabase[mRelatingDocument] as IfcDocumentSelect; } set { mRelatingDocument = value.Index; value.DocumentForObjects.Add(this); } }
 
 		public override NamedObjectIfc Relating() { return RelatingDocument; } 
 
@@ -1092,14 +1092,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssociatesLibrary : IfcRelAssociates
 	{
-		internal int mRelatingLibrary;// : IfcLibrarySelect; 
-		public IfcLibrarySelect RelatingLibrary { get { return mDatabase[mRelatingLibrary] as IfcLibrarySelect; } set { mRelatingLibrary = value.Index; } }
+		internal IfcLibrarySelect mRelatingLibrary;// : IfcLibrarySelect; 
+		public IfcLibrarySelect RelatingLibrary { get { return mRelatingLibrary; } set { mRelatingLibrary = value; } }
 
 		public override NamedObjectIfc Relating() { return RelatingLibrary; } 
 
 		internal IfcRelAssociatesLibrary() : base() { }
-		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r, DuplicateOptions options) : base(db, r, options) { RelatingLibrary = db.Factory.Duplicate(r.mDatabase[r.mRelatingLibrary], options) as IfcLibrarySelect; }
+		internal IfcRelAssociatesLibrary(DatabaseIfc db, IfcRelAssociatesLibrary r, DuplicateOptions options) : base(db, r, options) { RelatingLibrary = db.Factory.Duplicate(r.mRelatingLibrary as BaseClassIfc, options) as IfcLibrarySelect; }
+		public IfcRelAssociatesLibrary(IfcLibrarySelect library) : base(library.Database) { RelatingLibrary = library; }
 		public IfcRelAssociatesLibrary(IfcLibrarySelect library, IfcDefinitionSelect related) : base(related) { RelatingLibrary = library; }
+		public IfcRelAssociatesLibrary(IfcLibrarySelect library, IEnumerable<IfcDefinitionSelect> related) : base(library.Database) { RelatingLibrary = library; mRelatedObjects.AddRange(related); }
 	}
 	[Serializable]
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
@@ -1943,7 +1945,7 @@ namespace GeometryGym.Ifc
 			relatedObject.Nests = this;
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition ro, IfcObjectDefinition ro2) : this(relatingObject, ro) { ro2.Nests = this; }
-		public IfcRelNests(IfcObjectDefinition relatingObject, List<IfcObjectDefinition> relatedObjects) : base(relatingObject.mDatabase)
+		public IfcRelNests(IfcObjectDefinition relatingObject, IEnumerable<IfcObjectDefinition> relatedObjects) : base(relatingObject.mDatabase)
 		{
 			mRelatingObject = relatingObject;
 			relatingObject.IsNestedBy.Add(this);
@@ -2119,16 +2121,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelSequence : IfcRelConnects
 	{
-		internal int mRelatingProcess;// : IfcProcess;
-		internal int mRelatedProcess;//  IfcProcess;
-		private int mTimeLag;// : OPTIONAL IfcLagTime; IFC2x3 	IfcTimeMeasure
+		internal IfcProcess mRelatingProcess;// : IfcProcess;
+		internal IfcProcess mRelatedProcess;//  IfcProcess;
+		private IfcLagTime mTimeLag;// : OPTIONAL IfcLagTime; IFC2x3 	IfcTimeMeasure
 		private double mTimeLagSS = double.NaN;// : OPTIONAL IfcLagTime; IFC2x3 	IfcTimeMeasure
 		internal IfcSequenceEnum mSequenceType = IfcSequenceEnum.NOTDEFINED;//	 :	OPTIONAL IfcSequenceEnum;
 		internal string mUserDefinedSequenceType = "$";//	 :	OPTIONAL IfcLabel; 
 
-		public IfcProcess RelatingProcess { get { return mDatabase[mRelatingProcess] as IfcProcess; } set { mRelatingProcess = value.mIndex; value.mIsPredecessorTo.Add(this); } }
-		public IfcProcess RelatedProcess { get { return mDatabase[mRelatedProcess] as IfcProcess; } set { mRelatedProcess = value.mIndex; value.mIsSuccessorFrom.Add(this); } }
-		public IfcLagTime TimeLag { get { return mDatabase[mTimeLag] as IfcLagTime; } set { mTimeLag = (value == null ? 0 : value.mIndex); } }
+		public IfcProcess RelatingProcess { get { return mRelatingProcess; } set { mRelatingProcess = value; value.mIsPredecessorTo.Add(this); } }
+		public IfcProcess RelatedProcess { get { return mRelatedProcess; } set { mRelatedProcess = value; value.mIsSuccessorFrom.Add(this); } }
+		public IfcLagTime TimeLag { get { return mTimeLag; } set { mTimeLag = value; } }
 		public IfcSequenceEnum SequenceType { get { return mSequenceType; } set { mSequenceType = value; } }
 
 		internal IfcRelSequence() : base() { }
@@ -2140,10 +2142,10 @@ namespace GeometryGym.Ifc
 			mSequenceType = s.mSequenceType;
 			mUserDefinedSequenceType = s.mUserDefinedSequenceType;
 		}
-		public IfcRelSequence(IfcProcess rg, IfcProcess rd) : base(rg.mDatabase)
+		public IfcRelSequence(IfcProcess relating, IfcProcess related) : base(relating.mDatabase)
 		{
-			mRelatingProcess = rg.mIndex;
-			mRelatedProcess = rd.mIndex;
+			mRelatingProcess = relating;
+			mRelatedProcess = related;
 		}
 	}
 	[Serializable]
@@ -2594,7 +2596,7 @@ namespace GeometryGym.Ifc
 		public double Completion { get { return mCompletion; } set { mCompletion = value; } }
 
 		internal IfcResourceTime() : base() { }
-		internal IfcResourceTime(DatabaseIfc db, IfcResourceTime t) : base(db, t)
+		internal IfcResourceTime(DatabaseIfc db, IfcResourceTime t, DuplicateOptions options) : base(db, t, options)
 		{
 			mScheduleWork = t.mScheduleWork; mScheduleUsage = t.mScheduleUsage; mScheduleStart = t.mScheduleStart; mScheduleFinish = t.mScheduleFinish; mScheduleContour = t.mScheduleContour;
 			mLevelingDelay = t.mLevelingDelay; mIsOverAllocated = t.mIsOverAllocated; mStatusTime = t.mStatusTime; mActualWork = t.mActualWork; mActualUsage = t.mActualUsage;

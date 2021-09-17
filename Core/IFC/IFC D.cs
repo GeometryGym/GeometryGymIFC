@@ -52,20 +52,25 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DELETED IFC4
 	{
-		internal int mDateComponent;// : IfcCalendarDate;
-		internal int mTimeComponent;// : IfcLocalTime;
-		public IfcCalendarDate DateComponent { get { return mDatabase[mDateComponent] as IfcCalendarDate; } set { mDateComponent = value.Index; } }
-		public IfcLocalTime TimeComponent { get { return mDatabase[mTimeComponent] as IfcLocalTime; } set { mTimeComponent = value.Index; } }
+		internal IfcCalendarDate mDateComponent;// : IfcCalendarDate;
+		internal IfcLocalTime mTimeComponent;// : IfcLocalTime;
+		public IfcCalendarDate DateComponent { get { return mDateComponent; } set { mDateComponent = value; } }
+		public IfcLocalTime TimeComponent { get { return mTimeComponent; } set { mTimeComponent = value; } }
 
 		internal IfcDateAndTime(IfcDateAndTime v) : base() { mDateComponent = v.mDateComponent; mTimeComponent = v.mTimeComponent; }
 		internal IfcDateAndTime() : base() { }
-		public IfcDateAndTime(IfcCalendarDate d, IfcLocalTime t) : base(d.mDatabase) { mDateComponent = d.mIndex; mTimeComponent = t.mIndex; }
+		public IfcDateAndTime(IfcCalendarDate d, IfcLocalTime t) : base(d.mDatabase) { mDateComponent = d; mTimeComponent = t; }
+		public IfcDateAndTime(DatabaseIfc db, DateTime dateTime) : base(db)
+		{
+			mDateComponent = new IfcCalendarDate(db, dateTime);
+			mTimeComponent = new IfcLocalTime(db, dateTime);
+		}
 		public DateTime DateTime
 		{
 			get
 			{
-				IfcCalendarDate cd = mDatabase[mDateComponent] as IfcCalendarDate;
-				IfcLocalTime lt = mDatabase[mTimeComponent] as IfcLocalTime;
+				IfcCalendarDate cd = mDateComponent;
+				IfcLocalTime lt = mTimeComponent;
 				return new DateTime(cd.mYearComponent, cd.mMonthComponent, cd.mDayComponent, lt.mHourComponent, lt.mMinuteComponent, (int)lt.mSecondComponent);
 			}
 		}
@@ -486,12 +491,12 @@ namespace GeometryGym.Ifc
 		internal string mIdentification;// : IfcIdentifier;
 		internal string mName;// :  IfcLabel;
 		internal string mDescription = "";// : OPTIONAL IfcText;
-		internal List<int> mDocumentReferences = new List<int>(); // ifc2x3 : OPTIONAL SET [1:?] OF IfcDocumentReference;
+		internal SET<IfcDocumentReference> mDocumentReferences = new SET<IfcDocumentReference>(); // ifc2x3 : OPTIONAL SET [1:?] OF IfcDocumentReference;
 		internal string mLocation = "";// : IFC4	OPTIONAL IfcURIReference;
 		internal string mPurpose = "", mIntendedUse = "", mScope = "";// : OPTIONAL IfcText;
 		internal string mRevision = "";// : OPTIONAL IfcLabel;
 		internal int mDocumentOwner;// : OPTIONAL IfcActorSelect;
-		internal List<int> mEditors = new List<int>();// : OPTIONAL SET [1:?] OF IfcActorSelect;
+		internal SET<IfcActorSelect> mEditors = new SET<IfcActorSelect>();// : OPTIONAL SET [1:?] OF IfcActorSelect;
 		internal DateTime mCreationTime = DateTime.MinValue, mLastRevisionTime = DateTime.MinValue;// : OPTIONAL IFC4 IfcDateTime;
 		internal string mElectronicFormat = "";// IFC4	 :	OPTIONAL IfcIdentifier; IFC4
 		internal int mSSElectronicFormat;// IFC2x3 : OPTIONAL IfcDocumentElectronicFormat;
@@ -499,24 +504,24 @@ namespace GeometryGym.Ifc
 		internal int mSSValidFrom = 0, mSSVAlidUntil = 0;
 		internal IfcDocumentConfidentialityEnum mConfidentiality = IfcDocumentConfidentialityEnum.NOTDEFINED;// : OPTIONAL IfcDocumentConfidentialityEnum;
 		internal IfcDocumentStatusEnum mStatus = IfcDocumentStatusEnum.NOTDEFINED;// : OPTIONAL IfcDocumentStatusEnum; 
-																				  //INVERSE
-		internal List<IfcRelAssociatesDocument> mDocumentInfoForObjects = new List<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
-		internal List<IfcDocumentReference> mHasDocumentReferences = new List<IfcDocumentReference>();//	 :	SET OF IfcDocumentReference FOR ReferencedDocument;
-		internal List<IfcDocumentInformationRelationship> mIsPointedTo = new List<IfcDocumentInformationRelationship>();//	 :	SET OF IfcDocumentInformationRelationship FOR RelatedDocuments;
-		internal List<IfcDocumentInformationRelationship> mIsPointer = new List<IfcDocumentInformationRelationship>();//	 :	SET [0:1] OF IfcDocumentInformationRelationship FOR RelatingDocument;
+		//INVERSE
+		internal SET<IfcRelAssociatesDocument> mDocumentInfoForObjects = new SET<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
+		internal SET<IfcDocumentReference> mHasDocumentReferences = new SET<IfcDocumentReference>();//	 :	SET OF IfcDocumentReference FOR ReferencedDocument;
+		internal SET<IfcDocumentInformationRelationship> mIsPointedTo = new SET<IfcDocumentInformationRelationship>();//	 :	SET OF IfcDocumentInformationRelationship FOR RelatedDocuments;
+		internal SET<IfcDocumentInformationRelationship> mIsPointer = new SET<IfcDocumentInformationRelationship>();//	 :	SET [0:1] OF IfcDocumentInformationRelationship FOR RelatingDocument;
 
 		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }
 		public string Description { get { return mDescription == "$" ? "" : ParserIfc.Decode(mDescription); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		[Obsolete("DEPRECATED IFC4", false)]
-		public ReadOnlyCollection<IfcDocumentReference> DocumentReferences { get { return new ReadOnlyCollection<IfcDocumentReference>(mDocumentReferences.ConvertAll(x => mDatabase[x] as IfcDocumentReference)); } }
+		public SET<IfcDocumentReference> DocumentReferences { get { return mDocumentReferences; } }
 		public string Location { get { return mLocation == "$" ? "" : ParserIfc.Decode(mLocation); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Purpose { get { return mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string IntendedUse { get { return mIntendedUse == "$" ? "" : ParserIfc.Decode(mIntendedUse); } set { mIntendedUse = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Scope { get { return mScope == "$" ? "" : ParserIfc.Decode(mScope); } set { mScope = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Revision { get { return mRevision == "$" ? "" : ParserIfc.Decode(mRevision); } set { mRevision = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcActorSelect DocumentOwner { get { return mDatabase[mDocumentOwner] as IfcActorSelect; } set { mDocumentOwner = (value == null ? 0 : value.Index); } }
-		public ReadOnlyCollection<IfcActorSelect> Editors { get { return new ReadOnlyCollection<IfcActorSelect>(mEditors.ConvertAll(x => mDatabase[x] as IfcActorSelect)); } }
+		public SET<IfcActorSelect> Editors { get { return mEditors; } }
 		public DateTime CreationTime { get { return mCreationTime; } set { mCreationTime = value; } }
 		public DateTime LastRevisionTime { get { return mLastRevisionTime; } set { mLastRevisionTime = value; } } 
 		public string ElectronicFormat { get { return mElectronicFormat == "$" ? "" : ParserIfc.Decode(mElectronicFormat); } set { mElectronicFormat = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
@@ -525,21 +530,26 @@ namespace GeometryGym.Ifc
 		public IfcDocumentConfidentialityEnum Confidentiality { get { return mConfidentiality; } set { mConfidentiality = value; } } 
 		public IfcDocumentStatusEnum Status { get { return mStatus; } set { mStatus = value; } }
 
-		public ReadOnlyCollection<IfcRelAssociatesDocument> Associates { get { return new ReadOnlyCollection<IfcRelAssociatesDocument>( mDocumentInfoForObjects); } }
+		public SET<IfcRelAssociatesDocument> DocumentInfoForObjects { get { return mDocumentInfoForObjects; } }
+		public SET<IfcDocumentReference> HasDocumentReferences { get { return mHasDocumentReferences; } }
+		public SET<IfcDocumentInformationRelationship> IsPointedTo { get { return mIsPointedTo; } }
+		public SET<IfcDocumentInformationRelationship> IsPointer { get { return mIsPointer; } }
+
+		public SET<IfcRelAssociatesDocument> DocumentForObjects { get { return mDocumentInfoForObjects; } }
 
 		internal IfcDocumentInformation() : base() { }
-		internal IfcDocumentInformation(DatabaseIfc db, IfcDocumentInformation i) : base(db,i)
+		internal IfcDocumentInformation(DatabaseIfc db, IfcDocumentInformation i) : base(db, i)
 		{
 			mIdentification = i.mIdentification;
 			mName = i.mName;
 			mDescription = i.mDescription;
-			i.DocumentReferences.ToList().ForEach(x => addReference( db.Factory.Duplicate(x) as IfcDocumentReference));
+			DocumentReferences.AddRange(i.DocumentReferences.Select(x=> db.Factory.Duplicate(x) as IfcDocumentReference));
 			mPurpose = i.mPurpose;
 			mIntendedUse = i.mIntendedUse;
 			mScope = i.mScope;
 			mRevision = i.mRevision;
 			mDocumentOwner = i.mDocumentOwner;
-			i.mEditors.ForEach(x=> addEditor( db.Factory.Duplicate(i.mDatabase[x]) as IfcActorSelect));
+			Editors.AddRange(i.Editors.Select(x=> db.Factory.Duplicate(x) as IfcActorSelect));
 			mCreationTime = i.mCreationTime;
 			mLastRevisionTime = i.mLastRevisionTime;
 			mElectronicFormat = i.mElectronicFormat;
@@ -558,9 +568,6 @@ namespace GeometryGym.Ifc
 			Identification = identification;
 			Name = name;
 		}
-		public void Associate(IfcRelAssociatesDocument associates) { mDocumentInfoForObjects.Add(associates); }
-		internal void addReference(IfcDocumentReference reference) { mDocumentReferences.Add(reference.mIndex); }
-		internal void addEditor(IfcActorSelect editor) { mEditors.Add(editor.Index); }
 	}
 	[Serializable]
 	public partial class IfcDocumentInformationRelationship : IfcResourceLevelRelationship
@@ -577,23 +584,23 @@ namespace GeometryGym.Ifc
 		internal string mDescription = "$";// IFC4	 :	OPTIONAL IfcText;
 		internal int mReferencedDocument = 0;// IFC	 :	OPTIONAL IfcDocumentInformation;
 		//INVERSE
-		internal List<IfcRelAssociatesDocument> mDocumentRefForObjects = new List<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
+		internal SET<IfcRelAssociatesDocument> mDocumentRefForObjects = new SET<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
 
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcDocumentInformation ReferencedDocument { get { return mDatabase[mReferencedDocument] as IfcDocumentInformation; } set { mReferencedDocument = (value == null ? 0 : value.mIndex); } }
-		public ReadOnlyCollection<IfcRelAssociatesDocument> Associates { get { return new ReadOnlyCollection<IfcRelAssociatesDocument>( mDocumentRefForObjects); } }
+		public SET<IfcRelAssociatesDocument> DocumentRefForObjects { get { return mDocumentRefForObjects; } }
+
+		public SET<IfcRelAssociatesDocument> DocumentForObjects { get { return mDocumentRefForObjects; } }
 
 		internal IfcDocumentReference() : base() { }
 		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; if(r.mReferencedDocument > 0) ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 
-		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects[0].RelatedObjects.Add(d); }
-		public void Associate(IfcRelAssociatesDocument associates) { mDocumentRefForObjects.Add(associates); }
+		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects.First().RelatedObjects.Add(d); }
 	}
 	public interface IfcDocumentSelect : NamedObjectIfc //IFC4 SELECT (	IfcDocumentReference, IfcDocumentInformation);
 	{
-		ReadOnlyCollection<IfcRelAssociatesDocument> Associates { get; }
-		void Associate(IfcRelAssociatesDocument associates);
+		SET<IfcRelAssociatesDocument> DocumentForObjects { get; }
 	}
 	[Serializable]
 	public partial class IfcDoor : IfcBuiltElement

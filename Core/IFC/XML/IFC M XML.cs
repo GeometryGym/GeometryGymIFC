@@ -128,6 +128,36 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mHasRepresentation.GetXML(xml.OwnerDocument, "HasRepresentation", this, processed));
 		}
 	}
+	public abstract partial class IfcMaterialDefinition
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "HasProperties") == 0)
+				{
+					foreach (XmlNode node in child.ChildNodes)
+					{
+						IfcMaterialProperties p = mDatabase.ParseXml<IfcMaterialProperties>(node as XmlElement);
+						if (p != null)
+							HasProperties.Add(p);
+					}
+				}
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if(mHasProperties.Count> 0)
+			{
+				XmlElement element = xml.OwnerDocument.CreateElement("HasProperties", mDatabase.mXmlNamespace);
+				foreach (IfcMaterialProperties p in HasProperties)
+					element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
+			}
+		}
+	}
 	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -202,7 +232,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcMaterialLayer l = mDatabase.ParseXml<IfcMaterialLayer>(node as XmlElement);
 						if (l != null)
-							addMaterialLayer(l);
+							MaterialLayers.Add(l);
 					}
 				}
 			}

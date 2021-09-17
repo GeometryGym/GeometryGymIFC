@@ -749,11 +749,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRelAssociatesLibrary : IfcRelAssociates
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingLibrary); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mRelatingLibrary.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatingLibrary = ParserSTEP.StripLink(str, ref pos, len);
+			mRelatingLibrary = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLibrarySelect;
 		}
 	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates
@@ -1197,8 +1197,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingProcess) + "," + ParserSTEP.LinkToString(mRelatedProcess) + "," +
-				(release < ReleaseVersion.IFC4 ? ParserSTEP.DoubleToString(mTimeLagSS) : ParserSTEP.LinkToString((int)mTimeLag)) + ",." +
+			return base.BuildStringSTEP(release) + ",#" + mRelatingProcess.StepId + ",#" + mRelatedProcess.StepId + "," +
+				(release < ReleaseVersion.IFC4 ? ParserSTEP.DoubleToString(mTimeLagSS) : ParserSTEP.ObjToLinkString(mTimeLag)) + ",." +
 				mSequenceType + (release < ReleaseVersion.IFC4 ? "." : (mUserDefinedSequenceType == "$" ? ".,$" : ".,'" + mUserDefinedSequenceType + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -1209,7 +1209,7 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4)
 				mTimeLagSS = ParserSTEP.StripDouble(str, ref pos, len);
 			else
-				mTimeLag = ParserSTEP.StripLink(str, ref pos, len);
+				mTimeLag = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLagTime;
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
 				Enum.TryParse<IfcSequenceEnum>(s.Replace(".", ""), true, out mSequenceType);

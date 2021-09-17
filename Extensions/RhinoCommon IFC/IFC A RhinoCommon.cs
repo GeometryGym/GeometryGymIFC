@@ -68,6 +68,7 @@ namespace GeometryGym.Ifc
 		public Plane PlaneAtLength(double length, double tol)
 		{
 			Plane plane = Plane();
+
 			if (mPredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.LINE)
 			{
 				plane.Origin = plane.Origin + plane.XAxis * length;

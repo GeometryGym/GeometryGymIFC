@@ -234,7 +234,7 @@ namespace GeometryGym.Ifc
 			Units.Add(unit);
 		}
 		
-		internal double ScaleSI(IfcUnitEnum unitType)
+		public double ScaleSI(IfcUnitEnum unitType)
 		{
 			IfcNamedUnit namedUnit = this[unitType];
 			if(namedUnit != null)
@@ -248,7 +248,7 @@ namespace GeometryGym.Ifc
 			}
 			return 1;
 		}
-		internal double ScaleSI(IfcDerivedUnitEnum unitType)
+		public double ScaleSI(IfcDerivedUnitEnum unitType)
 		{
 			IfcDerivedUnit derivedUnit = this[unitType];
 			if(derivedUnit != null)

@@ -540,7 +540,7 @@ namespace GeometryGym.Ifc
 				{
 					foreach (XmlNode cn in child.ChildNodes)
 					{
-						IfcCompositeCurveSegment s = mDatabase.ParseXml<IfcCompositeCurveSegment>(cn as XmlElement);
+						IfcSegment s = mDatabase.ParseXml<IfcSegment>(cn as XmlElement);
 						if (s != null)
 							Segments.Add(s);
 					}
@@ -554,8 +554,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Segments", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (IfcCompositeCurveSegment s in Segments)
-				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (var segment in Segments)
+				element.AppendChild(segment.GetXML(xml.OwnerDocument, "", this, processed));
 			setAttribute(xml, "SelfIntersect", mSelfIntersect.ToString().ToLower());
 		}
 	}
@@ -1165,7 +1165,8 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(Placement.GetXML(xml.OwnerDocument, "Placement", this, processed));
-			//xml.AppendChild(SegmentLength.GetXML(xml.OwnerDocument, "SegmentLength", this, processed));
+			xml.AppendChild(convert(xml.OwnerDocument, SegmentStart as IfcValue, "SegmentStart", mDatabase.mXmlNamespace));
+			xml.AppendChild(convert(xml.OwnerDocument, SegmentLength as IfcValue, "SegmentLength", mDatabase.mXmlNamespace));
 			xml.AppendChild(ParentCurve.GetXML(xml.OwnerDocument, "ParentCurve", this, processed));
 		}
 		internal override void ParseXml(XmlElement xml)
@@ -1177,9 +1178,9 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "Placement", true) == 0)
 					Placement = mDatabase.ParseXml<IfcPlacement>(child as XmlElement);
 				else if (string.Compare(name, "SegmentStart", true) == 0)
-					SegmentStart = mDatabase.ParseXml<IfcCurveMeasureSelect>(child as XmlElement);
+					SegmentStart = extractValue(child.FirstChild) as IfcCurveMeasureSelect;
 				else if (string.Compare(name, "SegmentLength", true) == 0)
-					SegmentLength = mDatabase.ParseXml<IfcCurveMeasureSelect>(child as XmlElement);
+					SegmentLength = extractValue(child.FirstChild) as IfcCurveMeasureSelect;
 				else if (string.Compare(name, "ParentCurve", true) == 0)
 					ParentCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
 			}

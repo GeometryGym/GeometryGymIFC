@@ -487,6 +487,10 @@ namespace GeometryGym.Ifc
 			{
 				return new IfcURIReference(str[16] == '$' ? "" : ParserIfc.Decode(str.Substring(17, str.Length - 19)));
 			}
+			if(str.StartsWith("IFCDURATION("))
+			{
+				return IfcDuration.Convert(str.Substring(13, str.Length - 15));
+			}
 			int i = 0;
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);

@@ -344,10 +344,26 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild((Position as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
+			if(CoefficientsX.Count > 0)
+				xml.SetAttribute("CoefficientsX", string.Join(" ", CoefficientsX.Select(x=> x.ToString())));
+			if(CoefficientsY.Count > 0)
+				xml.SetAttribute("CoefficientsY", string.Join(" ", CoefficientsY.Select(x => x.ToString())));
+			if (CoefficientsZ.Count > 0)
+				xml.SetAttribute("CoefficientsZ", string.Join(" ", CoefficientsZ.Select(x => x.ToString())));
 		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
+			XmlAttribute att = xml.Attributes["CoefficientsX"];
+			if (att != null)
+				CoefficientsX.AddRange(att.InnerText.Split(" ".ToCharArray()).Select(x => double.Parse(x)));
+			att = xml.Attributes["CoefficientsY"];
+			if (att != null)
+				CoefficientsY.AddRange(att.InnerText.Split(" ".ToCharArray()).Select(x => double.Parse(x)));
+			att = xml.Attributes["CoefficientsZ"];
+			if (att != null)
+				CoefficientsZ.AddRange(att.InnerText.Split(" ".ToCharArray()).Select(x => double.Parse(x)));
+
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -474,7 +490,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcPresentationStyle s = mDatabase.ParseXml<IfcPresentationStyle>(cn as XmlElement);
 						if (s != null)
-							addLayerStyle(s);
+							LayerStyles.Add(s);
 					}
 				}
 			}

@@ -117,8 +117,8 @@ namespace GeometryGym.Ifc
 		{
 			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? ",'" + ParserIfc.Encode(mIdentification) + "'" : "") +
 				(string.IsNullOrEmpty(mStatus) ? ",$," : ",'" + ParserIfc.Encode(mStatus) + "',") + (string.IsNullOrEmpty(mWorkMethod) ? "$," : ",'" +
-				ParserIfc.Encode(mWorkMethod) + "',") + ParserSTEP.BoolToString(mIsMilestone) + "," + mPriority + 
-				(release < ReleaseVersion.IFC4 ? "" : "," + ParserSTEP.LinkToString(mTaskTime) + (mPredefinedType == IfcTaskTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
+				ParserIfc.Encode(mWorkMethod) + "',") + ParserSTEP.BoolToString(mIsMilestone) + (mPriority == int.MinValue ? ",$" : "," + mPriority) + 
+				(release < ReleaseVersion.IFC4 ? "" : "," + ParserSTEP.ObjToLinkString(mTaskTime) + (mPredefinedType == IfcTaskTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -128,9 +128,9 @@ namespace GeometryGym.Ifc
 			mWorkMethod = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mIsMilestone = ParserSTEP.StripBool(str, ref pos, len);
 			mPriority = ParserSTEP.StripInt(str, ref pos, len);
-			if (release != ReleaseVersion.IFC2x3)
+			if (release > ReleaseVersion.IFC2x3)
 			{
-				mTaskTime = ParserSTEP.StripLink(str, ref pos, len);
+				mTaskTime = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTaskTime;
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcTaskTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
@@ -143,7 +143,7 @@ namespace GeometryGym.Ifc
 		{
 			if (release <= ReleaseVersion.IFC2x3)
 				return "";
-			return base.BuildStringSTEP(release) + ",." + mDurationType + (mScheduleDuration == "$" ? ".,$," : ".,'" + mScheduleDuration + "',") + IfcDateTime.STEPAttribute(mScheduleStart) + "," +
+			return base.BuildStringSTEP(release) + (mDurationType == IfcTaskDurationEnum.NOTDEFINED ? ",$," : ",." + mDurationType + ".,") + (mScheduleDuration == "$" ? "$," : "'" + mScheduleDuration + "',") + IfcDateTime.STEPAttribute(mScheduleStart) + "," +
 				IfcDateTime.STEPAttribute(mScheduleFinish) + "," + IfcDateTime.STEPAttribute(mEarlyStart) + "," + IfcDateTime.STEPAttribute(mEarlyFinish) + "," + IfcDateTime.STEPAttribute(mLateStart) + "," +
 				IfcDateTime.STEPAttribute(mLateFinish) + (mFreeFloat == "$" ? ",$," : ",'" + mFreeFloat + "',") + (mTotalFloat == "$" ? "$," : "'" + mTotalFloat + "',") + ParserSTEP.BoolToString(mIsCritical) + "," +
 				IfcDateTime.STEPAttribute(mStatusTime) + "," + (mActualDuration == "$" ? "$," : "'" + mActualDuration + "',") + IfcDateTime.STEPAttribute(mActualStart) + "," + IfcDateTime.STEPAttribute(mActualFinish) + "," +

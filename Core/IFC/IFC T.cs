@@ -120,8 +120,8 @@ namespace GeometryGym.Ifc
 		private string mStatus = "";// : OPTIONAL IfcLabel;
 		internal string mWorkMethod = "";// : OPTIONAL IfcLabel;
 		internal bool mIsMilestone = false;// : BOOLEAN
-		internal int mPriority;// : OPTIONAL INTEGER IFC4
-		internal int mTaskTime;// : OPTIONAL IfcTaskTime; IFC4
+		internal int mPriority = int.MinValue;// : OPTIONAL INTEGER IFC4
+		internal IfcTaskTime mTaskTime = null;// : OPTIONAL IfcTaskTime; IFC4
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : OPTIONAL IfcTaskTypeEnum IFC4
 		//INVERSE
 		internal SET<IfcRelAssignsTasks> mOwningControls = new SET<IfcRelAssignsTasks>(); //gg
@@ -130,7 +130,7 @@ namespace GeometryGym.Ifc
 		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
 		public bool IsMilestone { get { return mIsMilestone; } set { mIsMilestone = value; } }
 		public int Priority { get { return mPriority; } set { mPriority = value; } }
-		public IfcTaskTime TaskTime { get { return mDatabase[mTaskTime] as IfcTaskTime; } set { mTaskTime = value == null ? 0 : value.mIndex; } }
+		public IfcTaskTime TaskTime { get { return mTaskTime; } set { mTaskTime = value; } }
 		public IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTask() : base() { }
@@ -140,7 +140,7 @@ namespace GeometryGym.Ifc
 			mWorkMethod = t.mWorkMethod;
 			mIsMilestone = t.mIsMilestone;
 			mPriority = t.mPriority;
-			if (t.mTaskTime > 0)
+			if (t.mTaskTime != null)
 				TaskTime = db.Factory.Duplicate(t.TaskTime) as IfcTaskTime;
 			mPredefinedType = t.mPredefinedType;
 		}
@@ -154,6 +154,31 @@ namespace GeometryGym.Ifc
 			mTaskTime = task.mTaskTime;
 			mPredefinedType = task.mPredefinedType;
 		}
+
+		public Tuple<DateTime, DateTime> computeScheduleStartFinish()
+		{
+			DateTime scheduledStart = DateTime.MaxValue, scheduledFinish = DateTime.MinValue;
+			if(mTaskTime != null)
+			{
+				if (mTaskTime.ScheduleStart > DateTime.MinValue && mTaskTime.ScheduleStart < scheduledStart)
+					scheduledStart = mTaskTime.ScheduleStart;
+				if (mTaskTime.ScheduleFinish > scheduledFinish)
+					scheduledFinish = mTaskTime.ScheduleFinish;
+			}
+			List<IfcTask> subTasks = mIsDecomposedBy.SelectMany(x => x.RelatedObjects).OfType<IfcTask>().ToList();
+			subTasks.AddRange(IsNestedBy.SelectMany(x => x.RelatedObjects).OfType<IfcTask>().ToList());
+			foreach(IfcTask t in subTasks)
+			{
+				Tuple<DateTime, DateTime> startFinish = t.computeScheduleStartFinish();
+				if (startFinish.Item1 != DateTime.MinValue && startFinish.Item1 < scheduledStart)
+					scheduledStart = startFinish.Item1;
+				if (startFinish.Item2 > scheduledStart)
+					scheduledFinish = startFinish.Item2;
+			}
+			return new Tuple<DateTime, DateTime>(scheduledStart, scheduledFinish);
+
+		}
+
 	}
 	[Serializable]
 	public partial class IfcTaskTime : IfcSchedulingTime //IFC4
@@ -188,7 +213,7 @@ namespace GeometryGym.Ifc
 		public double Completion { get { return mCompletion; } set { mCompletion = value; } }
 
 		internal IfcTaskTime() : base() { }
-		internal IfcTaskTime(DatabaseIfc db, IfcTaskTime t) : base(db, t)
+		internal IfcTaskTime(DatabaseIfc db, IfcTaskTime t, DuplicateOptions options) : base(db, t, options)
 		{
 			mDurationType = t.mDurationType; mScheduleDuration = t.mScheduleDuration; mScheduleStart = t.mScheduleStart; mScheduleFinish = t.mScheduleFinish;
 			mEarlyStart = t.mEarlyStart; mEarlyFinish = t.mEarlyFinish; mLateStart = t.mLateStart; mLateFinish = t.mLateFinish; mFreeFloat = t.mFreeFloat; mTotalFloat = t.mTotalFloat;
@@ -842,8 +867,8 @@ namespace GeometryGym.Ifc
 			if (s.mNormalIndex.Count > 0)
 				mNormalIndex.AddRange(s.mNormalIndex);
 		}
-		public IfcTriangulatedFaceSet(IfcCartesianPointList3D pl, IEnumerable<Tuple<int, int, int>> coords)
-			: base(pl) { CoordIndex.AddRange(coords); }
+		public IfcTriangulatedFaceSet(IfcCartesianPointList pointList, IEnumerable<Tuple<int, int, int>> coords)
+			: base(pointList) { CoordIndex.AddRange(coords); }
 	}
 	[Serializable]
 	public partial class IfcTriangulatedIrregularNetwork : IfcTriangulatedFaceSet
@@ -1151,7 +1176,7 @@ namespace GeometryGym.Ifc
 			IEnumerable<IfcRelAssociatesProfileProperties> associates = HasAssociations.OfType<IfcRelAssociatesProfileProperties>();
 			return associates.Count() <= 0 ? null : associates.First().RelatingProfileProperties;
 		}
-		internal bool MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
+		public bool MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
 		{
 			material = null;
 			profile = null;
@@ -1472,9 +1497,9 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-			foreach(IfcPropertySetDefinition pset in HasPropertySets)
+			foreach(IfcPropertySet pset in HasPropertySets.OfType<IfcPropertySet>())
 			{
-				if (pset.IsInstancePropertySet)
+				if (pset.IsInstancePropertySet())
 					pset.RelateObjectDefinition(element);
 			}
 			return element;

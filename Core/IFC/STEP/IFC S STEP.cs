@@ -88,7 +88,10 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcSchedulingTime : BaseClassIfc //	ABSTRACT SUPERTYPE OF(ONEOF(IfcEventTime, IfcLagTime, IfcResourceTime, IfcTaskTime, IfcWorkTime));
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mName == "$" ? ",$,." : ",'" + mName + "',.") + mDataOrigin.ToString() + (mUserDefinedDataOrigin == "$" ? ".,$" : ".,'" + mUserDefinedDataOrigin + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (mName == "$" ? ",$," : ",'" + mName + "',") + 
+				(mDataOrigin == IfcDataOriginEnum.NOTDEFINED ? "$" : "." + mDataOrigin.ToString() + ".") + (mUserDefinedDataOrigin == "$" ? ",$" : ",'" + mUserDefinedDataOrigin + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.StripString(str, ref pos, len);

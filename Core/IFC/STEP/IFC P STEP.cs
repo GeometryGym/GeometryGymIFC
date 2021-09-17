@@ -521,12 +521,9 @@ namespace GeometryGym.Ifc
 		{
 			if (mAssignedItems.Count < 1 || mLayerStyles.Count == 0)
 				return "";
-			string str = base.BuildStringSTEP(release) + "," + ParserIfc.LogicalToString(mLayerOn) + "," +
-				ParserIfc.LogicalToString(mLayerFrozen) + "," + ParserIfc.LogicalToString(mLayerBlocked);
-			str += ",(" + ParserSTEP.LinkToString(mLayerStyles[0]);
-			for (int icounter = 1; icounter < mLayerStyles.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mLayerStyles[icounter]);
-			return str + ")";
+			return base.BuildStringSTEP(release) + "," + ParserIfc.LogicalToString(mLayerOn) + "," +
+				ParserIfc.LogicalToString(mLayerFrozen) + "," + ParserIfc.LogicalToString(mLayerBlocked) + ",(" + 
+				string.Join(",", mLayerStyles.Select(x=>"#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -534,7 +531,7 @@ namespace GeometryGym.Ifc
 			mLayerOn = ParserIfc.StripLogical(str, ref pos, len);
 			mLayerFrozen = ParserIfc.StripLogical(str, ref pos, len);
 			mLayerBlocked = ParserIfc.StripLogical(str, ref pos, len);
-			mLayerStyles = ParserSTEP.StripListLink(str, ref pos, len);
+			LayerStyles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcPresentationStyle));
 		}
 	}
 	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));

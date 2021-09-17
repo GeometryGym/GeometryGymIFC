@@ -324,8 +324,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingLibrary)
-				obj["RelatingLibrary"] = mDatabase[mRelatingLibrary].getJson(this, options);
+			if (host != mRelatingLibrary)
+				obj["RelatingLibrary"] = mRelatingLibrary.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesMaterial : IfcRelAssociates

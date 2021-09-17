@@ -1584,7 +1584,7 @@ namespace GeometryGym.Ifc
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; }
 		public bool DuplicateProperties { get; set; } = true;
-		public bool CommonPropertySets { get; set; } = true;
+		public bool CommonPropertySets { get; set; } = false;
 		public bool DuplicateAssociations { get; set; } = true;
 		public bool DuplicateRepresentation { get; set; } = true;
 		public double DeviationTolerance { get; set; }
@@ -2320,13 +2320,39 @@ namespace GeometryGym.Ifc
 				}
 			}
 			sw.Write(getFooterString());
-			//sw.Close();
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
-
 			return true;
+		}
+		public List<string> GetStepLines()
+		{
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			List<string> result = getHeaderLines("");
+			foreach (BaseClassIfc e in mDatabase)
+			{
+				if (e != null)
+				{
+					try
+					{
+						string str = e.StringSTEP();
+						if (!string.IsNullOrEmpty(str))
+							result.Add(str);
+					}
+					catch (Exception) { }
+				}
+			}
+			result.AddRange(getFooterLines());
+			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			return result;
 		}
 		internal string getHeaderString(string fileName)
 		{
+			return string.Join("\r\n", getHeaderLines(fileName));
+		}
+		internal List<string> getHeaderLines(string fileName)
+		{
+			List<string> lines = new List<string>();
+
 			string modelView = mDatabase.ModelView.ToString();
 			if (mDatabase.ModelView == ModelView.Ifc2x3Coordination)
 				modelView = "CoordinationView_V2.0";
@@ -2334,23 +2360,24 @@ namespace GeometryGym.Ifc
 				modelView = "ReferenceView_V1.2";
 			else if (mDatabase.ModelView == ModelView.Ifc4DesignTransfer)
 				modelView = "DesignTransferView_V1.1";
-			string hdr = "ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + modelView + "]'),'2;1');\r\n";
-
-			hdr += "FILE_NAME(\r\n";
-			hdr += "/* name */ '" + ParserIfc.Encode(fileName) + "',\r\n";
+			lines.Add("ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + modelView + "]'),'2;1');");
+			
+			lines.Add("FILE_NAME(");
+			lines.Add("/* name */ '" + ParserIfc.Encode(fileName) + "',");
 			DateTime now = DateTime.Now;
-			hdr += "/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',\r\n";
+			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
 			IfcPerson person = mDatabase.Factory.mPerson;
 			string authorName = person == null ? mDatabase.Factory.PersonName() : person.Name;
-			hdr += "/* author */ ('" + authorName + "'),\r\n";
+			lines.Add("/* author */ ('" + authorName + "'),");
 			string organizationName = IfcOrganization.Organization;
 			IfcOrganization organization = null;
 			if (organization != null)
 				organizationName = organization.Name; 
-			hdr += "/* organization */ ('" + organizationName + "'),\r\n";
-			hdr += "/* preprocessor_version */ '" + mDatabase.Factory.ToolkitName + "',\r\n";
-			hdr += "/* originating_system */ '" + mDatabase.Factory.ApplicationFullName + "',\r\n";
-			hdr += "/* authorization */ 'None');\r\n\r\n";
+			lines.Add("/* organization */ ('" + organizationName + "'),");
+			lines.Add("/* preprocessor_version */ '" + mDatabase.Factory.ToolkitName + "',");
+			lines.Add("/* originating_system */ '" + mDatabase.Factory.ApplicationFullName + "',");
+			lines.Add("/* authorization */ 'None');");
+			lines.Add("");
 			string version = "IFC4";
 			ReleaseVersion release = mDatabase.Release;
 			if (release == ReleaseVersion.IFC2x3)
@@ -2367,12 +2394,14 @@ namespace GeometryGym.Ifc
 				version = "IFC4X3_RC3";
 			else if (release == ReleaseVersion.IFC4X3_RC4)
 				version = "IFC4X3_RC4";
-			hdr += "FILE_SCHEMA (('" + version + "'));\r\n";
-			hdr += "ENDSEC;\r\n";
-			hdr += "\r\nDATA;";
-			return hdr;
+			lines.Add("FILE_SCHEMA (('" + version + "'));");
+			lines.Add("ENDSEC;");
+			lines.Add("");
+			lines.Add("DATA;");
+			return lines;
 		}
-		internal string getFooterString() { return "ENDSEC;\r\n\r\nEND-ISO-10303-21;\r\n\r\n"; }
+		internal string getFooterString() { return string.Join("\r\n", getFooterLines()); }
+		internal List<string> getFooterLines() { return new List<string>() { "ENDSEC;", "", "END-ISO-10303-21;", "" }; }
 	}
 }
 

@@ -180,14 +180,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mMaterialLayers[0]);
-			for (int icounter = 1; icounter < mMaterialLayers.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mMaterialLayers[icounter]);
-			return str + (mLayerSetName == "$" ? "),$" : "),'" + mLayerSetName + "'") + (release < ReleaseVersion.IFC4 ? "" : (mDescription == "$" ? ",$" : ",'" + mDescription + "'"));
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mMaterialLayers.Select(x=>"#" +x.StepId)) +
+				(mLayerSetName == "$" ? "),$" : "),'" + mLayerSetName + "'") + (release < ReleaseVersion.IFC4 ? "" : (mDescription == "$" ? ",$" : ",'" + mDescription + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mMaterialLayers = ParserSTEP.StripListLink(str, ref pos, len);
+			MaterialLayers.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcMaterialLayer));
 			mLayerSetName = ParserSTEP.StripString(str, ref pos, len);
 			if (release != ReleaseVersion.IFC2x3)
 				mDescription = ParserSTEP.StripString(str, ref pos, len);

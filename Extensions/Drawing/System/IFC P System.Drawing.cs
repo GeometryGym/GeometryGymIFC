@@ -3,6 +3,8 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using GeometryGym.STEP;
+
 namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
@@ -19,7 +21,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				ReadOnlyCollection<IfcPresentationStyle> styles = LayerStyles;
+				SET<IfcPresentationStyle> styles = LayerStyles;
 				foreach (IfcPresentationStyle ps in styles)
 				{
 					IfcSurfaceStyle ss = ps as IfcSurfaceStyle;

@@ -56,7 +56,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcLagTime : IfcSchedulingTime //IFC4
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + "," + mLagValue.ToString() + ",." + mDurationType.ToString() + "."); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + (mLagValue == null ? ",$,." : "," + mLagValue.ToString() + ",.") + mDurationType.ToString() + ".");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -99,7 +102,7 @@ namespace GeometryGym.Ifc
 			string result = base.BuildStringSTEP(release) + ",'" + mName + (mVersion == "$" ? "',$," : "','" + mVersion + "',") + ParserSTEP.LinkToString(mPublisher);
 			if (mDatabase.Release < ReleaseVersion.IFC4)
 				return result + ",$,(" + string.Join(",", mHasConstraintRelationships.Select(x => "#" + x.StepId)) + ")";
-			return result + (mVersionDate == "$" ? ",$," : ",'" + mVersionDate + "',") + (mLocation == "$" ? "$," : "'" + mLocation + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'");
+			return result + "," + IfcDateTime.STEPAttribute(mVersionDate) + "," + (mLocation == "$" ? "$," : "'" + mLocation + "',") + (mDescription == "$" ? "$" : "'" + mDescription + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -113,7 +116,7 @@ namespace GeometryGym.Ifc
 			}
 			else
 			{
-				mVersionDate = ParserSTEP.StripString(str, ref pos, len);
+				mVersionDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 				mLocation = ParserSTEP.StripString(str, ref pos, len);
 				mDescription = ParserSTEP.StripString(str, ref pos, len);
 			}
@@ -327,7 +330,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	internal partial class IfcLinearSpanPlacement
 	{
 		protected override string BuildStringSTEP()
 		{

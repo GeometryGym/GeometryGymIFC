@@ -366,11 +366,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialLayerSet : IfcMaterialDefinition
 	{
-		private List<int> mMaterialLayers = new List<int>();// LIST [1:?] OF IfcMaterialLayer;
+		private LIST<IfcMaterialLayer> mMaterialLayers = new LIST<IfcMaterialLayer>();// LIST [1:?] OF IfcMaterialLayer;
 		private string mLayerSetName = "$";// : OPTIONAL IfcLabel;
 		private string mDescription = "$";// : OPTIONAL IfcText
 
-		public ReadOnlyCollection<IfcMaterialLayer> MaterialLayers { get { return new ReadOnlyCollection<IfcMaterialLayer>(mMaterialLayers.ConvertAll(x => (IfcMaterialLayer)mDatabase[x])); } }
+		public LIST<IfcMaterialLayer> MaterialLayers { get { return mMaterialLayers; } }
 		public string LayerSetName { get { return (mLayerSetName == "$" ? "" : ParserIfc.Decode(mLayerSetName)); } set { mLayerSetName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
@@ -378,16 +378,20 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return (mMaterialLayers.Count != 1 ? null : MaterialLayers[0].Material); }
 	 	
 		internal IfcMaterialLayerSet() : base() { }
-		internal IfcMaterialLayerSet(DatabaseIfc db, IfcMaterialLayerSet m) : base(db, m) { m.MaterialLayers.ToList().ForEach(x => addMaterialLayer( db.Factory.Duplicate(x) as IfcMaterialLayer)); mLayerSetName = m.mLayerSetName; mDescription = m.mDescription; }
+		internal IfcMaterialLayerSet(DatabaseIfc db, IfcMaterialLayerSet m) : base(db, m) 
+		{
+			MaterialLayers.AddRange(m.MaterialLayers.Select(x=> db.Factory.Duplicate(x) as IfcMaterialLayer)); 
+			mLayerSetName = m.mLayerSetName; 
+			mDescription = m.mDescription;
+		}
 		protected IfcMaterialLayerSet(DatabaseIfc db) : base(db) { }
-		public IfcMaterialLayerSet(IfcMaterialLayer layer, string name) : base(layer.mDatabase) { mMaterialLayers.Add(layer.mIndex); Name = name;  }
-		public IfcMaterialLayerSet(List<IfcMaterialLayer> layers, string name) : base(layers[0].mDatabase)
+		public IfcMaterialLayerSet(IfcMaterialLayer layer, string name) : base(layer.mDatabase) { MaterialLayers.Add(layer); Name = name;  }
+		public IfcMaterialLayerSet(IEnumerable<IfcMaterialLayer> layers, string name) : base(layers.First().mDatabase)
 		{
 			Name = name;
-			mMaterialLayers = layers.ConvertAll(x => x.mIndex);
+			MaterialLayers.AddRange(layers);
 		}
 		
-		internal void addMaterialLayer(IfcMaterialLayer layer) { mMaterialLayers.Add(layer.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcMaterialLayerSetUsage : IfcMaterialUsageDefinition

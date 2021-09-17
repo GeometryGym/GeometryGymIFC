@@ -54,7 +54,7 @@ namespace GeometryGym.Ifc
 		{
 			mCoordList = coordList.Select(x => new double[] { x.X, x.Y }).ToArray();
 		}
-		public override List<Point3d> Points() { return mCoordList.ToList().ConvertAll(x => new Point3d(x[0], x[1], 0)); }
+		public override List<Point3d> Points() { return mCoordList.Select(x => new Point3d(x[0], x[1], 0)).ToList(); }
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{

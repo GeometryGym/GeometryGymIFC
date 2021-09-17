@@ -49,11 +49,24 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTimeOrRatioSelect mLagValue;//	IfcTimeOrRatioSelect
 		internal IfcTaskDurationEnum mDurationType = IfcTaskDurationEnum.NOTDEFINED;//	IfcTaskDurationEnum; 
+
+		public IfcTimeOrRatioSelect LagValue { get { return mLagValue; } set { mLagValue = value; } }
+		public IfcTaskDurationEnum DurationType { get { return mDurationType; } set { mDurationType = value; } }
+
 		internal IfcLagTime() : base() { }
+		internal IfcLagTime(DatabaseIfc db, IfcLagTime lagTime, DuplicateOptions options) : base(db, lagTime, options)
+		{
+			mLagValue = lagTime.mLagValue;
+			mDurationType = lagTime.mDurationType;
+		}
 		//internal IfcLagTime(IfcLagTime i) : base(i) { mLagValue = i.mLagValue; mDurationType = i.mDurationType; }
-		internal IfcLagTime(DatabaseIfc db, IfcTimeOrRatioSelect lag, IfcTaskDurationEnum nature) : base(db) { mLagValue = lag; mDurationType = nature; }
+		public IfcLagTime(DatabaseIfc db, IfcTimeOrRatioSelect lag, IfcTaskDurationEnum nature) : base(db) { mLagValue = lag; mDurationType = nature; }
 		internal TimeSpan getLag() { return new TimeSpan(0, 0, (int)getSecondsDuration()); }
-		internal double getSecondsDuration() { IfcDuration d = mLagValue as IfcDuration; return (d == null ? 0 : d.ToSeconds()); }
+		internal double getSecondsDuration() 
+		{ 
+			IfcDuration d = mLagValue as IfcDuration; 
+			return (d == null ? 0 : d.ToSeconds()); 
+		}
 	}
 	[Serializable]
 	public partial class IfcLamp : IfcFlowTerminal //IFC4
@@ -80,25 +93,30 @@ namespace GeometryGym.Ifc
 		IfcPresentationLayerAssignment LayerAssignment { get; set; }
 	}
 	[Serializable]
-	public partial class IfcLibraryInformation : IfcExternalInformation, NamedObjectIfc
+	public partial class IfcLibraryInformation : IfcExternalInformation, NamedObjectIfc, IfcLibrarySelect
 	{
 		internal string mName;// :	IfcLabel;
 		internal string mVersion = "$";//:	OPTIONAL IfcLabel;
 		internal int mPublisher;//	 :	OPTIONAL IfcActorSelect;
-		internal string mVersionDate = "$"; // :	OPTIONAL IfcDateTime;
+		internal DateTime mVersionDate = DateTime.MinValue; // :	OPTIONAL IfcDateTime;
 		internal int mVersionDateSS = 0; // 
 		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
 		internal string mDescription = "$";//	 :	OPTIONAL IfcText; //IFC4 Added
+		[Obsolete("DEPRECATED IFC4", false)]
 		private SET<IfcLibraryReference> mLibraryReference = new SET<IfcLibraryReference>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
-																							//INVERSE
+		//INVERSE
 		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 		internal SET<IfcLibraryReference> mHasLibraryReferences = new SET<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
 
 		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } }
 		public string Version { get { return (mVersion == "$" ? "" : ParserIfc.Decode(mVersion)); } set { mVersion = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcActorSelect Publisher { get { return mDatabase[mPublisher] as IfcActorSelect; } set { mPublisher = (value == null ? 0 : value.Index); } }
+		public DateTime VersionDate { get { return mVersionDate; } set { mVersionDate = value;  } }
 		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+
+		public SET<IfcRelAssociatesLibrary> LibraryRefForObjects { get { return mLibraryRefForObjects; } }
+		public SET<IfcLibraryReference> HasLibraryReferences { get { return mHasLibraryReferences; } }
 
 		internal IfcLibraryInformation() : base() { }
 		internal IfcLibraryInformation(DatabaseIfc db, IfcLibraryInformation i) : base(db, i) { mName = i.mName; mVersion = i.mVersion; if (i.mPublisher > 0) Publisher = db.Factory.Duplicate(i.mDatabase[i.mPublisher]) as IfcActorSelect; mVersionDate = i.mVersionDate; mLocation = i.mLocation; mDescription = i.mDescription; }
@@ -135,12 +153,13 @@ namespace GeometryGym.Ifc
 		internal string mDescription = ""; //IFC4	 :	OPTIONAL IfcText;
 		internal string mLanguage = "$"; //IFC4	 :	OPTIONAL IfcLanguageId;
 		internal IfcLibraryInformation mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
-														   //INVERSE
-		internal List<IfcRelAssociatesLibrary> mLibraryRefForObjects = new List<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
+		//INVERSE
+		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public IfcLibraryInformation ReferencedLibrary { get { return mReferencedLibrary; } set { mReferencedLibrary = value; if (value != null) value.mHasLibraryReferences.Add(this); } }
+		public SET<IfcRelAssociatesLibrary> LibraryRefForObjects { get { return mLibraryRefForObjects; } }
 
 		internal IfcLibraryReference() : base() { }
 		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db, r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
@@ -379,7 +398,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
 	{
 		[Obsolete("DEPRECATED IFC4X3", false)]
-		private IfcLinearAxisSelect mAxis;// : IfcCurve;
+		protected IfcLinearAxisSelect mAxis;// : IfcCurve;
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcCurve Axis
 		{
@@ -395,22 +414,28 @@ namespace GeometryGym.Ifc
 
 		public IfcLinearPositioningElement() : base() { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
+		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape ) {  }
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcCurve axis) : base(host) { Axis = axis; }
-		internal IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) { Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; }
+		internal IfcLinearPositioningElement(DatabaseIfc db, IfcLinearPositioningElement e, DuplicateOptions options) : base(db, e, options) 
+		{
+			if(e.Axis != null)
+				Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; 
+		}
 	}
 	[Serializable]
-	public partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	[Obsolete("DEPRECATED IFC4x3", false)]
+	internal partial class IfcLinearSpanPlacement : IfcLinearPlacement
 	{
 		private double mSpan = 0; //: IfcPositiveLengthMeasure;
 		public double Span { get { return mSpan; } set { mSpan = value; } }
 
-		public IfcLinearSpanPlacement() : base() { }
+		internal IfcLinearSpanPlacement() : base() { }
 		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement) : base(db, linearSpanPlacement)
 		{
 			Span = linearSpanPlacement.Span;
 		}
-		public IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcPointByDistanceExpression distance, double span)
+		internal IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcPointByDistanceExpression distance, double span)
 			: base(placementMeasuredAlong, distance) { Span = span; }
 	}
 	[Serializable]
@@ -508,7 +533,14 @@ namespace GeometryGym.Ifc
 			mZone = t.mZone;
 			mDaylightSavingOffset = t.mDaylightSavingOffset;
 		}
-		internal IfcLocalTime(DatabaseIfc m, int hour, int min, int sec) : base(m) { mHourComponent = hour; mMinuteComponent = min; mSecondComponent = sec; }
+		internal IfcLocalTime(DatabaseIfc db, int hour, int min, int sec) : base(db) { mHourComponent = hour; mMinuteComponent = min; mSecondComponent = sec; }
+		internal IfcLocalTime(DatabaseIfc db, DateTime dateTime) : base(db)
+		{
+			DateTime localTime = dateTime.ToLocalTime();
+			mHourComponent = localTime.Hour;
+			mMinuteComponent = localTime.Minute;
+			mSecondComponent = localTime.Second;
+		}
 		public DateTime DateTime
 		{
 			get
