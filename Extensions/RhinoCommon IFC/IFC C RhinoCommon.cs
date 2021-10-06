@@ -67,7 +67,10 @@ namespace GeometryGym.Ifc
 		{
 			IfcCartesianPoint cp = LocalOrigin;
 			Point3d p = (cp == null ? Point3d.Origin : cp.Location);
-			return Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z) * vecsTransform() * getScaleTransform(p);
+			Transform translation = Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z);
+			Transform changeBasis = vecsTransform();
+			Transform scale = getScaleTransform(p);
+			return  translation * changeBasis * scale;
 		}
 		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(location, mScale); }
 		protected virtual Transform vecsTransform()

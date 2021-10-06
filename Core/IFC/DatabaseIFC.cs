@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3, IFC4X3_RC4 }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3, IFC4X3_RC4, IFC4X3_RC5TEST }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
@@ -67,13 +67,14 @@ namespace GeometryGym.Ifc
 		public void Dispose() { mIsDisposed = true; }
 
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
-		public FormatIfcSerialization Format { get; set; } 
+		public FormatIfcSerialization Format { get; set; }
+		public string SourceFilePath { get; set; } = "";
 		
 		private FactoryIfc mFactory = null;
 		public FactoryIfc Factory { get { return mFactory; } }
 
 		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
-		public DatabaseIfc(string fileName) : this() { new SerializationIfc(this).ReadFile(fileName); }
+		public DatabaseIfc(string filePath) : this() { SourceFilePath = filePath; new SerializationIfc(this).ReadFile(filePath); }
 		public DatabaseIfc(TextReader stream) : this() { new SerializationIfc(this).ReadFile(stream); }
 		public DatabaseIfc(ModelView view) : this(versionFromModelView(view), view) { }
 		public DatabaseIfc(ReleaseVersion schema) : this(schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
@@ -1753,17 +1754,17 @@ namespace GeometryGym.Ifc
 			return new FileStreamIfc(format, sr);
 		}
 
-		internal void ReadFile(string filename)
+		internal void ReadFile(string filePath)
 		{
-			if (string.IsNullOrEmpty(filename))
+			if (string.IsNullOrEmpty(filePath))
 				return;
 
-			mDatabase.FolderPath = Path.GetDirectoryName(filename);
-			if (filename.ToLower().EndsWith("ifc"))
-				new SerializationIfcSTEP(mDatabase).ReadStepFile(filename);
+			mDatabase.FolderPath = Path.GetDirectoryName(filePath);
+			if (filePath.ToLower().EndsWith("ifc"))
+				new SerializationIfcSTEP(mDatabase).ReadStepFile(filePath);
 			else
 			{
-				using (FileStreamIfc fileStream = getStreamReader(filename))
+				using (FileStreamIfc fileStream = getStreamReader(filePath))
 				{
 					ReadFile(fileStream);
 				}
@@ -1875,8 +1876,19 @@ namespace GeometryGym.Ifc
 				while((line = reader.ReadLine()) != null)
 				{
 					string str = line.Trim();
+					if (string.IsNullOrEmpty(str))
+						continue;
 					if (str.ToUpper().StartsWith("DATA"))
 						break;
+					char c = str.Last();
+					while (c != ';')
+					{
+						line = reader.ReadLine();
+						if (line == null)
+							break;
+						str += line.Trim();
+						c = str.Last();
+					}
 					processFileHeaderLine(str);
 				}
 			}
@@ -2288,13 +2300,25 @@ namespace GeometryGym.Ifc
 			}
 			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
 			{
-				int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
-				if (pos1 > 1 && pos2 > pos1)
+				try
 				{
-					string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
-					List<string> fields = ParserSTEP.SplitLineFields(str);
-					mDatabase.PreviousApplication = fields.Count > 6 ? fields[5].Replace("'", "") : "";
+					int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
+					if (pos1 > 1 && pos2 > pos1)
+					{
+						string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
+						List<string> fields = ParserSTEP.SplitLineFields(str);
+						if (fields.Count > 1)
+						{
+							string field = ParserSTEP.StripComments(fields[1].Replace("'", "").Trim());
+							DateTime dateTime = DateTime.MinValue;
+							if (DateTime.TryParse(field, out dateTime))
+								mDatabase.TimeStamp = dateTime;
+							if(fields.Count > 5)
+								mDatabase.OriginatingSystem = ParserSTEP.StripComments(fields[5].Replace("'", ""));
+						}
+					}
 				}
+				catch { }
 				return true;
 			}
 			return false;

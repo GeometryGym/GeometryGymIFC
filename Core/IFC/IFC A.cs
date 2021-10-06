@@ -701,13 +701,21 @@ namespace GeometryGym.Ifc
 			EndCantRight = alignmentCantSegment.EndCantRight;
 			PredefinedType = alignmentCantSegment.PredefinedType;
 		}
-		public IfcAlignmentCantSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight, IfcAlignmentCantSegmentTypeEnum predefinedType)
+		public IfcAlignmentCantSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight)
 			: base(db)
 		{
 			StartDistAlong = startDistAlong;
 			HorizontalLength = horizontalLength;
 			StartCantLeft = startCantLeft;
 			StartCantRight = startCantRight;
+			PredefinedType = IfcAlignmentCantSegmentTypeEnum.CONSTANTCANT;
+		}
+		public IfcAlignmentCantSegment(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight,
+			double endCantLeft, double endCantRight, IfcAlignmentCantSegmentTypeEnum predefinedType)
+			: this(db, startDistAlong, horizontalLength, startCantLeft, startCantRight)
+		{
+			EndCantLeft = endCantLeft;
+			EndCantRight = endCantRight;
 			PredefinedType = predefinedType;
 		}
 
@@ -1209,6 +1217,44 @@ namespace GeometryGym.Ifc
 			if (mDesignerOf != null)
 				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
 			return curveSegment;
+		}
+
+		public double HeightAt(double distanceAlongSegment)
+		{
+			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
+				return StartHeight + StartGradient * (distanceAlongSegment);
+			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
+			{
+				double gradient = 0;
+				return circularHeightAt(distanceAlongSegment, out gradient);
+			}
+			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
+			{
+				double x = distanceAlongSegment;
+				double R = RadiusOfCurvature * (EndGradient < StartGradient ? -1 : 1);
+				double g = x / R + StartGradient;
+				double result = StartHeight + x * (g + StartGradient) / 2;
+				return result;
+			}
+			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
+		}
+
+		private double circularHeightAt(double distanceAlongSegment, out double gradient)
+		{
+			double x = distanceAlongSegment;
+			double R = mRadiusOfCurvature, g1 = StartGradient;
+			double c = 1 / Math.Sqrt(1 + g1 * g1);
+			double xc = g1 * R * c, yc = R * c;
+			double y = 0;
+			if (g1 > EndGradient)
+			{
+				y = Math.Sqrt(R * R - Math.Pow(x - xc, 2));
+				gradient = (xc - x) / y;
+				return StartHeight - yc + y;
+			}
+			y = Math.Sqrt(R * R - Math.Pow(x + xc, 2));
+			gradient = (x + xc) / y;
+			return StartHeight + yc - y;
 		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]

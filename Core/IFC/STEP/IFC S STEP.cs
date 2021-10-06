@@ -139,7 +139,7 @@ namespace GeometryGym.Ifc
 				result += ",(#" + string.Join(",#", mCrossSectionPositionMeasures_OBSOLETE.ConvertAll(x => x.ToString()));
 			else
 				result += ",(" + string.Join(",", CrossSectionPositions.Select(x => "#" + x.StepId));
-			return result + (mFixedAxisVertical ? "),.T." : "),$");	
+			return result + (release < ReleaseVersion.IFC4X3_RC5TEST ? (mFixedAxisVertical ? "),.T." : "),.F.") : "");	
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -159,7 +159,8 @@ namespace GeometryGym.Ifc
 			}
 			else
 				mCrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
-			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
+			if (release < ReleaseVersion.IFC4X3_RC5TEST)
+				FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
 	public partial class IfcSectionedSpine : IfcGeometricRepresentationItem
@@ -182,10 +183,11 @@ namespace GeometryGym.Ifc
 		{
 			string result = base.BuildStringSTEP(release) + ",#" + mDirectrix.StepId;
 			if (release < ReleaseVersion.IFC4X3_RC4)
-				result += ",(#" + string.Join(",#", mCrossSectionPositions_OBSOLETE.ConvertAll(x => x.StepId.ToString())) + ")";
+				result += ",(" + string.Join(",", mCrossSectionPositions_OBSOLETE.ConvertAll(x => "#" + x.StepId.ToString())) + ")";
 			else
-				result += ",(#" + string.Join(",#", mCrossSectionPositions.ConvertAll(x => x.StepId.ToString())) + ")";
-			return result + ",(#" + string.Join(",#", mCrossSections.ConvertAll(x => x.StepId.ToString())) + ")" + "," + (mFixedAxisVertical ? ".T." : ".F");
+				result += ",(" + string.Join(",", mCrossSectionPositions.ConvertAll(x => "#" + x.StepId.ToString())) + ")";
+			return result + ",(" + string.Join(",", mCrossSections.ConvertAll(x => "#" + x.StepId.ToString())) + ")" +
+				(release < ReleaseVersion.IFC4X3_RC5TEST ? "," + (mFixedAxisVertical ? ".T." : ".F") : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -195,7 +197,8 @@ namespace GeometryGym.Ifc
 			else
 				CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
 			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
-			FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
+			if(release < ReleaseVersion.IFC4X3_RC5TEST)
+				FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
 	public partial class IfcSectionProperties : IfcPreDefinedProperties // IFC2x3 STPEntity

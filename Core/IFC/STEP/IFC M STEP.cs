@@ -148,7 +148,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRepresentedMaterial = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
+			RepresentedMaterial = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
 		}
 	}
 	public partial class IfcMaterialLayer : IfcMaterialDefinition

@@ -35,7 +35,7 @@ namespace GeometryGym.STEP
 	[Serializable]
 	public class SET<T> : ICollection<T>, IEnumerable<T>, IEnumerable, INotifyCollectionChanged where T : ISTEPEntity //ICollection, 
 	{
-		private Dictionary<string, T> mDictionary = new Dictionary<string, T>();
+		private HashSet<T> mSet = new HashSet<T>();
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -43,23 +43,12 @@ namespace GeometryGym.STEP
 		public SET(T item) : base() { Add(item); }
 		public SET(IEnumerable<T> collection) { Clear();  AddRange(collection); }
 
-		public int Count { get { return mDictionary.Count; } }
+		public int Count { get { return mSet.Count; } }
 		public bool IsReadOnly { get { return false; } }
 
-		private string getKey(T item)
-		{
-			IfcRoot root = item as IfcRoot;
-			if (root != null)
-				return root.GlobalId;
-			return item.StepId > 0 ? item.StepId.ToString() : item.GetHashCode().ToString();
-		}
 		private bool add(T item)
 		{
-			string key = getKey(item);
-			if (mDictionary.ContainsKey(key))
-				return false;
-			mDictionary[key] = item;
-			return true;
+			return mSet.Add(item);
 		}
 		public void Add(T item)
 		{
@@ -85,30 +74,23 @@ namespace GeometryGym.STEP
 		}
 		public void Clear() 
 		{
-			if (mDictionary.Count > 0)
+			if(mSet.Count > 0)
 			{
-				List<T> values = mDictionary.Values.ToList();
-				mDictionary.Clear();
+				List<T> values = mSet.ToList();
+				mSet.Clear();
 				if(CollectionChanged != null)
 					CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, values));
 			}
 		} 
-		public bool Contains(T item) { return mDictionary.ContainsKey(getKey(item)); }
+		public bool Contains(T item) { return mSet.Contains(item); }
 		public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return this.ToList().ConvertAll(converter); }
-		public void CopyTo(T[] array, int arrayIndex) { mDictionary.Values.CopyTo(array, arrayIndex); }
-		public IEnumerator<T> GetEnumerator() { return mDictionary.Values.GetEnumerator(); }
+		public void CopyTo(T[] array, int arrayIndex) { mSet.CopyTo(array, arrayIndex); }
+		public IEnumerator<T> GetEnumerator() { return mSet.GetEnumerator(); }
 		public bool Remove(T item) 
 		{
-			string key = getKey(item);
-			if (mDictionary.Remove(key))
-			{
-				if(CollectionChanged != null)
-					CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-				return true;
-			}
-			return false;
+			return mSet.Remove(item);
 		} 
-		IEnumerator IEnumerable.GetEnumerator() { return mDictionary.Values.GetEnumerator(); }
+		IEnumerator IEnumerable.GetEnumerator() { return mSet.GetEnumerator(); }
 
 	}
 	[Serializable]

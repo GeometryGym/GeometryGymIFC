@@ -90,12 +90,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
 	{
-		public double computeHeight(double distAlong)
-		{
-			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
-				return StartHeight + StartGradient * (distAlong - StartDistAlong);
-			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
-		}
+		
 	}
 	public partial class IfcAxis1Placement : IfcPlacement
 	{

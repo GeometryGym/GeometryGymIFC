@@ -539,7 +539,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcPresentationStyleSelect s = mDatabase.ParseXml<IfcPresentationStyleSelect>(cn as XmlElement);
 						if (s != null)
-							addStyle(s);
+							Styles.Add(s);
 					}
 				}
 			}
@@ -549,8 +549,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			XmlElement element = xml.OwnerDocument.CreateElement("Styles", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
-			foreach (int item in mStyles)
-				element.AppendChild(mDatabase[item].GetXML(xml.OwnerDocument, "", this, processed));
+			foreach (IfcPresentationStyleSelect item in mStyles)
+				element.AppendChild((item as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))

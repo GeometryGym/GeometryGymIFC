@@ -1540,6 +1540,13 @@ namespace GeometryGym.STEP
 			pos = icounter + 1;
 			return result;
 		}
+
+		public static string StripComments(string s)
+		{
+			string result = System.Text.RegularExpressions.Regex.Replace(s, "/\\*.*?\\*/", "");
+			return result;
+		}
+
 		internal static string offsetSTEPRecords(string line, int offset)
 		{
 			string newline = "";

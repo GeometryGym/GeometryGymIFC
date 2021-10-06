@@ -218,7 +218,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcSectionedSurface : IfcSurface
+	public partial class IfcSectionedSurface : IfcSurface 
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
 		[Obsolete("REVISED IFC4x3RC4", false)]
@@ -2166,7 +2166,6 @@ additional types	some additional representation types are given:
 	public partial interface IfcStyleAssignmentSelect : IBaseClassIfc //(IfcPresentationStyle, IfcPresentationStyleAssignment); 
 	{
 		SET<IfcStyledItem> StyledItems { get; }
-		void associateItem(IfcStyledItem item);
 	}
 	[Serializable]
 	public partial class IfcStyledItem : IfcRepresentationItem, NamedObjectIfc
@@ -2215,7 +2214,7 @@ additional types	some additional representation types are given:
 					mStyles.Add(presentationStyleAssignment);
 				else
 				{
-					IfcPresentationStyle presentationStyle = style as IfcPresentationStyle;
+					IfcPresentationStyleSelect presentationStyle = style as IfcPresentationStyleSelect;
 					if(presentationStyle != null)
 						mStyles.Add(new IfcPresentationStyleAssignment(presentationStyle));
 				}

@@ -135,7 +135,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP() + "," + (mHorizontalWidths ? ".T." : ".F") +
 			",(" + string.Join(",", mWidths.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
 			",(" + string.Join(",", mSlopes.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
-			(mTags.Count == 0 ? ",$" : ",(" + string.Join(",", mTags.ConvertAll(x => "'" + ParserIfc.Encode(x) + "'")) + ")");
+			(mTags.Count == 0 ? ",$" : ",(" + string.Join(",", mTags.ConvertAll(x => "'" + ParserIfc.Encode(x) + "'")) + ")") + ",#" + mStartPoint.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -144,6 +144,7 @@ namespace GeometryGym.Ifc
 			Widths.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 			Slopes.AddRange(ParserSTEP.StripListDouble(str, ref pos, len));
 			Tags.AddRange(ParserSTEP.SplitListStrings(ParserSTEP.StripField(str, ref pos, len)).ConvertAll(x => ParserIfc.Decode(x)));
+			StartPoint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;
 		}
 	}
 	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)

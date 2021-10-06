@@ -1015,20 +1015,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
 	{
-		internal List<int> mStyles = new List<int>();// : SET [1:?] OF IfcPresentationStyleSelect; 
+		internal SET<IfcPresentationStyleSelect> mStyles = new SET<IfcPresentationStyleSelect>();// : SET [1:?] OF IfcPresentationStyleSelect; 
 		//INVERSE
 		internal SET<IfcStyledItem> mStyledItems = new SET<IfcStyledItem>();
 
-		public ReadOnlyCollection<IfcPresentationStyleSelect> Styles { get { return new ReadOnlyCollection<IfcPresentationStyleSelect>(mStyles.ConvertAll(x => mDatabase[x] as IfcPresentationStyleSelect)); } }
+		public SET<IfcPresentationStyleSelect> Styles { get { return mStyles; } }
 		public SET<IfcStyledItem> StyledItems { get { return mStyledItems; } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
-		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(s.mDatabase[x]).Index)); }
-		public IfcPresentationStyleAssignment(IfcPresentationStyle style) : base(style.mDatabase) { mStyles.Add(style.Index); }
-		public IfcPresentationStyleAssignment(IEnumerable<IfcPresentationStyle> styles) : base(styles.First().mDatabase) { mStyles.AddRange(styles.Select(x => x.StepId)); }
-		
-		internal void addStyle(IfcPresentationStyleSelect style) { mStyles.Add(style.Index); }
-		public void associateItem(IfcStyledItem item) { mStyledItems.Add(item); }
+		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { Styles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x) as IfcPresentationStyleSelect)); }
+		public IfcPresentationStyleAssignment(IfcPresentationStyleSelect style) : base(style.Database) { Styles.Add(style); }
+		public IfcPresentationStyleAssignment(IEnumerable<IfcPresentationStyleSelect> styles) : base(styles.First().Database) { Styles.AddRange(styles); }
 	}
 	public partial interface IfcPresentationStyleSelect : IBaseClassIfc { } //DEPRECATED IFC4 TYPE  = SELECT(IfcNullStyle, IfcCurveStyle, IfcSymbolStyle, IfcFillAreaStyle, IfcTextStyle, IfcSurfaceStyle);
 	[Serializable]

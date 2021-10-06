@@ -842,11 +842,13 @@ namespace GeometryGym.Ifc
 		private LIST<double> mWidths = new LIST<double>(); //: LIST[1:?] OF IfcNonNegativeLengthMeasure;
 		private LIST<double> mSlopes = new LIST<double>(); //: LIST[1:?] OF IfcPlaneAngleMeasure;
 		private LIST<string> mTags = new LIST<string>(); //: OPTIONAL LIST[2:?] OF IfcLabel;
+		private IfcCartesianPoint mStartPoint = null; 
 
 		public bool HorizontalWidths { get { return mHorizontalWidths; } set { mHorizontalWidths = value; } }
 		public LIST<double> Widths { get { return mWidths; } set { mWidths = value; } }
 		public LIST<double> Slopes { get { return mSlopes; } set { mSlopes = value; } }
 		public LIST<string> Tags { get { return mTags; } set { mTags = value; } }
+		public IfcCartesianPoint StartPoint { get { return mStartPoint; } set { mStartPoint = value; } }
 
 		public IfcOpenCrossProfileDef() : base() { }
 		internal IfcOpenCrossProfileDef(DatabaseIfc db, IfcOpenCrossProfileDef openCrossProfileDef, DuplicateOptions options)
@@ -856,13 +858,15 @@ namespace GeometryGym.Ifc
 			Widths.AddRange(openCrossProfileDef.Widths);
 			Slopes.AddRange(openCrossProfileDef.Slopes);
 			Tags.AddRange(openCrossProfileDef.Tags);
+			StartPoint = db.Factory.Duplicate(openCrossProfileDef.StartPoint, options) as IfcCartesianPoint;
 		}
-		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes)
+		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes, IfcCartesianPoint startPoint)
 			: base(db, name)
 		{
 			HorizontalWidths = horizontalWidths;
 			Widths.AddRange(widths);
 			Slopes.AddRange(slopes);
+			StartPoint = StartPoint;
 		}
 	}
 	[Serializable]

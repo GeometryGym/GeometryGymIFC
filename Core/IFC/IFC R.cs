@@ -2155,7 +2155,7 @@ namespace GeometryGym.Ifc
 		internal IfcSystem mRelatingSystem;// : IfcSystem;
 		internal SET<IfcSpatialElement> mRelatedBuildings = new SET<IfcSpatialElement>();// : SET [1:?] OF IfcSpatialElement  ;
 
-		public IfcSystem RelatingSystem { get { return mRelatingSystem; } set { mRelatingSystem = value; value.ServicesBuildings = this; } }
+		public IfcSystem RelatingSystem { get { return mRelatingSystem; } set { mRelatingSystem = value; if(value != null) value.ServicesBuildings = this; } }
 		public SET<IfcSpatialElement> RelatedBuildings { get { return mRelatedBuildings; } }
 
 		internal IfcRelServicesBuildings() : base() { }
@@ -2753,7 +2753,7 @@ namespace GeometryGym.Ifc
 		protected IfcRoot(DatabaseIfc db) : base(db)
 		{
 			setGlobalId(ParserIfc.EncodeGuid(Guid.NewGuid()));
-			if (db.Release < ReleaseVersion.IFC4 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory))
+			if (db != null && (db.Release < ReleaseVersion.IFC4 || (db.mModelView != ModelView.Ifc4Reference && db.Factory.Options.GenerateOwnerHistory)))
 				OwnerHistory = db.Factory.OwnerHistoryAdded;
 		}
 		protected IfcRoot(DatabaseIfc db, IfcRoot r, DuplicateOptions options) : base(db, r)

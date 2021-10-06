@@ -45,102 +45,9 @@ namespace GeometryGym.Ifc
 		internal string mGlobalId { get; private set; } = ""; // :	IfcGloballyUniqueId;
 		internal void setGlobalId(string globalId)
 		{
-			if (string.IsNullOrEmpty(mGlobalId))
-			{
-				mGlobalId = globalId;
-				return;
-			}
-			if(string.Compare(mGlobalId, globalId, false) != 0)
-			{
-				GlobalIdChangeManager idChangeManager = new GlobalIdChangeManager(this);
-				mGlobalId = globalId;
-				idChangeManager.updateReferences();
-			}
+			mGlobalId = globalId;
 		}
-		private class GlobalIdChangeManager
-		{
-			BaseClassIfc mObject = null;
-			List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
-			IfcRelAggregates mDecomposes = null;
-			IfcRelNests mNests = null;
-			IfcRelContainedInSpatialStructure mContainedIn = null;
-			IfcRelDefinesByType mDefinesByType = null;
-
-			internal GlobalIdChangeManager(BaseClassIfc obj)
-			{
-				mObject = obj;
-				IfcObjectDefinition objectDefinition = obj as IfcObjectDefinition;
-				if(objectDefinition != null)
-				{
-					mIsDefinedBy.AddRange(objectDefinition.mIsDefinedBy);
-					foreach (IfcRelDefinesByProperties rdp in mIsDefinedBy)
-						rdp.RelatedObjects.Remove(objectDefinition);
-
-					mDecomposes = objectDefinition.mDecomposes;
-					if (mDecomposes != null)
-						mDecomposes.RelatedObjects.Remove(objectDefinition);
-					mNests = objectDefinition.mNests;
-					if (mNests != null)
-						mNests.RelatedObjects.Remove(objectDefinition);
-
-					IfcObject o = mObject as IfcObject;
-					if (o != null)
-					{
-						mDefinesByType = o.IsTypedBy;
-						if (mDefinesByType != null)
-							mDefinesByType.RelatedObjects.Remove(o);
-						IfcProduct product = objectDefinition as IfcProduct;
-						if (product != null)
-						{
-							mContainedIn = product.mContainedInStructure;
-							if (mContainedIn != null)
-								mContainedIn.RelatedElements.Remove(product);
-						}
-					}
-				}
-			}
-
-			internal void updateReferences()
-			{
-				IfcObjectDefinition objectDefinition = mObject as IfcObjectDefinition;
-				if(objectDefinition != null)
-				{
-					foreach (IfcRelDefinesByProperties isDefinedBy in mIsDefinedBy)
-						isDefinedBy.RelatedObjects.Add(objectDefinition);
-
-					if (mDecomposes != null)
-						mDecomposes.RelatedObjects.Add(objectDefinition);
-					if (mNests != null)
-						mNests.RelatedObjects.Add(objectDefinition);
-
-					IfcObject obj = mObject as IfcObject;
-					if (obj != null)
-					{
-						if (mDefinesByType != null)
-							mDefinesByType.RelatedObjects.Add(obj);
-						IfcProduct product = objectDefinition as IfcProduct;
-						if (product != null)
-						{
-							if (mContainedIn != null)
-								mContainedIn.RelatedElements.Add(product);
-						}
-					}
-				}
-			}
-		}
-		protected void ChangeGlobalId(string newGlobalId, string oldGlobalId) 
-		{
-			IfcObjectDefinition objectDefinition = this as IfcObjectDefinition;
-			if(objectDefinition != null)
-			{
-				List<IfcRelDefinesByProperties> isDefinedBy = objectDefinition.mIsDefinedBy.ToList();
-				foreach(IfcRelDefinesByProperties definedBy in isDefinedBy)
-				{
-					definedBy.RelatedObjects.Remove(objectDefinition);
-				}
-			}
-		}
-
+		
 		[NonSerialized] internal DatabaseIfc mDatabase = null;
 
 		public DatabaseIfc Database { get { return mDatabase; } private set { mDatabase = value; } }
@@ -447,6 +354,8 @@ namespace GeometryGym.Ifc
 				className = "IfcBuildingElementProxy";
 			if (string.Compare(className, "IfcDistanceExpression", true) == 0)
 				className = "IfcPointByDistanceExpression";
+			if (string.Compare(className, "IfcProductRepresentation", true) == 0)
+				className = "IfcProductDefinitionShape";
 
 			if (!mConstructors.TryGetValue(className, out constructor))
 			{

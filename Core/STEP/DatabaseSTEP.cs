@@ -100,7 +100,8 @@ namespace GeometryGym.STEP
 		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
 		public string FolderPath { get; set; } 
-		internal string PreviousApplication { get; set; }
+		public string OriginatingSystem { get; set; }
+		public DateTime TimeStamp { get; set; } = DateTime.MinValue;
 	}
 }
 

@@ -337,14 +337,14 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			foreach (IfcPresentationStyleSelect sas in mDatabase.extractJArray<IfcPresentationStyleSelect>(obj.GetValue("Styles", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				addStyle(sas);
+				Styles.Add(sas);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			JArray array = new JArray();
-			foreach (int style in mStyles)
-				array.Add(mDatabase[style].getJson(this, options));
+			foreach (IfcPresentationStyleSelect style in mStyles)
+				array.Add(style.getJson(this, options));
 			obj["Styles"] = array;
 		}
 	}
