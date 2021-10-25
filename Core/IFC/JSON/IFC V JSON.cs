@@ -51,6 +51,25 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
+	public partial class IfcVector
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Orientation"] = Orientation.getJson(this, options);
+			obj["Magnitude"] = Magnitude;
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Pnt", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Orientation = mDatabase.ParseJObject<IfcDirection>(jobj);
+			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				mMagnitude = token.Value<double>();
+		}
+	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
 		internal override void parseJObject(JObject obj)

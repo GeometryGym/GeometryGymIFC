@@ -123,7 +123,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return (mElements.Count == 0 ? "" : base.BuildStringSTEP(release) + ",(" + string.Join(",", mElements.ConvertAll(x => "#" + x.Index)) + ")");
+			return (mElements.Count == 0 ? "" : "(" + string.Join(",", mElements.ConvertAll(x => "#" + x.Index)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -173,7 +173,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridAxis : BaseClassIfc
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mAxisTag == "$" ? ",$," : ",'" + mAxisTag + "',#") + AxisCurve.Index.ToString() + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (mAxisTag == "$" ? "$," : "'" + mAxisTag + "',#") + AxisCurve.Index.ToString() + "," + ParserSTEP.BoolToString(mSameSense); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mAxisTag = ParserSTEP.StripString(str, ref pos, len);
@@ -183,7 +183,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridPlacement : IfcObjectPlacement
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mPlacesObject.Count == 0 ? "" : base.BuildStringSTEP(release) + ",#" + mPlacementLocation.StepId + "," + ParserSTEP.ObjToLinkString(mPlacementRefDirection)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			if (mPlacesObject.Count == 0)
+				return "";
+			return (release > ReleaseVersion.IFC4X1 ? base.BuildStringSTEP(release) + ",#" : "#)" + mPlacementLocation.StepId + "," + ParserSTEP.ObjToLinkString(mPlacementRefDirection)); 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mPlacementLocation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVirtualGridIntersection;

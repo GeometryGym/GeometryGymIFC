@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mBounds.Count == 0 ? ",()" : ",(#" + string.Join(",#", Bounds.ConvertAll(x => x.mIndex)) + ")");
+			return (mBounds.Count == 0 ? "()" : "(#" + string.Join(",#", Bounds.ConvertAll(x => x.mIndex)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -45,7 +45,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mFbsmFaces.Select(x => "#" + x.StepId)) + ")";
+			return "(" + string.Join(",", mFbsmFaces.Select(x => "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -54,7 +54,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBound.StepId + "," + ParserSTEP.BoolToString(mOrientation); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mBound.StepId + "," + ParserSTEP.BoolToString(mOrientation); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Bound = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLoop;
@@ -116,9 +116,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFailureConnectionCondition : IfcStructuralConnectionCondition
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + "," +
+			return base.BuildStringSTEP(release) + "," +
 			ParserSTEP.DoubleOptionalToString(mTensionFailureX) + "," +
 			ParserSTEP.DoubleOptionalToString(mTensionFailureY) + "," +
 			ParserSTEP.DoubleOptionalToString(mTensionFailureZ) + "," +
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mHatchLineAppearance) + "," + mStartOfNextHatchLine + "," + ParserSTEP.LinkToString(mPointOfReferenceHatchLine) + "," + ParserSTEP.LinkToString(mPatternStart) + "," + ParserSTEP.DoubleToString(mHatchLineAngle); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mHatchLineAppearance) + "," + mStartOfNextHatchLine + "," + ParserSTEP.LinkToString(mPointOfReferenceHatchLine) + "," + ParserSTEP.LinkToString(mPatternStart) + "," + ParserSTEP.DoubleToString(mHatchLineAngle); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mHatchLineAppearance = ParserSTEP.StripLink(str, ref pos, len);
@@ -196,10 +196,9 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcFillAreaStyleTileSymbolWithStyle // DEPRECATED IFC4
 	public partial class IfcFillAreaStyleTiles : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() +
-			",(#" + string.Join(",#", mTilingPattern.ConvertAll(x => x.StepId.ToString())) + ")" +
+			return "(#" + string.Join(",#", mTilingPattern.ConvertAll(x => x.StepId.ToString())) + ")" +
 			",(#" + string.Join(",#", mTiles.ConvertAll(x => x.StepId.ToString())) + ")" + "," +
 			ParserSTEP.DoubleOptionalToString(mTilingScale);
 		}

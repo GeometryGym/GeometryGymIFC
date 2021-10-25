@@ -33,7 +33,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			Elements = mDatabase.extractJArray<IfcDerivedUnitElement>(obj.GetValue("Elements", StringComparison.InvariantCultureIgnoreCase) as JArray);
+			Elements.AddRange(mDatabase.extractJArray<IfcDerivedUnitElement>(obj.GetValue("Elements", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			JToken token = obj.GetValue("UnitType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Enum.TryParse<IfcDerivedUnitEnum>(token.Value<string>(), true, out mUnitType);
@@ -47,8 +47,8 @@ namespace GeometryGym.Ifc
 			if (mElements.Count > 0)
 			{
 				JArray array = new JArray();
-				foreach (int i in mElements)
-					array.Add(mDatabase[i].getJson(this, options));
+				foreach (IfcDerivedUnitElement derived in mElements)
+					array.Add(derived.getJson(this, options));
 				obj["Elements"] = array;
 			}
 			base.setAttribute(obj, "UnitType", mUnitType.ToString());

@@ -78,6 +78,25 @@ namespace GeometryGym.Ifc
 				obj["ReferencedLibrary"] = ReferencedLibrary.getJson(this, options);
 		}
 	}
+	public partial class IfcLine
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["Pnt"] = Pnt.getJson(this, options);
+			obj["Dir"] = Dir.getJson(this, options);
+		}
+		internal override void parseJObject(JObject obj)
+		{
+			base.parseJObject(obj);
+			JObject jobj = obj.GetValue("Pnt", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Pnt = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
+			jobj = obj.GetValue("Dir", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			if (jobj != null)
+				Dir = mDatabase.ParseJObject<IfcVector>(jobj);
+		}
+	}
 	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

@@ -36,7 +36,7 @@ namespace GeometryGym.STEP
 		string StepClassName { get; }
 	}
 	[Serializable]
-	public partial class STEPEntity
+	public abstract partial class STEPEntity
 	{
 		[NonSerialized] internal int mIndex = 0;
 		[NonSerialized] internal List<string> mComments = new List<string>();
@@ -62,17 +62,17 @@ namespace GeometryGym.STEP
 				foreach (string c in mComments)
 					comment += "/* " + c + " */\r\n";
 			}
-			return comment + (mIndex > 0 ? "#" + mIndex + "= " : "") + StepClassName.ToUpper() + "(" + str.Substring(1) + ");";
+			return comment + (mIndex > 0 ? "#" + StepId + "= " : "") + StepClassName.ToUpper() + "(" + str + ");";
 		}
 		public string STEPSerialization()
 		{
 			string attributesString = BuildStringSTEP();
 			if (string.IsNullOrEmpty(attributesString))
 				return "";
-			return StepClassName.ToUpper() + "(" + attributesString.Substring(1) + ")"; 
+			return StepClassName.ToUpper() + "(" + attributesString + ")"; 
 		}
 		public override string ToString() { return StringSTEP(); }
-		protected virtual string BuildStringSTEP() { return ""; } 
+		protected abstract string BuildStringSTEP();// { return ""; } 
 		public void  AddComment(string comment) { mComments.Add(comment); }
 
 		

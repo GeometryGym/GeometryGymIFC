@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
@@ -27,12 +28,19 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcLine : IfcCurve
+	public partial class IfcLine
 	{
 		public Line Line()
 		{
 			Point3d pt = Pnt.Location;
 			return new Line(pt, pt + Dir.Vector);
+		}
+	}
+	public partial class IfcLinearElement
+	{
+		internal virtual Plane computePlaneAtLength(double length, double tol)
+		{
+			return Plane.Unset;
 		}
 	}
 }

@@ -91,7 +91,6 @@ namespace GeometryGym.STEP
 			return mSet.Remove(item);
 		} 
 		IEnumerator IEnumerable.GetEnumerator() { return mSet.GetEnumerator(); }
-
 	}
 	[Serializable]
 	public class LIST<T> : ObservableCollection<T>

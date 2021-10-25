@@ -65,17 +65,17 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcTessellatedFaceSet mMappedTo;// : IfcTessellatedFaceSet; 
 		internal double mOpacity = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
-		internal int mColours;// : IfcColourRgbList; 
+		internal IfcColourRgbList mColours;// : IfcColourRgbList; 
 		internal List<int> mColourIndex = new List<int>();// : LIST [1:?] OF IfcPositiveInteger;
 
 		public IfcTessellatedFaceSet MappedTo { get { return mMappedTo; } set { mMappedTo = value; value.HasColours = this; } }
 		public double Opacity { get { return mOpacity; } set { mOpacity = value; } }
-		public IfcColourRgbList Colours { get { return mDatabase[mColours] as IfcColourRgbList; } set { mColours = value.mIndex; } }
+		public IfcColourRgbList Colours { get { return mColours; } set { mColours = value; } }
 
 		internal IfcIndexedColourMap() : base() { }
 		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
-			: base(fs.mDatabase) { MappedTo = fs; mColours = colours.mIndex; mColourIndex.AddRange(colourindex); }
+			: base(fs.mDatabase) { MappedTo = fs; mColours = colours; mColourIndex.AddRange(colourindex); }
 	}
 	[Serializable]
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve 
@@ -138,7 +138,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap
 	{
-		internal Tuple<int, int, int>[] mTexCoordList = new Tuple<int, int, int>[0];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
+		internal List<Tuple<int, int, int>> mTexCoordList = new List<Tuple<int, int, int>>();// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
 
 		internal IfcIndexedTriangleTextureMap() : base() { }
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }

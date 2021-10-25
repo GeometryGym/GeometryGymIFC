@@ -368,10 +368,10 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Normals"))
 			{
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
-				List<double[]> normals = new List<double[]>(fields.Length/3);
+				List<Tuple<double, double, double>> normals = new List<Tuple<double, double, double>>(fields.Length/15);
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					normals.Add(new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]) });
-				mNormals = normals.ToArray();
+					normals.Add(new Tuple<double, double, double>(double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2])));
+				mNormals.AddRange(normals);
 			}
 			if (xml.HasAttribute("Closed"))
 				mClosed = bool.Parse(xml.Attributes["Closed"].Value) ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
@@ -391,8 +391,8 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mNormals != null && mNormals.Length > 0)
-				xml.SetAttribute("Normals", string.Join(" ", mNormals.Select(x => x[0] + " " + x[1] + " " + x[2])));
+			if (mNormals != null && mNormals.Count > 0)
+				xml.SetAttribute("Normals", string.Join(" ", mNormals.Select(x => x.Item1 + " " + x.Item2 + " " + x.Item3)));
 			if (mClosed != IfcLogicalEnum.UNKNOWN)
 				xml.SetAttribute("Closed", (mClosed == IfcLogicalEnum.TRUE).ToString().ToLower());
 			Tuple<int, int, int> coord = mCoordIndex[0];

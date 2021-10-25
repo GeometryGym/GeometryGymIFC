@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X2 ? "" : "," + ParserSTEP.ObjToLinkString(mPlacementRelTo));
+			return (release < ReleaseVersion.IFC4X2 ? "" : ParserSTEP.ObjToLinkString(mPlacementRelTo));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOffsetCurve : IfcCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mBasisCurve.Index; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mBasisCurve.Index; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			BasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRepeatFactor); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mRepeatFactor); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mRepeatFactor = ParserSTEP.StripLink(str, ref pos, len);
@@ -130,9 +130,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOpenCrossProfileDef : IfcProfileDef
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + "," + (mHorizontalWidths ? ".T." : ".F") +
+			return base.BuildStringSTEP(release) + "," + (mHorizontalWidths ? ".T." : ".F") +
 			",(" + string.Join(",", mWidths.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
 			",(" + string.Join(",", mSlopes.ConvertAll(x => ParserSTEP.DoubleToString(x))) + ")" +
 			(mTags.Count == 0 ? ",$" : ",(" + string.Join(",", mTags.ConvertAll(x => "'" + ParserIfc.Encode(x) + "'")) + ")") + ",#" + mStartPoint.StepId;
@@ -170,7 +170,7 @@ namespace GeometryGym.Ifc
 			string name = mName;
 			if(string.IsNullOrEmpty(name))
 				name = mDatabase.Factory.ApplicationDeveloper;
-			return base.BuildStringSTEP(release) + (mIdentification == "$" ? ",$,'" : ",'" + mIdentification + "','") + name 
+			return (mIdentification == "$" ? "$,'" : "'" + mIdentification + "','") + name 
 				+ (mDescription == "$" ? "',$," : "','" + mDescription + "',") 
 				+ (mRoles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.Select(x=>x.Index)) + "),")
 				+ (mAddresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.Select(x=>x.Index)) + ")");
@@ -188,11 +188,9 @@ namespace GeometryGym.Ifc
 	//ENTITY IfcOrganizationRelationship; //optional name
 	public partial class IfcOrientationExpression : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() +
-			",#" + mLateralAxisDirection.StepId +
-			",#" + mVerticalAxisDirection.StepId;
+			return "#" + mLateralAxisDirection.StepId + ",#" + mVerticalAxisDirection.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -236,7 +234,7 @@ namespace GeometryGym.Ifc
 	{ 
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",#" + mOwningUser.Index + ",#" + mOwningApplication.Index + ",";
+			string str = "#" + mOwningUser.Index + ",#" + mOwningApplication.Index + ",";
 			if (mState == IfcStateEnum.NOTDEFINED)
 				str += "$";
 			else

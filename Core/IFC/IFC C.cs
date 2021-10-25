@@ -238,31 +238,34 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
-	{ 
-		internal double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [2:2] OF IfcLengthMeasure; 
-		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
-		public double[][] CoordList
+	{
+		internal List<Tuple<double, double>> mCoordList = new List<Tuple<double, double>>();//	 :	LIST [1:?] OF LIST [2:2] OF IfcLengthMeasure; 
+		internal List<string> mTagList = new List<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
+		public List<Tuple<double,double>> CoordList
 		{
 			get { return mCoordList; }
 			set { mCoordList = value; }
 		}
-		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
+		public List<string> TagList { get { return mTagList; } }
 
 		internal IfcCartesianPointList2D() : base() { }
-		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
-		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Tuple<double, double>> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2 }).ToArray(); }
+		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options) : base(db, l, options) { mCoordList.AddRange(l.mCoordList); }
+		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Tuple<double, double>> coordList) : base(db) { mCoordList.AddRange(coordList); }
 	}
 	[Serializable]
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
-		private double[][] mCoordList = new double[0][];//	 :	LIST [1:?] OF LIST [3:3] OF IfcLengthMeasure; 
-		internal LIST<string> mTagList = new LIST<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
-		public double[][] CoordList { get { return mCoordList; } set { mCoordList = value; } }
-		public LIST<string> TagList { get { return mTagList; } set { mTagList = value; } }
+		private List<Tuple<double,double,double>> mCoordList = new List<Tuple<double,double,double>>();//	 :	LIST [1:?] OF LIST [3:3] OF IfcLengthMeasure; 
+		internal List<string> mTagList = new List<string>(); // : OPTIONAL LIST [1:?] OF IfcLabel;
+		public List<Tuple<double, double, double>> CoordList { get { return mCoordList; } }
+		public List<string> TagList { get { return mTagList; } }
 		internal IfcCartesianPointList3D() : base() { }
-		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) : base(db, l, options) { mCoordList = l.mCoordList.ToArray(); }
+		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) : base(db, l, options) { mCoordList.AddRange(l.mCoordList); }
 
-		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Tuple<double, double, double>> coordList) : base(db) { mCoordList = coordList.Select(x=> new double[] { x.Item1, x.Item2, x.Item3 }).ToArray(); }
+		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Tuple<double, double, double>> coordList) : base(db)
+		{
+			mCoordList.AddRange(coordList);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -823,9 +826,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcColourRgbList : IfcPresentationItem
 	{
-		internal double[][] mColourList = new double[0][];//	: LIST [1:?] OF LIST [3:3] OF IfcNormalisedRatioMeasure; 
+		internal List<Tuple<double, double, double>> mColourList = new List<Tuple<double, double, double>>();//	: LIST [1:?] OF LIST [3:3] OF IfcNormalisedRatioMeasure; 
 		internal IfcColourRgbList() : base() { }
-		internal IfcColourRgbList(DatabaseIfc db,IfcColourRgbList l) : base(db,l) { mColourList = l.mColourList; }
+		internal IfcColourRgbList(DatabaseIfc db,IfcColourRgbList l) : base(db,l) { mColourList.AddRange(l.mColourList); }
 	}
 	[Serializable]
 	public abstract partial class IfcColourSpecification : IfcPresentationItem, IfcColour, NamedObjectIfc //	ABSTRACT SUPERTYPE OF(IfcColourRgb)
@@ -2128,39 +2131,46 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCurveBoundedPlane : IfcBoundedSurface
 	{
-		internal int mBasisSurface;// : IfcPlane;
-		internal int mOuterBoundary;// : IfcCurve;
-		internal List<int> mInnerBoundaries = new List<int>();//: SET OF IfcCurve;
+		internal IfcPlane mBasisSurface;// : IfcPlane;
+		internal IfcCurve mOuterBoundary;// : IfcCurve;
+		internal SET<IfcCurve> mInnerBoundaries = new SET<IfcCurve>();//: SET OF IfcCurve;
 
-		public IfcPlane BasisSurface { get { return mDatabase[mBasisSurface] as IfcPlane; } set { mBasisSurface = value.mIndex; } }
-		public IfcCurve OuterBoundary { get { return mDatabase[mOuterBoundary] as IfcCurve; } set { mOuterBoundary = value.mIndex; } }
-		public ReadOnlyCollection<IfcCurve> InnerBoundaries { get { return new ReadOnlyCollection<IfcCurve>( mInnerBoundaries.ConvertAll(x => mDatabase[x] as IfcCurve)); } }
+		public IfcPlane BasisSurface { get { return mBasisSurface; } set { mBasisSurface = value; } }
+		public IfcCurve OuterBoundary { get { return mOuterBoundary; } set { mOuterBoundary = value; } }
+		public SET<IfcCurve> InnerBoundaries { get { return mInnerBoundaries; } }
 
 		internal IfcCurveBoundedPlane() : base() { }
-		internal IfcCurveBoundedPlane(DatabaseIfc db, IfcCurveBoundedPlane p, DuplicateOptions options) : base(db, p, options) { BasisSurface = db.Factory.Duplicate(p.BasisSurface) as IfcPlane; OuterBoundary = db.Factory.Duplicate(p.OuterBoundary) as IfcCurve; p.InnerBoundaries.ToList().ForEach(x=>addInnerBoundary( db.Factory.Duplicate(x) as IfcCurve)); }
+		internal IfcCurveBoundedPlane(DatabaseIfc db, IfcCurveBoundedPlane p, DuplicateOptions options) 
+			: base(db, p, options) 
+		{ 
+			BasisSurface = db.Factory.Duplicate(p.BasisSurface) as IfcPlane; 
+			OuterBoundary = db.Factory.Duplicate(p.OuterBoundary) as IfcCurve;
+			InnerBoundaries.AddRange(p.InnerBoundaries.Select(x=> db.Factory.Duplicate(x) as IfcCurve));
+		}
 		public IfcCurveBoundedPlane(IfcPlane p, IfcCurve outer) : base(p.mDatabase) { BasisSurface = p; OuterBoundary = outer;  }
-		public IfcCurveBoundedPlane(IfcPlane p, IfcCurve outer, List<IfcCurve> inner)
-			: this(p, outer) { inner.ForEach(x=>addInnerBoundary(x)); }
-
-		internal void addInnerBoundary(IfcCurve boundary) { mInnerBoundaries.Add(boundary.mIndex); }
+		public IfcCurveBoundedPlane(IfcPlane p, IfcCurve outer, IEnumerable<IfcCurve> inner)
+			: this(p, outer) { InnerBoundaries.AddRange(inner); }
 	}
 	[Serializable]
 	public partial class IfcCurveBoundedSurface : IfcBoundedSurface //IFC4
 	{
-		private int mBasisSurface;// : IfcSurface; 
-		private List<int> mBoundaries = new List<int>();//: SET [1:?] OF IfcBoundaryCurve;
+		private IfcSurface mBasisSurface;// : IfcSurface; 
+		private SET<IfcBoundaryCurve> mBoundaries = new SET<IfcBoundaryCurve>();//: SET [1:?] OF IfcBoundaryCurve;
 		private bool mImplicitOuter = false;//	 :	BOOLEAN; 
 
-		public IfcSurface BasisSurface { get { return mDatabase[mBasisSurface] as IfcSurface; } set { mBasisSurface = value.mIndex; } }
-		public ReadOnlyCollection<IfcBoundaryCurve> Boundaries { get { return new ReadOnlyCollection<IfcBoundaryCurve>( mBoundaries.ConvertAll(x => mDatabase[x] as IfcBoundaryCurve)); } }
+		public IfcSurface BasisSurface { get { return mBasisSurface; } set { mBasisSurface = value; } }
+		public SET<IfcBoundaryCurve> Boundaries { get { return mBoundaries; } }
 		public bool ImplicitOuter { get { return mImplicitOuter; } }
 
 		internal IfcCurveBoundedSurface() : base() { }
-		internal IfcCurveBoundedSurface(DatabaseIfc db, IfcCurveBoundedSurface s, DuplicateOptions options) : base(db, s, options) { BasisSurface = db.Factory.Duplicate(s.BasisSurface) as IfcSurface; s.Boundaries.ToList().ForEach(x => addBoundary(db.Factory.Duplicate(x) as IfcBoundaryCurve)); mImplicitOuter = s.mImplicitOuter; }
+		internal IfcCurveBoundedSurface(DatabaseIfc db, IfcCurveBoundedSurface s, DuplicateOptions options) : base(db, s, options) 
+		{
+			BasisSurface = db.Factory.Duplicate(s.BasisSurface) as IfcSurface;
+			Boundaries.AddRange(s.Boundaries.Select(x => db.Factory.Duplicate(x) as IfcBoundaryCurve));
+			mImplicitOuter = s.mImplicitOuter; 
+		}
 		public IfcCurveBoundedSurface(DatabaseIfc m, IfcSurface s, List<IfcBoundaryCurve> bounds)
-			: base(m) { mBasisSurface = s.mIndex; mBoundaries = bounds.ConvertAll(x => x.mIndex); mImplicitOuter = false; }
-
-		internal void addBoundary(IfcBoundaryCurve boundary) { mBoundaries.Add(boundary.mIndex); }
+			: base(m) { BasisSurface = s; Boundaries.AddRange(bounds); mImplicitOuter = false; }
 	}
 	public interface IfcCurveMeasureSelect : IBaseClassIfc { } // SELECT(IfcParameterValue, IfcNonNegativeLengthMeasure);
 	public interface IfcCurveOnSurface : IBaseClassIfc { } // SELECT(IfcCompositeCurveOnSurface, IfcPcurve, IfcSurfaceCurve);

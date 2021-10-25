@@ -671,7 +671,11 @@ namespace GeometryGym.Ifc
 		public Dictionary<string, IfcPhysicalQuantity> Quantities { get { return mQuantities; } }
 
 		internal IfcElementQuantity() : base() { }
-		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, DuplicateOptions options) : base(db, q, options) { mMethodOfMeasurement = q.mMethodOfMeasurement; SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity)); }
+		internal IfcElementQuantity(DatabaseIfc db, IfcElementQuantity q, DuplicateOptions options) : base(db, q, options)
+		{ 
+			mMethodOfMeasurement = q.mMethodOfMeasurement; 
+			SetQuantities(q.Quantities.Values.Select(x=> db.Factory.Duplicate(x) as IfcPhysicalQuantity));
+		}
 		protected IfcElementQuantity(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcElementQuantity(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		public IfcElementQuantity(DatabaseIfc db, string name) : base(db, name) { }

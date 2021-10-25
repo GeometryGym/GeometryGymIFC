@@ -17,10 +17,10 @@ namespace GeometryGym.Ifc
 	{
 		public IfcColourRgbList(DatabaseIfc db, IEnumerable<Color> colourList) : base(db)
 		{
-			mColourList = colourList.Select(x => new double[] { x.R / 255.0, x.G / 255.0, x.B / 255.0 }).ToArray();
+			mColourList.AddRange(colourList.Select(x => new Tuple<double, double, double>(x.R / 255.0, x.G / 255.0, x.B / 255.0)));
 		}
 
-		internal List<Color> ColorList { get { return mColourList.Select(x => Color.FromArgb((int)(x[0] * 255), (int)(x[1] * 255), (int)(x[2] * 255))).ToList(); } }
+		internal List<Color> ColorList { get { return mColourList.Select(x => Color.FromArgb((int)(x.Item1 * 255), (int)(x.Item2 * 255), (int)(x.Item3 * 255))).ToList(); } }
 	}
 	public abstract partial class IfcColourSpecification : IfcPresentationItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcColourRgb)
 	{

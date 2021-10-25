@@ -34,7 +34,23 @@ using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
 { 
-	public enum ReleaseVersion {[Obsolete("RETIRED", false)] IFC2X, [Obsolete("RETIRED", false)] IFC2x2, IFC2x3, IFC4, IFC4A1, IFC4A2, IFC4X1, IFC4X2, IFC4X3_RC1, IFC4X3_RC2, IFC4X3_RC3, IFC4X3_RC4, IFC4X3_RC5TEST }; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	public enum ReleaseVersion 
+	{
+		[Obsolete("Retired", false)] IFC2X, 
+		[Obsolete("Retired", false)] IFC2x2, 
+		IFC2x3, 
+		[Obsolete("Retired", false)] IFC4, 
+		[Obsolete("Withdrawn", false)] IFC4A1,  
+		IFC4A2, 
+		[Obsolete("Withdrawn", false)] IFC4X1, 
+		[Obsolete("Withdrawn", false)] IFC4X2,
+		[Obsolete("Obsolete", false)] IFC4X3_RC1,
+		[Obsolete("Obsolete", false)] IFC4X3_RC2,
+		[Obsolete("Obsolete", false)] IFC4X3_RC3,
+		IFC4X3_RC4, 
+		IFC4X3_RC5TEST 
+	}; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
+	
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
 
 	public class Triple<T>
@@ -714,7 +730,8 @@ namespace GeometryGym.Ifc
 						return null;
 				}
 			}
-			if (!options.CommonPropertySets && propertySet is IfcPropertySet propSet && propertySet.Database != null && propertySet.Database.id == mDatabase.id)
+			IfcPropertySet propSet = propertySet as IfcPropertySet;
+			if (!options.CommonPropertySets && propSet != null && propertySet.Database != null && propertySet.Database.id == mDatabase.id)
 				return new IfcPropertySet(mDatabase, propSet, options);
 
 			IfcPropertySetDefinition existing = null, result = result = Duplicate(propertySet, options) as IfcPropertySetDefinition;
@@ -1588,6 +1605,7 @@ namespace GeometryGym.Ifc
 		public bool CommonPropertySets { get; set; } = false;
 		public bool DuplicateAssociations { get; set; } = true;
 		public bool DuplicateRepresentation { get; set; } = true;
+		public bool DuplicatePresentationStyling { get; set; } = true;
 		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; }
 		public bool DuplicateOwnerHistory { get; set; } = true;
@@ -1604,9 +1622,11 @@ namespace GeometryGym.Ifc
 		{
 			DuplicateHost = options.DuplicateHost;
 			DuplicateDownstream = options.DuplicateDownstream;
-			DuplicateAssociations = options.DuplicateAssociations;
 			DuplicateProperties = options.DuplicateProperties;
 			CommonPropertySets = options.CommonPropertySets;
+			DuplicateAssociations = options.DuplicateAssociations;
+			DuplicateRepresentation = options.DuplicateRepresentation;
+			DuplicatePresentationStyling = options.DuplicatePresentationStyling;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
 			DuplicateOwnerHistory = options.DuplicateOwnerHistory;
@@ -1849,8 +1869,15 @@ namespace GeometryGym.Ifc
 	
 			internal void ParseDefinition(ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 			{
+				if (string.Compare(Object.StepClassName, "IfcRelAssociatesClassification", true) == 0)
+					Debug.WriteLine(ToString());
 				int pos = 0;
 				Object.parse(DefinitionString, ref pos, release, DefinitionString.Length, dictionary);
+			}
+
+			public override string ToString()
+			{
+				return Object.StepClassName + " " + DefinitionString;
 			}
 		}
 
@@ -2324,6 +2351,33 @@ namespace GeometryGym.Ifc
 			return false;
 		}
 
+		public bool WriteSTEP(string fileName, System.ComponentModel.BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs e)
+		{
+			mDatabase.FileName = fileName;
+			StreamWriter sw = new StreamWriter(fileName);
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			sw.Write(getHeaderString(fileName) + "\r\n");
+			int count = mDatabase.Count(),counter = 0;
+			foreach (BaseClassIfc c in mDatabase)
+			{
+				if (e != null)
+				{
+					try
+					{
+						string str = c.StringSTEP();
+						if (!string.IsNullOrEmpty(str))
+							sw.WriteLine(str);
+					}
+					catch (Exception) { }
+				}
+				worker.ReportProgress(counter / count);
+				counter++;
+			}
+			sw.Write(getFooterString());
+			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			return true;
+		}
 		public bool WriteSTEP(TextWriter sw, string filename)
 		{
 			mDatabase.FileName = filename;

@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 		{
 			return BuildStringSTEP(mDatabase == null ? ReleaseVersion.IFC4A2 : mDatabase.Release);
 		}
-		protected virtual string BuildStringSTEP(ReleaseVersion release) { return ""; }
+		protected abstract string BuildStringSTEP(ReleaseVersion release);
 
 		protected string StepOptionalLengthString(double length)
 		{

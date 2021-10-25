@@ -53,22 +53,23 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVector : IfcGeometricRepresentationItem
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mOrientation) + "," + ParserSTEP.DoubleToString(mMagnitude); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mOrientation.StepId + "," + ParserSTEP.DoubleToString(mMagnitude); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mOrientation = ParserSTEP.StripLink(str, ref pos, len);
+			mOrientation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
 			mMagnitude = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return ""; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { }
 	}
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECATED IFC4
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.LinkToString(mTextureVertices[0]);
+			string str = "(" + ParserSTEP.LinkToString(mTextureVertices[0]);
 			for (int icounter = 1; icounter < mTextureVertices.Count; icounter++)
 				str += "," + ParserSTEP.LinkToString(mTextureVertices[icounter]);
 			str += "),(" + ParserSTEP.LinkToString(mTexturePoints[0]);
@@ -84,7 +85,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVertexLoop : IfcLoop
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mLoopVertex); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mLoopVertex); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length); }
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
@@ -94,9 +95,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVibrationDamper : IfcElementComponent
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + (mPredefinedType == IfcVibrationDamperTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcVibrationDamperTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -108,9 +109,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVibrationDamperType : IfcElementComponentType
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() +
+			return base.BuildStringSTEP(release) +
 			(mPredefinedType == IfcVibrationDamperTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -147,7 +148,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(#" + mIntersectingAxes.Item1 + ",#" + mIntersectingAxes.Item2 + "),(";
+			string str = "(#" + mIntersectingAxes.Item1 + ",#" + mIntersectingAxes.Item2 + "),(";
 			str += ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2);
 			if (!double.IsNaN(mOffsetDistances.Item3))
 				str += "," + ParserSTEP.DoubleToString(mOffsetDistances.Item3);

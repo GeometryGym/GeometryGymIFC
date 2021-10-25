@@ -2315,7 +2315,7 @@ namespace GeometryGym.Ifc
 			mRepresentationType = r.mRepresentationType;
 			Items.AddRange(r.Items.Select(x => x.Duplicate(db, options) as RepresentationItem));
 
-			if(r.mLayerAssignment != null)
+			if(options.DuplicatePresentationStyling && r.mLayerAssignment != null)
 			{
 				IfcPresentationLayerAssignment la = db.Factory.Duplicate(r.mLayerAssignment, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
@@ -2390,12 +2390,12 @@ namespace GeometryGym.Ifc
 		protected IfcRepresentationItem() : base() { }
 		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i, DuplicateOptions options) : base(db, i)
 		{
-			if(i.mLayerAssignment != null)
+			if(options.DuplicatePresentationStyling && i.mLayerAssignment != null)
 			{
 				IfcPresentationLayerAssignment la = db.Factory.Duplicate(i.mLayerAssignment, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = false }) as IfcPresentationLayerAssignment;
 				la.AssignedItems.Add(this);
 			}
-			if (i.mStyledByItem != null)
+			if (options.DuplicatePresentationStyling && i.mStyledByItem != null)
 			{
 				IfcStyledItem si = db.Factory.Duplicate(i.mStyledByItem) as IfcStyledItem;
 				si.Item = this;

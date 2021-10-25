@@ -473,11 +473,11 @@ namespace GeometryGym.STEP
 			}
 			return result;
 		}
-		public static double[][] SplitListDoubleTuple(string s)
+		public static List<Tuple<double,double>> SplitListDoubleTuple(string s)
 		{
-			List<double[]> tss = new List<double[]>(100);
+			List<Tuple<double, double>> tss = new List<Tuple<double, double>>(s.Length / 10);
 			if (s == "$")
-				return new double[0][];
+				return new List<Tuple<double, double>>();
 			string field = "";
 			int ilast = s.Length;
 			int icounter = 0;
@@ -491,7 +491,7 @@ namespace GeometryGym.STEP
 
 			char c = s[icounter];
 			if (c != '(')
-				return new double[0][];
+				return new List<Tuple<double, double>>();
 			for (icounter++; icounter < ilast; icounter++)
 			{
 				c = s[icounter];
@@ -517,20 +517,20 @@ namespace GeometryGym.STEP
 							j = double.Parse(field, NumberFormat);
 							field = "";
 
-							tss.Add(new double[] { i, j });
+							tss.Add(new Tuple<double, double>(i, j));
 							break;
 						}
 						field += c;
 					}
 				}
 			}
-			return tss.ToArray();
+			return tss;
 		}
-		public static double[][] SplitListDoubleTriple(string s)
+		public static List<Tuple<double, double, double>> SplitListDoubleTriple(string s)
 		{
-			List<double[]> tss = new List<double[]>(100);
+			List<Tuple<double, double ,double>> tss = new List<Tuple<double, double, double>>(s.Length / 20);
 			if (s == "$")
-				return new double[0][];
+				return new List<Tuple<double, double, double>>();
 			string field = "";
 			int ilast = s.Length;
 			int icounter = 0;
@@ -544,7 +544,7 @@ namespace GeometryGym.STEP
 
 			char c = s[icounter];
 			if (c != '(')
-				return new double[0][];
+				return new List<Tuple<double, double, double>>();
 			for (icounter++; icounter < ilast; icounter++)
 			{
 				c = s[icounter];
@@ -581,20 +581,20 @@ namespace GeometryGym.STEP
 							k = double.Parse(field, NumberFormat);
 							field = "";
 
-							tss.Add(new double[] { i, j, k });
+							tss.Add(new Tuple<double, double, double>(i, j, k));
 							break;
 						}
 						field += c;
 					}
 				}
 			}
-			return tss.ToArray();
+			return tss;
 		}	
-		public static Tuple<int, int, int>[] SplitListSTPIntTriple(string s)
+		public static List<Tuple<int, int, int>> SplitListSTPIntTriple(string s)
 		{
 			List<Tuple<int, int, int>> tss = new List<Tuple<int, int, int>>(100);
 			if (s == "$")
-				return new Tuple<int, int, int>[0];
+				return new List<Tuple<int, int, int>>();
 			string field = "";
 			int ilast = s.Length;
 			int icounter = 0;
@@ -608,7 +608,7 @@ namespace GeometryGym.STEP
 
 			char c = s[icounter];
 			if (c != '(')
-				return new Tuple<int, int, int>[0];
+				return new List<Tuple<int, int, int>>();
 			for (icounter++; icounter < ilast; icounter++)
 			{
 				c = s[icounter];
@@ -653,7 +653,7 @@ namespace GeometryGym.STEP
 				}
 			}
 
-			return tss.ToArray();
+			return tss;
 		}
 
 		private static void progressToNext(string s, ref int pos, int len)
@@ -1348,11 +1348,11 @@ namespace GeometryGym.STEP
 			progressToNext(s, ref pos, len);
 			return result;
 		}
-		public static List<double[]> StripListTripleDouble(string s, ref int pos, int len)
+		public static List<Tuple<double,double,double>> StripListTripleDouble(string s, ref int pos, int len)
 		{
 			int icounter = pos;
 			if (string.IsNullOrEmpty(s) || pos == len)
-				return new List<double[]>();
+				return new List<Tuple<double,double,double>>();
 			while (char.IsWhiteSpace(s[icounter]))
 			{
 				icounter++;
@@ -1363,7 +1363,7 @@ namespace GeometryGym.STEP
 			{
 				pos = icounter + 1;
 				progressToNext(s, ref pos, len);
-				return new List<double[]>();
+				return new List<Tuple<double, double, double>>();
 			}
 			while (char.IsWhiteSpace(s[icounter]))
 				icounter++;
@@ -1373,7 +1373,7 @@ namespace GeometryGym.STEP
 				icounter++;
 
 			NumberFormatInfo numberFormat = NumberFormat;
-			List<double[]> result = new List<double[]>();
+			List<Tuple<double, double, double>> result = new List<Tuple<double, double, double>>();
 			while (s[icounter] != ')')
 			{
 				if (s[icounter++] != '(')
@@ -1427,7 +1427,7 @@ namespace GeometryGym.STEP
 							break;
 					}
 					double z = double.Parse(str, numberFormat);
-					result.Add(new double[] { x, y, z });
+					result.Add(new Tuple<double,double,double>(x, y, z));
 				}
 				if (icounter == len)
 					break;

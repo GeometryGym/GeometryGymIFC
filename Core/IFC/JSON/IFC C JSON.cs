@@ -78,18 +78,17 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("CoordList", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 			{
-				List<double[]> points = new List<double[]>();
+				List<Tuple<double, double>> points = new List<Tuple<double, double>>();
 				List<double> vals = token.Value<string>().Split(" ".ToCharArray()).ToList().ConvertAll(x => double.Parse(x));
 				for (int icounter = 0; icounter < vals.Count; icounter += 2)
-					points.Add(new double[] { vals[icounter], vals[icounter + 1] });
-				mCoordList = points.ToArray();
-
+					points.Add(new Tuple<double, double>(vals[icounter], vals[icounter + 1]));
+				mCoordList.AddRange(points);
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["CoordList"] = string.Join(" ", mCoordList.Select(x => x[0] + " " + x[1]));
+			obj["CoordList"] = string.Join(" ", mCoordList.Select(x => x.Item1 + " " + x.Item2));
 		}
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
@@ -101,17 +100,17 @@ namespace GeometryGym.Ifc
 			if (token != null)
 			{
 				List<double> vals = token.Value<string>().Split(" ".ToCharArray()).ToList().ConvertAll(x => double.Parse(x));
-				List<double[]> points = new List<double[]>(vals.Count / 3);
+				List<Tuple<double, double, double>> points = new List<Tuple<double, double, double>>(vals.Count / 3);
 				for (int icounter = 0; icounter < vals.Count; icounter += 3)
-					points.Add(new double[] { vals[icounter], vals[icounter + 1], vals[icounter + 2] });
-				mCoordList = points.ToArray();
+					points.Add(new Tuple<double, double, double>(vals[icounter], vals[icounter + 1], vals[icounter + 2]));
+				mCoordList.AddRange(points);
 
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["CoordList"] = string.Join(" ", mCoordList.ToList().ConvertAll(x => x[0] + " " + x[1] + " " + x[2]));
+			obj["CoordList"] = string.Join(" ", mCoordList.Select(x => x.Item1 + " " + x.Item2 + " " + x.Item3));
 		}
 	}
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -770,7 +769,7 @@ namespace GeometryGym.Ifc
 			OuterBoundary = extractObject<IfcCurve>(obj.GetValue("OuterBoundary", StringComparison.InvariantCultureIgnoreCase) as JObject);
 			JArray array = obj.GetValue("InnerBoundaries", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				mDatabase.extractJArray<IfcCurve>(array).ForEach(x=> addInnerBoundary(x));
+				InnerBoundaries.AddRange(mDatabase.extractJArray<IfcCurve>(array));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -778,7 +777,7 @@ namespace GeometryGym.Ifc
 			obj["BasisSurface"] = BasisSurface.getJson(this, options);
 			obj["OuterBoundary"] = OuterBoundary.getJson(this, options);
 			if (mInnerBoundaries.Count > 0)
-				obj["InnerBoundaries"] = new JArray(InnerBoundaries.ToList().ConvertAll(x => x.getJson(this, options)));
+				obj["InnerBoundaries"] = new JArray(InnerBoundaries.Select(x => x.getJson(this, options)));
 		}
 	}
 	public partial class IfcCurveSegment : IfcSegment

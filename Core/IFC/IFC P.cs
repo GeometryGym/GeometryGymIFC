@@ -287,6 +287,13 @@ namespace GeometryGym.Ifc
 		public string Usage { get { return mUsage; } set { mUsage = value; } }
 
 		public IfcPhysicalComplexQuantity() : base() { }
+		internal IfcPhysicalComplexQuantity(DatabaseIfc db, IfcPhysicalComplexQuantity q) : base(db, q)
+		{
+			HasQuantities.AddRange(q.HasQuantities.Select(x => db.Factory.Duplicate(x) as IfcPhysicalQuantity));
+			mDiscrimination = q.mDiscrimination;
+			mQuality = q.mQuality;
+			mUsage = q.mUsage;
+		}
 		public IfcPhysicalComplexQuantity(string name, IEnumerable<IfcPhysicalQuantity> hasQuantities, string discrimination)
 			: base(hasQuantities.First().Database, name)
 		{

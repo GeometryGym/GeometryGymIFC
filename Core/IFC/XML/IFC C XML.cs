@@ -99,16 +99,16 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("CoordList"))
 			{
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
-				List<double[]> coords = new List<double[]>(fields.Length / 2);
+				List<Tuple<double,double>> coords = new List<Tuple<double,double>>(fields.Length / 10);
 				for (int icounter = 0; icounter < fields.Length; icounter += 2)
-					coords.Add(new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]) });
-				CoordList = coords.ToArray();
+					coords.Add(new Tuple<double, double> (double.Parse(fields[icounter]), double.Parse(fields[icounter + 1])));
+				CoordList.AddRange(coords);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("CoordList", string.Join(" ", CoordList.Select(x => x[0] + " " + x[1])));
+			xml.SetAttribute("CoordList", string.Join(" ", CoordList.Select(x => x.Item1 + " " + x.Item2)));
 		}
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
@@ -119,16 +119,16 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("CoordList"))
 			{
 				string[] fields = xml.Attributes["CoordList"].Value.Split(" ".ToCharArray());
-				List<double[]> points = new List<double[]>(fields.Length / 3);
+				List<Tuple<double,double,double>> points = new List<Tuple<double,double,double>>(fields.Length / 30);
 				for (int icounter = 0; icounter < fields.Length; icounter += 3)
-					points.Add(new double[] { double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2]) });
-				mCoordList = points.ToArray();
+					points.Add(new Tuple<double, double, double>(double.Parse(fields[icounter]), double.Parse(fields[icounter + 1]), double.Parse(fields[icounter + 2])));
+				mCoordList.AddRange(points);
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.SetAttribute("CoordList", string.Join(" ", mCoordList.Select(x => x[0] + " " + x[1] + " " + x[2])));
+			xml.SetAttribute("CoordList", string.Join(" ", mCoordList.Select(x => x.Item1 + " " + x.Item2 + " " + x.Item3)));
 		}
 	}
 	public abstract partial class IfcCartesianTransformationOperator : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianTransformationOperator2D ,IfcCartesianTransformationOperator3D))*/
@@ -1140,7 +1140,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcCurve c = mDatabase.ParseXml<IfcCurve>(cn as XmlElement);
 						if (c != null)
-							addInnerBoundary(c);
+							InnerBoundaries.Add(c);
 					}
 				}
 			}

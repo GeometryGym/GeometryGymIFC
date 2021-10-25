@@ -532,11 +532,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTextureVertexList : IfcPresentationItem
 	{
-		internal double[][] mTexCoordsList = new double[0][];// : LIST [1:?] OF IfcSurfaceTexture
+		internal List<Tuple<double,double>> mTexCoordsList = new List<Tuple<double, double>>();// : LIST [1:?] OF LIST [2:2] OF IfcParameterValue;
+		public List<Tuple<double, double>> TexCoordsList {  get { return mTexCoordsList; } }
 
 		internal IfcTextureVertexList() : base() { }
 		internal IfcTextureVertexList(DatabaseIfc db, IfcTextureVertexList l) : base(db, l) { mTexCoordsList = l.mTexCoordsList; }
-		public IfcTextureVertexList(DatabaseIfc m, IEnumerable<Tuple<double, double>> coords) : base(m) { mTexCoordsList = coords.Select(x => new double[] { x.Item1, x.Item2 }).ToArray(); }
+		public IfcTextureVertexList(DatabaseIfc db, IEnumerable<Tuple<double, double>> coords) : base(db) { mTexCoordsList.AddRange(coords); }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -845,23 +846,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
 	{
-		internal double[][] mNormals = new double[0][];// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
+		internal List<Tuple<double, double, double>> mNormals = new List<Tuple<double,double,double>>();// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
 		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
-		internal LIST<Tuple<int, int, int>> mCoordIndex = new LIST<Tuple<int, int, int>>();// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
-		internal LIST<Tuple<int, int, int>> mNormalIndex = new LIST<Tuple<int, int, int>>();// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
-		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
+		internal List<Tuple<int, int, int>> mCoordIndex = new List<Tuple<int, int, int>>();// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
+		internal List<Tuple<int, int, int>> mNormalIndex = new List<Tuple<int, int, int>>();// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
+		internal List<int> mPnIndex = new List<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
-		public double[][] Normals { get { return mNormals; } set { mNormals = value; } }
+		public List<Tuple<double, double, double>> Normals { get { return mNormals; } }
 		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
-		public LIST<Tuple<int, int, int>> CoordIndex { get { return mCoordIndex; } }
-		public LIST<Tuple<int, int, int>> NormalIndex { get { return mNormalIndex; } }
-		public LIST<int> PnIndex { get { return mPnIndex; } }
+		public List<Tuple<int, int, int>> CoordIndex { get { return mCoordIndex; } }
+		public List<Tuple<int, int, int>> NormalIndex { get { return mNormalIndex; } }
+		public List<int> PnIndex { get { return mPnIndex; } }
 
 		internal IfcTriangulatedFaceSet() : base() { }
 		internal IfcTriangulatedFaceSet(DatabaseIfc db, IfcTriangulatedFaceSet s, DuplicateOptions options) : base(db, s, options)
 		{
-			if (s.mNormals.Length > 0)
-				mNormals = s.mNormals.ToArray();
+			if (s.mNormals.Count > 0)
+				mNormals.AddRange(s.mNormals);
 			mClosed = s.mClosed;
 			mCoordIndex.AddRange(s.mCoordIndex);
 			if (s.mNormalIndex.Count > 0)

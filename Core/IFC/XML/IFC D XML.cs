@@ -67,14 +67,12 @@ namespace GeometryGym.Ifc
 				string name = child.Name;
 				if (string.Compare(name, "Elements") == 0)
 				{
-					List<IfcDerivedUnitElement> elements = new List<IfcDerivedUnitElement>();
 					foreach (XmlNode node in child.ChildNodes)
 					{
 						IfcDerivedUnitElement element = mDatabase.ParseXml<IfcDerivedUnitElement>(node as XmlElement);
 						if (element != null)
-							elements.Add(element);
+							Elements.Add(element);
 					}
-					Elements = elements;
 				}
 			}
 		}

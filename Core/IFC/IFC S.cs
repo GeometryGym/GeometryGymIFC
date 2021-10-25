@@ -179,8 +179,8 @@ namespace GeometryGym.Ifc
 		internal IfcSectionedSolidHorizontal() : base() { }
 		internal IfcSectionedSolidHorizontal(DatabaseIfc db, IfcSectionedSolidHorizontal s, DuplicateOptions options) : base(db, s, options)
 		{
-			CrossSectionPositions.AddRange(s.CrossSectionPositions);
-			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.ConvertAll(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
+			CrossSectionPositions.AddRange(s.CrossSectionPositions.Select(x=>db.Factory.Duplicate(x) as IfcAxis2PlacementLinear));
+			mCrossSectionPositions_OBSOLETE.AddRange(s.mCrossSectionPositions_OBSOLETE.Select(x => db.Factory.Duplicate(x) as IfcPointByDistanceExpression));
 			mCrossSectionPositionMeasures_OBSOLETE.AddRange(s.mCrossSectionPositionMeasures_OBSOLETE);
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
@@ -1085,10 +1085,17 @@ additional types	some additional representation types are given:
 	public partial class IfcSpaceType : IfcSpatialStructureElementType
 	{
 		internal IfcSpaceTypeEnum mPredefinedType = IfcSpaceTypeEnum.NOTDEFINED;
+		private string mLongName = "";// : OPTIONAL IfcLabel; // Added IFC4
+
 		public IfcSpaceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public string LongName { get { return mLongName; } set { mLongName = value; } }
 
 		internal IfcSpaceType() : base() { }
-		internal IfcSpaceType(DatabaseIfc db, IfcSpaceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
+		internal IfcSpaceType(DatabaseIfc db, IfcSpaceType t, DuplicateOptions options) : base(db, t, options) 
+		{ 
+			mPredefinedType = t.mPredefinedType;
+			mLongName = t.mLongName;
+		}
 		public IfcSpaceType(DatabaseIfc db, string name, IfcSpaceTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]

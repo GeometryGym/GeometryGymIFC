@@ -63,10 +63,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVector : IfcGeometricRepresentationItem, IfcHatchLineDistanceSelect, IfcVectorOrDirection
 	{
-		internal int mOrientation; // : IfcDirection;
+		internal IfcDirection mOrientation; // : IfcDirection;
 		internal double mMagnitude;// : IfcLengthMeasure; 
 
-		public IfcDirection Orientation { get { return mDatabase[mOrientation] as IfcDirection; } set { mOrientation = value.mIndex; } }
+		public IfcDirection Orientation { get { return mOrientation; } set { mOrientation = value; } }
 		public double Magnitude { get { return mMagnitude; } set { mMagnitude = value; } }
 
 		internal IfcVector() : base() { }

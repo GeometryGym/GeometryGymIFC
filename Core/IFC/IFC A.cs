@@ -1221,40 +1221,44 @@ namespace GeometryGym.Ifc
 
 		public double HeightAt(double distanceAlongSegment)
 		{
+			double gradient = 0;
+			return HeightAt(distanceAlongSegment, out gradient);
+		}
+
+		public double HeightAt(double distanceAlongSegment, out double gradient)
+		{
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
-				return StartHeight + StartGradient * (distanceAlongSegment);
-			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
 			{
-				double gradient = 0;
-				return circularHeightAt(distanceAlongSegment, out gradient);
+				gradient = StartGradient;
+				return StartHeight + StartGradient * (distanceAlongSegment);
 			}
-			if(PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
+			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
+			{
+				double x = distanceAlongSegment;
+				double R = mRadiusOfCurvature, g1 = StartGradient;
+				double c = 1 / Math.Sqrt(1 + g1 * g1);
+				double xc = g1 * R * c, yc = R * c;
+				double y = 0;
+				if (g1 > EndGradient)
+				{
+					y = Math.Sqrt(R * R - Math.Pow(x - xc, 2));
+					gradient = (xc - x) / y;
+					return StartHeight - yc + y;
+				}
+				y = Math.Sqrt(R * R - Math.Pow(x + xc, 2));
+				gradient = (x + xc) / y;
+				return StartHeight + yc - y;
+			}
+			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
 			{
 				double x = distanceAlongSegment;
 				double R = RadiusOfCurvature * (EndGradient < StartGradient ? -1 : 1);
-				double g = x / R + StartGradient;
-				double result = StartHeight + x * (g + StartGradient) / 2;
+				gradient = x / R + StartGradient;
+				double result = StartHeight + x * (gradient + StartGradient) / 2;
 				return result;
 			}
+			gradient = double.NaN;	
 			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
-		}
-
-		private double circularHeightAt(double distanceAlongSegment, out double gradient)
-		{
-			double x = distanceAlongSegment;
-			double R = mRadiusOfCurvature, g1 = StartGradient;
-			double c = 1 / Math.Sqrt(1 + g1 * g1);
-			double xc = g1 * R * c, yc = R * c;
-			double y = 0;
-			if (g1 > EndGradient)
-			{
-				y = Math.Sqrt(R * R - Math.Pow(x - xc, 2));
-				gradient = (xc - x) / y;
-				return StartHeight - yc + y;
-			}
-			y = Math.Sqrt(R * R - Math.Pow(x + xc, 2));
-			gradient = (x + xc) / y;
-			return StartHeight + yc - y;
 		}
 	}
 	[Obsolete("DEPRECATED IFC4", false)]

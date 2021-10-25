@@ -124,27 +124,33 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
 	{
-		private List<int> mElements = new List<int>();// : SET [1:?] OF IfcDerivedUnitElement;
+		private SET<IfcDerivedUnitElement> mElements = new SET<IfcDerivedUnitElement>();// : SET [1:?] OF IfcDerivedUnitElement;
 		private IfcDerivedUnitEnum mUnitType;// : IfcDerivedUnitEnum;
 		private string mUserDefinedType = "$";// : OPTIONAL IfcLabel;
 
-		public List<IfcDerivedUnitElement> Elements { get { return mElements.ConvertAll(x => mDatabase[x] as IfcDerivedUnitElement); } set { mElements = value.ConvertAll(x => x.mIndex); } }
+		public SET<IfcDerivedUnitElement> Elements { get { return mElements; } }
 		public IfcDerivedUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
 		public string UserDefinedType { get { return (mUserDefinedType == "$" ? "" : ParserIfc.Decode(mUserDefinedType)); } set { mUserDefinedType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcDerivedUnit() : base() { }
-		internal IfcDerivedUnit(DatabaseIfc db, IfcDerivedUnit u) : base(db) { Elements = u.Elements.ConvertAll(x=>db.Factory.Duplicate(x) as IfcDerivedUnitElement); mUnitType = u.mUnitType; mUserDefinedType = u.mUserDefinedType; }
-		public IfcDerivedUnit(IfcDerivedUnitElement element, IfcDerivedUnitEnum type) : base(element.mDatabase) { mElements.Add(element.mIndex); mUnitType = type;  }
-		public IfcDerivedUnit(IEnumerable<IfcDerivedUnitElement> elements, IfcDerivedUnitEnum type) : base(elements.First().mDatabase) { foreach(IfcDerivedUnitElement e in elements) mElements.Add(e.mIndex); mUnitType = type; }
-		public IfcDerivedUnit(IEnumerable<IfcDerivedUnitElement> elements, string userDefinedType) : base(elements.First().mDatabase) { foreach(IfcDerivedUnitElement e in elements) mElements.Add(e.mIndex); UserDefinedType = userDefinedType; mUnitType = IfcDerivedUnitEnum.USERDEFINED; }
-		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitEnum type) : base(due1.mDatabase) { mElements.Add(due1.mIndex); mElements.Add(due2.mIndex); mUnitType = type;  }
-		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitElement due3, IfcDerivedUnitEnum type) : base(due1.mDatabase) { mElements.Add(due1.mIndex); mElements.Add(due2.mIndex); mElements.Add(due3.mIndex); mUnitType = type;  }
+		internal IfcDerivedUnit(DatabaseIfc db, IfcDerivedUnit u) : base(db) 
+		{ 
+			Elements.AddRange(u.Elements.ConvertAll(x=>db.Factory.Duplicate(x) as IfcDerivedUnitElement)); 
+			mUnitType = u.mUnitType; 
+			mUserDefinedType = u.mUserDefinedType; 
+		}
+		public IfcDerivedUnit(IfcDerivedUnitElement element, IfcDerivedUnitEnum type) : base(element.mDatabase) { Elements.Add(element); mUnitType = type;  }
+		public IfcDerivedUnit(IfcDerivedUnitEnum type, params IfcDerivedUnitElement[] elements) : base(elements.First().Database) { Elements.AddRange(elements); mUnitType = type;  }
+		public IfcDerivedUnit(IEnumerable<IfcDerivedUnitElement> elements, IfcDerivedUnitEnum type) : base(elements.First().mDatabase) { Elements.AddRange(elements); mUnitType = type; }
+		public IfcDerivedUnit(IEnumerable<IfcDerivedUnitElement> elements, string userDefinedType) : base(elements.First().mDatabase) { Elements.AddRange(elements); UserDefinedType = userDefinedType; mUnitType = IfcDerivedUnitEnum.USERDEFINED; }
+		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitEnum type) : base(due1.mDatabase) { Elements.Add(due1); Elements.Add(due2); mUnitType = type;  }
+		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitElement due3, IfcDerivedUnitEnum type) : base(due1.mDatabase) { Elements.Add(due1); Elements.Add(due2); Elements.Add(due3); mUnitType = type;  }
 		
 		public double SIFactor
 		{
 			get
 			{
-				List<IfcDerivedUnitElement> elements = Elements;
+				SET<IfcDerivedUnitElement> elements = Elements;
 				double result = 1;
 				foreach (IfcDerivedUnitElement due in elements)
 					result *= Math.Pow(due.Unit.SIFactor, due.Exponent);
@@ -155,15 +161,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDerivedUnitElement : BaseClassIfc
 	{
-		private int mUnit;// : IfcNamedUnit;
-		private int mExponent;// : INTEGER;
+		private IfcNamedUnit mUnit;// : IfcNamedUnit;
+		private int mExponent;// : IfcInteger;
 
-		public IfcNamedUnit Unit { get { return mDatabase[mUnit] as IfcNamedUnit; } set { mUnit = value.mIndex; } }
+		public IfcNamedUnit Unit { get { return mUnit; } set { mUnit = value; } }
 		public int Exponent { get { return mExponent; } set { mExponent = value; } } 
 
 		internal IfcDerivedUnitElement() : base() { }
 		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Factory.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
-		public IfcDerivedUnitElement(IfcNamedUnit u, int exponent) : base(u.mDatabase) { mUnit = u.mIndex; mExponent = exponent; }
+		public IfcDerivedUnitElement(IfcNamedUnit u, int exponent) : base(u.mDatabase) { Unit = u; mExponent = exponent; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]

@@ -30,9 +30,9 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcKerb : IfcBuiltElement
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + "," + (mMountable ? ".T." : ".F");
+			return base.BuildStringSTEP(release) + "," + (mMountable ? ".T." : ".F");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -42,9 +42,9 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
-		protected override string BuildStringSTEP()
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP() + "," + (mMountable ? ".T." : ".F");
+			return base.BuildStringSTEP(release) + "," + (mMountable ? ".T." : ".F");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

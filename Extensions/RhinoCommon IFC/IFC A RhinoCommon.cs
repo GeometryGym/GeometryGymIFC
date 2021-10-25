@@ -28,9 +28,9 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcAlignmentHorizontal : IfcLinearElement
+	public partial class IfcAlignmentHorizontal
 	{
-		internal Plane planeAtLength(double length, double tol)
+		internal override Plane computePlaneAtLength(double length, double tol)
 		{
 			double distAlong = 0;
 			List<IfcAlignmentHorizontalSegment> segments = HorizontalSegments.ToList();
@@ -88,15 +88,10 @@ namespace GeometryGym.Ifc
 			throw new NotImplementedException("Plane at length for " + PredefinedType + " not implemented yet!");
 		}
 	}
-	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
-	{
-		
-	}
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
 		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector3d : Vector3d.XAxis); } }
 	}
-	
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{
 		internal Vector3d DirectionVector { get { return (mRefDirection != null ? RefDirection.Vector3d : Vector3d.XAxis); } }
