@@ -116,7 +116,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJObject(JObject obj)
 		{
 			base.parseJObject(obj);
-			mDatabase.extractJArray<IfcShapeModel>(obj.GetValue("ShapeRepresentations", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x => addRepresentation(x));
+			mShapeRepresentations.AddRange(mDatabase.extractJArray<IfcShapeModel>(obj.GetValue("ShapeRepresentations", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			JToken token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Name = token.Value<string>();

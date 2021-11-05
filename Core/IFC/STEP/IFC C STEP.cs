@@ -226,6 +226,8 @@ namespace GeometryGym.Ifc
 						string field = lst[icounter];
 						if (field.Length > 2)
 							mTagList.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
+						else
+							mTagList.Add(null);
 					}
 				}
 			}
@@ -273,6 +275,8 @@ namespace GeometryGym.Ifc
 						string field = lst[icounter];
 						if (field.Length > 2)
 							mTagList.Add(ParserIfc.Decode(field.Substring(1, field.Length - 2)));
+						else
+							mTagList.Add(null);
 					}
 				}
 			}

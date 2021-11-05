@@ -345,8 +345,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			foreach (IfcShapeModel shapeModel in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcShapeModel))
-				addRepresentation(shapeModel);
+			mShapeRepresentations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcShapeModel));
 			mName = ParserSTEP.StripString(str, ref pos, len);
 			mDescription = ParserSTEP.StripString(str, ref pos, len);
 			mProductDefinitional = ParserIfc.StripLogical(str,ref pos, len);

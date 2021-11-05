@@ -2339,16 +2339,17 @@ namespace GeometryGym.Ifc
 			if (mDatabase != null && mDatabase.IsDisposed())
 				return;
 			IfcShapeModel shapeModel = this as IfcShapeModel;
+			if(shapeModel != null)
 			{
 				if (e.NewItems != null)
 				{
 					foreach (IfcRepresentationItem r in e.NewItems)
-						r.mRepresents.Add(shapeModel);
+						r.Represents.Add(shapeModel);
 				}
 				if (e.OldItems != null)
 				{
 					foreach (IfcRepresentationItem r in e.OldItems)
-						r.mRepresents.Remove(shapeModel);
+						r.Represents.Remove(shapeModel);
 				}
 			}
 		}
@@ -2381,11 +2382,11 @@ namespace GeometryGym.Ifc
 	{ //INVERSE
 		internal IfcPresentationLayerAssignment mLayerAssignment = null;// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal IfcStyledItem mStyledByItem = null;// : SET [0:1] OF IfcStyledItem FOR Item; 
-
-		internal List<IfcShapeModel> mRepresents = new List<IfcShapeModel>();
+		private HashSet<IfcShapeModel> mRepresents = new HashSet<IfcShapeModel>(); //GeometryGym Inverse Attribute
 
 		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
 		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
+		internal HashSet<IfcShapeModel> Represents { get { return mRepresents; } }
 
 		protected IfcRepresentationItem() : base() { }
 		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i, DuplicateOptions options) : base(db, i)

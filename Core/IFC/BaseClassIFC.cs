@@ -302,7 +302,7 @@ namespace GeometryGym.Ifc
 					if (styledItem != null)
 						styledItem.Item = revisedItem;
 
-					foreach (IfcShapeModel shapeModel in representationItem.mRepresents.ToList())
+					foreach (IfcShapeModel shapeModel in representationItem.Represents.ToList())
 					{
 						shapeModel.Items.Remove(representationItem);
 						shapeModel.Items.Add(revisedItem);

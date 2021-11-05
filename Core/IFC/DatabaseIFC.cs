@@ -2288,6 +2288,8 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
 				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC5", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3_RC5TEST;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
 				if (mDatabase.Release > ReleaseVersion.IFC2x3)

@@ -171,9 +171,11 @@ namespace GeometryGym.Ifc
 		[Obsolete("REVISED IFC4x3RC4", false)]
 		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositionMeasures_OBSOLETE = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcCurveMeasureSelect;
 		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
+		[Obsolete("REVISED IFC4x3RC5", false)]
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
 		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
+		[Obsolete("REVISED IFC4x3RC5", false)]
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
@@ -221,16 +223,20 @@ namespace GeometryGym.Ifc
 	public partial class IfcSectionedSurface : IfcSurface 
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
-		[Obsolete("REVISED IFC4x3RC4", false)]
+		[Obsolete("REVISED IFC4x3RC5", false)]
 		private LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>(); //: LIST[2:?] OF IfcDistanceExpression;
 		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
 		private LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>(); //: LIST[2:?] OF IfcProfileDef;
+		[Obsolete("REVISED IFC4x3RC5", false)]
 		private bool mFixedAxisVertical = false; //: IfcBoolean;
 
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
-		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions = value; } }
-		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections = value; } }
+		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } }
+		[Obsolete("REVISED IFC4x3RC5", false)]
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
+		[Obsolete("REVISED IFC4x3RC5", false)]
+		public LIST<IfcPointByDistanceExpression> CrossSectionPositions_OBSOLETE { get { return mCrossSectionPositions_OBSOLETE; } }
 
 		public IfcSectionedSurface() : base() { }
 		internal IfcSectionedSurface(DatabaseIfc db, IfcSectionedSurface s, DuplicateOptions options) : base(db, s, options)
@@ -459,15 +465,35 @@ namespace GeometryGym.Ifc
 		internal IfcShapeAspect() : base() { }
 		internal IfcShapeAspect(DatabaseIfc db, IfcShapeAspect a) : base(db,a)
 		{
-			a.ShapeRepresentations.ToList().ForEach(x=>addRepresentation(db.Factory.Duplicate(x) as IfcShapeModel));
+			ShapeRepresentations.AddRange(a.ShapeRepresentations.Select(x=> db.Factory.Duplicate(x) as IfcShapeModel));
 			mName = a.mName;
 			mDescription = a.mDescription;
 			mProductDefinitional = a.mProductDefinitional;
 		}
-		public IfcShapeAspect(List<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations[0].Database) { shapeRepresentations.ForEach(x=>addRepresentation(x)); }
-		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { addRepresentation(shapeRepresentation); }
-		
-		internal void addRepresentation(IfcShapeModel model) { mShapeRepresentations.Add(model); model.mOfShapeAspect = this; }
+		public IfcShapeAspect(List<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations[0].Database) { mShapeRepresentations.AddRange(shapeRepresentations); }
+		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { mShapeRepresentations.Add(shapeRepresentation); }
+
+		protected override void initialize()
+		{
+			base.initialize();
+			mShapeRepresentations.CollectionChanged += mShapeRepresentations_CollectionChanged;
+		}
+		private void mShapeRepresentations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcShapeModel m in e.NewItems)
+					m.mOfShapeAspect = this;
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcShapeModel m in e.OldItems)
+					m.OfShapeAspect = null;
+			}
+		}
+
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { }// mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	[Serializable]

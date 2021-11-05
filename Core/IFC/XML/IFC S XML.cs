@@ -188,7 +188,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcShapeModel s = mDatabase.ParseXml<IfcShapeModel>(cn as XmlElement);
 						if (s != null)
-							addRepresentation(s);
+							mShapeRepresentations.Add(s);
 					}
 				}
 				else if (string.Compare(name, "PartOfProductDefinitionShape") == 0)

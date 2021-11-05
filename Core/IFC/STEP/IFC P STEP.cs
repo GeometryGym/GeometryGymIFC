@@ -882,7 +882,11 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$" && !string.IsNullOrEmpty(s))
 			{
-				mNominalValue = ParserIfc.parseValue(s);
+				try
+				{
+					mNominalValue = ParserIfc.parseValue(s);
+				}
+				catch { }
 				if (mNominalValue == null)
 				{
 					mVal = s;

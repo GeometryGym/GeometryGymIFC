@@ -728,10 +728,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcInteger : IfcSimpleValue
 	{
-		public int Magnitude { get; set; }
-		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt32(value); } }
-		public override Type ValueType { get { return typeof(int); } }
-		public IfcInteger(int value) { Magnitude = value; }
+		public long Magnitude { get; set; }
+		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToInt64(value); } }
+		public override Type ValueType { get { return typeof(long); } }
+		public IfcInteger(long value) { Magnitude = value; }
 		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
 	}
 	[Serializable]
