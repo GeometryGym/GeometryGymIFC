@@ -277,13 +277,13 @@ namespace GeometryGym.Ifc
 			foreach (char c in chars)
 				fn = fn.Replace(c, '_');
 			FileName = Path.Combine(FolderPath, fn + Path.GetExtension(filename));
-			if (filename.EndsWith("xml"))
+			if (ExtensionHelper.ExtensionEquals(filename, ".xml"))
 			{
 				WriteXmlFile(FileName);
 				return true;
 			}
 #if (!NOIFCJSON)
-			else if (FileName.EndsWith("json"))
+			else if (ExtensionHelper.ExtensionEquals(FileName, ".json"))
 			{
 				ToJSON(FileName);
 				return true;
@@ -291,7 +291,7 @@ namespace GeometryGym.Ifc
 
 #endif
 #if (!NOIFCZIP)
-			bool zip = FileName.EndsWith(".ifczip");
+			bool zip = ExtensionHelper.ExtensionEquals(FileName, ".ifczip");
 			System.IO.Compression.ZipArchive za = null;
 			if (zip)
 			{
@@ -314,12 +314,12 @@ namespace GeometryGym.Ifc
 		}
 		public bool WriteStream(Stream stream, string filename)
 		{
-			if (filename.EndsWith(".xml"))
+			if (ExtensionHelper.ExtensionEquals(filename, ".xml"))
 			{
 				return WriteXml(new XmlTextWriter(stream, Encoding.UTF8));
 			}
 #if (!NOIFCJSON)
-			else if (filename.EndsWith(".json"))
+			else if (ExtensionHelper.ExtensionEquals(filename, ".json"))
 			{
 				var jsonObject = ToJSON(string.Empty);
 				var sw = new StreamWriter(stream);
@@ -328,7 +328,7 @@ namespace GeometryGym.Ifc
 			}
 #endif
 #if (!NOIFCZIP)
-			else if (filename.EndsWith(".ifczip"))
+			else if (ExtensionHelper.ExtensionEquals(filename, ".ifczip"))
 			{
 				var za = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create, true);
 				var zae = za.CreateEntry(Path.GetFileNameWithoutExtension(filename) + ".ifc");
@@ -1739,22 +1739,20 @@ namespace GeometryGym.Ifc
 		}
 		private FormatIfcSerialization detectFormat(string fileName)
 		{
-			string lower = fileName.ToLower();
-			if (lower.EndsWith("xml"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".xml"))
 				return FormatIfcSerialization.XML;
 #if (!NOIFCJSON)
-			if (lower.EndsWith("json"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".json"))
 				return FormatIfcSerialization.JSON;
 #endif
 			return FormatIfcSerialization.STEP;
 		}
 		internal FileStreamIfc getStreamReader(string fileName)
 		{
-			string ext = Path.GetExtension(fileName);
 			mDatabase.FileName = fileName;
 			mDatabase.FolderPath = Path.GetDirectoryName(fileName);
 #if (!NOIFCZIP)
-			if (fileName.ToLower().EndsWith("zip"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".zip"))
 			{
 				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
 				if (za.Entries.Count != 1)
@@ -1780,7 +1778,7 @@ namespace GeometryGym.Ifc
 				return;
 
 			mDatabase.FolderPath = Path.GetDirectoryName(filePath);
-			if (filePath.ToLower().EndsWith("ifc"))
+			if (ExtensionHelper.ExtensionEquals(filePath, ".ifc"))
 				new SerializationIfcSTEP(mDatabase).ReadStepFile(filePath);
 			else
 			{
@@ -2483,6 +2481,12 @@ namespace GeometryGym.Ifc
 		internal string getFooterString() { return string.Join("\r\n", getFooterLines()); }
 		internal List<string> getFooterLines() { return new List<string>() { "ENDSEC;", "", "END-ISO-10303-21;", "" }; }
 	}
-}
 
- 
+	public static class ExtensionHelper
+	{
+		public static bool ExtensionEquals(string fileName, string extension)
+		{
+			return fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase);
+		}
+	}
+}
