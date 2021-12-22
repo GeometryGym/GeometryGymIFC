@@ -91,9 +91,12 @@ namespace GeometryGym.Ifc
 		internal IfcIndexedPolyCurve() : base() { }
 		internal IfcIndexedPolyCurve(DatabaseIfc db, IfcIndexedPolyCurve c, DuplicateOptions options) : base(db, c, options) { Points = db.Factory.Duplicate(c.Points) as IfcCartesianPointList; mSegments.AddRange(c.mSegments); mSelfIntersect = c.mSelfIntersect; }
 		public IfcIndexedPolyCurve(IfcCartesianPointList pl) : base(pl.mDatabase) { Points = pl; }
-		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segs) : this(pl) { mSegments.AddRange(segs); }
-
-		internal void addSegment(IfcSegmentIndexSelect segment) { mSegments.Add(segment); }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, IEnumerable<IfcSegmentIndexSelect> segments) 
+			: this(pl) { mSegments.AddRange(segments); }
+		public IfcIndexedPolyCurve(IfcCartesianPointList pl, params IfcSegmentIndexSelect[] segments) : this(pl)
+		{
+			mSegments.AddRange(segments);
+		}
 	}
 	[Serializable]
 	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem //SUPERTYPE OF (ONEOF (IfcIndexedPolygonalFaceWithVoids))

@@ -665,7 +665,7 @@ namespace GeometryGym.Ifc
 			if(array != null)
 			{
 				foreach (IfcRelDefinesByProperties r in mDatabase.extractJArray<IfcRelDefinesByProperties>(array))
-					r.RelatingPropertyDefinition = this;
+					r.RelatingPropertyDefinition.Add(this);
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)

@@ -113,7 +113,7 @@ namespace GeometryGym.Ifc
 		public override IfcProperty FindProperty(string name) { return FindProperty(name, true); }
 		public IfcProperty FindProperty(string name, bool includeRelatedType)
 		{
-			foreach (IfcPropertySet pset in mIsDefinedBy.Select(x=>x.RelatingPropertyDefinition).OfType<IfcPropertySet>())
+			foreach (IfcPropertySet pset in mIsDefinedBy.SelectMany(x=>x.RelatingPropertyDefinition).OfType<IfcPropertySet>())
 			{
 				IfcProperty result = pset.FindProperty(name);
 				if (result != null)
@@ -140,7 +140,7 @@ namespace GeometryGym.Ifc
 		public override IfcPropertySetDefinition FindPropertySet(string name) { return FindPropertySet(name, true); }
 		public IfcPropertySetDefinition FindPropertySet(string name, bool includeRelatedType)
 		{
-			foreach(IfcPropertySetDefinition pset in mIsDefinedBy.Select(x=>x.RelatingPropertyDefinition))
+			foreach(IfcPropertySetDefinition pset in mIsDefinedBy.SelectMany(x=>x.RelatingPropertyDefinition))
 			{
 				if (string.Compare(pset.Name, name) == 0)
 					return pset;
@@ -350,11 +350,11 @@ namespace GeometryGym.Ifc
 			}
 			if (options.DuplicateProperties)
 			{
-				foreach (IfcRelDefinesByProperties rdp in o.mIsDefinedBy)
+				foreach (IfcPropertySetDefinition pset in o.mIsDefinedBy.SelectMany(x=>x.RelatingPropertyDefinition))
 				{
-					IfcPropertySetDefinition pset = db.Factory.DuplicatePropertySet(rdp.RelatingPropertyDefinition, options);
-					if (pset != null)
-						pset.RelateObjectDefinition(this);
+					IfcPropertySetDefinition dup = db.Factory.DuplicatePropertySet(pset, options);
+					if (dup != null)
+						dup.RelateObjectDefinition(this);
 				}
 			}
 			if (options.DuplicateDownstream)
@@ -621,24 +621,26 @@ namespace GeometryGym.Ifc
 			IfcPropertySet ps = null;
 			foreach (IfcRelDefinesByProperties rdp in definesByProperties.ToList())
 			{
-				IfcPropertySet propertySet = rdp.RelatingPropertyDefinition as IfcPropertySet;
-				if (propertySet == null)
-					continue;
-				if (propertySets.TryGetValue(propertySet.GlobalId, out ps))
+				foreach (IfcPropertySet propertySet in rdp.RelatingPropertyDefinition.OfType<IfcPropertySet>())
 				{
-					if (rdp.RelatedObjects.Count == 1 && propertySet.DefinesType.Count == 0)
+					if (propertySet == null)
+						continue;
+					if (propertySets.TryGetValue(propertySet.GlobalId, out ps))
 					{
-						if (propertySet.HasProperties.Count == 1)
-							rdp.Dispose(true);
+						if (rdp.RelatedObjects.Count == 1 && propertySet.DefinesType.Count == 0)
+						{
+							if (propertySet.HasProperties.Count == 1)
+								rdp.Dispose(true);
+							else
+								property.Dispose(true);
+						}
 						else
-							property.Dispose(true);
+						{
+							rdp.RelatedObjects.Remove(this);
+							new IfcPropertySet(this, propertySet.Name, propertySet.HasProperties.Values.Where(x => x != property));
+						}
+						return;
 					}
-					else
-					{
-						rdp.RelatedObjects.Remove(this);
-						new IfcPropertySet(this, propertySet.Name, propertySet.HasProperties.Values.Where(x => x != property));
-					}
-					return;
 				}
 			}
 		}

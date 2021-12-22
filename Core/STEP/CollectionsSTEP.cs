@@ -88,7 +88,13 @@ namespace GeometryGym.STEP
 		public IEnumerator<T> GetEnumerator() { return mSet.GetEnumerator(); }
 		public bool Remove(T item) 
 		{
-			return mSet.Remove(item);
+			if(mSet.Remove(item))
+			{
+				if(CollectionChanged != null)
+					CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
+				return true;
+			}
+			return false;
 		} 
 		IEnumerator IEnumerable.GetEnumerator() { return mSet.GetEnumerator(); }
 	}

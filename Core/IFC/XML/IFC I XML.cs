@@ -47,9 +47,9 @@ namespace GeometryGym.Ifc
 					{
 						List<int> ints = node.InnerText.Split(" ".ToCharArray()).ToList().ConvertAll(x => int.Parse(x));
 						if (string.Compare("IfcLineIndex-wrapper", node.Name) == 0)
-							addSegment(new IfcLineIndex(ints));
+							Segments.Add(new IfcLineIndex(ints));
 						else
-							addSegment(new IfcArcIndex(ints[0], ints[1], ints[2]));
+							Segments.Add(new IfcArcIndex(ints[0], ints[1], ints[2]));
 					}
 				}
 			}

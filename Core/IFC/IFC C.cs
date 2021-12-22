@@ -249,7 +249,13 @@ namespace GeometryGym.Ifc
 		public List<string> TagList { get { return mTagList; } }
 
 		internal IfcCartesianPointList2D() : base() { }
-		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options) : base(db, l, options) { mCoordList.AddRange(l.mCoordList); }
+		internal IfcCartesianPointList2D(DatabaseIfc db, IfcCartesianPointList2D l, DuplicateOptions options)
+			: base(db, l, options) 
+		{ 
+			mCoordList.AddRange(l.mCoordList);
+			if(l.mTagList.Count > 0)
+				mTagList.AddRange(l.mTagList);
+		}
 		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Tuple<double, double>> coordList) : base(db) { mCoordList.AddRange(coordList); }
 	}
 	[Serializable]
@@ -260,7 +266,13 @@ namespace GeometryGym.Ifc
 		public List<Tuple<double, double, double>> CoordList { get { return mCoordList; } }
 		public List<string> TagList { get { return mTagList; } }
 		internal IfcCartesianPointList3D() : base() { }
-		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) : base(db, l, options) { mCoordList.AddRange(l.mCoordList); }
+		internal IfcCartesianPointList3D(DatabaseIfc db, IfcCartesianPointList3D l, DuplicateOptions options) 
+			: base(db, l, options) 
+		{ 
+			mCoordList.AddRange(l.mCoordList); 
+			if(l.mTagList.Count > 0)
+				mTagList.AddRange(l.mTagList);
+		}
 
 		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Tuple<double, double, double>> coordList) : base(db)
 		{
@@ -1558,7 +1570,7 @@ namespace GeometryGym.Ifc
 		}
 		public override IfcPropertySetDefinition FindPropertySet(string name)
 		{
-			foreach (IfcPropertySetDefinition pset in mIsDefinedBy.Select(x => x.RelatingPropertyDefinition))
+			foreach (IfcPropertySetDefinition pset in mIsDefinedBy.SelectMany(x => x.RelatingPropertyDefinition))
 			{
 				if (string.Compare(pset.Name, name) == 0)
 					return pset;
@@ -2046,15 +2058,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcCShapeProfileDef : IfcParameterizedProfileDef
 	{
-		internal double mDepth, mWidth, mWallThickness, mGirth;// : IfcPositiveLengthMeasure;
-		internal double mInternalFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal double mCentreOfGravityInX = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
+		private double mDepth, mWidth, mWallThickness, mGirth;// : IfcPositiveLengthMeasure;
+		private double mInternalFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
+		private double mCentreOfGravityInX = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure // DELETED IFC4 	Superseded by respective attribute of IfcStructuralProfileProperties 
 
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 		public double Width { get { return mWidth; } set { mWidth = value; } }
 		public double WallThickness { get { return mWallThickness; } set { mWallThickness = value; } }
 		public double Girth { get { return mGirth; } set { mGirth = value; } }
-		public double InternalFilletRadius { get { return mInternalFilletRadius; } set { mInternalFilletRadius = (value < mDatabase.Tolerance ? double.NaN : value); } }
+		public double InternalFilletRadius 
+		{ 
+			get { return mInternalFilletRadius; } 
+			set 
+			{
+				double eps = (mDatabase == null ? 1e-5 : mDatabase.Tolerance);
+				mInternalFilletRadius = (value < eps ? double.NaN : value); 
+			} 
+		}
 		
 		internal IfcCShapeProfileDef() : base() { }
 		internal IfcCShapeProfileDef(DatabaseIfc db, IfcCShapeProfileDef c, DuplicateOptions options) : base(db, c, options)

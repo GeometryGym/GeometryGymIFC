@@ -798,6 +798,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelPositions> Positions { get { return mPositions; } } 
 
 		protected IfcPositioningElement() : base() { }
+		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
 		protected IfcPositioningElement(DatabaseIfc db) : base(db) { }
 		protected IfcPositioningElement(IfcSpatialStructureElement host) : base(host.Database) 
 		{ 
@@ -806,7 +807,6 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcPositioningElement(IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(placement, representation) { }
 		protected IfcPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-		protected IfcPositioningElement(DatabaseIfc db, IfcPositioningElement e, DuplicateOptions options) : base(db, e, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
@@ -1216,6 +1216,12 @@ namespace GeometryGym.Ifc
 				IfcRelContainedInSpatialStructure rcss = db.Factory.Duplicate(p.mContainedInStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelContainedInSpatialStructure;
 				rcss.RelatedElements.Add(this);
 			}
+			foreach(IfcRelPositions relPositions in p.mPositionedRelativeTo)
+			{
+				IfcPositioningElement positioningElement = db.Factory.Duplicate(relPositions.RelatingPositioningElement, options) as IfcPositioningElement;
+				new IfcRelPositions(positioningElement, this);
+			}
+
 		}
 		protected IfcProduct(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host.mDatabase)
 		{

@@ -90,8 +90,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mVertexGeometry); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mVertexGeometry = ParserSTEP.StripLink(str, ref pos, str.Length); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mVertexGeometry.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
+		{ 
+			mVertexGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, str.Length)] as IfcPoint;
+		}
 	}
 	public partial class IfcVibrationDamper : IfcElementComponent
 	{

@@ -626,13 +626,14 @@ namespace GeometryGym.Ifc
 					}
 				}
 				else if (string.Compare(name, "RelatingPropertyDefinition") == 0)
-					RelatingPropertyDefinition = mDatabase.ParseXml<IfcPropertySetDefinition>(child as XmlElement);
+					RelatingPropertyDefinition.Add(mDatabase.ParseXml<IfcPropertySetDefinition>(child as XmlElement));
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(RelatingPropertyDefinition.GetXML(xml.OwnerDocument, "RelatingPropertyDefinition", this, processed));
+			foreach(IfcPropertySetDefinition pset in RelatingPropertyDefinition)
+				xml.AppendChild(pset.GetXML(xml.OwnerDocument, "RelatingPropertyDefinition", this, processed));
 		}
 	}
 	public partial class IfcRelFillsElement : IfcRelConnects

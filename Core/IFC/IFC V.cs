@@ -107,8 +107,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
-		internal int mVertexGeometry;// : IfcPoint; 
-		public IfcPoint VertexGeometry { get { return mDatabase[mVertexGeometry] as IfcPoint; } set { mVertexGeometry = value.mIndex; } }
+		internal IfcPoint mVertexGeometry;// : IfcPoint; 
+		public IfcPoint VertexGeometry { get { return mVertexGeometry; } set { mVertexGeometry = value; } }
 		
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v, DuplicateOptions options) : base(db, v, options) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }

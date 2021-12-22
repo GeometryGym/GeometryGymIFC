@@ -376,7 +376,12 @@ namespace GeometryGym.Ifc
 			mDictionary.TryGetValue(keyValue, out result);
 			return result;
 		}
-		internal void AddObject(BaseClassIfc obj, int index) { mDictionary[key(obj)] = index; }
+		internal void AddObject(BaseClassIfc obj, int index) 
+		{
+			string objectKey = key(obj);
+			mDictionary[objectKey] = index; 
+		}
+
 		private string key(BaseClassIfc obj) 
 		{ 
 			return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mIndex; 
@@ -404,18 +409,18 @@ namespace GeometryGym.Ifc
 		internal GenerateOptions mOptions = new GenerateOptions();
 		public GenerateOptions Options { get { return mOptions; } }
 
-		internal IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+		public IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 		{
 			return ConstructElement(className, host, placement, representation, null);
 		}
-		internal IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
+		public IfcElement ConstructElement(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
 			IfcElement element = ConstructProduct(className, host, placement, representation, system) as IfcElement;
 			if (element == null)
 				element = new IfcBuildingElementProxy(host, placement, representation);
 			return element;
 		}
-		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
+		public IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
 		
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{

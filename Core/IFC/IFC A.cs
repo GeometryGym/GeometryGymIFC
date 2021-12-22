@@ -253,7 +253,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlignment() : base() { }
 		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, DuplicateOptions options) 
-			: base(db, alignment, options) { PredefinedType = alignment.PredefinedType; }
+			: base(db, alignment, new DuplicateOptions(options) { DuplicateDownstream = true }) { PredefinedType = alignment.PredefinedType; }
 		public IfcAlignment(IfcSite host) : base(host) { }
 		public IfcAlignment(IfcFacility host) : base(host) { }
 		public IfcAlignment(IfcFacilityPart host) : base(host) { }
@@ -874,8 +874,8 @@ namespace GeometryGym.Ifc
 																														  //INVERSE
 		public IfcCartesianPoint StartPoint { get { return mStartPoint; } set { mStartPoint = value; } }
 		public double StartDirection { get { return mStartDirection; } set { mStartDirection = value; } }
-		public double StartRadiusOfCurvature { get { return mStartRadiusOfCurvature; } set { mStartRadiusOfCurvature = value; } }
-		public double EndRadiusOfCurvature { get { return mEndRadiusOfCurvature; } set { mEndRadiusOfCurvature = value; } }
+		public double StartRadiusOfCurvature { get { return mStartRadiusOfCurvature; } set { mStartRadiusOfCurvature = double.IsNaN(value) ? 0 : value; } }
+		public double EndRadiusOfCurvature { get { return mEndRadiusOfCurvature; } set { mEndRadiusOfCurvature = double.IsNaN(value) ? 0 : value; } }
 		public double SegmentLength { get { return mSegmentLength; } set { mSegmentLength = value; } }
 		public double GravityCenterLineHeight { get { return mGravityCenterLineHeight; } set { mGravityCenterLineHeight = value; } }
 		public IfcAlignmentHorizontalSegmentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }

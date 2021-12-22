@@ -482,12 +482,12 @@ namespace GeometryGym.Ifc
 		{
 			base.parseJObject(obj);
 			mDatabase.extractJArray<IfcObjectDefinition>(obj.GetValue("RelatedObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=> RelatedObjects.Add(x));
-			RelatingPropertyDefinition = mDatabase.ParseJObject<IfcPropertySetDefinition>(obj.GetValue("RelatingPropertyDefinition", StringComparison.InvariantCultureIgnoreCase) as JObject);
+			RelatingPropertyDefinition.Add(mDatabase.ParseJObject<IfcPropertySetDefinition>(obj.GetValue("RelatingPropertyDefinition", StringComparison.InvariantCultureIgnoreCase) as JObject));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["RelatingPropertyDefinition"] = RelatingPropertyDefinition.getJson(this, options);
+			obj["RelatingPropertyDefinition"] = RelatingPropertyDefinition.First().getJson(this, options);
 		}
 	}
 	public partial class IfcRelDefinesByTemplate : IfcRelDefines

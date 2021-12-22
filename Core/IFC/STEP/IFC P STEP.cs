@@ -635,7 +635,7 @@ namespace GeometryGym.Ifc
 			if (profileDefinition == null)
 				return "";
 			if(release < ReleaseVersion.IFC4)
-				return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mName) ? ",$,#" : ",'" + ParserIfc.Encode(mName) + "',#") + profileDefinition.Index;
+				return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mName) ? "$,#" : "'" + ParserIfc.Encode(mName) + "',#") + profileDefinition.Index;
 			
 			return base.BuildStringSTEP(release) + ",#" + profileDefinition.Index;
 		}
@@ -643,7 +643,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			if(release < ReleaseVersion.IFC4)
-				mName = ParserSTEP.StripString(str, ref pos, len);
+				Name = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			ProfileDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 	}

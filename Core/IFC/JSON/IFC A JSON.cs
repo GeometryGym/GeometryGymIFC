@@ -297,10 +297,10 @@ namespace GeometryGym.Ifc
 				StartDirection = token.Value<double>();
 			JToken startRadius = obj.GetValue("StartRadiusOfCurvature", StringComparison.InvariantCultureIgnoreCase);
 			if (startRadius != null)
-				mStartRadiusOfCurvature = startRadius.Value<double>();
+				StartRadiusOfCurvature = startRadius.Value<double>();
 			JToken endRadius = obj.GetValue("EndRadiusOfCurvature", StringComparison.InvariantCultureIgnoreCase);
 			if (endRadius != null)
-				mEndRadiusOfCurvature = endRadius.Value<double>();
+				EndRadiusOfCurvature = endRadius.Value<double>();
 			JToken segmentLength = obj.GetValue("SegmentLength", StringComparison.InvariantCultureIgnoreCase);
 			if (segmentLength != null)
 				mSegmentLength = segmentLength.Value<double>();

@@ -985,7 +985,7 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "DefinesOccurrence") == 0)
 				{
 					foreach (IfcRelDefinesByProperties r in mDatabase.ParseXMLList<IfcRelDefinesByProperties>(child))
-						r.RelatingPropertyDefinition = this;
+						r.RelatingPropertyDefinition.Add(this);
 				}
 			}
 		}

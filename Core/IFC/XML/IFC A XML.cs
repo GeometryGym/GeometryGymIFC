@@ -495,11 +495,18 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("StartDirection"))
 				double.TryParse(xml.Attributes["StartDirection"].Value, out mStartDirection);
 			string startRadius = xml.GetAttribute("StartRadiusOfCurvature");
+			double val = 0;
 			if (!string.IsNullOrEmpty(startRadius))
-				double.TryParse(startRadius, out mStartRadiusOfCurvature);
+			{
+				if (double.TryParse(startRadius, out val))
+					StartRadiusOfCurvature = val;
+			}
 			string endRadius = xml.GetAttribute("EndRadiusOfCurvature");
 			if (!string.IsNullOrEmpty(endRadius))
-				double.TryParse(endRadius, out mEndRadiusOfCurvature);
+			{
+				if (double.TryParse(endRadius, out val))
+					EndRadiusOfCurvature = val;
+			}
 			string segmentLength = xml.GetAttribute("SegmentLength");
 			if (!string.IsNullOrEmpty(segmentLength))
 				double.TryParse(segmentLength, out mSegmentLength);

@@ -401,6 +401,11 @@ namespace GeometryGym.Ifc
 		public double RestartDistance { get { return mRestartDistance; } set { mRestartDistance = value; } }
 
 		public IfcReferent() : base() { }
+		internal IfcReferent(DatabaseIfc db, IfcReferent r, DuplicateOptions options) : base(db, r, options) 
+		{ 
+			mPredefinedType = r.mPredefinedType;
+			mRestartDistance = r.mRestartDistance;
+		}
 		public IfcReferent(IfcAlignment alignment) : base(alignment.Database)
 		{
 			IfcRelNests relNests = alignment.IsNestedBy.Where(x => x.RelatedObjects.FirstOrDefault() is IfcReferent).FirstOrDefault();
@@ -1704,12 +1709,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
 	{
 		private SET<IfcObjectDefinition> mRelatedObjects = new SET<IfcObjectDefinition>();// IFC4 change SET [1:?] OF IfcObjectDefinition; ifc2x3 : SET [1:?] OF IfcObject;  
-		private IfcPropertySetDefinition mRelatingPropertyDefinition;// : IfcPropertySetDefinitionSelect; 
+		private SET<IfcPropertySetDefinition> mRelatingPropertyDefinition = new SET<IfcPropertySetDefinition>();// : IfcPropertySetDefinitionSelect; 
 
 		public SET<IfcObjectDefinition> RelatedObjects { get { return mRelatedObjects; } }
-		public IfcPropertySetDefinition RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } set { mRelatingPropertyDefinition = value; if (value != null) value.DefinesOccurrence.Add(this); } }
+		public SET<IfcPropertySetDefinition> RelatingPropertyDefinition { get { return mRelatingPropertyDefinition; } }
 
-		public override IfcRoot Relating() { return RelatingPropertyDefinition as IfcRoot; } 
+		public override IfcRoot Relating() { return RelatingPropertyDefinition.First() as IfcRoot; } 
 
 		internal IfcRelDefinesByProperties() : base() { }
 		private IfcRelDefinesByProperties(DatabaseIfc db) : base(db) 
@@ -1719,12 +1724,12 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcRelDefinesByProperties(DatabaseIfc db, IfcRelDefinesByProperties d, DuplicateOptions options) : base(db, d, options)
 		{
-			RelatingPropertyDefinition = db.Factory.Duplicate(d.RelatingPropertyDefinition as BaseClassIfc, options) as IfcPropertySetDefinition;
+			RelatingPropertyDefinition.AddRange(d.RelatingPropertyDefinition.Select(x=> db.Factory.Duplicate(x as BaseClassIfc, options) as IfcPropertySetDefinition));
 		}
 		public IfcRelDefinesByProperties(IfcPropertySetDefinition propertySet) 
 			: base(propertySet.Database) 
 		{
-			mRelatingPropertyDefinition = propertySet; 
+			mRelatingPropertyDefinition.Add(propertySet); 
 			propertySet.DefinesOccurrence.Add(this); 
 		}
 		public IfcRelDefinesByProperties(IfcObjectDefinition relatedObject, IfcPropertySetDefinition propertySet)
@@ -1736,6 +1741,7 @@ namespace GeometryGym.Ifc
 		{
 			base.initialize();
 			mRelatedObjects.CollectionChanged += mRelatedObjects_CollectionChanged;
+			mRelatingPropertyDefinition.CollectionChanged += mRelatingPropertyDefinition_CollectionChanged;
 		}
 
 		protected virtual void mRelatedObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -1785,10 +1791,36 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+		protected virtual void mRelatingPropertyDefinition_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcPropertySetDefinition o in e.NewItems)
+				{
+					if (o != null)
+					{
+						o.DefinesOccurrence.Add(this);
+					}
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcPropertySetDefinition o in e.OldItems)
+				{
+					if (o != null)
+					{
+						o.DefinesOccurrence.Remove(this);
+					}
+				}
+			}
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
-			result.AddRange(RelatingPropertyDefinition.Extract<T>());
+			foreach(IfcPropertySetDefinition pset in RelatingPropertyDefinition)
+				result.AddRange(pset.Extract<T>());
 			return result;
 		}
 	}
