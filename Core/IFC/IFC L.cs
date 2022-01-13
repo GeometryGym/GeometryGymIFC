@@ -422,6 +422,22 @@ namespace GeometryGym.Ifc
 			if(e.Axis != null)
 				Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; 
 		}
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcLinearPositioningElement linearPositioningElement = e as IfcLinearPositioningElement;
+			if (linearPositioningElement == null)
+				return false;
+			if (mAxis != null)
+			{
+				BaseClassIfc axis = mAxis as BaseClassIfc;
+				if (!axis.isDuplicate(linearPositioningElement.mAxis as BaseClassIfc, tol))
+					return false;
+			}
+			else if (linearPositioningElement.mAxis != null)
+				return false;
+			return base.isDuplicate(e, tol);
+		}
 	}
 	[Serializable]
 	[Obsolete("DEPRECATED IFC4x3", false)]

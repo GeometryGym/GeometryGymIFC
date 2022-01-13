@@ -1366,6 +1366,33 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcProduct product = e as IfcProduct;
+			if (e == null)
+				return false;
+			if (base.isDuplicate(e, tol))
+			{
+				IfcObjectPlacement placement = ObjectPlacement, placement2 = product.ObjectPlacement;
+				if (placement != null)
+				{
+					if (!placement.isDuplicate(placement2, tol))
+						return false;
+				}
+				else if (placement2 != null)
+					return false;
+				IfcProductDefinitionShape rep = Representation, rep2 = product.Representation;
+				if (rep != null)
+				{
+					if (!rep.isDuplicate(rep2, tol))
+						return false;
+				}
+				else if (rep2 != null)
+					return false;
+				return true;
+			}
+			return false;
+		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcProductsOfCombustionProperties	 // DEPRECATED IFC4

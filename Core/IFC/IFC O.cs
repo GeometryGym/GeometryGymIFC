@@ -555,9 +555,14 @@ namespace GeometryGym.Ifc
 			{
 				object obj = pi.GetValue(this);
 				if (obj != null)
-					return obj.ToString();
+				{
+					string result = obj.ToString();
+					if (string.Compare(result, "NOTDEFINED", true) == 0)
+						return null;
+					return result;
+				}
 			}
-			return "";
+			return null;
 		}
 		public string GetObjectDefinitionType() 
 		{
@@ -671,6 +676,63 @@ namespace GeometryGym.Ifc
 		public virtual IfcStructuralAnalysisModel FindStructAnalysisModel(bool strict)
 		{
 			return (!strict && mDecomposes != null ? mDecomposes.RelatingObject.FindStructAnalysisModel(false) : null);
+		}
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcObjectDefinition objDef = e as IfcObjectDefinition;
+			if (objDef == null)
+				return false;
+			if (base.isDuplicate(e, tol))
+			{
+				if (objDef.mIsDecomposedBy.Count != mIsDecomposedBy.Count)
+					return false;
+				SET<IfcRelAggregates> rags = IsDecomposedBy, dupRags = objDef.IsDecomposedBy;
+				IEnumerable<IfcObjectDefinition> objDefs = rags.SelectMany(x => x.RelatedObjects), dupObjDefs = dupRags.SelectMany(x => x.RelatedObjects);
+				Dictionary<string, IfcObjectDefinition> dictObjDefs = dupObjDefs.ToDictionary(x => x.GlobalId, x => x);
+
+				foreach (IfcObjectDefinition od in objDefs)
+				{
+					if (!dictObjDefs.ContainsKey(od.GlobalId))
+						return false;
+					IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
+					if (!od.isDuplicate(dup, tol))
+						return false;
+				}
+
+				if (objDef.mIsNestedBy.Count != mIsNestedBy.Count)
+					return false;
+
+				List<IfcRelNests> nestedBy = objDef.mIsNestedBy.ToList();
+				foreach (IfcRelNests relNests in mIsNestedBy)
+				{
+					IfcObjectDefinition firstRelated = relNests.RelatedObjects.First();
+					IfcRelNests testDuplicate = null;
+					foreach (IfcRelNests nests in nestedBy)
+					{
+						IfcObjectDefinition firstOther = nests.RelatedObjects.First();
+						if (firstOther.isDuplicate(firstRelated, tol))
+						{
+							testDuplicate = nests;
+							break;
+						}
+					}
+					if (testDuplicate == null)
+						return false;
+					nestedBy.Remove(testDuplicate);
+
+					int count = testDuplicate.RelatedObjects.Count;
+					for (int icounter = 1; icounter < count; icounter++)
+					{
+						IfcObjectDefinition od1 = relNests.RelatedObjects[icounter];
+						IfcObjectDefinition od2 = testDuplicate.RelatedObjects[icounter];
+						if (!od1.isDuplicate(od2, tol))
+							return false;
+					}
+				}
+				return true;
+			}
+			return false;
 		}
 	}
 	[Serializable]

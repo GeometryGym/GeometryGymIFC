@@ -1559,14 +1559,11 @@ namespace GeometryGym.Ifc
 				result.AddRange(rdp.Extract<T>());
 			return result;
 		}
-		public List<IfcTypeObject> DeclaredTypes
+		public List<IfcTypeObject> DeclaredTypes()
 		{
-			get
-			{
-				if(mDeclares.Count > 0)
-					return mDeclares.SelectMany(x=>x.RelatedDefinitions).OfType<IfcTypeObject>().ToList();
-				return mDatabase.OfType<IfcTypeObject>().ToList();
-			}
+			if(mDeclares.Count > 0)
+				return mDeclares.SelectMany(x=>x.RelatedDefinitions).OfType<IfcTypeObject>().ToList();
+			return mDatabase.OfType<IfcTypeObject>().ToList();
 		}
 		public override IfcPropertySetDefinition FindPropertySet(string name)
 		{

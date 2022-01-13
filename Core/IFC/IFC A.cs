@@ -243,7 +243,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcAlarmType() : base() { }
 		internal IfcAlarmType(DatabaseIfc db, IfcAlarmType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcAlarmType(DatabaseIfc m, string name, IfcAlarmTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		public IfcAlarmType(DatabaseIfc db, string name, IfcAlarmTypeEnum t) : base(db) { Name = name; mPredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
@@ -282,6 +282,16 @@ namespace GeometryGym.Ifc
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcAlignment(IfcSite host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis)
 			: this(placement, horizontal, vertical, cant, host, axis) { }
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcAlignment alignment = e as IfcAlignment;
+			if (alignment == null)
+				return false;
+			if (PredefinedType != alignment.PredefinedType)
+				return false;
+			return base.isDuplicate(e, tol);
+		}
 	}
 	[Obsolete("DEPRECATED IFC4X3", false)]
 	[Serializable]
@@ -838,7 +848,7 @@ namespace GeometryGym.Ifc
 			alignment.AddNested(this);
 			ObjectPlacement = alignment.ObjectPlacement;
 		}
-			
+
 		public IfcCompositeCurve ComputeGeometry()
 		{
 			double tol = mDatabase.Tolerance;
@@ -851,7 +861,7 @@ namespace GeometryGym.Ifc
 			{
 				try
 				{
-					IfcAlignmentHorizontalSegment nextSegment = counter + 1 < segmentCount ? horizontalSegments[counter + 1] : null; 
+					IfcAlignmentHorizontalSegment nextSegment = counter + 1 < segmentCount ? horizontalSegments[counter + 1] : null;
 					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(nextSegment));
 				}
 				catch (Exception) { }
@@ -859,6 +869,39 @@ namespace GeometryGym.Ifc
 			IfcCompositeCurve result = new IfcCompositeCurve(curveSegments);
 			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve2D));
 			return result;
+		}
+
+		public bool IsDuplicateWorkInProgress(IfcAlignmentHorizontal horizontal, double tol)
+		{
+			return isDuplicate(horizontal, tol);
+		}
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcAlignmentHorizontal horizontal = e as IfcAlignmentHorizontal;
+			if (horizontal == null)
+				return false;
+			if (double.IsNaN(mStartDistAlong))
+			{
+				if (!double.IsNaN(horizontal.mStartDistAlong))
+					return false;
+			}
+			else if (double.IsNaN(horizontal.mStartDistAlong))
+				return false;
+			else if (Math.Abs(mStartDistAlong - horizontal.mStartDistAlong) > tol)
+				return false;
+
+			if (mHorizontalSegments.Count != horizontal.mHorizontalSegments.Count)
+				return false;
+			int count = mHorizontalSegments.Count; 
+			for(int icounter = 0; icounter < count; icounter++)
+			{
+				IfcAlignmentHorizontalSegment segment1 = mHorizontalSegments[icounter];
+				IfcAlignmentHorizontalSegment segment2 = horizontal.mHorizontalSegments[icounter];
+				if (!segment1.isDuplicate(segment2, tol))
+					return false;
+			}
+
+			return base.isDuplicate(e, tol);
 		}
 	}
 	[Serializable]
@@ -1040,7 +1083,27 @@ namespace GeometryGym.Ifc
 			return curveSegment;
 		}
 
-
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcAlignmentHorizontalSegment horizontalSegment = e as IfcAlignmentHorizontalSegment;
+			if (horizontalSegment == null)
+				return false;
+			if (!horizontalSegment.StartPoint.isDuplicate(horizontalSegment.StartPoint, tol))
+				return false;
+			if (Math.Abs(StartDirection - horizontalSegment.StartDirection) > 0.001)
+				return false;
+			if (Math.Abs(StartRadiusOfCurvature - horizontalSegment.StartRadiusOfCurvature) > tol)
+				return false;
+			if (Math.Abs(EndRadiusOfCurvature - horizontalSegment.EndRadiusOfCurvature) > tol)
+				return false;
+			if (Math.Abs(SegmentLength - horizontalSegment.SegmentLength) > tol)
+				return false;
+			if (Math.Abs(GravityCenterLineHeight - horizontalSegment.GravityCenterLineHeight) > tol)
+				return false;
+			if (PredefinedType != horizontalSegment.PredefinedType)
+				return false;
+			return base.isDuplicate(e, tol);
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcAlignmentParameterSegment : BaseClassIfc
@@ -1062,6 +1125,21 @@ namespace GeometryGym.Ifc
 				db.Factory.Duplicate(mDesignerOf, options);
 		}
 		protected IfcAlignmentParameterSegment(DatabaseIfc db) : base(db) { }
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcAlignmentParameterSegment parameterSegment = e as IfcAlignmentParameterSegment;
+			if (parameterSegment == null)
+				return false;
+
+			if (string.Compare(StartTag, parameterSegment.StartTag, false) != 0)
+				return false;
+
+			if (string.Compare(EndTag, parameterSegment.EndTag, false) != 0)
+				return false;
+
+			return base.isDuplicate(e, tol);
+		}
 	}
 	[Serializable]
 	public partial class IfcAlignmentSegment : IfcLinearElement
@@ -1093,6 +1171,16 @@ namespace GeometryGym.Ifc
 			host.AddNested(this);
 			ObjectPlacement = host.ObjectPlacement;
 			DesignParameters = design; 
+		}
+
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcAlignmentSegment segment = e as IfcAlignmentSegment;
+			if (segment == null)
+				return false;
+			if (!mDesignParameters.isDuplicate(segment.mDesignParameters, tol))
+				return false;
+			return base.isDuplicate(e, tol);
 		}
 	}
 	[Serializable]

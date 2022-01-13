@@ -2811,7 +2811,13 @@ namespace GeometryGym.Ifc
 			mName = r.mName;
 			mDescription = r.mDescription;
 		}
-
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcRoot root = e as IfcRoot; // || root.mOwnerHistory != mOwnerHistory
+			if (root == null || string.Compare(root.Name, Name) != 0 || string.Compare(root.Description, Description) != 0)
+				return false;
+			return base.isDuplicate(e, tol);
+		}
 	}
 	[Serializable]
 	public partial class IfcRotationalStiffnessSelect

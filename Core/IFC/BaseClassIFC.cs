@@ -451,6 +451,8 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
+		// This method has only partial implementation within opensource project and 
+		// any use of it should be carefully checked.
 		internal virtual bool isDuplicate(BaseClassIfc e, double tol) { return true; }
 
 		internal class RepositoryAttributes

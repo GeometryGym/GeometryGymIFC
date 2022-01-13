@@ -1874,8 +1874,6 @@ namespace GeometryGym.Ifc
 	
 			internal void ParseDefinition(ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 			{
-				if (string.Compare(Object.StepClassName, "IfcRelAssociatesClassification", true) == 0)
-					Debug.WriteLine(ToString());
 				int pos = 0;
 				Object.parse(DefinitionString, ref pos, release, DefinitionString.Length, dictionary);
 			}
