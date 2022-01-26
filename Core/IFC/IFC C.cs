@@ -1478,6 +1478,11 @@ namespace GeometryGym.Ifc
 			{
 				foreach(IfcRelDeclares declares in c.Declares)
 					db.Factory.Duplicate(declares, options);
+
+				foreach(IfcGroup group in c.Database.OfType<IfcGroup>())
+				{
+					db.Factory.Duplicate(group, options);
+				}
 			}
 		}
 		protected IfcContext(string name, IfcUnitAssignment units) : this(units.Database, name)

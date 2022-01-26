@@ -44,5 +44,26 @@ namespace GeometryGym.Ifc
 				return "$";
 			return formatLength(length);
 		}
+
+		public string StringSTEP(ReleaseVersion release)
+		{
+			string str = BuildStringSTEP(release);
+			if (string.IsNullOrEmpty(str))
+				return "";
+			return StepLinePrefix() + str + StepLineSuffix();
+		}
+
+		internal virtual void WriteStepLine(TextWriter textWriter, ReleaseVersion release)
+		{
+			try
+			{
+				string str = StringSTEP(release);
+				if (!string.IsNullOrEmpty(str))
+					textWriter.WriteLine(str);
+			}
+			catch (Exception) { }
+		}
+
+		
 	}
 }

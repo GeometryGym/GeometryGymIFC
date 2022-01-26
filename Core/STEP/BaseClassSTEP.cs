@@ -56,13 +56,34 @@ namespace GeometryGym.STEP
 			string str = BuildStringSTEP();
 			if (string.IsNullOrEmpty(str))
 				return "";
+			return StepLinePrefix() + str +  StepLineSuffix();
+		}
+		protected string StepLinePrefix()
+		{
 			string comment = "";
 			if (mComments.Count > 0)
 			{
 				foreach (string c in mComments)
 					comment += "/* " + c + " */\r\n";
 			}
-			return comment + (mIndex > 0 ? "#" + StepId + "= " : "") + StepClassName.ToUpper() + "(" + str + ");";
+			return comment + (mIndex > 0 ? "#" + StepId + "= " : "") + StepClassName.ToUpper() + "(";
+		}
+		protected string StepLineSuffix()
+		{
+			return ");";
+		}
+		protected void WriteStepLineWorkerPrefix(TextWriter textWriter)
+		{
+			if (mComments.Count > 0)
+			{
+				foreach (string c in mComments)
+					textWriter.WriteLine("/* " + c + " */)");
+			}
+			textWriter.Write("#" + StepId + "= " + StepClassName.ToUpper() + "(");
+		}
+		protected void WriteStepLineWorkerSuffix(TextWriter textWriter)
+		{
+			textWriter.WriteLine(");");
 		}
 		public string STEPSerialization()
 		{

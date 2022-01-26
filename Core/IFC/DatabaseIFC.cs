@@ -17,6 +17,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.ComponentModel;
+#if (!NOIFCZIP)
+using System.IO.Compression;
+#endif
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -267,49 +271,77 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		public bool WriteFile(string filename)
+		private string setFileInformation(string filePath)
+		{
+			FolderPath = Path.GetDirectoryName(filePath);
+			string fileName = Path.GetFileNameWithoutExtension(filePath);
+			char[] chars = Path.GetInvalidFileNameChars();
+			foreach (char c in chars)
+				fileName = fileName.Replace(c, '_');
+			return FileName = Path.Combine(FolderPath, fileName + Path.GetExtension(filePath));
+		}
+		public bool WriteSTEPFile(string filePath, BackgroundWorker worker, DoWorkEventArgs e)
+		{
+			string path = setFileInformation(filePath);
+			bool result = new SerializationIfcSTEP(this).WriteSTEPFile(path, worker, e);
+			if (!result)
+			{
+				try
+				{
+					File.Delete(path);
+				}
+				catch { }
+			}
+			return result;
+		}
+		public bool WriteFile(string filePath)
 		{
 			StreamWriter sw = null;
 
-			FolderPath = Path.GetDirectoryName(filename);
-			string fn = Path.GetFileNameWithoutExtension(filename);
-			char[] chars = Path.GetInvalidFileNameChars();
-			foreach (char c in chars)
-				fn = fn.Replace(c, '_');
-			FileName = Path.Combine(FolderPath, fn + Path.GetExtension(filename));
-			if (ExtensionHelper.ExtensionEquals(filename, ".xml"))
+			string path = setFileInformation(filePath);
+		
+			if (ExtensionHelper.ExtensionEquals(filePath, ".xml"))
 			{
-				WriteXmlFile(FileName);
+				WriteXmlFile(path);
 				return true;
 			}
 #if (!NOIFCJSON)
-			else if (ExtensionHelper.ExtensionEquals(FileName, ".json"))
+			else if (ExtensionHelper.ExtensionEquals(filePath, ".json"))
 			{
-				ToJSON(FileName);
+				ToJSON(path);
 				return true;
 			}
 
 #endif
 #if (!NOIFCZIP)
-			bool zip = ExtensionHelper.ExtensionEquals(FileName, ".ifczip");
-			System.IO.Compression.ZipArchive za = null;
+			bool zip = ExtensionHelper.ExtensionEquals(filePath, ".ifczip");
+			ZipArchive za = null;
 			if (zip)
 			{
-				if (System.IO.File.Exists(FileName))
-					System.IO.File.Delete(FileName);
-				za = System.IO.Compression.ZipFile.Open(FileName, System.IO.Compression.ZipArchiveMode.Create);
-				System.IO.Compression.ZipArchiveEntry zae = za.CreateEntry(System.IO.Path.GetFileNameWithoutExtension(FileName) + ".ifc");
+				if (File.Exists(path))
+					File.Delete(path);
+				za = ZipFile.Open(path, System.IO.Compression.ZipArchiveMode.Create);
+				ZipArchiveEntry zae = za.CreateEntry(Path.GetFileNameWithoutExtension(path) + ".ifc");
 				sw = new StreamWriter(zae.Open());
 			}
 			else
 #endif
 				sw = new StreamWriter(FileName);
-			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, FileName);
+			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, path);
 			sw.Close();
+			
 #if (!NOIFCZIP)
 			if (zip)
 				za.Dispose();
 #endif
+			if (!result)
+			{
+				try
+				{
+					File.Delete(path);
+				}
+				catch { }
+			}
 			return result;
 		}
 		public bool WriteStream(Stream stream, string filename)
@@ -2354,53 +2386,56 @@ namespace GeometryGym.Ifc
 			return false;
 		}
 
-		public bool WriteSTEP(string fileName, System.ComponentModel.BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs e)
+		public bool WriteSTEPFile(string filePath, BackgroundWorker worker, DoWorkEventArgs e)
 		{
-			mDatabase.FileName = fileName;
-			StreamWriter sw = new StreamWriter(fileName);
+			mDatabase.FileName = filePath;
+			StreamWriter sw = new StreamWriter(filePath);
 			mCachedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-			sw.Write(getHeaderString(fileName) + "\r\n");
-			int count = mDatabase.Count(),counter = 0;
+			sw.Write(getHeaderString(filePath) + "\r\n");
+			int count = mDatabase.Count(),counter = 0, progress = 0;
+			ReleaseVersion release = mDatabase.Release;
 			foreach (BaseClassIfc c in mDatabase)
 			{
 				if (e != null)
 				{
 					try
 					{
-						string str = c.StringSTEP();
-						if (!string.IsNullOrEmpty(str))
-							sw.WriteLine(str);
+						c.WriteStepLine(sw, release);
+						int calculatedProgress = 100 * counter / count;
+						if (calculatedProgress > progress)
+						{
+							worker.ReportProgress(++progress);
+						}
 					}
 					catch (Exception) { }
 				}
-				worker.ReportProgress(counter / count);
+				if(worker.CancellationPending)
+				{
+					return false;
+				}
 				counter++;
 			}
 			sw.Write(getFooterString());
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			worker.ReportProgress(100);
 			return true;
 		}
-		public bool WriteSTEP(TextWriter sw, string filename)
+		public bool WriteSTEP(TextWriter textWriter, string filename)
 		{
 			mDatabase.FileName = filename;
 			mCachedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-			sw.Write(getHeaderString(filename) + "\r\n");
+			textWriter.Write(getHeaderString(filename) + "\r\n");
+			ReleaseVersion release = mDatabase.Release;
 			foreach (BaseClassIfc e in mDatabase)
 			{
 				if (e != null)
 				{
-					try
-					{
-						string str = e.StringSTEP();
-						if (!string.IsNullOrEmpty(str))
-							sw.WriteLine(str);
-					}
-					catch (Exception) { }
+					e.WriteStepLine(textWriter, release);
 				}
 			}
-			sw.Write(getFooterString());
+			textWriter.Write(getFooterString());
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
 			return true;
 		}

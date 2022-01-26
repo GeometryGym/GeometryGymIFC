@@ -235,6 +235,35 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
 	{
+		internal override void WriteStepLine(TextWriter textWriter, ReleaseVersion release)
+		{
+			WriteStepLineWorkerPrefix(textWriter);
+
+			var first = mCoordList[0];
+
+			textWriter.Write("((");
+			textWriter.Write(formatLength(first.Item1));
+			textWriter.Write(",");
+			textWriter.Write(formatLength(first.Item2));
+			textWriter.Write(",");
+			textWriter.Write(formatLength(first.Item3));
+
+			foreach (var coord in mCoordList.Skip(1))
+			{
+				textWriter.Write("),(");
+				textWriter.Write(formatLength(coord.Item1));
+				textWriter.Write(",");
+				textWriter.Write(formatLength(coord.Item2));
+				textWriter.Write(",");
+				textWriter.Write(formatLength(coord.Item3));
+			}
+			textWriter.Write("))");
+			
+			if(release >= ReleaseVersion.IFC4X1)
+				textWriter.Write(mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => (string.IsNullOrEmpty(x) ? "$" : "'" + ParserIfc.Encode(x) + "'"))) + ")");
+
+			WriteStepLineWorkerSuffix(textWriter);
+		}
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			StringBuilder stringBuilder = new StringBuilder();

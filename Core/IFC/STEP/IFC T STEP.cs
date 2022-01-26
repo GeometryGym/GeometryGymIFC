@@ -360,6 +360,10 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
 	{
+		protected virtual void WriteStepLineWorker(TextWriter textWriter, ReleaseVersion release)
+		{
+			textWriter.Write("#" + mCoordinates.StepId);
+		}
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mCoordinates.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
 		{
@@ -775,6 +779,53 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
 	{
+		internal override void WriteStepLine(TextWriter textWriter, ReleaseVersion release)
+		{
+			WriteStepLineWorkerPrefix(textWriter);
+			WriteStepLineWorker(textWriter, release);
+			WriteStepLineWorkerSuffix(textWriter);
+		}
+		protected override void WriteStepLineWorker(TextWriter textWriter, ReleaseVersion release)
+		{
+			base.WriteStepLineWorker(textWriter, release);
+			if (mNormals.Count == 0)
+				textWriter.Write(",$,");
+			else
+				textWriter.Write(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + "),");
+			textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? "$" : ParserSTEP.BoolToString(Closed));
+
+
+			textWriter.Write(",((");
+			var first = mCoordIndex.First();
+			textWriter.Write(first.Item1);
+			textWriter.Write(",");
+			textWriter.Write(first.Item2);
+			textWriter.Write(",");
+			textWriter.Write(first.Item3);
+			foreach (var face in mCoordIndex.Skip(1))
+			{
+				textWriter.Write("),(");
+				textWriter.Write(face.Item1);
+				textWriter.Write(",");
+				textWriter.Write(face.Item2);
+				textWriter.Write(",");
+				textWriter.Write(face.Item3);
+			}
+			if (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC4A1)
+			{
+				if (mNormalIndex.Count == 0)
+					textWriter.Write(")),$");
+				else
+					textWriter.Write(")),(" + string.Join(",", mNormalIndex.Select(x => "(" + x.Item1 + "," + x.Item2 + "," + x.Item3 + ")")) + ")");
+			}
+			else
+			{
+				if (mPnIndex.Count == 0)
+					textWriter.Write(")),$");
+				else
+					textWriter.Write(")),(" + string.Join(",", mPnIndex) + ")");
+			}
+		}
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -839,6 +890,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTriangulatedIrregularNetwork : IfcTriangulatedFaceSet
 	{
+		protected override void WriteStepLineWorker(TextWriter textWriter, ReleaseVersion release)
+		{
+			base.WriteStepLineWorker(textWriter, release);
+			textWriter.Write(",(" + string.Join(",", mFlags.ConvertAll(x => x.ToString())) + ")");
+		}
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mFlags.ConvertAll(x=>x.ToString())) + ")";
