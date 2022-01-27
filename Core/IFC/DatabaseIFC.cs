@@ -78,6 +78,9 @@ namespace GeometryGym.Ifc
 		JSON,
 #endif
 	};
+
+	public delegate void SetProgressBarCallback(int percentDone);
+
 	public partial class DatabaseIfc : DatabaseSTEP<BaseClassIfc>
 	{
 		internal string id = ParserIfc.EncodeGuid(Guid.NewGuid());
@@ -279,6 +282,20 @@ namespace GeometryGym.Ifc
 			foreach (char c in chars)
 				fileName = fileName.Replace(c, '_');
 			return FileName = Path.Combine(FolderPath, fileName + Path.GetExtension(filePath));
+		}
+		public bool WriteSTEPFile(string filePath, SetProgressBarCallback setProgressBarCallback)
+		{
+			string path = setFileInformation(filePath);
+			bool result = new SerializationIfcSTEP(this).WriteSTEPFile(path, setProgressBarCallback);
+			if (!result)
+			{
+				try
+				{
+					File.Delete(path);
+				}
+				catch { }
+			}
+			return result;
 		}
 		public bool WriteSTEPFile(string filePath, BackgroundWorker worker, DoWorkEventArgs e)
 		{
@@ -2386,6 +2403,38 @@ namespace GeometryGym.Ifc
 			return false;
 		}
 
+
+		public bool WriteSTEPFile(string filePath, SetProgressBarCallback progressBarCallback)
+		{
+			mDatabase.FileName = filePath;
+			StreamWriter sw = new StreamWriter(filePath);
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			sw.Write(getHeaderString(filePath) + "\r\n");
+			int count = mDatabase.Count(), counter = 0, progress = 0;
+			ReleaseVersion release = mDatabase.Release;
+			progressBarCallback(0);
+
+			foreach (BaseClassIfc c in mDatabase)
+			{
+				try
+				{
+					c.WriteStepLine(sw, release);
+					int calculatedProgress = 100 * counter / count;
+					if (calculatedProgress > progress)
+					{
+						progressBarCallback(++progress);
+					}
+				}
+				catch (Exception) { }
+				counter++;
+			}
+			sw.Write(getFooterString());
+			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			progressBarCallback(100);
+			sw.Close();
+			return true;
+		}
 		public bool WriteSTEPFile(string filePath, BackgroundWorker worker, DoWorkEventArgs e)
 		{
 			mDatabase.FileName = filePath;
@@ -2397,7 +2446,7 @@ namespace GeometryGym.Ifc
 			ReleaseVersion release = mDatabase.Release;
 			foreach (BaseClassIfc c in mDatabase)
 			{
-				if (e != null)
+				if (c != null)
 				{
 					try
 					{
@@ -2419,6 +2468,7 @@ namespace GeometryGym.Ifc
 			sw.Write(getFooterString());
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
 			worker.ReportProgress(100);
+			sw.Close();
 			return true;
 		}
 		public bool WriteSTEP(TextWriter textWriter, string filename)
@@ -2437,6 +2487,7 @@ namespace GeometryGym.Ifc
 			}
 			textWriter.Write(getFooterString());
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			textWriter.Close();
 			return true;
 		}
 		public List<string> GetStepLines()
