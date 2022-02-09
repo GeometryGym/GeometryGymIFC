@@ -2487,7 +2487,6 @@ namespace GeometryGym.Ifc
 			}
 			textWriter.Write(getFooterString());
 			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
-			textWriter.Close();
 			return true;
 		}
 		public List<string> GetStepLines()
