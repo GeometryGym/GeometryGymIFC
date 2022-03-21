@@ -2563,11 +2563,36 @@ additional types	some additional representation types are given:
 		internal IfcSurfaceStyleRendering() : base() { }
 		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r) : base(db, r)
 		{
-			mDiffuseColour = r.mDiffuseColour;
-			mTransmissionColour = r.mTransmissionColour;
-			mDiffuseTransmissionColour = r.mDiffuseTransmissionColour;
-			mReflectionColour = r.mReflectionColour;
-			mSpecularColour = r.mSpecularColour;
+			IfcColourRgb colourRgb = r.mDiffuseColour as IfcColourRgb;
+			if (colourRgb != null)
+				mDiffuseColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+			else
+				mDiffuseColour = r.mDiffuseColour;
+
+			colourRgb = r.mTransmissionColour as IfcColourRgb;
+			if (colourRgb != null)
+				mTransmissionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+			else
+				mTransmissionColour = r.mTransmissionColour;
+
+			colourRgb = r.mDiffuseTransmissionColour as IfcColourRgb;
+			if (colourRgb != null)
+				mDiffuseTransmissionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+			else
+				mDiffuseTransmissionColour = r.mDiffuseTransmissionColour;
+
+			colourRgb = r.mReflectionColour as IfcColourRgb;
+			if (colourRgb != null)
+				mReflectionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+			else
+				mReflectionColour = r.mReflectionColour;
+
+			colourRgb = r.mSpecularColour as IfcColourRgb;
+			if (colourRgb != null)
+				mSpecularColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+			else
+				mSpecularColour = r.mSpecularColour;
+
 			mSpecularHighlight = r.mSpecularHighlight;
 			mReflectanceMethod = r.mReflectanceMethod;
 		}

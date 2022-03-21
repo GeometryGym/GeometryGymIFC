@@ -71,10 +71,10 @@ namespace GeometryGym.Ifc
 			Point3d p = (cp == null ? Point3d.Origin : cp.Location);
 			Transform translation = Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z);
 			Transform changeBasis = vecsTransform();
-			Transform scale = getScaleTransform(p);
+			Transform scale = getScaleTransform();
 			return  translation * changeBasis * scale;
 		}
-		internal virtual Transform getScaleTransform(Point3d location) { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(location, mScale); }
+		internal virtual Transform getScaleTransform() { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(Point3d.Origin, mScale); }
 		protected virtual Transform vecsTransform()
 		{
 			Vector3d vx = new Vector3d(1, 0, 0), vy = new Vector3d(0, 1, 0);
@@ -106,7 +106,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator2DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, mScale2, 1); }
+		internal override Transform getScaleTransform() 
+		{
+			double scaleX = double.IsNaN(Scale) ? 1 : Scale;
+			double scaleY = double.IsNaN(Scale2) ? scaleX : Scale2;
+			return Rhino.Geometry.Transform.Scale(Plane.WorldXY, scaleX, scaleY, 1); 
+		}
 	}
 	public partial class IfcCartesianTransformationOperator3D
 	{
@@ -123,7 +128,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator3DnonUniform
 	{
-		internal override Transform getScaleTransform(Point3d location) { return Rhino.Geometry.Transform.Scale(new Plane(location, Vector3d.XAxis, Vector3d.YAxis), Scale, Scale2, Scale3); }
+		internal override Transform getScaleTransform() 
+		{
+			double scaleX = double.IsNaN(Scale) ? 1 : Scale;
+			double scaleY = double.IsNaN(Scale2) ? scaleX : Scale2;
+			double scaleZ = double.IsNaN(Scale3) ? scaleX : Scale3;
+			return Rhino.Geometry.Transform.Scale(Plane.WorldXY, scaleX, scaleY, scaleZ);
+		}
 	}
 	public partial class IfcCompositeCurveSegment
 	{

@@ -1287,7 +1287,7 @@ namespace GeometryGym.Ifc
 			{
 				double parametricLength = (Math.Atan(EndGradient) - theta) / db.ScaleAngle();
 
-				IfcCircle circle = new IfcCircle(db, mRadiusOfCurvature);
+				IfcCircle circle = new IfcCircle(db, Math.Abs(mRadiusOfCurvature));
 				IfcCurveMeasureSelect start = new IfcNonNegativeLengthMeasure(0), end = new IfcParameterValue(parametricLength);
 				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, start, end, circle);
 			}
@@ -1323,7 +1323,7 @@ namespace GeometryGym.Ifc
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CIRCULARARC)
 			{
 				double x = distanceAlongSegment;
-				double R = mRadiusOfCurvature, g1 = StartGradient;
+				double R = Math.Abs(mRadiusOfCurvature), g1 = StartGradient;
 				double c = 1 / Math.Sqrt(1 + g1 * g1);
 				double xc = g1 * R * c, yc = R * c;
 				double y = 0;
@@ -1340,7 +1340,7 @@ namespace GeometryGym.Ifc
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
 			{
 				double x = distanceAlongSegment;
-				double R = RadiusOfCurvature * (EndGradient < StartGradient ? -1 : 1);
+				double R = Math.Abs(RadiusOfCurvature) * (EndGradient < StartGradient ? -1 : 1);
 				gradient = x / R + StartGradient;
 				double result = StartHeight + x * (gradient + StartGradient) / 2;
 				return result;

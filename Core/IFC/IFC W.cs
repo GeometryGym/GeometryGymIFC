@@ -152,6 +152,13 @@ namespace GeometryGym.Ifc
 		internal IfcWindow() : base() { }
 		internal IfcWindow(DatabaseIfc db, IfcWindow w, DuplicateOptions options) : base(db, w, options) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }
 		public IfcWindow(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcWindow(IfcOpeningElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) :
+			base(host.Database)
+		{
+			ObjectPlacement = placement;
+			Representation = representation;
+			IfcRelFillsElement relFillsElement = new IfcRelFillsElement(host, this);
+		}
 	}
 	[Serializable]
 	public partial class IfcWindowLiningProperties : IfcPreDefinedPropertySet //IFC2x3 : IfcPropertySetDefinition

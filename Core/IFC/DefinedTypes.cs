@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 // Copyright (c) 2016 Geometry Gym Pty Ltd
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
@@ -16,24 +16,9 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System;
 
-[assembly: AssemblyVersion("0.1.25.0")]
-[assembly: AssemblyFileVersion("0.1.25.0")]
+namespace GeometryGym.Ifc
+{
 
-[assembly: AssemblyTitle("GeometryGymIFC")]
-[assembly: AssemblyDescription("C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Geometry Gym Pty Ltd")]
-[assembly: AssemblyProduct("GeometryGymIFC")]
-[assembly: AssemblyCopyright("Copyright © Geometry Gym Pty Ltd 2016")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-[assembly: ComVisible(false)]
-
-[assembly: Guid("c26aa7cc-baf1-4551-b91b-76e56ca15567")]
-
-
+}

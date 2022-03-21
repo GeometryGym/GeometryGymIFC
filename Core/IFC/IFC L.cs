@@ -360,7 +360,7 @@ namespace GeometryGym.Ifc
 		private IfcPointByDistanceExpression mDistance = null; //: IfcDistanceExpression;
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		private IfcOrientationExpression mOrientation = null; //: OPTIONAL IfcOrientationExpression;
-		private IfcAxis2PlacementLinear mRelativePlacement; //: IfcLinearAxis2Placement;
+		private IfcAxis2PlacementLinear mRelativePlacement; //: IfcAxis2PlacementLinear;
 		private IfcAxis2Placement3D mCartesianPosition = null; //: OPTIONAL IfcAxis2Placement3D;
 
 		[Obsolete("DEPRECATED IFC4x3", false)]

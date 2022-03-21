@@ -751,10 +751,14 @@ namespace GeometryGym.Ifc
                 mRelatedObjects.AddRange(a.RelatedObjects.Select(x=> db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
             }
 		}
-		internal IfcRelAggregates(IfcObjectDefinition relObject) 
-			: base(relObject.mDatabase) { RelatingObject = relObject; }
-		public IfcRelAggregates(IfcObjectDefinition relObject, IfcObjectDefinition relatedObject) : this(relObject, new List<IfcObjectDefinition>() { relatedObject }) { }
-		public IfcRelAggregates(IfcObjectDefinition relObject, IEnumerable<IfcObjectDefinition> relatedObjects) : this(relObject)
+		internal IfcRelAggregates(IfcObjectDefinition relatingObject) 
+			: base(relatingObject.mDatabase)
+		{ 
+			RelatingObject = relatingObject;
+			GlobalId = ParserIfc.HashGlobalID(relatingObject.GlobalId + "Aggregates" + relatingObject.IsDecomposedBy.Count);
+		}
+		public IfcRelAggregates(IfcObjectDefinition relatingObject, IfcObjectDefinition relatedObject) : this(relatingObject, new List<IfcObjectDefinition>() { relatedObject }) { }
+		public IfcRelAggregates(IfcObjectDefinition relatingObject, IEnumerable<IfcObjectDefinition> relatedObjects) : this(relatingObject)
 		{
 			foreach (IfcObjectDefinition od in relatedObjects)
 				od.Decomposes = this;
@@ -947,9 +951,13 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToProduct() : base() { }
 		internal IfcRelAssignsToProduct(DatabaseIfc db, IfcRelAssignsToProduct r, DuplicateOptions options) 
 			: base(db, r, options) { RelatingProduct = db.Factory.Duplicate(r.RelatingProduct as BaseClassIfc, options) as IfcProductSelect; }
-		public IfcRelAssignsToProduct(IfcProductSelect relProduct) : base(relProduct.Database) { RelatingProduct = relProduct; }
-		public IfcRelAssignsToProduct(IfcObjectDefinition relObject, IfcProductSelect relProduct) : base(relObject) { RelatingProduct = relProduct; }
-		public IfcRelAssignsToProduct(IEnumerable<IfcObjectDefinition> relObjects, IfcProductSelect relProduct) : base(relObjects) { RelatingProduct = relProduct; }
+		public IfcRelAssignsToProduct(IfcProductSelect relatingProduct) : base(relatingProduct.Database) 
+		{ 
+			RelatingProduct = relatingProduct;
+			GlobalId = ParserIfc.HashGlobalID(relatingProduct.GlobalId + relatingProduct.ReferencedBy.Count);
+		}
+		public IfcRelAssignsToProduct(IfcObjectDefinition relatedObject, IfcProductSelect relatingProduct) : this(relatingProduct) { RelatedObjects.Add(relatedObject); }
+		public IfcRelAssignsToProduct(IEnumerable<IfcObjectDefinition> relelatedObjects, IfcProductSelect relatingProduct) : this(relatingProduct) { RelatedObjects.AddRange(relelatedObjects); }
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcRelAssignsToProjectOrder // DEPRECATED IFC4 
@@ -1482,6 +1490,7 @@ namespace GeometryGym.Ifc
 			Name = containerName;
 			Description = containerName + " Container for Elements";
 			RelatingStructure = host;
+			GlobalId = ParserIfc.HashGlobalID(host.GlobalId + "Contains" + host.ContainsElements.Count);
 		}
 		public IfcRelContainedInSpatialStructure(IfcProduct related, IfcSpatialElement host) : this(host) { RelatedElements.Add(related); }
 		public IfcRelContainedInSpatialStructure(IEnumerable<IfcProduct> related, IfcSpatialElement host) :this(host) { RelatedElements.AddRange(related); }
@@ -1969,11 +1978,10 @@ namespace GeometryGym.Ifc
 		{
 			mRelatingObject = relatingObject;
 			relatingObject.IsNestedBy.Add(this);
+			GlobalId = ParserIfc.HashGlobalID(relatingObject.GlobalId + "Nests" + relatingObject.IsNestedBy.Count);
 		}
-		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition relatedObject) : base(relatingObject.mDatabase)
+		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition relatedObject) : this(relatingObject)
 		{
-			mRelatingObject = relatingObject;
-			relatingObject.IsNestedBy.Add(this);
 			relatedObject.Nests = this;
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition ro, IfcObjectDefinition ro2) : this(relatingObject, ro) { ro2.Nests = this; }

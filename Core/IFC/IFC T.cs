@@ -509,7 +509,7 @@ namespace GeometryGym.Ifc
 		private IfcFace mMappedTo = null; //: IfcFace;
 
 		public LIST<IfcTextureVertex> Vertices { get { return mVertices; } set { mVertices = value; } }
-		public IfcFace MappedTo { get { return mMappedTo; } set { mMappedTo = value; } }
+		public IfcFace MappedTo { get { return mMappedTo; } set { mMappedTo = value; mMappedTo.HasTextureMaps.Add(this); } }
 
 		public IfcTextureMap() : base() { }
 		public IfcTextureMap(IEnumerable<IfcSurfaceTexture> maps, IEnumerable<IfcTextureVertex> vertices, IfcFace mappedTo)
@@ -1506,7 +1506,7 @@ namespace GeometryGym.Ifc
 			return element;
 		}
 
-		internal static IfcTypeProduct constructType(DatabaseIfc db, string className, string name)
+		public static IfcTypeProduct ConstructType(DatabaseIfc db, string className, string name)
 		{
 			string str = className, definedType = "";
 			if (!string.IsNullOrEmpty(str))

@@ -151,6 +151,29 @@ namespace GeometryGym.Ifc
 				xml.AppendChild((Axis as BaseClassIfc).GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
+	public partial class IfcLinearPlacement : IfcObjectPlacement
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "RelativePlacement") == 0)
+					RelativePlacement = mDatabase.ParseXml<IfcAxis2PlacementLinear>(child as XmlElement);
+				else if (string.Compare(name, "CartesianPosition") == 0)
+					CartesianPosition = mDatabase.ParseXml<IfcAxis2Placement3D>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild((mRelativePlacement as BaseClassIfc).GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
+			if(mCartesianPosition != null)
+				xml.AppendChild((mCartesianPosition as BaseClassIfc).GetXML(xml.OwnerDocument, "CartesianPosition", this, processed));
+		}
+	}
 	internal partial class IfcLinearSpanPlacement
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
@@ -213,7 +236,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mRelativePlacement.Index].GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
+			xml.AppendChild((mRelativePlacement as BaseClassIfc).GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
 		}
 	}
 	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef

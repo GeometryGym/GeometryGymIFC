@@ -1845,6 +1845,31 @@ namespace GeometryGym.Ifc
 		internal IfcPropertyBoundedValue() : base() { }
 		public IfcPropertyBoundedValue(DatabaseIfc db, string name) : base(db, name) { }
 	}
+	[Obsolete("DELETED IFC4", false)]
+	[Serializable]
+	public partial class IfcPropertyConstraintRelationship : BaseClassIfc
+	{
+		private IfcConstraint mRelatingConstraint = null;// : 	IfcConstraint;
+		private SET<IfcProperty> mRelatedProperties = new SET<IfcProperty>();// : 	SET[1:?] OF IfcProperty;
+		private string mName = ""; //: OPTIONAL IfcLabel;
+		private string mDescription = ""; //: OPTIONAL IfcText; 
+
+		public IfcConstraint RelatingConstraint { get {  return mRelatingConstraint; } set { mRelatingConstraint = value; } }
+		public SET<IfcProperty> RelatedProperties { get { return mRelatedProperties; } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+
+		protected IfcPropertyConstraintRelationship() : base() { }
+		internal IfcPropertyConstraintRelationship(DatabaseIfc db) : base(db) { }
+		public IfcPropertyConstraintRelationship(IfcConstraint constraint, IEnumerable<IfcProperty> relating) 
+			: base(constraint.Database) 
+		{
+			RelatingConstraint = constraint;
+			RelatedProperties.AddRange(relating);
+		}
+
+
+	}
 	[Serializable]
 	public abstract partial class IfcPropertyDefinition : IfcRoot, IfcDefinitionSelect //(IfcPropertySetDefinition, IfcPropertyTemplateDefinition)
 	{ //INVERSE
