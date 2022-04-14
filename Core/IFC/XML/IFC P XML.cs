@@ -237,6 +237,59 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("SizeInY", mSizeInY.ToString());
 		}
 	}
+	public partial class IfcPointByDistanceExpression
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "DistanceAlong") == 0)
+				{
+					if(child.HasChildNodes)
+					{
+						XmlNode distanceAlong = child.ChildNodes[0];
+						string lowerName = distanceAlong.Name.ToLower();
+							double d = 0;
+						if (double.TryParse(distanceAlong.InnerText, out d))
+						{
+							if (lowerName.StartsWith("ifcnonnegativelengthmeasure"))
+								DistanceAlong = new IfcNonNegativeLengthMeasure(d);
+							else if (lowerName.StartsWith("ifcparametervalue"))
+								DistanceAlong = new IfcParameterValue(d);
+						}
+					}
+					BasisCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+				}
+				else if (string.Compare(name, "BasisCurve") == 0)
+					BasisCurve = mDatabase.ParseXml<IfcCurve>(child as XmlElement);
+			}
+			if (xml.HasAttribute("OffsetLateral"))
+				mOffsetLateral = double.Parse(xml.Attributes["OffsetLateral"].Value);
+			if (xml.HasAttribute("OffsetVertical"))
+				mOffsetVertical = double.Parse(xml.Attributes["OffsetVertical"].Value);
+			if (xml.HasAttribute("OffsetLongitudinal"))
+				mOffsetLongitudinal = double.Parse(xml.Attributes["OffsetLongitudinal"].Value);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+
+			if(mDistanceAlong != null)
+			{
+				xml.AppendChild(convert(xml.OwnerDocument, mDistanceAlong as IfcValue, "DistanceAlong", mDatabase.mXmlNamespace));
+			}
+			if(!double.IsNaN(mOffsetLateral))
+				xml.SetAttribute("OffsetLateral", mOffsetLateral.ToString());
+			if(!double.IsNaN(mOffsetVertical))
+				xml.SetAttribute("OffsetVertical", mOffsetVertical.ToString());
+			if(!double.IsNaN(mOffsetLongitudinal))
+				xml.SetAttribute("OffsetLongitudinal", mOffsetLongitudinal.ToString());
+			if(BasisCurve != null)
+				xml.AppendChild(BasisCurve.GetXML(xml.OwnerDocument, "BasisCurve", this, processed));
+		}
+	}
 	public partial class IfcPointOnCurve : IfcPoint
 	{
 		internal override void ParseXml(XmlElement xml)

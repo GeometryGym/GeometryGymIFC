@@ -161,7 +161,12 @@ namespace GeometryGym.STEP
 			return sb.ToString();
 		}
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
-		public static string DoubleToString(double d) { if (double.IsNaN(d) || double.IsInfinity(d)) return "0.0"; return String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d); }
+		public static string DoubleToString(double d) 
+		{ 
+			if (double.IsNaN(d) || double.IsInfinity(d))
+				return "0.0";
+			return String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d);
+		}
 		public static string DoubleExponentialString(double d) 
 		{
 			double abs = Math.Abs(d);

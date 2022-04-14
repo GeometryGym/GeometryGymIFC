@@ -747,6 +747,22 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mUpperBoundValue == null ? ",$," : "," + mUpperBoundValue.ToString() + ",") + (mLowerBoundValue == null ? "$," : mLowerBoundValue.ToString() + ",") + ParserSTEP.LinkToString(mUnit) + (release < ReleaseVersion.IFC4 ? "" : (mSetPointValue == null ? ",$" : "," + mSetPointValue.ToString())); }
 	}
+	public abstract partial class IfcPropertyConstraintRelationship
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return "#" + mRelatingConstraint.StepId + ",(" + String.Join(",", mRelatedProperties.Select(x=>"#" + x.StepId)) +
+				(string.IsNullOrEmpty(mName) ? "),$," :  "),'" + ParserIfc.Encode(mName) + "',") + 
+				(string.IsNullOrEmpty(mDescription) ? "$" : "'" + ParserIfc.Encode( mDescription) + "'"); 
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			RelatingConstraint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConstraint;
+			RelatedProperties.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcProperty));
+			Name = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			Description = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+		}
+	}
 	public partial class IfcPropertyDependencyRelationship : IfcResourceLevelRelationship
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#"+ mDependingProperty + ",#" + mDependantProperty + (mExpression == "$" ? ",$" : ",'" + mExpression + "'"); }

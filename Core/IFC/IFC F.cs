@@ -33,7 +33,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
 	{
 		private SET<IfcFaceBound> mBounds = new SET<IfcFaceBound>();// : SET [1:?] OF IfcFaceBound;
+		//INVERSE
+		private SET<IfcTextureMap> mHasTextureMaps = new SET<IfcTextureMap>();// : SET[0:?] OF IfcTextureMap FOR MappedTo;
+	
 		public SET<IfcFaceBound> Bounds { get { return mBounds; } }
+		public SET<IfcTextureMap> HasTextureMaps { get { return mHasTextureMaps; } }
 
 		internal IfcFace() : base() { }
 		internal IfcFace(DatabaseIfc db, IfcFace f, DuplicateOptions options) : base(db, f, options) { Bounds.AddRange(f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound)); }

@@ -1056,7 +1056,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(RefDirection.GetXML(xml.OwnerDocument, "RefDirection", this, processed));
 		}
 	}
-	public partial class IfcAxis2PlacementLinear : IfcPlacement
+	public partial class IfcAxis2PlacementLinear 
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

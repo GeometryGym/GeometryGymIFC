@@ -322,6 +322,11 @@ namespace GeometryGym.Ifc
 				WriteXmlFile(path);
 				return true;
 			}
+			if (ExtensionHelper.ExtensionEquals(filePath, ".ifcxml"))
+			{
+				WriteXmlFile(path);
+				return true;
+			}
 #if (!NOIFCJSON)
 			else if (ExtensionHelper.ExtensionEquals(filePath, ".json"))
 			{
@@ -2534,14 +2539,14 @@ namespace GeometryGym.Ifc
 			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
 			IfcPerson person = mDatabase.Factory.mPerson;
 			string authorName = person == null ? mDatabase.Factory.PersonName() : person.Name;
-			lines.Add("/* author */ ('" + authorName + "'),");
+			lines.Add("/* author */ ('" + ParserIfc.Encode(authorName) + "'),");
 			string organizationName = IfcOrganization.Organization;
 			IfcOrganization organization = null;
 			if (organization != null)
 				organizationName = organization.Name; 
-			lines.Add("/* organization */ ('" + organizationName + "'),");
-			lines.Add("/* preprocessor_version */ '" + mDatabase.Factory.ToolkitName + "',");
-			lines.Add("/* originating_system */ '" + mDatabase.Factory.ApplicationFullName + "',");
+			lines.Add("/* organization */ ('" + ParserIfc.Encode(organizationName) + "'),");
+			lines.Add("/* preprocessor_version */ '" + ParserIfc.Encode(mDatabase.Factory.ToolkitName) + "',");
+			lines.Add("/* originating_system */ '" + ParserIfc.Encode(mDatabase.Factory.ApplicationFullName) + "',");
 			lines.Add("/* authorization */ 'None');");
 			lines.Add("");
 			string version = "IFC4";
