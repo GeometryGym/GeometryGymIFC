@@ -71,7 +71,13 @@ namespace GeometryGym.Ifc
 			{
 				IfcCalendarDate cd = mDateComponent;
 				IfcLocalTime lt = mTimeComponent;
-				return new DateTime(cd.mYearComponent, cd.mMonthComponent, cd.mDayComponent, lt.mHourComponent, lt.mMinuteComponent, (int)lt.mSecondComponent);
+				int seconds = 0, milliSeconds = 0;
+				if (!double.IsNaN(lt.mSecondComponent))
+				{
+					seconds = (int)Math.Floor(lt.mSecondComponent);
+					milliSeconds = Math.Min((int)Math.Round((lt.mSecondComponent - seconds) * 1000,0), 999);
+				}
+				return new DateTime(cd.mYearComponent, cd.mMonthComponent, cd.mDayComponent, lt.mHourComponent, lt.mMinuteComponent, seconds, milliSeconds);
 			}
 		}
 	}
