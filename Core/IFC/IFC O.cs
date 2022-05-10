@@ -350,7 +350,8 @@ namespace GeometryGym.Ifc
 			}
 			if (options.DuplicateProperties)
 			{
-				foreach (IfcPropertySetDefinition pset in o.mIsDefinedBy.SelectMany(x=>x.RelatingPropertyDefinition))
+				List<IfcPropertySetDefinition> psets = o.mIsDefinedBy.SelectMany(x => x.RelatingPropertyDefinition).ToList();
+				foreach (IfcPropertySetDefinition pset in psets)
 				{
 					IfcPropertySetDefinition dup = db.Factory.DuplicatePropertySet(pset, options);
 					if (dup != null)

@@ -28,7 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcNamedUnit : BaseClassIfc, IfcUnit //ABSTRACT SUPERTYPE OF (ONEOF(IfcContextDependentUnit,IfcConversionBasedUnit,IfcSIUnit));
+	public abstract partial class IfcNamedUnit
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return (mDimensions == null ? "*" : "#" + mDimensions.Index) + ",." + mUnitType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -37,7 +37,7 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcUnitEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mUnitType);
 		}
 	}
-	public partial class IfcNavigationElement : IfcBuiltElement
+	public partial class IfcNavigationElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcNavigationElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcNavigationElementType : IfcBuiltElementType
+	public partial class IfcNavigationElementType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

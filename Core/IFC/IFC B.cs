@@ -451,18 +451,19 @@ namespace GeometryGym.Ifc
 		private IfcKnotType mKnotSpec = IfcKnotType.UNSPECIFIED;//: IfcKnotType;
 
 		public LIST<int> KnotMultiplicities { get { return mKnotMultiplicities; } }
-		public ReadOnlyCollection<double> Knots { get { return new ReadOnlyCollection<double>( mKnots); } }
+		public LIST<double> Knots { get { return mKnots; } }
 		public IfcKnotType KnotSpec { get { return mKnotSpec; } }
 
 		internal IfcBSplineCurveWithKnots() : base() { }
-		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c, DuplicateOptions options) : base(db, c, options)
+		internal IfcBSplineCurveWithKnots(DatabaseIfc db, IfcBSplineCurveWithKnots c, DuplicateOptions options) 
+			: base(db, c, options)
 		{
 			mKnotMultiplicities.AddRange(c.KnotMultiplicities);
 			mKnots.AddRange(c.Knots);
 			mKnotSpec = c.mKnotSpec;
 		}
-		public IfcBSplineCurveWithKnots(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
-			base(degree, controlPoints)
+		public IfcBSplineCurveWithKnots(int degree, IEnumerable<IfcCartesianPoint> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) 
+			: base(degree, controlPoints)
 		{
 			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);

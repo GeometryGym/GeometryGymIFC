@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcGeometricRepresentationContext : IfcRepresentationContext, IfcCoordinateReferenceSystemSelect
+	public partial class IfcGeometricRepresentationContext
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -91,6 +91,9 @@ namespace GeometryGym.Ifc
 			List<IfcGeometricRepresentationSubContext> subs = mDatabase.extractJArray<IfcGeometricRepresentationSubContext>(obj.GetValue("HasSubContexts", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcGeometricRepresentationSubContext sub in subs)
 				sub.ParentContext = this;
+
+			foreach (IfcShapeModel shape in mDatabase.extractJArray<IfcShapeModel>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray))
+				mRepresentationsInContext.Add(shape);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -119,6 +122,15 @@ namespace GeometryGym.Ifc
 				obj["HasSubContexts"] = arr;
 			if (mHasCoordinateOperation != null)
 				obj["HasCoordinateOperation"] = mHasCoordinateOperation.getJson(this, options);
+
+			JArray reps = new JArray();
+			foreach (IfcRepresentation<IfcRepresentationItem> r in RepresentationsInContext)
+			{
+				if (r.mOfProductRepresentation.Count == 0 && r.mRepresentationMap == null)
+					reps.Add(r.getJson(this, options));
+			}
+			if (reps.Count > 0)
+				obj["RepresentationsInContext"] = reps;
 		}
 	}
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext

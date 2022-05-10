@@ -29,7 +29,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcGeometricRepresentationContext : IfcRepresentationContext, IfcCoordinateReferenceSystemSelect
+	public partial class IfcGeometricRepresentationContext
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

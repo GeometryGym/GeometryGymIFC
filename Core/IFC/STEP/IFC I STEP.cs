@@ -29,7 +29,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcImageTexture : IfcSurfaceTexture
+	public partial class IfcImageTexture
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mUrlReference + "'"; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 			mUrlReference = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcIndexedColourMap : IfcPresentationItem
+	public partial class IfcIndexedColourMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -53,7 +53,7 @@ namespace GeometryGym.Ifc
 			mColourIndex = ParserSTEP.SplitListSTPIntegers(ParserSTEP.StripField(str, ref pos, len));
 		}
 	}
-	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
+	public partial class IfcIndexedPolyCurve
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 				mSelfIntersect = field[1] == 'T' ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 		}
 	}
-	public partial class IfcIndexedPolygonalFace : IfcTessellatedItem  //SUPERTYPE OF (ONEOF (IfcIndexedPolygonalFaceWithVoids))
+	public partial class IfcIndexedPolygonalFace
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -95,7 +95,7 @@ namespace GeometryGym.Ifc
 			mCoordIndex = ParserSTEP.SplitListSTPIntegers(ParserSTEP.StripField(str, ref pos, len));
 		}
 	}
-	public partial class IfcIndexedPolygonalFaceWithVoids : IfcIndexedPolygonalFace
+	public partial class IfcIndexedPolygonalFaceWithVoids
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -109,7 +109,7 @@ namespace GeometryGym.Ifc
 			mInnerCoordIndices = fields.ConvertAll(x => ParserSTEP.SplitListSTPIntegers(x));
 		}
 	}
-	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)
+	public abstract partial class IfcIndexedTextureMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mMappedTo + ",#" + mTexCoords; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -119,7 +119,7 @@ namespace GeometryGym.Ifc
 			TexCoords = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTextureVertexList;
 		}
 	}
-	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap
+	public partial class IfcIndexedTriangleTextureMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -133,7 +133,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			mTexCoordList.AddRange(ParserSTEP.SplitListSTPIntTriple(ParserSTEP.StripField(str,ref pos, len))); }
 	}
-	public partial class IfcInterceptor : IfcFlowTreatmentDevice //IFC4  
+	public partial class IfcInterceptor  
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcInterceptorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -144,7 +144,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcInterceptorType : IfcFlowTreatmentDeviceType
+	public partial class IfcInterceptorType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -155,7 +155,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcInterceptorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcInventory : IfcGroup
+	public partial class IfcInventory
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -175,7 +175,7 @@ namespace GeometryGym.Ifc
 			mOriginalValue = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcImpactProtectionDevice : IfcElementComponent
+	public partial class IfcImpactProtectionDevice
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -187,7 +187,7 @@ namespace GeometryGym.Ifc
 			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
 		}
 	}
-	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
+	public partial class IfcImpactProtectionDeviceType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -199,7 +199,7 @@ namespace GeometryGym.Ifc
 			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
 		}
 	}
-	public partial class IfcIrregularTimeSeries : IfcTimeSeries
+	public partial class IfcIrregularTimeSeries
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -212,7 +212,7 @@ namespace GeometryGym.Ifc
 			Values.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcIrregularTimeSeriesValue));
 		}
 	}
-	public partial class IfcIrregularTimeSeriesValue : BaseClassIfc
+	public partial class IfcIrregularTimeSeriesValue
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -234,7 +234,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
+	public partial class IfcIShapeProfileDef 
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

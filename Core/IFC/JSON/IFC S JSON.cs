@@ -142,7 +142,7 @@ namespace GeometryGym.Ifc
 				obj["PartOfProductDefinitionShape"] = mPartOfProductDefinitionShape.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcShapeModel : IfcRepresentation<IfcRepresentationItem>//ABSTRACT SUPERTYPE OF (ONEOF (IfcShapeRepresentation,IfcTopologyRepresentation))
+	public abstract partial class IfcShapeModel 
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

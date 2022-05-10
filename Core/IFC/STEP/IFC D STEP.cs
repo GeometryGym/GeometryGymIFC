@@ -29,7 +29,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcDamper : IfcFlowController //IFC4
+	public partial class IfcDamper
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDamperTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -40,7 +40,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDamperTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDamperType : IfcFlowControllerType
+	public partial class IfcDamperType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDamperTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DEPRECATED IFC4
+	public partial class IfcDateAndTime
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mDateComponent.StepId + ",#" + mTimeComponent.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -60,8 +60,7 @@ namespace GeometryGym.Ifc
 			mTimeComponent = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLocalTime;
 		}
 	}
-	//ENTITY IfcDefinedSymbol  // DEPRECATED IFC4
-	public partial class IfcDerivedProfileDef : IfcProfileDef
+	public partial class IfcDerivedProfileDef
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mParentProfile.StepId + (mOperator == null ? ",*" : ",#" + mOperator.StepId) + (mLabel == "$" ? ",$" : ",'" + mLabel + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -72,7 +71,7 @@ namespace GeometryGym.Ifc
 			mLabel = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
+	public partial class IfcDerivedUnit
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -86,7 +85,7 @@ namespace GeometryGym.Ifc
 			mUserDefinedType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDerivedUnitElement : BaseClassIfc
+	public partial class IfcDerivedUnitElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mUnit.StepId + "," + ParserSTEP.IntToString(mExponent); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -95,7 +94,7 @@ namespace GeometryGym.Ifc
 			mExponent = ParserSTEP.StripInt(str, ref pos, len);
 		}
 	}
-	public partial class IfcDimensionalExponents : BaseClassIfc
+	public partial class IfcDimensionalExponents
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return mLengthExponent + "," + mMassExponent + "," + mTimeExponent + "," + mElectricCurrentExponent + "," + mThermodynamicTemperatureExponent + "," + mAmountOfSubstanceExponent + "," + mLuminousIntensityExponent; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -109,7 +108,7 @@ namespace GeometryGym.Ifc
 			mLuminousIntensityExponent = ParserSTEP.StripInt(str, ref pos, len);
 		}
 	}
-	public partial class IfcDimensionCurve : IfcAnnotationCurveOccurrence // DEPRECATED IFC4
+	public partial class IfcDimensionCurve
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -127,7 +126,7 @@ namespace GeometryGym.Ifc
 			mAnnotatedBySymbols = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol // DEPRECATED IFC4
+	public partial class IfcDimensionCurveTerminator
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mRole.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -136,7 +135,7 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcDimensionExtentUsage>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mRole);
 		}
 	}
-	public partial class IfcDirection : IfcGeometricRepresentationItem
+	public partial class IfcDirection
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{ 
@@ -162,7 +161,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -202,7 +201,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDiscreteAccessory : IfcElementComponent
+	public partial class IfcDiscreteAccessory
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDiscreteAccessoryTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -216,7 +215,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDiscreteAccessoryType : IfcElementComponentType
+	public partial class IfcDiscreteAccessoryType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDiscreteAccessoryTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -227,7 +226,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDiscreteAccessoryTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionBoard : IfcFlowController
+	public partial class IfcDistributionBoard
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -242,7 +241,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionBoardTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionBoardType : IfcFlowControllerType
+	public partial class IfcDistributionBoardType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -256,7 +255,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionBoardTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionChamberElement : IfcDistributionFlowElement
+	public partial class IfcDistributionChamberElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDistributionChamberElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -270,7 +269,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDistributionChamberElementType : IfcDistributionFlowElementType
+	public partial class IfcDistributionChamberElementType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -281,7 +280,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionChamberElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionControlElement : IfcDistributionElement // SUPERTYPE OF(ONEOF(IfcActuator, IfcAlarm, IfcController,
+	public partial class IfcDistributionControlElement
 	{ 
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
@@ -294,7 +293,7 @@ namespace GeometryGym.Ifc
 				mControlElementId = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDistributionPort : IfcPort
+	public partial class IfcDistributionPort
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mFlowDirection.ToString() + (release < ReleaseVersion.IFC4 ? "." : ".,." + mPredefinedType + ".,." + mSystemType + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -314,7 +313,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDistributionSystem : IfcSystem //SUPERTYPE OF(IfcDistributionCircuit) IFC4
+	public partial class IfcDistributionSystem
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mLongName == "$" ? ",$,." : ",'" + mLongName + "',.") + mPredefinedType.ToString() + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -326,7 +325,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionSystemEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDocumentElectronicFormat : BaseClassIfc // DEPRECATED IFC4
+	public partial class IfcDocumentElectronicFormat
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return (mFileExtension == "$" ? "$," : "'" + mFileExtension + ",',") + (mMimeContentType == "$" ? "$," : "'" + mMimeContentType + "',") + (mMimeSubtype == "$" ? "$" : "'" + mMimeSubtype + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -336,7 +335,7 @@ namespace GeometryGym.Ifc
 			mMimeSubtype = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDocumentInformation : IfcExternalInformation, IfcDocumentSelect
+	public partial class IfcDocumentInformation
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -387,7 +386,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDocumentStatusEnum>(s.Replace(".", ""), true, out mStatus);
 		}
 	}
-	public partial class IfcDocumentInformationRelationship : IfcResourceLevelRelationship
+	public partial class IfcDocumentInformationRelationship
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -403,7 +402,7 @@ namespace GeometryGym.Ifc
 			mRelationshipType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDocumentReference : IfcExternalReference, IfcDocumentSelect
+	public partial class IfcDocumentReference
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mDescription == "$" ? ",$," : ",'" + mDescription + "',") + ParserSTEP.LinkToString(mReferencedDocument)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -416,7 +415,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDoor : IfcBuiltElement
+	public partial class IfcDoor
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -446,7 +445,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDoorLiningProperties : IfcPreDefinedPropertySet // IFC2x3 IfcPropertySetDefinition
+	public partial class IfcDoorLiningProperties
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -474,7 +473,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcDoorPanelProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
+	public partial class IfcDoorPanelProperties
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mPanelDepth) + ",." + mOperationType.ToString() + ".," + ParserSTEP.DoubleOptionalToString(mPanelWidth) + ",." + mPanelPosition.ToString() + ".," + ParserSTEP.LinkToString(mShapeAspectStyle); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -487,7 +486,7 @@ namespace GeometryGym.Ifc
 			mShapeAspectStyle = ParserSTEP.StripLink(str,ref pos,len);
 		}
 	}
-	public partial class IfcDoorStyle : IfcTypeProduct //IFC2x3 
+	public partial class IfcDoorStyle 
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mOperationType.ToString() + ".,." + mConstructionType.ToString() + ".," + ParserSTEP.BoolToString(mParameterTakesPrecedence) + "," + ParserSTEP.BoolToString(mSizeable); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -499,7 +498,7 @@ namespace GeometryGym.Ifc
 			mSizeable = ParserSTEP.StripBool(str,ref pos, len);
 		}
 	}
-	public partial class IfcDoorType : IfcBuiltElementType //IFC2x3 IfcDoorStyle
+	public partial class IfcDoorType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
@@ -517,7 +516,7 @@ namespace GeometryGym.Ifc
 			mUserDefinedOperationType = ParserSTEP.StripString(str, ref pos, len);
 		}
 	}
-	public partial class IfcDraughtingCallout : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF (ONEOF (IfcDimensionCurveDirectedCallout ,IfcStructuredDimensionCallout))
+	public partial class IfcDraughtingCallout
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -525,7 +524,7 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mContents = ParserSTEP.StripListLink(str, ref pos, len); }
 	}
-	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECATED IFC4
+	public partial class IfcDraughtingCalloutRelationship
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -541,7 +540,7 @@ namespace GeometryGym.Ifc
 			mRelatedDraughtingCallout = ParserSTEP.StripLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcDuctFitting : IfcFlowFitting //IFC4
+	public partial class IfcDuctFitting
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDuctFittingTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -552,7 +551,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDuctFittingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDuctFittingType : IfcFlowFittingType
+	public partial class IfcDuctFittingType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -563,7 +562,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDuctFittingTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDuctSegment : IfcFlowSegment //IFC4
+	public partial class IfcDuctSegment
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDuctSegmentTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -574,7 +573,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDuctSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDuctSegmentType : IfcFlowSegmentType
+	public partial class IfcDuctSegmentType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -585,7 +584,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDuctSegmentTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDuctSilencer : IfcFlowTreatmentDevice //IFC4  
+	public partial class IfcDuctSilencer  
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDuctSilencerTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -596,7 +595,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDuctSilencerTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDuctSilencerType : IfcFlowTreatmentDeviceType
+	public partial class IfcDuctSilencerType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)

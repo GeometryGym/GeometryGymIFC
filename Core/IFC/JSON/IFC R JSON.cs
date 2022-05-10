@@ -665,8 +665,7 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("ContextType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				ContextType = token.Value<string>();
-			foreach (IfcShapeModel shape in mDatabase.extractJArray<IfcShapeModel>(obj.GetValue("RepresentationsInContext", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				mRepresentationsInContext[shape.StepId] = shape;
+			
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -679,15 +678,6 @@ namespace GeometryGym.Ifc
 			string contextType = ContextType;
 			if (!string.IsNullOrEmpty(contextType))
 				obj["ContextType"] = contextType;
-			JArray reps = new JArray();
-			foreach(IfcRepresentation<IfcRepresentationItem> r in RepresentationsInContext)
-			{
-				if (r.mOfProductRepresentation.Count == 0 && r.mRepresentationMap == null)
-					reps.Add(r.getJson(this, options));
-			}
-			if (reps.Count > 0)
-				obj["RepresentationsInContext"] = reps;
-
 		}
 	}
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/

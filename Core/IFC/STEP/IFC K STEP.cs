@@ -28,7 +28,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcKerb : IfcBuiltElement
+	public partial class IfcKerb
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -40,7 +40,7 @@ namespace GeometryGym.Ifc
 			Mountable = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
-	public partial class IfcKerbType : IfcBuiltElementType
+	public partial class IfcKerbType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

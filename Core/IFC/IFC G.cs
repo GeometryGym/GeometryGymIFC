@@ -120,6 +120,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement mWorldCoordinateSystem = null;// : IfcAxis2Placement;
 		internal IfcDirection mTrueNorth = null;// : OPTIONAL IfcDirection; 
 		//INVERSE
+		[NonSerialized] internal SET<IfcShapeModel> mRepresentationsInContext = new SET<IfcShapeModel>();// :	SET OF IfcRepresentation FOR ContextOfItems;
 		internal List<IfcGeometricRepresentationSubContext> mHasSubContexts = new List<IfcGeometricRepresentationSubContext>();//	 :	SET OF IfcGeometricRepresentationSubContext FOR ParentContext;
 		private IfcCoordinateOperation mHasCoordinateOperation = null; //IFC4
 
@@ -131,9 +132,11 @@ namespace GeometryGym.Ifc
 			get { return mTrueNorth; }  
 			set { mTrueNorth = value; if (value != null) value.DirectionRatioZ = double.NaN; } 
 		}
+		public SET<IfcShapeModel> RepresentationsInContext { get { return mRepresentationsInContext; } }
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
 		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != this) value.SourceCRS = this; } }
-		
+
+
 		internal IfcGeometricRepresentationContext() : base() { }
 		protected IfcGeometricRepresentationContext(DatabaseIfc db) : base(db) { }
 		internal IfcGeometricRepresentationContext(DatabaseIfc db, IfcGeometricRepresentationContext c, DuplicateOptions options) : base(db, c, options)

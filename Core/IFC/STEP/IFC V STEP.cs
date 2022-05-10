@@ -29,7 +29,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcValve : IfcFlowController //IFC4
+	public partial class IfcValve
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release< ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcValveTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -40,7 +40,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcValveType : IfcFlowControllerType
+	public partial class IfcValveType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcValveTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcVector : IfcGeometricRepresentationItem
+	public partial class IfcVector
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mOrientation.StepId + "," + ParserSTEP.DoubleToString(mMagnitude); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -60,12 +60,12 @@ namespace GeometryGym.Ifc
 			mMagnitude = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
-	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
+	public partial class IfcVertex
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return ""; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { }
 	}
-	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECATED IFC4
+	public partial class IfcVertexBasedTextureMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -83,12 +83,12 @@ namespace GeometryGym.Ifc
 			mTexturePoints = ParserSTEP.StripListLink(str, ref pos, len);
 		}
 	}
-	public partial class IfcVertexLoop : IfcLoop
+	public partial class IfcVertexLoop
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mLoopVertex); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length); }
 	}
-	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
+	public partial class IfcVertexPoint
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mVertexGeometry.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
@@ -96,7 +96,7 @@ namespace GeometryGym.Ifc
 			mVertexGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, str.Length)] as IfcPoint;
 		}
 	}
-	public partial class IfcVibrationDamper : IfcElementComponent
+	public partial class IfcVibrationDamper
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -110,7 +110,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcVibrationDamperTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcVibrationDamperType : IfcElementComponentType
+	public partial class IfcVibrationDamperType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -125,7 +125,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcVibrationDamperTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcVibrationIsolator : IfcElementComponent
+	public partial class IfcVibrationIsolator
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release< ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcVibrationIsolatorTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -136,7 +136,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcVibrationIsolatorType : IfcElementComponentType
+	public partial class IfcVibrationIsolatorType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -147,7 +147,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcVibrationIsolatorTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcVirtualGridIntersection : BaseClassIfc
+	public partial class IfcVirtualGridIntersection
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -166,7 +166,7 @@ namespace GeometryGym.Ifc
 			mOffsetDistances = new Tuple<double, double, double>(ParserSTEP.ParseDouble(lst[0]), ParserSTEP.ParseDouble(lst[1]), (lst.Count > 2 ? ParserSTEP.ParseDouble(lst[2]) : double.NaN));
 		}
 	}
-	public partial class IfcVoidingFeature : IfcFeatureElementSubtraction //IFC4
+	public partial class IfcVoidingFeature
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release< ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
