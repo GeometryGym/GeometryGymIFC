@@ -1604,18 +1604,21 @@ namespace GeometryGym.Ifc
 
 		internal IfcProfileProperties() : base() { }
 		internal IfcProfileProperties(DatabaseIfc db, IfcProfileProperties p, DuplicateOptions options) : base(db, p, options) { ProfileDefinition = db.Factory.Duplicate(p.ProfileDefinition) as IfcProfileDef; }
-		internal IfcProfileProperties(IfcProfileDef p) : base(p.mDatabase)
+		public IfcProfileProperties(IfcProfileDef profile) : base(profile.mDatabase)
 		{
-			ProfileDefinition = p;
+			ProfileDefinition = profile;
 			if (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4)
-				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
+				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = profile.ProfileName };
 		}
-		internal IfcProfileProperties(List<IfcProperty> props, IfcProfileDef p) : base(props)
+		public IfcProfileProperties(List<IfcProperty> properties, IfcProfileDef profile) : this(profile)
 		{
-			ProfileDefinition = p;
-			p.mHasProperties.Add(this);
-			if (mDatabase.mRelease < ReleaseVersion.IFC4)
-				mAssociates = new IfcRelAssociatesProfileProperties(this) { Name = p.ProfileName };
+			foreach (IfcProperty property in properties)
+				AddProperty(property);
+		}
+		public IfcProfileProperties(IfcProfileDef profile, params IfcProperty[] properties) : this(profile)
+		{
+			foreach (IfcProperty property in properties)
+				AddProperty(property);
 		}
 	}
 	[Serializable]
