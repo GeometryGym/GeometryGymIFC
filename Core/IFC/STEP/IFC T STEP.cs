@@ -920,6 +920,8 @@ namespace GeometryGym.Ifc
 			IfcTrimmingSelect ts = new IfcTrimmingSelect();
 			ts.mIfcParameterValue = double.NaN;
 			int i = 0;
+			while (str[i] == ' ')
+				i++;
 			if (str[i] == '(')
 				i++;
 			char c = str[i];
@@ -938,32 +940,41 @@ namespace GeometryGym.Ifc
 				ts.mIfcCartesianPoint = ParserSTEP.ParseLink(ls);
 				if (c == ',')
 				{
-					if (str.Substring(i + 1).StartsWith("IFCPARAMETERVALUE(", true, System.Globalization.CultureInfo.CurrentCulture))
+					i++;
+					while (str[i] == ' ')
+						i++;
+					if (str.Substring(i).StartsWith("IFCPARAMETERVALUE", true, System.Globalization.CultureInfo.CurrentCulture))
 					{
-						i += 19;
+						i += 17;
+						while (str[i] == ' ')
+							i++;
+						if(str[i] == '(')
+							i++;
 						string pv = "";
 						while (str[i] != ')')
-						{
 							pv += str[i++];
-						}
 						ts.mIfcParameterValue = ParserSTEP.ParseDouble(pv);
 					}
 				}
 			}
 			else
 			{
-				if (str.Substring(i).StartsWith("IFCPARAMETERVALUE(", true, System.Globalization.CultureInfo.CurrentCulture))
+				if (str.Substring(i).StartsWith("IFCPARAMETERVALUE", true, System.Globalization.CultureInfo.CurrentCulture))
 				{
-					i += 18;
+					i += 17;
+					while (str[i] == ' ')
+						i++;
+					if (str[i] == '(')
+						i++;
 					string pv = "";
 					while (str[i] != ')')
-					{
 						pv += str[i++];
-					}
 					ts.mIfcParameterValue = ParserSTEP.ParseDouble(pv);
 				}
 				if (++i < str.Length)
 				{
+					while (str[i] == ' ')
+						i++;
 					if (str[i++] == ',')
 					{
 						ts.mIfcCartesianPoint = ParserSTEP.ParseLink(str.Substring(i, str.Length - i - 1));
