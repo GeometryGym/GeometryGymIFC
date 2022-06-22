@@ -590,11 +590,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcExtrudedAreaSolid
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mExtrudedDirection) + "," + formatLength(mDepth); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mExtrudedDirection.StepId + "," + formatLength(mDepth); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mExtrudedDirection = ParserSTEP.StripLink(str, ref pos, len);
+			ExtrudedDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
 			mDepth = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}

@@ -74,10 +74,10 @@ namespace GeometryGym.Ifc
 				mIsTypedBy = null;
 			else //TODO CHECK CLASS NAME MATCHES INSTANCE
 			{
-				if (typeObject.mObjectTypeOf == null)
-					typeObject.mObjectTypeOf = new IfcRelDefinesByType(this, typeObject);
-				else if (!typeObject.mObjectTypeOf.RelatedObjects.Contains(this))
-					typeObject.mObjectTypeOf.RelatedObjects.Add(this);
+				if (typeObject.mTypes == null)
+					typeObject.mTypes = new IfcRelDefinesByType(this, typeObject);
+				else if (!typeObject.mTypes.RelatedObjects.Contains(this))
+					typeObject.mTypes.RelatedObjects.Add(this);
 			}
 		}
 		
@@ -351,11 +351,18 @@ namespace GeometryGym.Ifc
 			if (options.DuplicateProperties)
 			{
 				List<IfcPropertySetDefinition> psets = o.mIsDefinedBy.SelectMany(x => x.RelatingPropertyDefinition).ToList();
-				foreach (IfcPropertySetDefinition pset in psets)
+				foreach (IfcPropertySetDefinition propertySetDefinition in psets)
 				{
-					IfcPropertySetDefinition dup = db.Factory.DuplicatePropertySet(pset, options);
-					if (dup != null)
-						dup.RelateObjectDefinition(this);
+					if (propertySetDefinition is IfcPropertySet propertySet)
+					{
+						IfcPropertySet dup = db.Factory.DuplicatePropertySet(propertySet, options);
+						if (dup != null)
+							dup.RelateObjectDefinition(this);
+					}
+					else
+					{
+
+					}
 				}
 			}
 			if (options.DuplicateDownstream)
@@ -589,9 +596,9 @@ namespace GeometryGym.Ifc
 			if (associates == null)
 			{
 				IfcTypeProduct typeProduct = this as IfcTypeProduct;
-				if(typeProduct != null && typeProduct.ObjectTypeOf != null)
+				if(typeProduct != null && typeProduct.Types != null)
 				{
-					SET<IfcObject> related = typeProduct.ObjectTypeOf.RelatedObjects;
+					SET<IfcObject> related = typeProduct.Types.RelatedObjects;
 					IfcMaterialLayerSet layerSet = related.First().detectMaterialLayerSet();
 					if (layerSet == null)
 						return null;

@@ -1863,7 +1863,7 @@ namespace GeometryGym.Ifc
 		private IfcTypeObject mRelatingType = null;// : IfcTypeObject  
 
 		public SET<IfcObject> RelatedObjects { get { return mRelatedObjects; } }
-		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; if(value != null) value.mObjectTypeOf = this; } }
+		public IfcTypeObject RelatingType { get { return mRelatingType; } set { mRelatingType = value; if(value != null) value.mTypes = this; } }
 
 		public override IfcRoot Relating() { return RelatingType; } 
 

@@ -1255,18 +1255,18 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcExtrudedAreaSolid : IfcSweptAreaSolid // SUPERTYPE OF(IfcExtrudedAreaSolidTapered)
 	{
-		private int mExtrudedDirection;//: IfcDirection;
+		private IfcDirection mExtrudedDirection = null;//: IfcDirection;
 		private double mDepth;// : IfcPositiveLengthMeasure;
 
-		public IfcDirection ExtrudedDirection { get { return mDatabase[mExtrudedDirection] as IfcDirection; } set { mExtrudedDirection = value.mIndex; } }
+		public IfcDirection ExtrudedDirection { get { return mExtrudedDirection; } set { mExtrudedDirection = value; } }
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }
 		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e, DuplicateOptions options) : base(db, e, options) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection) as IfcDirection; mDepth = e.mDepth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, double depth) : base(prof) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
-		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir.mIndex; mDepth = depth; }
+		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, double depth) : base(prof, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
-		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { if(dir != null) mExtrudedDirection = dir.mIndex; mDepth = depth; }
+		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, IfcDirection dir, double depth) : base(prof, position) { if(dir != null) mExtrudedDirection = dir; mDepth = depth; }
 	}
 	[Serializable]
 	public partial class IfcExtrudedAreaSolidTapered : IfcExtrudedAreaSolid

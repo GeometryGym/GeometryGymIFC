@@ -699,10 +699,10 @@ namespace GeometryGym.Ifc
 			}
 		}
 		internal IfcBuiltSystemTypeEnum mPredefinedType = IfcBuiltSystemTypeEnum.NOTDEFINED;// : OPTIONAL IfcBuildingSystemTypeEnum;
-		internal string mLongName = "$"; // 	OPTIONAL IfcLabel IFC4ADD1 
+		internal string mLongName = ""; // 	OPTIONAL IfcLabel IFC4ADD1 
 
 		public IfcBuiltSystemTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value)); } }
+		public string LongName { get { return mLongName; } set { mLongName = value; } }
 
 		internal IfcBuiltSystem() : base() { }
 		internal IfcBuiltSystem(DatabaseIfc db, IfcBuiltSystem s, DuplicateOptions options) : base(db, s, options) { mLongName = s.mLongName; mPredefinedType = s.mPredefinedType; }

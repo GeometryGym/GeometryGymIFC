@@ -349,37 +349,51 @@ namespace GeometryGym.Ifc
 		public static BaseClassIfc Construct(string ifcClassName)
 		{
 			ConstructorInfo constructor = null;
-			string className = ifcClassName;
-			if (string.Compare(className, "IfcBuildingElement", true) == 0)
-				className = "IfcBuildingElementProxy";
-			if (string.Compare(className, "IfcDistanceExpression", true) == 0)
-				className = "IfcPointByDistanceExpression";
-			if (string.Compare(className, "IfcProductRepresentation", true) == 0)
-				className = "IfcProductDefinitionShape";
+			if (!mConstructors.TryGetValue(ifcClassName, out constructor))
+			{
+				string className = ifcClassName;
+				if (string.Compare(className, "IfcBuildingElement", true) == 0)
+					className = "IfcBuildingElementProxy";
+				if (string.Compare(className, "IfcDistanceExpression", true) == 0)
+					className = "IfcPointByDistanceExpression";
+				if (string.Compare(className, "IfcProductRepresentation", true) == 0)
+					className = "IfcProductDefinitionShape";
 
+				if (!mConstructors.TryGetValue(className, out constructor))
+				{
+					Type type = GetType(className);
+					if (type == null)
+						return null;
+					if (type.IsAbstract)
+					{
+						if (string.Compare(className, "IfcProductRepresentation", true) == 0)
+							return Construct("IfcProductDefinitionShape");
+						if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
+							return Construct("IfcProfileDef");
+						if (string.Compare(className, "IfcReinforcingElement", true) == 0)
+							return Construct("IfcReinforcingBar");
+						if (string.Compare(className, "IfcBuildingElementComponent", true) == 0)
+							return Construct("IfcBuildingElementPart");
+						if (string.Compare(className, "IfcFlowSegmentType", true) == 0)
+							return Construct("IfcDistributionElementType");
+						if (string.Compare(className, "IfcFlowTerminalType", true) == 0)
+							return Construct("IfcDistributionElementType");
+						else
+							return null;
+					}
+					constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
+					mConstructors.TryAdd(className, constructor);
+				}
+			}
+			return constructor.Invoke(new object[] { }) as BaseClassIfc;
+		}
+		internal static BaseClassIfc Construct(Type ifcType)
+		{
+			string className = ifcType.Name;
+			ConstructorInfo constructor = null;
 			if (!mConstructors.TryGetValue(className, out constructor))
 			{
-				Type type = GetType(className);
-				if (type == null)
-					return null;
-				if (type.IsAbstract)
-				{
-					if (string.Compare(className, "IfcProductRepresentation", true) == 0)
-						return Construct("IfcProductDefinitionShape");
-					if (string.Compare(className, "IfcParameterizedProfileDef", true) == 0)
-						return Construct("IfcProfileDef");
-					if (string.Compare(className, "IfcReinforcingElement", true) == 0)
-						return Construct("IfcReinforcingBar");
-					if (string.Compare(className, "IfcBuildingElementComponent", true) == 0)
-						return Construct("IfcBuildingElementPart");
-					if (string.Compare(className, "IfcFlowSegmentType", true) == 0)
-						return Construct("IfcDistributionElementType");
-					if (string.Compare(className, "IfcFlowTerminalType", true) == 0)
-						return Construct("IfcDistributionElementType");
-					else
-						return null;
-				}
-				constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
+				constructor = ifcType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
 				mConstructors.TryAdd(className, constructor);
 			}
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;

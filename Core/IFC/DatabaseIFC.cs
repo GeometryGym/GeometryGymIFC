@@ -165,7 +165,7 @@ namespace GeometryGym.Ifc
 			set { mModelView = value; }
 		}
 	
-		private static ReleaseVersion versionFromModelView(ModelView modelView)
+		internal static ReleaseVersion versionFromModelView(ModelView modelView)
 		{
 			if (modelView == ModelView.Ifc2x3Coordination || modelView == ModelView.Ifc2x3NotAssigned)
 				return ReleaseVersion.IFC2x3;
@@ -474,7 +474,10 @@ namespace GeometryGym.Ifc
 				element = new IfcBuildingElementProxy(host, placement, representation);
 			return element;
 		}
-		public IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) { return ConstructProduct(className, host, placement, representation, null); }
+		public IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
+		{
+			return ConstructProduct(className, host, placement, representation, null);
+		}
 		
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
@@ -613,7 +616,7 @@ namespace GeometryGym.Ifc
 		
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
-		internal Dictionary<string, IfcPropertySetDefinition> mPropertySets = new Dictionary<string, IfcPropertySetDefinition>();
+		internal Dictionary<string, IfcPropertySet> mPropertySets = new Dictionary<string, IfcPropertySet>();
 		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); }
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
 		public IfcAxis2Placement3D DuplicateAxis(IfcAxis2Placement3D placement, DuplicateOptions options)
@@ -747,18 +750,36 @@ namespace GeometryGym.Ifc
 			int index = mDuplicateMapping.FindExisting(property);
 			if (index > 0)
 				return mDatabase[index] as IfcProperty;
+			IfcPropertySingleValue psv = property as IfcPropertySingleValue;
+			IfcValue val = null;
+			if(psv != null && psv.Unit == null)
+			{
+				val = psv.NominalValue;
+				if (val is IfcLengthMeasure lengthMeasure)
+					psv.NominalValue = new IfcLengthMeasure(Math.Round(lengthMeasure.Measure, mDatabase.mLengthDigits));
+				else if (val is IfcPositiveLengthMeasure positiveLengthMeasure)
+					psv.NominalValue = new IfcPositiveLengthMeasure(Math.Round(positiveLengthMeasure.Measure, mDatabase.mLengthDigits));
+				else if (val is IfcNonNegativeLengthMeasure nonNegativeLengthMeasure)
+					psv.NominalValue = new IfcNonNegativeLengthMeasure(Math.Round(nonNegativeLengthMeasure.Measure, mDatabase.mLengthDigits));
+				else
+					psv = null;
+			}
 			string stepString = dictionaryKey(property);
 			IfcProperty result = null;
 			if(!string.IsNullOrEmpty(stepString) && mProperties.TryGetValue(stepString, out result))
 			{
 				mDuplicateMapping.AddObject(property, result.StepId);
+				if (psv != null)
+					psv.NominalValue = val; 
 				return result;
 			}
 			result = Duplicate(property, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcProperty;
+			if (psv != null)
+				psv.NominalValue = val; 
 			mProperties[stepString] = result;
 			return result;
 		}
-		internal IfcPropertySetDefinition DuplicatePropertySet(IfcPropertySetDefinition propertySet, DuplicateOptions options)
+		internal IfcPropertySet DuplicatePropertySet(IfcPropertySet propertySet, DuplicateOptions options)
 		{
 			if (propertySet.Database != null && propertySet.Database.id == mDatabase.id)
 			{
@@ -769,7 +790,7 @@ namespace GeometryGym.Ifc
 			{
 				int index = mDuplicateMapping.FindExisting(propertySet);
 				if (index > 0)
-					return mDatabase[index] as IfcPropertySetDefinition;
+					return mDatabase[index] as IfcPropertySet;
 			}
 			if(options.IgnoredPropertyNames.Count > 0)
 			{
@@ -789,22 +810,34 @@ namespace GeometryGym.Ifc
 						return null;
 				}
 			}
-			IfcPropertySet propSet = propertySet as IfcPropertySet;
-			if (!options.CommonPropertySets && propSet != null && propertySet.Database != null && propertySet.Database.id == mDatabase.id)
-				return new IfcPropertySet(mDatabase, propSet, options);
+			if (!options.CommonPropertySets && propertySet.Database != null && propertySet.Database.id == mDatabase.id)
+				return new IfcPropertySet(mDatabase, propertySet, options);
 
-			IfcPropertySetDefinition existing = null, result = result = Duplicate(propertySet, options) as IfcPropertySetDefinition;
-			string stepString = dictionaryKeyIgnoreId(result);
-			if(!string.IsNullOrEmpty(stepString) && mPropertySets.TryGetValue(stepString, out existing))
+			List<IfcProperty> properties = new List<IfcProperty>();
+			foreach (IfcProperty property in propertySet.HasProperties.Values)
 			{
-				if (result.StepId == existing.StepId)
-					return result;
-				mDuplicateMapping.AddObject(propertySet, existing.Index);
-				result.Dispose(false);
-				return existing;
+				if (!options.IgnoredPropertyNames.Contains(property.Name))
+					properties.Add(duplicateProperty(property));
+
 			}
-			mPropertySets[stepString] = result;
-			return result;
+			if (options.CommonPropertySets)
+			{
+				
+				string key = propertySet.Name + "," + propertySet.Description + "," + string.Join("|", properties.Select(x => x.StepId).OrderBy(x => x));
+				IfcPropertySet existing = null;
+				if (mPropertySets.TryGetValue(key, out existing))
+					return existing;
+
+				IfcPropertySet result = new IfcPropertySet(mDatabase, propertySet, properties, options);
+				mDuplicateMapping.AddObject(propertySet, result.StepId);
+				mPropertySets[key] = result;
+				return result;
+			}
+
+			IfcPropertySet duplicate = new IfcPropertySet(mDatabase, propertySet, properties, options);
+			mDuplicateMapping.AddObject(propertySet, duplicate.StepId);
+			return duplicate;
+			
 		}
 
 		private string dictionaryKey(BaseClassIfc obj)
@@ -1661,7 +1694,7 @@ namespace GeometryGym.Ifc
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; }
 		public bool DuplicateProperties { get; set; } = true;
-		public bool CommonPropertySets { get; set; } = false;
+		public bool CommonPropertySets { get; set; } = true;
 		public bool DuplicateAssociations { get; set; } = true;
 		public bool DuplicateRepresentation { get; set; } = true;
 		public bool DuplicatePresentationStyling { get; set; } = true;
@@ -1811,9 +1844,9 @@ namespace GeometryGym.Ifc
 			mDatabase.FileName = fileName;
 			mDatabase.FolderPath = Path.GetDirectoryName(fileName);
 #if (!NOIFCZIP)
-			if (ExtensionHelper.ExtensionEquals(fileName, ".zip"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".zip") || ExtensionHelper.ExtensionEquals(fileName, ".ifczip"))
 			{
-				System.IO.Compression.ZipArchive za = System.IO.Compression.ZipFile.OpenRead(fileName);
+				ZipArchive za = ZipFile.OpenRead(fileName);
 				if (za.Entries.Count != 1)
 				{
 					return null;

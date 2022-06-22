@@ -710,11 +710,11 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcProperty
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return "'" + mName + (mDescription == "$" ? "',$" : "','" + mDescription + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "'" + ParserIfc.Encode(mName) + (string.IsNullOrEmpty(mDescription) ? "',$" : "','" + ParserIfc.Encode(mDescription) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mName = ParserSTEP.StripString(str, ref pos, len);
-			mDescription = ParserSTEP.StripString(str, ref pos, len);
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcPropertyBoundedValue

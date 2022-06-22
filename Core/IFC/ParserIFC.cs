@@ -519,7 +519,7 @@ namespace GeometryGym.Ifc
 						return new IfcBoolean(result);
 					return new IfcBoolean( value.Contains("T"));
 				}
-				if (string.Compare(name, "IFCDATEE") == 0)
+				if (string.Compare(name, "IFCDATE") == 0)
 					return new IfcDate(DateTime.Parse(value));
 				if (string.Compare(name, "IFCDATETIME") == 0)
 					return new IfcDateTime(DateTime.Parse(value));
@@ -559,7 +559,7 @@ namespace GeometryGym.Ifc
 		{
             if (string.IsNullOrEmpty(value))
                 return null;
-			Type type = Type.GetType("GeometryGym.Ifc." + keyword, false, true);
+			Type type = BaseClassIfc.GetType(keyword);
 			if (type != null)
 			{
 			    if(type.IsSubclassOf(typeof(IfcSimpleValue)))	

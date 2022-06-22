@@ -599,6 +599,15 @@ namespace GeometryGym.Ifc
 			else
 				mIsGroupedBy.First().RelatedObjects.Add(related);
 		}
+		public void AddRelated(IEnumerable<IfcObjectDefinition> related)
+		{
+			if (mIsGroupedBy.Count == 0)
+			{
+				new IfcRelAssignsToGroup(related, this);
+			}
+			else
+				mIsGroupedBy.First().RelatedObjects.AddRange(related);
+		}
 
 		protected override List<T> Extract<T>(Type type)
 		{

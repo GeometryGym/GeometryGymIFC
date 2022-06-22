@@ -1068,28 +1068,39 @@ namespace GeometryGym.Ifc
 		internal string mApplicableOccurrence = "$";// : OPTIONAL IfcLabel;
 		internal SET<IfcPropertySetDefinition> mHasPropertySets = new SET<IfcPropertySetDefinition>();// : OPTIONAL SET [1:?] OF IfcPropertySetDefinition 
 		//INVERSE 
-		internal IfcRelDefinesByType mObjectTypeOf = null;
+		internal IfcRelDefinesByType mTypes = null;
 
 		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } set { mApplicableOccurrence = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public SET<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets; } }
-		public IfcRelDefinesByType ObjectTypeOf { get { return mObjectTypeOf; } }
+		public IfcRelDefinesByType Types { get { return mTypes; } }
+		[Obsolete("RENAMED IFC4", false)]
+		public IfcRelDefinesByType ObjectTypeOf { get { return mTypes; } }
 		//GeomGym
 		internal IfcMaterialProfileSet mTapering = null;
 
 		public new string Name { get { return base.Name; } set { base.Name = string.IsNullOrEmpty( value) ? "NameNotAssigned" : value; } }
 
 		protected IfcTypeObject() : base() { Name = "NameNotAssigned"; }
-		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mObjectTypeOf = basis.mObjectTypeOf; }
+		protected IfcTypeObject(IfcTypeObject basis) : base(basis, false) { mApplicableOccurrence = basis.mApplicableOccurrence; mHasPropertySets = basis.mHasPropertySets; mTypes = basis.mTypes; }
 		protected IfcTypeObject(DatabaseIfc db, IfcTypeObject t, DuplicateOptions options) : base(db, t, options) 
 		{ 
 			mApplicableOccurrence = t.mApplicableOccurrence;
 			if (options.DuplicateProperties)
 			{
-				foreach (IfcPropertySetDefinition pset in t.HasPropertySets)
+				foreach (IfcPropertySetDefinition propertySetDefinition in t.HasPropertySets)
 				{
-					IfcPropertySetDefinition duplicatePset = db.Factory.DuplicatePropertySet(pset, options);
-					if (duplicatePset != null)
-						HasPropertySets.Add(duplicatePset);
+					if (propertySetDefinition is IfcPropertySet propertySet)
+					{
+						IfcPropertySet duplicatePset = db.Factory.DuplicatePropertySet(propertySet, options);
+						if (duplicatePset != null)
+							HasPropertySets.Add(duplicatePset);
+					}
+					else
+					{
+						IfcPropertySetDefinition duplicate = db.Factory.Duplicate(propertySetDefinition, options) as IfcPropertySetDefinition;
+						if (duplicate != null)
+							HasPropertySets.Add(duplicate);
+					}
 				}
 			}
 		}
@@ -1220,7 +1231,7 @@ namespace GeometryGym.Ifc
 			}
 			if (profile != null)
 				return true;
-				IfcRelDefinesByType rbt = ObjectTypeOf;
+				IfcRelDefinesByType rbt = Types;
 			if (rbt != null)
 			{
 				List<IfcElement> relatedElements = rbt.RelatedObjects.OfType<IfcElement>().ToList();
@@ -1293,9 +1304,9 @@ namespace GeometryGym.Ifc
 			IfcTypeObject typeObject = db.Factory.Duplicate(this, new DuplicateOptions(db.Tolerance) { DuplicateDownstream = true }) as IfcTypeObject;
 			if (relatedObjects)
 			{
-				if (mObjectTypeOf != null)
+				if (mTypes != null)
 				{
-					foreach (IfcObject o in mObjectTypeOf.RelatedObjects)
+					foreach (IfcObject o in mTypes.RelatedObjects)
 						db.Factory.Duplicate(o);
 				}
 				if (HasContext != null)

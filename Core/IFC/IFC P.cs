@@ -1581,7 +1581,7 @@ namespace GeometryGym.Ifc
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
 	[Serializable]
-	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
+	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF (ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
 	{
 		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4 ? base.StepClassName : "IFCPROFILEPROPERTIES"); } }
 		//[Obsolete("DEPRECATED IFC4", false)]
@@ -1736,16 +1736,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcProperty : IfcPropertyAbstraction, NamedObjectIfc  //ABSTRACT SUPERTYPE OF (ONEOF(IfcComplexProperty,IfcSimpleProperty));
 	{
-		internal string mName; //: IfcIdentifier;
-		internal string mDescription = "$"; //: OPTIONAL IfcText;
+		internal string mName = ""; //: IfcIdentifier;
+		internal string mDescription = ""; //: OPTIONAL IfcText;
 		//INVERSE
 		internal SET<IfcPropertySet> mPartOfPset = new SET<IfcPropertySet>();//	:	SET OF IfcPropertySet FOR HasProperties;
 		internal SET<IfcPropertyDependencyRelationship> mPropertyForDependance = new SET<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependingProperty;
 		internal SET<IfcPropertyDependencyRelationship> mPropertyDependsOn = new SET<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependantProperty;
 		internal SET<IfcComplexProperty> mPartOfComplex = new SET<IfcComplexProperty>();//	:	SET OF IfcComplexProperty FOR HasProperties;
 
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = string.IsNullOrEmpty(value) ? "Unknown" : ParserIfc.Encode(value); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = string.IsNullOrEmpty(value) ? "Unknown" : value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public SET<IfcPropertySet> PartOfPset { get { return mPartOfPset; } }
 
 		protected IfcProperty() : base() { }
@@ -2056,6 +2056,12 @@ namespace GeometryGym.Ifc
 				if(!options.IgnoredPropertyNames.Contains(p.Name))
 					addProperty(db.Factory.DuplicateProperty(p), 1e-5);
 			}
+		}
+		internal IfcPropertySet(DatabaseIfc db, IfcPropertySet duplicatedFrom, List<IfcProperty> properties, DuplicateOptions options)
+			:base(db, duplicatedFrom, options)
+		{
+			foreach (IfcProperty property in properties)
+				addProperty(property, 1e-5);
 		}
 		public IfcPropertySet(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcPropertySet(IfcObjectDefinition relatedObject, string name) : base(relatedObject, name) { }
