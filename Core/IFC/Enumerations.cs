@@ -180,6 +180,7 @@ namespace GeometryGym.Ifc
 	public enum IfcGasTerminalTypeEnum { NOTDEFINED, USERDEFINED, GASAPPLIANCE, GASBOOSTER, GASBURNER };
 	public enum IfcGeographicElementTypeEnum { NOTDEFINED, USERDEFINED, TERRAIN, SOIL_BORING_POINT };
 	public enum IfcGeometricProjectionEnum { NOTDEFINED, USERDEFINED, GRAPH_VIEW, SKETCH_VIEW, MODEL_VIEW, PLAN_VIEW, REFLECTED_PLAN_VIEW, SECTION_VIEW, ELEVATION_VIEW };
+	public enum IfcGeotechnicalStratumTypeEnum { NOTDEFINED, USERDEFINED, SOLID, VOID, WATER };
 	public enum IfcGlobalOrLocalEnum { GLOBAL_COORDS, LOCAL_COORDS };
 	public enum IfcGridTypeEnum { NOTDEFINED, USERDEFINED, RECTANGULAR, RADIAL, TRIANGULAR, IRREGULAR };
 	public enum IfcHeatExchangerTypeEnum { NOTDEFINED, USERDEFINED, PLATE, SHELLANDTUBE, TURNOUTHEATING };
@@ -305,17 +306,17 @@ namespace GeometryGym.Ifc
 	public enum IfcTransformerTypeEnum { NOTDEFINED, USERDEFINED, CURRENT, FREQUENCY, VOLTAGE, INVERTER, RECTIFIER, CHOPPER, COMBINED };
 	public enum IfcTransitionCode { DISCONTINUOUS, CONTINUOUS, CONTSAMEGRADIENT, CONTSAMEGRADIENTSAMECURVATURE };
 	public enum IfcTransitionCurveType { BIQUADRATICPARABOLA, BLOSSCURVE, CLOTHOIDCURVE, COSINECURVE, CUBICPARABOLA, SINECURVE };
-	public enum IfcTransportElementFixedTypeEnum { NOTDEFINED, USERDEFINED, ELEVATOR, ESCALATOR, MOVINGWALKWAY, CRANEWAY, LIFTINGGEAR, HAULINGGEAR };
-	public enum IfcTransportElementNonFixedTypeEnum { NOTDEFINED, USERDEFINED, VEHICLE, VEHICLETRACKED, ROLLINGSTOCK, VEHICLEWHEELED, VEHICLEAIR, CARGO, VEHICLEMARINE };
-	public enum IfcTransportElementTypeEnum { NOTDEFINED, USERDEFINED, ELEVATOR, ESCALATOR, MOVINGWALKWAY };
+	public enum IfcTransportElementTypeEnum { NOTDEFINED, USERDEFINED, ELEVATOR, ESCALATOR, MOVINGWALKWAY, CRANEWAY, LIFTINGGEAR, HAULINGGEAR };
 	public enum IfcTrimmingPreference { UNSPECIFIED, CARTESIAN, PARAMETER };
 	public enum IfcTubeBundleTypeEnum { NOTDEFINED, USERDEFINED, FINNED };
 	public enum IfcUnitaryControlElementTypeEnum { NOTDEFINED, USERDEFINED, ALARMPANEL, CONTROLPANEL, GASDETECTIONPANEL, INDICATORPANEL, MIMICPANEL, HUMIDISTAT, THERMOSTAT, WEATHERSTATION, COMBINED, BASESTATIONCONTROLLER };
 	public enum IfcUnitaryEquipmentTypeEnum { NOTDEFINED, USERDEFINED, AIRHANDLER, AIRCONDITIONINGUNIT, SPLITSYSTEM, ROOFTOPUNIT, DEHUMIDIFIER };
 	public enum IfcUnitEnum { USERDEFINED, ABSORBEDDOSEUNIT, AMOUNTOFSUBSTANCEUNIT, AREAUNIT, DOSEEQUIVALENTUNIT, ELECTRICCAPACITANCEUNIT, ELECTRICCHARGEUNIT, ELECTRICCONDUCTANCEUNIT, ELECTRICCURRENTUNIT, ELECTRICRESISTANCEUNIT, ELECTRICVOLTAGEUNIT, ENERGYUNIT, FORCEUNIT, FREQUENCYUNIT, ILLUMINANCEUNIT, INDUCTANCEUNIT, LENGTHUNIT, LUMINOUSFLUXUNIT, LUMINOUSINTENSITYUNIT, MAGNETICFLUXDENSITYUNIT, MAGNETICFLUXUNIT, MASSUNIT, PLANEANGLEUNIT, POWERUNIT, PRESSUREUNIT, RADIOACTIVITYUNIT, SOLIDANGLEUNIT, THERMODYNAMICTEMPERATUREUNIT, TIMEUNIT, VOLUMEUNIT };
 	public enum IfcValveTypeEnum { NOTDEFINED, USERDEFINED, AIRRELEASE, ANTIVACUUM, CHANGEOVER, CHECK, COMMISSIONING, DIVERTING, DRAWOFFCOCK, DOUBLECHECK, DOUBLEREGULATING, FAUCET, FLUSHING, GASCOCK, GASTAP, ISOLATING, MIXING, PRESSUREREDUCING, PRESSURERELIEF, REGULATING, SAFETYCUTOFF, STEAMTRAP, STOPCOCK };
+	public enum IfcVehicleTypeEnum { NOTDEFINED, USERDEFINED, CARGO, ROLLINGSTOCK, VEHICLE, VEHICLEAIR, VEHICLEMARINE, VEHICLETRACKED,  VEHICLEWHEELED };
 	public enum IfcVibrationDamperTypeEnum { NOTDEFINED, USERDEFINED, BENDING_YIELD, SHEAR_YIELD, AXIAL_YIELD, FRICTION, VISCOUS, RUBBER };
 	public enum IfcVibrationIsolatorTypeEnum { NOTDEFINED, USERDEFINED, COMPRESSION, SPRING, BASE };
+	public enum IfcVirtualElementTypeEnum { NOTDEFINED, USERDEFINED, BOUNDARY, CLEARANCE, PROVISIONFORVOID };
 	public enum IfcVoidingFeatureTypeEnum { NOTDEFINED, USERDEFINED, CUTOUT, NOTCH, HOLE, MITER, CHAMFER, EDGE };
 	public enum IfcWallTypeEnum { NOTDEFINED, USERDEFINED, STANDARD, ELEMENTEDWALL, MOVABLE, PARAPET, PARTITIONING, PLUMBINGWALL, POLYGONAL, SHEAR, SOLIDWALL, RETAININGWALL, WAVEWALL }; //IFC4 change STANDARD, POLYGONAL, ELEMENTEDWALL
 	public enum IfcWasteTerminalTypeEnum { NOTDEFINED, USERDEFINED, FLOORTRAP, FLOORWASTE, GULLYSUMP, GULLYTRAP, GREASEINTERCEPTOR, OILINTERCEPTOR, PETROLINTERCEPTOR, ROOFDRAIN, WASTEDISPOSALUNIT, WASTETRAP }; // IFC4  
@@ -329,275 +330,6 @@ namespace GeometryGym.Ifc
 	public enum IfcWorkControlTypeEnum { NOTDEFINED, USERDEFINED, ACTUAL, BASELINE, PLANNED };
 	public enum IfcWorkPlanTypeEnum { NOTDEFINED, USERDEFINED, ACTUAL, BASELINE, PLANNED };
 	public enum IfcWorkScheduleTypeEnum { NOTDEFINED, USERDEFINED, ACTUAL, BASELINE, PLANNED };
-
-	public abstract class SelectEnum
-	{
-		internal abstract List<Tuple<string, string[]>> getConstants();
-	}
-	public abstract class SelectEnum<T, U> : SelectEnum where T : struct where U : struct
-	{
-		private T mFirstEnumeration;
-		private U mSecondEnumeration;
-		protected int mPosition = 0;
-		protected SelectEnum() { }
-		protected SelectEnum(T enumeration) { mFirstEnumeration = enumeration; mPosition = 0; }
-		protected SelectEnum(U enumeration) { mSecondEnumeration = enumeration; mPosition = 1; }
-		public override string ToString()
-		{
-			if (mPosition == 1)
-				return typeof(U).Name.ToUpper() + "(." + mSecondEnumeration.ToString() + ".)";
-			return typeof(T).Name.ToUpper() + "(." + mFirstEnumeration.ToString() + ".)";
-		}
-		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration)
-		{
-			if(str.StartsWith("."))
-			{
-				string s = str.Substring(1, str.Length - 2);
-				if (Enum.TryParse<T>(s, out firstEnumeration))
-					return 0;
-				Enum.TryParse<U>(s, out secondEnumeration);
-				return 1;
-			}
-			string firstName = typeof(T).Name.ToLower(), secondName = typeof(U).Name.ToLower();
-			
-			if(str.ToLower().StartsWith(firstName))
-			{
-				firstEnumeration = ParserIfc.ParseEnum<T>(str, firstName);
-				return 0;
-			}
-			secondEnumeration = ParserIfc.ParseEnum<U>(str, secondName);
-			return 1;
-		}
-		internal bool isEnumeration(ref T enumeration)
-		{
-			if (mPosition == 0)
-			{
-				enumeration = mFirstEnumeration;
-				return true;
-			}
-			return false;
-		}
-		internal bool isEnumeration(ref U enumeration)
-		{
-			if (mPosition == 1)
-			{
-				enumeration = mSecondEnumeration;
-				return true;
-			}
-			return false;
-		}
-
-		internal virtual string ValueString() { return (mPosition == 1 ? mSecondEnumeration.ToString() : mFirstEnumeration.ToString()); }
-		internal override List<Tuple<string, string[]>> getConstants()
-		{
-			List<Tuple<string, string[]>> result = new List<Tuple<string, string[]>>();
-			Type firstType = typeof(T), secondType = typeof(U);
-			result.Add(new Tuple<string, string[]>(firstType.Name, Enum.GetNames(firstType)));
-			result.Add(new Tuple<string, string[]>(secondType.Name, Enum.GetNames(secondType)));
-			return result;
-		}
-	}
-	public abstract class SelectEnum<T, U, V> : SelectEnum<T, U> where T : struct where U : struct where V : struct
-	{
-		private V mThirdEnumeration;
-		protected SelectEnum() { }
-		protected SelectEnum(T enumeration) : base(enumeration) { }
-		protected SelectEnum(U enumeration) : base(enumeration) { }
-		protected SelectEnum(V enumeration) { mThirdEnumeration = enumeration; mPosition = 2; }
-		public override string ToString()
-		{
-			if (mPosition == 2)
-				return typeof(V).Name.ToUpper() + "(." + mThirdEnumeration.ToString() + ".)";
-			return base.ToString();
-		}
-		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration, ref V thirdEnumeration)
-		{
-			if (str.StartsWith("."))
-			{
-				string s = str.Substring(1, str.Length - 2);
-				if (Enum.TryParse<V>(s, out thirdEnumeration))
-					return 2;
-				return parse(str, ref firstEnumeration, ref secondEnumeration);
-			}
-			string thirdName = typeof(V).Name.ToLower();
-			if (str.ToLower().StartsWith(thirdName))
-			{
-				thirdEnumeration = ParserIfc.ParseEnum<V>(str, thirdName);
-				return 2;
-			}
-			return parse(str, ref firstEnumeration, ref secondEnumeration);
-		}
-		internal bool isEnumeration(ref V enumeration)
-		{
-			if (mPosition == 2)
-			{
-				enumeration = mThirdEnumeration;
-				return true;
-			}
-			return false;
-		}
-		internal override string ValueString() { return mPosition == 2 ? mThirdEnumeration.ToString() : base.ValueString(); }
-		internal override List<Tuple<string, string[]>> getConstants()
-		{
-			List<Tuple<string, string[]>> result = base.getConstants();
-			Type thirdType = typeof(V);
-			result.Add(new Tuple<string, string[]>(thirdType.Name, Enum.GetNames(thirdType)));
-			return result;
-		}
-	}
-	public abstract class SelectEnum<T, U, V, W, X> : SelectEnum<T, U, V> where T : struct where U : struct where V : struct where W : struct where X: struct
-	{
-		private W mFourthEnumeration;
-		private X mFifthEnumeration;
-		protected SelectEnum(T enumeration) : base(enumeration) { }
-		protected SelectEnum(U enumeration) : base(enumeration) { }
-		protected SelectEnum(V enumeration) : base(enumeration) { }
-		protected SelectEnum(W enumeration) { mFourthEnumeration = enumeration; mPosition = 3; }
-		protected SelectEnum(X enumeration) { mFifthEnumeration = enumeration; mPosition = 4; }
-		public override string ToString()
-		{
-			if (mPosition == 3)
-				return typeof(W).Name.ToUpper() + "(." + mFourthEnumeration.ToString() + ".)";
-			if (mPosition == 4)
-				return typeof(X).Name.ToUpper() + "(." + mFifthEnumeration.ToString() + ".)";
-			return base.ToString();
-		}
-		protected static int parse(string str, ref T firstEnumeration, ref U secondEnumeration, ref V thirdEnumeration, ref W fourthEnumeration, ref X fithEnumeration)
-		{
-			if (str.StartsWith("."))
-			{
-				string s = str.Substring(1, str.Length - 2);
-				if (Enum.TryParse<W>(s, out fourthEnumeration))
-					return 3;
-				if (Enum.TryParse<X>(s, out fithEnumeration))
-					return 4;
-				return parse(str, ref firstEnumeration, ref secondEnumeration);
-			}
-			string fourthName = typeof(W).Name.ToLower(), fithName = typeof(X).Name.ToLower();
-
-			if (str.ToLower().StartsWith(fourthName))
-			{
-				fourthEnumeration = ParserIfc.ParseEnum<W>(str, fourthName);
-				return 3;
-			}
-			if (str.ToLower().StartsWith(fithName))
-			{
-				fithEnumeration = ParserIfc.ParseEnum<X>(str, fithName);
-				return 4;
-			}
-			return parse(str, ref firstEnumeration, ref secondEnumeration, ref thirdEnumeration);
-		}
-
-		internal bool isEnumeration(ref W enumeration)
-		{
-			if (mPosition == 3)
-			{
-				enumeration = mFourthEnumeration;
-				return true;
-			}
-			return false;
-		}
-		internal bool isEnumeration(ref X enumeration)
-		{
-			if (mPosition == 4)
-			{
-				enumeration = mFifthEnumeration;
-				return true;
-			}
-			return false;
-		}
-		internal override string ValueString()
-		{
-			if (mPosition == 3)
-				return mFourthEnumeration.ToString();
-			if (mPosition == 4)
-				return mFifthEnumeration.ToString();
-			return base.ValueString();
-		}
-		internal override List<Tuple<string, string[]>> getConstants()
-		{
-			List<Tuple<string, string[]>> result = base.getConstants();
-			Type fourthType = typeof(W), fithType = typeof(X);
-			result.Add(new Tuple<string, string[]>(fourthType.Name, Enum.GetNames(fourthType)));
-			result.Add(new Tuple<string, string[]>(fithType.Name, Enum.GetNames(fithType)));
-			return result;
-		}
-	}
-
-	public class IfcFacilityPartTypeSelect : SelectEnum<IfcRailwayPartTypeEnum, IfcBridgePartTypeEnum, IfcMarinePartTypeEnum, IfcRoadPartTypeEnum, IfcFacilityPartCommonTypeEnum>
-	{
-		public IfcFacilityPartTypeSelect() : base(IfcFacilityPartCommonTypeEnum.NOTDEFINED) { }
-		public IfcFacilityPartTypeSelect(IfcRailwayPartTypeEnum enumeration) : base(enumeration) { }
-		public IfcFacilityPartTypeSelect(IfcBridgePartTypeEnum enumeration) : base(enumeration) { }
-		public IfcFacilityPartTypeSelect(IfcMarinePartTypeEnum enumeration) : base(enumeration) { }
-		public IfcFacilityPartTypeSelect(IfcRoadPartTypeEnum enumeration) : base(enumeration) { }
-		public IfcFacilityPartTypeSelect(IfcFacilityPartCommonTypeEnum enumeration) : base(enumeration) { }
-		public static IfcFacilityPartTypeSelect Parse(string str)
-		{
-			if (string.IsNullOrEmpty(str) || str[0] == '$')
-				return null;
-			IfcRailwayPartTypeEnum railwayType = IfcRailwayPartTypeEnum.NOTDEFINED;
-			IfcBridgePartTypeEnum bridgePartType = IfcBridgePartTypeEnum.NOTDEFINED;
-			IfcMarinePartTypeEnum marineType = IfcMarinePartTypeEnum.NOTDEFINED;
-			IfcRoadPartTypeEnum roadType = IfcRoadPartTypeEnum.NOTDEFINED;
-			IfcFacilityPartCommonTypeEnum facilityType = IfcFacilityPartCommonTypeEnum.NOTDEFINED;
-
-			int enumeration = parse(str, ref railwayType, ref bridgePartType, ref marineType, ref roadType, ref facilityType);
-			if (enumeration == 0)
-				return new IfcFacilityPartTypeSelect(railwayType);
-			if (enumeration == 1)
-				return new IfcFacilityPartTypeSelect(bridgePartType);
-			if (enumeration == 2)
-				return new IfcFacilityPartTypeSelect(marineType);
-			if (enumeration == 3)
-				return new IfcFacilityPartTypeSelect(roadType);
-			if (enumeration == 4)
-				return new IfcFacilityPartTypeSelect(facilityType);
-			return null;
-		}
-	}
-	public class IfcImpactProtectionDeviceTypeSelect : SelectEnum<IfcImpactProtectionDeviceTypeEnum, IfcVibrationDamperTypeEnum, IfcVibrationIsolatorTypeEnum>
-	{
-		public IfcImpactProtectionDeviceTypeSelect() : base(IfcImpactProtectionDeviceTypeEnum.NOTDEFINED) { }
-		public IfcImpactProtectionDeviceTypeSelect(IfcImpactProtectionDeviceTypeEnum enumeration) : base(enumeration) { }
-		public IfcImpactProtectionDeviceTypeSelect(IfcVibrationDamperTypeEnum enumeration) : base(enumeration) { }
-		public IfcImpactProtectionDeviceTypeSelect(IfcVibrationIsolatorTypeEnum enumeration) : base(enumeration) { }
-		public static IfcImpactProtectionDeviceTypeSelect Parse(string str)
-		{
-			if(string.IsNullOrEmpty(str) || str[0] == '$')
-				return null;
-			IfcImpactProtectionDeviceTypeEnum impactProtectionDeviceType = IfcImpactProtectionDeviceTypeEnum.NOTDEFINED;
-			IfcVibrationDamperTypeEnum vibrationDamperType = IfcVibrationDamperTypeEnum.NOTDEFINED;
-			IfcVibrationIsolatorTypeEnum vibrationIsolatorType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;
-
-			int enumeration = parse(str, ref impactProtectionDeviceType, ref vibrationDamperType, ref vibrationIsolatorType);
-			if(enumeration == 0)
-				return new IfcImpactProtectionDeviceTypeSelect(impactProtectionDeviceType);
-			if (enumeration == 1)
-				return new IfcImpactProtectionDeviceTypeSelect(vibrationDamperType);
-			if (enumeration == 2)
-				return new IfcImpactProtectionDeviceTypeSelect(vibrationIsolatorType);
-			return null;
-		}
-	}
-	public class IfcTransportElementTypeSelect : SelectEnum<IfcTransportElementFixedTypeEnum, IfcTransportElementNonFixedTypeEnum>
-	{
-		public IfcTransportElementTypeSelect() : base(IfcTransportElementFixedTypeEnum.NOTDEFINED) { }
-		public IfcTransportElementTypeSelect(IfcTransportElementFixedTypeEnum enumeration) : base(enumeration) { }
-		public IfcTransportElementTypeSelect(IfcTransportElementNonFixedTypeEnum enumeration) : base(enumeration) { }
-		public static IfcTransportElementTypeSelect Parse(string str)
-		{
-			if (string.IsNullOrEmpty(str) || str[0] == '$')
-				return null;
-			IfcTransportElementFixedTypeEnum transportElementFixedTypeEnum = IfcTransportElementFixedTypeEnum.NOTDEFINED;
-			IfcTransportElementNonFixedTypeEnum transportElementNonFixedTypeEnum = IfcTransportElementNonFixedTypeEnum.NOTDEFINED;
-
-			int position = parse(str, ref transportElementFixedTypeEnum, ref transportElementNonFixedTypeEnum);
-			if (position == 0)
-				return new IfcTransportElementTypeSelect(transportElementFixedTypeEnum);
-			return new IfcTransportElementTypeSelect(transportElementNonFixedTypeEnum);
-		}
-	}
 
 	public enum PEnum_AcquisitionMethod { GPS, LASERSCAN_AIRBORNE, LASERSCAN_GROUND, SONAR, THEODOLITE, USERDEFINED, NOTKNOWN, UNSET };
 	public enum PEnum_ActionRequestChance { HAS_OCCURRED, HIGH, MODERATE, LOW, UNKNOWN };

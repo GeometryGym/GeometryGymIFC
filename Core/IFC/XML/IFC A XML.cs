@@ -751,7 +751,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcResourceConstraintRelationship r = mDatabase.ParseXml<IfcResourceConstraintRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 				else if (string.Compare(name, "Name", true) == 0)

@@ -41,8 +41,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcImpactProtectionDevice : IfcElementComponent
 	{
-		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: OPTIONAL IfcImpactProtectionDeviceTypeSelect;
-		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcImpactProtectionDeviceTypeEnum mPredefinedType = IfcImpactProtectionDeviceTypeEnum.NOTDEFINED; //: OPTIONAL IfcImpactProtectionDeviceTypeEnum;
+		public IfcImpactProtectionDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcImpactProtectionDevice() : base() { }
 		public IfcImpactProtectionDevice(DatabaseIfc db) : base(db) { }
@@ -52,12 +52,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcImpactProtectionDeviceType : IfcElementComponentType
 	{
-		private IfcImpactProtectionDeviceTypeSelect mPredefinedType = null; //: IfcImpactProtectionDeviceTypeSelect;
-		public IfcImpactProtectionDeviceTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcImpactProtectionDeviceTypeEnum mPredefinedType = IfcImpactProtectionDeviceTypeEnum.NOTDEFINED; //: IfcImpactProtectionDeviceTypeEnum;
+		public IfcImpactProtectionDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcImpactProtectionDeviceType() : base() { }
 		public IfcImpactProtectionDeviceType(DatabaseIfc db, IfcImpactProtectionDeviceType impactProtectionDeviceType, DuplicateOptions options) : base(db, impactProtectionDeviceType, options) { PredefinedType = impactProtectionDeviceType.PredefinedType; }
-		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeSelect predefinedType)
+		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeEnum predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}
 	[Serializable]
@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 	{
 		private IfcCartesianPointList mPoints; // IfcCartesianPointList
 		internal LIST<IfcSegmentIndexSelect> mSegments = new LIST<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
-		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcBoolean
+		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcLogical
 
 		public IfcCartesianPointList Points { get { return mPoints; } set { mPoints = value; } }
 		public LIST<IfcSegmentIndexSelect> Segments { get { return mSegments; } }
@@ -104,9 +104,10 @@ namespace GeometryGym.Ifc
 		internal List<int> mCoordIndex = new List<int>();// : LIST [3:?] OF IfcPositiveInteger;
 		 //INVERSE
 		internal SET<IfcPolygonalFaceSet> mToFaceSet = new SET<IfcPolygonalFaceSet>();
-
+		internal IfcTextureCoordinateIndices mHasTexCoords = null;// : SET[0:1] OF IfcTextureCoordinateIndices FOR TexCoordsOf;
 		public List<int> CoordIndex { get { return mCoordIndex; } }
 		public SET<IfcPolygonalFaceSet> ToFaceSet { get { return mToFaceSet; } }
+		public IfcTextureCoordinateIndices HasTexCoords { get { return mHasTexCoords; } set { mHasTexCoords = value; } }
 
 		internal IfcIndexedPolygonalFace() : base() { }
 		internal IfcIndexedPolygonalFace(DatabaseIfc db, IfcIndexedPolygonalFace f, DuplicateOptions options) : base(db, f, options) { mCoordIndex.AddRange(f.mCoordIndex); }
@@ -127,7 +128,21 @@ namespace GeometryGym.Ifc
 			: base(db, coords) { mInnerCoordIndices.AddRange(inners); }
 	}
 	[Serializable]
-	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedTriangleTextureMap)
+	public partial class IfcIndexedPolygonalTextureMap : IfcIndexedTextureMap
+	{
+		private LIST<IfcTextureCoordinateIndices> mTexCoordIndices = new LIST<IfcTextureCoordinateIndices>();// : SET [1:?] OF IfcTextureCoordinateIndices;
+		public LIST<IfcTextureCoordinateIndices> TexCoordIndices { get { return mTexCoordIndices; } set { mTexCoordIndices = value; } }
+
+		internal IfcIndexedPolygonalTextureMap() : base() { }
+		internal IfcIndexedPolygonalTextureMap(DatabaseIfc db) : base(db) { }
+		internal IfcIndexedPolygonalTextureMap(DatabaseIfc db, IfcIndexedPolygonalTextureMap m) : base(db, m)
+		{
+			foreach (IfcTextureCoordinateIndices i in m.mTexCoordIndices)
+				TexCoordIndices.Add(db.Factory.Duplicate(i) as IfcTextureCoordinateIndices);
+		}
+	}
+	[Serializable]
+	public abstract partial class IfcIndexedTextureMap : IfcTextureCoordinate // ABSTRACT SUPERTYPE OF(IfcIndexedPolygonalTextureMap, IfcIndexedTriangleTextureMap)
 	{
 		internal IfcTessellatedFaceSet mMappedTo;// : IfcTessellatedFaceSet;
 		internal IfcTextureVertexList mTexCoords;// : IfcTextureVertexList;
@@ -136,6 +151,7 @@ namespace GeometryGym.Ifc
 		public IfcTextureVertexList TexCoords { get { return mTexCoords; } set { mTexCoords = value; } }
 
 		protected IfcIndexedTextureMap() : base() { }
+		protected IfcIndexedTextureMap(DatabaseIfc db) : base(db) { }
 		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; }
 	}
 	[Serializable]
@@ -144,6 +160,7 @@ namespace GeometryGym.Ifc
 		internal List<Tuple<int, int, int>> mTexCoordList = new List<Tuple<int, int, int>>();// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcPositiveInteger;
 
 		internal IfcIndexedTriangleTextureMap() : base() { }
+		internal IfcIndexedTriangleTextureMap(DatabaseIfc db) : base(db) { }
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }
 		//public IfcIndexedTriangleTextureMap(DatabaseIfc m, IEnumerable<Tuple<int, int,int>> coords) : base(m) { mTexCoordList = coords.ToArray(); }
 	}

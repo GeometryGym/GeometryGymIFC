@@ -355,7 +355,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("AccessState", mAccessState.ToString().ToLower());
 		}
 	}
-	public partial class IfcSine
+	public partial class IfcSineSpiral
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -772,8 +772,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			if (mPredefinedType != IfcStructuralCurveMemberTypeEnum.NOTDEFINED)
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
-			if (mAxis > 0)
-				xml.AppendChild(mDatabase[mAxis].GetXML(xml.OwnerDocument, "Axis", this, processed));
+			if (mAxis != null)
+				xml.AppendChild(mAxis.GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
 	public partial class IfcStructuralCurveReaction : IfcStructuralReaction

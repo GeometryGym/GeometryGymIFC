@@ -931,7 +931,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcResourceObjectSelect r = mDatabase.ParseXml<IfcResourceObjectSelect>(cn as XmlElement);
 						if (r != null)
-							addRelated(r);
+							RelatedResourceObjects.Add(r);
 					}
 				}
 			}
@@ -939,13 +939,13 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mRelatingConstraint != host.mIndex)
+			if (mRelatingConstraint.StepId != host.StepId)
 				xml.AppendChild(RelatingConstraint.GetXML(xml.OwnerDocument, "RelatingConstraint", this, processed));
 			XmlElement element = xml.OwnerDocument.CreateElement("RelatedResourceObjects", mDatabase.mXmlNamespace);
-			foreach (int r in mRelatedResourceObjects)
+			foreach (IfcResourceObjectSelect r in mRelatedResourceObjects)
 			{
-				if (r != host.mIndex)
-					element.AppendChild(mDatabase[r].GetXML(xml.OwnerDocument, "", this, processed));
+				if (r.StepId != host.StepId)
+					element.AppendChild((r as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 			}
 			if (element.HasChildNodes)
 				xml.AppendChild(element);

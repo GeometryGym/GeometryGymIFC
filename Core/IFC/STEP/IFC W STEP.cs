@@ -284,13 +284,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWorkTime
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRecurrencePattern) + ","+ IfcDate.STEPAttribute(mStart) + "," + IfcDate.STEPAttribute(mFinish)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRecurrencePattern) + ","+ IfcDate.STEPAttribute(mStartDate) + "," + IfcDate.STEPAttribute(mFinishDate)); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRecurrencePattern = ParserSTEP.StripLink(str, ref pos, len);
-			mStart = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
-			mFinish = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
+			mStartDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
+			mFinishDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 }

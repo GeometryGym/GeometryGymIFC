@@ -271,7 +271,7 @@ namespace GeometryGym.Ifc
 			obj["Name"] = Name.ToString();
 		}
 	}
-	public partial class IfcSine
+	public partial class IfcSineSpiral
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -620,7 +620,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcStructuralCurveMemberTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
-			if (mAxis > 0)
+			if (mAxis != null)
 				obj["Axis"] = Axis.getJson(this, options);
 		}
 	}

@@ -373,12 +373,14 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
 	{
 		internal IfcCartesianPointList mCoordinates;// : 	IfcCartesianPointList;
+		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
 
 		// INVERSE
 		internal IfcIndexedColourMap mHasColours = null;// : SET [0:1] OF IfcIndexedColourMap FOR MappedTo;
 		internal SET<IfcIndexedTextureMap> mHasTextures = new SET<IfcIndexedTextureMap>();// : SET [0:?] OF IfcIndexedTextureMap FOR MappedTo;
 
 		public IfcCartesianPointList Coordinates { get { return mCoordinates; } set { mCoordinates = value; } }
+		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public IfcIndexedColourMap HasColours { get { return mHasColours; } set { mHasColours = value; } }
 		public SET<IfcIndexedTextureMap> HasTextures { get { return mHasTextures; } }
 
@@ -485,9 +487,10 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcSurfaceTexture> mMaps = new LIST<IfcSurfaceTexture>();// : LIST [1:?] OF IfcSurfaceTexture
 		public LIST<IfcSurfaceTexture> Maps { get { return mMaps; } }
 
-		internal IfcTextureCoordinate() : base() { }
-		internal IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c) : base(db, c) { Maps.AddRange(c.Maps.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
-		public IfcTextureCoordinate(IEnumerable<IfcSurfaceTexture> maps) : base(maps.First().Database) { mMaps.AddRange(maps); }
+		protected IfcTextureCoordinate() : base() { }
+		protected IfcTextureCoordinate(DatabaseIfc db) : base(db) { }
+		protected IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c) : base(db, c) { Maps.AddRange(c.Maps.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
+		protected IfcTextureCoordinate(IEnumerable<IfcSurfaceTexture> maps) : base(maps.First().Database) { mMaps.AddRange(maps); }
 	}
 	[Serializable]
 	public partial class IfcTextureCoordinateGenerator : IfcTextureCoordinate
@@ -503,6 +506,41 @@ namespace GeometryGym.Ifc
 			: base(maps) { Mode = mode; }
 	}
 	[Serializable]
+	public partial class IfcTextureCoordinateIndices : BaseClassIfc
+	{
+		private List<int> mTexCoordIndex = new List<int>();// : LIST[3:?] OF IfcPositiveInteger;
+		private IfcIndexedPolygonalFace mTexCoordsOf = null;//: IfcIndexedPolygonalFace;
+		//INVERSE
+		private IfcIndexedPolygonalTextureMap mToTexMap = null;// : IfcIndexedPolygonalTextureMap FOR TexCoordIndices;
+
+		public List<int> TexCoordIndex { get { return mTexCoordIndex; } }
+		public IfcIndexedPolygonalFace TexCoordsOf { get { return mTexCoordsOf; } set { mTexCoordsOf = value; } }
+		public IfcIndexedPolygonalTextureMap ToTexMap { get { return mToTexMap; } set { mToTexMap = value; } }
+
+		public IfcTextureCoordinateIndices() : base() { }
+		public IfcTextureCoordinateIndices(DatabaseIfc db) : base(db) { }
+		public IfcTextureCoordinateIndices(IEnumerable<int> texCoordIndex, IfcIndexedPolygonalFace texCoordsOf)
+			: base(texCoordsOf.Database)
+		{
+			mTexCoordIndex.AddRange(texCoordIndex);
+			TexCoordsOf = texCoordsOf;
+		}
+	}
+	[Serializable]
+	public partial class IfcTextureCoordinateIndicesWithVoids : IfcTextureCoordinateIndices
+	{
+		private List<List<int>> mInnerTexCoordIndices = new List<List<int>>();// : LIST[3:?] OF IfcPositiveInteger;
+		public List<List<int>> InnerTexCoordIndices { get { return mInnerTexCoordIndices; } }
+
+		public IfcTextureCoordinateIndicesWithVoids() : base() { }
+		public IfcTextureCoordinateIndicesWithVoids(DatabaseIfc db) : base(db) { }
+		public IfcTextureCoordinateIndicesWithVoids(IEnumerable<int> texCoordIndex, IfcIndexedPolygonalFace texCoordsOf, IEnumerable<List<int>> innerTexCoordIndices)
+			: base(texCoordIndex, texCoordsOf)
+		{
+			mInnerTexCoordIndices.AddRange(InnerTexCoordIndices);
+		}
+	}
+	[Serializable]
 	public partial class IfcTextureMap : IfcTextureCoordinate
 	{
 		private LIST<IfcTextureVertex> mVertices = new LIST<IfcTextureVertex>(); //: LIST[3:?] OF IfcTextureVertex;
@@ -512,6 +550,7 @@ namespace GeometryGym.Ifc
 		public IfcFace MappedTo { get { return mMappedTo; } set { mMappedTo = value; mMappedTo.HasTextureMaps.Add(this); } }
 
 		public IfcTextureMap() : base() { }
+		public IfcTextureMap(DatabaseIfc db) : base(db) { }
 		public IfcTextureMap(IEnumerable<IfcSurfaceTexture> maps, IEnumerable<IfcTextureVertex> vertices, IfcFace mappedTo)
 			: base(maps)
 		{
@@ -793,14 +832,29 @@ namespace GeometryGym.Ifc
 		public IfcTranslationalStiffnessSelect(double stiff) { mStiffness = new IfcLinearStiffnessMeasure(stiff); }
 		public IfcTranslationalStiffnessSelect(IfcLinearStiffnessMeasure stiff) { mStiffness = stiff; }
 	}
-	[Serializable]
-	public partial class IfcTransportElement : IfcElement
+	public partial class IfcTransportationDevice : IfcElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcTransportElement , IfcVehicle))
 	{
-		internal IfcTransportElementTypeSelect mPredefinedType = null;// : 	OPTIONAL IfcTransportElementTypeSelect;
+		internal IfcTransportationDevice() : base() { }
+		internal IfcTransportationDevice(DatabaseIfc db) : base(db) { }
+		protected IfcTransportationDevice(DatabaseIfc db, IfcTransportationDevice e, DuplicateOptions options) : base(db, e, options) { }
+		public IfcTransportationDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public abstract partial class IfcTransportationDeviceType : IfcElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcTransportElementType , IfcVehicleType))
+	{
+		internal IfcTransportationDeviceType() : base() { }
+		internal IfcTransportationDeviceType(IfcTransportationDeviceType basis) : base(basis) { }
+		public IfcTransportationDeviceType(DatabaseIfc db) : base(db) { }
+		protected IfcTransportationDeviceType(DatabaseIfc db, IfcTransportationDeviceType t, DuplicateOptions options) : base(db, t, options) { }
+	}
+	[Serializable]
+	public partial class IfcTransportElement : IfcTransportationDevice
+	{
+		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcTransportElementTypeEnum;
 		internal double mCapacityByWeight = double.NaN;// : 	OPTIONAL IfcMassMeasure;
 		internal double mCapacityByNumber = double.NaN;//	 : 	OPTIONAL IfcCountMeasure;
 
-		public IfcTransportElementTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		//public double CapacityByWeight { get { return mCapacityByWeight; } set { mCapacityByWeight = value; } }
 		//public double CapacityByNumber { get { return CapacityByNumber; } set { mCapacityByNumber = value; } }
 
@@ -809,14 +863,14 @@ namespace GeometryGym.Ifc
 		public IfcTransportElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcTransportElementType : IfcElementType
+	public partial class IfcTransportElementType : IfcTransportationDeviceType
 	{
-		internal IfcTransportElementTypeSelect mPredefinedType = new IfcTransportElementTypeSelect(IfcTransportElementFixedTypeEnum.NOTDEFINED);// IfcTransportElementTypeEnum; 
-		public IfcTransportElementTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		internal IfcTransportElementTypeEnum mPredefinedType = IfcTransportElementTypeEnum.NOTDEFINED;// IfcTransportElementTypeEnum; 
+		public IfcTransportElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcTransportElementType() : base() { }
 		internal IfcTransportElementType(DatabaseIfc db, IfcTransportElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcTransportElementType(DatabaseIfc m, string name, IfcTransportElementTypeSelect type) : base(m) { Name = name; mPredefinedType = type; }
+		public IfcTransportElementType(DatabaseIfc db, string name, IfcTransportElementTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef
@@ -847,13 +901,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
 	{
 		internal List<Tuple<double, double, double>> mNormals = new List<Tuple<double,double,double>>();// : OPTIONAL LIST [1:?] OF LIST [3:3] OF IfcParameterValue; 
-		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
 		internal List<Tuple<int, int, int>> mCoordIndex = new List<Tuple<int, int, int>>();// : 	LIST [1:?] OF LIST [3:3] OF INTEGER;
 		internal List<Tuple<int, int, int>> mNormalIndex = new List<Tuple<int, int, int>>();// :	OPTIONAL LIST [1:?] OF LIST [3:3] OF INTEGER;  
 		internal List<int> mPnIndex = new List<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
 		public List<Tuple<double, double, double>> Normals { get { return mNormals; } }
-		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public List<Tuple<int, int, int>> CoordIndex { get { return mCoordIndex; } }
 		public List<Tuple<int, int, int>> NormalIndex { get { return mNormalIndex; } }
 		public List<int> PnIndex { get { return mPnIndex; } }
@@ -1351,43 +1403,28 @@ namespace GeometryGym.Ifc
 			PropertyInfo pi = type.GetProperty("PredefinedType");
 			if (pi != null)
 			{
-				if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
+				Type enumType = pi.PropertyType;
+				if (enumType != null)
 				{
-					MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
-					if (method != null)
+					FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+					if (fi == null)
 					{
-						if (!enumName.EndsWith("TypeEnum"))
-							enumName += "TypeEnum";
-						object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
-						if (o != null)
-							pi.SetValue(this, o);
-					}
-				}
-				else
-				{
-					Type enumType = pi.PropertyType;
-					if (enumType != null)
-					{
-						FieldInfo fi = enumType.GetField(predefinedTypeConstant);
-						if (fi == null)
-						{
-							if (elementType != null)
-								elementType.ElementType = predefinedTypeConstant;
-							fi = enumType.GetField("USERDEFINED");
-						}
-						if (fi != null)
-						{
-							int i = (int)fi.GetValue(enumType);
-							object newEnumValue = Enum.ToObject(enumType, i);
-
-							pi.SetValue(this, newEnumValue);
-						}
-						else if (elementType != null)
+						if (elementType != null)
 							elementType.ElementType = predefinedTypeConstant;
+						fi = enumType.GetField("USERDEFINED");
+					}
+					if (fi != null)
+					{
+						int i = (int)fi.GetValue(enumType);
+						object newEnumValue = Enum.ToObject(enumType, i);
+
+						pi.SetValue(this, newEnumValue);
 					}
 					else if (elementType != null)
 						elementType.ElementType = predefinedTypeConstant;
 				}
+				else if (elementType != null)
+					elementType.ElementType = predefinedTypeConstant;
 			}
 			else if (elementType != null)
 				elementType.ElementType = predefinedTypeConstant;

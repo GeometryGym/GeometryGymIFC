@@ -223,11 +223,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcSectionedSurface : IfcSurface 
 	{
 		private IfcCurve mDirectrix = null; //: IfcCurve;
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		private LIST<IfcPointByDistanceExpression> mCrossSectionPositions_OBSOLETE = new LIST<IfcPointByDistanceExpression>(); //: LIST[2:?] OF IfcDistanceExpression;
 		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
 		private LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>(); //: LIST[2:?] OF IfcProfileDef;
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		private bool mFixedAxisVertical = false; //: IfcBoolean;
 
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
@@ -816,7 +816,7 @@ additional types	some additional representation types are given:
 		public IfcSimplePropertyTemplate(DatabaseIfc db, string name) : base(db,name) { }
 	}
 	[Serializable]
-	public partial class IfcSine : IfcSpiral
+	public partial class IfcSineSpiral : IfcSpiral
 	{
 		private double mSineTerm = 0; //: IfcLengthMeasure;
 		private double mLinearTerm = double.NaN; //: OPTIONAL IfcReal;
@@ -826,10 +826,10 @@ additional types	some additional representation types are given:
 		public double LinearTerm { get { return mLinearTerm; } set { mLinearTerm = value; } }
 		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
 
-		public IfcSine() : base() { }
-		internal IfcSine(DatabaseIfc db, IfcSine sine, DuplicateOptions options)
+		public IfcSineSpiral() : base() { }
+		internal IfcSineSpiral(DatabaseIfc db, IfcSineSpiral sine, DuplicateOptions options)
 			: base(db, sine, options) { SineTerm = sine.SineTerm; LinearTerm = sine.LinearTerm; ConstantTerm = sine.ConstantTerm; }
-		public IfcSine(IfcAxis2Placement position, double sineTerm)
+		public IfcSineSpiral(IfcAxis2Placement position, double sineTerm)
 			: base(position) { SineTerm = sineTerm; }
 	}
 	[Serializable]
@@ -974,13 +974,15 @@ additional types	some additional representation types are given:
 		protected IfcSolidModel(DatabaseIfc db, IfcSolidModel p, DuplicateOptions options) : base(db, p, options) { }
 	}
 	public interface IfcSolidOrShell : IBaseClassIfc { } // SELECT(IfcSolidModel, IfcClosedShell);
+	[Obsolete("RELEASE CANDIDATE IFC4X3", false)]
 	[Serializable]
 	public partial class IfcSolidStratum : IfcGeotechnicalStratum
 	{
-		public IfcSolidStratum() : base() { }
-		public IfcSolidStratum(DatabaseIfc db) : base(db) { }
-		public IfcSolidStratum(DatabaseIfc db, IfcSolidStratum solidStratum, DuplicateOptions options) : base(db, solidStratum, options) { }
-		public IfcSolidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public override string StepClassName { get { return (mDatabase.mRelease >= ReleaseVersion.IFC4X3 ? "IfcGeotechnicalStratum" : base.StepClassName); } }
+		public IfcSolidStratum() : base() { PredefinedType = IfcGeotechnicalStratumTypeEnum.SOLID; }
+		public IfcSolidStratum(DatabaseIfc db) : base(db) { PredefinedType = IfcGeotechnicalStratumTypeEnum.SOLID; }
+		public IfcSolidStratum(DatabaseIfc db, IfcSolidStratum solidStratum, DuplicateOptions options) 
+			: base(db, solidStratum, options) { PredefinedType = IfcGeotechnicalStratumTypeEnum.SOLID; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -1585,6 +1587,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralCurveConnection : IfcStructuralConnection
 	{
+		internal IfcDirection mAxisDirection; //: IfcDirection
+		public IfcDirection AxisDirection { get { return mAxisDirection; } set { mAxisDirection = value; } }
 		internal IfcStructuralCurveConnection() : base() { }
 		internal IfcStructuralCurveConnection(DatabaseIfc db, IfcStructuralCurveConnection c, DuplicateOptions options) : base(db, c, options) { }
 	}
@@ -1592,10 +1596,10 @@ additional types	some additional representation types are given:
 	public partial class IfcStructuralCurveMember : IfcStructuralMember
 	{
 		internal IfcStructuralCurveMemberTypeEnum mPredefinedType= IfcStructuralCurveMemberTypeEnum.NOTDEFINED;// : IfcStructuralCurveMemberTypeEnum; 
-		internal int mAxis; //: IfcDirection
+		internal IfcDirection mAxis; //: IfcDirection
 
 		public IfcStructuralCurveMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public IfcDirection Axis { get { return mDatabase[mAxis] as IfcDirection; } set { mAxis = value.mIndex; } }
+		public IfcDirection Axis { get { return mAxis; } set { mAxis = value; } }
 
 		internal IfcEdgeCurve EdgeCurve { get; set; } //Used for load applications in ifc2x3
 

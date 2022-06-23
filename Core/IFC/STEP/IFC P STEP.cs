@@ -406,13 +406,15 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserIfc.LogicalToString(mClosed)) + 
+			return base.BuildStringSTEP(release) + 
+				(release < ReleaseVersion.IFC4X3 ? (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserIfc.LogicalToString(mClosed)) : "") + 
 				",(#" + string.Join(",#", mFaces.Select(x => x.StepId)) + (mPnIndex.Count == 0 ? "),$" : "),(" + string.Join(",", mPnIndex) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mClosed = ParserIfc.StripLogical(str, ref pos, len);
+			if(release < ReleaseVersion.IFC4X3)
+				mClosed = ParserIfc.StripLogical(str, ref pos, len);
 			mFaces.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=> dictionary[x] as IfcIndexedPolygonalFace));
 			mPnIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 		}
@@ -710,11 +712,11 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcProperty
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return "'" + ParserIfc.Encode(mName) + (string.IsNullOrEmpty(mDescription) ? "',$" : "','" + ParserIfc.Encode(mDescription) + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "'" + ParserIfc.Encode(mName) + (string.IsNullOrEmpty(mSpecification) ? "',$" : "','" + ParserIfc.Encode(mSpecification) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
-			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mSpecification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcPropertyBoundedValue

@@ -40,6 +40,9 @@ namespace GeometryGym.Ifc
 			token = obj.GetValue("UserDefinedType", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				UserDefinedType = token.Value<string>();
+			token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase);
+			if (token != null)
+				Name = token.Value<string>();
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -53,6 +56,7 @@ namespace GeometryGym.Ifc
 			}
 			base.setAttribute(obj, "UnitType", mUnitType.ToString());
 			base.setAttribute(obj, "UserDefinedType", UserDefinedType);
+			base.setAttribute(obj, "Name", Name);
 
 		}
 	}

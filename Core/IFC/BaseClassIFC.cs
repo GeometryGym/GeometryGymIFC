@@ -337,6 +337,9 @@ namespace GeometryGym.Ifc
 
 		public static Type GetType(string classNameIfc)
 		{
+			Type type = STEPEntity.GetType(classNameIfc, "Ifc");
+			if (type != null)
+				return type;
 			string className = classNameIfc;
 			if (string.Compare(className, "IfcBuildingElement", true) == 0)
 				className = "IfcBuiltElement";
@@ -344,7 +347,11 @@ namespace GeometryGym.Ifc
 				className = "IfcBuiltElementType";
 			else if (string.Compare(className, "IfcBuildingSystem", true) == 0)
 				className = "IfcBuiltSystem";
-			return STEPEntity.GetType(className, "Ifc");	
+			else if (string.Compare(className, "IfcOpeningStandardCase", true) == 0)
+				className = "IfcOpeningElement";
+			else
+				return null;
+			return STEPEntity.GetType(className, "Ifc");
 		}
 		public static BaseClassIfc Construct(string ifcClassName)
 		{
@@ -382,7 +389,9 @@ namespace GeometryGym.Ifc
 							return null;
 					}
 					constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { }, null);
-					mConstructors.TryAdd(className, constructor);
+					mConstructors[className] = constructor;
+					if (string.Compare(className, ifcClassName, true) != 0)
+						mConstructors[ifcClassName] = constructor;
 				}
 			}
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;

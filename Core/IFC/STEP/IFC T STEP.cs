@@ -363,11 +363,18 @@ namespace GeometryGym.Ifc
 		protected virtual void WriteStepLineWorker(TextWriter textWriter, ReleaseVersion release)
 		{
 			textWriter.Write("#" + mCoordinates.StepId);
+			if(release >= ReleaseVersion.IFC4X3)
+				textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 		}
-		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mCoordinates.StepId; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			return "#" + mCoordinates.StepId + (release >= ReleaseVersion.IFC4X3 ? (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed)) : "");
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
 		{
-			mCoordinates = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPointList; 
+			mCoordinates = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPointList;
+			if(release >= ReleaseVersion.IFC4X3)
+				mClosed = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
 	public partial class IfcTextLiteral
@@ -471,11 +478,36 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
-			return "(#" + string.Join(",", mMaps.Select(x => "#" + x.StepId)) + ")"; 
+			return "(" + string.Join(",", mMaps.Select(x => "#" + x.StepId)) + ")"; 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
 		{ 
 			mMaps.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcSurfaceTexture));
+		}
+	}
+	public partial class IfcTextureCoordinateIndices
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return "(" + string.Join(",", mTexCoordIndex.Select(x=>x.ToString())) + "),#" + mTexCoordsOf.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			TexCoordIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
+			TexCoordsOf = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcIndexedPolygonalFace;
+		}
+	}
+	public partial class IfcTextureCoordinateIndicesWithVoids
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mInnerTexCoordIndices.ConvertAll(x => "(" + string.Join(",", x) + ")")) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			InnerTexCoordIndices.AddRange(ParserSTEP.StripListListInt(str, ref pos, len));
 		}
 	}
 	public partial class IfcTextureCoordinateGenerator
@@ -495,9 +527,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) +
-			",(#" + string.Join(",#", mVertices.ConvertAll(x => x.StepId.ToString())) + ")" +
-			",#" + mMappedTo.StepId;
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mVertices.ConvertAll(x => "#" + x.StepId.ToString())) + 
+				"),#" + mMappedTo.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -708,27 +739,16 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release);
-			if (mPredefinedType == null)
-				result += ",$";
-			else if (release < ReleaseVersion.IFC4X3_RC1)
-			{
-				string str = mPredefinedType.ValueString();
-				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcTransportElementTypeEnum>(str, out predefined))
-					result += ",." + predefined.ToString() + ".";
-				else
-					result += ",$";
-			}
-			else
-				result += "," + mPredefinedType.ToString();
+			string result = base.BuildStringSTEP(release) +
+				(mPredefinedType == IfcTransportElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 			return result + (release < ReleaseVersion.IFC4 ? "," + ParserSTEP.DoubleOptionalToString(mCapacityByWeight) + "," + ParserSTEP.DoubleOptionalToString(mCapacityByNumber) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			PredefinedType = IfcTransportElementTypeSelect.Parse(s);
+			if(s.StartsWith("."))
+				Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			if(release < ReleaseVersion.IFC4)
 			{
 				mCapacityByWeight = ParserSTEP.StripDouble(str, ref pos, len);
@@ -740,25 +760,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release);
-			if (release < ReleaseVersion.IFC4X3_RC1)
-			{
-				string str = mPredefinedType.ValueString();
-				IfcTransportElementTypeEnum predefined = IfcTransportElementTypeEnum.NOTDEFINED;
-				if (Enum.TryParse<IfcTransportElementTypeEnum>(str, out predefined))
-					result += ",." + predefined.ToString() + ".";
-				else
-					result += ",$";
-			}
-			else
-				result += "," + mPredefinedType.ToString();
-			return result;
+			return base.BuildStringSTEP(release) + "," + mPredefinedType.ToString();
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			PredefinedType = IfcTransportElementTypeSelect.Parse(s);
+			if(s.StartsWith("."))
+				Enum.TryParse<IfcTransportElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcTrapeziumProfileDef
@@ -787,9 +796,9 @@ namespace GeometryGym.Ifc
 			if (mNormals.Count == 0)
 				textWriter.Write(",$,");
 			else
-				textWriter.Write(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + "),");
-			textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? "$" : ParserSTEP.BoolToString(Closed));
-
+				textWriter.Write(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + ")");
+			if (release < ReleaseVersion.IFC4X3)
+				textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 
 			textWriter.Write(",((");
 			var first = mCoordIndex.First();
@@ -828,8 +837,9 @@ namespace GeometryGym.Ifc
 			if (mNormals.Count == 0)
 				sb.Append(",$,");
 			else
-				sb.Append(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + "),");
-			sb.Append( mClosed == IfcLogicalEnum.UNKNOWN ? "$" : ParserSTEP.BoolToString(Closed));
+				sb.Append(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + ")");
+			if(release < ReleaseVersion.IFC4X3)
+				sb.Append( mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 
 
 			sb.Append(",((");

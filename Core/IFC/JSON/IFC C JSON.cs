@@ -248,7 +248,7 @@ namespace GeometryGym.Ifc
 				setAttribute(obj, "EditionDate", IfcDate.FormatSTEP(EditionDate));
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			setAttribute(obj, "Location", Location);
+			setAttribute(obj, "Specification", Specification);
 			if (mReferenceTokens.Count > 0)
 				obj["ReferenceTokens"] = new JArray(ReferenceTokens);
 		}
@@ -422,7 +422,7 @@ namespace GeometryGym.Ifc
 				r.RelatingConstraint = this;
 			rcr = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			foreach (IfcResourceConstraintRelationship r in rcr)
-				r.addRelated(this);
+				r.RelatedResourceObjects.Add(this);
 			UserDefinedGrade = extractString(obj.GetValue("UserDefinedGrade", StringComparison.InvariantCultureIgnoreCase));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -607,7 +607,7 @@ namespace GeometryGym.Ifc
 				obj["VerticalDatum"] = str;
 		}
 	}
-	public partial class IfcCosine
+	public partial class IfcCosineSpiral
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

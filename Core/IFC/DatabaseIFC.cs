@@ -51,8 +51,8 @@ namespace GeometryGym.Ifc
 		[Obsolete("Obsolete", false)] IFC4X3_RC1,
 		[Obsolete("Obsolete", false)] IFC4X3_RC2,
 		[Obsolete("Obsolete", false)] IFC4X3_RC3,
-		IFC4X3_RC4, 
-		IFC4X3_RC5TEST 
+		[Obsolete("Obsolete", false)] IFC4X3_RC4, 
+		IFC4X3 
 	}; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	
 	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
@@ -501,8 +501,10 @@ namespace GeometryGym.Ifc
 					type = typeof(IfcBuildingElementProxy);
 				else if (release < ReleaseVersion.IFC4X2)
 				{
+					if(typeof(IfcFacility).IsAssignableFrom(type))
+						type = typeof(IfcSite);
 					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
-						type = typeof(IfcBuilding);
+						type = typeof(IfcSpace);
 					else if (typeof(IfcBearing).IsAssignableFrom(type))
 						type = typeof(IfcBuildingElementProxy);
 					else if (release < ReleaseVersion.IFC4X1)
@@ -2376,8 +2378,8 @@ namespace GeometryGym.Ifc
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
 				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
 					mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC5", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3_RC5TEST;
+				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
+					mDatabase.Release = ReleaseVersion.IFC4X3;
 				else
 					mDatabase.Release = ReleaseVersion.IFC4;
 				if (mDatabase.Release > ReleaseVersion.IFC2x3)

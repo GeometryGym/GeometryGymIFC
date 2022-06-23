@@ -128,15 +128,17 @@ namespace GeometryGym.Ifc
 		public IfcDerivedProfileDef(IfcProfileDef container, IfcCartesianTransformationOperator2D op, string name) : base(container.mDatabase, name) { ParentProfile = container; Operator = op; }
 	}
 	[Serializable]
-	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
+	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit, NamedObjectIfc
 	{
 		private SET<IfcDerivedUnitElement> mElements = new SET<IfcDerivedUnitElement>();// : SET [1:?] OF IfcDerivedUnitElement;
 		private IfcDerivedUnitEnum mUnitType;// : IfcDerivedUnitEnum;
-		private string mUserDefinedType = "$";// : OPTIONAL IfcLabel;
+		private string mUserDefinedType = "";// : OPTIONAL IfcLabel;
+		private string mName = ""; //: OPTIONAL IfcLabel;
 
 		public SET<IfcDerivedUnitElement> Elements { get { return mElements; } }
 		public IfcDerivedUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
-		public string UserDefinedType { get { return (mUserDefinedType == "$" ? "" : ParserIfc.Decode(mUserDefinedType)); } set { mUserDefinedType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedType { get { return mUserDefinedType; } set { mUserDefinedType = value; } }
+		public string Name { get { return mName; } set { mName = value; } }
 
 		internal IfcDerivedUnit() : base() { }
 		internal IfcDerivedUnit(DatabaseIfc db, IfcDerivedUnit u) : base(db) 

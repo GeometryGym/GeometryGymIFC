@@ -139,7 +139,7 @@ namespace GeometryGym.Ifc
 				result += ",(#" + string.Join(",#", mCrossSectionPositionMeasures_OBSOLETE.ConvertAll(x => x.ToString()));
 			else
 				result += ",(" + string.Join(",", CrossSectionPositions.Select(x => "#" + x.StepId));
-			return result + (release < ReleaseVersion.IFC4X3_RC5TEST ? (mFixedAxisVertical ? "),.T." : "),.F.") : "");	
+			return result + (release < ReleaseVersion.IFC4X3 ? (mFixedAxisVertical ? "),.T." : "),.F.") : "");	
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -159,7 +159,7 @@ namespace GeometryGym.Ifc
 			}
 			else
 				mCrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
-			if (release < ReleaseVersion.IFC4X3_RC5TEST)
+			if (release < ReleaseVersion.IFC4X3)
 				FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
@@ -182,7 +182,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			string result = "#" + mDirectrix.StepId;
-			if (release < ReleaseVersion.IFC4X3_RC5TEST)
+			if (release < ReleaseVersion.IFC4X3)
 			{
 				if(mCrossSectionPositions_OBSOLETE.Count > 0)
 					result += ",(" + string.Join(",", mCrossSectionPositions_OBSOLETE.ConvertAll(x => "#" + x.StepId.ToString())) + ")";
@@ -192,17 +192,17 @@ namespace GeometryGym.Ifc
 			else
 				result += ",(" + string.Join(",", mCrossSectionPositions.ConvertAll(x => "#" + x.StepId.ToString())) + ")";
 			return result + ",(" + string.Join(",", mCrossSections.ConvertAll(x => "#" + x.StepId.ToString())) + ")" +
-				(release < ReleaseVersion.IFC4X3_RC5TEST ? "," + (mFixedAxisVertical ? ".T." : ".F") : "");
+				(release < ReleaseVersion.IFC4X3 ? "," + (mFixedAxisVertical ? ".T." : ".F") : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			Directrix = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
-			if(release < ReleaseVersion.IFC4X3_RC5TEST)
+			if(release < ReleaseVersion.IFC4X3)
 				mCrossSectionPositions_OBSOLETE.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPointByDistanceExpression));
 			else
 				CrossSectionPositions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcAxis2PlacementLinear));
 			CrossSections.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcProfileDef));
-			if(release < ReleaseVersion.IFC4X3_RC5TEST)
+			if(release < ReleaseVersion.IFC4X3)
 				FixedAxisVertical = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}
@@ -450,7 +450,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcStateEnum>(s.Replace(".", ""), true, out mAccessState);
 		}
 	}
-	public partial class IfcSine
+	public partial class IfcSineSpiral
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
@@ -878,16 +878,28 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcStructuralCurveActivityTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcStructuralCurveConnection
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : ",#" + mAxisDirection.StepId); 
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mAxisDirection = dictionary[ ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
+		}
+	}
 	public partial class IfcStructuralCurveMember
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + (release < ReleaseVersion.IFC4 ? "." : ".," + ParserSTEP.LinkToString(mAxis)); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + (release < ReleaseVersion.IFC4 ? "." : ".,#" + mAxis.StepId); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			Enum.TryParse<IfcStructuralCurveMemberTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			if (release != ReleaseVersion.IFC2x3)
-				mAxis = ParserSTEP.StripLink(str, ref pos, len);
+				mAxis = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;
 		}
 	}
 	public partial class IfcStructuralLinearActionVarying

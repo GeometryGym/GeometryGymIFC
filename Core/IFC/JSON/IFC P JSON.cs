@@ -529,9 +529,11 @@ namespace GeometryGym.Ifc
 			JToken token = obj.GetValue("Name", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Name = token.Value<string>();
-			token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
+			token = obj.GetValue("Specification", StringComparison.InvariantCultureIgnoreCase);
+			if(token == null)
+				token = obj.GetValue("Description", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				Description = token.Value<string>();
+				Specification = token.Value<string>();
 			foreach (IfcPropertySet pset in mDatabase.extractJArray<IfcPropertySet>(obj.GetValue("PartOfPset", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				pset.addProperty(this);
 		}
@@ -539,7 +541,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["Name"] = Name;
-			setAttribute(obj, "Description", Description);
+			setAttribute(obj, "Specification", Specification);
 			if(host is IfcExtendedProperties)
 			{
 				List<IfcPropertySet> psets = mPartOfPset.Where(x=>x.mDefinesType.Count == 0 && x.DefinesOccurrence.Count==0).ToList();
@@ -556,7 +558,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				r.addRelated(this);
+				r.RelatedResourceObjects.Add(this);
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

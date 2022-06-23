@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 		{
 			base.ParseXml(xml);
 			if (xml.HasAttribute("CountValue"))
-				CountValue = double.Parse(xml.Attributes["CountValue"].Value);
+				CountValueDouble = double.Parse(xml.Attributes["CountValue"].Value);
 			if (xml.HasAttribute("Formula"))
 				Formula = xml.Attributes["Formula"].Value;
 		}

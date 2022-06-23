@@ -140,6 +140,20 @@ namespace GeometryGym.Ifc
 			Elements.AddRange(stepIds.ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
+	public partial class IfcGeotechnicalStratum
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3 ? "" : (mPredefinedType == IfcGeotechnicalStratumTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			if (release >= ReleaseVersion.IFC4X3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+					Enum.TryParse<IfcGeotechnicalStratumTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+			}
+		}
+	}
 	public partial class IfcGradientCurve
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

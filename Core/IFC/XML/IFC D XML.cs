@@ -62,6 +62,8 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDerivedUnitEnum>(xml.Attributes["UnitType"].Value, true, out mUnitType);
 			if (xml.HasAttribute("UserDefinedType"))
 				UserDefinedType = xml.Attributes["UserDefinedType"].Value;
+			if (xml.HasAttribute("Name"))
+				Name = xml.Attributes["Name"].Value;
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -85,6 +87,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(unit.GetXML(xml.OwnerDocument, "", this, processed));
 			xml.SetAttribute("UnitType", mUnitType.ToString().ToLower());
 			setAttribute(xml, "UserDefinedType", UserDefinedType);
+			setAttribute(xml, "Name", Name);
 		}
 	}
 	public partial class IfcDerivedUnitElement : BaseClassIfc

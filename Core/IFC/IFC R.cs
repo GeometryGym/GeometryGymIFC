@@ -91,6 +91,17 @@ namespace GeometryGym.Ifc
 		public IfcRailway(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
+	public partial class IfcRailwayPart : IfcFacilityPart
+	{
+		private IfcRailwayPartTypeEnum mPredefinedType = IfcRailwayPartTypeEnum.NOTDEFINED; //: OPTIONAL IfcRailwayPartTypeEnum;
+		public IfcRailwayPartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
+		public IfcRailwayPart() : base() { }
+		public IfcRailwayPart(DatabaseIfc db) : base(db) { }
+		public IfcRailwayPart(DatabaseIfc db, IfcRailwayPart railwayPart, DuplicateOptions options) : base(db, railwayPart, options) { }
+		public IfcRailwayPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
 	public partial class IfcRamp : IfcBuiltElement
 	{
 		internal IfcRampTypeEnum mPredefinedType = IfcRampTypeEnum.NOTDEFINED;// OPTIONAL : IfcRampTypeEnum
@@ -395,9 +406,11 @@ namespace GeometryGym.Ifc
 	public partial class IfcReferent : IfcPositioningElement
 	{
 		private IfcReferentTypeEnum mPredefinedType = IfcReferentTypeEnum.NOTDEFINED; //: OPTIONAL IfcReferentTypeEnum;
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		private double mRestartDistance = double.NaN; //: OPTIONAL IfcLengthMeasure;
 
 		public IfcReferentTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public double RestartDistance { get { return mRestartDistance; } set { mRestartDistance = value; } }
 
 		public IfcReferent() : base() { }
@@ -2546,34 +2559,54 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcResourceConstraintRelationship : IfcResourceLevelRelationship  // IfcPropertyConstraintRelationship; // DEPRECATED IFC4 renamed
 	{
-		internal int mRelatingConstraint;// :	IfcConstraint;
-		internal List<int> mRelatedResourceObjects = new List<int>();// :	SET [1:?] OF IfcResourceObjectSelect;
+		internal IfcConstraint mRelatingConstraint;// :	IfcConstraint;
+		internal SET<IfcResourceObjectSelect> mRelatedResourceObjects = new SET<IfcResourceObjectSelect>();// :	SET [1:?] OF IfcResourceObjectSelect;
 
-		public IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; if (!value.mPropertiesForConstraint.Contains(this)) value.mPropertiesForConstraint.Add(this); } }
-		public ReadOnlyCollection<IfcResourceObjectSelect> RelatedResourceObjects { get { return new ReadOnlyCollection<IfcResourceObjectSelect>(mRelatedResourceObjects.ConvertAll(x => mDatabase[x] as IfcResourceObjectSelect)); } }
+		public IfcConstraint RelatingConstraint { get { return mRelatingConstraint; } set { mRelatingConstraint = value; if (!value.mPropertiesForConstraint.Contains(this)) value.mPropertiesForConstraint.Add(this); } }
+		public SET<IfcResourceObjectSelect> RelatedResourceObjects { get { return mRelatedResourceObjects; } }
 
 		internal IfcResourceConstraintRelationship() : base() { }
-		internal IfcResourceConstraintRelationship(DatabaseIfc db, IfcResourceConstraintRelationship r) : base(db, r) { RelatingConstraint = db.Factory.Duplicate(r.RelatingConstraint) as IfcConstraint; r.mRelatedResourceObjects.ForEach(x => addRelated(db.Factory.Duplicate(r.mDatabase[x]) as IfcResourceObjectSelect)); }
+		internal IfcResourceConstraintRelationship(DatabaseIfc db, IfcResourceConstraintRelationship r, DuplicateOptions options) 
+			: base(db, r, options) 
+		{
+			RelatingConstraint = db.Factory.Duplicate(r.RelatingConstraint) as IfcConstraint;
+			RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.Select(x => db.Factory.Duplicate(x as BaseClassIfc) as IfcResourceObjectSelect)); }
 		public IfcResourceConstraintRelationship(IfcConstraint constraint, IfcResourceObjectSelect related) : this(constraint, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcResourceConstraintRelationship(IfcConstraint constraint, List<IfcResourceObjectSelect> related) : base(constraint.mDatabase)
 		{
 			RelatingConstraint = constraint;
-			related.ForEach(x => addRelated(x));
+			RelatedResourceObjects.AddRange(related);
 		}
 
-		internal void addRelated(IfcResourceObjectSelect r)
+		protected override void initialize()
 		{
-			r.AddConstraintRelationShip(this);
-			mRelatedResourceObjects.Add(r.Index);
+			base.initialize();
+			mRelatedResourceObjects.CollectionChanged += mRelatedResourceObjects_CollectionChanged;
+		}
+		private void mRelatedResourceObjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (mDatabase != null && mDatabase.IsDisposed())
+				return;
+			if (e.NewItems != null)
+			{
+				foreach (IfcResourceObjectSelect o in e.NewItems)
+				{
+					o.AddConstraintRelationShip(this);
+				}
+			}
+			if (e.OldItems != null)
+			{
+				foreach (IfcResourceObjectSelect o in e.OldItems)
+				{
+				}
+			}
 		}
 
 		protected override bool DisposeWorker(bool children)
 		{
-			for (int icounter = 0; icounter < mRelatedResourceObjects.Count; icounter++)
+			foreach(IfcResourceObjectSelect r in RelatedResourceObjects.ToList())
 			{
-				BaseClassIfc bc = mDatabase[mRelatedResourceObjects[icounter]];
-				if (bc != null)
-					bc.Dispose(children);
+				(r as BaseClassIfc).Dispose(children);
 			}
 			return base.DisposeWorker(children);
 		}
@@ -2581,17 +2614,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcResourceLevelRelationship : BaseClassIfc, NamedObjectIfc  //IFC4 ABSTRACT SUPERTYPE OF(ONEOF(IfcApprovalRelationship,
 	{ // IfcCurrencyRelationship, IfcDocumentInformationRelationship, IfcExternalReferenceRelationship, IfcMaterialRelationship, IfcOrganizationRelationship, IfcPropertyDependencyRelationship, IfcResourceApprovalRelationship, IfcResourceConstraintRelationship));
-		internal string mName = "$";// : OPTIONAL IfcLabel
-		internal string mDescription = "$";// : OPTIONAL IfcText; 
+		internal string mName = "";// : OPTIONAL IfcLabel
+		internal string mDescription = "";// : OPTIONAL IfcText; 
 		//INVERSE
 		//mHasExternalReference
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 
 		protected IfcResourceLevelRelationship() : base() { }
-		protected IfcResourceLevelRelationship(DatabaseIfc db, IfcResourceLevelRelationship r) : base(db, r) { mDescription = r.mDescription; mName = r.mName; }
 		protected IfcResourceLevelRelationship(DatabaseIfc db) : base(db) { }
+		protected IfcResourceLevelRelationship(DatabaseIfc db, IfcResourceLevelRelationship r, DuplicateOptions options)
+			: base(db)
+		{
+			Name = r.Name;
+			Description = r.Description; 
+		}
 	}
 	public partial interface IfcResourceObjectSelect : IBaseClassIfc //IFC4 SELECT (	IfcPropertyAbstraction, IfcPhysicalQuantity, IfcAppliedValue, 
 	{   //IfcContextDependentUnit, IfcConversionBasedUnit, IfcProfileDef, IfcActorRole, IfcApproval, IfcConstraint, IfcTimeSeries, IfcMaterialDefinition, IfcPerson, IfcPersonAndOrganization, IfcOrganization, IfcExternalReference, IfcExternalInformation););
@@ -2707,6 +2745,17 @@ namespace GeometryGym.Ifc
 		public IfcRoad(DatabaseIfc db, IfcRoad road, DuplicateOptions options) : base(db, road, options) { }
 		public IfcRoad(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 		public IfcRoad(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcRoadPart : IfcFacilityPart
+	{
+		private IfcRoadPartTypeEnum mPredefinedType = IfcRoadPartTypeEnum.NOTDEFINED; //: OPTIONAL IfcRoadPartTypeEnum;
+		public IfcRoadPartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
+		public IfcRoadPart() : base() { }
+		public IfcRoadPart(DatabaseIfc db) : base(db) { }
+		public IfcRoadPart(DatabaseIfc db, IfcRailwayPart railwayPart, DuplicateOptions options) : base(db, railwayPart, options) { }
+		public IfcRoadPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcRoof : IfcBuiltElement

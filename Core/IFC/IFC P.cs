@@ -488,14 +488,6 @@ namespace GeometryGym.Ifc
 		public IfcPlane(IfcAxis2Placement3D placement) : base(placement) { }
 	}
 	[Serializable]
-	public partial class IfcPlant : IfcGeographicElement
-	{
-		public IfcPlant() : base() { }
-		public IfcPlant(DatabaseIfc db) : base(db) { }
-		public IfcPlant(DatabaseIfc db, IfcPlant plant, DuplicateOptions options) : base(db, plant, options) { PredefinedType = plant.PredefinedType; }
-		public IfcPlant(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-	}
-	[Serializable]
 	public partial class IfcPlate : IfcBuiltElement
 	{
 		internal IfcPlateTypeEnum mPredefinedType = IfcPlateTypeEnum.NOTDEFINED;//: OPTIONAL IfcPlateTypeEnum;
@@ -623,11 +615,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPolygonalFaceSet : IfcTessellatedFaceSet //IFC4A2
 	{
-		internal IfcLogicalEnum mClosed = IfcLogicalEnum.UNKNOWN; // 	OPTIONAL BOOLEAN;
+		
 		internal LIST<IfcIndexedPolygonalFace> mFaces = new LIST<IfcIndexedPolygonalFace>(); // : LIST [1:?] OF IfcIndexedPolygonalFace;
 		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
-		public bool Closed { get { return mClosed == IfcLogicalEnum.TRUE; } set { mClosed = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 		public LIST<IfcIndexedPolygonalFace> Faces { get { return mFaces; } }
 		public LIST<int> PnIndex { get { return mPnIndex; } }
 
@@ -1737,7 +1728,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcProperty : IfcPropertyAbstraction, NamedObjectIfc  //ABSTRACT SUPERTYPE OF (ONEOF(IfcComplexProperty,IfcSimpleProperty));
 	{
 		internal string mName = ""; //: IfcIdentifier;
-		internal string mDescription = ""; //: OPTIONAL IfcText;
+		internal string mSpecification = ""; //: OPTIONAL IfcText;
 		//INVERSE
 		internal SET<IfcPropertySet> mPartOfPset = new SET<IfcPropertySet>();//	:	SET OF IfcPropertySet FOR HasProperties;
 		internal SET<IfcPropertyDependencyRelationship> mPropertyForDependance = new SET<IfcPropertyDependencyRelationship>();//	:	SET OF IfcPropertyDependencyRelationship FOR DependingProperty;
@@ -1745,18 +1736,18 @@ namespace GeometryGym.Ifc
 		internal SET<IfcComplexProperty> mPartOfComplex = new SET<IfcComplexProperty>();//	:	SET OF IfcComplexProperty FOR HasProperties;
 
 		public string Name { get { return mName; } set { mName = string.IsNullOrEmpty(value) ? "Unknown" : value; } }
-		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public string Specification { get { return mSpecification; } set { mSpecification = value; } }
 		public SET<IfcPropertySet> PartOfPset { get { return mPartOfPset; } }
 
 		protected IfcProperty() : base() { }
-		protected IfcProperty(IfcProperty property) : base(property) { Name = property.Name; Description = property.Description; }
-		protected IfcProperty(DatabaseIfc db, IfcProperty p, DuplicateOptions options) : base(db, p, options) { mName = p.mName; mDescription = p.mDescription; }
+		protected IfcProperty(IfcProperty property) : base(property) { Name = property.Name; Specification = property.Specification; }
+		protected IfcProperty(DatabaseIfc db, IfcProperty p, DuplicateOptions options) : base(db, p, options) { mName = p.mName; mSpecification = p.mSpecification; }
 		protected IfcProperty(DatabaseIfc db, string name) : base(db) { Name = name; }
 
 		internal override bool isDuplicate(BaseClassIfc e, double tol)
 		{
 			IfcProperty p = e as IfcProperty;
-			if (p == null || string.Compare(mName, p.mName) != 0 || string.Compare(mDescription, p.mDescription) != 0)
+			if (p == null || string.Compare(mName, p.mName) != 0 || string.Compare(mSpecification, p.mSpecification) != 0)
 				return false;
 			return base.isDuplicate(e, tol);
 		}
@@ -1938,7 +1929,8 @@ namespace GeometryGym.Ifc
 		public string Expression { get { return (mExpression == "$" ? "" : ParserIfc.Decode(mExpression)); } set { mExpression = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 
 		internal IfcPropertyDependencyRelationship() : base() { }
-		internal IfcPropertyDependencyRelationship(DatabaseIfc db, IfcPropertyDependencyRelationship p) : base(db, p)
+		internal IfcPropertyDependencyRelationship(DatabaseIfc db, IfcPropertyDependencyRelationship p, DuplicateOptions options) 
+			: base(db, p, options)
 		{
 			DependingProperty = db.Factory.DuplicateProperty(p.DependingProperty);
 			DependantProperty = db.Factory.DuplicateProperty(p.DependantProperty);
@@ -2543,6 +2535,7 @@ namespace GeometryGym.Ifc
 		internal IfcProtectiveDeviceType(DatabaseIfc db, IfcProtectiveDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
 		public IfcProtectiveDeviceType(DatabaseIfc m, string name, IfcProtectiveDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
 	}
+	[Obsolete("DEPRECATED IFC4x3", false)]
 	[Serializable]
 	public partial class IfcProxy : IfcProduct
 	{

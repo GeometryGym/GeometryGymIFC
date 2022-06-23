@@ -94,23 +94,67 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if(release >= ReleaseVersion.IFC4X3_RC1 && release < ReleaseVersion.IFC4X3)
+			{
+				string predefined = "IFCFACILITYPARTTYPEENUM(.NOTDEFINED.),.";
+				if(this is IfcFacilityPartCommon facilityPartCommon)
+				if (this is IfcBridgePart bridgePart)
+					predefined = "IFCBRIDGEPARTTYPEENUM(." + bridgePart.PredefinedType.ToString() + ".),.";
+
+				return base.BuildStringSTEP(release) + "," + predefined + mUsageType.ToString() + ".";
+			}
 			if (release > ReleaseVersion.IFC4X2)
 			{
-				return base.BuildStringSTEP(release) + "," + PredefinedType.ToString() + ",." + mUsageType.ToString() + ".";
+				return base.BuildStringSTEP(release) + ",." + mUsageType.ToString() + ".";
 			}
 			return base.BuildStringSTEP(release);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if(release > ReleaseVersion.IFC4X2)
+			if (release > ReleaseVersion.IFC4X2 && release < ReleaseVersion.IFC4X3)
 			{
-				string s = ParserSTEP.StripField(str, ref pos, len);
-				PredefinedType = IfcFacilityPartTypeSelect.Parse(s);
-
+				string s = "";
+				if (release > ReleaseVersion.IFC4X2 && release < ReleaseVersion.IFC4X3)
+				{
+					s = ParserSTEP.StripField(str, ref pos, len);
+					int index = s.IndexOf('.');
+					if(index > 0)
+					{
+						s = s.Substring(index + 1, s.Length - index - 3);
+						if (this is IfcFacilityPartCommon facilityPartCommon && Enum.TryParse<IfcFacilityPartCommonTypeEnum>(s, true, out IfcFacilityPartCommonTypeEnum facilityPartCommonTypeEnum))
+							facilityPartCommon.PredefinedType = facilityPartCommonTypeEnum;
+						else if (this is IfcBridgePart bridgePart && Enum.TryParse<IfcBridgePartTypeEnum>(s, true, out IfcBridgePartTypeEnum bridgePartTypeEnum))
+							bridgePart.PredefinedType = bridgePartTypeEnum;
+						//else if (this is IfcRoadPart roadPart && Enum.TryParse<IfcBridgePartTypeEnum>(s, true, out IfcBridgePartTypeEnum bridgePartTypeEnum))
+						//	bridgePart.PredefinedType = bridgePartTypeEnum;
+					}
+				}
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcFacilityUsageEnum>(s.Replace(".", ""), true, out mUsageType);
+			}
+		}
+	}
+	public partial class IfcFacilityPartCommon
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3 && release >= ReleaseVersion.IFC4X3_RC1)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcFacilityPartCommonTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			if (release < ReleaseVersion.IFC4X3_RC1 || release >= ReleaseVersion.IFC4X3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+				{
+					if (Enum.TryParse<IfcFacilityPartCommonTypeEnum>(s.Replace(".", ""), true, out IfcFacilityPartCommonTypeEnum partType))
+						PredefinedType = partType;
+				}
 			}
 		}
 	}

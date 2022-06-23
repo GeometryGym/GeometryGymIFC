@@ -98,6 +98,17 @@ namespace GeometryGym.Ifc
 		internal IfcMarineFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { }
 	}
 	[Serializable]
+	public partial class IfcMarinePart : IfcFacilityPart
+	{
+		private IfcMarinePartTypeEnum mPredefinedType = IfcMarinePartTypeEnum.NOTDEFINED; //: OPTIONAL IfcMarinePartTypeEnum;
+		public IfcMarinePartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
+		public IfcMarinePart() : base() { }
+		public IfcMarinePart(DatabaseIfc db) : base(db) { }
+		public IfcMarinePart(DatabaseIfc db, IfcBridgePart marinePart, DuplicateOptions options) : base(db, marinePart, options) { }
+		public IfcMarinePart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
 	public partial class IfcMaterial : IfcMaterialDefinition, NamedObjectIfc
 	{
 		private string mName = "";// : IfcLabel; 
@@ -655,20 +666,26 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialRelationship : IfcResourceLevelRelationship //IFC4
 	{
-		internal int mRelatingMaterial;// : IfcMaterial;
-		internal List<int> mRelatedMaterials = new List<int>(); //	:	SET [1:?] OF IfcMaterial;
-		internal string mExpression = "$";//:	OPTIONAL IfcLabel;
+		internal IfcMaterial mRelatingMaterial;// : IfcMaterial;
+		internal SET<IfcMaterial> mRelatedMaterials = new SET<IfcMaterial>(); //	:	SET [1:?] OF IfcMaterial;
+		internal string mMaterialExpression = "";//:	OPTIONAL IfcLabel;
+		public IfcMaterial RelatingMaterial { get { return mRelatingMaterial; } set { mRelatingMaterial = value; } }
+		public SET<IfcMaterial> RelatedMaterials { get { return mRelatedMaterials; } }
+		public string MaterialExpression { get { return mMaterialExpression; } set { mMaterialExpression = value; } }
+
 		internal IfcMaterialRelationship() : base() { }
-		//internal IfcMaterialRelationship(DatabaseIfc db, IfcMaterialRelationship r) : base(db,r) { mRelatingMaterial = i.mRelatingMaterial; mRelatedMaterials.AddRange(i.mRelatedMaterials); mExpression = i.mExpression; }
-		internal IfcMaterialRelationship(IfcMaterial mat, List<IfcMaterial> related, string expr)
-			: base(mat.mDatabase) { mRelatingMaterial = mat.mIndex; mRelatedMaterials = related.ConvertAll(x => x.mIndex); if (!string.IsNullOrEmpty(expr)) mExpression = expr.Replace("'", "");  }
-		//internal override void relate()
-		//{
-		//	base.relate();
-		//	IfcMaterial m = mModel.mIFCobjs[mRelatingMaterial] as IfcMaterial;
-		//	if (m != null)
-		//		m.mHasRepresentation = this;
-		//}
+		internal IfcMaterialRelationship(DatabaseIfc db) : base(db) { }
+		internal IfcMaterialRelationship(DatabaseIfc db, IfcMaterialRelationship r, DuplicateOptions options) : base(db, r, options) 
+		{
+			RelatingMaterial = db.Factory.Duplicate(r.RelatingMaterial, options) as IfcMaterial;
+			RelatedMaterials.AddRange(r.RelatedMaterials.Select(x => db.Factory.Duplicate(x) as IfcMaterial));
+			MaterialExpression = r.MaterialExpression;
+		}
+		public IfcMaterialRelationship(IfcMaterial mat, List<IfcMaterial> related) : base(mat.mDatabase)
+		{
+			mRelatingMaterial = mat;
+			mRelatedMaterials.AddRange(related);
+		}
 	}
 	public partial interface IfcMaterialSelect : NamedObjectIfc  //IFC4 SELECT (IfcMaterialDefinition, IfcMaterialList, IfcMaterialUsageDefinition);
 	{

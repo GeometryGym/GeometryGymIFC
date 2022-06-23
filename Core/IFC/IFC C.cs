@@ -496,7 +496,7 @@ namespace GeometryGym.Ifc
 		private int mEditionDateSS = 0; // : OPTIONAL IfcCalendarDate;
 		internal string mName;//  : IfcLabel;
 		internal string mDescription = "$";//	 :	OPTIONAL IfcText; IFC4 Addition
-		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; IFC4 Addition
+		internal string mSpecification = "$";//	 :	OPTIONAL IfcURIReference; IFC4 Addition
 		internal List<string> mReferenceTokens = new List<string>();//	 :	OPTIONAL LIST [1:?] OF IfcIdentifier; IFC4 Addition
 		//INVERSE 
 		internal SET<IfcRelAssociatesClassification> mClassificationForObjects = new SET<IfcRelAssociatesClassification>();//	 :	SET OF IfcRelAssociatesclassification FOR Relatingclassification;
@@ -520,14 +520,14 @@ namespace GeometryGym.Ifc
 		}
 		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { if (!string.IsNullOrEmpty(value)) mName = ParserIfc.Encode(value); } }
 		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Specification { get { return (mSpecification == "$" ? "" : ParserIfc.Decode(mSpecification)); } set { mSpecification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
 		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserIfc.Decode(x)); } }
 		public SET<IfcRelAssociatesClassification> ClassificationForObjects { get { return mClassificationForObjects; } }
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 
 		internal IfcClassification() : base() { }
 		internal IfcClassification(DatabaseIfc db, IfcClassification c) 
-			: base(db, c) { mSource = c.mSource; mEdition = c.mEdition; mEditionDate = c.mEditionDate; mName = c.mName; mDescription = c.mDescription; mLocation = c.mLocation; mReferenceTokens.AddRange(c.mReferenceTokens); }
+			: base(db, c) { mSource = c.mSource; mEdition = c.mEdition; mEditionDate = c.mEditionDate; mName = c.mName; mDescription = c.mDescription; mSpecification = c.mSpecification; mReferenceTokens.AddRange(c.mReferenceTokens); }
 		public IfcClassification(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected override void initialize()
 		{
@@ -584,7 +584,7 @@ namespace GeometryGym.Ifc
 			if (classification == null || !base.isDuplicate(e, tol))
 				return false;
 
-			if (string.Compare(Location, classification.Location, true) != 0)
+			if (string.Compare(Specification, classification.Specification, true) != 0)
 				return false;
 			if (string.Compare(Name, classification.Name, true) != 0)
 				return false;
@@ -1837,7 +1837,7 @@ namespace GeometryGym.Ifc
 		IfcCoordinateOperation HasCoordinateOperation { get; set; }
 	}
 	[Serializable]
-	public partial class IfcCosine : IfcSpiral
+	public partial class IfcCosineSpiral : IfcSpiral
 	{
 		private double mCosineTerm = 0; //: IfcLengthMeasure;
 		private double mConstantTerm = double.NaN; //: OPTIONAL IfcLengthMeasure;
@@ -1845,10 +1845,10 @@ namespace GeometryGym.Ifc
 		public double CosineTerm { get { return mCosineTerm; } set { mCosineTerm = value; } }
 		public double ConstantTerm { get { return mConstantTerm; } set { mConstantTerm = value; } }
 
-		public IfcCosine() : base() { }
-		internal IfcCosine(DatabaseIfc db, IfcCosine cosine, DuplicateOptions options)
+		public IfcCosineSpiral() : base() { }
+		internal IfcCosineSpiral(DatabaseIfc db, IfcCosineSpiral cosine, DuplicateOptions options)
 			: base(db, cosine, options) { CosineTerm = cosine.CosineTerm; ConstantTerm = cosine.ConstantTerm;  }
-		public IfcCosine(IfcAxis2Placement position, double cosineTerm)
+		public IfcCosineSpiral(IfcAxis2Placement position, double cosineTerm)
 			: base(position) { CosineTerm = cosineTerm; }
 	}
 	[Serializable]

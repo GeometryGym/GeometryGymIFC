@@ -408,7 +408,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBridgePart : IfcFacilityPart
 	{
-		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2) return "IfcFacilityPart"; return base.StepClassName; } }
+		private IfcBridgePartTypeEnum mPredefinedType = IfcBridgePartTypeEnum.NOTDEFINED; //: OPTIONAL IfcBridgeTypeEnum;
+		public IfcBridgePartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
 		public IfcBridgePart() : base() { }
 		public IfcBridgePart(DatabaseIfc db) : base(db) { }
 		public IfcBridgePart(DatabaseIfc db, IfcBridgePart bridgePart, DuplicateOptions options) : base(db, bridgePart, options) { }

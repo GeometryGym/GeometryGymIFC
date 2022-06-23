@@ -250,26 +250,20 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (PredefinedType != null && release < ReleaseVersion.IFC4X3_RC1)
-			{
-				IfcBridgePartTypeEnum part = IfcBridgePartTypeEnum.NOTDEFINED;
-				if (!PredefinedType.isEnumeration(ref part))
-					part = IfcBridgePartTypeEnum.NOTDEFINED;
-				return base.BuildStringSTEP(release) + (part == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + part.ToString() + ".");
-			}
-			return base.BuildStringSTEP(release);
+			if (release < ReleaseVersion.IFC4X3 && release >= ReleaseVersion.IFC4X3_RC1)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcBridgePartTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release < ReleaseVersion.IFC4X3_RC1)
+			if (release < ReleaseVersion.IFC4X3_RC1 || release >= ReleaseVersion.IFC4X3)
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 				{
-					IfcBridgePartTypeEnum partType = IfcBridgePartTypeEnum.NOTDEFINED;
-					if (Enum.TryParse<IfcBridgePartTypeEnum>(s.Replace(".", ""), true, out partType))
-						PredefinedType = new IfcFacilityPartTypeSelect(partType);
+					if (Enum.TryParse<IfcBridgePartTypeEnum>(s.Replace(".", ""), true, out IfcBridgePartTypeEnum partType))
+						PredefinedType = partType;
 				}
 			}
 		}

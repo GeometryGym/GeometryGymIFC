@@ -799,22 +799,29 @@ namespace GeometryGym.Ifc
 			base.ParseXml(xml);
 			if (xml.HasAttribute("Name"))
 				Name = xml.Attributes["Name"].Value;
-			if (xml.HasAttribute("Description"))
-				Description = xml.Attributes["Description"].Value;
+			if (xml.HasAttribute("Specification"))
+				Specification = xml.Attributes["Specification"].Value;
+			else if (xml.HasAttribute("Description"))
+				Specification = xml.Attributes["Description"].Value;
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
 				if (string.Compare(name, "Name", true) == 0)
 					Name = child.InnerText;
+				else if (string.Compare(name, "Specification", true) == 0)
+					Specification = child.InnerText;
 				else if (string.Compare(name, "Description",true) == 0)
-					Description = child.InnerText;
+					Specification = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
-			setAttribute(xml, "Description", Description);
+			if(mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3)
+				setAttribute(xml, "Description", Specification);
+			else
+				setAttribute(xml, "Specification", Specification);
 		}
 	}
 	public partial class IfcPropertyBoundedValue : IfcSimpleProperty
@@ -908,7 +915,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcResourceConstraintRelationship r = mDatabase.ParseXml<IfcResourceConstraintRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 			}

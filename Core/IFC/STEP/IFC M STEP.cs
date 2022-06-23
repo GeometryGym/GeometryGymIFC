@@ -84,6 +84,28 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMarineFacilityTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcMarinePart
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3 && release >= ReleaseVersion.IFC4X3_RC1)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcMarinePartTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			if (release < ReleaseVersion.IFC4X3_RC1 || release >= ReleaseVersion.IFC4X3)
+			{
+				string s = ParserSTEP.StripField(str, ref pos, len);
+				if (s.StartsWith("."))
+				{
+					if (Enum.TryParse<IfcMarinePartTypeEnum>(s.Replace(".", ""), true, out IfcMarinePartTypeEnum partType))
+						PredefinedType = partType;
+				}
+			}
+		}
+	}
 	public partial class IfcMaterial
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "'" + mName + (release > ReleaseVersion.IFC2x3 ?  (mDescription == "$" ? "',$," : "','" + mDescription + "',") + (mCategory == "$" ? "$" : "'" + mCategory + "'") : "'" ); }
@@ -330,18 +352,17 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4)
 				return "";
-			string result = base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRelatingMaterial) + ",(" + ParserSTEP.LinkToString(mRelatedMaterials[0]);
-			for (int icounter = 1; icounter < mRelatedMaterials.Count; icounter++)
-				result += "," + ParserSTEP.LinkToString(mRelatedMaterials[icounter]);
-			return result += mExpression == "$" ? "),$" : "),'" + mExpression + "'";
+			return base.BuildStringSTEP(release) + ",#" + mRelatingMaterial.StepId + ",(" + 
+				string.Join(",", mRelatedMaterials.Select(x=>"#" + x.StepId)) +
+				(string.IsNullOrEmpty(mMaterialExpression) ? "),$" : "),'" + ParserIfc.Encode(mMaterialExpression) + "'");
 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRelatingMaterial = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedMaterials = ParserSTEP.StripListLink(str, ref pos, len);
-			mExpression = ParserSTEP.StripString(str, ref pos, len);
+			RelatingMaterial = dictionary[ ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
+			RelatedMaterials.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>Database[x] as IfcMaterial));
+			mMaterialExpression = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcMeasureWithUnit

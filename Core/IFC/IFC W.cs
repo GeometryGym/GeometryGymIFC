@@ -126,13 +126,15 @@ namespace GeometryGym.Ifc
 			mDissolvedSolidsContent = p.mDissolvedSolidsContent;
 		}
 	}
+	[Obsolete("RELEASE CANDIDATE IFC4X3", false)]
 	[Serializable]
 	public partial class IfcWaterStratum : IfcGeotechnicalStratum
 	{
-		public IfcWaterStratum() : base() { }
-		public IfcWaterStratum(DatabaseIfc db) : base(db) { }
-		public IfcWaterStratum(DatabaseIfc db, IfcWaterStratum waterStratum, DuplicateOptions options) : base(db, waterStratum, options) { }
-		public IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public override string StepClassName { get { return (mDatabase.mRelease >= ReleaseVersion.IFC4X3 ? "IfcGeotechnicalStratum" : base.StepClassName); } }
+
+		public IfcWaterStratum() : base() { PredefinedType = IfcGeotechnicalStratumTypeEnum.WATER; }
+		public IfcWaterStratum(DatabaseIfc db) : base(db) { PredefinedType = IfcGeotechnicalStratumTypeEnum.WATER; }
+		public IfcWaterStratum(DatabaseIfc db, IfcWaterStratum waterStratum, DuplicateOptions options) : base(db, waterStratum, options) { PredefinedType = IfcGeotechnicalStratumTypeEnum.WATER; }
 	}
 	[Serializable]
 	public partial class IfcWindow : IfcBuiltElement
@@ -416,15 +418,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcWorkTime : IfcSchedulingTime //IFC4
 	{
 		internal int mRecurrencePattern;// OPTIONAL	IfcRecurrencePattern
-		internal DateTime mStart = DateTime.MinValue;//	 :	OPTIONAL IfcDate;
-		internal DateTime mFinish = DateTime.MinValue;//	 :	OPTIONAL IfcDate; 
+		internal DateTime mStartDate = DateTime.MinValue;//	 :	OPTIONAL IfcDate;
+		internal DateTime mFinishDate = DateTime.MinValue;//	 :	OPTIONAL IfcDate; 
 
 		internal IfcRecurrencePattern RecurrencePattern { get { return mDatabase[mRecurrencePattern] as IfcRecurrencePattern; } set { mRecurrencePattern = (value == null ? 0 : value.mIndex); } }
-		public DateTime Start { get { return mStart; } set { mStart = value; } }
-		public DateTime Finish { get { return mFinish; } set { mFinish = value; } }
+		public DateTime StartDate { get { return mStartDate; } set { mStartDate = value; } }
+		public DateTime FinishDate { get { return mFinishDate; } set { mFinishDate = value; } }
 
 		internal IfcWorkTime() : base() { }
-		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t, DuplicateOptions options) : base(db, t, options) { mRecurrencePattern = t.mRecurrencePattern; mStart = t.mStart; mFinish = t.mFinish; }
+		internal IfcWorkTime(DatabaseIfc db, IfcWorkTime t, DuplicateOptions options) : base(db, t, options) { mRecurrencePattern = t.mRecurrencePattern; mStartDate = t.mStartDate; mFinishDate = t.mFinishDate; }
 		public IfcWorkTime(DatabaseIfc db) : base(db) { }
 	}
 }

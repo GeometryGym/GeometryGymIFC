@@ -738,12 +738,12 @@ namespace GeometryGym.Ifc
 			JObject jobj = obj.GetValue("RelatingConstraint", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if(jobj != null)
 				RelatingConstraint = mDatabase.ParseJObject<IfcConstraint>(jobj);
-			mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addRelated(x));
+			RelatedResourceObjects.AddRange(mDatabase.extractJArray<IfcResourceObjectSelect>(obj.GetValue("RelatedResourceObjects", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mRelatingConstraint != host.mIndex)
+			if (mRelatingConstraint.StepId != host.StepId)
 				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, options);
 			JArray array = new JArray();
 			foreach (IfcResourceObjectSelect r in RelatedResourceObjects)

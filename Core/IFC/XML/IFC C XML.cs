@@ -335,7 +335,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Description"))
 				Description = xml.Attributes["Description"].Value;
 			if (xml.HasAttribute("Location"))
-				Location = xml.Attributes["Location"].Value;
+				Specification = xml.Attributes["Location"].Value;
 			foreach (XmlNode child in xml.ChildNodes)
 			{
 				string name = child.Name;
@@ -351,8 +351,10 @@ namespace GeometryGym.Ifc
 					Name = child.InnerText;
 				else if (string.Compare(name, "Description", true) == 0)
 					Description = child.InnerText;
+				else if (string.Compare(name, "Specification", true) == 0)
+					Specification = child.InnerText;
 				else if (string.Compare(name, "Location", true) == 0)
-					Location = child.InnerText;
+					Specification = child.InnerText;
 			}
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
@@ -365,7 +367,10 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("EditionDate", IfcDate.FormatSTEP(EditionDate));
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			setAttribute(xml, "Location", Location);
+			if(mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3)
+				setAttribute(xml, "Location", Specification);
+			else
+				setAttribute(xml, "Specification", Specification);
 			// tokens
 
 			XmlElement element = xml.OwnerDocument.CreateElement("HasReferences", mDatabase.mXmlNamespace);
@@ -823,7 +828,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcResourceConstraintRelationship r = mDatabase.ParseXml<IfcResourceConstraintRelationship>(cn as XmlElement);
 						if (r != null)
-							r.addRelated(this);
+							r.RelatedResourceObjects.Add(this);
 					}
 				}
 			}
@@ -946,7 +951,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "VerticalDatum", VerticalDatum);
 		}
 	}
-	public partial class IfcCosine
+	public partial class IfcCosineSpiral
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

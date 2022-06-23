@@ -164,21 +164,30 @@ namespace GeometryGym.Ifc
 		public IfcFacility(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 	}
 	[Serializable]
-	public partial class IfcFacilityPart : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBridgePart)
+	public abstract partial class IfcFacilityPart : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBridgePart)
 	{
-		private IfcFacilityPartTypeSelect mPredefinedType = new IfcFacilityPartTypeSelect(IfcFacilityPartCommonTypeEnum.NOTDEFINED);// : IfcFacilityPartTypeSelect;
 		private IfcFacilityUsageEnum mUsageType = IfcFacilityUsageEnum.NOTDEFINED;// : IfcFacilityUsageEnum;
 
-		public IfcFacilityPartTypeSelect PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcFacilityUsageEnum UsageType { get { return mUsageType; } set { mUsageType = value; } }
 
 		public IfcFacilityPart() : base() { }
 		internal IfcFacilityPart(DatabaseIfc db) : base(db) { }
 		internal IfcFacilityPart(DatabaseIfc db, IfcFacilityPart f, DuplicateOptions options) : base(db, f, options) { }
 		internal IfcFacilityPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
-		public IfcFacilityPart(IfcFacility host, string name, IfcFacilityPartTypeSelect predefined, IfcFacilityUsageEnum usage) : base(host, name) { mPredefinedType = predefined; mUsageType = usage; }
-		public IfcFacilityPart(IfcFacilityPart host, string name, IfcFacilityPartTypeSelect predefined, IfcFacilityUsageEnum usage) : base(host, name) { mPredefinedType = predefined; mUsageType = usage; }
-		public IfcFacilityPart(IfcFacility host, string name, IfcObjectPlacement p, IfcProductDefinitionShape r, IfcFacilityPartTypeSelect predefined, IfcFacilityUsageEnum usage) : base(host, p, r) { Name = name; mPredefinedType = predefined; mUsageType = usage; }
+		public IfcFacilityPart(IfcFacility host, string name, IfcFacilityUsageEnum usage) : base(host, name) { mUsageType = usage; }
+		public IfcFacilityPart(IfcFacilityPart host, string name, IfcFacilityUsageEnum usage) : base(host, name) { mUsageType = usage; }
+		public IfcFacilityPart(IfcFacility host, string name, IfcObjectPlacement p, IfcProductDefinitionShape r, IfcFacilityUsageEnum usage) : base(host, p, r) { Name = name; mUsageType = usage; }
+	}
+	[Serializable]
+	public partial class IfcFacilityPartCommon : IfcFacilityPart // IFC4x3
+	{
+		private IfcFacilityPartCommonTypeEnum mPredefinedType = IfcFacilityPartCommonTypeEnum.NOTDEFINED; //: OPTIONAL IfcFacilityPartCommonTypeEnum;
+		public IfcFacilityPartCommonTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
+		public IfcFacilityPartCommon() : base() { }
+		public IfcFacilityPartCommon(DatabaseIfc db) : base(db) { }
+		public IfcFacilityPartCommon(DatabaseIfc db, IfcBridgePart bridgePart, DuplicateOptions options) : base(db, bridgePart, options) { }
+		public IfcFacilityPartCommon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcFailureConnectionCondition : IfcStructuralConnectionCondition

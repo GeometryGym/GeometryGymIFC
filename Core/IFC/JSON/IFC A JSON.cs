@@ -493,7 +493,7 @@ namespace GeometryGym.Ifc
 				ers[icounter].RelatedResourceObjects.Add(this);
 			List<IfcResourceConstraintRelationship> crs = mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray);
 			for (int icounter = 0; icounter < crs.Count; icounter++)
-				crs[icounter].addRelated(this);
+				crs[icounter].RelatedResourceObjects.Add(this);
 			//todo
 			token = obj.GetValue("Category", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)

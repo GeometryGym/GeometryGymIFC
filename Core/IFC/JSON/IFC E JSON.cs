@@ -260,7 +260,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray))
 				r.RelatedResourceObjects.Add(this);
 			foreach (IfcResourceConstraintRelationship r in mDatabase.extractJArray<IfcResourceConstraintRelationship>(obj.GetValue("HasConstraintRelationships", StringComparison.InvariantCultureIgnoreCase) as JArray))
-				r.addRelated(this);
+				r.RelatedResourceObjects.Add(this);
 			//foreach (IfcExternalReferenceRelationship r in mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("ExternalReferenceForResources", StringComparison.InvariantCultureIgnoreCase) as JArray))
 			//	r.addRelated(this);
 		}

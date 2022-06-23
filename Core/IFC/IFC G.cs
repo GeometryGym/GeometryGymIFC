@@ -285,12 +285,35 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public abstract partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
+	public partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
 	{
-		protected IfcGeotechnicalStratum() : base() { }
-		protected IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
-		protected IfcGeotechnicalStratum(DatabaseIfc db, IfcGeotechnicalStratum geotechnicalStratum, DuplicateOptions options) : base(db, geotechnicalStratum, options) { }
-		protected IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+		public override string StepClassName 
+		{ 
+			get 
+			{
+				if(mDatabase == null)
+				return base.StepClassName; 
+				ReleaseVersion release = mDatabase.Release;
+				if (release < ReleaseVersion.IFC4X3)
+				{
+					if (PredefinedType == IfcGeotechnicalStratumTypeEnum.SOLID)
+						return "IfcSolidStratum";
+					if (PredefinedType == IfcGeotechnicalStratumTypeEnum.WATER)
+						return "IfcWaterStratum";
+					if (PredefinedType == IfcGeotechnicalStratumTypeEnum.VOID)
+						return "IfcVoidStratum";
+				}
+				return base.StepClassName; 
+			}
+		}
+
+		internal IfcGeotechnicalStratumTypeEnum mPredefinedType = IfcGeotechnicalStratumTypeEnum.NOTDEFINED;// IfcGeotechnicalStratumTypeEnum; 
+		public IfcGeotechnicalStratumTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		public IfcGeotechnicalStratum() : base() { }
+		public IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
+		public IfcGeotechnicalStratum(DatabaseIfc db, IfcGeotechnicalStratum geotechnicalStratum, DuplicateOptions options) : base(db, geotechnicalStratum, options) { }
+		public IfcGeotechnicalStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 			: base(host.Database)
 		{
 			IfcSpatialElement spatialElement = host as IfcSpatialElement;

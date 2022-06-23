@@ -109,6 +109,23 @@ namespace GeometryGym.Ifc
 			mInnerCoordIndices = fields.ConvertAll(x => ParserSTEP.SplitListSTPIntegers(x));
 		}
 	}
+	public partial class IfcIndexedPolygonalTextureMap
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mTexCoordIndices.Select(x => "#" + x.StepId)) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			foreach (int id in ParserSTEP.StripListLink(str, ref pos, len))
+			{
+				if (dictionary.TryGetValue(id, out BaseClassIfc obj) && obj is IfcTextureCoordinateIndices i)
+					mTexCoordIndices.Add(i);
+			}
+		}
+	}
 	public abstract partial class IfcIndexedTextureMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mMappedTo + ",#" + mTexCoords; }
@@ -179,24 +196,28 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mPredefinedType == null ? ",$" : mPredefinedType.ToString());
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcImpactProtectionDeviceTypeEnum.NOTDEFINED ? ",$" : mPredefinedType.ToString());
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcImpactProtectionDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcImpactProtectionDeviceType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",#" + mPredefinedType.ToString();
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			PredefinedType = IfcImpactProtectionDeviceTypeSelect.Parse(ParserSTEP.StripField(str, ref pos, len));
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcImpactProtectionDeviceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcIrregularTimeSeries

@@ -470,7 +470,7 @@ namespace GeometryGym.Ifc
 			bool older = mDatabase.Release <= ReleaseVersion.IFC2x3;
 			string result = (mSource == "$" ? (older ? "'Unknown'," : "$,") : "'" + mSource + "',") +
 				(mEdition == "$" ? (older ? "'Unknown'," : "$,") : "'" + mEdition + "',") + (older ? ParserSTEP.LinkToString(mEditionDateSS) : IfcDate.STEPAttribute(mEditionDate)) +
-				",'" + mName + (older ? "'" : (mDescription == "$" ? "',$," : "','" + mDescription + "',") + (mLocation == "$" ? "$," : "'" + mLocation + "',") + tokens);
+				",'" + mName + (older ? "'" : (mDescription == "$" ? "',$," : "','" + mDescription + "',") + (mSpecification == "$" ? "$," : "'" + mSpecification + "',") + tokens);
 			return result;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -487,7 +487,7 @@ namespace GeometryGym.Ifc
 				mEditionDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 				mName = ParserSTEP.StripString(str, ref pos, len);
 				mDescription = ParserSTEP.StripString(str, ref pos, len);
-				mLocation = ParserSTEP.StripString(str, ref pos, len);
+				mSpecification = ParserSTEP.StripString(str, ref pos, len);
 				mReferenceTokens = ParserSTEP.SplitListStrings(ParserSTEP.StripField(str, ref pos, len));
 			}
 		}
@@ -1209,7 +1209,7 @@ namespace GeometryGym.Ifc
 			mVerticalDatum = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
-	public partial class IfcCosine
+	public partial class IfcCosineSpiral
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{

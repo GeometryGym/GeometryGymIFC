@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JToken token = obj.GetValue("CountValue", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
-				CountValue = token.Value<double>();
+				CountValueDouble = token.Value<double>();
 			token = obj.GetValue("Formula", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				Formula = token.Value<string>();

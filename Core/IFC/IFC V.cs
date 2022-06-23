@@ -75,6 +75,26 @@ namespace GeometryGym.Ifc
 	}
 	public interface IfcVectorOrDirection : IBaseClassIfc { } // SELECT(IfcDirection, IfcVector);
 	[Serializable]
+	public partial class IfcVehicle : IfcTransportationDevice
+	{
+		internal IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcVehicleTypeEnum;
+		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		internal IfcVehicle() : base() { }
+		internal IfcVehicle(DatabaseIfc db, IfcVehicle e, DuplicateOptions options) : base(db, e, options) { }
+		public IfcVehicle(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcVehicleType : IfcTransportationDeviceType
+	{
+		internal IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// IfcVehicleTypeEnum; 
+		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
+		internal IfcVehicleType() : base() { }
+		internal IfcVehicleType(DatabaseIfc db, IfcVehicleType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
+		public IfcVehicleType(DatabaseIfc m, string name, IfcVehicleTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+	}
+	[Serializable]
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
 	{
 		//INVERSE
@@ -134,7 +154,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVibrationDamperType : IfcElementComponentType
 	{
-		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: OPTIONAL IfcVibrationDamperTypeEnum;
+		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: IfcVibrationDamperTypeEnum;
 		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		public IfcVibrationDamperType() : base() { }
@@ -163,6 +183,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVirtualElement : IfcElement
 	{
+		internal IfcVirtualElementTypeEnum mPredefinedType = IfcVirtualElementTypeEnum.NOTDEFINED;// : IfcVirtualElementTypeEnum
+		public IfcVirtualElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+
 		internal IfcVirtualElement() : base() { }
 		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, DuplicateOptions options) : base(db, e, options) { }
 		public IfcVirtualElement(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
@@ -186,13 +209,16 @@ namespace GeometryGym.Ifc
 		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
 		public IfcVoidingFeature(IfcElement host, IfcProductDefinitionShape rep, IfcVoidingFeatureTypeEnum type) : base(host, rep) { mPredefinedType = type; }
 	}
+	[Obsolete("RELEASE CANDIDATE IFC4X3", false)]
 	[Serializable]
 	public partial class IfcVoidStratum : IfcGeotechnicalStratum
 	{
-		public IfcVoidStratum() : base() { }
-		public IfcVoidStratum(DatabaseIfc db) : base(db) { }
-		public IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options) : base(db, voidStratum, options) { }
-		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public override string StepClassName { get { return (mDatabase.mRelease >= ReleaseVersion.IFC4X3 ? "IfcGeotechnicalStratum" : base.StepClassName); } }
+
+		public IfcVoidStratum() : base() { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
+		public IfcVoidStratum(DatabaseIfc db) : base(db) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
+		public IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options)
+			: base(db, voidStratum, options) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
 	}
 
 	[Serializable]

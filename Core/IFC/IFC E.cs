@@ -1198,7 +1198,11 @@ namespace GeometryGym.Ifc
 		public List<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		internal List<IfcExternalReferenceRelationship> mHasExternalReference = new List<IfcExternalReferenceRelationship>(); //IFC4
 		internal IfcExternalReferenceRelationship() : base() { }
-		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r) : base(db,r) { RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference; RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect)); }
+		internal IfcExternalReferenceRelationship(DatabaseIfc db, IfcExternalReferenceRelationship r, DuplicateOptions options) : base(db, r, options) 
+		{ 
+			RelatingReference = db.Factory.Duplicate(r.RelatingReference) as IfcExternalReference;
+			RelatedResourceObjects.AddRange(r.mRelatedResourceObjects.ConvertAll(x=>db.Factory.Duplicate(x.Database[x.Index]) as IfcResourceObjectSelect));
+		}
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IfcResourceObjectSelect related) : this(reference, new List<IfcResourceObjectSelect>() { related }) { }
 		public IfcExternalReferenceRelationship(IfcExternalReference reference, IEnumerable<IfcResourceObjectSelect> related)
 			: base(reference.mDatabase) { RelatingReference = reference; RelatedResourceObjects.AddRange(related); }

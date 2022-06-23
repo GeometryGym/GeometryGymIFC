@@ -169,42 +169,27 @@ namespace GeometryGym.Ifc
 				PropertyInfo pi = type.GetProperty("PredefinedType");
 				if (pi != null)
 				{
-					if (typeof(SelectEnum).IsAssignableFrom(pi.PropertyType))
+					Type enumType = pi.PropertyType;
+					if (enumType != null)
 					{
-						MethodInfo method = pi.PropertyType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Any, new Type[] { typeof(string) }, null);
-						if (method != null)
+						FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+						if (fi == null)
 						{
-							if (!enumName.EndsWith("TypeEnum"))
-								enumName += "TypeEnum";
-							object o = method.Invoke(null, new object[] { enumName + "(." + predefinedTypeConstant + ".)" });
-							if (o != null)
-								pi.SetValue(this, o);
+							ObjectType = predefinedTypeConstant;
+							fi = enumType.GetField("USERDEFINED");
 						}
-					}
-					else
-					{
-						Type enumType = pi.PropertyType;
-						if (enumType != null)
+						if (fi != null)
 						{
-							FieldInfo fi = enumType.GetField(predefinedTypeConstant);
-							if (fi == null)
-							{
-								ObjectType = predefinedTypeConstant;
-								fi = enumType.GetField("USERDEFINED");
-							}
-							if (fi != null)
-							{
-								int i = (int)fi.GetValue(enumType);
-								object newEnumValue = Enum.ToObject(enumType, i);
+							int i = (int)fi.GetValue(enumType);
+							object newEnumValue = Enum.ToObject(enumType, i);
 
-								pi.SetValue(this, newEnumValue);
-							}
-							else
-								ObjectType = predefinedTypeConstant;
+							pi.SetValue(this, newEnumValue);
 						}
 						else
 							ObjectType = predefinedTypeConstant;
 					}
+					else
+						ObjectType = predefinedTypeConstant;
 				}
 				else
 					ObjectType = predefinedTypeConstant;
@@ -914,13 +899,13 @@ namespace GeometryGym.Ifc
 		private LIST<double> mWidths = new LIST<double>(); //: LIST[1:?] OF IfcNonNegativeLengthMeasure;
 		private LIST<double> mSlopes = new LIST<double>(); //: LIST[1:?] OF IfcPlaneAngleMeasure;
 		private LIST<string> mTags = new LIST<string>(); //: OPTIONAL LIST[2:?] OF IfcLabel;
-		private IfcCartesianPoint mStartPoint = null; 
+		private IfcCartesianPoint mOffsetPoint = null; //: OPTIONAL IfcCartesianPoint; 
 
 		public bool HorizontalWidths { get { return mHorizontalWidths; } set { mHorizontalWidths = value; } }
 		public LIST<double> Widths { get { return mWidths; } set { mWidths = value; } }
 		public LIST<double> Slopes { get { return mSlopes; } set { mSlopes = value; } }
 		public LIST<string> Tags { get { return mTags; } set { mTags = value; } }
-		public IfcCartesianPoint StartPoint { get { return mStartPoint; } set { mStartPoint = value; } }
+		public IfcCartesianPoint OffsetPoint { get { return mOffsetPoint; } set { mOffsetPoint = value; } }
 
 		public IfcOpenCrossProfileDef() : base() { }
 		internal IfcOpenCrossProfileDef(DatabaseIfc db, IfcOpenCrossProfileDef openCrossProfileDef, DuplicateOptions options)
@@ -930,15 +915,15 @@ namespace GeometryGym.Ifc
 			Widths.AddRange(openCrossProfileDef.Widths);
 			Slopes.AddRange(openCrossProfileDef.Slopes);
 			Tags.AddRange(openCrossProfileDef.Tags);
-			StartPoint = db.Factory.Duplicate(openCrossProfileDef.StartPoint, options) as IfcCartesianPoint;
+			OffsetPoint = db.Factory.Duplicate(openCrossProfileDef.OffsetPoint, options) as IfcCartesianPoint;
 		}
-		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes, IfcCartesianPoint startPoint)
+		public IfcOpenCrossProfileDef(DatabaseIfc db, string name, bool horizontalWidths, IEnumerable<double> widths, IEnumerable<double> slopes, IfcCartesianPoint offsetPoint)
 			: base(db, name)
 		{
 			HorizontalWidths = horizontalWidths;
 			Widths.AddRange(widths);
 			Slopes.AddRange(slopes);
-			StartPoint = StartPoint;
+			OffsetPoint = offsetPoint;
 		}
 	}
 	[Serializable]
@@ -1087,7 +1072,12 @@ namespace GeometryGym.Ifc
 		public SET<IfcOrganization> RelatedOrganizations { get { return mRelatedOrganizations; } }
 
 		internal IfcOrganizationRelationship() : base() { }
-		internal IfcOrganizationRelationship(DatabaseIfc db, IfcOrganizationRelationship r) : base(db, r) { RelatingOrganization = db.Factory.Duplicate(r.RelatingOrganization) as IfcOrganization; RelatedOrganizations.AddRange(r.mRelatedOrganizations.ConvertAll(x => db.Factory.Duplicate(x.Database[x.Index]) as IfcOrganization)); }
+		internal IfcOrganizationRelationship(DatabaseIfc db, IfcOrganizationRelationship r, DuplicateOptions options) 
+			: base(db, r, options) 
+		{ 
+			RelatingOrganization = db.Factory.Duplicate(r.RelatingOrganization) as IfcOrganization;
+			RelatedOrganizations.AddRange(r.mRelatedOrganizations.ConvertAll(x => db.Factory.Duplicate(x) as IfcOrganization));
+		}
 		public IfcOrganizationRelationship(IfcOrganization relating, IfcOrganization related) : this(relating, new List<IfcOrganization>() { related }) { }
 		public IfcOrganizationRelationship(IfcOrganization relating, List<IfcOrganization> related)
 			: base(relating.mDatabase) { mRelatingOrganization = relating.mIndex; RelatedOrganizations.AddRange(related); }

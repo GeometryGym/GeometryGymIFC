@@ -31,11 +31,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcQuantityArea : IfcPhysicalSimpleQuantity
 	{
-		internal double mAreaValue;// : IfcAreaMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel; IFC4
+		private double mAreaValue;// : IfcAreaMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel; IFC4
 
 		public double AreaValue { get { return mAreaValue; } set { mAreaValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
+		public string Formula { get { return mFormula; } set { mFormula = value;  } }
 
 		internal IfcQuantityArea() : base() { }
 		internal IfcQuantityArea(DatabaseIfc db, IfcQuantityArea q) : base(db,q) { mAreaValue = q.mAreaValue; mFormula = q.mFormula; }
@@ -46,32 +46,50 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
 	{
-		internal double mCountValue;// : IfcCountMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
+		private int mCountValue = int.MinValue;// : IfcCountMeasure;	
+		private double mCountValueDouble;// : IfcCountMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  IFC4
 
-		public double CountValue { get { return mCountValue; } set { mCountValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public int CountValue { get { return (mCountValue == int.MinValue ? (int) mCountValueDouble :  mCountValue); } set { mCountValue = value; } }
+		public double CountValueDouble { get { return (mCountValue == int.MinValue ? mCountValueDouble :  mCountValue); } set { mCountValueDouble = value; mCountValue = int.MinValue; } }
+		public string Formula { get { return mFormula; } set { mFormula = value; } }
 
 		internal IfcQuantityCount() : base() { }
 		internal IfcQuantityCount(DatabaseIfc db, IfcQuantityCount q) : base(db,q) { mCountValue = q.mCountValue; mFormula = q.mFormula; }
-		public IfcQuantityCount(DatabaseIfc db, string name, double count) : base(db, name) { mCountValue = count; }
-		
+		public IfcQuantityCount(DatabaseIfc db, string name, int count) : base(db, name) { mCountValue = count; }
+		[Obsolete("Type changed to int IFC4x3", false)]
+		public IfcQuantityCount(DatabaseIfc db, string name, double count) : base(db, name) { mCountValueDouble = count; }
 		public override IfcMeasureValue MeasureValue { get { return new IfcCountMeasure(mCountValue); } }
 	}
 	[Serializable]
 	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
 	{
-		internal double mLengthValue;// : IfcLengthMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
+		private double mLengthValue;// : IfcLengthMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  IFC4
 
 		public double LengthValue { get { return mLengthValue; } set { mLengthValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
+		public string Formula { get { return mFormula; } set { mFormula = value;  } }
 
 		internal IfcQuantityLength() : base() { }
 		internal IfcQuantityLength(DatabaseIfc db, IfcQuantityLength q) : base(db,q) { mLengthValue = q.mLengthValue; mFormula = q.mFormula; }
 		public IfcQuantityLength(DatabaseIfc db, string name, double length) : base(db, name) { mLengthValue = length; }
 		
 		public override IfcMeasureValue MeasureValue { get { return new IfcLengthMeasure(mLengthValue); } }
+	}
+	[Serializable]
+	public partial class IfcQuantityNumber : IfcPhysicalSimpleQuantity //IFC4x3
+	{
+		public override string StepClassName { get { return (mDatabase == null || mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcQuantityCount" : base.StepClassName); } }
+		private double mNumberValue;// : IfcNumericMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  
+
+		public double NumberValue { get { return mNumberValue; } set { mNumberValue = value; } }
+		public string Formula { get { return mFormula; } set { mFormula = value; } }
+
+		internal IfcQuantityNumber() : base() { }
+		internal IfcQuantityNumber(DatabaseIfc db, IfcQuantityNumber q) : base(db, q) { mNumberValue = q.mNumberValue; mFormula = q.mFormula; }
+		public IfcQuantityNumber(DatabaseIfc db, string name, double count) : base(db, name) { mNumberValue = count; }
+		public override IfcMeasureValue MeasureValue { get { return new IfcNumericMeasure(mNumberValue); } }
 	}
 	[Serializable]
 	public abstract partial class IfcQuantitySet : IfcPropertySetDefinition // IFC4  ABSTRACT SUPERTYPE OF(IfcElementQuantity)
@@ -83,11 +101,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
 	{
-		internal double mTimeValue;// : IfcTimeMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
+		private double mTimeValue;// : IfcTimeMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  IFC4
 
 		public double TimeValue { get { return mTimeValue; } set { mTimeValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value);  } }
+		public string Formula { get { return mFormula; } set { mFormula = value;  } }
 
 		internal IfcQuantityTime() : base() { }
 		internal IfcQuantityTime(DatabaseIfc db, IfcQuantityTime q) : base(db,q) { mTimeValue = q.mTimeValue; mFormula = q.mFormula; }
@@ -98,11 +116,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
 	{
-		internal double mVolumeValue;// : IfcVolumeMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
+		private double mVolumeValue;// : IfcVolumeMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  IFC4
 
 		public double VolumeValue { get { return mVolumeValue; } set { mVolumeValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public string Formula { get { return mFormula; } set { mFormula = value; } }
 
 		internal IfcQuantityVolume() : base() { }
 		internal IfcQuantityVolume(DatabaseIfc db, IfcQuantityVolume q) : base(db,q) { mVolumeValue = q.mVolumeValue; mFormula = q.mFormula; }
@@ -113,11 +131,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
 	{
-		internal double mWeightValue;// : IfcMassMeasure;	
-		internal string mFormula = "$"; //:	OPTIONAL IfcLabel;  IFC4
+		private double mWeightValue;// : IfcMassMeasure;	
+		private string mFormula = ""; //:	OPTIONAL IfcLabel;  IFC4
 
 		public double WeightValue { get { return mWeightValue; } set { mWeightValue = value; } }
-		public string Formula { get { return mFormula == "$" ? "" : mFormula; } set { mFormula = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public string Formula { get { return mFormula; } set { mFormula = value; } }
 
 		internal IfcQuantityWeight() : base() { }
 		internal IfcQuantityWeight(DatabaseIfc db, IfcQuantityWeight q) : base(db,q) { mWeightValue = q.mWeightValue; mFormula = q.mFormula; }
