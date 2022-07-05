@@ -281,14 +281,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcReference : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect // IFC4
 	{
-		internal string mTypeIdentifier = "$", mAttributeIdentifier = "$"; //:	OPTIONAL IfcIdentifier;
-		internal string mInstanceName = "$"; //:OPTIONAL IfcLabel;
+		internal string mTypeIdentifier = "", mAttributeIdentifier = ""; //:	OPTIONAL IfcIdentifier;
+		internal string mInstanceName = ""; //:OPTIONAL IfcLabel;
 		internal LIST<int> mListPositions = new LIST<int>();//	 :	OPTIONAL LIST [1:?] OF INTEGER;
 		private int mInnerReference = 0;//	 :	OPTIONAL IfcReference;
 
-		public string TypeIdentifier { get { return (mTypeIdentifier == "$" ? "" : ParserIfc.Decode(mTypeIdentifier)); } set { mTypeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string AttributeIdentifier { get { return (mAttributeIdentifier == "$" ? "" : ParserIfc.Decode(mAttributeIdentifier)); } set { mAttributeIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string InstanceName { get { return (mInstanceName == "$" ? "" : ParserIfc.Decode(mInstanceName)); } set { mInstanceName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string TypeIdentifier { get { return mTypeIdentifier; } set { mTypeIdentifier = value; } }
+		public string AttributeIdentifier { get { return mAttributeIdentifier; } set { mAttributeIdentifier = value; } }
+		public string InstanceName { get { return mInstanceName; } set { mInstanceName = value; } }
 		public LIST<int> ListPositions { get { return mListPositions; } }
 		public IfcReference InnerReference { get { return mDatabase[mInnerReference] as IfcReference; } set { mInnerReference = (value == null ? 0 : value.mIndex); } }
 
@@ -504,22 +504,20 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcReinforcementDefinitionProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
 	{
-		internal string mDefinitionType = "$";// 	:	OPTIONAL IfcLabel; 
-		internal List<int> mReinforcementSectionDefinitions = new List<int>();// :	LIST [1:?] OF IfcSectionReinforcementProperties;
+		internal string mDefinitionType = "";// 	:	OPTIONAL IfcLabel; 
+		internal LIST<IfcSectionReinforcementProperties> mReinforcementSectionDefinitions = new LIST<IfcSectionReinforcementProperties>();// :	LIST [1:?] OF IfcSectionReinforcementProperties;
 
-		public string DefinitionType { get { return (mDefinitionType == "$" ? "" : ParserIfc.Decode(mDefinitionType)); } set { mDefinitionType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcSectionReinforcementProperties> ReinforcementSectionDefinitions { get { return new ReadOnlyCollection<IfcSectionReinforcementProperties>(mReinforcementSectionDefinitions.ConvertAll(x => mDatabase[x] as IfcSectionReinforcementProperties)); } }
+		public string DefinitionType { get { return mDefinitionType; } set { mDefinitionType = value; } }
+		public LIST<IfcSectionReinforcementProperties> ReinforcementSectionDefinitions { get { return mReinforcementSectionDefinitions; } }
 
 		internal IfcReinforcementDefinitionProperties() : base() { }
 		internal IfcReinforcementDefinitionProperties(DatabaseIfc db, IfcReinforcementDefinitionProperties p, DuplicateOptions options) : base(db, p, options)
 		{
 			mDefinitionType = p.mDefinitionType;
-			p.ReinforcementSectionDefinitions.ToList().ForEach(x => addSection(db.Factory.Duplicate(x) as IfcSectionReinforcementProperties));
+			ReinforcementSectionDefinitions.AddRange(p.ReinforcementSectionDefinitions.Select(x => db.Factory.Duplicate(x) as IfcSectionReinforcementProperties));
 		}
 		public IfcReinforcementDefinitionProperties(string name, IEnumerable<IfcSectionReinforcementProperties> sectProps)
-			: base(sectProps.First().mDatabase, name) { foreach (IfcSectionReinforcementProperties prop in sectProps) addSection(prop); }
-
-		internal void addSection(IfcSectionReinforcementProperties section) { mReinforcementSectionDefinitions.Add(section.mIndex); }
+			: base(sectProps.First().mDatabase, name) { ReinforcementSectionDefinitions.AddRange(sectProps); }
 	}
 	[Serializable]
 	public partial class IfcReinforcingBar : IfcReinforcingElement
@@ -565,7 +563,7 @@ namespace GeometryGym.Ifc
 		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
 		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NOTDEFINED;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
-		internal string mBendingShapeCode = "$";//	:	OPTIONAL IfcLabel;
+		internal string mBendingShapeCode = "";//	:	OPTIONAL IfcLabel;
 		internal List<IfcBendingParameterSelect> mBendingParameters = new List<IfcBendingParameterSelect>();//	:	OPTIONAL LIST [1:?] OF IfcBendingParameterSelect;
 
 		public IfcReinforcingBarTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -573,8 +571,8 @@ namespace GeometryGym.Ifc
 		public double CrossSectionArea { get { return mCrossSectionArea; } set { mCrossSectionArea = value; } }
 		public double BarLength { get { return mBarLength; } set { mBarLength = value; } }
 		public IfcReinforcingBarSurfaceEnum BarSurface { get { return mBarSurface; } set { mBarSurface = value; } }
-		public string BendingShapeCode { get { return (mBendingShapeCode == "$" ? "" : ParserIfc.Decode(mBendingShapeCode)); } set { mBendingShapeCode = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcBendingParameterSelect> BendingParameters { get { return new ReadOnlyCollection<IfcBendingParameterSelect>(mBendingParameters); } }
+		public string BendingShapeCode { get { return mBendingShapeCode; } set { mBendingShapeCode = value; } }
+		public List<IfcBendingParameterSelect> BendingParameters { get { return mBendingParameters; } }
 
 		internal IfcReinforcingBarType() : base() { }
 		internal IfcReinforcingBarType(DatabaseIfc db, IfcReinforcingBarType t, DuplicateOptions options) : base(db, t, options)
@@ -599,9 +597,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcReinforcingElement : IfcElementComponent //	ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBar, IfcReinforcingMesh, IfcTendon, IfcTendonAnchor))
 	{
-		private string mSteelGrade = "$";// : OPTIONAL IfcLabel; //IFC4 DEPRECATED 
+		private string mSteelGrade = "";// : OPTIONAL IfcLabel; //IFC4 DEPRECATED 
 		[Obsolete("DEPRECATED IFC4", false)]
-		public string SteelGrade { get { return (mSteelGrade == "$" ? "" : ParserIfc.Decode(mSteelGrade)); } set { mSteelGrade = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string SteelGrade { get { return mSteelGrade; } set { mSteelGrade = value; } }
 
 		protected IfcReinforcingElement() : base() { }
 		protected IfcReinforcingElement(DatabaseIfc db) : base(db) { }
@@ -658,7 +656,7 @@ namespace GeometryGym.Ifc
 		internal double mLongitudinalBarNominalDiameter = double.NaN, mTransverseBarNominalDiameter = double.NaN;// :OPTIONAL IfcPositiveLengthMeasure;
 		internal double mLongitudinalBarCrossSectionArea = double.NaN, mTransverseBarCrossSectionArea = double.NaN;// : OPTIONAL IfcAreaMeasure;
 		internal double mLongitudinalBarSpacing = double.NaN, mTransverseBarSpacing = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal string mBendingShapeCode = "$"; // : OPTIONAL IfcLabel;
+		internal string mBendingShapeCode = ""; // : OPTIONAL IfcLabel;
 		internal List<IfcBendingParameterSelect> mBendingParameters = new List<IfcBendingParameterSelect>(); // : OPTIONAL LIST [1:?] OF IfcBendingParameterSelect;
 
 		public IfcReinforcingMeshTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
@@ -670,8 +668,8 @@ namespace GeometryGym.Ifc
 		public double TransverseBarCrossSectionArea { get { return mTransverseBarCrossSectionArea; } set { mTransverseBarCrossSectionArea = value; } }
 		public double LongitudinalBarSpacing { get { return mLongitudinalBarSpacing; } set { mLongitudinalBarSpacing = value; } }
 		public double TransverseBarSpacing { get { return mTransverseBarSpacing; } set { mTransverseBarSpacing = value; } }
-		public string BendingShapeCode { get { return (mBendingShapeCode == "$" ? "" : ParserIfc.Decode(mBendingShapeCode)); } set { mBendingShapeCode = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public ReadOnlyCollection<IfcBendingParameterSelect> BendingParameters { get { return new ReadOnlyCollection<IfcBendingParameterSelect>(mBendingParameters); } }
+		public string BendingShapeCode { get { return mBendingShapeCode; } set { mBendingShapeCode = value; } }
+		public List<IfcBendingParameterSelect> BendingParameters { get { return mBendingParameters; } }
 
 		internal IfcReinforcingMeshType() : base() { }
 		internal IfcReinforcingMeshType(DatabaseIfc db, IfcReinforcingMeshType m, DuplicateOptions options) : base(db, m, options)
@@ -1088,10 +1086,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRelAssociatesConstraint : IfcRelAssociates
 	{
-		internal string mIntent = "$";// :	OPTIONAL IfcLabel;
+		internal string mIntent = "";// :	OPTIONAL IfcLabel;
 		private int mRelatingConstraint;// : IfcConstraint
 
-		public string Intent { get { return (mIntent == "$" ? "" : ParserIfc.Decode(mIntent)); } set { mIntent = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Intent { get { return mIntent; } set { mIntent = value; } }
 		public IfcConstraint RelatingConstraint { get { return mDatabase[mRelatingConstraint] as IfcConstraint; } set { mRelatingConstraint = value.mIndex; value.mConstraintForObjects.Add(this); } }
 
 		public override NamedObjectIfc Relating() { return RelatingConstraint; } 
@@ -1418,7 +1416,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelConnectsWithRealizingElements : IfcRelConnectsElements
 	{
 		internal SET<IfcElement> mRealizingElements = new SET<IfcElement>();// :	SET [1:?] OF IfcElement;
-		internal string mConnectionType = "$";// : :	OPTIONAL IfcLabel; 
+		internal string mConnectionType = "";// : :	OPTIONAL IfcLabel; 
 
 		public SET<IfcElement> RealizingElements { get { return mRealizingElements; } }
 
@@ -1480,11 +1478,11 @@ namespace GeometryGym.Ifc
 		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) 
 			: base(db, r, options)
 		{
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement;
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false });
 			if (options.DuplicateDownstream)
 			{
 				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
-				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcProduct));
+				RelatedElements.AddRange(r.RelatedElements.Select(x => db.Factory.Duplicate(x, optionsNoHost)));
 			}
 		}
 		public IfcRelContainedInSpatialStructure(IfcSpatialElement host) : base(host.mDatabase)
@@ -1946,14 +1944,14 @@ namespace GeometryGym.Ifc
 		internal int mRelatedElement;// : IfcInterferenceSelect;
 		internal int mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
 		internal IfcSpatialZone mInterferenceSpace = null;// : OPTIONAL IfcSpatialZone;
-		internal string mInterferenceType = "$";// : OPTIONAL IfcIdentifier;
+		internal string mInterferenceType = "";// : OPTIONAL IfcIdentifier;
 		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
 
 		public IfcInterferenceSelect RelatingElement { get { return mDatabase[mRelatingElement] as IfcInterferenceSelect; } set { mRelatingElement = value.StepId; value.InterferesElements.Add(this); } }
 		public IfcInterferenceSelect RelatedElement { get { return mDatabase[mRelatedElement] as IfcInterferenceSelect; } set { mRelatedElement = value.StepId; value.IsInterferedByElements.Add(this); } }
 		public IfcConnectionGeometry InterferenceGeometry { get { return mDatabase[mInterferenceGeometry] as IfcConnectionGeometry; } set { mInterferenceGeometry = value == null ? 0 : value.mIndex; } }
 		public IfcSpatialZone InterferenceSpace { get { return mInterferenceSpace; } set { mInterferenceSpace = value; } }
-		public string InterferenceType { get { return (mInterferenceType == "$" ? "" : ParserIfc.Decode(mInterferenceType)); } set { mInterferenceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string InterferenceType { get { return mInterferenceType; } set { mInterferenceType = value; } }
 		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
 
 		internal IfcRelInterferesElements() : base() { }
@@ -2179,7 +2177,7 @@ namespace GeometryGym.Ifc
 		private IfcLagTime mTimeLag;// : OPTIONAL IfcLagTime; IFC2x3 	IfcTimeMeasure
 		private double mTimeLagSS = double.NaN;// : OPTIONAL IfcLagTime; IFC2x3 	IfcTimeMeasure
 		internal IfcSequenceEnum mSequenceType = IfcSequenceEnum.NOTDEFINED;//	 :	OPTIONAL IfcSequenceEnum;
-		internal string mUserDefinedSequenceType = "$";//	 :	OPTIONAL IfcLabel; 
+		internal string mUserDefinedSequenceType = "";//	 :	OPTIONAL IfcLabel; 
 
 		public IfcProcess RelatingProcess { get { return mRelatingProcess; } set { mRelatingProcess = value; value.mIsPredecessorTo.Add(this); } }
 		public IfcProcess RelatedProcess { get { return mRelatedProcess; } set { mRelatedProcess = value; value.mIsSuccessorFrom.Add(this); } }
@@ -2417,11 +2415,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcRepresentationContext : BaseClassIfc //ABSTRACT SUPERTYPE OF(IfcGeometricRepresentationContext);
 	{
-		internal string mContextIdentifier = "$";// : OPTIONAL IfcLabel;
-		internal string mContextType = "$";// : OPTIONAL IfcLabel;
+		internal string mContextIdentifier = "";// : OPTIONAL IfcLabel;
+		internal string mContextType = "";// : OPTIONAL IfcLabel;
 	
-		public string ContextIdentifier { get { return (mContextIdentifier == "$" ? "" : ParserIfc.Decode(mContextIdentifier)); } set { mContextIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string ContextType { get { return (mContextType == "$" ? "" : ParserIfc.Decode(mContextType)); } set { mContextType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ContextIdentifier { get { return mContextIdentifier; } set { mContextIdentifier = value; } }
+		public string ContextType { get { return mContextType; } set { mContextType = value; } }
 		
 
 		protected IfcRepresentationContext() : base() { }
@@ -2643,32 +2641,32 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcResourceTime : IfcSchedulingTime //IFC4
 	{
-		internal string mScheduleWork = "$";//	 :	OPTIONAL IfcDuration;
+		internal string mScheduleWork = "";//	 :	OPTIONAL IfcDuration;
 		internal double mScheduleUsage = double.NaN; //:	OPTIONAL IfcPositiveRatioMeasure;
 		internal DateTime mScheduleStart = DateTime.MinValue, mScheduleFinish = DateTime.MinValue;//:	OPTIONAL IfcDateTime;
-		internal string mScheduleContour = "$";//:	OPTIONAL IfcLabel;
-		internal string mLevelingDelay = "$";//	 :	OPTIONAL IfcDuration;
+		internal string mScheduleContour = "";//:	OPTIONAL IfcLabel;
+		internal IfcDuration mLevelingDelay = null;//	 :	OPTIONAL IfcDuration;
 		internal bool mIsOverAllocated = false;//	 :	OPTIONAL BOOLEAN;
 		internal DateTime mStatusTime = DateTime.MinValue;//:	OPTIONAL IfcDateTime;
-		internal string mActualWork = "$";//	 :	OPTIONAL IfcDuration; 
+		internal IfcDuration mActualWork = null;//	 :	OPTIONAL IfcDuration; 
 		internal double mActualUsage = double.NaN; //:	OPTIONAL IfcPositiveRatioMeasure; 
 		internal DateTime mActualStart = DateTime.MinValue, mActualFinish = DateTime.MinValue;//	 :	OPTIONAL IfcDateTime;
-		internal string mRemainingWork = "$";//	 :	OPTIONAL IfcDuration;
+		internal IfcDuration mRemainingWork = null;//	 :	OPTIONAL IfcDuration;
 		internal double mRemainingUsage = double.NaN, mCompletion = double.NaN;//	 :	OPTIONAL IfcPositiveRatioMeasure; 
 
-		public string ScheduleWork { get { return (mScheduleWork == "$" ? "" : ParserIfc.Decode(mScheduleWork)); } set { mScheduleWork = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ScheduleWork { get { return mScheduleWork; } set { mScheduleWork = value; } }
 		public double ScheduleUsage { get { return mScheduleUsage; } set { mScheduleUsage = value; } }
 		public DateTime ScheduleStart { get { return mScheduleStart; } set { mScheduleStart = value; } }
 		public DateTime ScheduleFinish { get { return mScheduleFinish; } set { mScheduleFinish = value; } }
-		public string ScheduleContour { get { return (mScheduleContour == "$" ? "" : ParserIfc.Decode(mScheduleContour)); } set { mScheduleContour = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcDuration LevelingDelay { get { return null; } set { mLevelingDelay = (value == null ? "$" : value.ToString()); } }
+		public string ScheduleContour { get { return mScheduleContour; } set { mScheduleContour = value; } }
+		public IfcDuration LevelingDelay { get { return mLevelingDelay; } set { mLevelingDelay = value; } }
 		public bool IsOverAllocated { get { return mIsOverAllocated; } set { mIsOverAllocated = value; } }
 		public DateTime StatusTime { get { return mStatusTime; } set { mStatusTime = value; } }
-		public IfcDuration ActualWork { get { return null; } set { mActualWork = (value == null ? "$" : value.ToString()); } }
+		public IfcDuration ActualWork { get { return mActualWork; } set { mActualWork = value; } }
 		public double ActualUsage { get { return mActualUsage; } set { mActualUsage = value; } }
 		public DateTime ActualStart { get { return mActualStart; } set { mActualStart = value; } }
 		public DateTime ActualFinish { get { return mActualFinish; } set { mActualFinish = value; } }
-		public IfcDuration RemainingWork { get { return null; } set { mRemainingWork = (value == null ? "$" : value.ToString()); } }
+		public IfcDuration RemainingWork { get { return mRemainingWork; } set { mRemainingWork = value; } }
 		public double RemainingUsage { get { return mRemainingUsage; } set { mRemainingUsage = value; } }
 		public double Completion { get { return mCompletion; } set { mCompletion = value; } }
 

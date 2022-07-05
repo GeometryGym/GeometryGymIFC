@@ -112,8 +112,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcMaterial : IfcMaterialDefinition, NamedObjectIfc
 	{
 		private string mName = "";// : IfcLabel; 
-		private string mDescription = "$";// : IFC4 OPTIONAL IfcText;
-		private string mCategory = "$";// : IFC4 OPTIONAL IfcLabel; 
+		private string mDescription = "";// : IFC4 OPTIONAL IfcText;
+		private string mCategory = "";// : IFC4 OPTIONAL IfcLabel; 
 
 		//INVERSE
 		internal IfcMaterialDefinitionRepresentation mHasRepresentation = null;//	 : 	SET [0:1] OF IfcMaterialDefinitionRepresentation FOR RepresentedMaterial;
@@ -121,9 +121,9 @@ namespace GeometryGym.Ifc
 		internal List<IfcMaterialRelationship> mIsRelatedWith = new List<IfcMaterialRelationship>();//	:	SET OF IfcMaterialRelationship FOR RelatedMaterials;
 		internal IfcMaterialRelationship mRelatesTo = null;//	:	SET [0:1] OF IfcMaterialRelationship FOR RelatingMaterial;
 
-		public override string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN NAME" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public override string Name { get { return mName; } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN NAME" : value); } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public string Category { get { return mCategory; } set { mCategory = value; } }
 		public IfcMaterialDefinitionRepresentation HasRepresentation { get { return mHasRepresentation; } set { mHasRepresentation = value; if (value != null && value.RepresentedMaterial != this) value.RepresentedMaterial = this; } }
 
 		public override IfcMaterial PrimaryMaterial() { return this;  }
@@ -157,7 +157,7 @@ namespace GeometryGym.Ifc
 		{
 			get
 			{
-				if (mCategory != "$")
+				if (!string.IsNullOrEmpty(mCategory))
 				{
 					string cat = mCategory.ToUpper();
 					if (cat.Contains("STEEL"))
@@ -189,17 +189,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialConstituent : IfcMaterialDefinition //IFC4
 	{
-		internal string mName = "$";// :	OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText 
+		internal string mName = "";// :	OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText 
 		internal int mMaterial;// : IfcMaterial;
 		internal double mFraction;//	 :	OPTIONAL IfcNormalisedRatioMeasure;
-		internal string mCategory = "$";//	 :	OPTIONAL IfcLabel;  
+		internal string mCategory = "";//	 :	OPTIONAL IfcLabel;  
 
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public override string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public IfcMaterial Material { get { return mDatabase[mMaterial] as IfcMaterial; } set { mMaterial = (value == null ? 0 : value.mIndex); } }
 		public double Fraction { get { return mFraction; } set { mFraction = value; } }
-		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Category { get { return mCategory; } set { mCategory = value; } }
 
 		public override IfcMaterial PrimaryMaterial() { return Material; }
 		
@@ -215,12 +215,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialConstituentSet : IfcMaterialDefinition
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText 
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText 
 		internal Dictionary<string, IfcMaterialConstituent> mMaterialConstituents = new Dictionary<string, IfcMaterialConstituent>();// LIST [1:?] OF IfcMaterialConstituent;
 
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public override string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public Dictionary<string, IfcMaterialConstituent> MaterialConstituents { get { return mMaterialConstituents; } }
 
 		public override IfcMaterial PrimaryMaterial() { return MaterialConstituents.First().Value.PrimaryMaterial(); }
@@ -349,17 +349,17 @@ namespace GeometryGym.Ifc
 		internal int mMaterial;// : OPTIONAL IfcMaterial;
 		internal double mLayerThickness;// ::	IfcNonNegativeLengthMeasure IFC4Chagne IfcPositiveLengthMeasure;
 		internal IfcLogicalEnum mIsVentilated = IfcLogicalEnum.FALSE; // : OPTIONAL IfcLogical; 
-		internal string mName = "$";// : OPTIONAL IfcLabel; IFC4
-		internal string mDescription = "$";// : OPTIONAL IfcText; IFC4
-		internal string mCategory = "$";// : OPTIONAL IfcLabel; IFC4
+		internal string mName = "";// : OPTIONAL IfcLabel; IFC4
+		internal string mDescription = "";// : OPTIONAL IfcText; IFC4
+		internal string mCategory = "";// : OPTIONAL IfcLabel; IFC4
 		internal double mPriority = double.NaN;//	 :	OPTIONAL IfcNormalisedRatioMeasure;
 
 		public IfcMaterial Material { get { return mDatabase[mMaterial] as IfcMaterial; } set { mMaterial = (value == null ? 0 : value.mIndex); } }
 		public double LayerThickness { get { return mLayerThickness; } set { mLayerThickness = value; } }
 		public IfcLogicalEnum IsVentilated { get { return mIsVentilated; } set { mIsVentilated = value; } }
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public override string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public string Category { get { return mCategory; } set { mCategory = value; } }
 		public double Priority { get { return mPriority; } set { mPriority = value; } }
 
 		public override IfcMaterial PrimaryMaterial() { return Material; }
@@ -378,12 +378,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcMaterialLayerSet : IfcMaterialDefinition
 	{
 		private LIST<IfcMaterialLayer> mMaterialLayers = new LIST<IfcMaterialLayer>();// LIST [1:?] OF IfcMaterialLayer;
-		private string mLayerSetName = "$";// : OPTIONAL IfcLabel;
-		private string mDescription = "$";// : OPTIONAL IfcText
+		private string mLayerSetName = "";// : OPTIONAL IfcLabel;
+		private string mDescription = "";// : OPTIONAL IfcText
 
 		public LIST<IfcMaterialLayer> MaterialLayers { get { return mMaterialLayers; } }
-		public string LayerSetName { get { return (mLayerSetName == "$" ? "" : ParserIfc.Decode(mLayerSetName)); } set { mLayerSetName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string LayerSetName { get { return mLayerSetName; } set { mLayerSetName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 
 		public override string Name { get { return LayerSetName; } set { LayerSetName = value; } }
 		public override IfcMaterial PrimaryMaterial() { return (mMaterialLayers.Count != 1 ? null : MaterialLayers[0].Material); }
@@ -517,20 +517,20 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText;
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal IfcMaterial mMaterial = null;// : OPTIONAL IfcMaterial;
 		internal IfcProfileDef mProfile = null;// : OPTIONAL IfcProfileDef;
 		internal int mPriority = int.MaxValue;// : OPTIONAL IfcInteger [0..100] was  IfcNormalisedRatioMeasure
-		internal string mCategory = "$";// : OPTIONAL IfcLabel
+		internal string mCategory = "";// : OPTIONAL IfcLabel
 		// INVERSE
 		private IfcMaterialProfileSet mToMaterialProfileSet = null;// : IfcMaterialProfileSet FOR 
 		
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public override string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public IfcMaterial Material { get { return mMaterial; } set { mMaterial = value; } }
 		public IfcProfileDef Profile { get { return mProfile; } set { mProfile = value; } }
-		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Category { get { return mCategory; } set { mCategory = value; } }
 		public int Priority { get { return mPriority; } set { mPriority = (value >= 0 && value <= 100 ? value : int.MaxValue); } }
 		public IfcMaterialProfileSet ToMaterialProfileSet { get { return mToMaterialProfileSet; } set { mToMaterialProfileSet = value; } }
 
@@ -559,14 +559,14 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialProfileSet : IfcMaterialDefinition //IFC4
 	{
-		internal string mName = "$"; //: OPTIONAL IfcLabel;
-		internal string mDescription = "$"; //: OPTIONAL IfcText; 
+		internal string mName = ""; //: OPTIONAL IfcLabel;
+		internal string mDescription = ""; //: OPTIONAL IfcText; 
 		internal LIST<IfcMaterialProfile> mMaterialProfiles = new LIST<IfcMaterialProfile>();// LIST [1:?] OF IfcMaterialProfile;
 		internal IfcCompositeProfileDef mCompositeProfile = null;// : OPTIONAL IfcCompositeProfileDef; 
 
-		public override string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public LIST<IfcMaterialProfile> MaterialProfiles { get { return mMaterialProfiles; } set { mMaterialProfiles.Clear();  if(value != null) mMaterialProfiles = value; } }
+		public override string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public LIST<IfcMaterialProfile> MaterialProfiles { get { return mMaterialProfiles; } }
 		public IfcCompositeProfileDef CompositeProfile { get { return mCompositeProfile; } set { mCompositeProfile = value; } }
 
 		public override IfcMaterial PrimaryMaterial() { return (mMaterialProfiles.Count != 1 ? null : MaterialProfiles[0].Material); }
@@ -780,9 +780,9 @@ namespace GeometryGym.Ifc
 	{
 		internal double mCompressiveStrength = double.NaN;// : OPTIONAL IfcPressureMeasure;
 		internal double mMaxAggregateSize = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		internal string mAdmixturesDescription = "$", mWorkability = "$";// : OPTIONAL IfcText
+		internal string mAdmixturesDescription = "", mWorkability = "";// : OPTIONAL IfcText
 		internal double mProtectivePoreRatio = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
-		internal string mWaterImpermeability = "$";// : OPTIONAL IfcText; 
+		internal string mWaterImpermeability = "";// : OPTIONAL IfcText; 
 		internal IfcMechanicalConcreteMaterialProperties() : base() { }
 		internal IfcMechanicalConcreteMaterialProperties(DatabaseIfc db, IfcMechanicalConcreteMaterialProperties p, DuplicateOptions options) : base(db, p, options)
 		{
@@ -947,13 +947,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcMetric : IfcConstraint
 	{
 		internal IfcBenchmarkEnum mBenchMark = IfcBenchmarkEnum.EQUALTO;// : IfcBenchmarkEnum
-		internal string mValueSource = "$"; //	 :	OPTIONAL IfcLabel;
+		internal string mValueSource = ""; //	 :	OPTIONAL IfcLabel;
 		private int mDataValue = 0;// : OPTIONAL IfcMetricValueSelect;
 		private IfcValue mDataValueValue = null;
 		private int mReferencePath;// :	OPTIONAL IfcReference;
 
 		public IfcBenchmarkEnum BenchMark { get { return mBenchMark; } set { mBenchMark = value; } }
-		public string ValueSource { get { return (mValueSource == "$" ? "" : ParserIfc.Decode(mValueSource)); } set { mValueSource = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ValueSource { get { return mValueSource; } set { mValueSource = value; } }
 		public IfcMetricValueSelect DataValue
 		{
 			get

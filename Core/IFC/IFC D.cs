@@ -112,11 +112,11 @@ namespace GeometryGym.Ifc
 	{
 		private IfcProfileDef mParentProfile;// : IfcProfileDef;
 		private IfcCartesianTransformationOperator2D mOperator;// : IfcCartesianTransformationOperator2D;
-		internal string mLabel = "$";// : OPTIONAL IfcLabel;
+		internal string mLabel = "";// : OPTIONAL IfcLabel;
 
 		public IfcProfileDef ParentProfile { get { return mParentProfile; } set { mParentProfile = value; } }
 		public IfcCartesianTransformationOperator2D Operator { get { return mOperator; } set { mOperator = value; } }
-		public string Label { get { return (mLabel == "$" ? "" : ParserIfc.Decode(mLabel)); } set { mLabel = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Label { get { return mLabel; } set { mLabel = value; } }
 
 		internal IfcDerivedProfileDef() : base() { }
 		internal IfcDerivedProfileDef(DatabaseIfc db, IfcDerivedProfileDef p, DuplicateOptions options) : base(db, p, options)
@@ -401,8 +401,9 @@ namespace GeometryGym.Ifc
 	{ // IfcFlowInstrument, IfcProtectiveDeviceTrippingUnit, IfcSensor, IfcUnitaryControlElement)) //"IFCDISTRIBUTIONCONTROLELEMENT"
 		public override string StepClassName { get { return mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcDistributionControlElement" : base.StepClassName; } }
 
-		internal string mControlElementId = "$";// : OPTIONAL IfcIdentifier;
-		public string ControlElementId { get { return (mControlElementId == "$" ? "" : ParserIfc.Decode(mControlElementId)); } set { mControlElementId = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		private string mControlElementId = "";// : OPTIONAL IfcIdentifier;
+		[Obsolete("DEPRECATED IFC4", false)]
+		public string ControlElementId { get { return mControlElementId; } set { mControlElementId = value; } }
 
 		internal IfcDistributionControlElement() : base() { }
 		internal IfcDistributionControlElement(DatabaseIfc db, IfcDistributionControlElement e, DuplicateOptions options) : base(db, e, options) { }
@@ -479,10 +480,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcDistributionSystem : IfcSystem //SUPERTYPE OF(IfcDistributionCircuit) IFC4
 	{
 		public override string StepClassName { get { return (mDatabase != null && mDatabase.Release <= ReleaseVersion.IFC2x3 ? "IfcSystem" : base.StepClassName); } }
-		internal string mLongName = "$"; // 	OPTIONAL IfcLabel
+		internal string mLongName = ""; // 	OPTIONAL IfcLabel
 		internal IfcDistributionSystemEnum mPredefinedType = IfcDistributionSystemEnum.NOTDEFINED;// : OPTIONAL IfcDistributionSystemEnum
 
-		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value)); } }
+		public string LongName { get { return mLongName; } set { mLongName = value; } }
 		public IfcDistributionSystemEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 
 		internal IfcDistributionSystem() : base() { }
@@ -493,11 +494,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDocumentElectronicFormat : BaseClassIfc // DEPRECATED IFC4
 	{
-		internal string mFileExtension = "$";//  OPTIONAL IfcLabel;
-		internal string mMimeContentType = "$";//  OPTIONAL IfcLabel;
-		internal string mMimeSubtype = "$";//  OPTIONAL IfcLabel;
+		internal string mFileExtension = "";//  OPTIONAL IfcLabel;
+		internal string mMimeContentType = "";//  OPTIONAL IfcLabel;
+		internal string mMimeSubtype = "";//  OPTIONAL IfcLabel;
+		public string FileExtension { get { return mFileExtension; } set { mFileExtension = value; } }
+		public string MimeContentType { get { return mMimeContentType; } set { mMimeContentType = value; } }
+		public string MimeSubtype { get { return mMimeSubtype; } set { mMimeSubtype = value; } }
 		internal IfcDocumentElectronicFormat() : base() { }
-		//internal IfcDocumentElectronicFormat(IfcDocumentElectronicFormat i) : base() { mFileExtension = i.mFileExtension; mMimeContentType = i.mMimeContentType; mMimeSubtype = i.mMimeSubtype; }
+		public IfcDocumentElectronicFormat(DatabaseIfc db) : base(db) { }
+		public IfcDocumentElectronicFormat(DatabaseIfc db, IfcDocumentElectronicFormat f, DuplicateOptions options)
+			:base(db, f)
+		{
+			FileExtension = f.FileExtension;
+			MimeContentType = f.MimeContentType;
+			MimeSubtype = f.MimeSubtype;
+		}
 	}
 	[Serializable]
 	public partial class IfcDocumentInformation : IfcExternalInformation, IfcDocumentSelect, NamedObjectIfc
@@ -524,21 +535,21 @@ namespace GeometryGym.Ifc
 		internal SET<IfcDocumentInformationRelationship> mIsPointedTo = new SET<IfcDocumentInformationRelationship>();//	 :	SET OF IfcDocumentInformationRelationship FOR RelatedDocuments;
 		internal SET<IfcDocumentInformationRelationship> mIsPointer = new SET<IfcDocumentInformationRelationship>();//	 :	SET [0:1] OF IfcDocumentInformationRelationship FOR RelatingDocument;
 
-		public string Identification { get { return mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }
-		public string Description { get { return mDescription == "$" ? "" : ParserIfc.Decode(mDescription); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		[Obsolete("DEPRECATED IFC4", false)]
 		public SET<IfcDocumentReference> DocumentReferences { get { return mDocumentReferences; } }
-		public string Location { get { return mLocation == "$" ? "" : ParserIfc.Decode(mLocation); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Purpose { get { return mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string IntendedUse { get { return mIntendedUse == "$" ? "" : ParserIfc.Decode(mIntendedUse); } set { mIntendedUse = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Scope { get { return mScope == "$" ? "" : ParserIfc.Decode(mScope); } set { mScope = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Revision { get { return mRevision == "$" ? "" : ParserIfc.Decode(mRevision); } set { mRevision = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Location { get { return mLocation; } set { mLocation = value; } }
+		public string Purpose { get { return mPurpose; } set { mPurpose = value; } }
+		public string IntendedUse { get { return mIntendedUse; } set { mIntendedUse = value; } }
+		public string Scope { get { return mScope; } set { mScope = value; } }
+		public string Revision { get { return mRevision; } set { mRevision = value; } }
 		public IfcActorSelect DocumentOwner { get { return mDatabase[mDocumentOwner] as IfcActorSelect; } set { mDocumentOwner = (value == null ? 0 : value.Index); } }
 		public SET<IfcActorSelect> Editors { get { return mEditors; } }
 		public DateTime CreationTime { get { return mCreationTime; } set { mCreationTime = value; } }
 		public DateTime LastRevisionTime { get { return mLastRevisionTime; } set { mLastRevisionTime = value; } } 
-		public string ElectronicFormat { get { return mElectronicFormat == "$" ? "" : ParserIfc.Decode(mElectronicFormat); } set { mElectronicFormat = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ElectronicFormat { get { return mElectronicFormat; } set { mElectronicFormat = value; } }
 		public DateTime ValidFrom { get { return mValidFrom; } set { mValidFrom = value; } }
 		public DateTime ValidUntil { get { return mValidUntil; } set { mValidUntil = value; } }
 		public IfcDocumentConfidentialityEnum Confidentiality { get { return mConfidentiality; } set { mConfidentiality = value; } } 
@@ -586,28 +597,35 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDocumentInformationRelationship : IfcResourceLevelRelationship
 	{
-		internal int mRelatingDocument; //: IfcDocumentInformation
-		internal List<int> mRelatedDocuments = new List<int>();// : SET [1:?] OF IfcDocumentInformation;
-		internal string mRelationshipType = "$";// : OPTIONAL IfcLabel;
+		private IfcDocumentInformation mRelatingDocument; //: IfcDocumentInformation
+		private SET<IfcDocumentInformation> mRelatedDocuments = new SET<IfcDocumentInformation>();// : SET [1:?] OF IfcDocumentInformation;
+		private string mRelationshipType = "";// : OPTIONAL IfcLabel;
+		public IfcDocumentInformation RelatingDocument { get { return mRelatingDocument; } set { mRelatingDocument = value; } }
+		public SET<IfcDocumentInformation> RelatedDocuments { get { return mRelatedDocuments; } }
+		public string RelationshipType { get { return mRelationshipType; } set { mRelationshipType = value; } }
 		internal IfcDocumentInformationRelationship() : base() { }
-	//	internal IfcDocumentInformationRelationship(IfcDocumentInformationRelationship v) : base() { mRelatingDocument = v.mRelatingDocument; mRelatedDocuments = new List<int>(v.mRelatedDocuments.ToArray()); mRelationshipType = v.mRelationshipType; }
 	}
 	[Serializable]
 	public partial class IfcDocumentReference : IfcExternalReference, IfcDocumentSelect
 	{
-		internal string mDescription = "$";// IFC4	 :	OPTIONAL IfcText;
-		internal int mReferencedDocument = 0;// IFC	 :	OPTIONAL IfcDocumentInformation;
+		internal string mDescription = "";// IFC4	 :	OPTIONAL IfcText;
+		internal IfcDocumentInformation mReferencedDocument = null;// IFC	 :	OPTIONAL IfcDocumentInformation;
 		//INVERSE
 		internal SET<IfcRelAssociatesDocument> mDocumentRefForObjects = new SET<IfcRelAssociatesDocument>();//	 :	SET OF IfcRelAssociatesDocument FOR RelatingDocument;
 
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcDocumentInformation ReferencedDocument { get { return mDatabase[mReferencedDocument] as IfcDocumentInformation; } set { mReferencedDocument = (value == null ? 0 : value.mIndex); } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public IfcDocumentInformation ReferencedDocument { get { return mReferencedDocument; } set { mReferencedDocument = value; } }
 		public SET<IfcRelAssociatesDocument> DocumentRefForObjects { get { return mDocumentRefForObjects; } }
 
 		public SET<IfcRelAssociatesDocument> DocumentForObjects { get { return mDocumentRefForObjects; } }
 
 		internal IfcDocumentReference() : base() { }
-		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) { mDescription = r.mDescription; if(r.mReferencedDocument > 0) ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation;  }
+		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) 
+		{
+			mDescription = r.mDescription; 
+			if(r.mReferencedDocument != null)
+				ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation; 
+		}
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 
 		internal void associate(IfcDefinitionSelect d) { if (mDocumentRefForObjects.Count == 0) { new IfcRelAssociatesDocument(this); } mDocumentRefForObjects.First().RelatedObjects.Add(d); }
@@ -623,13 +641,13 @@ namespace GeometryGym.Ifc
 		internal double mOverallWidth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcDoorTypeEnum mPredefinedType = IfcDoorTypeEnum.NOTDEFINED;//: OPTIONAL IfcDoorTypeEnum; //IFC4 
 		internal IfcDoorTypeOperationEnum mOperationType = IfcDoorTypeOperationEnum.NOTDEFINED;// : OPTIONAL IfcDoorTypeOperationEnum; //IFC4
-		internal string mUserDefinedOperationType = "$";//	 :	OPTIONAL IfcLabel;
+		internal string mUserDefinedOperationType = "";//	 :	OPTIONAL IfcLabel;
 
 		public double OverallHeight { get { return mOverallHeight; } set { mOverallHeight = (value > 0 ? value : double.NaN); } }
 		public double OverallWidth { get { return mOverallWidth; } set { mOverallWidth = (value > 0 ? value : double.NaN); } }
 		public IfcDoorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcDoorTypeOperationEnum OperationType { get { return mOperationType; } set { mOperationType = value; } }
-		public string UserDefinedOperationType { get { return (mUserDefinedOperationType == "$" ? "" : ParserIfc.Decode(mUserDefinedOperationType)); } set { mUserDefinedOperationType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedOperationType { get { return mUserDefinedOperationType; } set { mUserDefinedOperationType = value; } }
 
 		internal IfcDoor() : base() { }
 		internal IfcDoor(DatabaseIfc db, IfcDoor d, DuplicateOptions options) : base(db, d, options) { mOverallHeight = d.mOverallHeight; mOverallWidth = d.mOverallWidth; mPredefinedType = d.mPredefinedType; mOperationType = d.mOperationType; mUserDefinedOperationType = d.mUserDefinedOperationType; }
@@ -738,10 +756,10 @@ namespace GeometryGym.Ifc
 		internal IfcDoorTypeEnum mPredefinedType = IfcDoorTypeEnum.NOTDEFINED;
 		internal IfcDoorTypeOperationEnum mOperationType;// : IfcDoorStyleOperationEnum; 
 		internal bool mParameterTakesPrecedence = false;// : BOOLEAN;  
-		internal string mUserDefinedOperationType = "$";//	 :	OPTIONAL IfcLabel;
+		internal string mUserDefinedOperationType = "";//	 :	OPTIONAL IfcLabel;
 
 		public IfcDoorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public string UserDefinedOperationType { get { return (mUserDefinedOperationType == "$" ? "" : ParserIfc.Decode(mUserDefinedOperationType)); } set { mUserDefinedOperationType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedOperationType { get { return mUserDefinedOperationType; } set { mUserDefinedOperationType = value; } }
 
 		internal IfcDoorType() : base() { }
 		internal IfcDoorType(DatabaseIfc db, IfcDoorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mOperationType = t.mOperationType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedOperationType = t.mUserDefinedOperationType; }
@@ -779,8 +797,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECATED IFC4
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText;
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal int mRelatingDraughtingCallout;// : IfcDraughtingCallout;
 		internal int mRelatedDraughtingCallout;// : IfcDraughtingCallout;
 		internal IfcDraughtingCalloutRelationship() : base() { }

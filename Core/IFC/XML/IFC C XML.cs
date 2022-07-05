@@ -843,8 +843,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 			xml.SetAttribute("ConstraintGrade", mConstraintGrade.ToString().ToLower());
 			setAttribute(xml, "ConstraintSource", ConstraintSource);
-			if (mCreatingActor > 0)
-				xml.AppendChild(mDatabase[mCreatingActor].GetXML(xml.OwnerDocument, "CreatingActor", host, processed));
+			if (mCreatingActor != null)
+				xml.AppendChild((mCreatingActor as BaseClassIfc).GetXML(xml.OwnerDocument, "CreatingActor", host, processed));
 			setAttribute(xml, "UserDefinedGrade", UserDefinedGrade);
 
 			if (mHasExternalReference.Count > 0)

@@ -823,7 +823,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTime : IfcSimpleValue
 	{
-		internal string mTime = "$";
+		internal string mTime = "";
 		public override string ToString() { return mTime; }
 		public override object Value { get { return parseSTEP(mTime); } set { mTime = formatSTEP(Convert.ToDateTime(value)); } }
 		public override Type ValueType { get { return typeof(DateTime); } }

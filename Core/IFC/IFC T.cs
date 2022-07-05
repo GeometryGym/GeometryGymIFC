@@ -32,11 +32,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTable : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, NamedObjectIfc
 	{
-		internal string mName = "$"; //:	OPTIONAL IfcLabel;
+		internal string mName = ""; //:	OPTIONAL IfcLabel;
 		private LIST<IfcTableRow> mRows = new LIST<IfcTableRow>();// OPTIONAL LIST [1:?] OF IfcTableRow;
 		private LIST<IfcTableColumn> mColumns = new LIST<IfcTableColumn>();// :	OPTIONAL LIST [1:?] OF IfcTableColumn;
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
 		public LIST<IfcTableRow> Rows { get { return mRows; } }
 		public LIST<IfcTableColumn> Columns { get { return mColumns; } }
 
@@ -51,7 +51,7 @@ namespace GeometryGym.Ifc
 		public IfcTable(string name, IEnumerable<IfcTableRow> rows, IEnumerable<IfcTableColumn> cols) 
 			: base(rows == null || rows.Count() == 0 ? cols.First().mDatabase : rows.First().mDatabase)
 		{
-			Name = name.Replace("'", "");
+			Name = name;
 			mRows.AddRange(rows);
 			mColumns.AddRange(cols);
 		}
@@ -59,15 +59,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTableColumn : BaseClassIfc, NamedObjectIfc
 	{
-		internal string mIdentifier = "$";//	 :	OPTIONAL IfcIdentifier;
-		internal string mName = "$";//	 :	OPTIONAL IfcLabel;
-		internal string mDescription = "$";//	 :	OPTIONAL IfcText;
+		internal string mIdentifier = "";//	 :	OPTIONAL IfcIdentifier;
+		internal string mName = "";//	 :	OPTIONAL IfcLabel;
+		internal string mDescription = "";//	 :	OPTIONAL IfcText;
 		internal int mUnit;//	 :	OPTIONAL IfcUnit;
 		private int mReferencePath;//	 :	OPTIONAL IfcReference;
 
-		public string Identifier { get { return (mIdentifier == "$" ? "" : ParserIfc.Decode(mIdentifier)); } set { mIdentifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identifier { get { return mIdentifier; } set { mIdentifier = value; } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public IfcUnit Unit { get { return mDatabase[mUnit] as IfcUnit; } set { mUnit = (value == null ? 0 : value.Index); } }
 		public IfcReference ReferencePath { get { return mDatabase[mReferencePath] as IfcReference; } set { mReferencePath = (value == null ? 0 : value.mIndex); } }
 
@@ -184,32 +184,32 @@ namespace GeometryGym.Ifc
 	public partial class IfcTaskTime : IfcSchedulingTime //IFC4
 	{
 		internal IfcTaskDurationEnum mDurationType = IfcTaskDurationEnum.NOTDEFINED;    // :	OPTIONAL IfcTaskDurationEnum;
-		internal string mScheduleDuration = "$";//	 :	OPTIONAL IfcDuration;
+		internal IfcDuration mScheduleDuration = null;//	 :	OPTIONAL IfcDuration;
 		internal DateTime mScheduleStart = DateTime.MinValue, mScheduleFinish = DateTime.MinValue, mEarlyStart = DateTime.MinValue, mEarlyFinish = DateTime.MinValue, mLateStart = DateTime.MinValue, mLateFinish = DateTime.MinValue; //:	OPTIONAL IfcDateTime;
-		internal string mFreeFloat = "$", mTotalFloat = "$";//	 :	OPTIONAL IfcDuration;
+		internal IfcDuration mFreeFloat = null, mTotalFloat = null;//	 :	OPTIONAL IfcDuration;
 		internal bool mIsCritical;//	 :	OPTIONAL BOOLEAN;
 		internal DateTime mStatusTime = DateTime.MinValue;//	 :	OPTIONAL IfcDateTime;
-		internal string mActualDuration = "$";//	 :	OPTIONAL IfcDuration;
+		internal IfcDuration mActualDuration = null;//	 :	OPTIONAL IfcDuration;
 		internal DateTime mActualStart = DateTime.MinValue, mActualFinish = DateTime.MinValue;//	 :	OPTIONAL IfcDateTime;
-		internal string mRemainingTime = "$";//	 :	OPTIONAL IfcDuration;
+		internal IfcDuration mRemainingTime = null;//	 :	OPTIONAL IfcDuration;
 		internal double mCompletion = double.NaN;//	 :	OPTIONAL IfcPositiveRatioMeasure; 
 
 		public IfcTaskDurationEnum DurationType { get { return mDurationType; } set { mDurationType = value; } }
-		public IfcDuration ScheduleDuration { get { return IfcDuration.Convert(mScheduleDuration); } set { mScheduleDuration = IfcDuration.Convert(value); } }
+		public IfcDuration ScheduleDuration { get { return mScheduleDuration; } set { mScheduleDuration = value; } }
 		public DateTime ScheduleStart { get { return mScheduleStart; } set { mScheduleStart = value; } }
 		public DateTime ScheduleFinish { get { return mScheduleFinish; } set { mScheduleFinish = value; } }
 		public DateTime EarlyStart { get { return mEarlyStart; } set { mEarlyStart = value; } }
 		public DateTime EarlyFinish { get { return mEarlyFinish; } set { mEarlyFinish = value; } }
 		public DateTime LateStart { get { return mLateStart; } set { mLateStart = value; } }
 		public DateTime LateFinish { get { return mLateFinish; } set { mLateFinish = value; } }
-		public IfcDuration FreeFloat { get { return IfcDuration.Convert(mFreeFloat); } set { mFreeFloat = IfcDuration.Convert(value); } }
-		public IfcDuration TotalFloat { get { return IfcDuration.Convert(mTotalFloat); } set { mTotalFloat = IfcDuration.Convert(value); } }
+		public IfcDuration FreeFloat { get { return mFreeFloat; } set { mFreeFloat = value; } }
+		public IfcDuration TotalFloat { get { return mTotalFloat; } set { mTotalFloat = value; } }
 		public bool IsCritical { get { return mIsCritical; } set { mIsCritical = value; } }
 		public DateTime StatusTime { get { return mStatusTime; } set { mStatusTime = value; } }
-		public IfcDuration ActualDuration { get { return IfcDuration.Convert(mActualDuration); } set { mActualDuration = IfcDuration.Convert(value); } }
+		public IfcDuration ActualDuration { get { return mActualDuration; } set { mActualDuration = value; } }
 		public DateTime ActualStart { get { return mActualStart; } set { mActualStart = value; } }
 		public DateTime ActualFinish { get { return mActualFinish; } set { mActualFinish = value; } }
-		public IfcDuration RemainingTime { get { return IfcDuration.Convert(mRemainingTime); } set { mRemainingTime = IfcDuration.Convert(value); } }
+		public IfcDuration RemainingTime { get { return mRemainingTime; } set { mRemainingTime = value; } }
 		public double Completion { get { return mCompletion; } set { mCompletion = value; } }
 
 		internal IfcTaskTime() : base() { }
@@ -236,10 +236,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcTaskType : IfcTypeProcess //IFC4
 	{
 		internal IfcTaskTypeEnum mPredefinedType = IfcTaskTypeEnum.NOTDEFINED;// : IfcTaskTypeEnum; 
-		private string mWorkMethod = "$";// : OPTIONAL IfcLabel;
+		private string mWorkMethod = "";// : OPTIONAL IfcLabel;
 
 		public IfcTaskTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
-		public string WorkMethod { get { return (mWorkMethod == "$" ? "" : ParserIfc.Decode(mWorkMethod)); } set { mWorkMethod = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string WorkMethod { get { return mWorkMethod; } set { mWorkMethod = value; } }
 
 		internal IfcTaskType() : base() { }
 		internal IfcTaskType(DatabaseIfc db, IfcTaskType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mWorkMethod = t.mWorkMethod; }
@@ -435,9 +435,9 @@ namespace GeometryGym.Ifc
 	public partial class IfcTextStyleFontModel : IfcPreDefinedTextFont
 	{
 		internal List<string> mFontFamily = new List<string>(1);// : OPTIONAL LIST [1:?] OF IfcTextFontName;
-		internal string mFontStyle = "$";// : OPTIONAL IfcFontStyle; ['normal','italic','oblique'];
-		internal string mFontVariant = "$";// : OPTIONAL IfcFontVariant; ['normal','small-caps'];
-		internal string mFontWeight = "$";// : OPTIONAL IfcFontWeight; // ['normal','small-caps','100','200','300','400','500','600','700','800','900'];
+		internal string mFontStyle = "";// : OPTIONAL IfcFontStyle; ['normal','italic','oblique'];
+		internal string mFontVariant = "";// : OPTIONAL IfcFontVariant; ['normal','small-caps'];
+		internal string mFontWeight = "";// : OPTIONAL IfcFontWeight; // ['normal','small-caps','100','200','300','400','500','600','700','800','900'];
 		internal string mFontSize;// : IfcSizeSelect; IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);
 		internal IfcTextStyleFontModel() : base() { }
 		internal IfcTextStyleFontModel(DatabaseIfc db, IfcTextStyleFontModel m) : base(db, m)
@@ -621,19 +621,19 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcTimeSeries : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
 	{ // ABSTRACT SUPERTYPE OF (ONEOF(IfcIrregularTimeSeries,IfcRegularTimeSeries));
-		internal string mName = "$";// : OPTIONAL IfcLabel;		
-		internal string mDescription;// : OPTIONAL IfcText;
+		internal string mName = "";// : OPTIONAL IfcLabel;		
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal int mStartTime;// : IfcDateTimeSelect;
 		internal int mEndTime;// : IfcDateTimeSelect;
 		internal IfcTimeSeriesDataTypeEnum mTimeSeriesDataType = IfcTimeSeriesDataTypeEnum.NOTDEFINED;// : IfcTimeSeriesDataTypeEnum;
 		internal IfcDataOriginEnum mDataOrigin = IfcDataOriginEnum.NOTDEFINED;// : IfcDataOriginEnum;
-		internal string mUserDefinedDataOrigin = "$";// : OPTIONAL IfcLabel;
+		internal string mUserDefinedDataOrigin = "";// : OPTIONAL IfcLabel;
 		internal int mUnit;// : OPTIONAL IfcUnit; 
 		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
@@ -1117,12 +1117,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTypeObject : IfcObjectDefinition //(IfcTypeProcess, IfcTypeProduct, IfcTypeResource) IFC4 ABSTRACT 
 	{
-		internal string mApplicableOccurrence = "$";// : OPTIONAL IfcLabel;
+		internal string mApplicableOccurrence = "";// : OPTIONAL IfcLabel;
 		internal SET<IfcPropertySetDefinition> mHasPropertySets = new SET<IfcPropertySetDefinition>();// : OPTIONAL SET [1:?] OF IfcPropertySetDefinition 
 		//INVERSE 
 		internal IfcRelDefinesByType mTypes = null;
 
-		public string ApplicableOccurrence { get { return (mApplicableOccurrence == "$" ? "" : ParserIfc.Decode(mApplicableOccurrence)); } set { mApplicableOccurrence = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string ApplicableOccurrence { get { return mApplicableOccurrence; } set { mApplicableOccurrence = value; } }
 		public SET<IfcPropertySetDefinition> HasPropertySets { get { return mHasPropertySets; } }
 		public IfcRelDefinesByType Types { get { return mTypes; } }
 		[Obsolete("RENAMED IFC4", false)]
@@ -1433,15 +1433,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcTypeProcess : IfcTypeObject, IfcProcessSelect  //ABSTRACT SUPERTYPE OF(ONEOF(IfcEventType, IfcProcedureType, IfcTaskType))
 	{
-		private string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
-		private string mLongDescription = "$";//	 :	OPTIONAL IfcText;
-		private string mProcessType = "$";//	 :	OPTIONAL IfcLabel;
+		private string mIdentification = "";// :	OPTIONAL IfcIdentifier;
+		private string mLongDescription = "";//	 :	OPTIONAL IfcText;
+		private string mProcessType = "";//	 :	OPTIONAL IfcLabel;
 		//INVERSE
 		internal SET<IfcRelAssignsToProcess> mOperatesOn = new SET<IfcRelAssignsToProcess>();// : SET [0:?] OF IfcRelAssignsToProcess FOR RelatingProcess;
 
-		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string LongDescription { get { return (mLongDescription == "$" ? "" : ParserIfc.Decode(mLongDescription)); } set { mLongDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string ProcessType { get { return (mProcessType == "$" ? "" : ParserIfc.Decode(mProcessType)); } set { mProcessType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
+		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+		public string ProcessType { get { return mProcessType; } set { mProcessType = value; } }
 		//INVERSE
 		public SET<IfcRelAssignsToProcess> OperatesOn { get { return mOperatesOn; } }
 
@@ -1453,12 +1453,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
 	{ 
 		internal LIST<IfcRepresentationMap> mRepresentationMaps = new LIST<IfcRepresentationMap>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcRepresentationMap;
-		private string mTag = "$";// : OPTIONAL IfcLabel 
+		private string mTag = "";// : OPTIONAL IfcLabel 
 		//INVERSE
 		internal SET<IfcRelAssignsToProduct> mReferencedBy = new SET<IfcRelAssignsToProduct>();//	 :	SET OF IfcRelAssignsToProduct FOR RelatingProduct;
 		
 		public LIST<IfcRepresentationMap> RepresentationMaps { get { return mRepresentationMaps; } set { mRepresentationMaps.Clear(); if (value != null) { mRepresentationMaps.CollectionChanged -= mRepresentationMaps_CollectionChanged; mRepresentationMaps = value; mRepresentationMaps.CollectionChanged += mRepresentationMaps_CollectionChanged; } } }
-		public string Tag { get { return (mTag == "$" ? "" : mTag); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : value); } }
+		public string Tag { get { return mTag; } set { mTag = value; } }
 		public SET<IfcRelAssignsToProduct> ReferencedBy { get { return mReferencedBy; } }
 
 		protected IfcTypeProduct() : base() { }
@@ -1627,15 +1627,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcTypeResource : IfcTypeObject, IfcResourceSelect //ABSTRACT SUPERTYPE OF(IfcConstructionResourceType)
 	{
-		internal string mIdentification = "$";// :	OPTIONAL IfcIdentifier;
-		internal string mLongDescription = "$";//	 :	OPTIONAL IfcText;
-		internal string mResourceType = "$";//	 :	OPTIONAL IfcLabel;
+		internal string mIdentification = "";// :	OPTIONAL IfcIdentifier;
+		internal string mLongDescription = "";//	 :	OPTIONAL IfcText;
+		internal string mResourceType = "";//	 :	OPTIONAL IfcLabel;
 		//INVERSE
 		internal SET<IfcRelAssignsToResource> mResourceOf = new SET<IfcRelAssignsToResource>();// : SET [0:?] OF IfcRelAssignsToResource FOR RelatingResource; 
 
-		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string LongDescription { get { return (mLongDescription == "$" ? "" : ParserIfc.Decode(mLongDescription)); } set { mLongDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string ResourceType { get { return (mResourceType == "$" ? "" : ParserIfc.Decode(mResourceType)); } set { mResourceType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
+		public string LongDescription { get { return mLongDescription; } set { mLongDescription = value; } }
+		public string ResourceType { get { return mResourceType; } set { mResourceType = value; } }
 		//INVERSE
 		public SET<IfcRelAssignsToResource> ResourceOf { get { return mResourceOf; } } 
 

@@ -459,7 +459,7 @@ namespace GeometryGym.Ifc
 			if (str.StartsWith("IFCIDENTIFIER("))
 				return new IfcIdentifier(ParserIfc.Decode(str.Substring(15, str.Length - 17)));
 			if (str.StartsWith("IFCINTEGER("))
-				return new IfcInteger(int.Parse(str.Substring(11, str.Length - 12)));
+				return new IfcInteger(long.Parse(str.Substring(11, str.Length - 12)));
 			if (str.StartsWith("IFCLABEL("))
 			{
 				if (str.Length <= 12)

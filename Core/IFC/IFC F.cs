@@ -581,7 +581,7 @@ namespace GeometryGym.Ifc
 		internal int mFlowConditionTimeSeries, mVelocityTimeSeries, mFlowrateTimeSeries;// : OPTIONAL IfcTimeSeries;
 		internal int mFluid;// : IfcMaterial;
 		internal int mPressureTimeSeries;// : OPTIONAL IfcTimeSeries;
-		internal string mUserDefinedPropertySource = "$";// : OPTIONAL IfcLabel;
+		internal string mUserDefinedPropertySource = "";// : OPTIONAL IfcLabel;
 		internal double mTemperatureSingleValue = double.NaN, mWetBulbTemperatureSingleValue = double.NaN;// : OPTIONAL IfcThermodynamicTemperatureMeasure;
 		internal int mWetBulbTemperatureTimeSeries, mTemperatureTimeSeries;// : OPTIONAL IfcTimeSeries;
 		internal double mFlowrateSingleValue = double.NaN;// : OPTIONAL IfcDerivedMeasureValue;

@@ -485,7 +485,7 @@ namespace GeometryGym.Ifc
 			if (jobj != null)
 				UnitBasis = mDatabase.ParseJObject<IfcMeasureWithUnit>(jobj);
 
-			mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray).ForEach(x=>addComponent(x));
+			Components.AddRange(mDatabase.extractJArray<IfcAppliedValue>(obj.GetValue("Components", StringComparison.InvariantCultureIgnoreCase) as JArray));
 
 
 			List <IfcExternalReferenceRelationship> ers = mDatabase.extractJArray<IfcExternalReferenceRelationship>(obj.GetValue("HasExternalReference", StringComparison.InvariantCultureIgnoreCase) as JArray);

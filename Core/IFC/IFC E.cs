@@ -215,10 +215,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcElectricDistributionPoint : IfcFlowController // DEPRECATED IFC4
 	{
 		internal IfcElectricDistributionPointFunctionEnum mDistributionPointFunction;// : IfcElectricDistributionPointFunctionEnum;
-		internal string mUserDefinedFunction = "$";// : OPTIONAL IfcLabel;
+		internal string mUserDefinedFunction = "";// : OPTIONAL IfcLabel;
 
 		public IfcElectricDistributionPointFunctionEnum DistributionPointFunction { get { return mDistributionPointFunction; } set { mDistributionPointFunction = value; } }
-		public string UserDefinedFunction { get { return mUserDefinedFunction == "$" ? "" : ParserIfc.Decode(mUserDefinedFunction); } set { mUserDefinedFunction = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public string UserDefinedFunction { get { return mUserDefinedFunction; } set { mUserDefinedFunction = value; } }
 
 		internal IfcElectricDistributionPoint() : base() { }
 		internal IfcElectricDistributionPoint(DatabaseIfc db, IfcElectricDistributionPoint p, DuplicateOptions options) : base(db, p, options) { mDistributionPointFunction = p.mDistributionPointFunction; mUserDefinedFunction = p.mUserDefinedFunction; }
@@ -351,7 +351,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcElement : IfcProduct, IfcInterferenceSelect, IfcStructuralActivityAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcBuildingElement, IfcCivilElement
 	{ //,IfcDistributionElement,IfcElementAssembly,IfcElementComponent,IfcFeatureElement,IfcFurnishingElement,IfcGeographicElement,IfcTransportElement ,IfcVirtualElement,IfcElectricalElement SS,IfcEquipmentElement SS)) 
-		private string mTag = "$";// : OPTIONAL IfcIdentifier;
+		private string mTag = "";// : OPTIONAL IfcIdentifier;
 
 		//INVERSE  
 		internal SET<IfcRelFillsElement> mFillsVoids = new SET<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
@@ -372,7 +372,7 @@ namespace GeometryGym.Ifc
 																									 // 
 		internal SET<IfcRelConnectsStructuralElement> mHasStructuralMember = new SET<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
-		public string Tag { get { return mTag == "$" ? "" : ParserIfc.Decode(mTag); } set { mTag = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value); } }
+		public string Tag { get { return mTag; } set { mTag = value; } }
 		public SET<IfcRelFillsElement> FillsVoids { get { return mFillsVoids; } }
 		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
@@ -664,10 +664,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcElementQuantity : IfcQuantitySet
 	{
 		public override string StepClassName { get { return "IfcElementQuantity"; } }
-		internal string mMethodOfMeasurement = "$";// : OPTIONAL IfcLabel;
+		internal string mMethodOfMeasurement = "";// : OPTIONAL IfcLabel;
 		private Dictionary<string, IfcPhysicalQuantity> mQuantities = new Dictionary<string, IfcPhysicalQuantity>();// : SET [1:?] OF IfcPhysicalQuantity;
 
-		public string MethodOfMeasurement { get { return (mMethodOfMeasurement == "$" ? "" : ParserIfc.Decode(mMethodOfMeasurement)); } set { mMethodOfMeasurement = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string MethodOfMeasurement { get { return mMethodOfMeasurement; } set { mMethodOfMeasurement = value; } }
 		public Dictionary<string, IfcPhysicalQuantity> Quantities { get { return mQuantities; } }
 
 		internal IfcElementQuantity() : base() { }
@@ -783,8 +783,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcElementType : IfcTypeProduct //ABSTRACT SUPERTYPE OF(ONEOF(IfcBuildingElementType, IfcDistributionElementType, IfcElementAssemblyType, IfcElementComponentType, IfcFurnishingElementType, IfcGeographicElementType, IfcTransportElementType))
 	{
-		private string mElementType = "$";// : OPTIONAL IfcLabel
-		public string ElementType { get { return mElementType == "$" ? "" : ParserIfc.Decode( mElementType); } set { mElementType = string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode( value); } }
+		private string mElementType = "";// : OPTIONAL IfcLabel
+		public string ElementType { get { return mElementType; } set { mElementType = value; } }
 
 		protected IfcElementType() : base() { }
 		protected IfcElementType(IfcElementType basis) : base(basis) { mElementType = basis.mElementType; }
@@ -882,7 +882,7 @@ namespace GeometryGym.Ifc
 	{
 		internal string mImpactType;// : IfcLabel;
 		internal IfcEnvironmentalImpactCategoryEnum mEnvCategory = IfcEnvironmentalImpactCategoryEnum.NOTDEFINED;// IfcEnvironmentalImpactCategoryEnum
-		internal string mUserDefinedCategory = "$";//  : OPTIONAL IfcLabel;
+		internal string mUserDefinedCategory = "";//  : OPTIONAL IfcLabel;
 		internal IfcEnvironmentalImpactValue() : base() { }
 		internal IfcEnvironmentalImpactValue(DatabaseIfc db, IfcEnvironmentalImpactValue v) : base(db,v) { mImpactType = v.mImpactType; mEnvCategory = v.mEnvCategory; mUserDefinedCategory = v.mUserDefinedCategory; }
 	}
@@ -945,12 +945,12 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcEventTypeEnum mPredefinedType = IfcEventTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal IfcEventTriggerTypeEnum mEventTriggerType = IfcEventTriggerTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
-		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
-		internal int mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
+		internal string mUserDefinedEventTriggerType = "";//	:	OPTIONAL IfcLabel;
+		internal IfcEventTime mEventOccurrenceTime;//	:	OPTIONAL IfcEventTime;
 
 		public IfcEventTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcEventTriggerTypeEnum EventTriggerType { get { return mEventTriggerType; } set { mEventTriggerType = value; } }
-		public string UserDefinedEventTriggerType { get { return ParserIfc.Decode(mUserDefinedEventTriggerType); } set { mUserDefinedEventTriggerType = ParserIfc.Encode(value); } }
+		public string UserDefinedEventTriggerType { get { return mUserDefinedEventTriggerType; } set { mUserDefinedEventTriggerType = value; } }
 		
 		internal IfcEvent() : base() { }
 		internal IfcEvent(DatabaseIfc db, IfcEvent e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; mEventTriggerType = e.mEventTriggerType; mUserDefinedEventTriggerType = e.mUserDefinedEventTriggerType; }
@@ -976,11 +976,11 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcEventTypeEnum mPredefinedType = IfcEventTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
 		internal IfcEventTriggerTypeEnum mEventTriggerType = IfcEventTriggerTypeEnum.NOTDEFINED;// : IfcEventTypeEnum; 
-		internal string mUserDefinedEventTriggerType = "$";//	:	OPTIONAL IfcLabel;
+		internal string mUserDefinedEventTriggerType = "";//	:	OPTIONAL IfcLabel;
 
 		public IfcEventTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcEventTriggerTypeEnum EventTriggerType { get { return mEventTriggerType; } set { mEventTriggerType = value; } }
-		public string UserDefinedEventTriggerType { get { return (mUserDefinedEventTriggerType == "$" ? "" : ParserIfc.Decode(mUserDefinedEventTriggerType)); } set { mUserDefinedEventTriggerType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedEventTriggerType { get { return mUserDefinedEventTriggerType; } set { mUserDefinedEventTriggerType = value; } }
 
 		internal IfcEventType() : base() { }
 		internal IfcEventType(DatabaseIfc db, IfcEventType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; mEventTriggerType = t.mEventTriggerType; mUserDefinedEventTriggerType = t.mUserDefinedEventTriggerType; }
@@ -1113,16 +1113,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcExternalReference : BaseClassIfc, IfcLightDistributionDataSourceSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
 	{ //ABSTRACT SUPERTYPE OF (ONEOF (IfcClassificationReference ,IfcDocumentReference ,IfcExternallyDefinedHatchStyle ,IfcExternallyDefinedSurfaceStyle ,IfcExternallyDefinedSymbol ,IfcExternallyDefinedTextFont ,IfcLibraryReference)); 
-		private string mLocation = "$";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
-		private string mIdentification = "$";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
+		private string mLocation = "";//  :	OPTIONAL IfcURIReference; ifc2x3 ifclabel
+		private string mIdentification = "";// : OPTIONAL IfcIdentifier; ifc2x3 ItemReference
 		private string mName = "";//  : OPTIONAL IfcLabel;
 		//INVERSE  
-		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	public override string Name { get { return (mName == "$" ? "" : mName); } set { if (!string.IsNullOrEmpty(value)) mName = value; } } 
+		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;	
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 		internal SET<IfcExternalReferenceRelationship> mExternalReferenceForResources = new SET<IfcExternalReferenceRelationship>();//	:	SET [0:?] OF IfcExternalReferenceRelationship FOR RelatingReference;
 
-		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Location { get { return mLocation; } set { mLocation = value; } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public string Name { get { return mName; } set { mName = value; } } 
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }

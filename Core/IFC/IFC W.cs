@@ -143,13 +143,13 @@ namespace GeometryGym.Ifc
 		internal double mOverallWidth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
 		internal IfcWindowTypeEnum mPredefinedType = IfcWindowTypeEnum.NOTDEFINED;//	 :	OPTIONAL IfcWindowTypeEnum;
 		internal IfcWindowTypePartitioningEnum mPartitioningType = IfcWindowTypePartitioningEnum.NOTDEFINED;//	 :	OPTIONAL IfcWindowTypePartitioningEnum;
-		internal string mUserDefinedPartitioningType = "$";//:	OPTIONAL IfcLabel;
+		internal string mUserDefinedPartitioningType = "";//:	OPTIONAL IfcLabel;
 
 		public double OverallHeight { get { return mOverallHeight; } set { mOverallHeight = (value > 0 ? value : double.NaN); } } 
 		public double OverallWidth { get { return mOverallWidth; } set { mOverallWidth = (value > 0 ? value : double.NaN); } } 
 		public IfcWindowTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
 		public IfcWindowTypePartitioningEnum PartitioningType { get { return mPartitioningType; } set { mPartitioningType = value; } }
-		public string UserDefinedPartitioningType { get { return (mUserDefinedPartitioningType == "$" ? "" : ParserIfc.Decode(mUserDefinedPartitioningType)); } set { mUserDefinedPartitioningType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedPartitioningType { get { return mUserDefinedPartitioningType; } set { mUserDefinedPartitioningType = value; } }
 
 		internal IfcWindow() : base() { }
 		internal IfcWindow(DatabaseIfc db, IfcWindow w, DuplicateOptions options) : base(db, w, options) { mOverallHeight = w.mOverallHeight; mOverallWidth = w.mOverallWidth; mPredefinedType = w.mPredefinedType; mPartitioningType = w.mPartitioningType; mUserDefinedPartitioningType = w.mUserDefinedPartitioningType; }

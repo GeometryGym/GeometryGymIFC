@@ -365,6 +365,8 @@ namespace GeometryGym.Ifc
 					className = "IfcPointByDistanceExpression";
 				if (string.Compare(className, "IfcProductRepresentation", true) == 0)
 					className = "IfcProductDefinitionShape";
+				if (string.Compare(className, "IfcFacilityPart", true) == 0)
+					className = "IfcFacilityPartCommon";
 
 				if (!mConstructors.TryGetValue(className, out constructor))
 				{
@@ -474,6 +476,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
+		internal virtual bool isDuplicate(BaseClassIfc e) { return isDuplicate(e, mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
 		// This method has only partial implementation within opensource project and 
 		// any use of it should be carefully checked.
 		internal virtual bool isDuplicate(BaseClassIfc e, double tol) { return true; }

@@ -118,14 +118,14 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",#" + mParentContext.Index + (double.IsNaN(mTargetScale) || mTargetScale <=0 ? ",$,." : "," + ParserSTEP.DoubleOptionalToString(mTargetScale) + ",.") + 
-				mTargetView.ToString() + (mUserDefinedTargetView == "$" ?  ".,$" : ".,'" + mUserDefinedTargetView + "'"); }
+				mTargetView.ToString() + (string.IsNullOrEmpty(mUserDefinedTargetView) ?  ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedTargetView) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			ParentContext = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcGeometricRepresentationContext;
 			mTargetScale = ParserSTEP.StripDouble(str, ref pos, len);
 			Enum.TryParse<IfcGeometricProjectionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mTargetView);
-			mUserDefinedTargetView = ParserSTEP.StripString(str, ref pos, len);
+			mUserDefinedTargetView = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcGeometricSet
@@ -196,10 +196,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridAxis
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mAxisTag == "$" ? "$," : "'" + mAxisTag + "',#") + AxisCurve.Index.ToString() + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (string.IsNullOrEmpty(mAxisTag) ? "$," : "'" + ParserIfc.Encode(mAxisTag) + "',#") + AxisCurve.Index.ToString() + "," + ParserSTEP.BoolToString(mSameSense); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mAxisTag = ParserSTEP.StripString(str, ref pos, len);
+			mAxisTag = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			AxisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
 			mSameSense = ParserSTEP.StripBool(str, ref pos, len);
 		}

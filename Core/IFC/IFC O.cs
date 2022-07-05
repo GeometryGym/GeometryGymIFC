@@ -671,56 +671,61 @@ namespace GeometryGym.Ifc
 			return (!strict && mDecomposes != null ? mDecomposes.RelatingObject.FindStructAnalysisModel(false) : null);
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		internal override sealed bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			return isDuplicate(e, false, tol);
+		}
+		internal virtual bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
 		{
 			IfcObjectDefinition objDef = e as IfcObjectDefinition;
 			if (objDef == null)
 				return false;
 			if (base.isDuplicate(e, tol))
 			{
-				if (objDef.mIsDecomposedBy.Count != mIsDecomposedBy.Count)
-					return false;
-				SET<IfcRelAggregates> rags = IsDecomposedBy, dupRags = objDef.IsDecomposedBy;
-				IEnumerable<IfcObjectDefinition> objDefs = rags.SelectMany(x => x.RelatedObjects), dupObjDefs = dupRags.SelectMany(x => x.RelatedObjects);
-				Dictionary<string, IfcObjectDefinition> dictObjDefs = dupObjDefs.ToDictionary(x => x.GlobalId, x => x);
-
-				foreach (IfcObjectDefinition od in objDefs)
+				if (includeAggregated)
 				{
-					if (!dictObjDefs.ContainsKey(od.GlobalId))
-						return false;
-					IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
-					if (!od.isDuplicate(dup, tol))
-						return false;
-				}
+					IEnumerable<IfcObjectDefinition> objDefs = IsDecomposedBy.SelectMany(x => x.RelatedObjects);
+					IEnumerable<IfcObjectDefinition> dupObjDefs = objDef.IsDecomposedBy.SelectMany(x => x.RelatedObjects);
+					Dictionary<string, IfcObjectDefinition> dictObjDefs = dupObjDefs.ToDictionary(x => x.GlobalId, x => x);
 
-				if (objDef.mIsNestedBy.Count != mIsNestedBy.Count)
-					return false;
-
-				List<IfcRelNests> nestedBy = objDef.mIsNestedBy.ToList();
-				foreach (IfcRelNests relNests in mIsNestedBy)
-				{
-					IfcObjectDefinition firstRelated = relNests.RelatedObjects.First();
-					IfcRelNests testDuplicate = null;
-					foreach (IfcRelNests nests in nestedBy)
+					foreach (IfcObjectDefinition od in objDefs)
 					{
-						IfcObjectDefinition firstOther = nests.RelatedObjects.First();
-						if (firstOther.isDuplicate(firstRelated, tol))
-						{
-							testDuplicate = nests;
-							break;
-						}
-					}
-					if (testDuplicate == null)
-						return false;
-					nestedBy.Remove(testDuplicate);
-
-					int count = testDuplicate.RelatedObjects.Count;
-					for (int icounter = 1; icounter < count; icounter++)
-					{
-						IfcObjectDefinition od1 = relNests.RelatedObjects[icounter];
-						IfcObjectDefinition od2 = testDuplicate.RelatedObjects[icounter];
-						if (!od1.isDuplicate(od2, tol))
+						if (!dictObjDefs.ContainsKey(od.GlobalId))
 							return false;
+						IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
+						if (!od.isDuplicate(dup, tol))
+							return false;
+					}
+
+					if (objDef.mIsNestedBy.Count != mIsNestedBy.Count)
+						return false;
+
+					List<IfcRelNests> nestedBy = objDef.mIsNestedBy.ToList();
+					foreach (IfcRelNests relNests in mIsNestedBy)
+					{
+						IfcObjectDefinition firstRelated = relNests.RelatedObjects.First();
+						IfcRelNests testDuplicate = null;
+						foreach (IfcRelNests nests in nestedBy)
+						{
+							IfcObjectDefinition firstOther = nests.RelatedObjects.First();
+							if (firstOther.isDuplicate(firstRelated, tol))
+							{
+								testDuplicate = nests;
+								break;
+							}
+						}
+						if (testDuplicate == null)
+							return false;
+						nestedBy.Remove(testDuplicate);
+
+						int count = testDuplicate.RelatedObjects.Count;
+						for (int icounter = 1; icounter < count; icounter++)
+						{
+							IfcObjectDefinition od1 = relNests.RelatedObjects[icounter];
+							IfcObjectDefinition od2 = testDuplicate.RelatedObjects[icounter];
+							if (!od1.isDuplicate(od2, tol))
+								return false;
+						}
 					}
 				}
 				return true;
@@ -787,12 +792,12 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcConstraint> mBenchmarkValues = new LIST<IfcConstraint>();//	 :	OPTIONAL LIST [1:?] OF IfcConstraint;
 		internal IfcLogicalOperatorEnum mLogicalAggregator = IfcLogicalOperatorEnum.NONE;// : OPTIONAL IfcLogicalOperatorEnum;
 		internal IfcObjectiveEnum mObjectiveQualifier = IfcObjectiveEnum.NOTDEFINED;// : 	IfcObjectiveEnum
-		internal string mUserDefinedQualifier = "$"; //	:	OPTIONAL IfcLabel;
+		internal string mUserDefinedQualifier = ""; //	:	OPTIONAL IfcLabel;
 
 		public LIST<IfcConstraint> BenchmarkValues { get { return mBenchmarkValues; } }
 		public IfcLogicalOperatorEnum LogicalAggregator { get { return mLogicalAggregator; } set { mLogicalAggregator = value; } }
 		public IfcObjectiveEnum ObjectiveQualifier { get { return mObjectiveQualifier; } set { mObjectiveQualifier = value; } }
-		public string UserDefinedQualifier { get { return (mUserDefinedQualifier == "$" ? "" : ParserIfc.Decode(mUserDefinedQualifier)); } set { mUserDefinedQualifier = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedQualifier { get { return mUserDefinedQualifier; } set { mUserDefinedQualifier = value; } }
 
 		internal IfcObjective() : base() { }
 		internal IfcObjective(DatabaseIfc db, IfcObjective o) : base(db,o) 
@@ -980,22 +985,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
 	{
-		internal string mIdentification = "$";// : OPTIONAL IfcIdentifier;
+		internal string mIdentification = "";// : OPTIONAL IfcIdentifier;
 		private string mName = "";// : IfcLabel;
-		private string mDescription = "$";// : OPTIONAL IfcText;
+		private string mDescription = "";// : OPTIONAL IfcText;
 		private LIST<IfcActorRole> mRoles = new LIST<IfcActorRole>();// : OPTIONAL LIST [1:?] OF IfcActorRole;
 		private LIST<IfcAddress> mAddresses = new LIST<IfcAddress>();//: OPTIONAL LIST [1:?] OF IfcAddress; 
 		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
-		public string Identification { get { return (mIdentification == "$" ? "" : ParserIfc.Decode(mIdentification)); } set { mIdentification = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identification { get { return mIdentification; } set { mIdentification = value; } }
 		public string Name
 		{
-			get { return ParserIfc.Decode(mName); }
-			set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); }
+			get { return mName; }
+			set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : value); }
 		}
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public LIST<IfcActorRole> Roles { get { return mRoles; } }
 		public LIST<IfcAddress> Addresses { get { return mAddresses; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
@@ -1035,7 +1040,7 @@ namespace GeometryGym.Ifc
 			Roles.AddRange(o.Roles.Select(x => db.Factory.Duplicate(x) as IfcActorRole));
 			Addresses.AddRange(o.Addresses.Select(x => db.Factory.Duplicate(x) as IfcAddress));
 		}
-		public IfcOrganization(DatabaseIfc m, string name) : base(m) { Name = name; }
+		public IfcOrganization(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1188,10 +1193,10 @@ namespace GeometryGym.Ifc
 		private IfcApplication mOwningApplication = null;// : IfcApplication;
 		private IfcStateEnum mState = IfcStateEnum.NOTDEFINED;// : OPTIONAL IfcStateEnum;
 		private IfcChangeActionEnum mChangeAction;// : IfcChangeActionEnum;
-		private int mLastModifiedDate = int.MinValue;// : OPTIONAL IfcTimeStamp;
+		internal int mLastModifiedDate = int.MinValue;// : OPTIONAL IfcTimeStamp;
 		private IfcPersonAndOrganization mLastModifyingUser;// : OPTIONAL IfcPersonAndOrganization;
 		private IfcApplication mLastModifyingApplication;// : OPTIONAL IfcApplication;
-		private int mCreationDate = 0;// : IfcTimeStamp; 
+		internal int mCreationDate = 0;// : IfcTimeStamp; 
 
 		public IfcPersonAndOrganization OwningUser { get { return mOwningUser; } set { mOwningUser = value; } }
 		public IfcApplication OwningApplication { get { return mOwningApplication; } set { mOwningApplication = value; } }
@@ -1225,7 +1230,7 @@ namespace GeometryGym.Ifc
 			OwningUser = owningUser;
 			OwningApplication = owningApplication;
 			mChangeAction = action;
-			CreationDate = DateTime.Now;
+			CreationDate = DateTime.UtcNow;
 			if (action != IfcChangeActionEnum.NOCHANGE && action != IfcChangeActionEnum.NOTDEFINED)
 				LastModifiedDate = CreationDate;
 		}

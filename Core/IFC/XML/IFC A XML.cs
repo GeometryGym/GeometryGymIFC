@@ -733,7 +733,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcAppliedValue v = mDatabase.ParseXml<IfcAppliedValue>(node as XmlElement);
 						if (v != null)
-							addComponent(v);
+							Components.Add(v);
 					}
 				}
 				else if (string.Compare(name, "HasExternalReference") == 0)

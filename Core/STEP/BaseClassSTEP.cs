@@ -44,7 +44,7 @@ namespace GeometryGym.STEP
 		public int Index { get { return mIndex; } private set { mIndex = value; } }
 		public int StepId { get { return mIndex; } private set { mIndex = value; } }
 
-		protected static ConcurrentDictionary<string, Type> mTypes = new ConcurrentDictionary<string, Type>();
+		protected static ConcurrentDictionary<string, Type> mSTEPTypes = new ConcurrentDictionary<string, Type>();
 		protected static ConcurrentDictionary<string, ConstructorInfo> mConstructors = new ConcurrentDictionary<string, ConstructorInfo>();
 
 		internal STEPEntity() { initialize(); }
@@ -106,11 +106,11 @@ namespace GeometryGym.STEP
 			string[] fields = classNameIfc.Split(".".ToCharArray());
 			if (fields != null && fields.Length > 0)
 				name = fields[0];
-			if (!mTypes.TryGetValue(name, out type))
+			if (!mSTEPTypes.TryGetValue(name, out type))
 			{
 				type = Type.GetType("GeometryGym." + nameSpace + "." + name, false, true);
 				if (type != null)
-					mTypes[name] = type;
+					mSTEPTypes[name] = type;
 			}
 			return type;
 		}

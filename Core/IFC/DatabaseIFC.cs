@@ -92,6 +92,7 @@ namespace GeometryGym.Ifc
 		internal ReleaseVersion mRelease = ReleaseVersion.IFC2x3;
 		public FormatIfcSerialization Format { get; set; }
 		public string SourceFilePath { get; set; } = "";
+		public string Authorization { get; set; } = "None";
 		
 		private FactoryIfc mFactory = null;
 		public FactoryIfc Factory { get { return mFactory; } }
@@ -174,7 +175,7 @@ namespace GeometryGym.Ifc
 			if (modelView == ModelView.Ifc4X2NotAssigned)
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
-				return ReleaseVersion.IFC4X3_RC4;
+				return ReleaseVersion.IFC4X3;
 			return ReleaseVersion.IFC4A2;
 		}
 		public double Tolerance
@@ -311,6 +312,23 @@ namespace GeometryGym.Ifc
 			}
 			return result;
 		}
+#if(!NOIFCZIP)
+		public bool WriteSTEPZipFile(string filePath, SetProgressBarCallback setProgressBarCallback)
+		{
+			string path = setFileInformation(filePath);
+			ZipArchive za = null;
+			if (File.Exists(path))
+				File.Delete(path);
+			za = ZipFile.Open(path, System.IO.Compression.ZipArchiveMode.Create);
+			ZipArchiveEntry zae = za.CreateEntry(Path.GetFileNameWithoutExtension(path) + ".ifc");
+			StreamWriter sw = new StreamWriter(zae.Open());
+			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, path, setProgressBarCallback);
+			sw.Close();
+
+			za.Dispose();
+			return true;
+		}
+#endif
 		public bool WriteFile(string filePath)
 		{
 			StreamWriter sw = null;
@@ -501,7 +519,7 @@ namespace GeometryGym.Ifc
 					type = typeof(IfcBuildingElementProxy);
 				else if (release < ReleaseVersion.IFC4X2)
 				{
-					if(typeof(IfcFacility).IsAssignableFrom(type))
+					if(typeof(IfcFacility).IsAssignableFrom(type) && !typeof(IfcBuilding).IsAssignableFrom(type))
 						type = typeof(IfcSite);
 					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
 						type = typeof(IfcSpace);
@@ -519,6 +537,11 @@ namespace GeometryGym.Ifc
 						}
 					}
 				}
+			}
+			else if (release > ReleaseVersion.IFC4X1)
+			{
+				if (typeof(IfcFacilityPart) == type)
+					type = typeof(IfcFacilityPartCommon);
 			}
 			IfcProduct product = construct(type, host, placement, representation, system);
 			if (product == null)
@@ -619,7 +642,10 @@ namespace GeometryGym.Ifc
 		internal DuplicateMapping mDuplicateMapping = new DuplicateMapping();
 		internal Dictionary<string, IfcProperty> mProperties = new Dictionary<string, IfcProperty>();
 		internal Dictionary<string, IfcPropertySet> mPropertySets = new Dictionary<string, IfcPropertySet>();
-		public BaseClassIfc Duplicate(IBaseClassIfc entity) { return Duplicate(entity as BaseClassIfc, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); }
+		public T Duplicate<T>(T entity) where T : class, IBaseClassIfc
+		{
+			return Duplicate<T>(entity, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); 
+		}
 		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
 		public IfcAxis2Placement3D DuplicateAxis(IfcAxis2Placement3D placement, DuplicateOptions options)
 		{
@@ -630,45 +656,47 @@ namespace GeometryGym.Ifc
 				return mDatabase[index] as IfcAxis2Placement3D;
 			if (placement.IsXYPlane(mDatabase.Tolerance))
 				return XYPlanePlacement;
-			return Duplicate(placement, options) as IfcAxis2Placement3D;
+			return Duplicate<IfcAxis2Placement3D>(placement, options);
 		}
-		public BaseClassIfc Duplicate(BaseClassIfc entity, DuplicateOptions options)
+		public T Duplicate<T>(T entity, DuplicateOptions options) where T : class, IBaseClassIfc
 		{
 			if (entity == null)
 				return null;
-			if (entity.mDatabase != null && entity.mDatabase.id == mDatabase.id)
+			BaseClassIfc obj = entity as BaseClassIfc;
+			if (obj.Database != null && obj.Database.id == mDatabase.id)
 				return entity;
-			BaseClassIfc result = null;
+			T result = null;
 			IfcClassification classification = entity as IfcClassification;
 			if(classification != null)
-				result = findExisting<IfcClassification>(classification);
+				result = findExisting<IfcClassification>(classification) as T;
 			else
 			{
 				IfcClassificationReference classificationReference = entity as IfcClassificationReference;
 				if (classificationReference != null)
-					result = findExisting<IfcClassificationReference>(classificationReference);
+					result = findExisting<IfcClassificationReference>(classificationReference) as T;
 			}
 			if (result != null)
 				return result;
-			int index = mDuplicateMapping.FindExisting(entity);
+			int index = mDuplicateMapping.FindExisting(obj);
 			if (index > 0)
 			{
-				result = mDatabase[index];
+				result = mDatabase[index] as T;
 				if (result != null)
 					return result;
 			}
-			if (!string.IsNullOrEmpty(entity.mGlobalId))
+			if (!string.IsNullOrEmpty(obj.mGlobalId))
 			{
-				if (mDatabase.mDictionary.TryGetValue(entity.mGlobalId, out result))
+				if (mDatabase.mDictionary.TryGetValue(obj.mGlobalId, out BaseClassIfc existing))
 				{
+					result = existing as T;
 					if (result != null)
 					{
-						mDuplicateMapping.AddObject(entity, result.mIndex);
+						mDuplicateMapping.AddObject(obj, result.StepId);
 						return result;
 					}
 				}
 			}
-			result = duplicateWorker(entity, options);
+			result = duplicateWorker(obj, options) as T;
 			if (result == null)
 				return null;
 
@@ -1343,7 +1371,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		private IfcPersonAndOrganization mPersonOrganization = null;
+		internal IfcPersonAndOrganization mPersonOrganization = null;
 		internal IfcPersonAndOrganization PersonOrganization
 		{
 			get
@@ -1356,7 +1384,7 @@ namespace GeometryGym.Ifc
 		}
 		internal string PersonName() { return System.Environment.UserName; }
 		internal IfcPerson mPerson = null;
-		internal IfcPerson Person
+		public IfcPerson Person
 		{
 			get
 			{
@@ -1383,7 +1411,7 @@ namespace GeometryGym.Ifc
 			set { mPerson = value; }
 		}
 		internal IfcOrganization mOrganization = null;
-		internal IfcOrganization Organization
+		public IfcOrganization Organization
 		{
 			get
 			{
@@ -1430,7 +1458,7 @@ namespace GeometryGym.Ifc
 			}
 			mOwnerHistories.Add(ownerHistory);
 		}
-		private IfcOwnerHistory mOwnerHistoryAdded = null;
+		internal IfcOwnerHistory mOwnerHistoryAdded = null;
 		public IfcOwnerHistory OwnerHistoryAdded
 		{
 			get
@@ -2511,6 +2539,30 @@ namespace GeometryGym.Ifc
 			sw.Close();
 			return true;
 		}
+		public bool WriteSTEP(TextWriter textWriter, string filename, SetProgressBarCallback progressBarCallback)
+		{
+			mDatabase.FileName = filename;
+			mCachedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+			textWriter.Write(getHeaderString(filename) + "\r\n");
+			ReleaseVersion release = mDatabase.Release;
+			int count = mDatabase.Count(), counter = 0, progress = 0;
+			progressBarCallback(0);
+			foreach (BaseClassIfc e in mDatabase)
+			{
+				if (e != null)
+					e.WriteStepLine(textWriter, release);
+				int calculatedProgress = 100 * counter / count;
+				if (calculatedProgress > progress)
+				{
+					progressBarCallback(++progress);
+				}
+			}
+			textWriter.Write(getFooterString());
+			Thread.CurrentThread.CurrentUICulture = mCachedCulture;
+			progressBarCallback(100);
+			return true;
+		}
 		public bool WriteSTEP(TextWriter textWriter, string filename)
 		{
 			mDatabase.FileName = filename;
@@ -2576,30 +2628,18 @@ namespace GeometryGym.Ifc
 			string authorName = person == null ? mDatabase.Factory.PersonName() : person.Name;
 			lines.Add("/* author */ ('" + ParserIfc.Encode(authorName) + "'),");
 			string organizationName = IfcOrganization.Organization;
-			IfcOrganization organization = null;
+			IfcOrganization organization = mDatabase.Factory.Organization;
 			if (organization != null)
 				organizationName = organization.Name; 
 			lines.Add("/* organization */ ('" + ParserIfc.Encode(organizationName) + "'),");
 			lines.Add("/* preprocessor_version */ '" + ParserIfc.Encode(mDatabase.Factory.ToolkitName) + "',");
 			lines.Add("/* originating_system */ '" + ParserIfc.Encode(mDatabase.Factory.ApplicationFullName) + "',");
-			lines.Add("/* authorization */ 'None');");
+			lines.Add("/* authorization */ '" + (string.IsNullOrEmpty(mDatabase.Authorization) ? "None" : ParserIfc.Encode(mDatabase.Authorization)) + "');");
 			lines.Add("");
-			string version = "IFC4";
 			ReleaseVersion release = mDatabase.Release;
-			if (release == ReleaseVersion.IFC2x3)
-				version = "IFC2X3";
-			else if (release == ReleaseVersion.IFC4X1)
-				version = "IFC4X1";
-			else if (release == ReleaseVersion.IFC4X2)
-				version = "IFC4X2";
-			else if (release == ReleaseVersion.IFC4X3_RC1)
-				version = "IFC4X3_RC1";
-			else if (release == ReleaseVersion.IFC4X3_RC2)
-				version = "IFC4X3_RC2";
-			else if (release == ReleaseVersion.IFC4X3_RC3)
-				version = "IFC4X3_RC3";
-			else if (release == ReleaseVersion.IFC4X3_RC4)
-				version = "IFC4X3_RC4";
+			string version = release.ToString().ToUpper();
+			if (release == ReleaseVersion.IFC4A1 || release == ReleaseVersion.IFC4A2)
+				version = "IFC4";
 			lines.Add("FILE_SCHEMA (('" + version + "'));");
 			lines.Add("ENDSEC;");
 			lines.Add("");

@@ -203,8 +203,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcBoundaryCondition : BaseClassIfc, NamedObjectIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcBoundaryEdgeCondition ,IfcBoundaryFaceCondition ,IfcBoundaryNodeCondition));
 	{
-		internal string mName  = "$";//  : OPTIONAL IfcLabel;
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
+		internal string mName  = "";//  : OPTIONAL IfcLabel;
+		public string Name { get { return mName; } set { mName = value; } } 
 		protected IfcBoundaryCondition() : base() { }
 		protected IfcBoundaryCondition(DatabaseIfc db, IfcBoundaryCondition b) : base(db,b) { mName = b.mName; }
 		protected IfcBoundaryCondition(DatabaseIfc db) : base(db) { }
@@ -649,7 +649,7 @@ namespace GeometryGym.Ifc
 			{
 				if (type != IfcBuildingElementProxyTypeEnum.USERDEFINED && type != IfcBuildingElementProxyTypeEnum.NOTDEFINED)
 				{
-					if (ElementType == "$")
+					if (string.IsNullOrEmpty(ElementType))
 						ElementType = type.ToString();
 					mPredefinedType = IfcBuildingElementProxyTypeEnum.USERDEFINED;
 				}

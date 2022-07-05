@@ -146,10 +146,10 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcBoundaryCondition
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mName == "$" ? "$" : "'" + mName + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (string.IsNullOrEmpty(mName) ? "$" : "'" + ParserIfc.Encode(mName) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mName = ParserSTEP.StripString(str, ref pos, len);
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcBoundaryEdgeCondition

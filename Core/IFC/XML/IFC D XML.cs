@@ -343,7 +343,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "Description", Description);
-			if (mReferencedDocument > 0)
+			if (mReferencedDocument != null)
 				xml.AppendChild(ReferencedDocument.GetXML(xml.OwnerDocument, "ReferencedDocument", this, processed));
 		}
 	}

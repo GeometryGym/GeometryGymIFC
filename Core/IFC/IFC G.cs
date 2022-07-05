@@ -201,12 +201,12 @@ namespace GeometryGym.Ifc
 		internal IfcGeometricRepresentationContext mParentContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
 		private IfcGeometricProjectionEnum mTargetView;// : IfcGeometricProjectionEnum;
-		internal string mUserDefinedTargetView = "$";// : OPTIONAL IfcLabel;
+		internal string mUserDefinedTargetView = "";// : OPTIONAL IfcLabel;
 
 		public IfcGeometricRepresentationContext ParentContext { get { return mParentContext; } set { mParentContext = value; if(value != null) value.mHasSubContexts.Add(this); } }
 		public double TargetScale { get { return mTargetScale; } set { mTargetScale = value; } }
 		public IfcGeometricProjectionEnum TargetView { get { return mTargetView; } set { mTargetView = value; } }
-		public string UserDefinedTargetView { get { return (mUserDefinedTargetView == "$" ? "" : ParserIfc.Decode(mUserDefinedTargetView)); } set { mUserDefinedTargetView = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedTargetView { get { return mUserDefinedTargetView; } set { mUserDefinedTargetView = value; } }
 
 		internal IfcGeometricRepresentationSubContext() : base() { }
 		internal IfcGeometricRepresentationSubContext(DatabaseIfc db, IfcGeometricRepresentationSubContext s, DuplicateOptions options) : base(db, s, options)
@@ -539,7 +539,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGridAxis : BaseClassIfc, NamedObjectIfc
 	{
-		private string mAxisTag = "$";// : OPTIONAL IfcLabel;
+		private string mAxisTag = "";// : OPTIONAL IfcLabel;
 		internal bool mSameSense;// : IfcBoolean;
 
 		//INVERSE
@@ -549,7 +549,7 @@ namespace GeometryGym.Ifc
 		internal List<IfcVirtualGridIntersection> mHasIntersections = new List<IfcVirtualGridIntersection>();//:	SET OF IfcVirtualGridIntersection FOR IntersectingAxes;
 
 		public string Name { get { return AxisTag; } set { AxisTag = value; } }
-		public string AxisTag { get { return mAxisTag == "$" ? "" : ParserIfc.Decode(mAxisTag); } set { mAxisTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string AxisTag { get { return mAxisTag; } set { mAxisTag = value; } }
 		public IfcCurve AxisCurve { get; set; }
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 

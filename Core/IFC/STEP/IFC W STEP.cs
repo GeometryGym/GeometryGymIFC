@@ -98,7 +98,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWindow
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mOverallHeight) + "," + ParserSTEP.DoubleOptionalToString(mOverallWidth) + (release < ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + (mUserDefinedPartitioningType == "$" ? ".,$" : ".,'" + mUserDefinedPartitioningType + "'")); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{ 
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mOverallHeight) + "," + 
+				ParserSTEP.DoubleOptionalToString(mOverallWidth) + 
+				(release < ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + 
+				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedPartitioningType) + "'"));
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -112,7 +118,7 @@ namespace GeometryGym.Ifc
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcWindowTypePartitioningEnum>(s.Replace(".", ""), true, out mPartitioningType);
-				mUserDefinedPartitioningType = ParserSTEP.StripString(str, ref pos, len);
+				mUserDefinedPartitioningType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			}
 		}
 	}

@@ -101,13 +101,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcSchedulingTime : BaseClassIfc, NamedObjectIfc  //	ABSTRACT SUPERTYPE OF(ONEOF(IfcEventTime, IfcLagTime, IfcResourceTime, IfcTaskTime, IfcWorkTime));
 	{
-		internal string mName = "$";//	 :	OPTIONAL IfcLabel;
+		internal string mName = "";//	 :	OPTIONAL IfcLabel;
 		internal IfcDataOriginEnum mDataOrigin = IfcDataOriginEnum.NOTDEFINED;// OPTIONAL : IfcDataOriginEnum;
-		internal string mUserDefinedDataOrigin = "$";//:	OPTIONAL IfcLabel; 
+		internal string mUserDefinedDataOrigin = "";//:	OPTIONAL IfcLabel; 
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
+		public string Name { get { return mName; } set { mName = value; } } 
 		public IfcDataOriginEnum DataOrigin { get { return mDataOrigin; } set { mDataOrigin = value; } }
-		public string UserDefinedDataOrigin { get { return (mUserDefinedDataOrigin == "$" ? "" : ParserIfc.Decode(mName)); } set { mUserDefinedDataOrigin = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedDataOrigin { get { return mUserDefinedDataOrigin; } set { mUserDefinedDataOrigin = value; } }
 
 		protected IfcSchedulingTime() : base() { }
 		protected IfcSchedulingTime(DatabaseIfc db, IfcSchedulingTime t, DuplicateOptions options) : base(db,t) 
@@ -448,16 +448,16 @@ namespace GeometryGym.Ifc
 	public partial class IfcShapeAspect : BaseClassIfc, IfcResourceObjectSelect, NamedObjectIfc
 	{
 		internal LIST<IfcShapeModel> mShapeRepresentations = new LIST<IfcShapeModel>();// : LIST [1:?] OF IfcShapeModel;
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText;
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		private IfcLogicalEnum mProductDefinitional;// : LOGICAL;
 		internal IfcProductRepresentationSelect mPartOfProductDefinitionShape;// IFC4 OPTIONAL IfcProductRepresentationSelect IFC2x3 IfcProductDefinitionShape;
 		//	INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 
 		public LIST<IfcShapeModel> ShapeRepresentations { get { return mShapeRepresentations; } }
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public IfcLogicalEnum ProductDefinitional { get { return mProductDefinitional; } set { mProductDefinitional = value; } }
 		public IfcProductRepresentationSelect PartOfProductDefinitionShape { get { return mPartOfProductDefinitionShape; } set { mPartOfProductDefinitionShape = value; if (value != null) value.HasShapeAspects.Add(this); } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
@@ -782,20 +782,20 @@ additional types	some additional representation types are given:
 	public partial class IfcSimplePropertyTemplate : IfcPropertyTemplate
 	{
 		private IfcSimplePropertyTemplateTypeEnum mTemplateType = IfcSimplePropertyTemplateTypeEnum.NOTDEFINED;// : OPTIONAL IfcSimplePropertyTemplateTypeEnum;
-		internal string mPrimaryMeasureType = "$";// : OPTIONAL IfcLabel;
-		internal string mSecondaryMeasureType = "$";// : OPTIONAL IfcLabel;
+		internal string mPrimaryMeasureType = "";// : OPTIONAL IfcLabel;
+		internal string mSecondaryMeasureType = "";// : OPTIONAL IfcLabel;
 		internal int mEnumerators = 0;// : OPTIONAL IfcPropertyEnumeration;
 		internal int mPrimaryUnit = 0, mSecondaryUnit = 0;// : OPTIONAL IfcUnit; 
-		internal string mExpression = "$";// : OPTIONAL IfcLabel;
+		internal string mExpression = "";// : OPTIONAL IfcLabel;
 		internal IfcStateEnum mAccessState = IfcStateEnum.NOTDEFINED;//	:	OPTIONAL IfcStateEnum;
 
 		public IfcSimplePropertyTemplateTypeEnum TemplateType { get { return mTemplateType; } set { mTemplateType = value; } }
-		public string PrimaryMeasureType { get { return (mPrimaryMeasureType == "$" ? "" : ParserIfc.Decode(mPrimaryMeasureType)); } set { mPrimaryMeasureType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string SecondaryMeasureType { get { return (mSecondaryMeasureType == "$" ? "" : ParserIfc.Decode(mSecondaryMeasureType)); } set { mSecondaryMeasureType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string PrimaryMeasureType { get { return mPrimaryMeasureType; } set { mPrimaryMeasureType = value; } }
+		public string SecondaryMeasureType { get { return mSecondaryMeasureType; } set { mSecondaryMeasureType = value; } }
 		public IfcPropertyEnumeration Enumerators { get { return mDatabase[mEnumerators] as IfcPropertyEnumeration; } set { mEnumerators = (value == null ? 0 : value.mIndex); } }
 		public IfcUnit PrimaryUnit { get { return mDatabase[mPrimaryUnit] as IfcUnit; } set { mPrimaryUnit = (value == null ? 0 : value.Index); } }
 		public IfcUnit SecondaryUnit { get { return mDatabase[mSecondaryUnit] as IfcUnit; } set { mSecondaryUnit = (value == null ? 0 : value.Index); } }
-		public string Expression { get { return (mExpression == "$" ? "" : ParserIfc.Decode(mExpression)); } set { mExpression = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Expression { get { return mExpression; } set { mExpression = value; } }
 		public IfcStateEnum AccessState { get { return mAccessState; } set { mAccessState = value; } }
 
 		internal IfcSimplePropertyTemplate() : base() { }
@@ -839,14 +839,14 @@ additional types	some additional representation types are given:
 		internal IfcCompoundPlaneAngleMeasure mRefLongitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
 		internal double mRefElevation = double.NaN;// : OPTIONAL IfcLengthMeasure;
 		[Obsolete("DEPRECATED IFC4", false)]
-		internal string mLandTitleNumber = "$";// : OPTIONAL IfcLabel;
+		internal string mLandTitleNumber = "";// : OPTIONAL IfcLabel;
 		internal int mSiteAddress;// : OPTIONAL IfcPostalAddress; 
 
 		public IfcCompoundPlaneAngleMeasure RefLatitude { get { return mRefLatitude; } set { mRefLatitude = value; } }
 		public IfcCompoundPlaneAngleMeasure RefLongitude { get { return mRefLongitude; } set { mRefLongitude = value; } }
 		public double RefElevation { get { return mRefElevation; } set { mRefElevation = value; } }
 		[Obsolete("DEPRECATED IFC4", false)]
-		public string LandTitleNumber { get { return (mLandTitleNumber == "$" ? "" : ParserIfc.Decode(mLandTitleNumber)); } set { mLandTitleNumber = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string LandTitleNumber { get { return mLandTitleNumber; } set { mLandTitleNumber = value; } }
 		public IfcPostalAddress SiteAddress { get { return mDatabase[mSiteAddress] as IfcPostalAddress; } set { mSiteAddress = (value == null ? 0 : value.mIndex); } }
 
 		internal IfcSite() : base() { }
@@ -1284,8 +1284,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcSpatialElementType : IfcTypeProduct //IFC4 ABSTRACT SUPERTYPE OF(IfcSpatialStructureElementType)
 	{
-		internal string mElementType = "$";// : OPTIONAL IfcLabel
-		public string ElementType { get { return (mElementType == "$" ? "" : ParserIfc.Decode(mElementType)); } set { mElementType = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		internal string mElementType = "";// : OPTIONAL IfcLabel
+		public string ElementType { get { return mElementType; } set { mElementType = value; } }
 
 		protected IfcSpatialElementType() : base() { }
 		protected IfcSpatialElementType(DatabaseIfc db) : base(db) { }
@@ -1561,8 +1561,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcStructuralConnectionCondition : BaseClassIfc, NamedObjectIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcFailureConnectionCondition ,IfcSlippageConnectionCondition));
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		public string Name { get { return mName; } set { mName = value; } }
 
 		protected IfcStructuralConnectionCondition() : base() { }
 		protected IfcStructuralConnectionCondition(DatabaseIfc db) : base(db) { }
@@ -1738,8 +1738,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public abstract partial class IfcStructuralLoad : BaseClassIfc, NamedObjectIfc //	ABSTRACT SUPERTYPE OF(ONEOF(IfcStructuralLoadConfiguration, IfcStructuralLoadOrResult));
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		internal string mName = "";// : OPTIONAL IfcLabel
+		public string Name { get { return mName; } set { mName = value; } }
 
 		protected IfcStructuralLoad() : base() { }
 		protected IfcStructuralLoad(DatabaseIfc db) : base(db) { }
@@ -1796,7 +1796,7 @@ additional types	some additional representation types are given:
 		internal IfcActionTypeEnum mActionType = IfcActionTypeEnum.NOTDEFINED;// : IfcActionTypeEnum;
 		internal IfcActionSourceTypeEnum mActionSource = IfcActionSourceTypeEnum.NOTDEFINED;//: IfcActionSourceTypeEnum;
 		internal double mCoefficient = double.NaN;//: OPTIONAL IfcRatioMeasure;
-		internal string mPurpose = "$";// : OPTIONAL IfcLabel; 
+		internal string mPurpose = "";// : OPTIONAL IfcLabel; 
 		//INVERSE 
 		internal IfcStructuralResultGroup mSourceOfResultGroup = null;// :	SET [0:1] OF IfcStructuralResultGroup FOR ResultForLoadGroup;
 		internal List<IfcStructuralAnalysisModel> mLoadGroupFor = new List<IfcStructuralAnalysisModel>();//	 :	SET [0:?] OF IfcStructuralAnalysisModel 
@@ -1805,7 +1805,7 @@ additional types	some additional representation types are given:
 		public IfcActionTypeEnum ActionType { get { return mActionType; } set { mActionType = value; } }
 		public IfcActionSourceTypeEnum ActionSource { get { return mActionSource; } set { mActionSource = value; } }
 		public double Coefficient { get { return mCoefficient; } set { mCoefficient = value; } }
-		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Purpose { get { return mPurpose; } set { mPurpose = value; } }
 
 		internal IfcStructuralLoadGroup() : base() { }
 		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, DuplicateOptions options) : base(db, g, options) { mPredefinedType = g.mPredefinedType; mActionType = g.mActionType; mActionSource = g.mActionSource; mCoefficient = g.mCoefficient; mPurpose = g.mPurpose; }
@@ -2209,7 +2209,7 @@ additional types	some additional representation types are given:
 	{
 		private IfcRepresentationItem mItem = null;// : OPTIONAL IfcRepresentationItem;
 		private SET<IfcStyleAssignmentSelect> mStyles = new SET<IfcStyleAssignmentSelect>();// : SET [1:?] OF IfcStyleAssignmentSelect; ifc2x3 IfcPresentationStyleAssignment;
-		private string mName = "$";// : OPTIONAL IfcLabel; 
+		private string mName = "";// : OPTIONAL IfcLabel; 
 
 		public IfcRepresentationItem Item
 		{
@@ -2225,7 +2225,7 @@ additional types	some additional representation types are given:
 			}
 		}
 		public SET<IfcStyleAssignmentSelect> Styles { get { return mStyles; } }
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } }
 
 		internal IfcStyledItem() : base() { }
 		internal IfcStyledItem(DatabaseIfc db, IfcStyledItem i, DuplicateOptions options) : base(db, i, options)
@@ -2633,15 +2633,15 @@ additional types	some additional representation types are given:
 	{
 		internal bool mRepeatS;// : BOOLEAN;
 		internal bool mRepeatT;// : BOOLEAN;
-		internal string mMode = "$"; //:	OPTIONAL IfcIdentifier; ifc2x3 IfcSurfaceTextureEnum mTextureType;// 
-		internal int mTextureTransform;// : OPTIONAL IfcCartesianTransformationOperator2D;
+		internal string mMode = ""; //:	OPTIONAL IfcIdentifier; ifc2x3 IfcSurfaceTextureEnum mTextureType;// 
+		internal IfcCartesianTransformationOperator2D mTextureTransform;// : OPTIONAL IfcCartesianTransformationOperator2D;
 		internal List<string> mParameter = new List<string>();// IFC4 OPTIONAL LIST [1:?] OF IfcIdentifier;
 
 		public bool RepeatS { get { return mRepeatS; } set { mRepeatS = value; } }
 		public bool RepeatT { get { return mRepeatT; } set { mRepeatT = value; } }
-		public string Mode { get { return (mMode == "$" ? "" : ParserIfc.Decode(mMode)); } set { mMode = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public IfcCartesianTransformationOperator2D TextureTransform { get { return mDatabase[mTextureTransform] as IfcCartesianTransformationOperator2D; } set { mTextureTransform = (value == null ? 0 : value.mIndex); } }
-		public ReadOnlyCollection<string> Parameter { get { return new ReadOnlyCollection<string>( mParameter.ConvertAll(x => ParserIfc.Decode(x))); } }
+		public string Mode { get { return mMode; } set { mMode = value; } }
+		public IfcCartesianTransformationOperator2D TextureTransform { get { return mTextureTransform; } set { mTextureTransform = value; } }
+		public List<string> Parameter { get { return mParameter; } }
 
 		protected IfcSurfaceTexture() : base() { }
 		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t) : base(db,t) { mRepeatS = t.mRepeatS; mRepeatT = t.mRepeatT; mMode = t.mMode; mTextureTransform = t.mTextureTransform; }
@@ -2652,7 +2652,7 @@ additional types	some additional representation types are given:
 			mRepeatS = t.mRepeatS; 
 			mRepeatT = t.mRepeatT; 
 			mMode = t.mMode;
-			if (t.mTextureTransform > 0)
+			if (t.mTextureTransform != null)
 				TextureTransform = db.Factory.Duplicate(t.TextureTransform, options) as IfcCartesianTransformationOperator2D;
 			mParameter.AddRange(t.mParameter);
 		}

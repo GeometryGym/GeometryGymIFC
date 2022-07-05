@@ -59,7 +59,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + (mBenchmarkValues.Count == 0 ? ",$," : ",(" + string.Join(",", mBenchmarkValues.Select(x=>"#" + x.StepId)) + "),") +
-				(mLogicalAggregator != IfcLogicalOperatorEnum.NONE ? "." + mLogicalAggregator.ToString() + ".,." : "$,.") + mObjectiveQualifier + (mUserDefinedQualifier == "$" ? ".,$" : ".,'" + mUserDefinedQualifier + "'");
+				(mLogicalAggregator != IfcLogicalOperatorEnum.NONE ? "." + mLogicalAggregator.ToString() + ".,." : "$,.") + mObjectiveQualifier + (string.IsNullOrEmpty(mUserDefinedQualifier) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedQualifier) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 			if (s[0] == '.')
 				Enum.TryParse<IfcLogicalOperatorEnum>(s.Replace(".", ""), true, out mLogicalAggregator);
 			Enum.TryParse<IfcObjectiveEnum>(ParserSTEP.StripField( str, ref pos, len).Replace(".", ""), true, out mObjectiveQualifier);
-			mUserDefinedQualifier = ParserSTEP.StripString(str, ref pos, len);
+			mUserDefinedQualifier = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcOccupant
@@ -168,17 +168,17 @@ namespace GeometryGym.Ifc
 			string name = mName;
 			if(string.IsNullOrEmpty(name))
 				name = mDatabase.Factory.ApplicationDeveloper;
-			return (mIdentification == "$" ? "$,'" : "'" + mIdentification + "','") + name 
-				+ (mDescription == "$" ? "',$," : "','" + mDescription + "',") 
+			return (string.IsNullOrEmpty(mIdentification) ? "$,'" : "'" + ParserIfc.Encode(mIdentification) + "','") + ParserIfc.Encode(name) 
+				+ (string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserIfc.Encode(mDescription) + "',") 
 				+ (mRoles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.Select(x=>x.Index)) + "),")
 				+ (mAddresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.Select(x=>x.Index)) + ")");
 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mIdentification = ParserSTEP.StripString(str, ref pos, len);
-			mName = ParserSTEP.StripString(str, ref pos, len);
-			mDescription = ParserSTEP.StripString(str, ref pos, len);
+			mIdentification = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			Roles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcActorRole));
 			mAddresses.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAddress));
 		}

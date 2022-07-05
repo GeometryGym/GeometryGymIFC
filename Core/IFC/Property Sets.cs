@@ -83,6 +83,28 @@ namespace GeometryGym.Ifc
 		public Pset_ActuatorTypeRotationalActuation(IfcActuator instance) : base(instance) { }
 		public Pset_ActuatorTypeRotationalActuation(IfcActuatorType type) : base(type) { }
 	}
+	public partial class Pset_Address : IfcPropertySet
+	{
+		public IfcAddressTypeEnum Purpose { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Purpose", new IfcLabel(value.ToString()))); } }
+		public string AddressDescription { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Description", new IfcText(value))); } }
+		public string UserDefinedPurpose { set { AddProperty(new IfcPropertySingleValue(mDatabase, "UserDefinedPurpose", new IfcLabel(value))); } }
+		public string InternalLocation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "InternalLocation", new IfcLabel(value))); } }
+		public IfcPropertyListValue<IfcLabel> AddressLines { set { value.Name = "AddressLines"; addProperty(value); } }
+		public string PostalBox { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PostalBox", new IfcLabel(value))); } }
+		public string Town { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Town", new IfcLabel(value))); } }
+		public string Region { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Region", new IfcLabel(value))); } }
+		public string PostalCode { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PostalCode", new IfcLabel(value))); } }
+		public string Country { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Country", new IfcLabel(value))); } }
+		public IfcPropertyListValue<IfcLabel> TelephoneNumbers { set { value.Name = "TelephoneNumbers"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> FacsimileNumbers { set { value.Name = "FacsimileNumbers"; addProperty(value); } }
+		public string PagerNumber { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PagerNumber", new IfcLabel(value))); } }
+		public IfcPropertyListValue<IfcLabel> ElectronicMailAddresses { set { value.Name = "ElectronicMailAddresses"; addProperty(value); } }
+		public string WWWHomePageURL { set { AddProperty(new IfcPropertySingleValue(mDatabase, "WWWHomePageURL", new IfcURIReference(value))); } }
+		public IfcPropertyListValue<IfcURIReference> MessagingIDs { set { value.Name = "MessagingIDs"; addProperty(value); } }
+		public Pset_Address(IfcBuilding instance) : base(instance) { }
+		public Pset_Address(IfcActor instance) : base(instance) { }
+		public Pset_Address(IfcFacility instance) : base(instance) { }
+	}
 	public partial class Pset_AirSideSystemInformation : IfcPropertySet
 	{
 		public string Name { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Name", new IfcLabel(value))); } }

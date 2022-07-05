@@ -54,15 +54,15 @@ namespace GeometryGym.Ifc
 	public partial class IfcActorRole : BaseClassIfc, IfcResourceObjectSelect
 	{
 		internal IfcRoleEnum mRole = IfcRoleEnum.NOTDEFINED;// : OPTIONAL IfcRoleEnum
-		internal string mUserDefinedRole = "$";// : OPTIONAL IfcLabel
-		internal string mDescription = "$";// : OPTIONAL IfcText; 
-										   //INVERSE
+		internal string mUserDefinedRole = "";// : OPTIONAL IfcLabel
+		internal string mDescription = "";// : OPTIONAL IfcText; 
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal LIST<IfcResourceConstraintRelationship> mHasConstraintRelationships = new LIST<IfcResourceConstraintRelationship>(); //gg
 
 		public IfcRoleEnum Role { get { return mRole; } set { mRole = value; } }
-		public string UserDefinedRole { get { return (mUserDefinedRole == "$" ? "" : ParserIfc.Decode(mUserDefinedRole)); } set { mUserDefinedRole = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string UserDefinedRole { get { return mUserDefinedRole; } set { mUserDefinedRole = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public LIST<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
@@ -122,12 +122,12 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcAddress : BaseClassIfc, IfcObjectReferenceSelect   //ABSTRACT SUPERTYPE OF(ONEOF(IfcPostalAddress, IfcTelecomAddress));
 	{
 		internal IfcAddressTypeEnum mPurpose = IfcAddressTypeEnum.NOTDEFINED;// : OPTIONAL IfcAddressTypeEnum
-		internal string mDescription = "$";// : OPTIONAL IfcText;
-		internal string mUserDefinedPurpose = "$";// : OPTIONAL IfcLabel 
+		internal string mDescription = "";// : OPTIONAL IfcText;
+		internal string mUserDefinedPurpose = "";// : OPTIONAL IfcLabel 
 
 		public IfcAddressTypeEnum Purpose { get { return mPurpose; } set { mPurpose = value; } }
-		public string Description { get { return mDescription == "$" ? "" : ParserIfc.Decode(mDescription); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string UserDefinedPurpose { get { return mUserDefinedPurpose == "$" ? "" : ParserIfc.Decode(mUserDefinedPurpose); } set { mUserDefinedPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Description { get { return mDescription ; } set { mDescription = value; } }
+		public string UserDefinedPurpose { get { return mUserDefinedPurpose; } set { mUserDefinedPurpose = value; } }
 		
 		protected IfcAddress() : base() { }
 		protected IfcAddress(DatabaseIfc db) : base(db) {  }
@@ -283,14 +283,14 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcSite host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis)
 			: this(placement, horizontal, vertical, cant, host, axis) { }
 
-		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		internal override bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
 		{
 			IfcAlignment alignment = e as IfcAlignment;
 			if (alignment == null)
 				return false;
 			if (PredefinedType != alignment.PredefinedType)
 				return false;
-			return base.isDuplicate(e, tol);
+			return base.isDuplicate(e, includeAggregated, tol);
 		}
 	}
 	[Obsolete("DEPRECATED IFC4X3", false)]
@@ -521,12 +521,12 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
 		internal IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
-		private string mStartTag = "$";// : OPTIONAL IfcLabel;
-		private string mEndTag = "$";// : OPTIONAL IfcLabel;
+		private string mStartTag = "";// : OPTIONAL IfcLabel;
+		private string mEndTag = "";// : OPTIONAL IfcLabel;
 
 		public bool TangentialContinuity { get { return mTangentialContinuity == IfcLogicalEnum.TRUE; } set { mTangentialContinuity = (value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE); } }
-		public string StartTag { get { return (mStartTag == "$" ? "" : ParserIfc.Decode(mStartTag)); } set { mStartTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
-		public string EndTag { get { return (mEndTag == "$" ? "" : ParserIfc.Decode(mEndTag)); } set { mEndTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value.Replace("'", ""))); } }
+		public string StartTag { get { return mStartTag; } set { mStartTag = value; } }
+		public string EndTag { get { return mEndTag; } set { mEndTag = value; } }
 
 		protected IfcAlignment2DSegment() : base() { }
 		protected IfcAlignment2DSegment(DatabaseIfc db) : base(db) { }
@@ -793,11 +793,11 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcAlignment2DHorizontal mHorizontal = null;// : OPTIONAL IfcAlignment2DHorizontal;
 		private IfcAlignment2DVertical mVertical = null;// : OPTIONAL IfcAlignment2DVertical;
-		internal string mTag = "$";// : OPTIONAL IfcLabel;
+		internal string mTag = "";// : OPTIONAL IfcLabel;
 
 		public IfcAlignment2DHorizontal Horizontal { get { return mHorizontal; } set { mHorizontal = value; } }
 		public IfcAlignment2DVertical Vertical { get { return mVertical; } set { if (mVertical != null) mVertical.ToAlignmentCurve = null; mVertical = value; if (value != null) value.ToAlignmentCurve = this; } }
-		public string Tag { get { return (mTag == "$" ? "" : ParserIfc.Decode(mTag)); } set { mTag = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Tag { get { return mTag; } set { mTag = value; } }
 
 		internal IfcAlignmentCurve() : base() { }
 		internal IfcAlignmentCurve(DatabaseIfc db, IfcAlignmentCurve c, DuplicateOptions options) : base(db, c, options)
@@ -875,7 +875,7 @@ namespace GeometryGym.Ifc
 		{
 			return isDuplicate(horizontal, tol);
 		}
-		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		internal override bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
 		{
 			IfcAlignmentHorizontal horizontal = e as IfcAlignmentHorizontal;
 			if (horizontal == null)
@@ -901,7 +901,7 @@ namespace GeometryGym.Ifc
 					return false;
 			}
 
-			return base.isDuplicate(e, tol);
+			return base.isDuplicate(e, includeAggregated, tol);
 		}
 	}
 	[Serializable]
@@ -1173,14 +1173,14 @@ namespace GeometryGym.Ifc
 			DesignParameters = design; 
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		internal override bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
 		{
 			IfcAlignmentSegment segment = e as IfcAlignmentSegment;
 			if (segment == null)
 				return false;
 			if (!mDesignParameters.isDuplicate(segment.mDesignParameters, tol))
 				return false;
-			return base.isDuplicate(e, tol);
+			return base.isDuplicate(e, includeAggregated, tol);
 		}
 	}
 	[Serializable]
@@ -1516,16 +1516,16 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcObjectReferenceSelect, IfcResourceObjectSelect, NamedObjectIfc
 	{  // SUPERTYPE OF(IfcCostValue);
-		internal string mName = "$";// : OPTIONAL IfcLabel;
-		internal string mDescription = "$";// : OPTIONAL IfcText;
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal IfcAppliedValueSelect mAppliedValue = null;// : OPTIONAL IfcAppliedValueSelect;
 		internal int mUnitBasis;// : OPTIONAL IfcMeasureWithUnit;
 		internal DateTime mApplicableDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
 		internal DateTime mFixedUntilDate = DateTime.MinValue;// : OPTIONAL IfcDateTimeSelect; 4 IfcDate
 		private IfcDateTimeSelect mSSApplicableDate = null;
 		private IfcDateTimeSelect mSSFixedUntilDate = null;
-		internal string mCategory = "$";// : OPTIONAL IfcLabel; IFC4
-		internal string mCondition = "$";// : OPTIONAL IfcLabel; IFC4
+		internal string mCategory = "";// : OPTIONAL IfcLabel; IFC4
+		internal string mCondition = "";// : OPTIONAL IfcLabel; IFC4
 		internal IfcArithmeticOperatorEnum mArithmeticOperator = IfcArithmeticOperatorEnum.NONE;//	 :	OPTIONAL IfcArithmeticOperatorEnum; IFC4 
 		internal LIST<IfcAppliedValue> mComponents = new LIST<IfcAppliedValue>();//	 :	OPTIONAL LIST [1:?] OF IfcAppliedValue; IFC4
 		//INVERSE
@@ -1533,14 +1533,14 @@ namespace GeometryGym.Ifc
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 		internal SET<IfcAppliedValue> mComponentFor = new SET<IfcAppliedValue>(); //gg
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } } 
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = value; } } 
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public IfcAppliedValueSelect AppliedValue { get { return mAppliedValue; } set { mAppliedValue = value; } }
 		public IfcMeasureWithUnit UnitBasis { get { return mDatabase[mUnitBasis] as IfcMeasureWithUnit; } set { mUnitBasis = (value == null ? 0 : value.mIndex); } }
 		public DateTime ApplicableDate { get { return mApplicableDate; } set { mApplicableDate = value; } }
 		public DateTime FixedUntilDate { get { return mFixedUntilDate; } set { mFixedUntilDate = value; } }
-		public string Category { get { return (mCategory == "$" ? "" : ParserIfc.Decode(mCategory)); } set { mCategory = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Condition { get { return (mCondition == "$" ? "" : ParserIfc.Decode(mCondition)); } set { mCondition = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Category { get { return mCategory; } set { mCategory = value; } }
+		public string Condition { get { return mCondition; } set { mCondition = value; } }
 		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
 		public LIST<IfcAppliedValue> Components { get { return mComponents; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
@@ -1557,18 +1557,26 @@ namespace GeometryGym.Ifc
 				if (value != null)
 					mAppliedValue = value;
 				else
-					AppliedValue = db.Factory.Duplicate(v.mAppliedValue) as IfcAppliedValueSelect;
+					AppliedValue = db.Factory.Duplicate(v.mAppliedValue);
 			}
-			UnitBasis = db.Factory.Duplicate(v.UnitBasis) as IfcMeasureWithUnit;
-			mApplicableDate = v.mApplicableDate; mFixedUntilDate = v.mFixedUntilDate; mCategory = v.mCategory; mCondition = v.mCondition; mArithmeticOperator = v.mArithmeticOperator;
-			v.Components.ToList().ForEach(x => addComponent(db.Factory.Duplicate(x) as IfcAppliedValue));
+			UnitBasis = db.Factory.Duplicate(v.UnitBasis);
+			mApplicableDate = v.mApplicableDate; 
+			mFixedUntilDate = v.mFixedUntilDate; 
+			mCategory = v.mCategory; 
+			mCondition = v.mCondition; 
+			mArithmeticOperator = v.mArithmeticOperator;
+			Components.AddRange(v.Components.Select(x => db.Factory.Duplicate(x)));
 		}
 		public IfcAppliedValue(DatabaseIfc db) : base(db) { }
 		public IfcAppliedValue(IfcAppliedValueSelect appliedValue) : base(appliedValue.Database) { AppliedValue = appliedValue; }
 		public IfcAppliedValue(DatabaseIfc db, IfcValue value) : base(db) { AppliedValue = value; }
-		public IfcAppliedValue(IfcAppliedValue component1, IfcArithmeticOperatorEnum op,IfcAppliedValue component2) : base(component1.mDatabase) { addComponent(component1); addComponent(component2); mArithmeticOperator = op; } 
-		
-
+		public IfcAppliedValue(IfcAppliedValue component1, IfcArithmeticOperatorEnum op,IfcAppliedValue component2) 
+			: base(component1.mDatabase)
+		{ 
+			Components.Add(component1); 
+			Components.Add(component2); 
+			mArithmeticOperator = op; 
+		} 
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1621,7 +1629,6 @@ namespace GeometryGym.Ifc
 		}
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
-		internal void addComponent(IfcAppliedValue value) { mComponents.Add(value); value.mComponentFor.Add(this); }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -1653,19 +1660,30 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcApproval : BaseClassIfc, IfcResourceObjectSelect, NamedObjectIfc
 	{
-		internal string mDescription = "$";// : OPTIONAL IfcText;
-		internal int mApprovalDateTime;// : IfcDateTimeSelect;
-		internal string mApprovalStatus = "$";// : OPTIONAL IfcLabel;
-		internal string mApprovalLevel = "$";// : OPTIONAL IfcLabel;
-		internal string mApprovalQualifier = "$";// : OPTIONAL IfcText;
-		internal string mName = "$";// :OPTIONAL IfcLabel;
-		internal string mIdentifier = "$";// : OPTIONAL IfcIdentifier;
-										  //INVERSE
+		internal string mIdentifier = "";// : OPTIONAL IfcIdentifier;
+		internal string mName = "";// :OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText;
+		internal DateTime mTimeOfApproval;// : IfcDateTime
+		internal IfcDateTimeSelect mApprovalDateTime;// : IfcDateTimeSelect;
+		internal string mStatus = "";// : OPTIONAL IfcLabel;
+		internal string mLevel = "";// : OPTIONAL IfcLabel;
+		internal string mQualifier = "";// : OPTIONAL IfcText;
+		internal IfcActorSelect mRequestingApproval = null;// : OPTIONAL IfcActorSelect;
+		internal IfcActorSelect mGivingApproval = null;// : OPTIONAL IfcActorSelect;
+		//INVERSE
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		private SET<IfcRelAssociatesApproval> mApprovedObjects = new SET<IfcRelAssociatesApproval>();
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
-		public string Name { get { return (mName == "$" ? "" : ParserIfc.Decode(mName)); } set { mName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Identifier { get { return mIdentifier; } set { mIdentifier = value; } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public DateTime TimeOfApproval { get { return mTimeOfApproval; } set { mTimeOfApproval = value; } }
+		public string Status { get { return mStatus; } set { mStatus = value; } }
+		public string Level { get { return mLevel; } set { mLevel = value; } }
+		public string Qualifier { get { return mQualifier; } set { mQualifier = value; } }
+		public IfcActorSelect RequestingApproval { get { return mRequestingApproval; } set { mRequestingApproval = value; } }
+		public IfcActorSelect GivingApproval { get { return mGivingApproval; } set { mGivingApproval = value; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcRelAssociatesApproval> ApprovedObjects { get { return mApprovedObjects; } }
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }

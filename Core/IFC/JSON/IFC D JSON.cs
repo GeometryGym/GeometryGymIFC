@@ -333,7 +333,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Description", Description);
-			if (mReferencedDocument > 0)
+			if (mReferencedDocument != null)
 				obj["ReferencedDocument"] = ReferencedDocument.getJson(this, options);
 		}
 	}

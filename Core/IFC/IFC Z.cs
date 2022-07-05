@@ -31,8 +31,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcZone : IfcSystem
 	{
-		internal string mLongName = "$";// :	OPTIONAL IfcLabel; IFC4
-		public string LongName { get { return (mLongName == "$" ? "" : ParserIfc.Decode(mLongName)); } set { mLongName = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		internal string mLongName = "";// :	OPTIONAL IfcLabel; IFC4
+		public string LongName { get { return mLongName; } set { mLongName = value; } }
 
 		internal IfcZone() : base() { }
 		internal IfcZone(DatabaseIfc db, IfcZone z, DuplicateOptions options) : base(db, z, options) { mLongName = z.mLongName; }

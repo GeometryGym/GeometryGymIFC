@@ -96,24 +96,24 @@ namespace GeometryGym.Ifc
 	public partial class IfcLibraryInformation : IfcExternalInformation, NamedObjectIfc, IfcLibrarySelect
 	{
 		internal string mName;// :	IfcLabel;
-		internal string mVersion = "$";//:	OPTIONAL IfcLabel;
+		internal string mVersion = "";//:	OPTIONAL IfcLabel;
 		internal int mPublisher;//	 :	OPTIONAL IfcActorSelect;
 		internal DateTime mVersionDate = DateTime.MinValue; // :	OPTIONAL IfcDateTime;
 		internal int mVersionDateSS = 0; // 
-		internal string mLocation = "$";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
-		internal string mDescription = "$";//	 :	OPTIONAL IfcText; //IFC4 Added
+		internal string mLocation = "";//	 :	OPTIONAL IfcURIReference; //IFC4 Added
+		internal string mDescription = "";//	 :	OPTIONAL IfcText; //IFC4 Added
 		[Obsolete("DEPRECATED IFC4", false)]
 		private SET<IfcLibraryReference> mLibraryReference = new SET<IfcLibraryReference>();// IFC2x3 : 	OPTIONAL SET[1:?] OF IfcLibraryReference;
 		//INVERSE
 		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 		internal SET<IfcLibraryReference> mHasLibraryReferences = new SET<IfcLibraryReference>();//	:	SET OF IfcLibraryReference FOR ReferencedLibrary;
 
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : ParserIfc.Encode(value)); } }
-		public string Version { get { return (mVersion == "$" ? "" : ParserIfc.Decode(mVersion)); } set { mVersion = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = (string.IsNullOrEmpty(value) ? "UNKNOWN" : value); } }
+		public string Version { get { return mVersion; } set { mVersion = value; } }
 		public IfcActorSelect Publisher { get { return mDatabase[mPublisher] as IfcActorSelect; } set { mPublisher = (value == null ? 0 : value.Index); } }
 		public DateTime VersionDate { get { return mVersionDate; } set { mVersionDate = value;  } }
-		public string Location { get { return (mLocation == "$" ? "" : ParserIfc.Decode(mLocation)); } set { mLocation = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
-		public string Description { get { return (mDescription == "$" ? "" : ParserIfc.Decode(mDescription)); } set { mDescription = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Location { get { return mLocation; } set { mLocation = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 
 		public SET<IfcRelAssociatesLibrary> LibraryRefForObjects { get { return mLibraryRefForObjects; } }
 		public SET<IfcLibraryReference> HasLibraryReferences { get { return mHasLibraryReferences; } }
@@ -151,13 +151,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcLibraryReference : IfcExternalReference, IfcLibrarySelect
 	{
 		internal string mDescription = ""; //IFC4	 :	OPTIONAL IfcText;
-		internal string mLanguage = "$"; //IFC4	 :	OPTIONAL IfcLanguageId;
+		internal string mLanguage = ""; //IFC4	 :	OPTIONAL IfcLanguageId;
 		internal IfcLibraryInformation mReferencedLibrary; //	 :	OPTIONAL IfcLibraryInformation; ifc2x3 INVERSE ReferenceIntoLibrary
 		//INVERSE
 		internal SET<IfcRelAssociatesLibrary> mLibraryRefForObjects = new SET<IfcRelAssociatesLibrary>();//IFC4 :	SET [0:?] OF IfcRelAssociatesLibrary FOR RelatingLibrary;
 
 		public string Description { get { return mDescription; } set { mDescription = value; } }
-		public string Language { get { return (mLanguage == "$" ? "" : ParserIfc.Decode(mLanguage)); } set { mLanguage = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Language { get { return mLanguage; } set { mLanguage = value; } }
 		public IfcLibraryInformation ReferencedLibrary { get { return mReferencedLibrary; } set { mReferencedLibrary = value; if (value != null) value.mHasLibraryReferences.Add(this); } }
 		public SET<IfcRelAssociatesLibrary> LibraryRefForObjects { get { return mLibraryRefForObjects; } }
 
@@ -232,7 +232,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcLightSource : IfcGeometricRepresentationItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcLightSourceAmbient ,IfcLightSourceDirectional ,IfcLightSourceGoniometric ,IfcLightSourcePositional))
 	{
-		internal string mName = "$";// : OPTIONAL IfcLabel;
+		internal string mName = "";// : OPTIONAL IfcLabel;
 		internal int mLightColour;// : IfcColourRgb;
 		internal double mAmbientIntensity;// : OPTIONAL IfcNormalisedRatioMeasure;
 		internal double mIntensity;// : OPTIONAL IfcNormalisedRatioMeasure; 
@@ -423,7 +423,7 @@ namespace GeometryGym.Ifc
 				Axis = db.Factory.Duplicate(e.Axis) as IfcCurve; 
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		internal override bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
 		{
 			IfcLinearPositioningElement linearPositioningElement = e as IfcLinearPositioningElement;
 			if (linearPositioningElement == null)
@@ -436,7 +436,7 @@ namespace GeometryGym.Ifc
 			}
 			else if (linearPositioningElement.mAxis != null)
 				return false;
-			return base.isDuplicate(e, tol);
+			return base.isDuplicate(e, includeAggregated, tol);
 		}
 	}
 	[Serializable]
