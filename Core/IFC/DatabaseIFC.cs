@@ -37,7 +37,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace GeometryGym.Ifc
-{ 
+{
 	public enum ReleaseVersion 
 	{
 		[Obsolete("Retired", false)] IFC2X, 
@@ -125,19 +125,29 @@ namespace GeometryGym.Ifc
 		{
 			set
 			{
-				IfcRoot root = this[index] as IfcRoot;
-				if (root != null)
+				BaseClassIfc existing = this[index];
+				if (existing != null)
 				{
-					BaseClassIfc obj = null;
-					mDictionary.TryRemove(root.GlobalId, out obj);
+					if (existing is IfcRoot existingRoot)
+					{
+						BaseClassIfc obj = null;
+						mDictionary.TryRemove(existingRoot.GlobalId, out obj);
+					}
+					else if (existing is IfcClassificationReference existingClassificationReference)
+						mClassificationReferences.Remove(existingClassificationReference);
+					else if (existing is IfcClassification existingClassification)
+						mClassifications.Add(existingClassification);
 				}
-				root = value as IfcRoot;
-				if(root != null && !string.IsNullOrEmpty(root.GlobalId))
+				if (value is IfcRoot root)
 				{
-					if (mDictionary.ContainsKey(root.GlobalId))
-						root.Guid = Guid.NewGuid();
 					mDictionary[root.GlobalId] = value;
 				}
+				else if (value is IfcClassificationReference classificationReference)
+					mClassificationReferences.Add(classificationReference);
+				else if (value is IfcClassification classification)
+					mClassifications.Add(classification);
+
+			
 				base[index] = value;
 				if(value != null)
 					value.mDatabase = this;
@@ -239,6 +249,8 @@ namespace GeometryGym.Ifc
 		internal IfcContext mContext = null;
 		
 		internal ConcurrentDictionary<string, BaseClassIfc> mDictionary = new ConcurrentDictionary<string, BaseClassIfc>();
+		internal HashSet<IfcClassificationReference> mClassificationReferences = new HashSet<IfcClassificationReference>();
+		internal HashSet<IfcClassification> mClassifications = new HashSet<IfcClassification>();
 		
 		private string viewDefinition { get { return (mModelView == ModelView.Ifc2x3Coordination ? "CoordinationView_V2" : (mModelView == ModelView.Ifc4Reference ? "ReferenceView_V1" : (mModelView == ModelView.Ifc4DesignTransfer ? "DesignTransferView_V1" : "notYetAssigned"))); } }
 		
@@ -456,7 +468,7 @@ namespace GeometryGym.Ifc
 
 		private string key(BaseClassIfc obj) 
 		{ 
-			return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mIndex; 
+			return (obj.mDatabase == null ? "" : obj.mDatabase.id + "|") + obj.mStepId; 
 		}
 		internal bool Remove(BaseClassIfc obj)
 		{
@@ -499,42 +511,31 @@ namespace GeometryGym.Ifc
 		
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
-			string str = className, predefinedTypeConstant = "", enumName = "";
+			string str = className, predefinedTypeConstant = "";
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant, out enumName);
+			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
-			if (release < ReleaseVersion.IFC4X3_RC1)
+			VersionAddedAttribute versionAdded = type.GetCustomAttribute(typeof(VersionAddedAttribute)) as VersionAddedAttribute;
+			if(versionAdded != null && (versionAdded.Release > release) && release != ReleaseVersion.IFC4X3_RC4)
+				type = typeof(IfcBuildingElementProxy);
+			else if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				if (string.Compare(str, "IfcBuiltElement", true) == 0)
-					type = typeof(IfcBuildingElementProxy);
-				else if (typeof(IfcCourse).IsAssignableFrom(type) || typeof(IfcEarthworksElement).IsAssignableFrom(type))
-					type = typeof(IfcBuildingElementProxy);
-				else if (typeof(IfcEarthworksCut).IsAssignableFrom(type) || typeof(IfcGeotechnicalStratum).IsAssignableFrom(type))
-					type = typeof(IfcBuildingElementProxy);
-				else if (typeof(IfcPavement).IsAssignableFrom(type))
 					type = typeof(IfcBuildingElementProxy);
 				else if (release < ReleaseVersion.IFC4X2)
 				{
 					if(typeof(IfcFacility).IsAssignableFrom(type) && !typeof(IfcBuilding).IsAssignableFrom(type))
 						type = typeof(IfcSite);
-					if (typeof(IfcFacilityPart).IsAssignableFrom(type))
-						type = typeof(IfcSpace);
-					else if (typeof(IfcBearing).IsAssignableFrom(type))
-						type = typeof(IfcBuildingElementProxy);
+					else if (typeof(IfcFacilityPart).IsAssignableFrom(type))
+						type = host is IfcBuilding ? typeof(IfcSpace) : typeof(IfcSite);
 					else if (release < ReleaseVersion.IFC4X1)
 					{
 						if (type != typeof(IfcBuilding) && typeof(IfcFacility).IsAssignableFrom(type))
 							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
-						else if (release < ReleaseVersion.IFC4)
-						{
-							if (typeof(IfcShadingDevice).IsAssignableFrom(type) || typeof(IfcGeographicElement).IsAssignableFrom(type) ||
-								typeof(IfcCivilElement).IsAssignableFrom(type))
-								type = typeof(IfcBuildingElementProxy);
-						}
 					}
 				}
 			}
@@ -551,17 +552,17 @@ namespace GeometryGym.Ifc
 				product.ObjectType = className;
 			else if (!string.IsNullOrEmpty(predefinedTypeConstant))
 			{
-				product.SetPredefinedType(predefinedTypeConstant, enumName);
+				product.SetPredefinedType(predefinedTypeConstant);
 			}
 			return product;
 		}
 		internal IfcConstructionResource ConstructResource(string className)
 		{
-			string str = className, predefinedTypeConstant = "", enumName = "";
+			string str = className, predefinedTypeConstant = "";
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant, out enumName);
+			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -571,7 +572,7 @@ namespace GeometryGym.Ifc
 				throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 			if (!string.IsNullOrEmpty(predefinedTypeConstant))
 			{
-				resource.SetPredefinedType(predefinedTypeConstant, enumName);
+				resource.SetPredefinedType(predefinedTypeConstant);
 			}
 			return resource;
 		}
@@ -581,16 +582,16 @@ namespace GeometryGym.Ifc
 			{
 				IfcProduct product = null;
 				ConstructorInfo constructor = getConstructor(type, new[] { typeof(DatabaseIfc) });
-				if(constructor == null)
-				{
+				if(constructor != null)
+					product = constructor.Invoke(new object[] { mDatabase }) as IfcProduct;
+				else
+				{ 
 					constructor = getConstructor(type, new Type[] { });
 					if (constructor == null)
 						return null;
 					product = constructor.Invoke(new object[] { }) as IfcProduct;
 					mDatabase.appendObject(product);
 				}
-				else
-					product = constructor.Invoke(new object[] { mDatabase }) as IfcProduct;
 
 				product.ObjectPlacement = placement;
 				product.Representation = representation;
@@ -646,7 +647,7 @@ namespace GeometryGym.Ifc
 		{
 			return Duplicate<T>(entity, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }); 
 		}
-		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.Index); }
+		public void NominateDuplicate(IBaseClassIfc entity, IBaseClassIfc existingDuplicate) { mDuplicateMapping.AddObject(entity as BaseClassIfc, existingDuplicate.StepId); }
 		public IfcAxis2Placement3D DuplicateAxis(IfcAxis2Placement3D placement, DuplicateOptions options)
 		{
 			if (placement == null)
@@ -662,21 +663,12 @@ namespace GeometryGym.Ifc
 		{
 			if (entity == null)
 				return null;
+
 			BaseClassIfc obj = entity as BaseClassIfc;
 			if (obj.Database != null && obj.Database.id == mDatabase.id)
 				return entity;
+			
 			T result = null;
-			IfcClassification classification = entity as IfcClassification;
-			if(classification != null)
-				result = findExisting<IfcClassification>(classification) as T;
-			else
-			{
-				IfcClassificationReference classificationReference = entity as IfcClassificationReference;
-				if (classificationReference != null)
-					result = findExisting<IfcClassificationReference>(classificationReference) as T;
-			}
-			if (result != null)
-				return result;
 			int index = mDuplicateMapping.FindExisting(obj);
 			if (index > 0)
 			{
@@ -684,6 +676,52 @@ namespace GeometryGym.Ifc
 				if (result != null)
 					return result;
 			}
+
+			if(entity is IfcClassification classification)
+				result = findExistingClassification(classification) as T;
+			else if(entity is IfcClassificationReference classificationReference)
+				result = findExistingClassificationReference(classificationReference) as T;
+			else if (entity is IfcRelAssociatesClassification associatesClassification)
+			{
+				if(associatesClassification.RelatingClassification is IfcClassification ifcClassification)
+				{
+					IfcClassification existing = findExistingClassification(ifcClassification);
+					if(existing != null)
+					{
+						result = existing.HasReferences.OfType<T>().FirstOrDefault();
+						if (result != null)
+							return result;
+					}
+				}
+				else if (associatesClassification.RelatingClassification is IfcClassificationReference ifcClassificationReference)
+				{
+					IfcClassificationReference existing = findExistingClassificationReference(ifcClassificationReference);
+					if(existing != null)
+					{
+						result = existing.HasReferences.OfType<T>().FirstOrDefault();
+						if (result != null)
+							return result;
+					}
+				}
+			}
+			else if (entity is IfcRelAssignsToGroup assignsToGroup && assignsToGroup as IfcRelAssignsToGroupByFactor == null)
+			{
+				IfcGroup group = assignsToGroup.RelatingGroup;
+				if(group != null)
+				{
+					IfcGroup existing = mDatabase[group.GlobalId] as IfcGroup;
+					if(existing != null)
+					{
+						result = existing.IsGroupedBy.OfType<T>().FirstOrDefault();
+						if (result != null)
+							return result;
+					}
+				}
+			}
+		
+			if (result != null)
+				return result;
+		
 			if (!string.IsNullOrEmpty(obj.mGlobalId))
 			{
 				if (mDatabase.mDictionary.TryGetValue(obj.mGlobalId, out BaseClassIfc existing))
@@ -703,11 +741,29 @@ namespace GeometryGym.Ifc
 			NominateDuplicate(entity, result);
 			return result;
 		}
+		private IfcClassification findExistingClassification(IfcClassification classification)
+		{
+			foreach (IfcClassification c in mDatabase.mClassifications)
+			{
+				if (c.isDuplicate(classification, 1e-5))
+					return c;
+			}
+			return null;
+		}
+		private IfcClassificationReference findExistingClassificationReference(IfcClassificationReference classificationReference)
+		{
+			foreach(IfcClassificationReference r in mDatabase.mClassificationReferences)
+			{
+				if (r.isDuplicate(classificationReference, 1e-5))
+					return r;
+			}
+			return null;
+		}
 		private T findExisting<T>(T obj) where T : BaseClassIfc
 		{
 			foreach (T existing in mDatabase.OfType<T>())
 			{
-				if (existing.isDuplicate(obj, 1e-3))
+				if (existing.isDuplicate(obj, 1e-5))
 				{
 					NominateDuplicate(obj, existing);
 					return existing;
@@ -1390,7 +1446,7 @@ namespace GeometryGym.Ifc
 			{
 				if (mPerson == null)
 				{
-					mPerson = new IfcPerson(mDatabase, PersonName(), "", "");
+					mPerson = new IfcPerson(mDatabase) { Identification = PersonName() };
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
 					string str = ggAssembly.mOptions.OwnerRole;
 					if (!string.IsNullOrEmpty(str))
@@ -1488,14 +1544,28 @@ namespace GeometryGym.Ifc
 			{
 				if (revised.OwningUser.mDatabase == mDatabase)
 					modifier = revised.OwningUser;
+				else if (ownerHistory != null)
+				{
+					if (revised.OwningUser.isDuplicate(ownerHistory.OwningUser))
+						modifier = Duplicate(ownerHistory.OwningUser);
+					else
+						modifier = Duplicate(revised.OwningUser);
+				}
 				else
-					modifier = Duplicate(revised.OwningUser) as IfcPersonAndOrganization;
+					modifier = Duplicate(revised.OwningUser);
 			}
 			IfcApplication application = null;
 			if (revised == null)
 				application = (action == IfcChangeActionEnum.ADDED ? null : Application);
+			else if (ownerHistory != null)
+			{
+				if (revised.OwningApplication.isDuplicate(ownerHistory.OwningApplication))
+					application = Duplicate(ownerHistory.OwningApplication);
+				else
+					application = Duplicate(revised.OwningApplication);
+			}
 			else
-				application = revised.OwningApplication.mDatabase == mDatabase ? revised.OwningApplication : Duplicate(revised.OwningApplication) as IfcApplication;
+				application = Duplicate(revised.OwningApplication);
 			DateTime modified = (revised == null ? (action == IfcChangeActionEnum.ADDED ? DateTime.MinValue : DateTime.Now) : revised.CreationDate);
 			return OwnerHistory(action, owner, owningApplication, modifier, application, modified, created);
 		}
@@ -2240,7 +2310,7 @@ namespace GeometryGym.Ifc
 					else
 						firstPass.Add(obj);
 				}
-				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.StepId + " " + obj.Object.StepClassName + " " + x.Message); }
 			}
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Executing Constructors");
 			Task taskThreadSafe = Task.Run(() =>
@@ -2255,7 +2325,7 @@ namespace GeometryGym.Ifc
 				{
 					parseDefinition(obj, release);
 				}
-				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.StepId + " " + obj.Object.StepClassName + " " + x.Message); }
 			}
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed FirstPass");
 			firstPass.Clear();
@@ -2265,7 +2335,7 @@ namespace GeometryGym.Ifc
 				{
 					parseDefinition(obj, release);
 				}
-				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.Index + " " + obj.Object.StepClassName + " " + x.Message); }
+				catch (Exception x) { mDatabase.logParseError("XXX Error in line #" + obj.Object.StepId + " " + obj.Object.StepClassName + " " + x.Message); }
 			}
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Completed SecondPass");
 			secondPass.Clear();
@@ -2291,7 +2361,7 @@ namespace GeometryGym.Ifc
 					{
 						if (string.Compare(ea.mApplicationIdentifier, application.mApplicationIdentifier) == 0)
 						{
-							mDatabase[ea.mIndex] = null;
+							mDatabase[ea.StepId] = null;
 							mDatabase.Factory.mApplication = application;
 						}
 					}
@@ -2329,7 +2399,7 @@ namespace GeometryGym.Ifc
 					BaseClassIfc obj = BaseClassIfc.Construct(kw);
 					if (obj != null)
 					{
-						obj.mIndex = stepID;
+						obj.mStepId = stepID;
 						mDictionary[stepID] = obj;
 						ConstructorClass constructorClass = new ConstructorClass(obj, def);
 						//Todo add more primitive classes

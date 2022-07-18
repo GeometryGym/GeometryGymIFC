@@ -100,8 +100,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{ 
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mOverallHeight) + "," + 
-				ParserSTEP.DoubleOptionalToString(mOverallWidth) + 
+			return base.BuildStringSTEP(release) + "," + formatLength(mOverallHeight) + "," + formatLength(mOverallWidth) + 
 				(release < ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + 
 				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedPartitioningType) + "'"));
 		}
@@ -126,9 +125,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mLiningDepth) + "," + ParserSTEP.DoubleOptionalToString(mLiningThickness) + "," + ParserSTEP.DoubleOptionalToString(mTransomThickness) + "," + ParserSTEP.DoubleOptionalToString(mMullionThickness)
-				+ "," + ParserSTEP.DoubleOptionalToString(mFirstTransomOffset) + "," + ParserSTEP.DoubleOptionalToString(mSecondTransomOffset) + "," + ParserSTEP.DoubleOptionalToString(mFirstMullionOffset) + "," + ParserSTEP.DoubleOptionalToString(mSecondMullionOffset) + "," +
-				ParserSTEP.LinkToString(mShapeAspectStyle) + (release < ReleaseVersion.IFC4 ? "" : "," + ParserSTEP.DoubleOptionalToString(mLiningOffset) + "," + ParserSTEP.DoubleOptionalToString(mLiningToPanelOffsetX) + "," + ParserSTEP.DoubleOptionalToString(mLiningToPanelOffsetY));
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mLiningDepth) + "," + 
+				ParserSTEP.DoubleOptionalToString(mLiningThickness) + "," + ParserSTEP.DoubleOptionalToString(mTransomThickness) + "," +
+				ParserSTEP.DoubleOptionalToString(mMullionThickness) + "," + ParserSTEP.DoubleOptionalToString(mFirstTransomOffset) + "," + 
+				ParserSTEP.DoubleOptionalToString(mSecondTransomOffset) + "," + ParserSTEP.DoubleOptionalToString(mFirstMullionOffset) + "," + 
+				ParserSTEP.DoubleOptionalToString(mSecondMullionOffset) + (mShapeAspectStyle == null ? ",$" : ",#" + mShapeAspectStyle.StepId) +
+				(release < ReleaseVersion.IFC4 ? "" : "," + ParserSTEP.DoubleOptionalToString(mLiningOffset) + "," + 
+				ParserSTEP.DoubleOptionalToString(mLiningToPanelOffsetX) + "," + ParserSTEP.DoubleOptionalToString(mLiningToPanelOffsetY));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -141,7 +144,7 @@ namespace GeometryGym.Ifc
 			mSecondTransomOffset = ParserSTEP.StripDouble(str, ref pos, len);
 			mFirstMullionOffset = ParserSTEP.StripDouble(str, ref pos, len);
 			mSecondMullionOffset = ParserSTEP.StripDouble(str, ref pos, len);
-			mShapeAspectStyle = ParserSTEP.StripLink(str, ref pos, len);
+			mShapeAspectStyle = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcShapeAspect;
 			if (release != ReleaseVersion.IFC2x3)
 			{
 				mLiningOffset = ParserSTEP.StripDouble(str, ref pos, len);
@@ -152,7 +155,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWindowPanelProperties
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mOperationType.ToString() + ".,." + mPanelPosition.ToString() + ".," + ParserSTEP.DoubleOptionalToString(mFrameDepth) + "," + ParserSTEP.DoubleOptionalToString(mFrameThickness) + "," + ParserSTEP.LinkToString(mShapeAspectStyle); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",." + mOperationType.ToString() + ".,." + mPanelPosition.ToString() + ".," +
+				ParserSTEP.DoubleOptionalToString(mFrameDepth) + "," + ParserSTEP.DoubleOptionalToString(mFrameThickness) +
+				(mShapeAspectStyle == null ? ",$" : ",#" + mShapeAspectStyle);
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -160,7 +168,7 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcWindowPanelPositionEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPanelPosition);
 			mFrameDepth = ParserSTEP.StripDouble(str, ref pos, len);
 			mFrameThickness = ParserSTEP.StripDouble(str, ref pos, len);
-			mShapeAspectStyle = ParserSTEP.StripLink(str, ref pos, len);
+			mShapeAspectStyle = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcShapeAspect;
 		}
 	}
 	public partial class IfcWindowStyle
@@ -183,8 +191,11 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return (release < ReleaseVersion.IFC4 ? base.BuildStringSTEP(release) + ",.NOTDEFINED.,.NOTDEFINED.," + ParserSTEP.BoolToString(mParameterTakesPrecedence) + "," + ParserSTEP.BoolToString(false) :
-				base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,." + mPartitioningType.ToString() + ".," + ParserSTEP.BoolToString(mParameterTakesPrecedence) + (mUserDefinedPartitioningType == "$" ? ",$" : ",'" + mUserDefinedPartitioningType + "'"));
+			return (release < ReleaseVersion.IFC4 ? base.BuildStringSTEP(release) + ",.NOTDEFINED.,.NOTDEFINED.," +
+				ParserSTEP.BoolToString(mParameterTakesPrecedence) + "," + ParserSTEP.BoolToString(false) : 
+				base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,." + mPartitioningType.ToString() + ".," + 
+				ParserSTEP.BoolToString(mParameterTakesPrecedence) + 
+				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ",$" : ",'" + ParserIfc.Encode(mUserDefinedPartitioningType) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -192,7 +203,7 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcWindowTypeEnum>(ParserSTEP.StripField(str,ref pos, len).Replace(".", ""), true, out mPredefinedType);
 			Enum.TryParse<IfcWindowTypePartitioningEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPartitioningType);
 			mParameterTakesPrecedence = ParserSTEP.StripBool(str, ref pos, len);
-			mUserDefinedPartitioningType = ParserSTEP.StripString(str, ref pos, len);
+			mUserDefinedPartitioningType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcWorkCalendar
@@ -248,7 +259,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4 ? "'" + mIdentification + "'," + ParserSTEP.ObjToLinkString(mSSCreationDate) : IfcDateTime.STEPAttribute(mCreationDate)) +
-				(mCreators.Count > 0 ? ",(#" + string.Join(",#", Creators.ConvertAll(x=>x.Index)) + ")," : ",$,") +
+				(mCreators.Count > 0 ? ",(" + string.Join(",", Creators.ConvertAll(x=>"#" + x.StepId)) + ")," : ",$,") +
 				(release < ReleaseVersion.IFC4 ? (mPurpose == "$" ? "$," : "'" + mPurpose + "',") + ParserSTEP.DoubleOptionalToString(mSSDuration) + "," + ParserSTEP.DoubleOptionalToString(mSSTotalFloat) + "," +
 					ParserSTEP.ObjToLinkString(mSSStartTime) + "," + ParserSTEP.ObjToLinkString(mSSFinishTime) + ",." + mWorkControlType.ToString() + (mUserDefinedControlType == "$" ? ".,$" : ".,'" + mUserDefinedControlType + "'") :
 				(mPurpose == "$" ? "$," : "'" + mPurpose + "',") + mDuration + "," + mTotalFloat + "," + IfcDateTime.STEPAttribute(mStartTime) + "," + IfcDateTime.STEPAttribute(mFinishTime));
@@ -290,11 +301,16 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcWorkTime
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 ? "" : base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mRecurrencePattern) + ","+ IfcDate.STEPAttribute(mStartDate) + "," + IfcDate.STEPAttribute(mFinishDate)); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{ 
+			return (release < ReleaseVersion.IFC4 ? "" : 
+				base.BuildStringSTEP(release) + (mRecurrencePattern == null ? ",$" : ",#" + mRecurrencePattern.StepId) + ","+ 
+				IfcDate.STEPAttribute(mStartDate) + "," + IfcDate.STEPAttribute(mFinishDate)); 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRecurrencePattern = ParserSTEP.StripLink(str, ref pos, len);
+			mRecurrencePattern = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRecurrencePattern;
 			mStartDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
 			mFinishDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
 		}

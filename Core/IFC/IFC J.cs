@@ -30,21 +30,21 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcJunctionBox : IfcFlowFitting //IFC4
 	{
-		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// OPTIONAL : IfcJunctionBoxTypeEnum;
-		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// OPTIONAL : IfcJunctionBoxTypeEnum;
+		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcJunctionBoxTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcJunctionBox() : base() { }
-		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b, DuplicateOptions options) : base(db, b, options) { mPredefinedType = b.mPredefinedType; }
+		internal IfcJunctionBox(DatabaseIfc db, IfcJunctionBox b, DuplicateOptions options) : base(db, b, options) { PredefinedType = b.PredefinedType; }
 		public IfcJunctionBox(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcJunctionBoxType : IfcFlowFittingType
 	{
-		internal IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// : IfcJunctionBoxTypeEnum;
-		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcJunctionBoxTypeEnum mPredefinedType = IfcJunctionBoxTypeEnum.NOTDEFINED;// : IfcJunctionBoxTypeEnum;
+		public IfcJunctionBoxTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcJunctionBoxTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcJunctionBoxType() : base() { }
-		internal IfcJunctionBoxType(DatabaseIfc db, IfcJunctionBoxType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcJunctionBoxType(DatabaseIfc m, string name, IfcJunctionBoxTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcJunctionBoxType(DatabaseIfc db, IfcJunctionBoxType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcJunctionBoxType(DatabaseIfc db, string name, IfcJunctionBoxTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 }

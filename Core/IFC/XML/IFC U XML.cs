@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 			XmlElement element = xml.OwnerDocument.CreateElement("Units", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcUnit unit in Units)
-				element.AppendChild(mDatabase[unit.Index].GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild((unit as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef

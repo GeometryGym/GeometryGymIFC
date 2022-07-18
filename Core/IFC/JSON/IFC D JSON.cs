@@ -300,8 +300,8 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Location", Location);
 			setAttribute(obj, "Purpose", Purpose);
 			setAttribute(obj, "Revision", Revision);
-			if(mDocumentOwner > 0)
-				obj["DocumentOwner"] = mDatabase[mDocumentOwner].getJson(this, options);
+			if(mDocumentOwner != null)
+				obj["DocumentOwner"] = mDocumentOwner.getJson(this, options);
 			if(mEditors.Count > 0)
 				obj["Editors"] = new JArray(mEditors.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mCreationTime != DateTime.MinValue)
@@ -367,7 +367,7 @@ namespace GeometryGym.Ifc
 			if (!double.IsNaN(mPanelWidth))
 				obj["PanelWidth"] = mPanelWidth;
 			obj["PanelPosition"] = mPanelPosition.ToString();
-			if (mShapeAspectStyle > 0)
+			if (mShapeAspectStyle != null)
 				obj["ShapeAspectStyle"] = ShapeAspectStyle.getJson(this, options);
 		}
 	}

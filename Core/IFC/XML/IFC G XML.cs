@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 				if (!double.IsNaN(mPrecision))
 					xml.SetAttribute("Precision", mPrecision.ToString());
 				if (mWorldCoordinateSystem != null)
-					xml.AppendChild(mDatabase[mWorldCoordinateSystem.Index].GetXML(xml.OwnerDocument, "WorldCoordinateSystem", this, processed));
+					xml.AppendChild((mWorldCoordinateSystem as BaseClassIfc).GetXML(xml.OwnerDocument, "WorldCoordinateSystem", this, processed));
 				if (mTrueNorth != null)
 					xml.AppendChild(TrueNorth.GetXML(xml.OwnerDocument, "TrueNorth", this, processed));
 			}
@@ -139,7 +139,7 @@ namespace GeometryGym.Ifc
 			XmlElement element = xml.OwnerDocument.CreateElement("Elements", mDatabase.mXmlNamespace);
 			xml.AppendChild(element);
 			foreach (IfcGeometricSetSelect el in mElements)
-				element.AppendChild(mDatabase[el.Index].GetXML(xml.OwnerDocument, "", this, processed));
+				element.AppendChild((el as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
 	public partial class IfcGradientCurve

@@ -105,9 +105,9 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Identifier", Identifier);
 			setAttribute(xml, "Name", Name);
 			setAttribute(xml, "Description", Description);
-			if (mUnit > 0)
-				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
-			if (mReferencePath > 0)
+			if (mUnit != null)
+				xml.AppendChild((mUnit as BaseClassIfc).GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mReferencePath != null)
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath",this,processed));
 		}
 	}
@@ -457,12 +457,12 @@ namespace GeometryGym.Ifc
 			{
 				string name = child.Name;
 				if (string.Compare(name, "IfcParameterValue-wrapper") == 0)
-					result.mIfcParameterValue = double.Parse(child.InnerText);
+					result.ParameterValue = double.Parse(child.InnerText);
 				else if (string.Compare(name, "IfcCartesianPoint") == 0)
 				{
 					IfcCartesianPoint p = db.ParseXml<IfcCartesianPoint>(child as XmlElement);
 					if (p != null)
-						result.mIfcCartesianPoint = p.mIndex;
+						result.CartesianPoint = p;
 				}
 			}
 			return result;
@@ -470,14 +470,14 @@ namespace GeometryGym.Ifc
 		internal XmlElement getXML(XmlDocument doc, string name, Dictionary<string, XmlElement> processed, DatabaseIfc db)
 		{
 			XmlElement result = doc.CreateElement(name, db.mXmlNamespace);
-			if (!double.IsNaN(mIfcParameterValue))
+			if (!double.IsNaN(ParameterValue))
 			{
 				XmlElement element = doc.CreateElement("IfcParameterValue-wrapper", db.mXmlNamespace);
-				element.InnerText = mIfcParameterValue.ToString();
+				element.InnerText = ParameterValue.ToString();
 				result.AppendChild(element);
 			}
-			if (mIfcCartesianPoint > 0)
-				result.AppendChild(db[mIfcCartesianPoint].GetXML(doc, "", null, processed));
+			if (CartesianPoint != null)
+				result.AppendChild(CartesianPoint.GetXML(doc, "", null, processed));
 			return result;
 		}
 	}

@@ -48,29 +48,29 @@ namespace GeometryGym.STEP
 		public int LastKey() { return mObjects.Count == 0 ? 0 : mObjects.Last().Key; }
 
 		public int NextObjectRecord { set { mNextBlank = value; } }
-		public virtual T this[int index]
+		public virtual T this[int stepId]
 		{
 			get
 			{
 				T result = null;
-				mObjects.TryGetValue(index, out result);
+				mObjects.TryGetValue(stepId, out result);
 				return result;
 			}
 			set
 			{
 				if (value == null)
 				{
-					if (mObjects.ContainsKey(index))
-						mObjects.Remove(index);
-					if (index < mNextBlank && index > 0)
-						mNextBlank = index;
+					if (mObjects.ContainsKey(stepId))
+						mObjects.Remove(stepId);
+					if (stepId < mNextBlank && stepId > 0)
+						mNextBlank = stepId;
 					return;
 				}
 				
-				mObjects[index] = value;
-				if (index == mNextBlank)
+				mObjects[stepId] = value;
+				if (stepId == mNextBlank)
 					mNextBlank = mNextBlank + 1;
-				value.mIndex = index;
+				value.mStepId = stepId;
 			}
 		}
 		internal void appendObject(T o) { this[NextBlank()] = o; }

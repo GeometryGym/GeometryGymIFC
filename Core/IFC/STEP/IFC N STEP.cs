@@ -30,7 +30,7 @@ namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcNamedUnit
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (mDimensions == null ? "*" : "#" + mDimensions.Index) + ",." + mUnitType.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (mDimensions == null ? "*" : "#" + mDimensions.StepId) + ",." + mUnitType.ToString() + "."; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mDimensions = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDimensionalExponents;

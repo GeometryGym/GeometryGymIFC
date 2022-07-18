@@ -364,7 +364,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild(convert(xml.OwnerDocument, mValueComponent, "ValueComponent", mDatabase.mXmlNamespace));
-			xml.AppendChild(mDatabase[mUnitComponent].GetXML(xml.OwnerDocument, "UnitComponent", this, processed));
+			xml.AppendChild((mUnitComponent as BaseClassIfc).GetXML(xml.OwnerDocument, "UnitComponent", this, processed));
 		}
 	}
 	public partial class IfcMetric : IfcConstraint
@@ -382,15 +382,15 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "DataValue") == 0)
 				{
 					if(child.HasChildNodes)
-						mDataValueValue = extractValue(child.FirstChild);
-					if (mDataValueValue == null)
+						mDataValue = extractValue(child.FirstChild) as IfcMetricValueSelect;
+					if (mDataValue == null)
 					{
 						BaseClassIfc baseClass = mDatabase.ParseXml<BaseClassIfc>(child as XmlElement);
 						IfcMetricValueSelect metric = baseClass as IfcMetricValueSelect;
 						if (metric != null)
 							DataValue = metric;
 						else
-							mDataValueValue = extractValue(child as XmlNode);
+							mDataValue = extractValue(child as XmlNode);
 					}
 				}
 				else if (string.Compare(name, "ReferencePath") == 0)
@@ -402,11 +402,11 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("BenchMark", mBenchMark.ToString().ToLower());
 			setAttribute(xml, "ValueSource", ValueSource);
-			if (mDataValue > 0)
-				xml.AppendChild(mDatabase[mDataValue].GetXML(xml.OwnerDocument, "DataValue", this, processed));
-			else if(mDataValueValue != null)
-				xml.AppendChild(convert(xml.OwnerDocument, mDataValueValue, "DataValue", mDatabase.mXmlNamespace));
-			if(mReferencePath > 0)
+			if (mDataValue is BaseClassIfc o)
+				xml.AppendChild(o.GetXML(xml.OwnerDocument, "DataValue", this, processed));
+			else if(mDataValue is IfcValue val)
+				xml.AppendChild(convert(xml.OwnerDocument, val, "DataValue", mDatabase.mXmlNamespace));
+			if(mReferencePath != null)
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath", this, processed));
 		}
 	}

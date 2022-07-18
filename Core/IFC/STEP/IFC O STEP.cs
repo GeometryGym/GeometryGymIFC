@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOffsetCurve
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mBasisCurve.Index; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mBasisCurve.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			BasisCurve = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurve;
@@ -112,7 +112,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOffsetCurveByDistances
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", OffsetValues.ConvertAll(x => x.Index)) + (string.IsNullOrEmpty(Tag) ? "),$" : "),'" + ParserIfc.Encode(Tag) + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",(" + string.Join(",", OffsetValues.ConvertAll(x => "#" + x.StepId)) + (string.IsNullOrEmpty(Tag) ? "),$" : "),'" + ParserIfc.Encode(Tag) + "'"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -122,10 +122,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcOneDirectionRepeatFactor
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mRepeatFactor); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mRepeatFactor.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mRepeatFactor = ParserSTEP.StripLink(str, ref pos, len);
+			mRepeatFactor = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVector;
 		}
 	}
 	public partial class IfcOpenCrossProfileDef
@@ -165,13 +165,10 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string name = mName;
-			if(string.IsNullOrEmpty(name))
-				name = mDatabase.Factory.ApplicationDeveloper;
-			return (string.IsNullOrEmpty(mIdentification) ? "$,'" : "'" + ParserIfc.Encode(mIdentification) + "','") + ParserIfc.Encode(name) 
+			return (string.IsNullOrEmpty(mIdentification) ? "$,'" : "'" + ParserIfc.Encode(mIdentification) + "','") + ParserIfc.Encode(Name) 
 				+ (string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserIfc.Encode(mDescription) + "',") 
-				+ (mRoles.Count == 0 ? "$," : "(#" + string.Join(",#", Roles.Select(x=>x.Index)) + "),")
-				+ (mAddresses.Count == 0 ? "$" : "(#" + string.Join(",#", Addresses.Select(x=>x.Index)) + ")");
+				+ (mRoles.Count == 0 ? "$," : "(" + string.Join(",", Roles.Select(x=>"#" + x.StepId)) + "),")
+				+ (mAddresses.Count == 0 ? "$" : "(" + string.Join(",", Addresses.Select(x=> "#" + x.StepId)) + ")");
 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -181,6 +178,19 @@ namespace GeometryGym.Ifc
 			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			Roles.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcActorRole));
 			mAddresses.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAddress));
+		}
+	}
+	public partial class IfcOrganizationRelationship
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return "#" + mRelatingOrganization.StepId + ",(" + String.Join(",", mRelatedOrganizations.Select(x => "#" + x.StepId)) + ")";
+
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			RelatingOrganization = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcOrganization;
+			RelatedOrganizations.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcOrganization));
 		}
 	}
 	public partial class IfcOrientationExpression
@@ -231,7 +241,7 @@ namespace GeometryGym.Ifc
 	{ 
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = "#" + mOwningUser.Index + ",#" + mOwningApplication.Index + ",";
+			string str = "#" + mOwningUser.StepId + ",#" + mOwningApplication.StepId + ",";
 			if (mState == IfcStateEnum.NOTDEFINED)
 				str += "$";
 			else

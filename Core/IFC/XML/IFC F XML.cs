@@ -121,7 +121,7 @@ namespace GeometryGym.Ifc
 					{
 						IfcClosedShell s = mDatabase.ParseXml<IfcClosedShell>(cn as XmlElement);
 						if (s != null)
-							addVoid(s);
+							Voids.Add(s);
 					}
 				}
 			}

@@ -97,7 +97,7 @@ namespace GeometryGym.Ifc
 				if (string.Compare(name, "MiddleNames") == 0)
 				{
 					foreach (XmlNode cn in child.ChildNodes)
-						AddMiddleName(cn.InnerText);
+						MiddleNames.Add(cn.InnerText);
 				}
 				else if (string.Compare(name, "Roles", true) == 0)
 				{
@@ -788,7 +788,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			setAttribute(xml, "MapProjection", MapProjection);
 			setAttribute(xml, "MapZone", MapZone);
-			if (mMapUnit > 0)
+			if (mMapUnit != null)
 				xml.AppendChild(MapUnit.GetXML(xml.OwnerDocument, "MapUnit", this, processed));
 		}
 	}
@@ -833,8 +833,8 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(convert(xml.OwnerDocument, mUpperBoundValue, "UpperBoundValue", mDatabase.mXmlNamespace));
 			if (mLowerBoundValue != null)
 				xml.AppendChild(convert(xml.OwnerDocument, mLowerBoundValue, "LowerBoundValue", mDatabase.mXmlNamespace));
-			if (mUnit > 0)
-				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if (mUnit != null) 
+				xml.AppendChild((mUnit as BaseClassIfc).GetXML(xml.OwnerDocument, "Unit", this, processed));
 			if (mSetPointValue != null)
 				xml.AppendChild(convert(xml.OwnerDocument, mSetPointValue, "SetPointValue", mDatabase.mXmlNamespace));
 		}
@@ -848,8 +848,8 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(convert(xml.OwnerDocument, mUpperBoundValue, "UpperBoundValue", mDatabase.mXmlNamespace));
 			if (mLowerBoundValue != null)
 				xml.AppendChild(convert(xml.OwnerDocument, mLowerBoundValue, "LowerBoundValue", mDatabase.mXmlNamespace));
-			if(mUnit > 0)
-				xml.AppendChild(mDatabase[mUnit].GetXML(xml.OwnerDocument, "Unit", this, processed));
+			if(mUnit != null)
+				xml.AppendChild((mUnit as BaseClassIfc).GetXML(xml.OwnerDocument, "Unit", this, processed));
 			if (mSetPointValue != null)
 				xml.AppendChild(convert(xml.OwnerDocument, mSetPointValue, "SetPointValue", mDatabase.mXmlNamespace));
 		}
@@ -966,7 +966,7 @@ namespace GeometryGym.Ifc
 			XmlElement element = xml.OwnerDocument.CreateElement("EnumerationValues", mDatabase.mXmlNamespace);
 			foreach (IfcValue value in mEnumerationValues)
 				element.AppendChild(convert(xml.OwnerDocument, value, "", mDatabase.mXmlNamespace));
-			if (mEnumerationReference > 0)
+			if (mEnumerationReference != null)
 				element.AppendChild(EnumerationReference.GetXML(xml.OwnerDocument, "EnumerationReference", this, processed));
 		}
 	}
@@ -1040,7 +1040,7 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "IsDefinedBy") == 0)
 				{
 					foreach (IfcRelDefinesByTemplate r in mDatabase.ParseXMLList<IfcRelDefinesByTemplate>(child))
-						r.AddRelated(this);
+						r.RelatedPropertySets.Add(this);
 				}
 				else if (string.Compare(name, "DefinesOccurrence") == 0)
 				{

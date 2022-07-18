@@ -786,7 +786,7 @@ namespace GeometryGym.Ifc
 				else
 					xml.AppendChild((mAppliedValue as BaseClassIfc).GetXML(xml.OwnerDocument, "AppliedValue", this, processed));
 			}
-			if (mUnitBasis > 0)
+			if (mUnitBasis != null)
 				xml.AppendChild(UnitBasis.GetXML(xml.OwnerDocument, "UnitBasis", this, processed));
 			//todo
 			setAttribute(xml, "Category", Category);
@@ -813,7 +813,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships", mDatabase.mXmlNamespace);
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
-					if (r.mIndex != host.mIndex)
+					if (r != host)
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -1010,7 +1010,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mAxis > 0)
+			if (mAxis != null)
 				xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}

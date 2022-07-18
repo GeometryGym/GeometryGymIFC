@@ -217,10 +217,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBoundingBox
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mCorner) + "," + ParserSTEP.DoubleToString(mXDim) + "," + ParserSTEP.DoubleToString(mYDim) + "," + ParserSTEP.DoubleToString(mZDim); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mCorner.StepId + "," +  ParserSTEP.DoubleToString(mXDim) + "," + ParserSTEP.DoubleToString(mYDim) + "," + ParserSTEP.DoubleToString(mZDim); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mCorner = ParserSTEP.StripLink(str, ref pos, len);
+			mCorner = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPoint;
 			mXDim = ParserSTEP.StripDouble(str, ref pos, len);
 			mYDim = ParserSTEP.StripDouble(str, ref pos, len);
 			mZDim = ParserSTEP.StripDouble(str, ref pos, len);
@@ -228,8 +228,8 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBoxedHalfSpace
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mEnclosure); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mEnclosure = ParserSTEP.StripLink(str, ref pos, len); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mEnclosure.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mEnclosure = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcBoundingBox; }
 	}
 	public partial class IfcBridge
 	{

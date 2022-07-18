@@ -102,10 +102,8 @@ namespace GeometryGym.Ifc
 				GivenName = token.Value<string>();
 			JArray array = obj.GetValue("MiddleName", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-			{
-				foreach (string s in array.Values<string>())
-					AddMiddleName(s);
-			}
+				MiddleNames.AddRange(array.Values<string>());
+			
 			Roles.AddRange(mDatabase.extractJArray<IfcActorRole>(obj.GetValue("Roles", StringComparison.InvariantCultureIgnoreCase) as JArray));
 			Addresses.AddRange(mDatabase.extractJArray<IfcAddress>(obj.GetValue("Addresses", StringComparison.InvariantCultureIgnoreCase) as JArray));
 		}
@@ -577,8 +575,8 @@ namespace GeometryGym.Ifc
 				obj["UpperBoundValue"] = DatabaseIfc.extract(UpperBoundValue);
 			if (mLowerBoundValue != null)
 				obj["LowerBoundValue"] = DatabaseIfc.extract(LowerBoundValue);
-			if (mUnit > 0)
-				obj["Unit"] = mDatabase[mUnit].getJson(this, options);
+			if (mUnit is BaseClassIfc o)
+				obj["Unit"] = o.getJson(this, options);
 			if (mSetPointValue != null)
 				obj["SetPointValue"] = DatabaseIfc.extract(SetPointValue);
 		}
@@ -592,8 +590,8 @@ namespace GeometryGym.Ifc
 				obj["UpperBoundValue"] = DatabaseIfc.extract(UpperBoundValue);
 			if (mLowerBoundValue != null)
 				obj["LowerBoundValue"] = DatabaseIfc.extract(LowerBoundValue);
-			if (mUnit > 0)
-				obj["Unit"] = mDatabase[mUnit].getJson(this, options);
+			if (mUnit is BaseClassIfc o)
+				obj["Unit"] = o.getJson(this, options);
 			if (mSetPointValue != null)
 				obj["SetPointValue"] = DatabaseIfc.extract(SetPointValue);
 		}
@@ -629,7 +627,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["EnumerationValues"] = new JArray(EnumerationValues.ToList().ConvertAll(x => DatabaseIfc.extract(x)));
-			if (mEnumerationReference > 0)
+			if (mEnumerationReference != null)
 				obj["EnumerationReference"] = EnumerationReference.getJson(this, options);
 		}
 	}
@@ -661,7 +659,7 @@ namespace GeometryGym.Ifc
 			if(array != null)
 			{
 				foreach (IfcRelDefinesByTemplate r in mDatabase.extractJArray<IfcRelDefinesByTemplate>(array))
-					r.AddRelated(this);
+					r.RelatedPropertySets.Add(this);
 			}
 			array = obj.GetValue("DefinesOccurrence", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if(array != null)

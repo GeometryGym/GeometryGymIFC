@@ -36,7 +36,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcZone() : base() { }
 		internal IfcZone(DatabaseIfc db, IfcZone z, DuplicateOptions options) : base(db, z, options) { mLongName = z.mLongName; }
-		internal IfcZone(DatabaseIfc m, string name) : base(m, name) { }
+		internal IfcZone(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcZone(IfcSpatialElement e, string name, List<IfcSpace> spaces) : base(e, name)
 		{
 			if (spaces != null && spaces.Count > 0)

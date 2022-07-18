@@ -55,8 +55,8 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			xml.SetAttribute("Name", Name);
 			setAttribute(xml, "Version", Version);
-			if (mPublisher > 0)
-				xml.AppendChild(mDatabase[mPublisher].GetXML(xml.OwnerDocument, "Publisher", this, processed));
+			if (mPublisher != null)
+				xml.AppendChild((mPublisher as BaseClassIfc).GetXML(xml.OwnerDocument, "Publisher", this, processed));
 			//VersionDate
 			setAttribute(xml, "Location", Location);
 			setAttribute(xml, "Description", Description);

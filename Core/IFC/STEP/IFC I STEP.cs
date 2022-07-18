@@ -31,11 +31,11 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcImageTexture
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + mUrlReference + "'"; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUrlReference) + "'"; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mUrlReference = ParserSTEP.StripString(str, ref pos, len);
+			mUrlReference = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcIndexedColourMap
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return "#" + mPoints.Index + (mSegments.Count == 0 ? ",$," : ",(" + string.Join(",", mSegments) + "),") +
+			return "#" + mPoints.StepId + (mSegments.Count == 0 ? ",$," : ",(" + string.Join(",", mSegments) + "),") +
 				(mSelfIntersect == IfcLogicalEnum.UNKNOWN ? "$" : (mSelfIntersect == IfcLogicalEnum.TRUE ? ".T." : ".F."));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -176,20 +176,23 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,#" + mJurisdiction + ",(#" + mResponsiblePersons[0];
-			for (int icounter = 1; icounter < mResponsiblePersons.Count; icounter++)
-				result += ",#" + mResponsiblePersons[icounter];
-			return result + "),#" + mLastUpdateDate + (mCurrentValue == 0 ? ",$" : ",#" + mCurrentValue) + (mOriginalValue == 0 ? ",$" : ",#" + mOriginalValue);
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,#" + mJurisdiction.StepId + ",(" + 
+				string.Join(",", mResponsiblePersons.Select(x=>"#" + x.StepId)) +
+				(release < ReleaseVersion.IFC4 ? "),#" + mLastUpdateDate : ")," + IfcDate.STEPAttribute(mLastUpdateDate)) +
+				(mCurrentValue == null ? ",$" : ",#" + mCurrentValue.StepId) + (mOriginalValue == null ? ",$" : ",#" + mOriginalValue.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			Enum.TryParse<IfcInventoryTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
-			mJurisdiction = ParserSTEP.StripLink(str, ref pos, len);
-			mResponsiblePersons = ParserSTEP.StripListLink(str, ref pos, len);
-			mLastUpdateDate = ParserSTEP.StripLink(str, ref pos, len);
-			mCurrentValue = ParserSTEP.StripLink(str, ref pos, len);
-			mOriginalValue = ParserSTEP.StripLink(str, ref pos, len);
+			mJurisdiction = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcActorSelect;
+			mResponsiblePersons.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcPerson));
+			if(release < ReleaseVersion.IFC4)
+				mLastUpdateDateSS = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCalendarDate;
+			else
+				mLastUpdateDate = IfcDate.ParseSTEP(ParserSTEP.StripString(str, ref pos, len));
+			mCurrentValue = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCostValue;
+			mOriginalValue = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCostValue;
 		}
 	}
 	public partial class IfcImpactProtectionDevice

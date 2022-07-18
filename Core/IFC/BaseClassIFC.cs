@@ -53,24 +53,17 @@ namespace GeometryGym.Ifc
 		public DatabaseIfc Database { get { return mDatabase; } private set { mDatabase = value; } }
 
 #if (NOIFCJSON)
-		public BaseClassIfc() : base() { }// this(new DatabaseIfc(false, ModelView.Ifc4NotAssigned)) { }
+		public BaseClassIfc() : base() { }
 #else
-		public BaseClassIfc() : base() { } // this(new DatabaseIfc(false, ModelView.Ifc4NotAssigned) { Format = FormatIfcSerialization.JSON }) { }
+		public BaseClassIfc() : base() { } 
 #endif
-		protected BaseClassIfc(BaseClassIfc basis, bool replace) : base()
-		{
-			if (replace)
-				basis.ReplaceDatabase(this);
-			else
-				basis.Database.appendObject(this);	
-		}
 		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base()
 		{
 			mGlobalId = e.mGlobalId;
 			if (db != null)
 			{
 				db.appendObject(this);
-				db.Factory.mDuplicateMapping.AddObject(e, mIndex);
+				db.Factory.mDuplicateMapping.AddObject(e, mStepId);
 			}
 		}
 		protected BaseClassIfc(DatabaseIfc db) : base()
@@ -315,9 +308,9 @@ namespace GeometryGym.Ifc
 					}
 				}
 			}
-			mDatabase[revised.mIndex] = null;
-			revised.mIndex = mIndex;
-			mDatabase[mIndex] = revised;
+			mDatabase[revised.mStepId] = null;
+			revised.mStepId = StepId;
+			mDatabase[StepId] = revised;
 		}
 		
 		public bool Dispose(bool children)
@@ -330,7 +323,7 @@ namespace GeometryGym.Ifc
 		}
 		protected virtual bool DisposeWorker(bool children)
 		{
-			mDatabase[mIndex] = null;
+			mDatabase[mStepId] = null;
 			return true;
 		}
 		internal virtual List<IBaseClassIfc> retrieveReference(IfcReference reference) { return (reference.InnerReference != null ? null : new List<IBaseClassIfc>() { }); }
@@ -350,7 +343,9 @@ namespace GeometryGym.Ifc
 			else if (string.Compare(className, "IfcOpeningStandardCase", true) == 0)
 				className = "IfcOpeningElement";
 			else
+			{
 				return null;
+			}
 			return STEPEntity.GetType(className, "Ifc");
 		}
 		public static BaseClassIfc Construct(string ifcClassName)
@@ -410,10 +405,9 @@ namespace GeometryGym.Ifc
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;
 		}
 
-		internal static string identifyIfcClass(string className, out string predefinedConstant, out string enumName)
+		internal static string identifyIfcClass(string className, out string predefinedConstant)
 		{
 			predefinedConstant = "";
-			enumName = "";
 			if (string.IsNullOrEmpty(className))
 				return "";
 			int index = className.IndexOf('.');
@@ -423,7 +417,6 @@ namespace GeometryGym.Ifc
 				index = className.IndexOf('/');
 
 			string result = className;
-			enumName = className;
 			if (index > 0)
 			{
 				result = className.Substring(0, index);
@@ -431,7 +424,6 @@ namespace GeometryGym.Ifc
 				index = remainder.IndexOf('(');
 				if (index > 0)
 				{
-					enumName = remainder.Substring(0, index).Trim();
 					int startIndex = remainder.IndexOf('.'), endIndex = remainder.IndexOf(')');
 					if (startIndex < index)
 						startIndex = index;
@@ -440,8 +432,6 @@ namespace GeometryGym.Ifc
 
 					predefinedConstant = remainder.Substring(startIndex + 1, endIndex - startIndex - 1).Trim();
 				}
-				else
-					enumName = result;
 			}
 
 			if (result.EndsWith("Type"))
@@ -449,11 +439,6 @@ namespace GeometryGym.Ifc
 			else if (result.EndsWith("TypeEnum"))
 				result = result.Substring(0, result.Length - 8);
 
-			string lowerEnumName = enumName.ToLower();
-			if (lowerEnumName.EndsWith("type"))
-				enumName = enumName + "Enum";
-			else if (!lowerEnumName.EndsWith("typeenum"))
-				enumName = enumName + "TypeEnum";
 			return result;
 		}
 
@@ -476,7 +461,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 
-		internal virtual bool isDuplicate(BaseClassIfc e) { return isDuplicate(e, mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
+		internal bool isDuplicate(BaseClassIfc e) { return isDuplicate(e, mDatabase == null ? 1e-5 : mDatabase.Tolerance); }
 		// This method has only partial implementation within opensource project and 
 		// any use of it should be carefully checked.
 		internal virtual bool isDuplicate(BaseClassIfc e, double tol) { return true; }

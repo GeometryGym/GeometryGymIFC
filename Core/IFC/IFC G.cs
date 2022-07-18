@@ -32,12 +32,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGasTerminalType : IfcFlowTerminalType // DEPRECATED IFC4
 	{
-		internal IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
-		public IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcGasTerminalTypeEnum mPredefinedType = IfcGasTerminalTypeEnum.NOTDEFINED;// : IfcGasTerminalBoxTypeEnum;
+		public IfcGasTerminalTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGasTerminalTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcGasTerminalType() : base() { }
-		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcGasTerminalType(DatabaseIfc m, string name, IfcGasTerminalTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcGasTerminalType(DatabaseIfc db, IfcGasTerminalType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcGasTerminalType(DatabaseIfc db, string name, IfcGasTerminalTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -75,38 +75,39 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p, DuplicateOptions options) : base(db, p, options) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
 	public partial class IfcGeographicElement : IfcElement  //IFC4
 	{
-		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// OPTIONAL IfcGeographicElementTypeEnum; 
-		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// OPTIONAL IfcGeographicElementTypeEnum; 
+		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGeographicElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcGeographicElement() : base() { }
 		internal IfcGeographicElement(DatabaseIfc db) : base(db) { }
-		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, DuplicateOptions options) : base(db, e, options) { mPredefinedType = e.mPredefinedType; }
-		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { if (mDatabase.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
+		internal IfcGeographicElement(DatabaseIfc db, IfcGeographicElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
+		public IfcGeographicElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) {  }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
 	public partial class IfcGeographicElementType : IfcElementType //IFC4
 	{
-		internal IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// IfcGeographicElementTypeEnum; 
-		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcGeographicElementTypeEnum mPredefinedType = IfcGeographicElementTypeEnum.NOTDEFINED;// IfcGeographicElementTypeEnum; 
+		public IfcGeographicElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGeographicElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcGeographicElementType() : base() { }
-		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcGeographicElementType(DatabaseIfc m, string name, IfcGeographicElementTypeEnum type) : base(m) { Name = name; mPredefinedType = type; if (m.mRelease < ReleaseVersion.IFC4) throw new Exception(StepClassName + " only supported in IFC4!"); }
+		internal IfcGeographicElementType(DatabaseIfc db, IfcGeographicElementType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcGeographicElementType(DatabaseIfc db, string name, IfcGeographicElementTypeEnum type) : base(db) { Name = name; PredefinedType = type;  }
 	}
 	[Serializable]
 	public partial class IfcGeometricCurveSet : IfcGeometricSet
 	{
 		internal IfcGeometricCurveSet() : base() { }
 		internal IfcGeometricCurveSet(DatabaseIfc db, IfcGeometricCurveSet s, DuplicateOptions options) : base(db, s, options) { }
-		public IfcGeometricCurveSet(IfcGeometricSetSelect element) : base(element) { if(element is IfcSurface) throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + mIndex); }
+		public IfcGeometricCurveSet(IfcGeometricSetSelect element) : base(element) { if(element is IfcSurface) throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + StepId); }
 		public IfcGeometricCurveSet(IEnumerable<IfcGeometricSetSelect> set) : base(set)
 		{
 			foreach(IfcGeometricSetSelect item in set)
 			{
 				if(item is IfcSurface)
-					throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + mIndex);
+					throw new Exception("XXX Error, IfcSurface cannot be added to IfcGeometricCurveSet " + StepId);
 			}
 		}
 	}
@@ -144,7 +145,7 @@ namespace GeometryGym.Ifc
 			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
 			mPrecision = c.mPrecision;
 			if(c.mWorldCoordinateSystem != null)
-				WorldCoordinateSystem = db.Factory.Duplicate(c.mDatabase[c.mWorldCoordinateSystem.Index]) as IfcAxis2Placement;
+				WorldCoordinateSystem = db.Factory.Duplicate<IfcAxis2Placement>(c.mWorldCoordinateSystem);
 			if (c.mTrueNorth != null)
 				TrueNorth = db.Factory.Duplicate(c.TrueNorth) as IfcDirection;
 
@@ -247,12 +248,12 @@ namespace GeometryGym.Ifc
 		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } }
 
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(s.mDatabase[x.Index]) as IfcGeometricSetSelect)); }
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate<IfcGeometricSetSelect>(x))); }
 		public IfcGeometricSet(IfcGeometricSetSelect element) : base(element.Database) { mElements.Add(element); }
 		public IfcGeometricSet(IEnumerable<IfcGeometricSetSelect> set) : base(set.First().Database) { mElements.AddRange(set); }
 	}
 	public partial interface IfcGeometricSetSelect : IBaseClassIfc { } //SELECT ( IfcPoint, IfcCurve,  IfcSurface);
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcGeomodel : IfcGeotechnicalAssembly
 	{
 		public IfcGeomodel() : base() { }
@@ -260,7 +261,7 @@ namespace GeometryGym.Ifc
 		public IfcGeomodel(DatabaseIfc db, IfcGeomodel geomodel, DuplicateOptions options) : base(db, geomodel, options) {  }
 		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcGeoslice : IfcGeotechnicalAssembly
 	{
 		public IfcGeoslice() : base() { }
@@ -268,7 +269,7 @@ namespace GeometryGym.Ifc
 		public IfcGeoslice(DatabaseIfc db, IfcGeoslice geoslice, DuplicateOptions options) : base(db, geoslice, options) { }
 		public IfcGeoslice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public abstract partial class IfcGeotechnicalAssembly : IfcGeotechnicalElement
 	{
 		protected IfcGeotechnicalAssembly() : base() { }
@@ -276,7 +277,7 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalAssembly(DatabaseIfc db, IfcGeotechnicalAssembly geotechnicalAssembly, DuplicateOptions options) : base(db, geotechnicalAssembly, options) { }
 		protected IfcGeotechnicalAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public abstract partial class IfcGeotechnicalElement : IfcElement
 	{
 		protected IfcGeotechnicalElement() : base() { }
@@ -284,7 +285,7 @@ namespace GeometryGym.Ifc
 		protected IfcGeotechnicalElement(DatabaseIfc db, IfcGeotechnicalElement geotechnicalElement, DuplicateOptions options) : base(db, geotechnicalElement, options) { }
 		protected IfcGeotechnicalElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcGeotechnicalStratum : IfcGeotechnicalElement
 	{
 		public override string StepClassName 
@@ -307,8 +308,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		internal IfcGeotechnicalStratumTypeEnum mPredefinedType = IfcGeotechnicalStratumTypeEnum.NOTDEFINED;// IfcGeotechnicalStratumTypeEnum; 
-		public IfcGeotechnicalStratumTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcGeotechnicalStratumTypeEnum mPredefinedType = IfcGeotechnicalStratumTypeEnum.NOTDEFINED;// IfcGeotechnicalStratumTypeEnum; 
+		public IfcGeotechnicalStratumTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGeotechnicalStratumTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcGeotechnicalStratum() : base() { }
 		public IfcGeotechnicalStratum(DatabaseIfc db) : base(db) { }
@@ -349,9 +350,9 @@ namespace GeometryGym.Ifc
 		private LIST<IfcGridAxis> mUAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
 		private LIST<IfcGridAxis> mVAxes = new LIST<IfcGridAxis>();// : LIST [1:?] OF UNIQUE IfcGridAxis;
 		private LIST<IfcGridAxis> mWAxes = new LIST<IfcGridAxis>();// : OPTIONAL LIST [1:?] OF UNIQUE IfcGridAxis;
-		internal IfcGridTypeEnum mPredefinedType = IfcGridTypeEnum.NOTDEFINED;// :OPTIONAL IfcGridTypeEnum; //IFC4 CHANGE  New attribute.
+		private IfcGridTypeEnum mPredefinedType = IfcGridTypeEnum.NOTDEFINED;// :OPTIONAL IfcGridTypeEnum; //IFC4 CHANGE  New attribute.
 		//INVERSE
-		public IfcGridTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcGridTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGridTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } set { mUAxes.Clear(); if (value != null) { mUAxes.CollectionChanged -= mUAxes_CollectionChanged; mUAxes = value; mUAxes.CollectionChanged += mUAxes_CollectionChanged; } } }
 		public LIST<IfcGridAxis> VAxes { get { return mVAxes; } set { mVAxes.Clear(); if (value != null) { mVAxes.CollectionChanged -= mVAxes_CollectionChanged; mVAxes = value; mVAxes.CollectionChanged += mVAxes_CollectionChanged; } } }
@@ -363,7 +364,7 @@ namespace GeometryGym.Ifc
 			UAxes.AddRange(g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
 			VAxes.AddRange(g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
 			WAxes.AddRange(g.WAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
-			mPredefinedType = g.mPredefinedType;
+			PredefinedType = g.PredefinedType;
 		}
 		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes) 
 			: base(new IfcLocalPlacement(host.ObjectPlacement, placement), getRepresentation(uAxes,vAxes, null))

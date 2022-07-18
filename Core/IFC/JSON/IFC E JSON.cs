@@ -136,7 +136,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcRelVoidsElement rv in HasOpenings)
 				{
-					if (rv.mIndex != host.mIndex)
+					if (rv.StepId != host.StepId)
 						array.Add(rv.getJson(this, options));
 				}
 				if (array.Count > 0)

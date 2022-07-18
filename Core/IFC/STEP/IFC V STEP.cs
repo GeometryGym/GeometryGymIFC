@@ -98,24 +98,22 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = "(" + ParserSTEP.LinkToString(mTextureVertices[0]);
-			for (int icounter = 1; icounter < mTextureVertices.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mTextureVertices[icounter]);
-			str += "),(" + ParserSTEP.LinkToString(mTexturePoints[0]);
-			for (int icounter = 1; icounter < mTexturePoints.Count; icounter++)
-				str += "," + ParserSTEP.LinkToString(mTexturePoints[icounter]);
-			return str;
+			return "(" + string.Join(",", mTextureVertices.Select(x => "#" + x.StepId)) + "),(" +
+				string.Join(",", mTexturePoints.Select(x => "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mTextureVertices = ParserSTEP.StripListLink(str, ref pos, len);
-			mTexturePoints = ParserSTEP.StripListLink(str, ref pos, len);
+			mTextureVertices.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcTextureVertex));
+			mTexturePoints.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcCartesianPoint));
 		}
 	}
 	public partial class IfcVertexLoop
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mLoopVertex); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mLoopVertex = ParserSTEP.StripLink(str, ref pos, str.Length); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mLoopVertex.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
+		{
+			mLoopVertex = dictionary[ParserSTEP.StripLink(str, ref pos, str.Length)] as IfcVertex;
+		}
 	}
 	public partial class IfcVertexPoint
 	{
@@ -190,17 +188,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = "(#" + mIntersectingAxes.Item1 + ",#" + mIntersectingAxes.Item2 + "),(";
-			str += ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2);
-			if (!double.IsNaN(mOffsetDistances.Item3))
-				str += "," + ParserSTEP.DoubleToString(mOffsetDistances.Item3);
-			str += ")";
-			return str;
+			return "(#" + mIntersectingAxes.Item1.StepId + ",#" + mIntersectingAxes.Item2.StepId + "),(" +
+				ParserSTEP.DoubleToString(mOffsetDistances.Item1) + "," + ParserSTEP.DoubleToString(mOffsetDistances.Item2) +
+				(!double.IsNaN(mOffsetDistances.Item3) ? "," + ParserSTEP.DoubleToString(mOffsetDistances.Item3) : "") + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			List<int> links = ParserSTEP.StripListLink(str, ref pos, len);
-			mIntersectingAxes = new Tuple<int, int>(links[0], links[1]);
+			mIntersectingAxes = new Tuple<IfcGridAxis, IfcGridAxis>(dictionary[links[0]] as IfcGridAxis, dictionary[links[1]] as IfcGridAxis);
 			List<string> lst = ParserSTEP.SplitLineFields(ParserSTEP.StripField(str,ref pos, len));
 			mOffsetDistances = new Tuple<double, double, double>(ParserSTEP.ParseDouble(lst[0]), ParserSTEP.ParseDouble(lst[1]), (lst.Count > 2 ? ParserSTEP.ParseDouble(lst[2]) : double.NaN));
 		}

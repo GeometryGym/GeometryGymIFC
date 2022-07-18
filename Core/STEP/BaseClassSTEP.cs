@@ -31,18 +31,16 @@ namespace GeometryGym.STEP
 
 	public partial interface ISTEPEntity
 	{
-		int Index { get; }
 		int StepId { get; }
 		string StepClassName { get; }
 	}
 	[Serializable]
 	public abstract partial class STEPEntity
 	{
-		[NonSerialized] internal int mIndex = 0;
+		[NonSerialized] internal int mStepId = 0;
 		[NonSerialized] internal List<string> mComments = new List<string>();
 
-		public int Index { get { return mIndex; } private set { mIndex = value; } }
-		public int StepId { get { return mIndex; } private set { mIndex = value; } }
+		public int StepId { get { return mStepId; } private set { mStepId = value; } }
 
 		protected static ConcurrentDictionary<string, Type> mSTEPTypes = new ConcurrentDictionary<string, Type>();
 		protected static ConcurrentDictionary<string, ConstructorInfo> mConstructors = new ConcurrentDictionary<string, ConstructorInfo>();
@@ -66,7 +64,7 @@ namespace GeometryGym.STEP
 				foreach (string c in mComments)
 					comment += "/* " + c + " */\r\n";
 			}
-			return comment + (mIndex > 0 ? "#" + StepId + "= " : "") + StepClassName.ToUpper() + "(";
+			return comment + (mStepId > 0 ? "#" + StepId + "= " : "") + StepClassName.ToUpper() + "(";
 		}
 		protected string StepLineSuffix()
 		{

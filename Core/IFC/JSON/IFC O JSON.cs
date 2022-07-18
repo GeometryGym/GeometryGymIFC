@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcRelAssigns ra in HasAssignments)
 				{
-					if (host == null || ra.mIndex != host.mIndex)
+					if (host == null || ra.StepId != host.StepId)
 						array.Add(ra.getJson(this, options));
 				}
 				if (array.Count > 0)
@@ -149,7 +149,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcConstraint c in BenchmarkValues)
 				{
-					if (c.mIndex != host.mIndex)
+					if (c.StepId != host.StepId)
 						array.Add(c.getJson(this, options));
 				}
 				if (array.Count > 0)
@@ -203,7 +203,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcRelFillsElement rf in HasFillings)
 				{
-					if (rf.mIndex != host.mIndex)
+					if (rf.StepId != host.StepId)
 						array.Add(rf.getJson(this, options));
 				}
 				if (array.Count > 0)

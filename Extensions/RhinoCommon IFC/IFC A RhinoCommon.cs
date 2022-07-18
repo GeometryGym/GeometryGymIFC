@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcAxis1Placement : IfcPlacement
 	{
-		internal Vector3d AxisVector { get { return (mAxis > 0 ? Axis.Vector3d : Vector3d.XAxis); } }
+		internal Vector3d AxisVector { get { return (mAxis != null ? Axis.Vector3d : Vector3d.XAxis); } }
 	}
 	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
 	{

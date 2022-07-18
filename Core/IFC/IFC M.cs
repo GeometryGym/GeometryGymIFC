@@ -32,8 +32,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcManifoldSolidBrep : IfcSolidModel //ABSTRACT SUPERTYPE OF(ONEOF(IfcAdvancedBrep, IfcFacetedBrep))
 	{
-		protected int mOuter;// : IfcClosedShell; 
-		public IfcClosedShell Outer { get { return mDatabase[mOuter] as IfcClosedShell; } set { mOuter = value.mIndex; } }
+		protected IfcClosedShell mOuter;// : IfcClosedShell; 
+		public IfcClosedShell Outer { get { return mOuter; } set { mOuter = value; } }
 
 		protected IfcManifoldSolidBrep() : base() { }
 		protected IfcManifoldSolidBrep(IfcClosedShell s) : base(s.mDatabase) { Outer = s; }
@@ -87,21 +87,22 @@ namespace GeometryGym.Ifc
 	public partial class IfcMarineFacility : IfcFacility
 	{
 		private IfcMarineFacilityTypeEnum mPredefinedType = IfcMarineFacilityTypeEnum.NOTDEFINED; //: OPTIONAL IfcMarineFacilityTypeEnum;
-		public IfcMarineFacilityTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMarineFacilityTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMarineFacilityTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcMarineFacility() : base() { }
-		public IfcMarineFacility(DatabaseIfc db) : base(db) { }
+		internal IfcMarineFacility(DatabaseIfc db) : base(db) { }
+		public IfcMarineFacility(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcMarineFacility(DatabaseIfc db, IfcMarineFacility marineFacility, DuplicateOptions options) : base(db, marineFacility, options) { }
 		public IfcMarineFacility(DatabaseIfc db, IfcMarineFacilityTypeEnum predefinedType)
 			: base(db) { PredefinedType = predefinedType; }
 		public IfcMarineFacility(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { Name = name; }
-		internal IfcMarineFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcMarineFacilityTypeEnum predefinedType) : base(host, placement, representation) { }
+		internal IfcMarineFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcMarinePart : IfcFacilityPart
 	{
 		private IfcMarinePartTypeEnum mPredefinedType = IfcMarinePartTypeEnum.NOTDEFINED; //: OPTIONAL IfcMarinePartTypeEnum;
-		public IfcMarinePartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMarinePartTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMarinePartTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
 		public IfcMarinePart() : base() { }
 		public IfcMarinePart(DatabaseIfc db) : base(db) { }
@@ -177,27 +178,33 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
+	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcMaterialClassificationRelationship : BaseClassIfc
 	{
-		internal List<int> mMaterialClassifications = new List<int>();// : SET [1:?] OF IfcClassificationNotationSelect;
-		internal int mClassifiedMaterial;// : IfcMaterial;
+		internal SET<IfcClassificationNotationSelect> mMaterialClassifications = new SET<IfcClassificationNotationSelect>();// : SET [1:?] OF IfcClassificationNotationSelect;
+		internal IfcMaterial mClassifiedMaterial;// : IfcMaterial;
 		internal IfcMaterialClassificationRelationship() : base() { }
-		//internal IfcMaterialClassificationRelationship(IfcMaterialClassificationRelationship m) : base() { mMaterialClassifications = new List<int>(m.mMaterialClassifications.ToArray()); mClassifiedMaterial = m.mClassifiedMaterial; }
 		internal IfcMaterialClassificationRelationship(DatabaseIfc db) : base(db) { }
+		internal IfcMaterialClassificationRelationship(DatabaseIfc db, IfcMaterialClassificationRelationship m, DuplicateOptions options) 
+			: base(db, m)
+		{
+			mMaterialClassifications.AddRange(m.mMaterialClassifications.Select(x=>db.Factory.Duplicate(x, options))); 
+			mClassifiedMaterial = db.Factory.Duplicate(m.mClassifiedMaterial, options);
+		}
 	}
 	[Serializable]
 	public partial class IfcMaterialConstituent : IfcMaterialDefinition //IFC4
 	{
 		internal string mName = "";// :	OPTIONAL IfcLabel;
 		internal string mDescription = "";// : OPTIONAL IfcText 
-		internal int mMaterial;// : IfcMaterial;
+		internal IfcMaterial mMaterial;// : IfcMaterial;
 		internal double mFraction;//	 :	OPTIONAL IfcNormalisedRatioMeasure;
 		internal string mCategory = "";//	 :	OPTIONAL IfcLabel;  
 
 		public override string Name { get { return mName; } set { mName = value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
-		public IfcMaterial Material { get { return mDatabase[mMaterial] as IfcMaterial; } set { mMaterial = (value == null ? 0 : value.mIndex); } }
+		public IfcMaterial Material { get { return mMaterial; } set { mMaterial = value; } }
 		public double Fraction { get { return mFraction; } set { mFraction = value; } }
 		public string Category { get { return mCategory; } set { mCategory = value; } }
 
@@ -209,7 +216,7 @@ namespace GeometryGym.Ifc
 			: base(mat.mDatabase)
 		{
 			Name = name;
-			mMaterial = mat.mIndex;
+			mMaterial = mat;
 		}
 	}
 	[Serializable]
@@ -248,12 +255,12 @@ namespace GeometryGym.Ifc
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		private SET<IfcMaterialProperties> mHasProperties = new SET<IfcMaterialProperties>();
-		[NonSerialized] internal List<IfcResourceConstraintRelationship> mHasConstraintRelationships = new List<IfcResourceConstraintRelationship>(); //gg
+		[NonSerialized] internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
 
 		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } }
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcMaterialProperties> HasProperties { get { return mHasProperties; } }
-		public ReadOnlyCollection<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return new ReadOnlyCollection<IfcResourceConstraintRelationship>( mHasConstraintRelationships); } }
+		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		public abstract string Name { get; set; }
 		public virtual IfcMaterial PrimaryMaterial() { return null; }
@@ -346,7 +353,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialLayer : IfcMaterialDefinition
 	{
-		internal int mMaterial;// : OPTIONAL IfcMaterial;
+		internal IfcMaterial mMaterial;// : OPTIONAL IfcMaterial;
 		internal double mLayerThickness;// ::	IfcNonNegativeLengthMeasure IFC4Chagne IfcPositiveLengthMeasure;
 		internal IfcLogicalEnum mIsVentilated = IfcLogicalEnum.FALSE; // : OPTIONAL IfcLogical; 
 		internal string mName = "";// : OPTIONAL IfcLabel; IFC4
@@ -354,7 +361,7 @@ namespace GeometryGym.Ifc
 		internal string mCategory = "";// : OPTIONAL IfcLabel; IFC4
 		internal double mPriority = double.NaN;//	 :	OPTIONAL IfcNormalisedRatioMeasure;
 
-		public IfcMaterial Material { get { return mDatabase[mMaterial] as IfcMaterial; } set { mMaterial = (value == null ? 0 : value.mIndex); } }
+		public IfcMaterial Material { get { return mMaterial; } set { mMaterial = value; } }
 		public double LayerThickness { get { return mLayerThickness; } set { mLayerThickness = value; } }
 		public IfcLogicalEnum IsVentilated { get { return mIsVentilated; } set { mIsVentilated = value; } }
 		public override string Name { get { return mName; } set { mName = value; } }
@@ -407,13 +414,13 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialLayerSetUsage : IfcMaterialUsageDefinition
 	{
-		private int mForLayerSet;// : IfcMaterialLayerSet;
+		private IfcMaterialLayerSet mForLayerSet;// : IfcMaterialLayerSet;
 		private IfcLayerSetDirectionEnum mLayerSetDirection = IfcLayerSetDirectionEnum.AXIS1;// : IfcLayerSetDirectionEnum;
 		private IfcDirectionSenseEnum mDirectionSense = IfcDirectionSenseEnum.POSITIVE;// : IfcDirectionSenseEnum;
 		private double mOffsetFromReferenceLine;// : IfcLengthMeasure;  
 		private double mReferenceExtent = double.NaN;//	 : IFC4	OPTIONAL IfcPositiveLengthMeasure;
 
-		public IfcMaterialLayerSet ForLayerSet { get { return mDatabase[mForLayerSet] as IfcMaterialLayerSet; } set { mForLayerSet = value.mIndex; } }
+		public IfcMaterialLayerSet ForLayerSet { get { return mForLayerSet; } set { mForLayerSet = value; } }
 		public IfcLayerSetDirectionEnum LayerSetDirection { get { return mLayerSetDirection; } }
 		public IfcDirectionSenseEnum DirectionSense { get { return mDirectionSense; } }
 		public double OffsetFromReferenceLine { get { return mOffsetFromReferenceLine; } set { mOffsetFromReferenceLine = value; } }
@@ -426,7 +433,7 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialLayerSetUsage(DatabaseIfc db, IfcMaterialLayerSetUsage m) : base(db, m) { ForLayerSet = db.Factory.Duplicate(m.ForLayerSet) as IfcMaterialLayerSet; mLayerSetDirection = m.mLayerSetDirection; mDirectionSense = m.mDirectionSense; mOffsetFromReferenceLine = m.mOffsetFromReferenceLine; mReferenceExtent = m.mReferenceExtent; }
 		public IfcMaterialLayerSetUsage(IfcMaterialLayerSet ls, IfcLayerSetDirectionEnum dir, IfcDirectionSenseEnum sense, double offset) : base(ls.mDatabase)
 		{
-			mForLayerSet = ls.mIndex;
+			mForLayerSet = ls;
 			mLayerSetDirection = dir;
 			mDirectionSense = sense;
 			mOffsetFromReferenceLine = offset;
@@ -466,18 +473,20 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMaterialList : BaseClassIfc, IfcMaterialSelect, NamedObjectIfc //DEPRECATED IFC4
 	{
-		internal List<int> mMaterials = new List<int>();// LIST [1:?] OF IfcMaterial; 
+		internal LIST<IfcMaterial> mMaterials = new LIST<IfcMaterial>();// LIST [1:?] OF IfcMaterial; 
 		//INVERSE
 		[NonSerialized] private SET<IfcRelAssociatesMaterial> mAssociatedTo = new SET<IfcRelAssociatesMaterial>();
 
-		public ReadOnlyCollection<IfcMaterial> Materials { get { return new ReadOnlyCollection<IfcMaterial>( mMaterials.ConvertAll(x =>mDatabase[x] as IfcMaterial)); } }
+		public LIST<IfcMaterial> Materials { get { return mMaterials; } }
 		public SET<IfcRelAssociatesMaterial> AssociatedTo { get { return mAssociatedTo; } }
 
 		public string Name { get { return "MaterialList"; } }
-		public IfcMaterial PrimaryMaterial() {  return mDatabase[mMaterials[0]] as IfcMaterial; }
+		public IfcMaterial PrimaryMaterial() {  return mMaterials.First(); }
 
 		internal IfcMaterialList() : base() { }
-		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) { m.Materials.ToList().ForEach(x=>addMaterial( db.Factory.Duplicate(x) as IfcMaterial)); }
+		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) 
+		{ 
+			Materials.AddRange(m.Materials.Select(x=>db.Factory.Duplicate(x))); }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -512,7 +521,6 @@ namespace GeometryGym.Ifc
 		}
 		public void Associate(IfcRelAssociatesMaterial associates) { if(!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 
-		internal void addMaterial(IfcMaterial material) { mMaterials.Add(material.mIndex); }
 	}
 	[Serializable]
 	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
@@ -576,7 +584,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcMaterialProfileSet() : base() { }
 		internal IfcMaterialProfileSet(DatabaseIfc db, IfcMaterialProfileSet m) : base(db, m) { mName = m.mName; mDescription = m.mDescription; MaterialProfiles.AddRange(m.mMaterialProfiles.ConvertAll(x => db.Factory.Duplicate(x) as IfcMaterialProfile)); if (m.mCompositeProfile != null) CompositeProfile = db.Factory.Duplicate(m.CompositeProfile) as IfcCompositeProfileDef; }
-		private IfcMaterialProfileSet(DatabaseIfc m, string name) : base(m) { Name = name; }
+		private IfcMaterialProfileSet(DatabaseIfc db, string name) : base(db) { Name = name; }
 		public IfcMaterialProfileSet(string name, IfcMaterialProfile profile) : base(profile.mDatabase)
 		{
 			Name = name;
@@ -740,19 +748,19 @@ namespace GeometryGym.Ifc
 		public void Associate(IfcRelAssociatesMaterial associates) { if (!mAssociatedTo.Contains(associates)) mAssociatedTo.Add(associates); }
 	}
 	[Serializable]
-	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect
+	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect, IfcConditionCriterionSelect
 	{
 		internal IfcValue mValueComponent;// : IfcValue; 
 		private string mVal;
-		private int mUnitComponent;// : IfcUnit; 
+		private IfcUnit mUnitComponent;// : IfcUnit; 
 
 		public IfcValue ValueComponent { get { return mValueComponent; } set { mValueComponent = value; } }
-		public IfcUnit UnitComponent { get { return mDatabase[mUnitComponent] as IfcUnit; } set { mUnitComponent = value.Index; } }
+		public IfcUnit UnitComponent { get { return mUnitComponent; } set { mUnitComponent = value; } }
 
 		internal IfcMeasureWithUnit() : base() { }
-		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m) : base(db) { mValueComponent = m.mValueComponent; mVal = m.mVal;  UnitComponent = db.Factory.Duplicate(m.mDatabase[ m.mUnitComponent]) as IfcUnit; }
-		public IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u.Index; }
-		internal IfcMeasureWithUnit(double value, IfcUnit u) : base(u.Database) { mValueComponent = new IfcReal(value); mUnitComponent = u.Index;  }
+		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m) : base(db) { mValueComponent = m.mValueComponent; mVal = m.mVal;  UnitComponent = db.Factory.Duplicate(m.mUnitComponent); }
+		public IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u; }
+		internal IfcMeasureWithUnit(double value, IfcUnit u) : base(u.Database) { mValueComponent = new IfcReal(value); mUnitComponent = u;  }
 		public double SIFactor()
 		{
 			IfcUnit u = UnitComponent;
@@ -799,8 +807,8 @@ namespace GeometryGym.Ifc
 	{
 		internal double mNominalDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; IFC4 DEPRECATED
 		internal double mNominalLength = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;  IFC4 DEPRECATED
-		internal IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : OPTIONAL IfcMechanicalFastenerTypeEnum;
-		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : OPTIONAL IfcMechanicalFastenerTypeEnum;
+		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMechanicalFastenerTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMechanicalFastener() : base() { }
 		internal IfcMechanicalFastener(DatabaseIfc db, IfcMechanicalFastener f, DuplicateOptions options) : base(db, f, options) { mNominalDiameter = f.mNominalDiameter; mNominalLength = f.mNominalLength; }
@@ -812,13 +820,13 @@ namespace GeometryGym.Ifc
 	{
 		internal double mNominalDiameter;// : OPTIONAL IfcPositiveLengthMeasure; IFC4
 		internal double mNominalLength;// : OPTIONAL IfcPositiveLengthMeasure; IFC4
-		internal IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : IfcMechanicalFastenerTypeEnum; IFC4
-		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMechanicalFastenerTypeEnum mPredefinedType = IfcMechanicalFastenerTypeEnum.NOTDEFINED;// : IfcMechanicalFastenerTypeEnum; IFC4
+		public IfcMechanicalFastenerTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMechanicalFastenerTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMechanicalFastenerType() : base() { }
 		internal IfcShapeRepresentation mProfileRep = null;
-		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, DuplicateOptions options) : base(db, t, options) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; mPredefinedType = t.mPredefinedType; }
-		public IfcMechanicalFastenerType(DatabaseIfc db, string name, IfcMechanicalFastenerTypeEnum type) : base(db) { Name = name; mPredefinedType = type; }
+		internal IfcMechanicalFastenerType(DatabaseIfc db, IfcMechanicalFastenerType t, DuplicateOptions options) : base(db, t, options) { mNominalDiameter = t.mNominalDiameter; mNominalLength = t.mNominalLength; PredefinedType = t.PredefinedType; }
+		public IfcMechanicalFastenerType(DatabaseIfc db, string name, IfcMechanicalFastenerTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -851,14 +859,14 @@ namespace GeometryGym.Ifc
 		internal double mHardeningModule = double.NaN;// : OPTIONAL IfcModulusOfElasticityMeasure
 		internal double mProportionalStress = double.NaN;// : OPTIONAL IfcPressureMeasure;
 		internal double mPlasticStrain = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;
-		internal List<int> mRelaxations = new List<int>();// : OPTIONAL SET [1:?] OF IfcRelaxation 
+		internal SET<IfcRelaxation> mRelaxations = new SET<IfcRelaxation>();// : OPTIONAL SET [1:?] OF IfcRelaxation 
 
 		public double YieldStress { get { return mYieldStress; } set { mYieldStress = value; } }
 		public double UltimateStress { get { return mUltimateStress; } set { mUltimateStress = value; } }
 		public double HardeningModule { get { return mHardeningModule; } set { mHardeningModule = value; } }
 		public double ProportionalStress { get { return mProportionalStress; } set { mProportionalStress = value; } }
 		public double PlasticStrain { get { return mPlasticStrain; } set { mPlasticStrain = value; } }
-		public List<IfcRelaxation> Relaxations { get { return mRelaxations.ConvertAll(x => mDatabase[x] as IfcRelaxation); } set { mRelaxations = (value == null ? new List<int>() : value.ConvertAll(x => x.mIndex)); } }
+		public SET<IfcRelaxation> Relaxations { get { return mRelaxations; } }
 
 		internal IfcMechanicalSteelMaterialProperties() : base() { }
 		internal IfcMechanicalSteelMaterialProperties(DatabaseIfc db, IfcMechanicalSteelMaterialProperties p, DuplicateOptions options) : base(db, p, options)
@@ -869,7 +877,7 @@ namespace GeometryGym.Ifc
 			mHardeningModule = p.mHardeningModule;
 			mProportionalStress = p.mProportionalStress;
 			mPlasticStrain = p.mPlasticStrain;
-			Relaxations = p.Relaxations.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRelaxation);
+			Relaxations.AddRange(p.Relaxations.Select(x=> db.Factory.Duplicate(x)));
 		}
 		public IfcMechanicalSteelMaterialProperties(IfcMaterial mat) : base(mat) { }
 		public IfcMechanicalSteelMaterialProperties(IfcMaterial mat, double dynVisc, double youngs, double shear, double poisson, double thermalExp, double yieldStress, double ultimateStress, double ultimateStrain, double hardeningModule, double proportionalStress, double plasticStrain)
@@ -886,31 +894,31 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMedicalDevice : IfcFlowTerminal //IFC4
 	{
-		internal IfcMedicalDeviceTypeEnum mPredefinedType = IfcMedicalDeviceTypeEnum.NOTDEFINED;// OPTIONAL : IfcMedicalDeviceTypeEnum;
-		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMedicalDeviceTypeEnum mPredefinedType = IfcMedicalDeviceTypeEnum.NOTDEFINED;// OPTIONAL : IfcMedicalDeviceTypeEnum;
+		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMedicalDeviceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMedicalDevice() : base() { }
-		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, DuplicateOptions options) : base(db, d, options) { mPredefinedType = d.mPredefinedType; }
+		internal IfcMedicalDevice(DatabaseIfc db, IfcMedicalDevice d, DuplicateOptions options) : base(db, d, options) { PredefinedType = d.PredefinedType; }
 		public IfcMedicalDevice(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMedicalDeviceType : IfcFlowTerminalType
 	{
-		internal IfcMedicalDeviceTypeEnum mPredefinedType = IfcMedicalDeviceTypeEnum.NOTDEFINED;// : IfcMedicalDeviceBoxTypeEnum; 
-		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMedicalDeviceTypeEnum mPredefinedType = IfcMedicalDeviceTypeEnum.NOTDEFINED;// : IfcMedicalDeviceBoxTypeEnum; 
+		public IfcMedicalDeviceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMedicalDeviceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMedicalDeviceType() : base() { }
-		internal IfcMedicalDeviceType(DatabaseIfc db, IfcMedicalDeviceType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcMedicalDeviceType(DatabaseIfc m, string name, IfcMedicalDeviceTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		internal IfcMedicalDeviceType(DatabaseIfc db, IfcMedicalDeviceType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcMedicalDeviceType(DatabaseIfc db, string name, IfcMedicalDeviceTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcMember : IfcBuiltElement
 	{
-		internal IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;//: OPTIONAL IfcMemberTypeEnum; 
-		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;//: OPTIONAL IfcMemberTypeEnum; 
+		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMemberTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMember() : base() { }
-		internal IfcMember(DatabaseIfc db, IfcMember m, DuplicateOptions options) : base(db, m, options) { mPredefinedType = m.mPredefinedType; }
+		internal IfcMember(DatabaseIfc db, IfcMember m, DuplicateOptions options) : base(db, m, options) { PredefinedType = m.PredefinedType; }
 		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcMember(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
@@ -926,71 +934,50 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMemberType : IfcBuiltElementType
 	{
-		internal IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;
-		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMemberTypeEnum mPredefinedType = IfcMemberTypeEnum.NOTDEFINED;
+		public IfcMemberTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMemberTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMemberType() : base() { }
-		internal IfcMemberType(DatabaseIfc db, IfcMemberType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
+		internal IfcMemberType(DatabaseIfc db, IfcMemberType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
 		public IfcMemberType(string name, IfcMaterialProfileSet ps, IfcMemberTypeEnum type) : base(ps.mDatabase)
 		{
 			Name = name;
-			mPredefinedType = type;
+			PredefinedType = type;
 			if (ps.mTaperEnd != null)
 				mTapering = ps;
 			else
 				MaterialSelect = ps;
 		}
-		public IfcMemberType(DatabaseIfc m, string name, IfcMemberTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
-		public IfcMemberType(string name, IfcMaterialProfile mp, IfcMemberTypeEnum type) : base(mp.mDatabase) { Name = name; mPredefinedType = type; MaterialSelect = mp; }
+		public IfcMemberType(DatabaseIfc db, string name, IfcMemberTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
+		public IfcMemberType(string name, IfcMaterialProfile mp, IfcMemberTypeEnum type) : base(mp.mDatabase) { Name = name; PredefinedType = type; MaterialSelect = mp; }
 	}
 	[Serializable]
 	public partial class IfcMetric : IfcConstraint
 	{
 		internal IfcBenchmarkEnum mBenchMark = IfcBenchmarkEnum.EQUALTO;// : IfcBenchmarkEnum
 		internal string mValueSource = ""; //	 :	OPTIONAL IfcLabel;
-		private int mDataValue = 0;// : OPTIONAL IfcMetricValueSelect;
-		private IfcValue mDataValueValue = null;
-		private int mReferencePath;// :	OPTIONAL IfcReference;
+		private IfcMetricValueSelect mDataValue = null;// : OPTIONAL IfcMetricValueSelect;
+		private IfcReference mReferencePath;// :	OPTIONAL IfcReference;
 
 		public IfcBenchmarkEnum BenchMark { get { return mBenchMark; } set { mBenchMark = value; } }
 		public string ValueSource { get { return mValueSource; } set { mValueSource = value; } }
 		public IfcMetricValueSelect DataValue
 		{
-			get
-			{
-				if (mDataValueValue != null)
-					return mDataValueValue;
-				return mDatabase[mDataValue] as IfcMetricValueSelect;
-			}
-			set
-			{
-				IfcValue ivalue = value as IfcValue;
-				if (value != null)
-				{
-					mDataValueValue = ivalue;
-					mDataValue = 0;
-				}
-				else
-				{
-					BaseClassIfc baseClass = value as BaseClassIfc;
-					mDataValue = baseClass == null ? 0 : baseClass.mIndex;
-					mDataValueValue = null;
-				}
-			}
+			get { return mDataValue; }
+			set { mDataValue = value; }
 		}
-		public IfcValue Value { get { return mDataValueValue; } set { mDataValueValue = value; } }
-		public IfcReference ReferencePath { get { return mDatabase[mReferencePath] as IfcReference; } set { mReferencePath = (value == null ? 0 : value.mIndex); } }
+		public IfcReference ReferencePath { get { return mReferencePath; } set { mReferencePath = value; } }
 
 		internal IfcMetric() : base() { }
 		internal IfcMetric(DatabaseIfc db, IfcMetric m) : base(db,m)
 		{
 			mBenchMark = m.mBenchMark;
 			mValueSource = m.mValueSource;
-			if(mDataValue > 0)
-				DataValue = db.Factory.Duplicate(m.mDatabase[ m.mDataValue]) as IfcMetricValueSelect;
-			mDataValueValue = m.mDataValueValue;
-			if(mReferencePath > 0)
-				ReferencePath = db.Factory.Duplicate( m.ReferencePath) as IfcReference;
+			if (m.DataValue is BaseClassIfc o)
+				DataValue = db.Factory.Duplicate(o) as IfcMetricValueSelect;
+			else
+				DataValue = m.DataValue;
+			ReferencePath = db.Factory.Duplicate(m.ReferencePath);
 		}
 		public IfcMetric(DatabaseIfc db, string name, IfcConstraintEnum constraint) : base(db, name, constraint) { }
 	}
@@ -1003,22 +990,22 @@ namespace GeometryGym.Ifc
 		internal IfcMirroredProfileDef(DatabaseIfc db, IfcMirroredProfileDef p, DuplicateOptions options) : base(db, p, options) { }
 		public IfcMirroredProfileDef(IfcProfileDef p, string name) : base(p, null, name) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
 	{
 		private IfcMobileTelecommunicationsApplianceTypeEnum mPredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED; //: OPTIONAL IfcMobileTelecommunicationsApplianceTypeEnum;
-		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMobileTelecommunicationsApplianceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcMobileTelecommunicationsAppliance() : base() { }
 		public IfcMobileTelecommunicationsAppliance(DatabaseIfc db) : base(db) { }
 		public IfcMobileTelecommunicationsAppliance(DatabaseIfc db, IfcMobileTelecommunicationsAppliance mobileAppliance, DuplicateOptions options) : base(db, mobileAppliance, options) { PredefinedType = mobileAppliance.PredefinedType; }
 		public IfcMobileTelecommunicationsAppliance(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
 	{
 		private IfcMobileTelecommunicationsApplianceTypeEnum mPredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.NOTDEFINED; //: IfcMobileTelecommunicationsApplianceTypeEnum;
-		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMobileTelecommunicationsApplianceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMobileTelecommunicationsApplianceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcMobileTelecommunicationsApplianceType() : base() { }
 		public IfcMobileTelecommunicationsApplianceType(DatabaseIfc db, IfcMobileTelecommunicationsApplianceType mobileApplianceType, DuplicateOptions options) : base(db, mobileApplianceType, options) { PredefinedType = mobileApplianceType.PredefinedType; }
@@ -1042,7 +1029,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcMooringDevice : IfcBuiltElement
 	{
 		private IfcMooringDeviceTypeEnum mPredefinedType = IfcMooringDeviceTypeEnum.NOTDEFINED; //: OPTIONAL IfcMooringDeviceTypeEnum;
-		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMooringDeviceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcMooringDevice() : base() { }
 		public IfcMooringDevice(DatabaseIfc db) : base(db) { }
@@ -1053,7 +1040,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcMooringDeviceType : IfcBuiltElementType
 	{
 		private IfcMooringDeviceTypeEnum mPredefinedType = IfcMooringDeviceTypeEnum.NOTDEFINED; //: IfcMooringDeviceTypeEnum;
-		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcMooringDeviceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMooringDeviceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcMooringDeviceType() : base() { }
 		public IfcMooringDeviceType(DatabaseIfc db, IfcMooringDeviceType mooringDeviceType, DuplicateOptions options) : base(db, mooringDeviceType, options) { PredefinedType = mooringDeviceType.PredefinedType; }
@@ -1063,22 +1050,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcMotorConnection : IfcEnergyConversionDevice //IFC4
 	{
-		internal IfcMotorConnectionTypeEnum mPredefinedType = IfcMotorConnectionTypeEnum.NOTDEFINED;// OPTIONAL : IfcMotorConnectionTypeEnum;
-		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMotorConnectionTypeEnum mPredefinedType = IfcMotorConnectionTypeEnum.NOTDEFINED;// OPTIONAL : IfcMotorConnectionTypeEnum;
+		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMotorConnectionTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMotorConnection() : base() { }
-		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c, DuplicateOptions options) : base(db, c, options) { mPredefinedType = c.mPredefinedType; }
+		internal IfcMotorConnection(DatabaseIfc db, IfcMotorConnection c, DuplicateOptions options) : base(db, c, options) { PredefinedType = c.PredefinedType; }
 		public IfcMotorConnection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcMotorConnectionType : IfcEnergyConversionDeviceType
 	{
-		internal IfcMotorConnectionTypeEnum mPredefinedType = IfcMotorConnectionTypeEnum.NOTDEFINED;// : IfcMotorConnectionTypeEnum; 
-		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcMotorConnectionTypeEnum mPredefinedType = IfcMotorConnectionTypeEnum.NOTDEFINED;// : IfcMotorConnectionTypeEnum; 
+		public IfcMotorConnectionTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcMotorConnectionTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcMotorConnectionType() : base() { }
-		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcMotorConnectionType(DatabaseIfc m, string name, IfcMotorConnectionTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcMotorConnectionType(DatabaseIfc db, IfcMotorConnectionType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcMotorConnectionType(DatabaseIfc db, string name, IfcMotorConnectionTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcMove // DEPRECATED IFC4

@@ -148,7 +148,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasOpenings", mDatabase.mXmlNamespace);
 				foreach (IfcRelVoidsElement voids in mHasOpenings)
 				{
-					if (voids.mIndex != host.mIndex)
+					if (voids != host)
 						element.AppendChild(voids.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)

@@ -62,7 +62,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			IfcOrientedEdge oe = this as IfcOrientedEdge;
-			return (oe == null ? "#" + mEdgeStart.Index + ",#" + mEdgeEnd.Index : "*,*");
+			return (oe == null ? "#" + mEdgeStart.StepId + ",#" + mEdgeEnd.StepId : "*,*");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -145,7 +145,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcElectricDistributionPoint
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mDistributionPointFunction.ToString() + (string.IsNullOrEmpty(mUserDefinedFunction) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedFunction) + "'"); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (release > ReleaseVersion.IFC2x3 ? "" :
+				",." + mDistributionPointFunction.ToString() + 
+				(string.IsNullOrEmpty(mUserDefinedFunction) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedFunction) + "'"));
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -227,7 +232,10 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcElectricHeaterType
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + (release > ReleaseVersion.IFC2x3 ? "" : ",." + mPredefinedType.ToString() + "."); 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -291,8 +299,11 @@ namespace GeometryGym.Ifc
 	}
 	public abstract partial class IfcElementarySurface
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mPosition); }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { mPosition = ParserSTEP.StripLink(str, ref pos, len); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mPosition.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
+		{
+			mPosition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement3D; 
+		}
 	}
 	public partial class IfcElementAssembly
 	{
@@ -581,8 +592,7 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4)
 				return "";
-			return base.BuildStringSTEP(release) + ",#" + mRelatingReference.StepId + ",(#" + string.Join(",#", mRelatedResourceObjects.ConvertAll(x=>x.Index)) + ")";
-
+			return base.BuildStringSTEP(release) + ",#" + mRelatingReference.StepId + ",(" + string.Join(",", mRelatedResourceObjects.Select(x=> "#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -614,11 +624,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcExtrudedAreaSolidTapered
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.LinkToString(mEndSweptArea); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mEndSweptArea.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mEndSweptArea = ParserSTEP.StripLink(str, ref pos, len);
+			mEndSweptArea = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 		}
 	}
 }

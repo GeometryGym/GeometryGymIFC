@@ -127,7 +127,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "InstanceName", InstanceName);
 			if (mListPositions.Count > 0)
 				obj["ListPositions"] = new JArray(mListPositions.ToArray());
-			if (mInnerReference > 0)
+			if (mInnerReference != null)
 				obj["InnerReference"] = InnerReference.getJson(this, options);
 		}
 	}
@@ -237,7 +237,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			if (host != mRelatingProduct)
-				obj["RelatingProduct"] = mDatabase[mRelatingProduct.Index].getJson(this, options);
+				obj["RelatingProduct"] = mDatabase[mRelatingProduct.StepId].getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociates : IfcRelationship   //ABSTRACT SUPERTYPE OF (ONEOF(IfcRelAssociatesApproval,IfcRelAssociatesclassification,IfcRelAssociatesConstraint,IfcRelAssociatesDocument,IfcRelAssociatesLibrary,IfcRelAssociatesMaterial))
@@ -292,7 +292,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Intent", Intent);
-			if (host.mIndex != mRelatingConstraint)
+			if (host != mRelatingConstraint)
 				obj["RelatingConstraint"] = RelatingConstraint.getJson(this, options);
 		}
 	}
@@ -308,8 +308,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingDocument)
-				obj["RelatingDocument"] = mDatabase[mRelatingDocument].getJson(this, options);
+			if (host != mRelatingDocument)
+				obj["RelatingDocument"] = mRelatingDocument.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesLibrary : IfcRelAssociates
@@ -340,8 +340,8 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingMaterial)
-				obj["RelatingMaterial"] = mDatabase[mRelatingMaterial].getJson(this, options);
+			if (host != mRelatingMaterial)
+				obj["RelatingMaterial"] = mRelatingMaterial.getJson(this, options);
 		}
 	}
 	public partial class IfcRelAssociatesProfileDef : IfcRelAssociates
@@ -376,28 +376,28 @@ namespace GeometryGym.Ifc
 			{
 				JToken measure = jobj["IfcPlaneAngleMeasure"];
 				if (measure != null)
-					mProfileOrientationValue = measure.Value<double>();
+					mProfileOrientation = new IfcPlaneAngleMeasure(measure.Value<double>());
 				else
 				{
 					IfcDirection dir = mDatabase.ParseJObject<IfcDirection>(jobj);
 					if (dir != null)
-						mProfileOrientation = dir.mIndex;
+						mProfileOrientation = dir;
 				}
 			}
 		}
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingProfileProperties)
-				obj["RelatingProfileProperties"] = mDatabase[mRelatingProfileProperties].getJson(this, options);
-			if (mProfileSectionLocation > 0 && host.mIndex != mProfileSectionLocation)
-				obj["ProfileSectionLocation"] = mDatabase[mProfileSectionLocation].getJson(this, options);
-			if (mProfileOrientation > 0)
-				obj["ProfileOrientation"] = mDatabase[mProfileOrientation].getJson(this, options);
-			else if (!double.IsNaN(mProfileOrientationValue))
+			if (host != mRelatingProfileProperties)
+				obj["RelatingProfileProperties"] = mRelatingProfileProperties.getJson(this, options);
+			if (mProfileSectionLocation != null && host != mProfileSectionLocation)
+				obj["ProfileSectionLocation"] = mProfileSectionLocation.getJson(this, options);
+			if (mProfileOrientation is BaseClassIfc o)
+				obj["ProfileOrientation"] = o.getJson(this, options);
+			else if (mProfileOrientation is IfcPlaneAngleMeasure planeAngleMeasure)
 			{
 				JObject jobj = new JObject();
-				jobj["IfcPlaneAngleMeasure"] = mProfileOrientationValue;
+				jobj["IfcPlaneAngleMeasure"] = planeAngleMeasure.Measure;
 				obj["ProfileOrientation"] = jobj;
 			}
 		}
@@ -429,17 +429,17 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host == null || host.mIndex != mRelatingStructuralMember)
+			if (host == null || host != mRelatingStructuralMember)
 				obj["RelatingStructuralMember"] = RelatingStructuralMember.getJson(host, options);
-			if (host == null || host.mIndex != mRelatedStructuralConnection)
+			if (host == null || host != mRelatedStructuralConnection)
 				obj["RelatedStructuralConnection"] = RelatedStructuralConnection.getJson(host, options);
-			if (mAppliedCondition > 0)
+			if (mAppliedCondition != null)
 				obj["AppliedCondition"] = AppliedCondition.getJson(this, options);
-			if (mAdditionalConditions > 0)
+			if (mAdditionalConditions != null)
 				obj["AdditionalConditions"] = AdditionalConditions.getJson(this, options);
 			if (mSupportedLength > 0)
 				obj["SupportedLength"] = SupportedLength;
-			if (mConditionCoordinateSystem > 0)
+			if (mConditionCoordinateSystem != null)
 				obj["ConditionCoordinateSystem"] = ConditionCoordinateSystem.getJson(this, options);
 		}
 	}
@@ -473,7 +473,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			if (RelatingContext != host)
 				obj["RelatingContext"] = RelatingContext.getJson(this, options);
-			obj["RelatedDefinitions"] = new JArray(mRelatedDefinitions.ConvertAll(x => mDatabase[x.Index].getJson(this, options)));
+			obj["RelatedDefinitions"] = new JArray(mRelatedDefinitions.ConvertAll(x => mDatabase[x.StepId].getJson(this, options)));
 		}
 	}
 	public partial class IfcRelDefinesByProperties : IfcRelDefines
@@ -497,7 +497,7 @@ namespace GeometryGym.Ifc
 			base.parseJObject(obj);
 			JArray array = obj.GetValue("RelatedPropertySets", StringComparison.InvariantCultureIgnoreCase) as JArray;
 			if (array != null)
-				mDatabase.extractJArray<IfcPropertySetDefinition>(array).ForEach(x=>AddRelated(x));
+				RelatedPropertySets.AddRange(mDatabase.extractJArray<IfcPropertySetDefinition>(array));
 			JObject jobj = obj.GetValue("RelatingTemplate", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if(jobj != null)
 				RelatingTemplate = extractObject<IfcPropertySetTemplate>(jobj);
@@ -509,7 +509,7 @@ namespace GeometryGym.Ifc
 			//List<IfcObject> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
 			//foreach (IfcObject obj in relatedObjects)
-			//	array.Add(obj.Index);
+			//	array.Add(obj.StepId);
 			//obj["RelatedObjects"] = array;
 		}
 	}
@@ -532,7 +532,7 @@ namespace GeometryGym.Ifc
 			//List<IfcObject> relatedObjects = RelatedObjects;
 			//JArray array = new JArray();
 			//foreach (IfcObject obj in relatedObjects)
-			//	array.Add(obj.Index);
+			//	array.Add(obj.StepId);
 			//obj["RelatedObjects"] = array;
 		}
 	}
@@ -551,10 +551,10 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (host.mIndex != mRelatingOpeningElement)
-				obj["RelatingOpeningElement"] = mDatabase[mRelatingOpeningElement].getJson(this, options);
-			if (host.mIndex != mRelatedBuildingElement)
-				obj["RelatedBuildingElement"] = mDatabase[mRelatedBuildingElement].getJson(this, options);
+			if (host != mRelatingOpeningElement)
+				obj["RelatingOpeningElement"] = mRelatingOpeningElement.getJson(this, options);
+			if (host != mRelatedBuildingElement)
+				obj["RelatedBuildingElement"] = mRelatedBuildingElement.getJson(this, options);
 		}
 	}
 	public partial class IfcRelNests : IfcRelDecomposes
@@ -749,8 +749,8 @@ namespace GeometryGym.Ifc
 			foreach (IfcResourceObjectSelect r in RelatedResourceObjects)
 			{
 				IfcResourceConstraintRelationship rcr = r as IfcResourceConstraintRelationship;
-				if (r.Index != host.mIndex)
-					array.Add(mDatabase[r.Index].getJson(this, options));
+				if (r.StepId != host.StepId)
+					array.Add(mDatabase[r.StepId].getJson(this, options));
 			}
 			if (array.Count > 0)
 				obj["RelatedResourceObjects"] = array;

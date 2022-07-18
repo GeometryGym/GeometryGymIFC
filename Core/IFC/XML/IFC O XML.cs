@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasAssignments", mDatabase.mXmlNamespace);
 				foreach (IfcRelAssigns rap in mHasAssignments)
 				{
-					if (rap.mIndex != host.mIndex)
+					if (rap != host)
 						element.AppendChild(rap.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -277,7 +277,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasFillings", mDatabase.mXmlNamespace);
 				foreach (IfcRelFillsElement fills in mHasFillings)
 				{
-					if (fills.mIndex != host.mIndex)
+					if (fills != host)
 						element.AppendChild(fills.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)

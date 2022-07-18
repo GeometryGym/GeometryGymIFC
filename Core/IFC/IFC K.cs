@@ -27,7 +27,7 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcKerb : IfcBuiltElement
 	{
 		private bool mMountable = false; //: IfcBoolean;
@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
 		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
 		private bool mMountable = false; //: IfcBoolean;

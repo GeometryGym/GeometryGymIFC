@@ -196,7 +196,7 @@ namespace GeometryGym.STEP
 			else
 				return "#" + link;
 		}
-		public static string ObjToLinkString(ISTEPEntity obj) { return obj == null ? "$" : "#" + obj.Index; }
+		public static string ObjToLinkString(ISTEPEntity obj) { return obj == null ? "$" : "#" + obj.StepId; }
 		public static string ListLinksToString(List<int> links)
 		{
 			if (links.Count == 0)

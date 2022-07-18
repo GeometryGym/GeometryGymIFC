@@ -47,8 +47,8 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			obj["Name"] = Name;
 			setAttribute(obj, "Version", Version);
-			if (mPublisher > 0)
-				obj["Publisher"] = mDatabase[mPublisher].getJson(this, options);
+			if (mPublisher != null)
+				obj["Publisher"] = mPublisher.getJson(this, options);
 			//VersionDate
 			setAttribute(obj, "Location", Location);
 			setAttribute(obj, "Description", Description);

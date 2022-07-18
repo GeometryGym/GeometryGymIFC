@@ -104,7 +104,7 @@ namespace GeometryGym.Ifc
 					obj["CoordinateSpaceDimension"] = CoordinateSpaceDimension;
 				if (mPrecision > 0)
 					obj["Precision"] = Precision;
-				obj["WorldCoordinateSystem"] = mDatabase[mWorldCoordinateSystem.Index].getJson(this, options);
+				obj["WorldCoordinateSystem"] = mDatabase[mWorldCoordinateSystem.StepId].getJson(this, options);
 				if (mTrueNorth != null)
 					obj["TrueNorth"] = TrueNorth.getJson(this, options);
 			}
@@ -114,7 +114,7 @@ namespace GeometryGym.Ifc
 			{
 				foreach (IfcGeometricRepresentationSubContext sub in HasSubContexts)
 				{
-					if (sub.mIndex != host.mIndex)
+					if (sub.StepId != host.StepId)
 						arr.Add(sub.getJson(this, options));
 				}
 			}

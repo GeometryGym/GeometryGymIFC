@@ -30,10 +30,10 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcHalfSpaceSolid
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ParserSTEP.LinkToString(mBaseSurface) + "," + ParserSTEP.BoolToString(mAgreementFlag); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mBaseSurface.StepId + "," + ParserSTEP.BoolToString(mAgreementFlag); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mBaseSurface = ParserSTEP.StripLink(str, ref pos, len);
+			mBaseSurface = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSurface;
 			mAgreementFlag = ParserSTEP.StripBool(str, ref pos, len);
 		}
 	}

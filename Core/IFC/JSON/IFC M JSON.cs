@@ -150,7 +150,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
-			if (mMaterial > 0)
+			if (mMaterial != null)
 				obj["Material"] = Material.getJson(this, options);
 			setAttribute(obj, "Category", Category);
 		}
@@ -219,7 +219,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 
-			if (mMaterial > 0)
+			if (mMaterial != null)
 				obj["Material"] = Material.getJson(this, options);
 			obj["LayerThickness"] = mLayerThickness;
 			obj["IsVentilated"] = mIsVentilated.ToString();
@@ -388,7 +388,7 @@ namespace GeometryGym.Ifc
 				obj["ValueComponent"] = DatabaseIfc.extract(value);
 			IfcUnit unit = UnitComponent;
 			if (unit != null)
-				obj["UnitComponent"] = mDatabase[mUnitComponent].getJson(this, options);
+				obj["UnitComponent"] = mUnitComponent.getJson(this, options);
 		}
 	}
 	public partial class IfcMetric : IfcConstraint
@@ -413,7 +413,7 @@ namespace GeometryGym.Ifc
 					if (value != null)
 						DataValue = value;
 					else
-						mDataValueValue = DatabaseIfc.ParseValue(jobj);
+						mDataValue = DatabaseIfc.ParseValue(jobj) as IfcMetricValueSelect;
 				}
 				//else
 
@@ -428,11 +428,11 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			obj["BenchMark"] = mBenchMark.ToString();
 			setAttribute(obj, "ValueSource", ValueSource);
-			if (mDataValue > 0)
-				obj["DataValue"] = mDatabase[mDataValue].getJson(this, options);
-			else if(mDataValueValue != null)
-				obj["DataValue"] = DatabaseIfc.extract(mDataValueValue);
-			if (mReferencePath > 0)
+			if (mDataValue is BaseClassIfc o)
+				obj["DataValue"] = o.getJson(this, options);
+			else if(mDataValue is IfcValue val)
+				obj["DataValue"] = DatabaseIfc.extract(val);
+			if (mReferencePath != null)
 				obj["ReferencePath"] = ReferencePath.getJson(this, options);
 		}
 	}

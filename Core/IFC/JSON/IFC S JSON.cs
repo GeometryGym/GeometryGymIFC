@@ -238,12 +238,12 @@ namespace GeometryGym.Ifc
 				obj["TemplateType"] = mTemplateType.ToString();
 			setAttribute(obj, "PrimaryMeasureType", PrimaryMeasureType);
 			setAttribute(obj, "SecondaryMeasureType", SecondaryMeasureType);
-			if (mEnumerators > 0)
+			if (mEnumerators != null)
 				obj["Enumerators"] = Enumerators.getJson(this, options);
-			if (mPrimaryUnit > 0)
-				obj["PrimaryUnit"] = mDatabase[mPrimaryUnit].getJson(this, options);
-			if (mSecondaryUnit > 0)
-				obj["SecondaryUnit"] = mDatabase[mSecondaryUnit].getJson(this, options);
+			if (mPrimaryUnit is BaseClassIfc o)
+				obj["PrimaryUnit"] = o.getJson(this, options);
+			if (mSecondaryUnit != null)
+				obj["SecondaryUnit"] = mSecondaryUnit.getJson(this, options);
 			setAttribute(obj, "Expression", Expression);
 			if (mAccessState != IfcStateEnum.NOTDEFINED)
 				obj["AccessState"] = mAccessState.ToString();
@@ -476,7 +476,7 @@ namespace GeometryGym.Ifc
 			}
 			else
 				obj["DestabilizingLoad"] = mDestabilizingLoad == IfcLogicalEnum.TRUE;
-			if (mCausedBy > 0)
+			if (mCausedBy != null)
 				obj["CausedBy"] = CausedBy.getJson(this, options);
 		}
 	}
@@ -530,12 +530,12 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcAnalysisModelTypeEnum.NOTDEFINED)
 				obj["PredefinedType"] = mPredefinedType.ToString();
-			if (mOrientationOf2DPlane > 0)
+			if (mOrientationOf2DPlane != null)
 				obj["OrientationOf2DPlane"] = OrientationOf2DPlane.getJson(this, options);
 			if (mLoadedBy.Count > 0)
-				obj["LoadedBy"] = new JArray(mLoadedBy.ConvertAll(x => mDatabase[x].getJson(this, options)));
+				obj["LoadedBy"] = new JArray(mLoadedBy.ConvertAll(x => x.getJson(this, options)));
 			if (mHasResults.Count > 0)
-				obj["HasResults"] = new JArray(mHasResults.ConvertAll(x => mDatabase[x].getJson(this, options)));
+				obj["HasResults"] = new JArray(mHasResults.ConvertAll(x => x.getJson(this, options)));
 			if (mSharedPlacement != null)
 				obj["SharedPlacement"] = SharedPlacement.getJson(this, options);
 		}
@@ -555,13 +555,13 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 
-			if (mAppliedCondition > 0)
+			if (mAppliedCondition != null)
 				obj["AppliedCondition"] = AppliedCondition.getJson(this, options);
 			JArray array = new JArray();
 			foreach(IfcRelConnectsStructuralMember connects in mConnectsStructuralMembers)
 			{
 				IfcStructuralMember member = connects.RelatingStructuralMember;
-				if(host == null || member.mIndex != host.mIndex)
+				if(host == null || member.StepId != host.StepId)
 					array.Add(member.getJson(this, options));
 			}
 			if (array.Count > 0)
@@ -746,7 +746,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcRelConnectsStructuralMember connects in mConnectedBy)
 			{
 				IfcStructuralConnection connection = connects.RelatedStructuralConnection;
-				if (host == null || connection.mIndex != host.mIndex)
+				if (host == null || connection.StepId != host.StepId)
 					array.Add(connects.getJson(this, options));
 			}
 			if (array.Count > 0)
@@ -765,7 +765,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mConditionCoordinateSystem > 0)
+			if (mConditionCoordinateSystem != null)
 				obj["ConditionCoordinateSystem"] = ConditionCoordinateSystem.getJson(this, options);
 		}
 	}

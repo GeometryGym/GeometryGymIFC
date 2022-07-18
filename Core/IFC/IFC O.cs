@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 			}
 			if (typeObject == null)
 				mIsTypedBy = null;
-			else //TODO CHECK CLASS NAME MATCHES INSTANCE
+			else 
 			{
 				if (typeObject.mTypes == null)
 					typeObject.mTypes = new IfcRelDefinesByType(this, typeObject);
@@ -82,19 +82,6 @@ namespace GeometryGym.Ifc
 		}
 		
 		protected IfcObject() : base() { }
-		protected IfcObject(IfcObject obj, bool replace) : base(obj, replace)
-		{
-			mObjectType = obj.mObjectType;
-			IfcTypeObject typeObject = obj.RelatingType();
-			if (typeObject != null)
-				setRelatingType(typeObject);
-			if(replace)
-			{
-				mIsDeclaredBy = obj.mIsDeclaredBy;
-				mIsDefinedBy.AddRange(obj.mIsDefinedBy);
-			}
-
-		}
 		protected IfcObject(DatabaseIfc db, IfcObject o, DuplicateOptions options) : base(db, o, options)
 		{
 			mObjectType = o.mObjectType;
@@ -103,6 +90,12 @@ namespace GeometryGym.Ifc
 				IsTypedBy = db.Factory.Duplicate(o.mIsTypedBy, options) as IfcRelDefinesByType;
 		}
 		protected IfcObject(DatabaseIfc db) : base(db) { }
+		protected IfcObject(IfcObject obj) : base(obj)
+		{
+			mObjectType = obj.mObjectType;
+			if (obj.mIsTypedBy != null)
+				obj.mIsTypedBy.RelatedObjects.Add(this);
+		}
 		protected override List<T> Extract<T>(Type type)
 		{
 			List<T> result = base.Extract<T>(type);
@@ -158,42 +151,6 @@ namespace GeometryGym.Ifc
 					result = typeObject.GetPredefinedType();
 			}
 			return result;
-		}
-		internal void SetPredefinedType(string predefinedTypeConstant, string enumName)
-		{
-			if (mDatabase.mRelease < ReleaseVersion.IFC4)
-				ObjectType = predefinedTypeConstant;
-			else
-			{
-				Type type = GetType();
-				PropertyInfo pi = type.GetProperty("PredefinedType");
-				if (pi != null)
-				{
-					Type enumType = pi.PropertyType;
-					if (enumType != null)
-					{
-						FieldInfo fi = enumType.GetField(predefinedTypeConstant);
-						if (fi == null)
-						{
-							ObjectType = predefinedTypeConstant;
-							fi = enumType.GetField("USERDEFINED");
-						}
-						if (fi != null)
-						{
-							int i = (int)fi.GetValue(enumType);
-							object newEnumValue = Enum.ToObject(enumType, i);
-
-							pi.SetValue(this, newEnumValue);
-						}
-						else
-							ObjectType = predefinedTypeConstant;
-					}
-					else
-						ObjectType = predefinedTypeConstant;
-				}
-				else
-					ObjectType = predefinedTypeConstant;
-			}
 		}
 
 		public void MaterialProfile(out IfcMaterial material, out IfcProfileDef profile)
@@ -302,12 +259,16 @@ namespace GeometryGym.Ifc
 
 		protected IfcObjectDefinition() : base() { }
 		protected IfcObjectDefinition(DatabaseIfc db) : base(db) {  }
-		protected IfcObjectDefinition(IfcObjectDefinition objectDefinition, bool replace) : base(objectDefinition, replace)
+		protected IfcObjectDefinition(IfcObjectDefinition obj) : base(obj) 
 		{
-			if(replace)
-			{
-				//todo
-			}
+			foreach (IfcRelAssigns assigns in obj.HasAssignments)
+				assigns.RelatedObjects.Add(this);
+			if(obj.mHasContext != null)
+				obj.mHasContext.RelatedDefinitions.Add(this);
+			foreach(IfcRelAssociates associates in obj.HasAssociations)
+				associates.RelatedObjects.Add(this);
+			foreach(IfcRelDefinesByProperties defines in obj.mIsDefinedBy)
+				defines.RelatedObjects.Add(this);
 		}
 		protected IfcObjectDefinition(DatabaseIfc db, IfcObjectDefinition o, DuplicateOptions options) : base(db, o, options)
 		{
@@ -456,8 +417,75 @@ namespace GeometryGym.Ifc
 			if (product != null && product.mContainedInStructure != null)
 				product.mContainedInStructure.RelatedElements.Remove(product);
 		}
-		
-		
+
+		protected T validPredefinedType<T>(T predefinedType, ReleaseVersion version) where T : struct
+		{
+			T result = predefinedType;
+			Type type = typeof(T);
+			string val = Enum.GetName(type, predefinedType);
+			VersionAddedAttribute versionAddedAttribute = type.GetField(val).GetCustomAttribute<VersionAddedAttribute>();
+			if (versionAddedAttribute != null && versionAddedAttribute.Release > version && version < ReleaseVersion.IFC4X3_RC1)
+			{
+				if (Enum.TryParse<T>("USERDEFINED", out T value))
+				{
+					result = value;
+					if (this is IfcObject obj && string.IsNullOrEmpty(obj.ObjectType))
+						obj.ObjectType = predefinedType.ToString();
+					else if (this is IfcElementType elementType && string.IsNullOrEmpty(elementType.ElementType))
+						elementType.ElementType = predefinedType.ToString();
+				}
+			}
+			return result;
+		}
+		internal void SetPredefinedType(string predefinedTypeConstant)
+		{
+			string objectType = "";
+			Type type = GetType();
+			PropertyInfo propertyInfo = type.GetProperty("mPredefinedType", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			FieldInfo fieldInfo = type.GetField("mPredefinedType", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			if (fieldInfo != null)
+			{
+				Type enumType = fieldInfo.FieldType;
+				if (enumType != null)
+				{
+					FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+					if (fi == null)
+					{
+						objectType = predefinedTypeConstant;
+						fi = enumType.GetField("USERDEFINED");
+					}
+					else if (mDatabase != null)
+					{
+						VersionAddedAttribute versionAddedAttribute = fi.GetCustomAttribute<VersionAddedAttribute>();
+						if (versionAddedAttribute != null && versionAddedAttribute.Release > mDatabase.mRelease && mDatabase.mRelease < ReleaseVersion.IFC4X3_RC1)
+						{
+							objectType = predefinedTypeConstant;
+							fi = enumType.GetField("USERDEFINED");
+						}
+					}
+					if (fi != null)
+					{
+						int i = (int)fi.GetValue(enumType);
+						object newEnumValue = Enum.ToObject(enumType, i);
+
+						fieldInfo.SetValue(this, newEnumValue);
+					}
+				}
+			}
+			if(!string.IsNullOrEmpty(objectType))
+			{
+				if (this is IfcObject o && string.IsNullOrEmpty(o.ObjectType))
+					o.ObjectType = objectType;
+				else if (this is IfcElementType elementType && string.IsNullOrEmpty(elementType.ElementType))
+					elementType.ElementType = objectType;
+			}
+			if (this is IfcObject obj && mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4)
+			{
+				if (string.IsNullOrEmpty(obj.mObjectType))
+					obj.mObjectType = predefinedTypeConstant;
+			}
+		}
+
 		internal IfcMaterialSelect RelatedMaterial() { return (mMaterialSelectIFC4 != null ? mMaterialSelectIFC4 : GetMaterialSelect()); }
 		protected virtual IfcMaterialSelect GetMaterialSelect()
 		{
@@ -673,16 +701,25 @@ namespace GeometryGym.Ifc
 
 		internal override sealed bool isDuplicate(BaseClassIfc e, double tol)
 		{
-			return isDuplicate(e, false, tol);
+			return isDuplicate(e, new OptionsTestDuplicate(tol));
 		}
-		internal virtual bool isDuplicate(BaseClassIfc e, bool includeAggregated, double tol)
+		internal class OptionsTestDuplicate
+		{
+			public bool CheckRelatedObjects = true;
+			public double Tolerance = 1e-5;
+			public OptionsTestDuplicate(double tol)
+			{
+				Tolerance = tol;
+			}
+		}
+		internal virtual bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcObjectDefinition objDef = e as IfcObjectDefinition;
 			if (objDef == null)
 				return false;
-			if (base.isDuplicate(e, tol))
+			if (base.isDuplicate(e, options.Tolerance))
 			{
-				if (includeAggregated)
+				if (options.CheckRelatedObjects)
 				{
 					IEnumerable<IfcObjectDefinition> objDefs = IsDecomposedBy.SelectMany(x => x.RelatedObjects);
 					IEnumerable<IfcObjectDefinition> dupObjDefs = objDef.IsDecomposedBy.SelectMany(x => x.RelatedObjects);
@@ -693,7 +730,7 @@ namespace GeometryGym.Ifc
 						if (!dictObjDefs.ContainsKey(od.GlobalId))
 							return false;
 						IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
-						if (!od.isDuplicate(dup, tol))
+						if (!od.isDuplicate(dup, options.Tolerance))
 							return false;
 					}
 
@@ -708,7 +745,7 @@ namespace GeometryGym.Ifc
 						foreach (IfcRelNests nests in nestedBy)
 						{
 							IfcObjectDefinition firstOther = nests.RelatedObjects.First();
-							if (firstOther.isDuplicate(firstRelated, tol))
+							if (firstOther.isDuplicate(firstRelated, options.Tolerance))
 							{
 								testDuplicate = nests;
 								break;
@@ -723,7 +760,7 @@ namespace GeometryGym.Ifc
 						{
 							IfcObjectDefinition od1 = relNests.RelatedObjects[icounter];
 							IfcObjectDefinition od2 = testDuplicate.RelatedObjects[icounter];
-							if (!od1.isDuplicate(od2, tol))
+							if (!od1.isDuplicate(od2, options.Tolerance))
 								return false;
 						}
 					}
@@ -830,12 +867,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOccupant : IfcActor
 	{
-		internal IfcOccupantTypeEnum mPredefinedType = IfcOccupantTypeEnum.NOTDEFINED;//		:	OPTIONAL IfcOccupantTypeEnum;
-		public IfcOccupantTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcOccupantTypeEnum mPredefinedType = IfcOccupantTypeEnum.NOTDEFINED;//		:	OPTIONAL IfcOccupantTypeEnum;
+		public IfcOccupantTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcOccupantTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcOccupant() : base() { }
-		internal IfcOccupant(DatabaseIfc db, IfcOccupant o, DuplicateOptions options) : base(db, o, options) { mPredefinedType = o.mPredefinedType; }
-		public IfcOccupant(IfcActorSelect a, IfcOccupantTypeEnum type) : base(a) { mPredefinedType = type; }
+		internal IfcOccupant(DatabaseIfc db, IfcOccupant o, DuplicateOptions options) : base(db, o, options) { PredefinedType = o.PredefinedType; }
+		public IfcOccupant(IfcActorSelect a, IfcOccupantTypeEnum type) : base(a) { PredefinedType = type; }
 	}
 	public abstract partial class IfcOffsetCurve : IfcCurve //ABSTRACT SUPERTYPE OF(ONEOF(IfcOffsetCurve2D, IfcOffsetCurve3D, IfcOffsetCurveByDistances))
 	{
@@ -891,8 +928,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOneDirectionRepeatFactor : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF	(IfcTwoDirectionRepeatFactor)
 	{
-		internal int mRepeatFactor;//  : IfcVector 
-		public IfcVector RepeatFactor { get { return mDatabase[mRepeatFactor] as IfcVector; } set { mRepeatFactor = value.mIndex; } }
+		internal IfcVector mRepeatFactor;//  : IfcVector 
+		public IfcVector RepeatFactor { get { return mRepeatFactor; } set { mRepeatFactor = value; } }
 
 		internal IfcOneDirectionRepeatFactor() : base() { }
 		internal IfcOneDirectionRepeatFactor(DatabaseIfc db, IfcOneDirectionRepeatFactor f, DuplicateOptions options) : base(db, f, options) { RepeatFactor = db.Factory.Duplicate(f.RepeatFactor) as IfcVector; }
@@ -934,17 +971,17 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)
 	{
-		internal IfcOpeningElementTypeEnum mPredefinedType = IfcOpeningElementTypeEnum.NOTDEFINED;// :	OPTIONAL IfcOpeningElementTypeEnum; //IFC4
+		private IfcOpeningElementTypeEnum mPredefinedType = IfcOpeningElementTypeEnum.NOTDEFINED;// :	OPTIONAL IfcOpeningElementTypeEnum; //IFC4
 		//INVERSE
 		internal SET<IfcRelFillsElement> mHasFillings = new SET<IfcRelFillsElement>();
 
-		public IfcOpeningElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcOpeningElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcOpeningElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 		public SET<IfcRelFillsElement> HasFillings { get { return mHasFillings; } }
 
 		internal IfcOpeningElement() : base() { }
 		internal IfcOpeningElement(DatabaseIfc db, IfcOpeningElement e, DuplicateOptions options) : base(db, e, options)
 		{
-			mPredefinedType = e.mPredefinedType;
+			PredefinedType = e.PredefinedType;
 			if (options.DuplicateDownstream)
 			{
 				foreach (IfcRelFillsElement fills in e.HasFillings)
@@ -1070,10 +1107,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOrganizationRelationship : IfcResourceLevelRelationship //IFC4
 	{
-		private int mRelatingOrganization;// :	IfcOrganization;
+		private IfcOrganization mRelatingOrganization;// :	IfcOrganization;
 		private SET<IfcOrganization> mRelatedOrganizations = new SET<IfcOrganization>(); //	:	SET [1:?] OF IfcResourceObjectSelect;
 
-		public IfcOrganization RelatingOrganization { get { return mDatabase[mRelatingOrganization] as IfcOrganization; } set { mRelatingOrganization = value.mIndex; } }
+		public IfcOrganization RelatingOrganization { get { return mRelatingOrganization; } set { mRelatingOrganization = value; } }
 		public SET<IfcOrganization> RelatedOrganizations { get { return mRelatedOrganizations; } }
 
 		internal IfcOrganizationRelationship() : base() { }
@@ -1085,7 +1122,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcOrganizationRelationship(IfcOrganization relating, IfcOrganization related) : this(relating, new List<IfcOrganization>() { related }) { }
 		public IfcOrganizationRelationship(IfcOrganization relating, List<IfcOrganization> related)
-			: base(relating.mDatabase) { mRelatingOrganization = relating.mIndex; RelatedOrganizations.AddRange(related); }
+			: base(relating.mDatabase) { mRelatingOrganization = relating; RelatedOrganizations.AddRange(related); }
 
 		protected override void initialize()
 		{
@@ -1134,6 +1171,7 @@ namespace GeometryGym.Ifc
 			VerticalAxisDirection = verticalAxisDirection;
 		}
 	}
+	public interface IfcOrientationSelect : IBaseClassIfc { } //= SELECT(IfcPlaneAngleMeasure, IfcDirection)
 	[Serializable]
 	public partial class IfcOrientedEdge : IfcEdge
 	{
@@ -1169,22 +1207,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcOutlet : IfcFlowTerminal //IFC4
 	{
-		internal IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// OPTIONAL : IfcOutletTypeEnum;
-		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// OPTIONAL : IfcOutletTypeEnum;
+		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcOutletTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcOutlet() : base() { }
-		internal IfcOutlet(DatabaseIfc db, IfcOutlet o, DuplicateOptions options) : base(db,o, options) { mPredefinedType = o.mPredefinedType; }
+		internal IfcOutlet(DatabaseIfc db, IfcOutlet o, DuplicateOptions options) : base(db,o, options) { PredefinedType = o.PredefinedType; }
 		public IfcOutlet(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcOutletType : IfcFlowTerminalType
 	{
-		internal IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// : IfcOutletTypeEnum; 
-		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcOutletTypeEnum mPredefinedType = IfcOutletTypeEnum.NOTDEFINED;// : IfcOutletTypeEnum; 
+		public IfcOutletTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcOutletTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcOutletType() : base() { }
-		internal IfcOutletType(DatabaseIfc db, IfcOutletType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcOutletType(DatabaseIfc m, string name, IfcOutletTypeEnum t) : base(m) { Name = name; mPredefinedType = t; }
+		internal IfcOutletType(DatabaseIfc db, IfcOutletType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcOutletType(DatabaseIfc db, string name, IfcOutletTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
 	}
 	[Serializable]
 	public partial class IfcOwnerHistory : BaseClassIfc

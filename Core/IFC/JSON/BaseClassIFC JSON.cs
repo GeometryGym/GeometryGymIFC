@@ -209,7 +209,7 @@ namespace GeometryGym.Ifc
 		{
 			if (objects.Count() == 0)
 				return;
-			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.Index].getJson(host, options)));
+			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.StepId].getJson(host, options)));
 		}
 
 		public static void setJSON(IfcColourOrFactor colourOrFactor, string name, JObject obj, BaseClassIfc host, SetJsonOptions options)

@@ -43,22 +43,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcValve : IfcFlowController //IFC4
 	{
-		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// OPTIONAL : IfcValveTypeEnum;
-		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// OPTIONAL : IfcValveTypeEnum;
+		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcValveTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcValve() : base() { }
-		internal IfcValve(DatabaseIfc db, IfcValve v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
+		internal IfcValve(DatabaseIfc db, IfcValve v, DuplicateOptions options) : base(db, v, options) { PredefinedType = v.PredefinedType; }
 		public IfcValve(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
 	}
 	[Serializable]
 	public partial class IfcValveType : IfcFlowControllerType
 	{
-		internal IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// : IfcValveTypeEnum; 
-		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcValveTypeEnum mPredefinedType = IfcValveTypeEnum.NOTDEFINED;// : IfcValveTypeEnum; 
+		public IfcValveTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcValveTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcValveType() : base() { }
-		internal IfcValveType(DatabaseIfc db, IfcValveType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcValveType(DatabaseIfc m, string name, IfcValveTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcValveType(DatabaseIfc db, IfcValveType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcValveType(DatabaseIfc db, string name, IfcValveTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVector : IfcGeometricRepresentationItem, IfcHatchLineDistanceSelect, IfcVectorOrDirection
@@ -77,8 +77,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVehicle : IfcTransportationDevice
 	{
-		internal IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcVehicleTypeEnum;
-		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// : 	OPTIONAL IfcVehicleTypeEnum;
+		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVehicleTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcVehicle() : base() { }
 		internal IfcVehicle(DatabaseIfc db, IfcVehicle e, DuplicateOptions options) : base(db, e, options) { }
@@ -87,12 +87,12 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVehicleType : IfcTransportationDeviceType
 	{
-		internal IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// IfcVehicleTypeEnum; 
-		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVehicleTypeEnum mPredefinedType = IfcVehicleTypeEnum.NOTDEFINED;// IfcVehicleTypeEnum; 
+		public IfcVehicleTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVehicleTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcVehicleType() : base() { }
-		internal IfcVehicleType(DatabaseIfc db, IfcVehicleType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcVehicleType(DatabaseIfc m, string name, IfcVehicleTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcVehicleType(DatabaseIfc db, IfcVehicleType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcVehicleType(DatabaseIfc db, string name, IfcVehicleTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVertex : IfcTopologicalRepresentationItem //SUPERTYPE OF(IfcVertexPoint)
@@ -108,17 +108,21 @@ namespace GeometryGym.Ifc
 	[Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcVertexBasedTextureMap : BaseClassIfc // DEPRECATED IFC4
 	{
-		internal List<int> mTextureVertices = new List<int>();// LIST [3:?] OF IfcTextureVertex;
-		internal List<int> mTexturePoints = new List<int>();// LIST [3:?] OF IfcCartesianPoint; 
+		internal LIST<IfcTextureVertex> mTextureVertices = new LIST<IfcTextureVertex>();// LIST [3:?] OF IfcTextureVertex;
+		internal LIST<IfcCartesianPoint> mTexturePoints = new LIST<IfcCartesianPoint>();// LIST [3:?] OF IfcCartesianPoint; 
 
 		internal IfcVertexBasedTextureMap() : base() { }
-		internal IfcVertexBasedTextureMap(IfcVertexBasedTextureMap m) : base() { mTextureVertices = new List<int>(m.mTextureVertices.ToArray()); mTexturePoints = new List<int>(m.mTexturePoints.ToArray()); }
+		internal IfcVertexBasedTextureMap(DatabaseIfc db, IfcVertexBasedTextureMap m) : base(db) 
+		{
+			mTextureVertices.AddRange(m.mTextureVertices.Select(x => db.Factory.Duplicate(x)));
+			mTexturePoints.AddRange(m.mTexturePoints.Select(x => db.Factory.Duplicate(x)));
+		}
 	}
 	[Serializable]
 	public partial class IfcVertexLoop : IfcLoop
 	{
-		internal int mLoopVertex;// : IfcVertex; 
-		public IfcVertex LoopVertex { get { return mDatabase[mLoopVertex] as IfcVertex; } set { mLoopVertex = value.mIndex; } }
+		internal IfcVertex mLoopVertex;// : IfcVertex; 
+		public IfcVertex LoopVertex { get { return mLoopVertex; } set { mLoopVertex = value; } }
 
 		internal IfcVertexLoop() : base() { }
 		internal IfcVertexLoop(DatabaseIfc db, IfcVertexLoop l, DuplicateOptions options) : base(db, l, options) { LoopVertex = db.Factory.Duplicate(l.LoopVertex) as IfcVertex; }
@@ -141,21 +145,21 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcVibrationDamper : IfcElementComponent
 	{
 		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: OPTIONAL IfcVibrationDamperTypeEnum;
-		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVibrationDamperTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcVibrationDamper() : base() { }
 		public IfcVibrationDamper(DatabaseIfc db) : base(db) { }
 		public IfcVibrationDamper(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcVibrationDamperType : IfcElementComponentType
 	{
 		private IfcVibrationDamperTypeEnum mPredefinedType = IfcVibrationDamperTypeEnum.NOTDEFINED; //: IfcVibrationDamperTypeEnum;
-		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcVibrationDamperTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVibrationDamperTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcVibrationDamperType() : base() { }
 		public IfcVibrationDamperType(DatabaseIfc db, string name) : base(db, name) { }
@@ -163,28 +167,28 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVibrationIsolator : IfcElementComponent
 	{
-		internal IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : OPTIONAL IfcVibrationIsolatorTypeEnum;
-		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : OPTIONAL IfcVibrationIsolatorTypeEnum;
+		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVibrationIsolatorTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcVibrationIsolator() : base() { }
-		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, DuplicateOptions options) : base(db, i, options) { mPredefinedType = i.mPredefinedType; }
+		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, DuplicateOptions options) : base(db, i, options) { PredefinedType = i.PredefinedType; }
 		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcVibrationIsolatorType : IfcElementComponentType
 	{
-		internal IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : IfcVibrationIsolatorTypeEnum
-		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : IfcVibrationIsolatorTypeEnum
+		public IfcVibrationIsolatorTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVibrationIsolatorTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcVibrationIsolatorType() : base() { }
-		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, DuplicateOptions options) : base(db, t, options) { mPredefinedType = t.mPredefinedType; }
-		public IfcVibrationIsolatorType(DatabaseIfc m, string name, IfcVibrationIsolatorTypeEnum type) : base(m) { Name = name; mPredefinedType = type; }
+		internal IfcVibrationIsolatorType(DatabaseIfc db, IfcVibrationIsolatorType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcVibrationIsolatorType(DatabaseIfc db, string name, IfcVibrationIsolatorTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcVirtualElement : IfcElement
 	{
-		internal IfcVirtualElementTypeEnum mPredefinedType = IfcVirtualElementTypeEnum.NOTDEFINED;// : IfcVirtualElementTypeEnum
-		public IfcVirtualElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVirtualElementTypeEnum mPredefinedType = IfcVirtualElementTypeEnum.NOTDEFINED;// : IfcVirtualElementTypeEnum
+		public IfcVirtualElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVirtualElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcVirtualElement() : base() { }
 		internal IfcVirtualElement(DatabaseIfc db, IfcVirtualElement e, DuplicateOptions options) : base(db, e, options) { }
@@ -193,32 +197,34 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVirtualGridIntersection : BaseClassIfc, IfcGridPlacementDirectionSelect
 	{
-		private Tuple<int,int> mIntersectingAxes = new Tuple<int,int>(0,0);// : LIST [2:2] OF UNIQUE IfcGridAxis;
+		private Tuple<IfcGridAxis, IfcGridAxis> mIntersectingAxes = null;// : LIST [2:2] OF UNIQUE IfcGridAxis;
 		private Tuple<double,double,double> mOffsetDistances = null;// : LIST [2:3] OF IfcLengthMeasure; 
-		public Tuple<IfcGridAxis,IfcGridAxis> IntersectingAxes { get { return new Tuple<IfcGridAxis, IfcGridAxis>(mDatabase[mIntersectingAxes.Item1] as IfcGridAxis, mDatabase[mIntersectingAxes.Item2] as IfcGridAxis); } set { mIntersectingAxes = new Tuple<int, int>(value.Item1.mIndex, value.Item2.mIndex); } }
+		public Tuple<IfcGridAxis,IfcGridAxis> IntersectingAxes { get { return mIntersectingAxes; } set { mIntersectingAxes = value; } }
 		internal IfcVirtualGridIntersection() : base() { }
 		internal IfcVirtualGridIntersection(DatabaseIfc db, IfcVirtualGridIntersection i) : base(db, i) { Tuple<IfcGridAxis, IfcGridAxis> axes = i.IntersectingAxes; IntersectingAxes = new Tuple<IfcGridAxis,IfcGridAxis>(db.Factory.Duplicate(axes.Item1) as IfcGridAxis, db.Factory.Duplicate(axes.Item2) as IfcGridAxis); mOffsetDistances = i.mOffsetDistances; }
 	}
 	[Serializable]
 	public partial class IfcVoidingFeature : IfcFeatureElementSubtraction //IFC4
 	{
-		internal IfcVoidingFeatureTypeEnum mPredefinedType = IfcVoidingFeatureTypeEnum.NOTDEFINED;// :IfcVoidingFeatureTypeEnum;  
-		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		private IfcVoidingFeatureTypeEnum mPredefinedType = IfcVoidingFeatureTypeEnum.NOTDEFINED;// :IfcVoidingFeatureTypeEnum;  
+		public IfcVoidingFeatureTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcVoidingFeatureTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 		
 		internal IfcVoidingFeature() : base() { }
-		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { mPredefinedType = v.mPredefinedType; }
-		public IfcVoidingFeature(IfcElement host, IfcProductDefinitionShape rep, IfcVoidingFeatureTypeEnum type) : base(host, rep) { mPredefinedType = type; }
+		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { PredefinedType = v.PredefinedType; }
+		public IfcVoidingFeature(IfcElement host, IfcProductDefinitionShape rep, IfcVoidingFeatureTypeEnum type) : base(host, rep) { PredefinedType = type; }
 	}
 	[Obsolete("RELEASE CANDIDATE IFC4X3", false)]
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcVoidStratum : IfcGeotechnicalStratum
 	{
 		public override string StepClassName { get { return (mDatabase.mRelease >= ReleaseVersion.IFC4X3 ? "IfcGeotechnicalStratum" : base.StepClassName); } }
 
-		public IfcVoidStratum() : base() { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
-		public IfcVoidStratum(DatabaseIfc db) : base(db) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
-		public IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options)
+		internal IfcVoidStratum() : base() { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
+		internal IfcVoidStratum(DatabaseIfc db) : base(db) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
+		internal IfcVoidStratum(DatabaseIfc db, IfcVoidStratum voidStratum, DuplicateOptions options)
 			: base(db, voidStratum, options) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
+		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) 
+			: base(host, placement, shape) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
 	}
 
 	[Serializable]
@@ -510,7 +516,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcParameterValue : IfcMeasureValue, IfcCurveMeasureSelect { public IfcParameterValue(double value) : base(value) { } }
 	[Serializable]
-	public class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect { public IfcPlaneAngleMeasure(double value) : base(value) { } }
+	public class IfcPlaneAngleMeasure : IfcMeasureValue, IfcBendingParameterSelect, IfcOrientationSelect { public IfcPlaneAngleMeasure(double value) : base(value) { } }
 	[Serializable]
 	public class IfcPositivePlaneAngleMeasure : IfcMeasureValue { public IfcPositivePlaneAngleMeasure(double value) : base(value) { } }
 	[Serializable]
@@ -644,12 +650,12 @@ namespace GeometryGym.Ifc
 			DateTime result = DateTime.MinValue;
 			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
 		}
-		internal static IfcDateTimeSelect convertDateTimeSelect(DatabaseIfc m, DateTime date)
+		internal static IfcDateTimeSelect convertDateTimeSelect(DatabaseIfc db, DateTime date)
 		{
-			IfcCalendarDate cd = new IfcCalendarDate(m, date.Day, date.Month, date.Year);
-			if (date.Hour + date.Minute + date.Second < m.Tolerance)
+			IfcCalendarDate cd = new IfcCalendarDate(db, date.Day, date.Month, date.Year);
+			if (date.Hour + date.Minute + date.Second < db.Tolerance)
 				return cd;
-			return new IfcDateAndTime(cd, new IfcLocalTime(m, date.Hour, date.Minute, date.Second));
+			return new IfcDateAndTime(cd, new IfcLocalTime(db, date.Hour, date.Minute, date.Second));
 		}
 		public override string ValueString { get { return FormatSTEP(mDateTime); } }
 	}
@@ -761,7 +767,7 @@ namespace GeometryGym.Ifc
 		public override string ToString() { return "IFCINTEGER(" + Magnitude.ToString() + ")"; }
 	}
 	[Serializable]
-	public partial class IfcLabel : IfcSimpleValue
+	public partial class IfcLabel : IfcSimpleValue, IfcConditionCriterionSelect
 	{
 		public string Label { get; set; }
 		public override object Value { get { return Label; } set { Label = value.ToString(); } }

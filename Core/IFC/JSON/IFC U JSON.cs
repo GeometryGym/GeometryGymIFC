@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 			base.setJSON(obj, host, options);
 			JArray array = new JArray();
 			foreach (IfcUnit unit in mUnits)
-				array.Add(mDatabase[unit.Index].getJson(this, options));
+				array.Add(mDatabase[unit.StepId].getJson(this, options));
 			obj["Units"] = array;
 		}
 	}

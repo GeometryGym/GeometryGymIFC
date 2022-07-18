@@ -251,7 +251,7 @@ namespace GeometryGym.Ifc
 			BaseClassIfc result = BaseClassIfc.LineParser(kw, str, schema, dict);
 			if (result == null)
 				return null;
-			result.mIndex = stepID;
+			result.mStepId = stepID;
 			return result;
 		}
 
@@ -547,6 +547,8 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcValue parseValue(string str)
 		{
+			if (string.Compare(str, "$", true) == 0)
+				return null;
 			IfcMeasureValue mv = parseMeasureValue(str);
 			if (mv != null)
 				return mv;

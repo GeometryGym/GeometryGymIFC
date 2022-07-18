@@ -77,16 +77,16 @@ namespace GeometryGym.Ifc
 		internal virtual Transform getScaleTransform() { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(Point3d.Origin, mScale); }
 		protected virtual Transform vecsTransform()
 		{
-			Vector3d vx = new Vector3d(1, 0, 0), vy = new Vector3d(0, 1, 0);
+			Vector3d vx = Vector3d.XAxis, vy = Vector3d.YAxis;
 			Transform tr = Rhino.Geometry.Transform.Identity;
-			if (mAxis1 > 0)
+			if (mAxis1 != null)
 			{
 				vx = Axis1.Vector3d;
 				tr.M00 = vx.X;
 				tr.M10 = vx.Y;
 				tr.M20 = vx.Z;
 			}
-			if (mAxis2 > 0)
+			if (mAxis2 != null)
 			{
 				vy = Axis2.Vector3d;
 			}
@@ -115,7 +115,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCartesianTransformationOperator3D
 	{
-		internal Vector3d Axis3Vector { get { return (mAxis3 > 0 ? Axis3.Vector3d : Vector3d.ZAxis); } }
+		internal Vector3d Axis3Vector { get { return (mAxis3 != null ? Axis3.Vector3d : Vector3d.ZAxis); } }
 		protected override Transform vecsTransform()
 		{
 			Transform tr = base.vecsTransform();

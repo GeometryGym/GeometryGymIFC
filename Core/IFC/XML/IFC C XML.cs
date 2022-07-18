@@ -152,9 +152,9 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mAxis1 > 0)
+			if (mAxis1 != null)
 				xml.AppendChild(Axis1.GetXML(xml.OwnerDocument, "Axis1", this, processed));
-			if (mAxis2 > 0)
+			if (mAxis2 != null)
 				xml.AppendChild(Axis2.GetXML(xml.OwnerDocument, "Axis2", this, processed));
 			xml.AppendChild(LocalOrigin.GetXML(xml.OwnerDocument, "LocalOrigin", this, processed));
 			if (!double.IsNaN(mScale))
@@ -192,7 +192,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			if (mAxis3 > 0)
+			if (mAxis3 != null)
 				xml.AppendChild(Axis1.GetXML(xml.OwnerDocument, "Axis3", this, processed));
 		}
 	}
@@ -346,7 +346,7 @@ namespace GeometryGym.Ifc
 				else if (string.Compare(name, "Edition", true) == 0)
 					Edition = child.InnerText;
 				else if (string.Compare(name, "EditionDate", true) == 0)
-					mEditionDateSS = mDatabase.ParseXml<IfcCalendarDate>(child as XmlElement).StepId;
+					mEditionDateSS = mDatabase.ParseXml<IfcCalendarDate>(child as XmlElement);
 				else if (string.Compare(name, "Name", true) == 0)
 					Name = child.InnerText;
 				else if (string.Compare(name, "Description", true) == 0)
@@ -407,7 +407,7 @@ namespace GeometryGym.Ifc
 			base.SetXML(xml, host, processed);
 			IfcClassificationReferenceSelect referenced = ReferencedSource;
 			if (referenced != null && referenced != host)
-				xml.AppendChild(mDatabase[referenced.Index].GetXML(xml.OwnerDocument, "ReferencedSource", this, processed));
+				xml.AppendChild((referenced as BaseClassIfc).GetXML(xml.OwnerDocument, "ReferencedSource", this, processed));
 			setAttribute(xml, "Description", Description);
 			setAttribute(xml, "Sort", Sort);
 
@@ -632,7 +632,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mPosition].GetXML(xml.OwnerDocument, "Position", this, processed));
+			xml.AppendChild((mPosition as BaseClassIfc).GetXML(xml.OwnerDocument, "Position", this, processed));
 		}
 	}
 	public partial class IfcConnectedFaceSet : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcClosedShell ,IfcOpenShell))
@@ -725,7 +725,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Phase", Phase);
 			if (repContexts != null)
 				xml.AppendChild(repContexts);
-			if (mUnitsInContext > 0)
+			if (mUnitsInContext != null)
 				xml.AppendChild(UnitsInContext.GetXML(xml.OwnerDocument, "UnitsInContext", this, processed));
 			if (mIsDefinedBy.Count > 0)
 			{
@@ -782,7 +782,7 @@ namespace GeometryGym.Ifc
 		{
 			base.SetXML(xml, host, processed);
 			xml.AppendChild((CurveOnRelatingElement as BaseClassIfc).GetXML(xml.OwnerDocument, "CurveOnRelatingElement", this, processed));
-			if(mCurveOnRelatedElement > 0)
+			if(mCurveOnRelatedElement != null)
 			xml.AppendChild((CurveOnRelatedElement as BaseClassIfc).GetXML(xml.OwnerDocument, "CurveOnRelatedElement", this, processed));
 		}
 	}
@@ -859,7 +859,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("PropertiesForConstraint", mDatabase.mXmlNamespace);
 				foreach (IfcResourceConstraintRelationship r in mPropertiesForConstraint)
 				{
-					if (host.mIndex != r.mIndex && !processed.ContainsKey(r.xmlId()))
+					if (host != r && !processed.ContainsKey(r.xmlId()))
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -870,7 +870,7 @@ namespace GeometryGym.Ifc
 				XmlElement element = xml.OwnerDocument.CreateElement("HasConstraintRelationships", mDatabase.mXmlNamespace);
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
-					if (host.mIndex != r.mIndex)
+					if (host != r)
 						element.AppendChild(r.GetXML(xml.OwnerDocument, "", this, processed));
 				}
 				if (element.HasChildNodes)
@@ -1067,7 +1067,7 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
-			xml.AppendChild(mDatabase[mTreeRootExpression].GetXML(xml.OwnerDocument, "TreeRootExpression", this, processed));
+			xml.AppendChild((mTreeRootExpression as BaseClassIfc).GetXML(xml.OwnerDocument, "TreeRootExpression", this, processed));
 		}
 	}
 	public partial class IfcCShapeProfileDef : IfcParameterizedProfileDef

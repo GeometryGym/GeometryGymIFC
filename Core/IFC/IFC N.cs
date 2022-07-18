@@ -38,31 +38,31 @@ namespace GeometryGym.Ifc
 
 		protected IfcNamedUnit() : base() { }
 		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db, u) { if (u.mDimensions != null) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
-		protected IfcNamedUnit(DatabaseIfc m, IfcUnitEnum unitEnum, bool gendims) : base(m)
+		protected IfcNamedUnit(DatabaseIfc db, IfcUnitEnum unitEnum, bool gendims) : base(db)
 		{
 			mUnitType = unitEnum;
 			if (gendims)
 			{
 				if (unitEnum == IfcUnitEnum.LENGTHUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 1, 0, 0, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 1, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.AREAUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 2, 0, 0, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 2, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.VOLUMEUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 3, 0, 0, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 3, 0, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.MASSUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 1, 0, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 1, 0, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.TIMEUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 1, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 1, 0, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.ELECTRICCURRENTUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 1, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 0, 1, 0, 0, 0);
 				else if (unitEnum == IfcUnitEnum.THERMODYNAMICTEMPERATUREUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 1, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 0, 0, 1, 0, 0);
 				else if (unitEnum == IfcUnitEnum.AMOUNTOFSUBSTANCEUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 1, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 0, 0, 0, 1, 0);
 				else if (unitEnum == IfcUnitEnum.LUMINOUSINTENSITYUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 1);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 0, 0, 0, 0, 1);
 				else if (unitEnum == IfcUnitEnum.PLANEANGLEUNIT)
-					Dimensions = new IfcDimensionalExponents(m, 0, 0, 0, 0, 0, 0, 0);
+					Dimensions = new IfcDimensionalExponents(db, 0, 0, 0, 0, 0, 0, 0);
 			}
 		}
 		public IfcNamedUnit(IfcDimensionalExponents dimensions, IfcUnitEnum unitType)
@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcNavigationElement : IfcBuiltElement
 	{
 		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: OPTIONAL IfcNavigationElementTypeEnum;
-		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcNavigationElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcNavigationElement() : base() { }
 		public IfcNavigationElement(DatabaseIfc db) : base(db) { }
@@ -85,7 +85,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcNavigationElementType : IfcBuiltElementType
 	{
 		private IfcNavigationElementTypeEnum mPredefinedType = IfcNavigationElementTypeEnum.NOTDEFINED; //: IfcNavigationElementTypeEnum;
-		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = value; } }
+		public IfcNavigationElementTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcNavigationElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcNavigationElementType() : base() { }
 		public IfcNavigationElementType(DatabaseIfc db, IfcNavigationElementType navigationElementType, DuplicateOptions options) : base(db, navigationElementType, options) { PredefinedType = navigationElementType.PredefinedType; }

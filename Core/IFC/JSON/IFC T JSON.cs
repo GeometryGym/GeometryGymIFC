@@ -251,10 +251,10 @@ namespace GeometryGym.Ifc
 		internal JArray getJSON(DatabaseIfc db)
 		{
 			JArray result = new JArray();
-			if (!double.IsNaN(mIfcParameterValue))
-				result.Add(DatabaseIfc.extract(new IfcParameterValue(mIfcParameterValue)));
-			if (mIfcCartesianPoint > 0)
-				result.Add(db[mIfcCartesianPoint].getJson(null, new BaseClassIfc.SetJsonOptions()));
+			if (!double.IsNaN(ParameterValue))
+				result.Add(DatabaseIfc.extract(new IfcParameterValue(ParameterValue)));
+			if (CartesianPoint != null)
+				result.Add(CartesianPoint.getJson(null, new BaseClassIfc.SetJsonOptions()));
 			return result;
 		}
 	}

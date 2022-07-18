@@ -519,7 +519,7 @@ namespace GeometryGym.Ifc
 				else
 					obj["AppliedValue"] = mAppliedValue.getJson(this, options);
 			}
-			if (mUnitBasis > 0)
+			if (mUnitBasis != null)
 				obj["UnitBasis"] = UnitBasis.getJson(this, options);
 			//todo
 			setAttribute(obj, "Category", Category);
@@ -527,7 +527,7 @@ namespace GeometryGym.Ifc
 			if (mArithmeticOperator != IfcArithmeticOperatorEnum.NONE)
 				obj["ArithmeticOperator"] = ArithmeticOperator.ToString();
 			if(mComponents.Count > 0)
-				obj["Components"] = new JArray(Components.ToList().ConvertAll(x => x.getJson(this, options)));
+				obj["Components"] = new JArray(Components.Select(x => x.getJson(this, options)));
 			if (mHasExternalReference.Count > 0)
 				obj["HasExternalReference"] = new JArray(HasExternalReference.ToList().ConvertAll(x => x.getJson(this, options)));
 			if (mHasConstraintRelationships.Count > 0)
@@ -535,7 +535,7 @@ namespace GeometryGym.Ifc
 				JArray array = new JArray();
 				foreach (IfcResourceConstraintRelationship r in HasConstraintRelationships)
 				{
-					if (r.mIndex != host.mIndex)
+					if (r.StepId != host.StepId)
 						array.Add(r.getJson(this, options));
 				}
 				if(array.Count > 0)

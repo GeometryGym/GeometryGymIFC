@@ -126,13 +126,8 @@ namespace GeometryGym.Ifc
 				Axis2 = mDatabase.ParseJObject<IfcDirection>(jobj);
 			jobj = obj.GetValue("LocalOrigin", StringComparison.InvariantCultureIgnoreCase) as JObject;
 			if (jobj != null)
-			{
-				JToken jtoken = jobj["href"];
-				if (jtoken != null)
-					mLocalOrigin = jtoken.Value<int>();
-				else
-					LocalOrigin = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
-			}
+				LocalOrigin = mDatabase.ParseJObject<IfcCartesianPoint>(jobj);
+		
 			JToken token = obj.GetValue("Scale", StringComparison.InvariantCultureIgnoreCase);
 			if (token != null)
 				mScale = token.Value<double>();
@@ -140,9 +135,9 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mAxis1 > 0)
+			if (mAxis1 != null)
 				obj["Axis1"] = Axis1.getJson(this, options);
-			if (mAxis2 > 0)
+			if (mAxis2 != null)
 				obj["Axis2"] = Axis2.getJson(this, options);
 			obj["LocalOrigin"] = LocalOrigin.getJson(this, options);
 			if (!double.IsNaN(mScale))
@@ -162,7 +157,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			if (mAxis3 > 0)
+			if (mAxis3 != null)
 				obj["Axis3"] = Axis3.getJson(this, options);
 		}
 	}
