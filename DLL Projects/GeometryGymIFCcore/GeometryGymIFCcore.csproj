@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>GeometryGymIFC_Core</PackageId>
-    <Version>0.1.24</Version>
+    <Version>0.2.01</Version>
     <Authors>Geometry Gym</Authors>
     <Product>GeometryGymIFC_Core</Product>
     <Description>.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
