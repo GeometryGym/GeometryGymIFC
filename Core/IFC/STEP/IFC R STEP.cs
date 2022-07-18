@@ -1397,7 +1397,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRevolvedAreaSolid
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mAxis + "," + ParserSTEP.DoubleToString(mAngle); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mAxis.StepId + "," + ParserSTEP.DoubleToString(mAngle); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
