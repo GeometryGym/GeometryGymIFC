@@ -55,7 +55,7 @@ namespace GeometryGym.Ifc
 			obj["FbsmFaces"] = new JArray(mFbsmFaces.ConvertAll(x => x.getJson(this, options)));
 		}
 	}
-	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
+	public partial class IfcFaceBound
 	{
 		internal override void parseJObject(JObject obj)
 		{
@@ -74,7 +74,16 @@ namespace GeometryGym.Ifc
 			obj["Orientation"] = Orientation;
 		}
 	}
-	public partial class IfcFillAreaStyle : IfcPresentationStyle, IfcPresentationStyleSelect
+	public partial class IfcFaceSurface
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["FaceSurface"] = FaceSurface.getJson(this, options);
+			obj["SameSense"] = SameSense;
+		}
+	}
+	public partial class IfcFillAreaStyle 
 	{
 		internal override void parseJObject(JObject obj)
 		{

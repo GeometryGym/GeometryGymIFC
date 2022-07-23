@@ -219,7 +219,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcBSplineCurve : IfcBoundedCurve //SUPERTYPE OF(IfcBSplineCurveWithKnots)
+	public abstract partial class IfcBSplineCurve
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -230,11 +230,13 @@ namespace GeometryGym.Ifc
 				array.Add(point.getJson(this, options));
 			obj["ControlPointsList"] = array;
 			obj["CurveForm"] = CurveForm.ToString();
-			obj["ClosedCurve"] = ClosedCurve.ToString();
-			obj["SelfIntersect"] = SelfIntersect.ToString();
+			if(ClosedCurve != IfcLogicalEnum.UNKNOWN)
+				obj["ClosedCurve"] = ClosedCurve == IfcLogicalEnum.TRUE;
+			if (SelfIntersect != IfcLogicalEnum.UNKNOWN)
+				obj["SelfIntersect"] = SelfIntersect == IfcLogicalEnum.TRUE;
 		}
 	}
-	public partial class IfcBSplineCurveWithKnots : IfcBSplineCurve
+	public partial class IfcBSplineCurveWithKnots
 	{
 		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -250,7 +252,56 @@ namespace GeometryGym.Ifc
 			obj["KnotSpec"] = mKnotSpec.ToString();
 		}
 	}
-	public partial class IfcBuilding : IfcFacility
+	public abstract partial class IfcBSplineSurface
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["UDegree"] = UDegree;
+			obj["VDegree"] = VDegree;
+			JArray array = new JArray();
+			foreach (var points in ControlPointsList)
+			{
+				JArray sub = new JArray();
+				foreach (var point in points)
+					sub.Add(point.getJson(this, options));
+				array.Add(sub);
+			}
+			obj["ControlPointsList"] = array;
+			obj["SurfaceForm"] = SurfaceForm.ToString();
+			if(UClosed != IfcLogicalEnum.UNKNOWN)
+				obj["UClosed"] = UClosed == IfcLogicalEnum.TRUE;
+			if(VClosed != IfcLogicalEnum.UNKNOWN)
+				obj["VClosed"] = VClosed == IfcLogicalEnum.TRUE;
+			if (SelfIntersect != IfcLogicalEnum.UNKNOWN)
+				obj["SelfIntersect"] = SelfIntersect == IfcLogicalEnum.TRUE;
+		}
+	}
+	public partial class IfcBSplineSurfaceWithKnots
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			JArray array = new JArray();
+			foreach (int i in mUMultiplicities)
+				array.Add(i);
+			obj["UMultiplicities"] = array;
+			array = new JArray();
+			foreach (int i in mVMultiplicities)
+				array.Add(i);
+			obj["VMultiplicities"] = array;
+			array = new JArray();
+			foreach (int i in mUKnots)
+				array.Add(i);
+			obj["UKnots"] = array;
+			array = new JArray();
+			foreach (int i in mVKnots)
+				array.Add(i);
+			obj["VKnots"] = array;
+			obj["KnotSpec"] = mKnotSpec.ToString();
+		}
+	}
+	public partial class IfcBuilding 
 	{
 		internal override void parseJObject(JObject obj)
 		{

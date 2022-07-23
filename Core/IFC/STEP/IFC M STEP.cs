@@ -185,9 +185,12 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string s = (release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserIfc.Encode(mName) + "',") +
-				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserIfc.Encode(mDescription) + "',") + (string.IsNullOrEmpty(mCategory) ? "$," : "'" + ParserIfc.Encode(mCategory) + "',") + ParserSTEP.DoubleOptionalToString(mPriority));
-			return "#" + mMaterial.StepId + "," + ParserSTEP.DoubleToString(mLayerThickness) + "," + ParserIfc.LogicalToString(mIsVentilated) + s;
+			return (mMaterial == null ? "$," : "#" + mMaterial.StepId + ",") + ParserSTEP.DoubleToString(mLayerThickness) + "," + 
+				ParserIfc.LogicalToString(mIsVentilated) + (release < ReleaseVersion.IFC4 ? "" : 
+				(string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserIfc.Encode(mName) + "',") + 
+				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserIfc.Encode(mDescription) + "',") + 
+				(string.IsNullOrEmpty(mCategory) ? "$," : "'" + ParserIfc.Encode(mCategory) + "',") + 
+				ParserSTEP.DoubleOptionalToString(mPriority));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

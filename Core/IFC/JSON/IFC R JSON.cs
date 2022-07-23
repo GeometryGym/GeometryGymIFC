@@ -60,7 +60,34 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcRailTypeEnum>(token.Value<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
+	public partial class IfcRationalBSplineCurveWithKnots
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			JArray array = new JArray();
+			foreach (double weight in mWeightsData)
+				array.Add(weight);
+			obj["WeightsData"] = array;
+		}
+	}
+	public partial class IfcRationalBSplineSurfaceWithKnots
+	{
+		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			JArray array = new JArray();
+			foreach (List<double> weights in mWeightsData)
+			{
+				JArray sub = new JArray();
+				foreach (double weight in weights)
+					sub.Add(weight);
+				array.Add(sub);
+			}
+			obj["WeightsData"] = array;
+		}
+	}
+	public partial class IfcRectangleHollowProfileDef
 	{
 		internal override void parseJObject(JObject obj)
 		{

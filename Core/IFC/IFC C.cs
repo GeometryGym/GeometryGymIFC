@@ -1410,7 +1410,6 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRepresentationContext> mRepresentationContexts = new SET<IfcRepresentationContext>();// : 	OPTIONAL SET [1:?] OF IfcRepresentationContext;
 		private IfcUnitAssignment mUnitsInContext;// : OPTIONAL IfcUnitAssignment; IFC2x3 not Optional
 		//INVERSE
-		internal SET<IfcRelDefinesByProperties> mIsDefinedBy = new SET<IfcRelDefinesByProperties>();
 		internal SET<IfcRelDeclares> mDeclares = new SET<IfcRelDeclares>();
 
 		public string ObjectType { get { return mObjectType; } set { mObjectType = value; } }
@@ -2017,7 +2016,7 @@ namespace GeometryGym.Ifc
 		public IfcCrewResourceType(DatabaseIfc db, string name, IfcCrewResourceTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Serializable]
-	public abstract partial class IfcCsgPrimitive3D : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBlock ,IfcRectangularPyramid ,IfcRightCircularCone ,IfcRightCircularCylinder ,IfcSphere))*/
+	public abstract partial class IfcCsgPrimitive3D : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBlock, IfcRectangularPyramid, IfcRightCircularCone, IfcRightCircularCylinder, IfcSphere))*/
 	{
 		private IfcAxis2Placement3D mPosition;// : IfcAxis2Placement3D;
 		public IfcAxis2Placement3D Position { get { return mPosition; } set { mPosition = value; } }

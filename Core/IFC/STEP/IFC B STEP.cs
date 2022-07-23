@@ -327,19 +327,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string str = base.BuildStringSTEP(release) + ",(" + ParserSTEP.IntToString(mUMultiplicities[0]);
-			for (int jcounter = 1; jcounter < mUMultiplicities.Count; jcounter++)
-				str += "," + ParserSTEP.IntToString(mUMultiplicities[jcounter]);
-			str += "),(" + ParserSTEP.IntToString(mVMultiplicities[0]);
-			for (int jcounter = 1; jcounter < mVMultiplicities.Count; jcounter++)
-				str += "," + ParserSTEP.IntToString(mVMultiplicities[jcounter]);
-			str += "),(" + ParserSTEP.DoubleToString(mUKnots[0]);
-			for (int jcounter = 1; jcounter < mUKnots.Count; jcounter++)
-				str += "," + ParserSTEP.DoubleToString(mUKnots[jcounter]);
-			str += "),(" + ParserSTEP.DoubleToString(mVKnots[0]);
-			for (int jcounter = 1; jcounter < mVKnots.Count; jcounter++)
-				str += "," + ParserSTEP.DoubleToString(mVKnots[jcounter]);
-			return str + "),." + mKnotSpec.ToString() + ".";
+			return base.BuildStringSTEP(release) + ",(" + string.Join(",", mUMultiplicities) + "),(" +
+				string.Join(",", mVMultiplicities) + "),(" + string.Join(",", mUKnots.Select(x=>ParserSTEP.DoubleToString(x))) + "),(" +
+				string.Join(",", mVKnots.Select(x=>ParserSTEP.DoubleToString(x))) + "),." + mKnotSpec.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
