@@ -1049,17 +1049,14 @@ namespace GeometryGym.Ifc
 			get
 			{
 				if (!string.IsNullOrEmpty(mOrganization))
-					return mOrganization;
-				try
 				{
-#if (!NETSTANDARD2_0)
-					string name = ((string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion", "RegisteredOrganization", "")).Replace("'", "");
-					if (!string.IsNullOrEmpty(name) && string.Compare(name, "Microsoft", true) != 0 && string.Compare(name, "HP Inc.",true) != 0)
-						return name;
-#endif
+					return mOrganization;
 				}
-				catch (Exception) { }
-				return "Unknown";
+				else
+				{
+					return "Unknown";
+				}
+				
 			}
 			set
 			{

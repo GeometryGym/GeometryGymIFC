@@ -1,129 +1,136 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>GeometryGymIFC_Core</PackageId>
-    <Version>0.2.01</Version>
-    <Authors>Geometry Gym</Authors>
-    <Product>GeometryGymIFC_Core</Product>
-    <Description>.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
+	<PropertyGroup>
+	  <TargetFrameworks>net6.0</TargetFrameworks>
+		<PackageId>GeometryGymIFC_Core</PackageId>
+		<Version>0.2.01</Version>
+		<Authors>Geometry Gym</Authors>
+		<Product>GeometryGymIFC_Core</Product>
+		<Description>
+			.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
 
-License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Description>
-    <Copyright>Copyright (c) 2016 Geometry Gym Pty Ltd</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl>https://github.com/GeometryGym/GeometryGymIFC</RepositoryUrl>
-    <PackageTags>BIM, IFC, openBIM</PackageTags>
-    <AssemblyVersion>0.1.24.0</AssemblyVersion>
-    <FileVersion>0.1.24.0</FileVersion>
-  </PropertyGroup>
+			License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE
+		</Description>
+		<Copyright>Copyright (c) 2016 Geometry Gym Pty Ltd</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl></PackageProjectUrl>
+		<RepositoryUrl>https://github.com/GeometryGym/GeometryGymIFC</RepositoryUrl>
+		<PackageTags>BIM, IFC, openBIM</PackageTags>
+		<AssemblyVersion>0.1.24.0</AssemblyVersion>
+		<FileVersion>0.1.24.0</FileVersion>
+	
+	    <DefineConstants>TRACE;NETSTANDARD2_0 NOIFCJSON</DefineConstants>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD2_0 NOIFCJSON</DefineConstants>
-    <OutputPath>bin\</OutputPath>
-  </PropertyGroup>
+	</PropertyGroup>
 
+	<ItemGroup>
+		<Compile Include="..\..\Core\IFC\BaseClassIFC.cs" Link="IFC\BaseClassIFC.cs" />
+		<Compile Include="..\..\Core\IFC\DatabaseIFC.cs" Link="IFC\DatabaseIFC.cs" />
+		<Compile Include="..\..\Core\IFC\Enumerations.cs" Link="IFC\Enumerations.cs" />
+		<Compile Include="..\..\Core\IFC\IFC A.cs" Link="IFC\IFC A.cs" />
+		<Compile Include="..\..\Core\IFC\IFC B.cs" Link="IFC\IFC B.cs" />
+		<Compile Include="..\..\Core\IFC\IFC C.cs" Link="IFC\IFC C.cs" />
+		<Compile Include="..\..\Core\IFC\IFC D.cs" Link="IFC\IFC D.cs" />
+		<Compile Include="..\..\Core\IFC\IFC E.cs" Link="IFC\IFC E.cs" />
+		<Compile Include="..\..\Core\IFC\IFC F.cs" Link="IFC\IFC F.cs" />
+		<Compile Include="..\..\Core\IFC\IFC G.cs" Link="IFC\IFC G.cs" />
+		<Compile Include="..\..\Core\IFC\IFC H.cs" Link="IFC\IFC H.cs" />
+		<Compile Include="..\..\Core\IFC\IFC I.cs" Link="IFC\IFC I.cs" />
+		<Compile Include="..\..\Core\IFC\IFC J.cs" Link="IFC\IFC J.cs" />
+		<Compile Include="..\..\Core\IFC\IFC K.cs" Link="IFC\IFC K.cs" />
+		<Compile Include="..\..\Core\IFC\IFC L.cs" Link="IFC\IFC L.cs" />
+		<Compile Include="..\..\Core\IFC\IFC M.cs" Link="IFC\IFC M.cs" />
+		<Compile Include="..\..\Core\IFC\IFC N.cs" Link="IFC\IFC N.cs" />
+		<Compile Include="..\..\Core\IFC\IFC O.cs" Link="IFC\IFC O.cs" />
+		<Compile Include="..\..\Core\IFC\IFC P.cs" Link="IFC\IFC P.cs" />
+		<Compile Include="..\..\Core\IFC\IFC Q.cs" Link="IFC\IFC Q.cs" />
+		<Compile Include="..\..\Core\IFC\IFC R.cs" Link="IFC\IFC R.cs" />
+		<Compile Include="..\..\Core\IFC\IFC S.cs" Link="IFC\IFC S.cs" />
+		<Compile Include="..\..\Core\IFC\IFC T.cs" Link="IFC\IFC T.cs" />
+		<Compile Include="..\..\Core\IFC\IFC U.cs" Link="IFC\IFC U.cs" />
+		<Compile Include="..\..\Core\IFC\IFC V.cs" Link="IFC\IFC V.cs" />
+		<Compile Include="..\..\Core\IFC\IFC W.cs" Link="IFC\IFC W.cs" />
+		<Compile Include="..\..\Core\IFC\IFC X.cs" Link="IFC\IFC X.cs" />
+		<Compile Include="..\..\Core\IFC\IFC Y.cs" Link="IFC\IFC Y.cs" />
+		<Compile Include="..\..\Core\IFC\IFC Z.cs" Link="IFC\IFC Z.cs" />
+		<Compile Include="..\..\Core\IFC\ParserIFC.cs" Link="IFC\ParserIFC.cs" />
+		<Compile Include="..\..\Core\IFC\Property Sets.cs" Link="IFC\Property Sets.cs" />
+		<Compile Include="..\..\Core\IFC\Quantity Sets.cs" Link="IFC\Quantity Sets.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\BaseClassIFC STEP.cs" Link="IFC\STEP\BaseClassIFC STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC A STEP.cs" Link="IFC\STEP\IFC A STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC B STEP.cs" Link="IFC\STEP\IFC B STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC C STEP.cs" Link="IFC\STEP\IFC C STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC D STEP.cs" Link="IFC\STEP\IFC D STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC E STEP.cs" Link="IFC\STEP\IFC E STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC F STEP.cs" Link="IFC\STEP\IFC F STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC G STEP.cs" Link="IFC\STEP\IFC G STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC H STEP.cs" Link="IFC\STEP\IFC H STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC I STEP.cs" Link="IFC\STEP\IFC I STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC J STEP.cs" Link="IFC\STEP\IFC J STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC K STEP.cs" Link="IFC\STEP\IFC K STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC L STEP.cs" Link="IFC\STEP\IFC L STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC M STEP.cs" Link="IFC\STEP\IFC M STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC N STEP.cs" Link="IFC\STEP\IFC N STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC O STEP.cs" Link="IFC\STEP\IFC O STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC P STEP.cs" Link="IFC\STEP\IFC P STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC Q STEP.cs" Link="IFC\STEP\IFC Q STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC R STEP.cs" Link="IFC\STEP\IFC R STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC S STEP.cs" Link="IFC\STEP\IFC S STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC T STEP.cs" Link="IFC\STEP\IFC T STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC U STEP.cs" Link="IFC\STEP\IFC U STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC V STEP.cs" Link="IFC\STEP\IFC V STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC W STEP.cs" Link="IFC\STEP\IFC W STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC X STEP.cs" Link="IFC\STEP\IFC X STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC Y STEP.cs" Link="IFC\STEP\IFC Y STEP.cs" />
+		<Compile Include="..\..\Core\IFC\STEP\IFC Z STEP.cs" Link="IFC\STEP\IFC Z STEP.cs" />
+		<Compile Include="..\..\Core\IFC\XML\BaseClassIFC XML.cs" Link="IFC\XML\BaseClassIFC XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\DatabaseIFC XML.cs" Link="IFC\XML\DatabaseIFC XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC A XML.cs" Link="IFC\XML\IFC A XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC B XML.cs" Link="IFC\XML\IFC B XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC C XML.cs" Link="IFC\XML\IFC C XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC D XML.cs" Link="IFC\XML\IFC D XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC E XML.cs" Link="IFC\XML\IFC E XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC F XML.cs" Link="IFC\XML\IFC F XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC G XML.cs" Link="IFC\XML\IFC G XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC H XML.cs" Link="IFC\XML\IFC H XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC I XML.cs" Link="IFC\XML\IFC I XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC J XML.cs" Link="IFC\XML\IFC J XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC K XML.cs" Link="IFC\XML\IFC K XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC L XML.cs" Link="IFC\XML\IFC L XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC M XML.cs" Link="IFC\XML\IFC M XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC N XML.cs" Link="IFC\XML\IFC N XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC O XML.cs" Link="IFC\XML\IFC O XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC P XML.cs" Link="IFC\XML\IFC P XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC Q XML.cs" Link="IFC\XML\IFC Q XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC R XML.cs" Link="IFC\XML\IFC R XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC S XML.cs" Link="IFC\XML\IFC S XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC T XML.cs" Link="IFC\XML\IFC T XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC U XML.cs" Link="IFC\XML\IFC U XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC V XML.cs" Link="IFC\XML\IFC V XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC W XML.cs" Link="IFC\XML\IFC W XML.cs" />
+		<Compile Include="..\..\Core\IFC\XML\IFC Z XML.cs" Link="IFC\XML\IFC Z XML.cs" />
+		<Compile Include="..\..\Core\STEP\BaseClassSTEP.cs" Link="STEP\BaseClassSTEP.cs" />
+		<Compile Include="..\..\Core\STEP\CollectionsSTEP.cs" Link="STEP\CollectionsSTEP.cs" />
+		<Compile Include="..\..\Core\STEP\DatabaseSTEP.cs" Link="STEP\DatabaseSTEP.cs" />
+		<Compile Include="..\..\Core\STEP\ParserSTEP.cs" Link="STEP\ParserSTEP.cs" />
+		<Compile Include="..\..\Extensions\Drawing\System\IFC C System.Drawing.cs" Link="IFC\Drawing\IFC C System.Drawing.cs" />
+		<Compile Include="..\..\Extensions\Drawing\System\IFC N System.Drawing.cs" Link="IFC\Drawing\IFC N System.Drawing.cs" />
+		<Compile Include="..\..\Extensions\Drawing\System\IFC P System.Drawing.cs" Link="IFC\Drawing\IFC P System.Drawing.cs" />
+		<Compile Include="..\..\Extensions\Drawing\System\IFC S System.Drawing.cs" Link="IFC\Drawing\IFC S System.Drawing.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="IFC\Drawing\" />
+		<Folder Include="IFC\STEP\" />
+		<Folder Include="IFC\XML\" />
+		<Folder Include="STEP\" />
+	</ItemGroup>
+	
   <ItemGroup>
-    <Compile Include="..\..\Core\IFC\BaseClassIFC.cs" Link="IFC\BaseClassIFC.cs" />
-    <Compile Include="..\..\Core\IFC\DatabaseIFC.cs" Link="IFC\DatabaseIFC.cs" />
-    <Compile Include="..\..\Core\IFC\Enumerations.cs" Link="IFC\Enumerations.cs" />
-    <Compile Include="..\..\Core\IFC\IFC A.cs" Link="IFC\IFC A.cs" />
-    <Compile Include="..\..\Core\IFC\IFC B.cs" Link="IFC\IFC B.cs" />
-    <Compile Include="..\..\Core\IFC\IFC C.cs" Link="IFC\IFC C.cs" />
-    <Compile Include="..\..\Core\IFC\IFC D.cs" Link="IFC\IFC D.cs" />
-    <Compile Include="..\..\Core\IFC\IFC E.cs" Link="IFC\IFC E.cs" />
-    <Compile Include="..\..\Core\IFC\IFC F.cs" Link="IFC\IFC F.cs" />
-    <Compile Include="..\..\Core\IFC\IFC G.cs" Link="IFC\IFC G.cs" />
-    <Compile Include="..\..\Core\IFC\IFC H.cs" Link="IFC\IFC H.cs" />
-    <Compile Include="..\..\Core\IFC\IFC I.cs" Link="IFC\IFC I.cs" />
-    <Compile Include="..\..\Core\IFC\IFC J.cs" Link="IFC\IFC J.cs" />
-    <Compile Include="..\..\Core\IFC\IFC K.cs" Link="IFC\IFC K.cs" />
-    <Compile Include="..\..\Core\IFC\IFC L.cs" Link="IFC\IFC L.cs" />
-    <Compile Include="..\..\Core\IFC\IFC M.cs" Link="IFC\IFC M.cs" />
-    <Compile Include="..\..\Core\IFC\IFC N.cs" Link="IFC\IFC N.cs" />
-    <Compile Include="..\..\Core\IFC\IFC O.cs" Link="IFC\IFC O.cs" />
-    <Compile Include="..\..\Core\IFC\IFC P.cs" Link="IFC\IFC P.cs" />
-    <Compile Include="..\..\Core\IFC\IFC Q.cs" Link="IFC\IFC Q.cs" />
-    <Compile Include="..\..\Core\IFC\IFC R.cs" Link="IFC\IFC R.cs" />
-    <Compile Include="..\..\Core\IFC\IFC S.cs" Link="IFC\IFC S.cs" />
-    <Compile Include="..\..\Core\IFC\IFC T.cs" Link="IFC\IFC T.cs" />
-    <Compile Include="..\..\Core\IFC\IFC U.cs" Link="IFC\IFC U.cs" />
-    <Compile Include="..\..\Core\IFC\IFC V.cs" Link="IFC\IFC V.cs" />
-    <Compile Include="..\..\Core\IFC\IFC W.cs" Link="IFC\IFC W.cs" />
-    <Compile Include="..\..\Core\IFC\IFC X.cs" Link="IFC\IFC X.cs" />
-    <Compile Include="..\..\Core\IFC\IFC Y.cs" Link="IFC\IFC Y.cs" />
-    <Compile Include="..\..\Core\IFC\IFC Z.cs" Link="IFC\IFC Z.cs" />
-    <Compile Include="..\..\Core\IFC\ParserIFC.cs" Link="IFC\ParserIFC.cs" />
-    <Compile Include="..\..\Core\IFC\Property Sets.cs" Link="IFC\Property Sets.cs" />
-    <Compile Include="..\..\Core\IFC\Quantity Sets.cs" Link="IFC\Quantity Sets.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\BaseClassIFC STEP.cs" Link="IFC\STEP\BaseClassIFC STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC A STEP.cs" Link="IFC\STEP\IFC A STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC B STEP.cs" Link="IFC\STEP\IFC B STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC C STEP.cs" Link="IFC\STEP\IFC C STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC D STEP.cs" Link="IFC\STEP\IFC D STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC E STEP.cs" Link="IFC\STEP\IFC E STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC F STEP.cs" Link="IFC\STEP\IFC F STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC G STEP.cs" Link="IFC\STEP\IFC G STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC H STEP.cs" Link="IFC\STEP\IFC H STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC I STEP.cs" Link="IFC\STEP\IFC I STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC J STEP.cs" Link="IFC\STEP\IFC J STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC K STEP.cs" Link="IFC\STEP\IFC K STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC L STEP.cs" Link="IFC\STEP\IFC L STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC M STEP.cs" Link="IFC\STEP\IFC M STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC N STEP.cs" Link="IFC\STEP\IFC N STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC O STEP.cs" Link="IFC\STEP\IFC O STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC P STEP.cs" Link="IFC\STEP\IFC P STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC Q STEP.cs" Link="IFC\STEP\IFC Q STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC R STEP.cs" Link="IFC\STEP\IFC R STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC S STEP.cs" Link="IFC\STEP\IFC S STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC T STEP.cs" Link="IFC\STEP\IFC T STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC U STEP.cs" Link="IFC\STEP\IFC U STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC V STEP.cs" Link="IFC\STEP\IFC V STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC W STEP.cs" Link="IFC\STEP\IFC W STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC X STEP.cs" Link="IFC\STEP\IFC X STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC Y STEP.cs" Link="IFC\STEP\IFC Y STEP.cs" />
-    <Compile Include="..\..\Core\IFC\STEP\IFC Z STEP.cs" Link="IFC\STEP\IFC Z STEP.cs" />
-    <Compile Include="..\..\Core\IFC\XML\BaseClassIFC XML.cs" Link="IFC\XML\BaseClassIFC XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\DatabaseIFC XML.cs" Link="IFC\XML\DatabaseIFC XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC A XML.cs" Link="IFC\XML\IFC A XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC B XML.cs" Link="IFC\XML\IFC B XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC C XML.cs" Link="IFC\XML\IFC C XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC D XML.cs" Link="IFC\XML\IFC D XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC E XML.cs" Link="IFC\XML\IFC E XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC F XML.cs" Link="IFC\XML\IFC F XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC G XML.cs" Link="IFC\XML\IFC G XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC H XML.cs" Link="IFC\XML\IFC H XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC I XML.cs" Link="IFC\XML\IFC I XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC J XML.cs" Link="IFC\XML\IFC J XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC K XML.cs" Link="IFC\XML\IFC K XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC L XML.cs" Link="IFC\XML\IFC L XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC M XML.cs" Link="IFC\XML\IFC M XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC N XML.cs" Link="IFC\XML\IFC N XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC O XML.cs" Link="IFC\XML\IFC O XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC P XML.cs" Link="IFC\XML\IFC P XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC Q XML.cs" Link="IFC\XML\IFC Q XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC R XML.cs" Link="IFC\XML\IFC R XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC S XML.cs" Link="IFC\XML\IFC S XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC T XML.cs" Link="IFC\XML\IFC T XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC U XML.cs" Link="IFC\XML\IFC U XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC V XML.cs" Link="IFC\XML\IFC V XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC W XML.cs" Link="IFC\XML\IFC W XML.cs" />
-    <Compile Include="..\..\Core\IFC\XML\IFC Z XML.cs" Link="IFC\XML\IFC Z XML.cs" />
-    <Compile Include="..\..\Core\STEP\BaseClassSTEP.cs" Link="STEP\BaseClassSTEP.cs" />
-    <Compile Include="..\..\Core\STEP\CollectionsSTEP.cs" Link="STEP\CollectionsSTEP.cs" />
-    <Compile Include="..\..\Core\STEP\DatabaseSTEP.cs" Link="STEP\DatabaseSTEP.cs" />
-    <Compile Include="..\..\Core\STEP\ParserSTEP.cs" Link="STEP\ParserSTEP.cs" />
-    <Compile Include="..\..\Extensions\Drawing\System\IFC C System.Drawing.cs" Link="IFC\Drawing\IFC C System.Drawing.cs" />
-    <Compile Include="..\..\Extensions\Drawing\System\IFC N System.Drawing.cs" Link="IFC\Drawing\IFC N System.Drawing.cs" />
-    <Compile Include="..\..\Extensions\Drawing\System\IFC P System.Drawing.cs" Link="IFC\Drawing\IFC P System.Drawing.cs" />
-    <Compile Include="..\..\Extensions\Drawing\System\IFC S System.Drawing.cs" Link="IFC\Drawing\IFC S System.Drawing.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="IFC\Drawing\" />
-    <Folder Include="IFC\STEP\" />
-    <Folder Include="IFC\XML\" />
-    <Folder Include="STEP\" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-
+	
 </Project>
