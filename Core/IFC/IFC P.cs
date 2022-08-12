@@ -1598,17 +1598,17 @@ namespace GeometryGym.Ifc
 
 		internal IfcProject() : base() { }
 		internal IfcProject(DatabaseIfc db, IfcProject p, DuplicateOptions options) : base(db, p, options) { }
-		public IfcProject(IfcBuilding building, string projectNumber) : this(building.mDatabase, projectNumber) { new IfcRelAggregates(this, building); }
-		public IfcProject(IfcSite site, string projectNumber) : this(site.mDatabase, projectNumber) { new IfcRelAggregates(this, site); }
-		public IfcProject(IfcBuilding building, string projectNumber, IfcUnitAssignment units) : this(projectNumber, units) { new IfcRelAggregates(this, building); }
-		public IfcProject(IfcBuilding building, string projectNumber, IfcUnitAssignment.Length length) : this(building.mDatabase, projectNumber, length) { new IfcRelAggregates(this, building); }
-		public IfcProject(IfcFacility facility, string projectNumber, IfcUnitAssignment units) : this(projectNumber, units) { new IfcRelAggregates(this, facility); }
-		public IfcProject(IfcFacility facility, string projectNumber, IfcUnitAssignment.Length length) : this(facility.mDatabase, projectNumber, length) { new IfcRelAggregates(this, facility); }
-		public IfcProject(IfcSite site, string projectNumber, IfcUnitAssignment units) : this(projectNumber, units) { new IfcRelAggregates(this, site); }
-		public IfcProject(IfcSite site, string projectNumber, IfcUnitAssignment.Length length) : this(site.mDatabase, projectNumber, length) { new IfcRelAggregates(this, site); }
-		public IfcProject(IfcSpatialZone zone, string projectNumber, IfcUnitAssignment units) : this(projectNumber, units) { new IfcRelAggregates(this, zone); }
-		public IfcProject(IfcSpatialZone zone, string projectNumber, IfcUnitAssignment.Length length) : this(zone.mDatabase, projectNumber, length) { new IfcRelAggregates(this, zone); }
-		public IfcProject(DatabaseIfc db, string projectNumber) : base(db, projectNumber)
+		public IfcProject(IfcBuilding building, string name) : this(building.mDatabase, name) { new IfcRelAggregates(this, building); }
+		public IfcProject(IfcSite site, string name) : this(site.mDatabase, name) { new IfcRelAggregates(this, site); }
+		public IfcProject(IfcBuilding building, string name, IfcUnitAssignment units) : this(name, units) { new IfcRelAggregates(this, building); }
+		public IfcProject(IfcBuilding building, string name, IfcUnitAssignment.Length length) : this(building.mDatabase, name, length) { new IfcRelAggregates(this, building); }
+		public IfcProject(IfcFacility facility, string name, IfcUnitAssignment units) : this(name, units) { new IfcRelAggregates(this, facility); }
+		public IfcProject(IfcFacility facility, string name, IfcUnitAssignment.Length length) : this(facility.mDatabase, name, length) { new IfcRelAggregates(this, facility); }
+		public IfcProject(IfcSite site, string name, IfcUnitAssignment units) : this(name, units) { new IfcRelAggregates(this, site); }
+		public IfcProject(IfcSite site, string name, IfcUnitAssignment.Length length) : this(site.mDatabase, name, length) { new IfcRelAggregates(this, site); }
+		public IfcProject(IfcSpatialZone zone, string name, IfcUnitAssignment units) : this(name, units) { new IfcRelAggregates(this, zone); }
+		public IfcProject(IfcSpatialZone zone, string name, IfcUnitAssignment.Length length) : this(zone.mDatabase, name, length) { new IfcRelAggregates(this, zone); }
+		public IfcProject(DatabaseIfc db, string name) : base(db, name)
 		{
 			if (string.IsNullOrEmpty(Name))
 				Name = "UNKNOWN PROJECT";
@@ -1906,6 +1906,15 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+		protected override bool DisposeWorker(bool children)
+		{
+			foreach (IfcRelAssociates associates in mHasAssociations.ToList())
+				associates.mRelatedObjects.Remove(this);
+			if (mHasContext != null)
+				mHasContext.RelatedDefinitions.Remove(this);
+			return base.DisposeWorker(children);
+		}
+
 	}
 	[Serializable]
 	public partial class IfcPropertyDependencyRelationship : IfcResourceLevelRelationship
@@ -1939,6 +1948,12 @@ namespace GeometryGym.Ifc
 		public IfcPropertyEnumeration EnumerationReference { get { return mEnumerationReference; } set { mEnumerationReference = value; } }
 
 		internal IfcPropertyEnumeratedValue() : base() { }
+		internal IfcPropertyEnumeratedValue(DatabaseIfc db, IfcPropertyEnumeratedValue p, DuplicateOptions options) : base(db, p, options)
+		{
+			mEnumerationValues.AddRange(p.mEnumerationValues);	
+			if (p.mEnumerationReference != null)
+				mEnumerationReference = db.Factory.Duplicate(p.mEnumerationReference, options);
+		}
 		public IfcPropertyEnumeratedValue(DatabaseIfc db, string name, IfcValue value) : base(db, name) { mEnumerationValues.Add(value); }
 		public IfcPropertyEnumeratedValue(DatabaseIfc db, string name, IEnumerable<IfcValue> values) : base(db, name) { mEnumerationValues.AddRange(values); }
 		public IfcPropertyEnumeratedValue(string name, IfcValue value, IfcPropertyEnumeration reference) : base(reference.mDatabase, name) { mEnumerationValues.Add(value); EnumerationReference = reference; }
@@ -2119,7 +2134,7 @@ namespace GeometryGym.Ifc
 			IfcProperty result = this[name];
 			if (result != null)
 				return result;
-			foreach(IfcComplexProperty complexProperty in mHasProperties.OfType<IfcComplexProperty>())
+			foreach(IfcComplexProperty complexProperty in mHasProperties.Values.OfType<IfcComplexProperty>())
 			{
 				result = complexProperty.FindProperty(name);
 				if (result != null)

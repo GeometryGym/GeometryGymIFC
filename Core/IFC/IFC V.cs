@@ -520,7 +520,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcPositivePlaneAngleMeasure : IfcMeasureValue { public IfcPositivePlaneAngleMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect
+	public class IfcPositiveLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcHatchLineDistanceSelect
 	{
 		public IfcPositiveLengthMeasure(double value) : base(value) { }
 		internal IfcPositiveLengthMeasure(string str) : base(0)

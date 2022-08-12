@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcZShapeProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

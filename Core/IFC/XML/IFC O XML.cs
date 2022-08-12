@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcObject : IfcObjectDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcActor ,IfcControl ,IfcGroup ,IfcProcess ,IfcProduct ,IfcProject ,IfcResource))
+	public abstract partial class IfcObject
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -52,7 +46,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mIsTypedBy.GetXML(xml.OwnerDocument, "IsTypedBy", this, processed));
 		}
 	}
-	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
+	public abstract partial class IfcObjectDefinition
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -151,7 +145,7 @@ namespace GeometryGym.Ifc
 			//}
 		}
 	}
-	public partial class IfcObjective : IfcConstraint
+	public partial class IfcObjective
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -195,7 +189,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
+	public abstract partial class IfcObjectPlacement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -214,7 +208,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mPlacementRelTo.GetXML(xml.OwnerDocument, "PlacementRelTo", this, processed));
 		}
 	}
-	public partial class IfcOpenCrossProfileDef : IfcProfileDef
+	public partial class IfcOpenCrossProfileDef
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -246,7 +240,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)
+	public partial class IfcOpeningElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -285,7 +279,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
+	public partial class IfcOrganization
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -349,7 +343,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcOrganizationRelationship : IfcResourceLevelRelationship //IFC4
+	public partial class IfcOrganizationRelationship
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -380,7 +374,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(o.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcOwnerHistory : BaseClassIfc
+	public partial class IfcOwnerHistory
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

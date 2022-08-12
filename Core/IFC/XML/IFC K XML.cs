@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcKerb : IfcBuiltElement
+	public partial class IfcKerb
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -44,7 +38,7 @@ namespace GeometryGym.Ifc
 				bool.TryParse(mountable, out mMountable);
 		}
 	}
-	public partial class IfcKerbType : IfcBuiltElementType
+	public partial class IfcKerbType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcNamedUnit : BaseClassIfc, IfcUnit //ABSTRACT SUPERTYPE OF (ONEOF(IfcContextDependentUnit,IfcConversionBasedUnit,IfcSIUnit));
+	public abstract partial class IfcNamedUnit
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -53,7 +47,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("UnitType", mUnitType.ToString().ToLower());
 		}
 	}
-	public partial class IfcNavigationElement : IfcBuiltElement
+	public partial class IfcNavigationElement
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -69,7 +63,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcNavigationElementTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcNavigationElementType : IfcBuiltElementType
+	public partial class IfcNavigationElementType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

@@ -167,8 +167,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcRationalBSplineSurfaceWithKnots : IfcBSplineSurfaceWithKnots
 	{
-		internal LIST<List<double>> mWeightsData = new LIST<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
-		public LIST<List<double>> WeightsData { get { return new LIST<List<double>>(mWeightsData); } }
+		internal List<List<double>> mWeightsData = new List<List<double>>();// : LIST [2:?] OF LIST [2:?] OF IfcReal;
+		public List<List<double>> WeightsData { get { return mWeightsData; } }
 		internal IfcRationalBSplineSurfaceWithKnots() : base() { }
 		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s, DuplicateOptions options) : base(db, s, options)
 		{
@@ -2782,8 +2782,6 @@ namespace GeometryGym.Ifc
 					{
 						if (mDatabase != null)
 						{
-							if (mDatabase.mDictionary.ContainsKey(mGlobalId))
-								Debug.WriteLine("Here");
 							mDatabase.mDictionary.TryRemove(mGlobalId, out BaseClassIfc obj);
 							mDatabase.mDictionary[value] = this;
 						}

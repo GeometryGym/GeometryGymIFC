@@ -18,13 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
 
 
 namespace GeometryGym.Ifc
@@ -85,7 +80,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(HasCoordinateOperation.GetXML(xml.OwnerDocument, "HasCoordinateOperation", this, processed));
 		}
 	}
-	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
+	public partial class IfcGeometricRepresentationSubContext
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -114,7 +109,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "UserDefinedTargetView", UserDefinedTargetView);
 		}
 	}
-	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
+	public partial class IfcGeometricSet
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -164,7 +159,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcGrid : IfcPositioningElement
+	public partial class IfcGrid
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -222,7 +217,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(wAxes);
 		}
 	}
-	public partial class IfcGridAxis : BaseClassIfc
+	public partial class IfcGridAxis
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -252,7 +247,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(AxisCurve.GetXML(xml.OwnerDocument, "AxisCurve", this, processed));
 		}
 	}
-	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
+	public partial class IfcGroup
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

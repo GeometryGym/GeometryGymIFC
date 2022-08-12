@@ -103,8 +103,8 @@ namespace GeometryGym.Ifc
 			double scale = scaleSI(length);
 			if (length == Length.Inch || length == Length.Foot)
 			{
-				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.square_foot));
-				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.cubic_foot));
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.CommonUnitName.square_foot));
+				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.CommonUnitName.cubic_foot));
 				//farenheit
 			}
 			SetUnits();
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 				if (mDatabase.Factory.Options.AngleUnitsInRadians)
 					Units.Add(new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN));
 				else
-					Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.Common.degree));
+					Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.CommonUnitName.degree));
 			}
 			if (this[IfcUnitEnum.TIMEUNIT] == null)
 			{

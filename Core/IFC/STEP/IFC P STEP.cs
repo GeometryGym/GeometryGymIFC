@@ -851,7 +851,7 @@ namespace GeometryGym.Ifc
 		{
 			if (mHasProperties.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mHasProperties.Values.Select(x=>x.StepId)) + ")";
+			return base.BuildStringSTEP(release) + ",(#" + string.Join(",#", mHasProperties.Values.OrderBy(x=>x.StepId).Select(x=>x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

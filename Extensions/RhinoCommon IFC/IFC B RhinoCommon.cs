@@ -83,61 +83,36 @@ namespace GeometryGym.Ifc
 			mKnots.AddRange(knots);
 		}
 		private void adoptKnotsAndMultiplicities(NurbsCurve nc)
-		{ 
-			double tol = (nc.Knots[nc.Knots.Count - 1] - nc.Knots[0]) / Math.Max(1000, nc.Knots.Count) / 1000;
+		{
+			var knotList = nc.Knots;
+			int count = knotList.Count;
 			if (nc.IsPeriodic)
 			{
-				int kc = 1;
-				if (nc.Knots[1] - nc.Knots[0] < tol)
-					kc = 2;
-				else
-				{
-					mKnots.Add(nc.Knots[0] - (nc.Knots[1] - nc.Knots[0]));
-					mKnotMultiplicities.Add(1);
-				}
 				double knot = nc.Knots[0];
-				for (int icounter = 1; icounter < nc.Knots.Count; icounter++)
+				mKnots.Add(knot - (nc.Knots[1] - knot));
+				mKnotMultiplicities.Add(1);
+				for(int u = 0; u < count; u++)
 				{
-					double t = nc.Knots[icounter];
-					if ((t - knot) > tol)
-					{
-						mKnots.Add(knot);
-						mKnotMultiplicities.Add(kc);
-						knot = t;
-						kc = 1;
-					}
-					else
-						kc++;
+					int multiplicity = knotList.KnotMultiplicity(u);
+					mKnots.Add(knotList[u]);
+					mKnotMultiplicities.Add(multiplicity);
+					u += multiplicity - 1;
 				}
-				mKnots.Add(knot);
-				if (kc > 1)
-					mKnotMultiplicities.Add(kc + 1);
-				else
-				{
-					mKnotMultiplicities.Add(1);
-					mKnots.Add(knot + (knot - nc.Knots[nc.Knots.Count - 2]));
-					mKnotMultiplicities.Add(1);
-				}
+				knot = nc.Knots[count - 1];
+				mKnots.Add(knot + (knot - nc.Knots[count - 2]));
+				mKnotMultiplicities.Add(1);
 			}
 			else
 			{
-				int kc = 2;
-				double knot = nc.Knots[0];
-				for (int icounter = 1; icounter < nc.Knots.Count; icounter++)
+				for (int u = 0; u < count; u++)
 				{
-					double t = nc.Knots[icounter];
-					if ((t - knot) > tol)
-					{
-						mKnots.Add(knot);
-						mKnotMultiplicities.Add(kc);
-						knot = t;
-						kc = 1;
-					}
-					else
-						kc++;
+					double knot = knotList[u];
+					int multiplicity = knotList.KnotMultiplicity(u);
+					bool superfluous = (u == 0 || u + multiplicity == count);
+					mKnots.Add(knot);
+					mKnotMultiplicities.Add(multiplicity + (superfluous ? 1 : 0));
+					u += multiplicity - 1;
 				}
-				mKnots.Add(knot);
-				mKnotMultiplicities.Add(kc + 1);
 			}
 		}
 	}
