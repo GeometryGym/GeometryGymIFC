@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcWall : IfcBuiltElement
+	public partial class IfcWall
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -44,7 +38,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcWallType : IfcBuiltElementType
+	public partial class IfcWallType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

@@ -645,8 +645,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + 
-				(mHasProperties.Values.Count == 0 ? "',()" : "',(#" + string.Join(",#", mHasProperties.Values.Select(x=>x.StepId)) + ")");
+			return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUsageName) + "',(" + 
+				string.Join(",", mHasProperties.Values.OrderBy(x=>x.StepId).Select(x=>"#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1634,12 +1634,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcCurveStyleFontAndScaling
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return ",'" + mName + "'," + ParserSTEP.LinkToString(mCurveFont) + "," + mCurveFontScaling.ToString(); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return (string.IsNullOrEmpty(mName) ? "$,#" : "'" + ParserIfc.Encode(mName) + "',#") + mCurveStyleFont.StepId + "," + mCurveFontScaling.ToString(); 
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			mName = ParserSTEP.StripString(str, ref pos, len);
-			mCurveFont = ParserSTEP.StripLink(str, ref pos, len);
-			mCurveFontScaling = new IfcPositiveRatioMeasure(ParserSTEP.StripField(str, ref pos, len));
+			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mCurveStyleFont = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCurveStyleFontSelect;
+			mCurveFontScaling = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcCurveStyleFontPattern

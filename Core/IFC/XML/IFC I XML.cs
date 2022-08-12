@@ -18,20 +18,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
 
 using GeometryGym.STEP;
 
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
+	public partial class IfcIndexedPolyCurve
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -80,7 +75,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcIShapeProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcQuantityArea : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityArea
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -46,7 +40,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityCount
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -63,7 +57,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityLength
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -80,7 +74,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityTime
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -97,7 +91,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityVolume : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityVolume
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -114,7 +108,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityWeight
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

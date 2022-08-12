@@ -877,7 +877,7 @@ namespace GeometryGym.Ifc
 		private Dictionary<string, IfcProperty> mHasProperties = new Dictionary<string, IfcProperty>();// : SET [1:?] OF IfcProperty;
 
 		public string UsageName { get { return mUsageName; } set { mUsageName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
-		public ReadOnlyDictionary<string, IfcProperty> HasProperties { get { return new ReadOnlyDictionary<string, IfcProperty>(mHasProperties); } }
+		public Dictionary<string, IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcComplexProperty() : base() { }
 		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p, DuplicateOptions options) : base(db, p, options) { mUsageName = p.mUsageName; foreach(IfcProperty prop in p.HasProperties.Values) addProperty( db.Factory.DuplicateProperty(prop)); }
@@ -1644,7 +1644,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcConversionBasedUnit : IfcNamedUnit, IfcResourceObjectSelect, NamedObjectIfc //	SUPERTYPE OF(IfcConversionBasedUnitWithOffset)
 	{
-		public enum Common
+		public enum CommonUnitName
 		{
 			inch, foot, yard, mile, square_inch, square_foot, square_yard, acre, square_mile, cubic_inch, cubic_foot, cubic_yard, litre, fluid_ounce_UK,
 			fluid_ounce_US, pint_UK, pint_US, gallon_UK, gallon_US, degree, ounce, pound, ton_UK, ton_US, lbf, kip, psi, ksi, minute, hour, day, btu
@@ -2275,10 +2275,20 @@ namespace GeometryGym.Ifc
 	public partial class IfcCurveStyleFontAndScaling : IfcPresentationItem, IfcCurveFontOrScaledCurveFontSelect
 	{
 		internal string mName; // : 	OPTIONAL IfcLabel;
-		internal int mCurveFont;// : 	IfcCurveStyleFontSelect;
-		internal IfcPositiveRatioMeasure mCurveFontScaling;//: 	IfcPositiveRatioMeasure;
+		internal IfcCurveStyleFontSelect mCurveStyleFont;// : 	IfcCurveStyleFontSelect;
+		internal double mCurveFontScaling;//: 	IfcPositiveRatioMeasure;
 		internal IfcCurveStyleFontAndScaling() : base() { }
-	//	internal IfcCurveStyleFontAndScaling(IfcCurveStyleFontAndScaling i) : base() { mName = i.mName; mCurveFont = i.mCurveFont; mCurveFontScaling = i.mCurveFontScaling; }
+		internal IfcCurveStyleFontAndScaling(DatabaseIfc db, IfcCurveStyleFontAndScaling f) : base(db, f)
+		{
+			mName = f.mName;
+			mCurveStyleFont = db.Factory.Duplicate(f.mCurveStyleFont);
+			mCurveFontScaling = f.mCurveFontScaling;
+		}
+		public IfcCurveStyleFontAndScaling(IfcCurveStyleFontSelect curveStyleFont, double scaling)
+		{
+			mCurveStyleFont = curveStyleFont;
+			mCurveFontScaling = scaling;
+		}
 	}
 	public interface IfcCurveFontOrScaledCurveFontSelect : IBaseClassIfc { } //SELECT (IfcCurveStyleFontAndScaling ,IfcCurveStyleFontSelect);
 	[Serializable]

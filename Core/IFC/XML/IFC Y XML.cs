@@ -18,31 +18,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
+using System.IO;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml;
+//using System.Xml.Linq;
+
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcHalfSpaceSolid
-	{
-		internal override void ParseXml(XmlElement xml)
-		{
-			base.ParseXml(xml);
-			foreach (XmlNode child in xml.ChildNodes)
-			{
-				string name = child.Name;
-				if (string.Compare(name, "BaseSurface") == 0)
-					BaseSurface = mDatabase.ParseXml<IfcSurface>(child as XmlElement);
-			}
-			if (xml.HasAttribute("AgreementFlag"))
-				mAgreementFlag = bool.Parse(xml.Attributes["AgreementFlag"].Value);
-		}
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.AppendChild(BaseSurface.GetXML(xml.OwnerDocument, "BaseSurface", this, processed));
-			xml.SetAttribute("AgreementFlag", mAgreementFlag.ToString().ToLower());
-		}
-	}
 	
 }

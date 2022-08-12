@@ -439,7 +439,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP(release) + (mTemplateType == IfcSimplePropertyTemplateTypeEnum.NOTDEFINED ? ",$," : ",." + mTemplateType.ToString() + ".,") + 
 				(string.IsNullOrEmpty(mPrimaryMeasureType) ? "$," : "'" + ParserIfc.Encode(mPrimaryMeasureType) + "',") + 
 				(string.IsNullOrEmpty(mSecondaryMeasureType) ? "$," : "'" + ParserIfc.Encode(mSecondaryMeasureType) + "',") + 
-				(mEnumerators == null ? "$" : "#" + mEnumerators.StepId) + (mPrimaryUnit == null ? ",$" : ",#" + mPrimaryUnit) +
+				(mEnumerators == null ? "$" : "#" + mEnumerators.StepId) + (mPrimaryUnit == null ? ",$" : ",#" + mPrimaryUnit.StepId) +
 				(mSecondaryUnit == null ? ",$" : ",#" + mSecondaryUnit.StepId) + "," +
 				(string.IsNullOrEmpty(mExpression) ? "$," : "'" + ParserIfc.Encode(mExpression) + "',") +
 				(mAccessState == IfcStateEnum.NOTDEFINED ? "$" : "." + mAccessState.ToString() + ".");

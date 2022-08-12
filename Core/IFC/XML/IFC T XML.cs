@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcTable : BaseClassIfc, IfcMetricValueSelect
+	public partial class IfcTable
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -79,7 +73,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcTableColumn : BaseClassIfc
+	public partial class IfcTableColumn
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -111,7 +105,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath",this,processed));
 		}
 	}
-	public partial class IfcTableRow : BaseClassIfc
+	public partial class IfcTableRow
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -145,7 +139,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("IsHeading", mIsHeading.ToString().ToLower());
 		}
 	}
-	public partial class IfcTelecomAddress : IfcAddress
+	public partial class IfcTelecomAddress
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -234,9 +228,8 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "WWWHomePageURL", WWWHomePageURL);
 		}
 	}
-	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet)
+	public abstract partial class IfcTessellatedFaceSet
 	{
-		//internal int mCoordinates;// : 	IfcCartesianPointList;
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
@@ -272,7 +265,7 @@ namespace GeometryGym.Ifc
 				double.TryParse(att, out mConstantTerm);
 		}
 	}
-	public partial class IfcTrackElement : IfcBuiltElement
+	public partial class IfcTrackElement
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -288,7 +281,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcTrackElementTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcTrackElementType : IfcBuiltElementType
+	public partial class IfcTrackElementType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -303,7 +296,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcTrackElementTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcTransitionCurveSegment2D : IfcCurveSegment2D  //IFC4x1
+	public partial class IfcTransitionCurveSegment2D
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -337,7 +330,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "TransitionCurveType", TransitionCurveType.ToString());
 		}
 	}
-	public partial class IfcTrapeziumProfileDef : IfcParameterizedProfileDef
+	public partial class IfcTrapeziumProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -360,7 +353,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("TopXOffset", mTopXOffset.ToString());
 		}
 	}
-	public partial class IfcTriangulatedFaceSet : IfcTessellatedFaceSet
+	public partial class IfcTriangulatedFaceSet
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -417,7 +410,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcTrimmedCurve : IfcBoundedCurve
+	public partial class IfcTrimmedCurve
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -481,7 +474,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	public partial class IfcTShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcTShapeProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -528,9 +521,8 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("CentreOfGravityInX", mCentreOfGravityInX.ToString());
 		}
 	}
-	public partial class IfcTypeObject : IfcObjectDefinition //(IfcTypeProcess, IfcTypeProduct, IfcTypeResource) IFC4 ABSTRACT 
+	public partial class IfcTypeObject 
 	{
-		//internal List<int> mHasPropertySets = new List<int>();// : OPTIONAL SET [1:?] OF IfcPropertySetDefinition 
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
@@ -565,7 +557,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}	
-	public partial class IfcTypeProduct : IfcTypeObject, IfcProductSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcDoorStyle ,IfcElementType ,IfcSpatialElementType ,IfcWindowStyle)) 
+	public partial class IfcTypeProduct 
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

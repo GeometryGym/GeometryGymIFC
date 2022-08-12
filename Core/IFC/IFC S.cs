@@ -876,7 +876,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSIUnit() : base() { }
 		internal IfcSIUnit(DatabaseIfc db, IfcSIUnit u) : base(db, u) { mPrefix = u.mPrefix; mName = u.mName; }
-		public IfcSIUnit(DatabaseIfc db, IfcUnitEnum unitEnum, IfcSIPrefix pref, IfcSIUnitName name) : base(db, unitEnum, false) { mPrefix = pref; mName = name; }
+		public IfcSIUnit(DatabaseIfc db, IfcUnitEnum unitEnum, IfcSIPrefix prefix, IfcSIUnitName name) : base(db, unitEnum, false) { mPrefix = prefix; mName = name; }
 		public override double SIFactor
 		{
 			get

@@ -18,18 +18,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
 
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcFace : IfcTopologicalRepresentationItem //	SUPERTYPE OF(IfcFaceSurface)
+	public partial class IfcFace
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -57,7 +52,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(face.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem
+	public partial class IfcFaceBasedSurfaceModel
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -85,7 +80,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(face.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcFaceBound : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcFaceOuterBound))
+	public partial class IfcFaceBound
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -107,7 +102,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Orientation", mOrientation.ToString().ToLower());
 		}
 	}
-	public partial class IfcFacetedBrepWithVoids : IfcFacetedBrep
+	public partial class IfcFacetedBrepWithVoids
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -135,7 +130,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcFixedReferenceSweptAreaSolid : IfcDirectrixCurveSweptAreaSolid //IFC4
+	public partial class IfcFixedReferenceSweptAreaSolid
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

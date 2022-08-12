@@ -230,8 +230,9 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return "#" + mHatchLineAppearance.StepId + 
-				(mStartOfNextHatchLine is BaseClassIfc o ? ",#" + o.StepId : ","  + mStartOfNextHatchLine.ToString()) + ",#" +
-				mPointOfReferenceHatchLine.StepId + (mPatternStart == null ? ",$," : ",#" + mPatternStart.StepId + ",") + ParserSTEP.DoubleToString(mHatchLineAngle);
+				(mStartOfNextHatchLine is BaseClassIfc o ? ",#" + o.StepId : ","  + mStartOfNextHatchLine.ToString()) + 
+				(mPointOfReferenceHatchLine == null ? ",$" : ",#" + mPointOfReferenceHatchLine.StepId) +
+				(mPatternStart == null ? ",$," : ",#" + mPatternStart.StepId + ",") + ParserSTEP.DoubleToString(mHatchLineAngle);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

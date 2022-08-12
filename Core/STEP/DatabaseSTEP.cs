@@ -35,6 +35,12 @@ namespace GeometryGym.STEP
 {
 	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
+		public string FolderPath { get; set; }
+		public string OriginatingSystem { get; set; }
+		public DateTime TimeStamp { get; set; } = DateTime.MinValue;
+
+		public List<string> Comments { get; } = new List<string>();
+
 		internal string mFileName = "";
 		public string FileName
 		{
@@ -99,9 +105,7 @@ namespace GeometryGym.STEP
 		internal void logParseError(string str) { string error = "XX Error " + str;  if (!mParsingErrors.Contains(error)) mParsingErrors.Add(error); }
 		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
-		public string FolderPath { get; set; } 
-		public string OriginatingSystem { get; set; }
-		public DateTime TimeStamp { get; set; } = DateTime.MinValue;
+	
 	}
 }
 

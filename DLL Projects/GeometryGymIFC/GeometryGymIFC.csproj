@@ -382,6 +382,12 @@
     <Compile Include="..\..\Core\IFC\XML\IFC W XML.cs">
       <Link>IFC\XML\IFC W XML.cs</Link>
     </Compile>
+    <Compile Include="..\..\Core\IFC\XML\IFC X XML.cs">
+      <Link>IFC\XML\IFC X XML.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\IFC\XML\IFC Y XML.cs">
+      <Link>IFC\XML\IFC Y XML.cs</Link>
+    </Compile>
     <Compile Include="..\..\Core\IFC\XML\IFC Z XML.cs">
       <Link>IFC\XML\IFC Z XML.cs</Link>
     </Compile>

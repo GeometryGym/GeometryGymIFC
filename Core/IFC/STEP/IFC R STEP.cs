@@ -763,8 +763,9 @@ namespace GeometryGym.Ifc
 		{
 			if (release > ReleaseVersion.IFC2x3 || mRelatedObjects.Count == 0)
 				return "";
-			return base.BuildStringSTEP(release) + ",#" + mRelatingProfileProperties.StepId + ",#" + mProfileSectionLocation.StepId + "," +
-				(mProfileOrientation is BaseClassIfc o ? "#" + o.StepId : (mProfileOrientation == null ? "$" : mProfileOrientation.ToString()));
+			return base.BuildStringSTEP(release) + ",#" + mRelatingProfileProperties.StepId + 
+				(mProfileSectionLocation == null ? ",$" : ",#" + mProfileSectionLocation.StepId) +
+				(mProfileOrientation is BaseClassIfc o ? ",#" + o.StepId : (mProfileOrientation == null ? ",$" : mProfileOrientation.ToString()));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -974,7 +975,7 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			RelatingContext = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcContext;
-			RelatedDefinitions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcDefinitionSelect));
+			RelatedDefinitions.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcDefinitionSelect));
 		}
 	}
 	public partial class IfcRelDefinesByObject
@@ -1517,7 +1518,9 @@ namespace GeometryGym.Ifc
 	{
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
-			GlobalId = ParserSTEP.StripString(str, ref pos, len);
+			string globalId = ParserSTEP.StripString(str, ref pos, len);
+			if (string.Compare(GlobalId, globalId, true) != 0)
+				GlobalId = globalId;
 			mOwnerHistory = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcOwnerHistory;
 			mName = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mDescription = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));

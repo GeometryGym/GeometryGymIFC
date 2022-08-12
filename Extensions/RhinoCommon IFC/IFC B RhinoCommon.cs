@@ -106,9 +106,11 @@ namespace GeometryGym.Ifc
 			{
 				for (int u = 0; u < count; u++)
 				{
-					int multiplicity = knotList.KnotMultiplicity(u) + (u == 0 || u + 1 == count ? 1 : 0);
-					mKnots.Add(knotList[u]);
-					mKnotMultiplicities.Add(multiplicity);
+					double knot = knotList[u];
+					int multiplicity = knotList.KnotMultiplicity(u);
+					bool superfluous = (u == 0 || u + multiplicity == count);
+					mKnots.Add(knot);
+					mKnotMultiplicities.Add(multiplicity + (superfluous ? 1 : 0));
 					u += multiplicity - 1;
 				}
 			}

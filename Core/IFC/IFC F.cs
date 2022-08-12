@@ -307,7 +307,6 @@ namespace GeometryGym.Ifc
 		public bool ModelorDraughting { get { return mModelorDraughting; } set { mModelorDraughting = value; } }
 
 		internal IfcFillAreaStyle() : base() { }
-		//internal IfcFillAreaStyle(IfcFillAreaStyle i) : base(i) { mFillStyles = new List<int>(i.mFillStyles.ToArray()); }
 		public IfcFillAreaStyle(IfcFillStyleSelect style) : base(style.Database) { mFillStyles.Add(style); }
 		public IfcFillAreaStyle(IEnumerable<IfcFillStyleSelect> styles) : base(styles.First().Database) { mFillStyles.AddRange(styles); }
 		internal IfcFillAreaStyle(DatabaseIfc db, IfcFillAreaStyle fillAreaStyle) : base(db, fillAreaStyle) { FillStyles.AddRange(fillAreaStyle.FillStyles.Select(x => db.Factory.Duplicate(x) as IfcFillStyleSelect)); }

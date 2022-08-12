@@ -18,18 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
-
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcActor : IfcObject // SUPERTYPE OF(IfcOccupant)
+	public partial class IfcActor
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -48,7 +42,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild((TheActor as BaseClassIfc).GetXML(xml.OwnerDocument, "TheActor", this, processed));
 		}
 	}
-	public partial class IfcActorRole : BaseClassIfc, IfcResourceObjectSelect
+	public partial class IfcActorRole
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -79,7 +73,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 		}
 	}
-	public abstract partial class IfcAddress : BaseClassIfc     //ABSTRACT SUPERTYPE OF(ONEOF(IfcPostalAddress, IfcTelecomAddress));
+	public abstract partial class IfcAddress
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -110,7 +104,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "UserDefinedPurpose", UserDefinedPurpose);
 		}
 	}
-	public partial class IfcAdvancedBrepWithVoids : IfcAdvancedBrep
+	public partial class IfcAdvancedBrepWithVoids
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -138,7 +132,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcAirTerminal : IfcFlowTerminal
+	public partial class IfcAirTerminal
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -159,7 +153,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcAirTerminalType : IfcFlowTerminalType
+	public partial class IfcAirTerminalType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -180,7 +174,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
+	public partial class IfcAlignment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -195,7 +189,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
+	public partial class IfcAlignment2DHorizontal
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -228,7 +222,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
+	public partial class IfcAlignment2DHorizontalSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -246,7 +240,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(CurveGeometry.GetXML(xml.OwnerDocument, "CurveGeometry", this, processed));
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
+	public abstract partial class IfcAlignment2DSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -268,7 +262,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "EndTag", EndTag);
 		}
 	}
-	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	public partial class IfcAlignment2DVerSegCircularArc
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -286,7 +280,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "IsConvex", IsConvex.ToString());
 		}
 	}
-	public partial class IfcAlignment2DVerSegParabolicArc : IfcAlignment2DVerticalSegment  //IFC4.1
+	public partial class IfcAlignment2DVerSegParabolicArc
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -304,7 +298,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "IsConvex", IsConvex.ToString());
 		}
 	}
-	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment //IFC4.1
+	public abstract partial class IfcAlignment2DVerticalSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -328,7 +322,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "StartGradient", StartGradient.ToString());
 		}
 	}
-	public partial class IfcAlignmentCant : IfcLinearElement
+	public partial class IfcAlignmentCant
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -343,7 +337,7 @@ namespace GeometryGym.Ifc
 				double.TryParse(railHeadDistance, out mRailHeadDistance);
 		}
 	}
-	public partial class IfcAlignmentCantSegment : IfcAlignmentParameterSegment
+	public partial class IfcAlignmentCantSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -384,7 +378,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
+	public partial class IfcAlignmentCurve
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -410,7 +404,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Tag", Tag);
 		}
 	}
-	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem //IFC4.1
+	public partial class IfcAlignment2DVertical
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -439,7 +433,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(s.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcAlignmentHorizontal : IfcLinearElement
+	public partial class IfcAlignmentHorizontal
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -475,7 +469,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
+	public partial class IfcAlignmentHorizontalSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -523,7 +517,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcAlignmentParameterSegment : BaseClassIfc
+	public abstract partial class IfcAlignmentParameterSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -539,7 +533,7 @@ namespace GeometryGym.Ifc
 			EndTag = xml.GetAttribute("EndTag");
 		}
 	}
-	public partial class IfcAlignmentSegment : IfcLinearElement
+	public partial class IfcAlignmentSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -557,7 +551,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcAlignmentVertical : IfcLinearElement
+	public partial class IfcAlignmentVertical
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -588,7 +582,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
+	public partial class IfcAlignmentVerticalSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -628,7 +622,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentVerticalSegmentTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcAnnotation : IfcProduct
+	public partial class IfcAnnotation
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -643,7 +637,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem
+	public partial class IfcAnnotationFillArea
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -677,7 +671,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcApplication : BaseClassIfc
+	public partial class IfcApplication
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -711,7 +705,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ApplicationIdentifier", ApplicationIdentifier);
 		}
 	}
-	public partial class IfcAppliedValue : BaseClassIfc, IfcMetricValueSelect, IfcAppliedValueSelect, IfcResourceObjectSelect //SUPERTYPE OF(IfcCostValue);
+	public partial class IfcAppliedValue
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -821,7 +815,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef //SUPERTYPE OF(IfcArbitraryProfileDefWithVoids)
+	public partial class IfcArbitraryClosedProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -839,7 +833,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(OuterCurve.GetXML(xml.OwnerDocument, "OuterCurve", this, processed));
 		}
 	}
-	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef //	SUPERTYPE OF(IfcCenterLineProfileDef)
+	public partial class IfcArbitraryOpenProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -857,7 +851,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Curve.GetXML(xml.OwnerDocument, "Curve", this, processed));
 		}
 	}
-	public partial class IfcArbitraryProfileDefWithVoids : IfcArbitraryClosedProfileDef
+	public partial class IfcArbitraryProfileDefWithVoids
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -885,7 +879,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public partial class IfcAsymmetricIShapeProfileDef : IfcParameterizedProfileDef //IFC4 IfcParameterizedProfileDef
+	public partial class IfcAsymmetricIShapeProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -994,7 +988,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("TopFlangeSlope", mTopFlangeSlope.ToString());
 		}
 	}
-	public partial class IfcAxis1Placement : IfcPlacement
+	public partial class IfcAxis1Placement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -1014,7 +1008,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(Axis.GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
-	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
+	public partial class IfcAxis2Placement2D
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -1033,7 +1027,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(RefDirection.GetXML(xml.OwnerDocument, "RefDirection", this, processed));
 		}
 	}
-	public partial class IfcAxis2Placement3D : IfcPlacement, IfcAxis2Placement
+	public partial class IfcAxis2Placement3D
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
