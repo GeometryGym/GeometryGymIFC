@@ -282,7 +282,7 @@ namespace GeometryGym.Ifc
 				if (o.mDecomposes != null)
 					(db.Factory.Duplicate(o.mDecomposes, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelAggregates).RelatedObjects.Add(this);
 				if(o.mNests != null)
-					(db.Factory.Duplicate(o.mNests, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelNests).RelatedObjects.Add(this);
+					db.Factory.Duplicate(o.mNests, new DuplicateOptions(options) { DuplicateDownstream = true });
 				if (mHasContext != null)
 					(db.Factory.Duplicate(mHasContext, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelDeclares).RelatedDefinitions.Add(this);	
 			}

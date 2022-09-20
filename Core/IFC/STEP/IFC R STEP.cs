@@ -1078,10 +1078,10 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",#" + mRelatingElement.StepId + ",#" + mRelatedElement.StepId +
-				(mInterferenceGeometry == null ? ",$" : ",#" + mInterferenceGeometry.StepId) +
-				(release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "") + 
+				(mInterferenceGeometry == null ? ",$" : ",#" + mInterferenceGeometry.StepId) + 
 				(string.IsNullOrEmpty( mInterferenceType) ? ",$," : ",'" + ParserIfc.Encode(mInterferenceType) + "',") + 
-				ParserIfc.LogicalToString(mImpliedOrder);
+				ParserIfc.LogicalToString(mImpliedOrder) +
+				(release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1089,10 +1089,10 @@ namespace GeometryGym.Ifc
 			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			RelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			InterferenceGeometry =dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConnectionGeometry;
-			if (release > ReleaseVersion.IFC4X3_RC3)
-				mInterferenceSpace = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialZone;
 			mInterferenceType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mImpliedOrder = ParserIfc.StripLogical(str, ref pos, len);
+			if (release > ReleaseVersion.IFC4X3_RC3)
+				mInterferenceSpace = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialZone;
 		}
 	}
 	public partial class IfcRelNests

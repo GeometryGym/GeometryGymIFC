@@ -1609,7 +1609,7 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcControl(DatabaseIfc db) : base(db)
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
+			if (mDatabase.mModelView == ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcControl : " + db.ModelView.ToString());
 		}
 

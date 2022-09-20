@@ -53,12 +53,14 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcParameterizedProfileDef(DatabaseIfc db, string name) : base(db, name)
 		{
-			if (db.mModelView == ModelView.Ifc4Reference)
-				throw new Exception("Invalid Model View for IfcParameterizedProfileDef : " + db.ModelView.ToString());
-			if (db.mRelease < ReleaseVersion.IFC4)
-				Position = db.Factory.Origin2dPlace;
+			if (db != null)
+			{
+				if (db.mModelView == ModelView.Ifc4Reference)
+					throw new Exception("Invalid Model View for IfcParameterizedProfileDef : " + db.ModelView.ToString());
+				if (db.mRelease < ReleaseVersion.IFC4)
+					Position = db.Factory.Origin2dPlace;
+			}
 		}
-		
 	}
 	[Serializable]
 	public partial class IfcPath : IfcTopologicalRepresentationItem
@@ -604,7 +606,6 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPolygonalFaceSet : IfcTessellatedFaceSet //IFC4A2
 	{
-		
 		internal LIST<IfcIndexedPolygonalFace> mFaces = new LIST<IfcIndexedPolygonalFace>(); // : LIST [1:?] OF IfcIndexedPolygonalFace;
 		internal LIST<int> mPnIndex = new LIST<int>(); // : OPTIONAL LIST [1:?] OF IfcPositiveInteger;
 
@@ -636,8 +637,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPolyLoop : IfcLoop
 	{
-		internal LIST<IfcCartesianPoint> mPolygon = new LIST<IfcCartesianPoint> ();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
-		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } set { mPolygon = value; } }
+		private LIST<IfcCartesianPoint> mPolygon = new LIST<IfcCartesianPoint> ();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
+		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } 
+			set { mPolygon = value; } }
 
 		internal IfcPolyLoop() : base() { }
 		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l, DuplicateOptions options) : base(db, l, options) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
@@ -1071,7 +1073,7 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcProcess(DatabaseIfc db) : base(db)
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
+			if (mDatabase.mModelView == ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcProcess : " + db.ModelView.ToString());
 		}
 		public bool AddOperatesOn(IfcObjectDefinition related)
@@ -2354,8 +2356,6 @@ namespace GeometryGym.Ifc
 
 		public IfcValue NominalValue { get { return mNominalValue; } set { mNominalValue = value; } }
 		public IfcUnit Unit { get { return mUnit as IfcUnit; } set { mUnit = value; } }
-
-		internal string mVal;
 		internal IfcPropertySingleValue() : base() { }
 
 		public IfcPropertySingleValue(IfcPropertySingleValue propertySingleValue) : base(propertySingleValue)
@@ -2393,8 +2393,6 @@ namespace GeometryGym.Ifc
 					else
 						return false;
 				}
-				else if (string.Compare(mVal, psv.mVal) != 0)
-					return false;
 				return true;
 			}
 			return false;

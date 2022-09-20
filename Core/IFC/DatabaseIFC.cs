@@ -259,7 +259,7 @@ namespace GeometryGym.Ifc
 			if (string.IsNullOrEmpty(str))
 				return null;
 
-			DatabaseIfc db = new DatabaseIfc(false, ReleaseVersion.IFC4);
+			DatabaseIfc db = new DatabaseIfc(ModelView.Ifc4NotAssigned);
 #if (!NOIFCJSON)
 			if (str.StartsWith("{"))
 			{
@@ -529,14 +529,12 @@ namespace GeometryGym.Ifc
 				else if (release < ReleaseVersion.IFC4X2)
 				{
 					if(typeof(IfcFacility).IsAssignableFrom(type) && !typeof(IfcBuilding).IsAssignableFrom(type))
-						type = typeof(IfcSite);
-					else if (typeof(IfcFacilityPart).IsAssignableFrom(type))
-						type = host is IfcBuilding ? typeof(IfcSpace) : typeof(IfcSite);
-					else if (release < ReleaseVersion.IFC4X1)
 					{
-						if (type != typeof(IfcBuilding) && typeof(IfcFacility).IsAssignableFrom(type))
+						if (release < ReleaseVersion.IFC4X1)
 							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
 					}
+					else if (typeof(IfcFacilityPart).IsAssignableFrom(type))
+						type = typeof(IfcSpace);
 				}
 			}
 			else if (release > ReleaseVersion.IFC4X1)
@@ -829,7 +827,6 @@ namespace GeometryGym.Ifc
 		}
 		
 		public T DuplicateProperty<T>(T property) where T : IfcProperty { return duplicateProperty(property) as T; }
-		public IfcPropertySingleValue DuplicatePropertySingleValue(IfcPropertySingleValue property) { return duplicateProperty(property) as IfcPropertySingleValue; }
 		public IfcProperty DuplicateProperty(IfcProperty property) { return duplicateProperty(property); }
 		private IfcProperty duplicateProperty(IfcProperty property)
 		{
@@ -860,7 +857,7 @@ namespace GeometryGym.Ifc
 				return result;
 			}
 			result = Duplicate(property, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcProperty;
-			if (psv != null)
+			if (psv != null && val != null)
 				psv.NominalValue = val; 
 			mProperties[stepString] = result;
 			return result;
@@ -982,10 +979,10 @@ namespace GeometryGym.Ifc
 		}
 		public IfcConversionBasedUnit ConversionUnit(IfcConversionBasedUnit.CommonUnitName name)
 		{
-			if (mDictionaryConversionBasedUnits.TryGetValue(name, out IfcConversionBasedUnit exisiting))
-				return exisiting;
+			if (mDictionaryConversionBasedUnits.TryGetValue(name, out IfcConversionBasedUnit existing))
+				return existing;
 			IfcUnitAssignment assignment = (mDatabase.Context == null ? null : mDatabase.Context.UnitsInContext);
-			string nameString = name.ToString().Replace("_", "");
+			string nameString = name.ToString().Replace("_", " ");
 			IfcNamedUnit unit = assignment == null ? null : assignment[IfcUnitEnum.LENGTHUNIT];
 			if (unit == null)
 				unit = SILength;
@@ -1459,7 +1456,7 @@ namespace GeometryGym.Ifc
 			}
 			set { mPersonOrganization = value; }
 		}
-		internal string PersonName() { return System.Environment.UserName; }
+		internal string PersonIdentification() { return System.Environment.UserName; }
 		internal IfcPerson mPerson = null;
 		public IfcPerson Person
 		{
@@ -1467,7 +1464,11 @@ namespace GeometryGym.Ifc
 			{
 				if (mPerson == null)
 				{
-					mPerson = new IfcPerson(mDatabase) { Identification = PersonName() };
+					mPerson = new IfcPerson(mDatabase);
+					if (mDatabase.Release > ReleaseVersion.IFC2x3)
+						mPerson.Identification = PersonIdentification();
+					else
+						mPerson.FamilyName = PersonIdentification();
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
 					string str = ggAssembly.mOptions.OwnerRole;
 					if (!string.IsNullOrEmpty(str))
@@ -1476,10 +1477,10 @@ namespace GeometryGym.Ifc
 						if (Enum.TryParse<IfcRoleEnum>(str, out role))
 						{
 							if (role != IfcRoleEnum.NOTDEFINED)
-								mPerson.Roles.Add(new IfcActorRole(mDatabase, role, "", "", new List<int>()));
+								mPerson.Roles.Add(new IfcActorRole(mDatabase) { Role = role });
 						}
 						else
-							mPerson.Roles.Add(new IfcActorRole(mDatabase, IfcRoleEnum.USERDEFINED, str, "", new List<int>()));
+							mPerson.Roles.Add(new IfcActorRole(mDatabase) { Role = IfcRoleEnum.USERDEFINED, UserDefinedRole = str });
 					}
 #endif
 				}
@@ -2709,7 +2710,7 @@ namespace GeometryGym.Ifc
 			DateTime now = DateTime.Now;
 			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
 			IfcPerson person = mDatabase.Factory.mPerson;
-			string authorName = person == null ? mDatabase.Factory.PersonName() : person.Name;
+			string authorName = person == null ? mDatabase.Factory.PersonIdentification() : person.Name;
 			lines.Add("/* author */ ('" + ParserIfc.Encode(authorName) + "'),");
 			string organizationName = IfcOrganization.Organization;
 			IfcOrganization organization = mDatabase.Factory.Organization;

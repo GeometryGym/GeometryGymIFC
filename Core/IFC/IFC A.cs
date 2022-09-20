@@ -914,7 +914,6 @@ namespace GeometryGym.Ifc
 		private double mSegmentLength = 0; //: IfcNonNegativeLengthMeasure;
 		private double mGravityCenterLineHeight = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
 		private IfcAlignmentHorizontalSegmentTypeEnum mPredefinedType; //: IfcAlignmentHorizontalSegmentTypeEnum;
-																														  //INVERSE
 		public IfcCartesianPoint StartPoint { get { return mStartPoint; } set { mStartPoint = value; } }
 		public double StartDirection { get { return mStartDirection; } set { mStartDirection = value; } }
 		public double StartRadiusOfCurvature { get { return mStartRadiusOfCurvature; } set { mStartRadiusOfCurvature = double.IsNaN(value) ? 0 : value; } }
@@ -1871,7 +1870,7 @@ namespace GeometryGym.Ifc
 		internal double mBottomFlangeSlope = double.NaN;//	:	OPTIONAL IfcPlaneAngleMeasure;
 		internal double mTopFlangeEdgeRadius = double.NaN;//	:	OPTIONAL IfcNonNegativeLengthMeasure;
 		internal double mTopFlangeSlope = double.NaN;//:	OPTIONAL IfcPlaneAngleMeasure;
-		internal double mCentreOfGravityInY;// : OPTIONAL IfcPositiveLengthMeasure IFC4 deleted
+		internal double mCentreOfGravityInY = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure IFC4 deleted
 
 		public double BottomFlangeWidth { get { return mBottomFlangeWidth; } set { mBottomFlangeWidth = value; } }
 		public double OverallDepth { get { return mOverallDepth; } set { mOverallDepth = value; } }

@@ -429,7 +429,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcRelConnectsStructuralActivity : IfcRelConnects
+	public partial class IfcRelConnectsStructuralActivity
 	{
 		internal override void parseJObject(JObject obj)
 		{

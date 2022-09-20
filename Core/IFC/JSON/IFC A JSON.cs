@@ -630,7 +630,7 @@ namespace GeometryGym.Ifc
 				obj["TopFlangeEdgeRadius"] = formatLength(mTopFlangeEdgeRadius);
 			if (!double.IsNaN(mTopFlangeSlope) && mTopFlangeSlope > 0)
 				obj["TopFlangeSlope"] = mTopFlangeSlope;
-			if (mDatabase.Release <= ReleaseVersion.IFC2x3)
+			if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4)
 			{
 				if (!double.IsNaN(mCentreOfGravityInY) && mCentreOfGravityInY > 0)
 					obj["CentreOfGravityInY"] = formatLength(mCentreOfGravityInY);

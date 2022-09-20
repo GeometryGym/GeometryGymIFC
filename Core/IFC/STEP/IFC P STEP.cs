@@ -882,7 +882,11 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcPropertySingleValue
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + (mNominalValue == null ? (string.IsNullOrEmpty(mVal) ? "$" :  mVal) : mNominalValue.ToString()) + "," + ParserSTEP.ObjToLinkString(mUnit); }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + "," + (mNominalValue == null ?  "$" : mNominalValue.ToString()) + 
+				(mUnit == null ? ",$" : ",#" + mUnit.StepId);
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -894,10 +898,6 @@ namespace GeometryGym.Ifc
 					mNominalValue = ParserIfc.parseValue(s);
 				}
 				catch { }
-				if (mNominalValue == null)
-				{
-					mVal = s;
-				}
 			}
 			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 		}

@@ -116,7 +116,7 @@ namespace GeometryGym.Ifc
 	{
 		public Vector3d Force
 		{
-			get { return new Vector3d(mForceX, mForceY, mForceZ); }
+			get { return new Vector3d(ForceX, ForceY, ForceZ); }
 			set
 			{
 				if (value.IsValid)
@@ -131,7 +131,7 @@ namespace GeometryGym.Ifc
 		}
 		public Vector3d Moment
 		{
-			get { return new Vector3d(mMomentX, mMomentY, mMomentZ); }
+			get { return new Vector3d(MomentX, MomentY, MomentZ); }
 			set
 			{
 				if (value.IsValid)

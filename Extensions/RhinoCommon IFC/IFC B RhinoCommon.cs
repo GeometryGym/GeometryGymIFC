@@ -69,16 +69,16 @@ namespace GeometryGym.Ifc
 		internal IfcBSplineCurveWithKnots(DatabaseIfc m, NurbsCurve nc, bool twoD)
 			: base(m, nc, twoD)
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
-				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
+			if (mDatabase.mModelView == ModelView.Ifc4Reference)
+				throw new Exception("Invalid Model View for IfcBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
 			ClosedCurve = nc.IsClosed ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 			adoptKnotsAndMultiplicities(nc);
 		}
 		public IfcBSplineCurveWithKnots(DatabaseIfc m, int degree, List<Point2d> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
 			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)))
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned)
-				throw new Exception("Invalid Model View for IfcRationalBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
+			if (mDatabase.mModelView != ModelView.Ifc4Reference)
+				throw new Exception("Invalid Model View for IfcBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
 			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}

@@ -171,11 +171,11 @@ namespace GeometryGym.Ifc
 		[Obsolete("REVISED IFC4x3RC4", false)]
 		internal LIST<IfcCurveMeasureSelect> mCrossSectionPositionMeasures_OBSOLETE = new LIST<IfcCurveMeasureSelect>();// : LIST [2:?] OF IfcCurveMeasureSelect;
 		internal LIST<IfcAxis2PlacementLinear> mCrossSectionPositions = new LIST<IfcAxis2PlacementLinear>();// : LIST [2:?] OF IfcAxis2PlacementLinear;
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		internal bool mFixedAxisVertical;// : IfcBoolean
 
 		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if (value != null) CrossSectionPositions = value; } }
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
 
 		internal IfcSectionedSolidHorizontal() : base() { }
@@ -186,11 +186,10 @@ namespace GeometryGym.Ifc
 			mCrossSectionPositionMeasures_OBSOLETE.AddRange(s.mCrossSectionPositionMeasures_OBSOLETE);
 			FixedAxisVertical = s.FixedAxisVertical;
 		}
-		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcAxis2PlacementLinear> positions, bool fixedAxisVertical)
+		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcAxis2PlacementLinear> positions)
 			: base(directrix, profiles)
 		{
 			CrossSectionPositions.AddRange(positions);
-			FixedAxisVertical = fixedAxisVertical;
 		}
 		[Obsolete("REVISED IFC4x3", false)]
 		public IfcSectionedSolidHorizontal(IfcCurve directrix, IEnumerable<IfcProfileDef> profiles, IEnumerable<IfcPointByDistanceExpression> positions, bool fixedAxisVertical)
@@ -233,9 +232,9 @@ namespace GeometryGym.Ifc
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; } }
 		public LIST<IfcAxis2PlacementLinear> CrossSectionPositions { get { return mCrossSectionPositions; } }
 		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } }
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		public bool FixedAxisVertical { get { return mFixedAxisVertical; } set { mFixedAxisVertical = value; } }
-		[Obsolete("REVISED IFC4x3RC5", false)]
+		[Obsolete("REVISED IFC4x3", false)]
 		public LIST<IfcPointByDistanceExpression> CrossSectionPositions_OBSOLETE { get { return mCrossSectionPositions_OBSOLETE; } }
 
 		public IfcSectionedSurface() : base() { }
@@ -1747,8 +1746,8 @@ additional types	some additional representation types are given:
 		}
 		public IfcStructuralLoadConfiguration(IfcStructuralLoadOrResult val, double length)
 			: base(val.Database) { mValues.Add(val); mLocations.Add( new List<double>() { length } );  }
-		public IfcStructuralLoadConfiguration(List<IfcStructuralLoadOrResult> vals, List<List<double>> lengths)
-			: base(vals[0].mDatabase) { mValues.AddRange(vals); if (lengths != null) mLocations.AddRange(lengths); }
+		public IfcStructuralLoadConfiguration(List<IfcStructuralLoadOrResult> vals, IEnumerable<List<double>> locations)
+			: base(vals[0].mDatabase) { mValues.AddRange(vals); if (locations != null) mLocations.AddRange(locations); }
 		public IfcStructuralLoadConfiguration(IfcStructuralLoadOrResult val1, double loc1, IfcStructuralLoadOrResult val2, double loc2)
 			: this(new List<IfcStructuralLoadOrResult>() { val1, val2}, new List<List<double>>() { new List<double>() { loc1 }, new List<double>() { loc2 } }) {  }
 		
@@ -1833,15 +1832,15 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadLinearForce : IfcStructuralLoadStatic
 	{
-		internal double mLinearForceX = 0, mLinearForceY = 0, mLinearForceZ = 0; // : OPTIONAL IfcLinearForceMeasure
-		internal double mLinearMomentX = 0, mLinearMomentY = 0, mLinearMomentZ = 0;// : OPTIONAL IfcLinearMomentMeasure; 
+		private double mLinearForceX = 0, mLinearForceY = 0, mLinearForceZ = 0; // : OPTIONAL IfcLinearForceMeasure
+		private double mLinearMomentX = 0, mLinearMomentY = 0, mLinearMomentZ = 0;// : OPTIONAL IfcLinearMomentMeasure; 
 
-		public double LinearForceX { get { return mLinearForceX; } set { mLinearForceX = value; } }
-		public double LinearForceY { get { return mLinearForceY; } set { mLinearForceY = value; } }
-		public double LinearForceZ { get { return mLinearForceZ; } set { mLinearForceZ = value; } }
-		public double LinearMomentX { get { return mLinearMomentX; } set { mLinearMomentX = value; } }
-		public double LinearMomentY { get { return mLinearMomentY; } set { mLinearMomentY = value; } }
-		public double LinearMomentZ { get { return mLinearMomentZ; } set { mLinearMomentZ = value; } }
+		public double LinearForceX { get { return double.IsNaN(mLinearForceX) ? 0 : mLinearForceX; } set { mLinearForceX = value; } }
+		public double LinearForceY { get { return double.IsNaN(mLinearForceY) ? 0 : mLinearForceY; } set { mLinearForceY = value; } }
+		public double LinearForceZ { get { return double.IsNaN(mLinearForceZ) ? 0 : mLinearForceZ; } set { mLinearForceZ = value; } }
+		public double LinearMomentX { get { return double.IsNaN(mLinearMomentX) ? 0 : mLinearMomentX; } set { mLinearMomentX = value; } }
+		public double LinearMomentY { get { return double.IsNaN(mLinearMomentY) ? 0 : mLinearMomentY; } set { mLinearMomentY = value; } }
+		public double LinearMomentZ { get { return double.IsNaN(mLinearMomentZ) ? 0 : mLinearMomentZ; } set { mLinearMomentZ = value; } }
 
 		internal IfcStructuralLoadLinearForce() : base() { }
 		internal IfcStructuralLoadLinearForce(DatabaseIfc db, IfcStructuralLoadLinearForce f) : base(db,f) { mLinearForceX = f.mLinearForceX; mLinearForceY = f.mLinearForceY; mLinearForceZ = f.mLinearForceZ; mLinearMomentX = f.mLinearMomentX; mLinearMomentY = f.mLinearMomentY; mLinearMomentZ = f.mLinearMomentZ; }

@@ -187,7 +187,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
 		public IfcFacilityPartCommon() : base() { }
 		public IfcFacilityPartCommon(DatabaseIfc db) : base(db) { }
-		public IfcFacilityPartCommon(DatabaseIfc db, IfcBridgePart bridgePart, DuplicateOptions options) : base(db, bridgePart, options) { }
+		public IfcFacilityPartCommon(DatabaseIfc db, IfcFacilityPartCommon facilityPartCommon, DuplicateOptions options) : base(db, facilityPartCommon, options) { }
 		public IfcFacilityPartCommon(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]

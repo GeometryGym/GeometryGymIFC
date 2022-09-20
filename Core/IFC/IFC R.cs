@@ -172,8 +172,8 @@ namespace GeometryGym.Ifc
 		internal IfcRationalBSplineSurfaceWithKnots() : base() { }
 		internal IfcRationalBSplineSurfaceWithKnots(DatabaseIfc db, IfcRationalBSplineSurfaceWithKnots s, DuplicateOptions options) : base(db, s, options)
 		{
-			for (int icounter = 0; icounter < s.mWeightsData.Count; icounter++)
-				mWeightsData.Add(new List<double>(s.mWeightsData[icounter].ToArray()));
+			foreach(var list in s.WeightsData)
+				mWeightsData.Add(new List<double>(list));
 		}
 		public IfcRationalBSplineSurfaceWithKnots(int uDegree, int vDegree, IEnumerable<IEnumerable<IfcCartesianPoint>> controlPoints, IEnumerable<int> uMultiplicities, IEnumerable<int> vMultiplicities, IEnumerable<double> uKnots, IEnumerable<double> vKnots, IfcKnotType type, List<List<double>> weights)
 			: base(uDegree, vDegree, controlPoints, uMultiplicities, vMultiplicities, uKnots, vKnots, type)
@@ -1931,16 +1931,16 @@ namespace GeometryGym.Ifc
 		internal IfcInterferenceSelect mRelatingElement;// : IfcInterferenceSelect;
 		internal IfcInterferenceSelect mRelatedElement;// : IfcInterferenceSelect;
 		internal IfcConnectionGeometry mInterferenceGeometry;// : OPTIONAL IfcConnectionGeometry; 
-		internal IfcSpatialZone mInterferenceSpace = null;// : OPTIONAL IfcSpatialZone;
 		internal string mInterferenceType = "";// : OPTIONAL IfcIdentifier;
 		internal IfcLogicalEnum mImpliedOrder = IfcLogicalEnum.UNKNOWN;// : LOGICAL;
+		internal IfcSpatialZone mInterferenceSpace = null;// : OPTIONAL IfcSpatialZone;
 
 		public IfcInterferenceSelect RelatingElement { get { return mRelatingElement; } set { mRelatingElement = value; value.InterferesElements.Add(this); } }
 		public IfcInterferenceSelect RelatedElement { get { return mRelatedElement; } set { mRelatedElement = value; value.IsInterferedByElements.Add(this); } }
 		public IfcConnectionGeometry InterferenceGeometry { get { return mInterferenceGeometry; } set { mInterferenceGeometry = value; } }
-		public IfcSpatialZone InterferenceSpace { get { return mInterferenceSpace; } set { mInterferenceSpace = value; } }
 		public string InterferenceType { get { return mInterferenceType; } set { mInterferenceType = value; } }
 		public IfcLogicalEnum ImpliedOrder { get { return mImpliedOrder; } }
+		public IfcSpatialZone InterferenceSpace { get { return mInterferenceSpace; } set { mInterferenceSpace = value; } }
 
 		internal IfcRelInterferesElements() : base() { }
 		internal IfcRelInterferesElements(DatabaseIfc db, IfcRelInterferesElements r, DuplicateOptions options) : base(db, r, options)
@@ -2741,7 +2741,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release > ReleaseVersion.IFC4X2 && mDatabase.Release < ReleaseVersion.IFC4X3) return "IfcFacilityPart"; return base.StepClassName; } }
 		public IfcRoadPart() : base() { }
 		public IfcRoadPart(DatabaseIfc db) : base(db) { }
-		public IfcRoadPart(DatabaseIfc db, IfcRailwayPart railwayPart, DuplicateOptions options) : base(db, railwayPart, options) { }
+		public IfcRoadPart(DatabaseIfc db, IfcRoadPart roadPart, DuplicateOptions options) : base(db, roadPart, options) { }
 		public IfcRoadPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]

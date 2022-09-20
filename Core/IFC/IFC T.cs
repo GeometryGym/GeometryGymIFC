@@ -925,8 +925,6 @@ namespace GeometryGym.Ifc
 		internal IfcTrapeziumProfileDef(DatabaseIfc db, IfcTrapeziumProfileDef p, DuplicateOptions options) : base(db, p, options) { mBottomXDim = p.mBottomXDim; mTopXDim = p.mTopXDim; mYDim = p.mYDim; mTopXOffset = p.mTopXOffset; }
 		public IfcTrapeziumProfileDef(DatabaseIfc db, string name, double bottomXDim, double topXDim, double yDim, double topXOffset) : base(db, name)
 		{
-			if (mDatabase.mModelView != ModelView.Ifc4NotAssigned && mDatabase.mModelView != ModelView.Ifc2x3NotAssigned)
-				throw new Exception("Invalid Model View for IfcTrapeziumProfileDef : " + db.ModelView.ToString());
 			mBottomXDim = bottomXDim;
 			mTopXDim = topXDim;
 			mYDim = yDim;
