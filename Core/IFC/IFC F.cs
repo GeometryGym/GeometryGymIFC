@@ -278,10 +278,12 @@ namespace GeometryGym.Ifc
 			: base(db, e, options)
 		{
 			IfcRelVoidsElement relVoidsElement = e.VoidsElement;
-			
-			VoidsElement = db.Factory.Duplicate(relVoidsElement, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelVoidsElement;
-			VoidsElement.RelatingBuildingElement = db.Factory.Duplicate(relVoidsElement.RelatingBuildingElement, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcElement;
-			VoidsElement.RelatedOpeningElement = this;
+			if (relVoidsElement != null)
+			{
+				VoidsElement = db.Factory.Duplicate(relVoidsElement, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelVoidsElement;
+				VoidsElement.RelatingBuildingElement = db.Factory.Duplicate(relVoidsElement.RelatingBuildingElement, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcElement;
+				VoidsElement.RelatedOpeningElement = this;
+			}
 		}
 		protected IfcFeatureElementSubtraction(DatabaseIfc db) : base(db) {  }
 		protected IfcFeatureElementSubtraction(IfcElement host, IfcProductDefinitionShape rep) : base(host.mDatabase)
