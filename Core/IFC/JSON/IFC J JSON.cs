@@ -25,7 +25,18 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
+
 namespace GeometryGym.Ifc
 {
 	
 }
+#endif

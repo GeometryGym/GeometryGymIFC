@@ -36,6 +36,19 @@ using GeometryGym.STEP;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+#endif
+#endif
+
 namespace GeometryGym.Ifc
 {
 	public enum ReleaseVersion 
@@ -263,7 +276,7 @@ namespace GeometryGym.Ifc
 #if (!NOIFCJSON)
 			if (str.StartsWith("{"))
 			{
-				Newtonsoft.Json.Linq.JObject jobj = Newtonsoft.Json.Linq.JObject.Parse(str);
+				JsonObject jobj = JsonObject.Parse(str) as JsonObject;
 				if (str != null)
 					db.ReadJSON(jobj);
 			}
@@ -405,10 +418,7 @@ namespace GeometryGym.Ifc
 #if (!NOIFCJSON)
 			else if (ExtensionHelper.ExtensionEquals(filename, ".json"))
 			{
-				var jsonObject = ToJSON(string.Empty);
-				var sw = new StreamWriter(stream);
-				sw.Write(jsonObject.ToString(Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonConverter[0]));
-				return true;
+				return this.ToJSON(filename) != null;
 			}
 #endif
 #if (!NOIFCZIP)

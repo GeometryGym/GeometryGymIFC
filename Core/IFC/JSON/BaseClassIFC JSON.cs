@@ -25,14 +25,21 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
-	public partial interface IBaseClassIfc { JObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options); }
+	public partial interface IBaseClassIfc { JsonObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options); }
 	public partial class BaseClassIfc : STEPEntity, IBaseClassIfc
 	{
 		public class SetJsonOptions
@@ -73,9 +80,9 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
-		internal virtual void parseJObject(JObject obj)
+		internal virtual void parseJsonObject(JsonObject obj)
 		{
-
+			
 		}
 		internal string removeFileNameIllegal(string filename)
 		{
@@ -93,9 +100,8 @@ namespace GeometryGym.Ifc
 			}
 		}
 		
-		//internal JObject obj = null;
-		private JObject writeRepositoryCommon(JObject obj, SetJsonOptions options) { return writeRepositoryCommon(obj, options, ""); }
-		private JObject writeRepositoryCommon(JObject obj, SetJsonOptions options, string folderName)
+		private JsonObject writeRepositoryCommon(JsonObject obj, SetJsonOptions options) { return writeRepositoryCommon(obj, options, ""); }
+		private JsonObject writeRepositoryCommon(JsonObject obj, SetJsonOptions options, string folderName)
 		{
 			if (string.IsNullOrEmpty(options.ProjectFolder))
 				return obj;
@@ -111,15 +117,10 @@ namespace GeometryGym.Ifc
 			streamWriter.Close();
 			setFileAttributes(path, options.RepositoryAttributes);
 			setFolderAttributes(folder, options.RepositoryAttributes);
-			JObject	result = new JObject();
+			JsonObject	result = new JsonObject();
 			result["href"] = mGlobalId;
 				return result;
 		}
-			//if (pset != null)
-				//{
-				//	if (pset.DefinesType.Count > 1)
-				//		return true;
-				//	IfcRelDefinesByProperties rdp = pset.DefinesOccurrence;
 		internal bool isCommon
 		{
 			get
@@ -140,10 +141,10 @@ namespace GeometryGym.Ifc
 				return false;	
 			}
 		}
-		public JObject getJson(BaseClassIfc host, SetJsonOptions options)
+		public JsonObject getJson(BaseClassIfc host, SetJsonOptions options)
 		{
 			bool common = isCommon;
-			JObject obj = new JObject();
+			JsonObject obj = new JsonObject();
 			
 			if (!string.IsNullOrEmpty(mGlobalId))
 			{
@@ -190,29 +191,66 @@ namespace GeometryGym.Ifc
 			}
 			return obj;
 		}
-		protected virtual void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected virtual void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			if(options.SerializeAllGlobalIds && !string.IsNullOrEmpty(mGlobalId) && this as IfcRoot == null)
 				obj["id"] = mGlobalId;
 		}
-		protected T extractObject<T>(JObject obj) where T : IBaseClassIfc
+		protected T extractObject<T>(JsonObject obj) where T : IBaseClassIfc
 		{
-			return (obj == null ? default(T) : mDatabase.ParseJObject<T>(obj));
+			return (obj == null ? default(T) : mDatabase.ParseJsonObject<T>(obj));
 		}
-		protected string extractString(JToken token) { return (token == null ? "" : token.Value<string>()); }
-		protected void setAttribute(JObject obj, string attribute, string value)
+		protected string extractString(JsonObject obj, string key)
+		{
+			var node = obj[key];
+			return node == null ? "" : node.GetValue<string>();
+		}
+		protected DateTime extractDateTime(JsonObject obj, string key)
+		{
+			string str = extractString(obj, key);
+			if (string.IsNullOrEmpty(str))
+				return DateTime.MinValue;
+			return DateTime.Parse(str);
+		}
+#if (NEWTONSOFT)
+		protected string extractString(JToken node) { return (node == null ? "" : node.Value<string>()); }
+#else
+		protected string extractString(JsonNode node) { return (node == null ? "" : node.GetValue<string>()); }
+#endif
+		protected void setAttribute(JsonObject obj, string attribute, string value)
 		{
 			if (!string.IsNullOrEmpty(value))
 				obj[attribute] = value;
 		}
-		protected void createArray(JObject obj,string name, IEnumerable<IBaseClassIfc> objects, BaseClassIfc host, SetJsonOptions options)
+		protected void createArray(JsonObject obj, string name, IEnumerable<IBaseClassIfc> objects, BaseClassIfc host, SetJsonOptions options)
 		{
 			if (objects.Count() == 0)
 				return;
-			obj[name] = new JArray( objects.ToList().ConvertAll(x => mDatabase[x.StepId].getJson(host, options)));
+			JsonArray array = new JsonArray();
+			foreach(var o in objects.OfType<BaseClassIfc>())
+			{
+				var jsonObject = o.getJson(host, options);
+				if(jsonObject != null)
+				array.Append(jsonObject);
+			}	
+			obj[name] = array;
+		}
+		protected void createArray(JsonObject obj, string name, IEnumerable<string> strings)
+		{
+			JsonArray array = new JsonArray();
+			foreach (string str in strings)
+				array.Add(str);
+			obj[name] = array;
+		}
+		protected void createArray(JsonObject obj, string name, IEnumerable<JsonObject> objects)
+		{
+			JsonArray array = new JsonArray();
+			foreach (var o in objects)
+				array.Add(o);
+			obj[name] = array;
 		}
 
-		public static void setJSON(IfcColourOrFactor colourOrFactor, string name, JObject obj, BaseClassIfc host, SetJsonOptions options)
+		public static void setJSON(IfcColourOrFactor colourOrFactor, string name, JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			if (colourOrFactor == null)
 				return;
@@ -225,3 +263,4 @@ namespace GeometryGym.Ifc
 		 
 	}
 }
+#endif

@@ -24,27 +24,35 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 namespace GeometryGym.Ifc
 {
 	public abstract partial class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
 	{
-		public JObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options)
+		public JsonObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options)
 		{
 			return DatabaseIfc.extract(this);
 		}
 	}
 	public partial class IfcValveType : IfcFlowControllerType
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcValveTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcValveTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcValveTypeEnum.NOTDEFINED)
@@ -53,36 +61,37 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcVector
 	{
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Orientation"] = Orientation.getJson(this, options);
 			obj["Magnitude"] = Magnitude;
 		}
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JObject jobj = obj.GetValue("Pnt", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			base.parseJsonObject(obj);
+			JsonObject jobj = obj["Pnt"] as JsonObject;
 			if (jobj != null)
-				Orientation = mDatabase.ParseJObject<IfcDirection>(jobj);
-			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				mMagnitude = token.Value<double>();
+				Orientation = mDatabase.ParseJsonObject<IfcDirection>(jobj);
+			var node = obj["Depth"];
+			if (node != null)
+				mMagnitude = node.GetValue<double>();
 		}
 	}
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JObject rp = obj.GetValue("VertexGeometry", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			base.parseJsonObject(obj);
+			JsonObject rp = obj["VertexGeometry"] as JsonObject;
 			if (rp != null)
-				VertexGeometry = mDatabase.ParseJObject<IfcPoint>(rp);
+				VertexGeometry = mDatabase.ParseJsonObject<IfcPoint>(rp);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 				obj["VertexGeometry"] = VertexGeometry.getJson(this, options);
 		}
 	}
 }
+#endif

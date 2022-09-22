@@ -25,57 +25,65 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 namespace GeometryGym.Ifc
 {
 	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JObject jobj = obj.GetValue("Points", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			base.parseJsonObject(obj);
+			JsonObject jobj = obj["Points"] as JsonObject;
 			if (jobj != null)
-				Points = mDatabase.ParseJObject<IfcCartesianPointList>(jobj);
-			JArray array = obj.GetValue("Segments", StringComparison.InvariantCultureIgnoreCase) as JArray;
+				Points = mDatabase.ParseJsonObject<IfcCartesianPointList>(jobj);
+			JsonArray array = obj["Segments"] as JsonArray;
 			if (array != null)
 			{
-				foreach (JToken tok in array)
+				foreach (var token in array)
 				{
-					JObject ob = tok as JObject;
+					JsonObject ob = token as JsonObject;
 					if (ob != null)
 					{
-						JToken jtoken = ob.GetValue("IfcLineIndex", StringComparison.InvariantCultureIgnoreCase);
+						var jtoken = ob["IfcLineIndex"];
 						if (jtoken != null)
-							mSegments.Add(new IfcLineIndex(jtoken.Value<string>().Split(" ".ToCharArray()).ToList().ConvertAll(x => int.Parse(x))));
+							mSegments.Add(new IfcLineIndex(jtoken.GetValue<string>().Split(' ').Select(x => int.Parse(x))));
 						else
 						{
-							jtoken = ob.GetValue("IfcArcIndex", StringComparison.InvariantCultureIgnoreCase);
+							jtoken = ob["IfcArcIndex"];
 							if (jtoken != null)
 							{
-								List<int> tokens = jtoken.Value<string>().Split(" ".ToCharArray()).ToList().ConvertAll(x => int.Parse(x));
+								List<int> tokens = jtoken.GetValue<string>().Split(' ').Select(x => int.Parse(x)).ToList();
 								mSegments.Add(new IfcArcIndex(tokens[0], tokens[1], tokens[2]));
 							}
 						}
 					}
 				}
 			}
-			JToken token = obj.GetValue("SelfIntersect", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcLogicalEnum>(token.Value<string>(), true, out mSelfIntersect);
+			var node = obj["SelfIntersect"];
+			if (node != null)
+				Enum.TryParse<IfcLogicalEnum>(node.GetValue<string>(), true, out mSelfIntersect);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Points"] = Points.getJson(this, options);
 			if (mSegments.Count > 0)
 			{
-				JArray array = new JArray();
+				JsonArray array = new JsonArray();
 				obj["Segments"] = array;
 				foreach (IfcSegmentIndexSelect seg in Segments)
 				{
 					IfcArcIndex ai = seg as IfcArcIndex;
-					JObject jobj = new JObject();
+					JsonObject jobj = new JsonObject();
 					if (ai != null)
 					{
 						jobj["IfcArcIndex"] = ai[0] + " " + ai[1] + " " + ai[2];
@@ -95,32 +103,32 @@ namespace GeometryGym.Ifc
 
 	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("OverallWidth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mOverallWidth);
-			token = obj.GetValue("OverallDepth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mOverallDepth);
-			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mWebThickness);
-			token = obj.GetValue("FlangeThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeThickness);
-			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFilletRadius);
-			token = obj.GetValue("FlangeEdgeRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeEdgeRadius);
-			token = obj.GetValue("FlangeSlope", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeSlope);
+			base.parseJsonObject(obj);
+			var node = obj["OverallWidth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mOverallWidth);
+			node = obj["OverallDepth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mOverallDepth);
+			node = obj["WebThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mWebThickness);
+			node = obj["FlangeThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
+			node = obj["FilletRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFilletRadius);
+			node = obj["FlangeEdgeRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeEdgeRadius);
+			node = obj["FlangeSlope"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeSlope);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["OverallWidth"] = formatLength(mOverallWidth);
@@ -136,3 +144,4 @@ namespace GeometryGym.Ifc
 		}
 	}
 }
+#endif

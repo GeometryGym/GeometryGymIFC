@@ -25,23 +25,31 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 namespace GeometryGym.Ifc
 {
 	public partial class IfcHalfSpaceSolid : IfcGeometricRepresentationItem, IfcBooleanOperand /* SUPERTYPE OF (ONEOF (IfcBoxedHalfSpace ,IfcPolygonalBoundedHalfSpace)) */
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JObject jobj = obj.GetValue("BaseSurface", StringComparison.InvariantCultureIgnoreCase) as JObject;
+			base.parseJsonObject(obj);
+			JsonObject jobj = obj["BaseSurface"] as JsonObject;
 			if (jobj != null)
-				BaseSurface = mDatabase.ParseJObject<IfcSurface>(jobj);
-			JToken token = obj.GetValue("AgreementFlag", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				bool.TryParse(token.Value<string>(), out mAgreementFlag);
+				BaseSurface = mDatabase.ParseJsonObject<IfcSurface>(jobj);
+			var node = obj["AgreementFlag"];
+			if (node != null)
+				bool.TryParse(node.GetValue<string>(), out mAgreementFlag);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["BaseSurface"] = BaseSurface.getJson(this, options);
@@ -49,3 +57,4 @@ namespace GeometryGym.Ifc
 		}
 	}
 }
+#endif

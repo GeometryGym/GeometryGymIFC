@@ -24,20 +24,28 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 namespace GeometryGym.Ifc
 {
 	public partial class IfcUnitaryEquipment : IfcEnergyConversionDevice
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
@@ -46,14 +54,14 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("PredefinedType", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(token.Value<string>(), true, out mPredefinedType);
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcUnitaryEquipmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			if (mPredefinedType != IfcUnitaryEquipmentTypeEnum.NOTDEFINED)
@@ -62,15 +70,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcUnitAssignment : BaseClassIfc
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			Units.AddRange(mDatabase.extractJArray<IfcUnit>(obj.GetValue("Units", StringComparison.InvariantCultureIgnoreCase) as JArray));
+			base.parseJsonObject(obj);
+			Units.AddRange(mDatabase.extractJsonArray<IfcUnit>(obj["Units"] as JsonArray));
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			JArray array = new JArray();
+			JsonArray array = new JsonArray();
 			foreach (IfcUnit unit in mUnits)
 				array.Add(mDatabase[unit.StepId].getJson(this, options));
 			obj["Units"] = array;
@@ -78,35 +86,35 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef
 	{
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mDepth);
-			token = obj.GetValue("FlangeWidth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeWidth);
-			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mWebThickness);
-			token = obj.GetValue("FlangeThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeThickness);
-			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFilletRadius);
-			token = obj.GetValue("EdgeRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mEdgeRadius);
-			token = obj.GetValue("FlangeSlope", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeSlope);
-			token = obj.GetValue("mCentreOfGravityInX", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mCentreOfGravityInX);
+			base.parseJsonObject(obj);
+			var node = obj["Depth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mDepth);
+			node = obj["FlangeWidth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeWidth);
+			node = obj["WebThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mWebThickness);
+			node = obj["FlangeThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
+			node = obj["FilletRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFilletRadius);
+			node = obj["EdgeRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mEdgeRadius);
+			node = obj["FlangeSlope"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeSlope);
+			node = obj["mCentreOfGravityInX"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mCentreOfGravityInX);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Depth"] = formatLength(mDepth);
@@ -124,3 +132,4 @@ namespace GeometryGym.Ifc
 		}
 	}
 }
+#endif

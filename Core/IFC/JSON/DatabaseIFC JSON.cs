@@ -26,7 +26,17 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+#endif
 
 namespace GeometryGym.Ifc
 {
@@ -43,7 +53,13 @@ namespace GeometryGym.Ifc
 
 			Release = ReleaseVersion.IFC4;
 			string str = reader.ReadToEnd();
-			ReadJSON(JObject.Parse(str));
+
+#if (NEWTONSOFT)
+			JsonObject jsonObject = JsonObject.Parse(str);
+#else
+			JsonObject jsonObject = JsonObject.Parse(str) as JsonObject;
+#endif
+			ReadJSON(jsonObject);
 
 			if (mContext != null)
 				mContext.initializeUnitsAndScales();
@@ -55,45 +71,44 @@ namespace GeometryGym.Ifc
 
 		internal int mNextUnassigned = 0;
 
-		public List<IBaseClassIfc> ReadJSON(JObject ifcFile)
+		public List<IBaseClassIfc> ReadJSON(JsonObject ifcFile)
 		{
 			List<IBaseClassIfc> result = new List<IBaseClassIfc>();
-			JToken token = ifcFile.First;
-			token = ifcFile["HEADER"];
-			token = ifcFile["DATA"];
-			JArray array = token as JArray;
+			var node = ifcFile["HEADER"];
+			node = ifcFile["DATA"];
+			JsonArray array = node as JsonArray;
 			if (array != null)
-				result = extractJArray<IBaseClassIfc>(array);
+				result = extractJsonArray<IBaseClassIfc>(array);
 			else
 			{
-				IBaseClassIfc obj = ParseJObject<IBaseClassIfc>(ifcFile);
+				IBaseClassIfc obj = ParseJsonObject<IBaseClassIfc>(ifcFile);
 				if (obj != null)
 					result.Add(obj);
 			}
 			return result;
 		}
-		internal List<T> extractJArray<T>(JArray array) where T : IBaseClassIfc 
+		internal List<T> extractJsonArray<T>(JsonArray array) where T : IBaseClassIfc 
 		{
 			List<T> result = new List<T>();
 			if (array == null)
 				return result;
-			foreach (JToken token in array)
+			foreach (var node in array)
 			{
-				JObject obj = token as JObject;
+				JsonObject obj = node as JsonObject;
 				if (obj != null)
 				{
-					T entity = ParseJObject<T>(obj);
+					T entity = ParseJsonObject<T>(obj);
 					if (entity != null)
 						result.Add(entity);
 				}
 				else
 				{
-					logParseError("Unrecognized token");
+					logParseError("Unrecognized node");
 				}
 			}
 			return result;
 		}
-		public T ParseJObject<T>(JObject obj) where T : IBaseClassIfc
+		public T ParseJsonObject<T>(JsonObject obj) where T : IBaseClassIfc
 		{
 			if (obj == null)
 				return default(T);
@@ -102,19 +117,19 @@ namespace GeometryGym.Ifc
 			
 			string hrefId = "";
 			BaseClassIfc result = null;
-			JToken token = obj.GetValue("href", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
+			var node = obj["href"];
+			if (node != null)
 			{
-				hrefId = token.Value<string>();
+				hrefId = node.GetValue<string>();
 				if (mDictionary.TryGetValue(hrefId, out result) && obj.Count == 1)
 					return (T)(IBaseClassIfc)result;
 			}
 			if(string.IsNullOrEmpty(hrefId))
 			{
-				token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
+				node = obj["id"];
+				if (node != null)
 				{
-					hrefId = token.Value<string>();
+					hrefId = node.GetValue<string>();
 					mDictionary.TryGetValue(hrefId, out result);
 				}
 			}
@@ -123,11 +138,22 @@ namespace GeometryGym.Ifc
 			{
 				if (type.IsAbstract)
 				{
-					JProperty jtoken = (JProperty)obj.First;
+#if (NEWTONSOFT)
+					var jtoken = (JProperty)obj.First;
 					Type valueType = BaseClassIfc.GetType(jtoken.Name);
+					string key = jtoken.Name;
+					string value = jtoken.Value.ToString();
+				
+#else
+					var pair = obj.First();
+					Type valueType = BaseClassIfc.GetType(pair.Key);
+					string key = pair.Key;
+					string value = pair.Value.ToString();
+
+#endif
 					if (valueType != null && valueType.IsSubclassOf(typeof(IfcValue)))
 					{
-						IBaseClassIfc val = ParserIfc.extractValue(jtoken.Name, jtoken.Value.ToString()) as IBaseClassIfc;
+						IBaseClassIfc val = ParserIfc.extractValue(key, value) as IBaseClassIfc;
 						if (val != null)
 							return (T)val;
 						return default(T);
@@ -135,10 +161,10 @@ namespace GeometryGym.Ifc
 				}
 
 
-				token = obj.GetValue("type", StringComparison.InvariantCultureIgnoreCase);
-				if (token != null)
+				node = obj["type"];
+				if (node != null)
 				{
-					Type nominatedType = BaseClassIfc.GetType(token.Value<string>());
+					Type nominatedType = BaseClassIfc.GetType(node.GetValue<string>());
 					if (nominatedType != null)
 						type = nominatedType;
 				}
@@ -159,7 +185,7 @@ namespace GeometryGym.Ifc
 							IfcCartesianPoint point = result as IfcCartesianPoint;
 							if (point != null)
 							{
-								point.parseJObject(obj);
+								point.parseJsonObject(obj);
 								if (point.isOrigin(Tolerance))
 								{
 									if (point.is2D)
@@ -174,7 +200,7 @@ namespace GeometryGym.Ifc
 								IfcDirection direction = result as IfcDirection;
 								if (direction != null)
 								{
-									direction.parseJObject(obj);
+									direction.parseJsonObject(obj);
 									if (!direction.is2D)
 									{
 										common = true;
@@ -199,7 +225,7 @@ namespace GeometryGym.Ifc
 									IfcAxis2Placement3D placement = result as IfcAxis2Placement3D;
 									if (placement != null)
 									{
-										placement.parseJObject(obj);
+										placement.parseJsonObject(obj);
 										if (placement.IsXYPlane(Tolerance))
 										{
 											result = Factory.XYPlanePlacement;
@@ -208,12 +234,16 @@ namespace GeometryGym.Ifc
 									}
 								}
 							}
-							token = obj.GetValue("id", StringComparison.InvariantCultureIgnoreCase);
-							if (!string.IsNullOrEmpty(hrefId))
+							node = obj["id"];
+							if (node != null)
 							{
-								if (!(result is IfcRoot))
-									result.setGlobalId(hrefId);
-								mDictionary.TryAdd(hrefId, result);
+								hrefId = node.GetValue<string>();
+								if (!string.IsNullOrEmpty(hrefId))
+								{
+									if (!(result is IfcRoot))
+										result.setGlobalId(hrefId);
+									mDictionary.TryAdd(hrefId, result);
+								}
 							}
 
 							if (common)
@@ -228,7 +258,7 @@ namespace GeometryGym.Ifc
 			}
 			if(result == null)
 				return default(T);
-			result.parseJObject(obj);
+			result.parseJsonObject(obj);
 			parseBespoke(result, obj);
 			IfcRoot root = result as IfcRoot;
 			if (root != null)
@@ -236,14 +266,14 @@ namespace GeometryGym.Ifc
 			return (T)(IBaseClassIfc)result;
 		}
 
-		partial void parseBespoke(BaseClassIfc entity, JObject jObject);
-		public JObject JSON() { return ToJSON(""); }
-		public JObject ToJSON(string filename)
+		partial void parseBespoke(BaseClassIfc entity, JsonObject JsonObject);
+		public JsonObject JSON() { return ToJSON(""); }
+		public JsonObject ToJSON(string filename)
 		{
 			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions() { };
 			return ToJSON(filename, options);
 		}
-		public JObject ToJSON(string filename, BaseClassIfc.SetJsonOptions options)
+		public JsonObject ToJSON(string filename, BaseClassIfc.SetJsonOptions options)
 		{ 
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
@@ -251,13 +281,13 @@ namespace GeometryGym.Ifc
 			options.Version = mRelease;
 			options.LengthDigitCount = mLengthDigits;
 
-			JObject ifcFile = new JObject();
-			JObject header = new JObject();
-			JObject fileDescription = new JObject();
+			JsonObject ifcFile = new JsonObject();
+			JsonObject header = new JsonObject();
+			JsonObject fileDescription = new JsonObject();
 			fileDescription["description"] = "ViewDefinition[" + viewDefinition + "]";
 			fileDescription["implementation_level"] = "2;1";
 			header["FILE_DESCRIPTION"] = fileDescription;
-			JObject fileName = new JObject();
+			JsonObject fileName = new JsonObject();
 			fileName["name"] = filename;
 			DateTime now = DateTime.Now;
 			fileName["time_stamp"] = now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second;
@@ -267,16 +297,16 @@ namespace GeometryGym.Ifc
 			fileName["originating_system"] = Factory.ApplicationFullName;
 			fileName["authorization"] = "None";
 			header["FILE_NAME"] = fileName;
-			JObject fileSchema = new JObject();
+			JsonObject fileSchema = new JsonObject();
 			fileSchema["schema_identifiers"] = mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4";
 			header["FILE_SCHEMA"] = fileSchema;
 			ifcFile["HEADER"] = header;
 
-			JArray data = new JArray();
+			JsonArray data = new JsonArray();
 			IfcContext context = this.mContext;
 			if (context != null)
 			{
-				JObject jcontext = context.getJson(null, options); //null);//
+				JsonObject jcontext = context.getJson(null, options); 
 				data.Add(jcontext);
 			}
 			if(context == null || (context.mIsDecomposedBy.Count == 0 && context.Declares.Count == 0))
@@ -301,34 +331,52 @@ namespace GeometryGym.Ifc
 			ifcFile["DATA"] = data;
 			if (!string.IsNullOrEmpty(filename))
 			{
+#if (NEWTONSOFT)
 				StreamWriter sw = new StreamWriter(filename);
-#if(DEBUG)
+#if (DEBUG)
 				sw.Write(ifcFile.ToString());
 #else
 				sw.Write(ifcFile.ToString(Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonConverter[0]));
 #endif
 				sw.Close();
+#else
+				JsonSerializerOptions jsonoptions = new JsonSerializerOptions();
+				jsonoptions.WriteIndented = true;
+				string jsonString = JsonSerializer.Serialize(ifcFile, jsonoptions);
+				File.WriteAllText(filename, jsonString);
+#endif
 			}
 			Thread.CurrentThread.CurrentUICulture = current;
 			return ifcFile;
 			
 		}
 		
-		internal static JObject extract(IfcValue value)
+		internal static JsonObject extract(IfcValue value)
 		{
-			JObject result = new JObject();
+			JsonObject result = new JsonObject();
 			result[value.GetType().Name] = value.ValueString;
 			return result;
 		}
-		internal static IfcValue ParseValue(JObject obj)
+		internal static IfcValue ParseValue(JsonObject obj)
 		{
+#if (NEWTONSOFT)
 			JProperty token = (JProperty) obj.First;
 			return ParserIfc.extractValue(token.Name, token.Value.ToString());
+#else
+			var token = obj.First();
+			return ParserIfc.extractValue(token.Key, token.Value.ToString());
+#endif
 		}
 	}
 
 	public static class JsonIFCExtensions
 	{
+
+#if (NEWTONSOFT)
+		public static T GetValue<T>(this JToken node)
+		{
+			return node.Value<T>();
+		}
 		public static void StripToEssentialIFC(this JToken containerToken)
 		{
 			HashSet<string> toStrip = new HashSet<string>();
@@ -357,7 +405,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+#endif
 	}
 }
-
- 
+#endif

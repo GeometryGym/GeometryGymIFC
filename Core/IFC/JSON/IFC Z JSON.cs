@@ -25,42 +25,43 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
+#if (!NOIFCJSON)
+#if (NEWTONSOFT)
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonObject = Newtonsoft.Json.Linq.JObject;
+using JsonArray = Newtonsoft.Json.Linq.JArray;
+#else
+using System.Text.Json.Nodes;
+#endif
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcZShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcZShapeProfileDef 
 	{
-		//internal double mDepth;// : IfcPositiveLengthMeasure;
-		//internal double mFlangeWidth;// : IfcPositiveLengthMeasure;
-		//internal double mWebThickness;// : IfcPositiveLengthMeasure;
-		//internal double mFlangeThickness;// : IfcPositiveLengthMeasure;
-		//internal double mFilletRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
-		//internal double mEdgeRadius = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
-
-		internal override void parseJObject(JObject obj)
+		internal override void parseJsonObject(JsonObject obj)
 		{
-			base.parseJObject(obj);
-			JToken token = obj.GetValue("Depth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mDepth);
-			token = obj.GetValue("FlangeWidth", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeWidth);
-			token = obj.GetValue("WebThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mWebThickness);
-			token = obj.GetValue("FlangeThickness", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFlangeThickness);
-			token = obj.GetValue("FilletRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mFilletRadius);
-			token = obj.GetValue("EdgeRadius", StringComparison.InvariantCultureIgnoreCase);
-			if (token != null)
-				double.TryParse(token.Value<string>(), out mEdgeRadius);
+			base.parseJsonObject(obj);
+			var node = obj["Depth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mDepth);
+			node = obj["FlangeWidth"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeWidth);
+			node = obj["WebThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mWebThickness);
+			node = obj["FlangeThickness"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
+			node = obj["FilletRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mFilletRadius);
+			node = obj["EdgeRadius"];
+			if (node != null)
+				double.TryParse(node.GetValue<string>(), out mEdgeRadius);
 		}
-		protected override void setJSON(JObject obj, BaseClassIfc host, SetJsonOptions options)
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["Depth"] = formatLength(mDepth);
@@ -74,3 +75,4 @@ namespace GeometryGym.Ifc
 		}
 	}
 }
+#endif
