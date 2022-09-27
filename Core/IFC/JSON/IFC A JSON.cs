@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -88,9 +88,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["StartDistAlong"];
-			if (node != null)
-				StartDistAlong = node.GetValue<double>();
+			mStartDistAlong = extractDouble(obj["StartDistAlong"]);
 			Segments.AddRange(mDatabase.extractJsonArray<IfcAlignment2DHorizontalSegment>(obj["Segments"] as JsonArray));
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -182,14 +180,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["RailHeadDistance"];
-			if (node != null)
-				mRailHeadDistance = node.GetValue<double>();
+			mRailHeadDistance = extractDouble(obj["RailHeadDistance"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["RailHeadDistance"] = mRailHeadDistance.ToString();
+			obj["RailHeadDistance"] = mRailHeadDistance;
 		}
 	
 	}
@@ -198,25 +194,13 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["StartDistAlong"];
-			if (node != null)
-				mStartDistAlong = node.GetValue<double>();
-			node = obj["HorizontalLength"];
-			if (node != null)
-				mHorizontalLength = node.GetValue<double>();
-			node = obj["StartCantLeft"];
-			if (node != null)
-				mStartCantLeft = node.GetValue<double>();
-			node = obj["EndCantLeft"];
-			if (node != null)
-				mEndCantLeft = node.GetValue<double>();
-			node = obj["StartCantRight"];
-			if (node != null)
-				mStartCantRight = node.GetValue<double>();
-			node = obj["EndCantRight"];
-			if (node != null)
-				mEndCantRight = node.GetValue<double>();
-			node = obj["PredefinedType"];
+			mStartDistAlong = extractDouble(obj["StartDistAlong"]);
+			mHorizontalLength = extractDouble(obj["HorizontalLength"]);
+			mStartCantLeft = extractDouble(obj["StartCantLeft"]);
+			mEndCantLeft = extractDouble(obj["EndCantLeft"]);
+			mStartCantRight = extractDouble(obj["StartCantRight"]);
+			mEndCantRight = extractDouble(obj["EndCantRight"]);
+			var node = obj["PredefinedType"];
 			if (node != null)
 				Enum.TryParse<IfcAlignmentCantSegmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
@@ -265,9 +249,7 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["StartDistAlong"];
-			if (node != null)
-				mStartDistAlong = node.GetValue<double>();
+			mStartDistAlong = extractDouble(obj["StartDistAlong"]);
 			mHorizontalSegments.AddRange(mDatabase.extractJsonArray<IfcAlignmentHorizontalSegment>(obj["Segments"] as JsonArray));
 		}
 	}
@@ -359,37 +341,25 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["StartDistAlong"] = mStartDistAlong.ToString();
-			obj["HorizontalLength"] = mHorizontalLength.ToString();
-			obj["StartHeight"] = mStartHeight.ToString();
-			obj["StartGradient"] = mStartGradient.ToString();
-			obj["EndGradient"] = mStartGradient.ToString();
+			obj["StartDistAlong"] = mStartDistAlong;
+			obj["HorizontalLength"] = mHorizontalLength;
+			obj["StartHeight"] = mStartHeight;
+			obj["StartGradient"] = mStartGradient;
+			obj["EndGradient"] = mStartGradient;
 			if(!double.IsNaN(mRadiusOfCurvature))
-				obj["RadiusOfCurvature"] = mRadiusOfCurvature.ToString();
+				obj["RadiusOfCurvature"] = mRadiusOfCurvature;
 			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["StartDistAlong"];
-			if (node != null)
-				mStartDistAlong = node.GetValue<double>();
-			node = obj["HorizontalLength"];
-			if (node != null)
-				mHorizontalLength = node.GetValue<double>();
-			node = obj["StartHeight"];
-			if (node != null)
-				mStartHeight = node.GetValue<double>();
-			node = obj["StartGradient"];
-			if (node != null)
-				mStartGradient = node.GetValue<double>();
-			node = obj["EndGradient"];
-			if (node != null)
-				mEndGradient = node.GetValue<double>();
-			node = obj["RadiusOfCurvature"];
-			if (node != null)
-				mRadiusOfCurvature = node.GetValue<double>();
-			node = obj["PredefinedType"];
+			mStartDistAlong = extractDouble(obj["StartDistAlong"]);
+			mHorizontalLength = extractDouble(obj["HorizontalLength"]);
+			mStartHeight = extractDouble(obj["StartHeight"]);
+			mStartGradient = extractDouble(obj["StartGradient"]);
+			mEndGradient = extractDouble(obj["EndGradient"]);
+			mRadiusOfCurvature = extractDouble(obj["RadiusOfCurvature"]);
+			var node = obj["PredefinedType"];
 			if (node != null)
 				Enum.TryParse<IfcAlignmentVerticalSegmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
@@ -517,45 +487,19 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["BottomFlangeWidth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mBottomFlangeWidth);
-			node = obj["OverallDepth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mOverallDepth);
-			node = obj["WebThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mWebThickness);
-			node = obj["BottomFlangeThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mBottomFlangeThickness);
-			node = obj["BottomFlangeFilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mBottomFlangeFilletRadius);
-			node = obj["TopFlangeWidth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mTopFlangeWidth);
-			node = obj["TopFlangeThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mTopFlangeThickness);
-			node = obj["TopFlangeFilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mTopFlangeFilletRadius);
-			node = obj["BottomFlangeEdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mBottomFlangeEdgeRadius);
-			node = obj["BottomFlangeSlope"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mBottomFlangeSlope);
-			node = obj["TopFlangeEdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mTopFlangeEdgeRadius);
-			node = obj["TopFlangeSlope"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mTopFlangeSlope);
-			node = obj["CentreOfGravityInY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mCentreOfGravityInY);
+			mBottomFlangeWidth = extractDouble(obj["BottomFlangeWidth"]);
+			mOverallDepth = extractDouble(obj["OverallDepth"]);
+			mWebThickness = extractDouble(obj["WebThickness"]);
+			mBottomFlangeThickness = extractDouble(obj["BottomFlangeThickness"]);
+			mBottomFlangeFilletRadius = extractDouble(obj["BottomFlangeFilletRadius"]);
+			mTopFlangeWidth = extractDouble(obj["TopFlangeWidth"]);
+			mTopFlangeThickness = extractDouble(obj["TopFlangeThickness"]);
+			mTopFlangeFilletRadius = extractDouble(obj["TopFlangeFilletRadius"]);
+			mBottomFlangeEdgeRadius = extractDouble(obj["BottomFlangeEdgeRadius"]);
+			mBottomFlangeSlope = extractDouble(obj["BottomFlangeSlope"]);
+			mTopFlangeEdgeRadius = extractDouble(obj["TopFlangeEdgeRadius"]);
+			mTopFlangeSlope = extractDouble(obj["TopFlangeSlope"]);
+			mCentreOfGravityInY = extractDouble(obj["CentreOfGravityInY"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

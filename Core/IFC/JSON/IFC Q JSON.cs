@@ -25,7 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,17 +37,13 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcQuantityArea : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityArea
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["AreaValue"];
-			if (node != null)
-				AreaValue = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			AreaValue = extractDouble(obj["AreaValue"]);
+			Formula = extractString( obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -57,17 +53,13 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public partial class IfcQuantityCount : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityCount
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["CountValue"];
-			if (node != null)
-				CountValueDouble = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			CountValueDouble = extractDouble(obj["CountValue"]);
+			Formula = extractString(obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -77,17 +69,13 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public partial class IfcQuantityLength : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityLength
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["LengthValue"];
-			if (node != null)
-				LengthValue = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			LengthValue = extractDouble(obj["LengthValue"]);
+			Formula = extractString(obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -96,17 +84,28 @@ namespace GeometryGym.Ifc
 			base.setAttribute(obj, "Formula", Formula);
 		}
 	}
-	public partial class IfcQuantityTime : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityNumber
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["TimeValue"];
-			if (node != null)
-				TimeValue = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			NumberValue = extractDouble(obj["NumberValue"]);
+			Formula = extractString(obj["Formula"]);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["NumberValue"] = NumberValue;
+			base.setAttribute(obj, "Formula", Formula);
+		}
+	}
+	public partial class IfcQuantityTime 
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			TimeValue = extractDouble(obj["TimeValue"]);
+			Formula = extractString(obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -121,12 +120,8 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["VolumeValue"];
-			if (node != null)
-				VolumeValue = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			VolumeValue = extractDouble(obj["VolumeValue"]);
+			Formula = extractString(obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -136,17 +131,13 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public partial class IfcQuantityWeight : IfcPhysicalSimpleQuantity
+	public partial class IfcQuantityWeight 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["WeightValue"];
-			if (node != null)
-				WeightValue = node.GetValue<double>();
-			node = obj["Formula"];
-			if (node != null)
-				Formula = node.GetValue<string>();
+			WeightValue = extractDouble(obj["WeightValue"]);
+			Formula = extractString(obj["Formula"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -154,7 +145,6 @@ namespace GeometryGym.Ifc
 			obj["WeightValue"] = WeightValue;
 			base.setAttribute(obj, "Formula", Formula);
 		}
-
 	}
 }
 #endif

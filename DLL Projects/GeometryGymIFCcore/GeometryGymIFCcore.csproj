@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <PackageId>GeometryGymIFC_Core</PackageId>
-    <Version>0.2.03</Version>
+    <Version>0.2.04</Version>
     <Authors>Geometry Gym</Authors>
     <Product>GeometryGymIFC_Core</Product>
-    <Description>.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
+    <Description>.Net C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
 
 License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Description>
     <Copyright>Copyright (c) 2016 Geometry Gym Pty Ltd</Copyright>
@@ -14,8 +14,8 @@ License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Descr
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/GeometryGym/GeometryGymIFC</RepositoryUrl>
     <PackageTags>BIM, IFC, openBIM</PackageTags>
-    <AssemblyVersion>0.2.03.0</AssemblyVersion>
-    <FileVersion>0.2.03.0</FileVersion>
+    <AssemblyVersion>0.2.04.0</AssemblyVersion>
+    <FileVersion>0.2.04.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -53,6 +53,32 @@ License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Descr
     <Compile Include="..\..\Core\IFC\IFC X.cs" Link="IFC\IFC X.cs" />
     <Compile Include="..\..\Core\IFC\IFC Y.cs" Link="IFC\IFC Y.cs" />
     <Compile Include="..\..\Core\IFC\IFC Z.cs" Link="IFC\IFC Z.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\BaseClassIFC JSON.cs" Link="IFC\JSON\BaseClassIFC JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\DatabaseIFC JSON.cs" Link="IFC\JSON\DatabaseIFC JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC A JSON.cs" Link="IFC\JSON\IFC A JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC B JSON.cs" Link="IFC\JSON\IFC B JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC C JSON.cs" Link="IFC\JSON\IFC C JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC D JSON.cs" Link="IFC\JSON\IFC D JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC E JSON.cs" Link="IFC\JSON\IFC E JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC F JSON.cs" Link="IFC\JSON\IFC F JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC G JSON.cs" Link="IFC\JSON\IFC G JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC H JSON.cs" Link="IFC\JSON\IFC H JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC I JSON.cs" Link="IFC\JSON\IFC I JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC J JSON.cs" Link="IFC\JSON\IFC J JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC K JSON.cs" Link="IFC\JSON\IFC K JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC L JSON.cs" Link="IFC\JSON\IFC L JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC M JSON.cs" Link="IFC\JSON\IFC M JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC N JSON.cs" Link="IFC\JSON\IFC N JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC O JSON.cs" Link="IFC\JSON\IFC O JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC P JSON.cs" Link="IFC\JSON\IFC P JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC Q JSON.cs" Link="IFC\JSON\IFC Q JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC R JSON.cs" Link="IFC\JSON\IFC R JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC S JSON.cs" Link="IFC\JSON\IFC S JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC T JSON.cs" Link="IFC\JSON\IFC T JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC U JSON.cs" Link="IFC\JSON\IFC U JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC V JSON.cs" Link="IFC\JSON\IFC V JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC W JSON.cs" Link="IFC\JSON\IFC W JSON.cs" />
+    <Compile Include="..\..\Core\IFC\JSON\IFC Z JSON.cs" Link="IFC\JSON\IFC Z JSON.cs" />
     <Compile Include="..\..\Core\IFC\ParserIFC.cs" Link="IFC\ParserIFC.cs" />
     <Compile Include="..\..\Core\IFC\Property Sets.cs" Link="IFC\Property Sets.cs" />
     <Compile Include="..\..\Core\IFC\Quantity Sets.cs" Link="IFC\Quantity Sets.cs" />
@@ -123,6 +149,7 @@ License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Descr
 
   <ItemGroup>
     <Folder Include="IFC\Drawing\" />
+    <Folder Include="IFC\JSON\" />
     <Folder Include="IFC\STEP\" />
     <Folder Include="IFC\XML\" />
     <Folder Include="STEP\" />

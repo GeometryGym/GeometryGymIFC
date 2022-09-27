@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -41,27 +41,21 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["QuadraticTerm"] = mQuadraticTerm.ToString();
+			obj["QuadraticTerm"] = mQuadraticTerm;
 			if (double.IsNaN(mLinearTerm))
-				obj["LinearTerm"] = mLinearTerm.ToString();
+				obj["LinearTerm"] = mLinearTerm;
 			if (double.IsNaN(mConstantTerm))
-				obj["ConstantTerm"] = mConstantTerm.ToString();
+				obj["ConstantTerm"] = mConstantTerm;
 		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["QuadraticTerm"];
-			if (node != null)
-				mLinearTerm = node.GetValue<double>();
-			node = obj["LinearTerm"];
-			if (node != null)
-				mConstantTerm = node.GetValue<double>();
-			node = obj["ConstantTerm"];
-			if (node != null)
-				mConstantTerm = node.GetValue<double>();
+			QuadraticTerm = extractDouble(obj["QuadraticTerm"]);
+			LinearTerm = extractDouble(obj["LinearTerm"]);
+			ConstantTerm = extractDouble(obj["ConstantTerm"]);
 		}
 	}
-	public partial class IfcSectionedSurface : IfcSurface
+	public partial class IfcSectionedSurface
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -69,7 +63,8 @@ namespace GeometryGym.Ifc
 			obj["Directrix"] = Directrix.getJson(this, options);
 			createArray(obj, "CrossSectionPositions", CrossSectionPositions, this, options);
 			createArray(obj, "CrossSections", CrossSections, this, options);
-			obj["FixedAxisVertical"] = mFixedAxisVertical;
+			if(mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3)
+				obj["FixedAxisVertical"] = mFixedAxisVertical;
 		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -84,7 +79,7 @@ namespace GeometryGym.Ifc
 				mFixedAxisVertical = node.GetValue<bool>();
 		}
 	}
-	public abstract partial class IfcSegment : IfcGeometricRepresentationItem
+	public abstract partial class IfcSegment
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -119,7 +114,7 @@ namespace GeometryGym.Ifc
 				EndPoint = mDatabase.ParseJsonObject<IfcPlacement>(jobj);
 		}
 	}
-	public partial class IfcShapeAspect : BaseClassIfc
+	public partial class IfcShapeAspect
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -159,7 +154,7 @@ namespace GeometryGym.Ifc
 				obj["OfShapeAspect"] = mOfShapeAspect.getJson(this, options);
 		}
 	}
-	public partial class IfcSign : IfcElementComponent
+	public partial class IfcSign
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -175,7 +170,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSignTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcSignal : IfcFlowTerminal
+	public partial class IfcSignal
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -191,7 +186,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSignalTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcSignalType : IfcFlowTerminalType
+	public partial class IfcSignalType 
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -206,7 +201,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSignalTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcSignType : IfcElementComponentType
+	public partial class IfcSignType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -221,7 +216,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcSignTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcSimplePropertyTemplate : IfcPropertyTemplate
+	public partial class IfcSimplePropertyTemplate
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -259,7 +254,7 @@ namespace GeometryGym.Ifc
 
 	}
 
-	public partial class IfcSIUnit : IfcNamedUnit
+	public partial class IfcSIUnit
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -284,7 +279,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["CosineTerm"] = mSineTerm.ToString();
+			obj["SineTerm"] = mSineTerm;
 			if(!double.IsNaN(mLinearTerm))
 				obj["LinearTerm"] = mLinearTerm.ToString();
 			if(!double.IsNaN(mConstantTerm))
@@ -293,18 +288,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["SineTerm"];
-			if (node != null)
-				mSineTerm = node.GetValue<double>();
-			node = obj["LinearTerm"];
-			if (node != null)
-				mLinearTerm = node.GetValue<double>();
-			node = obj["ConstantTerm"];
-			if (node != null)
-				mConstantTerm = node.GetValue<double>();
+			mSineTerm = extractDouble(obj["SineTerm"]);
+			mLinearTerm = extractDouble(obj["LinearTerm"]);
+			mConstantTerm = extractDouble(obj["ConstantTerm"]);
 		}
 	}
-	public partial class IfcSlab : IfcBuiltElement
+	public partial class IfcSlab
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -320,7 +309,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcSlabType : IfcBuiltElementType
+	public partial class IfcSlabType
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -336,7 +325,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcSpace : IfcSpatialStructureElement, IfcSpaceBoundarySelect
+	public partial class IfcSpace
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -344,9 +333,7 @@ namespace GeometryGym.Ifc
 			var node = obj["PredefinedType"];
 			if (node != null)
 				Enum.TryParse<IfcSpaceTypeEnum>(node.GetValue<string>(), out mPredefinedType);
-			node = obj["ElevationWithFlooring"];
-			if (node != null)
-				mElevationWithFlooring = node.GetValue<double>();
+			mElevationWithFlooring = extractDouble(obj["ElevationWithFlooring"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -359,7 +346,7 @@ namespace GeometryGym.Ifc
 				obj["ElevationWithFlooring"] = mElevationWithFlooring;
 		}
 	}
-	public partial class IfcSpaceHeater : IfcFlowTerminal
+	public partial class IfcSpaceHeater
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -375,7 +362,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcSpaceHeaterType : IfcFlowTerminalType
+	public partial class IfcSpaceHeaterType
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -391,14 +378,12 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcSpatialElement : IfcProduct //ABSTRACT SUPERTYPE OF (ONEOF (IfcExternalSpatialStructureElement ,IfcSpatialStructureElement ,IfcSpatialZone))
+	public abstract partial class IfcSpatialElement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["LongName"];
-			if (node != null)
-				LongName = node.GetValue<string>();
+			LongName = extractString(obj["LongName"]);
 			foreach (IfcRelContainedInSpatialStructure rcss in mDatabase.extractJsonArray<IfcRelContainedInSpatialStructure>(obj["ContainsElements"] as JsonArray))
 				rcss.RelatingStructure = this;
 			foreach (IfcRelServicesBuildings rsbs in mDatabase.extractJsonArray<IfcRelServicesBuildings>(obj["ServicedBySystems"] as JsonArray))
@@ -431,7 +416,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcSpatialStructureElement : IfcSpatialElement /*ABSTRACT SUPERTYPE OF (ONEOF (IfcBuilding ,IfcBuildingStorey ,IfcSite ,IfcSpace, IfcCivilStructureElement))*/
+	public abstract partial class IfcSpatialStructureElement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -462,7 +447,7 @@ namespace GeometryGym.Ifc
 				Position = mDatabase.ParseJsonObject<IfcAxis2Placement>(jobj);
 		}
 	}
-	public abstract partial class IfcStructuralAction : IfcStructuralActivity // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveAction, IfcStructuralPointAction, IfcStructuralSurfaceAction))
+	public abstract partial class IfcStructuralAction 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -488,7 +473,7 @@ namespace GeometryGym.Ifc
 				obj["CausedBy"] = CausedBy.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcStructuralActivity : IfcProduct
+	public abstract partial class IfcStructuralActivity
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -512,7 +497,7 @@ namespace GeometryGym.Ifc
 				obj["AssignedToStructuralItem"] = mAssignedToStructuralItem.getJson(this, options);
 		}
 	}
-	public partial class IfcStructuralAnalysisModel : IfcSystem
+	public partial class IfcStructuralAnalysisModel
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -540,7 +525,7 @@ namespace GeometryGym.Ifc
 				obj["SharedPlacement"] = SharedPlacement.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcStructuralConnection : IfcStructuralItem //ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralCurveConnection ,IfcStructuralPointConnection ,IfcStructuralSurfaceConnection))
+	public abstract partial class IfcStructuralConnection 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -568,7 +553,7 @@ namespace GeometryGym.Ifc
 				obj["ConnectsStructuralMembers"] = array;
 		}
 	}
-	public abstract partial class IfcStructuralConnectionCondition : BaseClassIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcFailureConnectionCondition ,IfcSlippageConnectionCondition));
+	public abstract partial class IfcStructuralConnectionCondition
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -583,7 +568,7 @@ namespace GeometryGym.Ifc
 			base.setAttribute(obj, "Name", Name);
 		}
 	}
-	public partial class IfcStructuralCurveAction : IfcStructuralAction // IFC4 SUPERTYPE OF(IfcStructuralLinearAction)
+	public partial class IfcStructuralCurveAction
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -603,7 +588,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcStructuralCurveMember : IfcStructuralMember
+	public partial class IfcStructuralCurveMember
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -624,7 +609,7 @@ namespace GeometryGym.Ifc
 				obj["Axis"] = Axis.getJson(this, options);
 		}
 	}
-	public partial class IfcStructuralCurveReaction : IfcStructuralReaction
+	public partial class IfcStructuralCurveReaction
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -640,7 +625,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcStructuralItem : IfcProduct, IfcStructuralActivityAssignmentSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralConnection ,IfcStructuralMember))
+	public abstract partial class IfcStructuralItem
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -649,29 +634,17 @@ namespace GeometryGym.Ifc
 				rcsa.RelatingElement = this;
 		}
 	}
-	public partial class IfcStructuralLoadLinearForce : IfcStructuralLoadStatic
+	public partial class IfcStructuralLoadLinearForce
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["LinearForceX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearForceX);
-			node = obj["LinearForceY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearForceY);
-			node = obj["LinearForceZ"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearForceZ);
-			node = obj["LinearMomentX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearMomentX);
-			node = obj["LinearMomentY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearMomentY);
-			node = obj["LinearMomentZ"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLinearMomentZ);
+			mLinearForceX = extractDouble(obj["LinearForceX"]);
+			mLinearForceY = extractDouble(obj["LinearForceY"]);
+			mLinearForceZ = extractDouble(obj["LinearForceZ"]);
+			mLinearMomentX = extractDouble(obj["LinearMomentX"]);
+			mLinearMomentY = extractDouble(obj["LinearMomentY"]);
+			mLinearMomentZ = extractDouble(obj["LinearMomentZ"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -690,29 +663,17 @@ namespace GeometryGym.Ifc
 				obj["LinearMomentZ"] = mLinearMomentZ;
 		}
 	}
-	public partial class IfcStructuralLoadSingleForce : IfcStructuralLoadStatic
+	public partial class IfcStructuralLoadSingleForce
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["ForceX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mForceX);
-			node = obj["ForceY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mForceY);
-			node = obj["ForceZ"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mForceZ);
-			node = obj["MomentX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mMomentX);
-			node = obj["MomentY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mMomentY);
-			node = obj["MomentZ"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mMomentZ);
+			mForceX = extractDouble(obj["ForceX"]);
+			mForceY = extractDouble(obj["ForceY"]);
+			mForceZ = extractDouble(obj["ForceZ"]);
+			mMomentX = extractDouble(obj["MomentX"]);
+			mMomentY = extractDouble(obj["MomentY"]);
+			mMomentZ = extractDouble(obj["MomentZ"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -731,7 +692,7 @@ namespace GeometryGym.Ifc
 				obj["MomentZ"] = mMomentZ;
 		}
 	}
-	public abstract partial class IfcStructuralMember : IfcStructuralItem //ABSTRACT SUPERTYPE OF(ONEOF(IfcStructuralCurveMember, IfcStructuralSurfaceMember))
+	public abstract partial class IfcStructuralMember 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -753,7 +714,7 @@ namespace GeometryGym.Ifc
 				obj["ConnectedBy"] = array;
 		}
 	}
-	public partial class IfcStructuralPointConnection : IfcStructuralConnection
+	public partial class IfcStructuralPointConnection
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -769,7 +730,7 @@ namespace GeometryGym.Ifc
 				obj["ConditionCoordinateSystem"] = ConditionCoordinateSystem.getJson(this, options);
 		}
 	}
-	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
+	public partial class IfcStructuralSurfaceMember 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -789,7 +750,7 @@ namespace GeometryGym.Ifc
 			obj["Thickness"] = mThickness;
 		}
 	}
-	public partial class IfcStyledItem : IfcRepresentationItem
+	public partial class IfcStyledItem
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -816,7 +777,7 @@ namespace GeometryGym.Ifc
 			base.setAttribute(obj, "Name", Name);
 		}
 	}
-	public partial class IfcSurfaceStyle : IfcPresentationStyle, IfcPresentationStyleSelect
+	public partial class IfcSurfaceStyle 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -833,7 +794,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "Styles", Styles, this, options);
 		}
 	}
-	public partial class IfcSurfaceStyleRefraction : IfcPresentationItem, IfcSurfaceStyleElementSelect
+	public partial class IfcSurfaceStyleRefraction 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -854,7 +815,7 @@ namespace GeometryGym.Ifc
 				obj["DispersionFactor"] = mDispersionFactor;
 		}
 	}
-	public partial class IfcSurfaceStyleRendering : IfcSurfaceStyleShading
+	public partial class IfcSurfaceStyleRendering
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -907,7 +868,7 @@ namespace GeometryGym.Ifc
 			obj["ReflectanceMethod"] = ReflectanceMethod.ToString();
 		}
 	}
-	public partial class IfcSurfaceStyleShading : IfcPresentationItem, IfcSurfaceStyleElementSelect
+	public partial class IfcSurfaceStyleShading
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -928,7 +889,7 @@ namespace GeometryGym.Ifc
 				obj["Transparency"] = Transparency;
 		}
 	}
-	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/
+	public abstract partial class IfcSweptAreaSolid
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -948,7 +909,7 @@ namespace GeometryGym.Ifc
 				obj["Position"] = Position.getJson(this, options);
 		}
 	}
-	public partial class IfcSweptDiskSolid : IfcSolidModel
+	public partial class IfcSweptDiskSolid
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -963,7 +924,7 @@ namespace GeometryGym.Ifc
 				obj["EndParam"] = InnerRadius;
 		}
 	}
-	public partial class IfcSystem : IfcGroup //SUPERTYPE OF(ONEOF(IfcBuildingSystem, IfcDistributionSystem, IfcStructuralAnalysisModel, IfcZone))
+	public partial class IfcSystem 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

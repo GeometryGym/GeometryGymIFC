@@ -25,7 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,7 +37,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcKerb : IfcBuiltElement
+	public partial class IfcKerb
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 				mMountable = node.GetValue<bool>();
 		}
 	}
-	public partial class IfcKerbType : IfcBuiltElementType
+	public partial class IfcKerbType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

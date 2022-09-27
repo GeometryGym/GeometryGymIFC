@@ -25,7 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,24 +42,12 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["Depth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mDepth);
-			node = obj["FlangeWidth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeWidth);
-			node = obj["WebThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mWebThickness);
-			node = obj["FlangeThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
-			node = obj["FilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFilletRadius);
-			node = obj["EdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mEdgeRadius);
+			mDepth = extractDouble(obj["Depth"]);
+			mFlangeWidth = extractDouble(obj["FlangeWidth"]);
+			mWebThickness = extractDouble(obj["WebThickness"]);
+			mFlangeThickness = extractDouble(obj["FlangeThickness"]);
+			mFilletRadius = extractDouble(obj["FilletRadius"]);
+			mEdgeRadius = extractDouble(obj["EdgeRadius"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

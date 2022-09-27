@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,14 +36,14 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcValue : IfcMetricValueSelect //SELECT(IfcMeasureValue,IfcSimpleValue,IfcDerivedMeasureValue); stpentity parse method
+	public abstract partial class IfcValue
 	{
 		public JsonObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options)
 		{
 			return DatabaseIfc.extract(this);
 		}
 	}
-	public partial class IfcValveType : IfcFlowControllerType
+	public partial class IfcValveType 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -78,7 +78,7 @@ namespace GeometryGym.Ifc
 				mMagnitude = node.GetValue<double>();
 		}
 	}
-	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
+	public partial class IfcVertexPoint
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

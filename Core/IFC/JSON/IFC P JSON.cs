@@ -26,7 +26,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,8 +38,8 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcParameterizedProfileDef : IfcProfileDef //ABSTRACT SUPERTYPE OF (ONEOF (IfcCShapeProfileDef ,IfcCircleProfileDef ,IfcCraneRailAShapeProfileDef ,IfcCraneRailFShapeProfileDef ,
-	{//IfcEllipseProfileDef ,IfcIShapeProfileDef ,IfcLShapeProfileDef ,IfcRectangleProfileDef ,IfcTShapeProfileDef ,IfcTrapeziumProfileDef ,IfcUShapeProfileDef ,IfcZShapeProfileDef))*/
+	public abstract partial class IfcParameterizedProfileDef 
+	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
@@ -60,7 +60,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcPavement : IfcBuiltElement
+	public partial class IfcPavement
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcPavementTypeEnum>(node.GetValue<string>(), out mPredefinedType);
 		}
 	}
-	public partial class IfcPavementType : IfcBuiltElementType
+	public partial class IfcPavementType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -93,7 +93,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcPavementTypeEnum>(node.GetValue<string>(), out mPredefinedType);
 		}
 	}
-	public partial class IfcPerson : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
+	public partial class IfcPerson
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -157,7 +157,7 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	public partial class IfcPersonAndOrganization : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
+	public partial class IfcPersonAndOrganization
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -185,7 +185,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcPhysicalQuantity : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF(ONEOF(IfcPhysicalComplexQuantity, IfcPhysicalSimpleQuantity));
+	public abstract partial class IfcPhysicalQuantity
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -204,7 +204,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Description", Description);
 		}
 	}
-	public partial class IfcPipeFittingType : IfcFlowFittingType
+	public partial class IfcPipeFittingType
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -220,7 +220,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
+	public abstract partial class IfcPlacement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -239,7 +239,7 @@ namespace GeometryGym.Ifc
 			obj["Location"] = mLocation.getJson(this, options);
 		}
 	}
-	public partial class IfcPolyline : IfcBoundedCurve
+	public partial class IfcPolyline
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -252,7 +252,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "Points", Points, this, options);
 		}
 	}
-	public partial class IfcPolyLoop : IfcLoop
+	public partial class IfcPolyLoop
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -265,7 +265,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "Polygon", Polygon, this, options);
 		}
 	}
-	public partial class IfcPolynomialCurve : IfcCurve
+	public partial class IfcPolynomialCurve
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -277,7 +277,7 @@ namespace GeometryGym.Ifc
 			Position = mDatabase.ParseJsonObject<IfcPlacement>(obj);
 		}
 	}
-	public partial class IfcPresentationLayerAssignment : BaseClassIfc //SUPERTYPE OF	(IfcPresentationLayerWithStyle);
+	public partial class IfcPresentationLayerAssignment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -299,7 +299,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Identifier", Identifier);
 		}
 	}
-	public partial class IfcPresentationLayerWithStyle : IfcPresentationLayerAssignment
+	public partial class IfcPresentationLayerWithStyle
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -324,7 +324,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "LayerStyles", LayerStyles, this, options);
 		}
 	}
-	public abstract partial class IfcPresentationStyle : BaseClassIfc, IfcStyleAssignmentSelect //ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveStyle,IfcFillAreaStyle,IfcSurfaceStyle,IfcSymbolStyle,IfcTextStyle));
+	public abstract partial class IfcPresentationStyle
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -338,7 +338,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcPresentationStyleAssignment : BaseClassIfc, IfcStyleAssignmentSelect //DEPRECATED IFC4
+	public partial class IfcPresentationStyleAssignment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -355,7 +355,7 @@ namespace GeometryGym.Ifc
 			obj["Styles"] = array;
 		}
 	}
-	public abstract partial class IfcProduct : IfcObject, IfcProductSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcAnnotation ,IfcElement ,IfcGrid ,IfcPort ,IfcProxy ,IfcSpatialElement ,IfcStructuralActivity ,IfcStructuralItem))
+	public abstract partial class IfcProduct
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -394,7 +394,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcProductDefinitionShape : IfcProductRepresentation<IfcShapeModel, IfcRepresentationItem>, IfcProductRepresentationSelect
+	public partial class IfcProductDefinitionShape
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -423,7 +423,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "HasShapeAspects", HasShapeAspects, this, options);
 		}
 	}
-	public partial class IfcProductRepresentation<Representation, RepresentationItem> : BaseClassIfc //(IfcMaterialDefinitionRepresentation ,IfcProductDefinitionShape));
+	public partial class IfcProductRepresentation<Representation, RepresentationItem> 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -449,8 +449,8 @@ namespace GeometryGym.Ifc
 			createArray(obj, "Representations", Representations, this, options);
 		}
 	}
-	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef
-	{  //,IfcCompositeProfileDef ,IfcDerivedProfileDef ,IfcParameterizedProfileDef));  IFC2x3 abstract 
+	public partial class IfcProfileDef 
+	{   
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
@@ -491,7 +491,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcProfileProperties : IfcExtendedProperties //IFC2x3 Abstract : BaseClassIfc ABSTRACT SUPERTYPE OF	(ONEOF(IfcGeneralProfileProperties, IfcRibPlateProfileProperties));
+	public partial class IfcProfileProperties 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -511,7 +511,7 @@ namespace GeometryGym.Ifc
 			obj["ProfileDefinition"] = ProfileDefinition.getJson(this, options);
 		}
 	}
-	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4
+	public partial class IfcProjectedCRS 
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -527,7 +527,7 @@ namespace GeometryGym.Ifc
 				obj["MapUnit"] = unit.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcProperty : IfcPropertyAbstraction  //ABSTRACT SUPERTYPE OF (ONEOF(IfcComplexProperty,IfcSimpleProperty));
+	public abstract partial class IfcProperty
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -556,7 +556,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcPropertyAbstraction : BaseClassIfc, IfcResourceObjectSelect //ABSTRACT SUPERTYPE OF (ONEOF (IfcExtendedProperties ,IfcPreDefinedProperties ,IfcProperty ,IfcPropertyEnumeration));
+	public abstract partial class IfcPropertyAbstraction 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -574,7 +574,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcPropertyBoundedValue : IfcSimpleProperty
+	public partial class IfcPropertyBoundedValue
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -589,7 +589,7 @@ namespace GeometryGym.Ifc
 				obj["SetPointValue"] = DatabaseIfc.extract(SetPointValue);
 		}
 	}
-	public partial class IfcPropertyBoundedValue<T> : IfcSimpleProperty where T : IfcValue
+	public partial class IfcPropertyBoundedValue<T>
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -604,7 +604,7 @@ namespace GeometryGym.Ifc
 				obj["SetPointValue"] = DatabaseIfc.extract(SetPointValue);
 		}
 	}
-	public abstract partial class IfcPropertyDefinition : IfcRoot, IfcDefinitionSelect //(IfcPropertySetDefinition, IfcPropertyTemplateDefinition)
+	public abstract partial class IfcPropertyDefinition
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -618,7 +618,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "HasAssociations", HasAssociations, this, options);
 		}
 	}
-	public partial class IfcPropertyEnumeratedValue : IfcSimpleProperty
+	public partial class IfcPropertyEnumeratedValue
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -638,7 +638,7 @@ namespace GeometryGym.Ifc
 				obj["EnumerationReference"] = EnumerationReference.getJson(this, options);
 		}
 	}
-	public partial class IfcPropertySet : IfcPropertySetDefinition
+	public partial class IfcPropertySet 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -651,7 +651,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "HasProperties", mHasProperties.Values, this, options);
 		}
 	}
-	public partial class IfcPropertySetDefinition : IfcPropertyDefinition
+	public partial class IfcPropertySetDefinition
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -681,7 +681,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "IsDefinedBy", IsDefinedBy, this, options);
 		}
 	}
-	public partial class IfcPropertySetTemplate : IfcPropertyTemplateDefinition
+	public partial class IfcPropertySetTemplate
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -703,7 +703,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "HasPropertyTemplates", mHasPropertyTemplates.Values, this, options);
 		}
 	}
-	public partial class IfcPropertySingleValue : IfcSimpleProperty
+	public partial class IfcPropertySingleValue
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -726,7 +726,7 @@ namespace GeometryGym.Ifc
 				obj["Unit"] = unit.getJson(this, options);
 		}
 	}
-	public partial class IfcPumpType : IfcFlowMovingDeviceType
+	public partial class IfcPumpType
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

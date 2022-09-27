@@ -25,7 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,7 +37,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcIndexedPolyCurve : IfcBoundedCurve
+	public partial class IfcIndexedPolyCurve
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -101,32 +101,18 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public partial class IfcIShapeProfileDef : IfcParameterizedProfileDef // Ifc2x3 SUPERTYPE OF	(IfcAsymmetricIShapeProfileDef) 
+	public partial class IfcIShapeProfileDef 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["OverallWidth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mOverallWidth);
-			node = obj["OverallDepth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mOverallDepth);
-			node = obj["WebThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mWebThickness);
-			node = obj["FlangeThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
-			node = obj["FilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFilletRadius);
-			node = obj["FlangeEdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeEdgeRadius);
-			node = obj["FlangeSlope"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeSlope);
+			mOverallWidth = extractDouble(obj["OverallWidth"]);
+			mOverallDepth = extractDouble(obj["OverallDepth"]);
+			mWebThickness = extractDouble(obj["WebThickness"]);
+			mFlangeThickness = extractDouble(obj["FlangeThickness"]);
+			mFilletRadius = extractDouble(obj["FilletRadius"]);
+			mFlangeEdgeRadius = extractDouble(obj["FlangeEdgeRadius"]);
+			mFlangeSlope = extractDouble(obj["FlangeSlope"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

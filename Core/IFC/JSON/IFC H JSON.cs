@@ -25,7 +25,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,7 +37,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcHalfSpaceSolid : IfcGeometricRepresentationItem, IfcBooleanOperand /* SUPERTYPE OF (ONEOF (IfcBoxedHalfSpace ,IfcPolygonalBoundedHalfSpace)) */
+	public partial class IfcHalfSpaceSolid
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -45,15 +45,13 @@ namespace GeometryGym.Ifc
 			JsonObject jobj = obj["BaseSurface"] as JsonObject;
 			if (jobj != null)
 				BaseSurface = mDatabase.ParseJsonObject<IfcSurface>(jobj);
-			var node = obj["AgreementFlag"];
-			if (node != null)
-				bool.TryParse(node.GetValue<string>(), out mAgreementFlag);
+			mAgreementFlag = extractBool(obj["AgreementFlag"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
 			obj["BaseSurface"] = BaseSurface.getJson(this, options);
-			obj["AgreementFlag"] = mAgreementFlag.ToString();
+			obj["AgreementFlag"] = mAgreementFlag;
 		}
 	}
 }

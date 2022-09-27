@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcNamedUnit : BaseClassIfc, IfcUnit //ABSTRACT SUPERTYPE OF (ONEOF(IfcContextDependentUnit,IfcConversionBasedUnit,IfcSIUnit));
+	public abstract partial class IfcNamedUnit
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -58,7 +58,7 @@ namespace GeometryGym.Ifc
 			obj["UnitType"] = mUnitType.ToString();
 		}
 	}
-	public partial class IfcNavigationElement : IfcBuiltElement
+	public partial class IfcNavigationElement
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -74,7 +74,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcNavigationElementTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcNavigationElementType : IfcBuiltElementType
+	public partial class IfcNavigationElementType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

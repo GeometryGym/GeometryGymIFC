@@ -36,7 +36,7 @@ using GeometryGym.STEP;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 	{
 		STEP,
 		XML,
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 		JSON,
 #endif
 	};
@@ -370,7 +370,7 @@ namespace GeometryGym.Ifc
 				WriteXmlFile(path);
 				return true;
 			}
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 			else if (ExtensionHelper.ExtensionEquals(filePath, ".json"))
 			{
 				ToJSON(path);
@@ -2024,7 +2024,7 @@ namespace GeometryGym.Ifc
 					mDatabase.ReadXMLStream(fs.mTextReader);
 					finalizeImport();
 					break;
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 				case FormatIfcSerialization.JSON:
 					initializeImport();
 					mDatabase.ReadJSONFile(fs.mTextReader);

@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,26 +36,16 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcGeneralProfileProperties : IfcProfileProperties //DELETED IFC4  SUPERTYPE OF	(IfcStructuralProfileProperties)
+	public partial class IfcGeneralProfileProperties 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["PhysicalWeight"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mPhysicalWeight);
-			node = obj["Perimeter"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mPerimeter);
-			node = obj["MinimumPlateThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mMinimumPlateThickness);
-			node = obj["MaximumPlateThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mMaximumPlateThickness);
-			node = obj["CrossSectionArea"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mCrossSectionArea);
+			mPhysicalWeight = extractDouble(obj["PhysicalWeight"]);
+			mPerimeter = extractDouble(obj["Perimeter"]);
+			mMinimumPlateThickness = extractDouble(obj["MinimumPlateThickness"]);
+			mMaximumPlateThickness = extractDouble(obj["MaximumPlateThickness"]);
+			mCrossSectionArea = extractDouble(obj["CrossSectionArea"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -72,7 +62,7 @@ namespace GeometryGym.Ifc
 				obj["CrossSectionArea"] = mCrossSectionArea;
 		}
 	}
-	public partial class IfcGeographicElement : IfcElement  //IFC4
+	public partial class IfcGeographicElement
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -140,7 +130,7 @@ namespace GeometryGym.Ifc
 				obj["RepresentationsInContext"] = reps;
 		}
 	}
-	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
+	public partial class IfcGeometricRepresentationSubContext
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -173,7 +163,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "UserDefinedTargetView", UserDefinedTargetView);
 		}
 	}
-	public partial class IfcGeometricSet : IfcGeometricRepresentationItem //SUPERTYPE OF(IfcGeometricCurveSet)
+	public partial class IfcGeometricSet
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -209,7 +199,7 @@ namespace GeometryGym.Ifc
 				EndPoint = mDatabase.ParseJsonObject<IfcPlacement>(jobj);
 		}
 	}
-	public partial class IfcGrid : IfcPositioningElement
+	public partial class IfcGrid
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -226,7 +216,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "WAxes", WAxes, this, options);
 		}
 	}
-	public partial class IfcGridAxis : BaseClassIfc
+	public partial class IfcGridAxis
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -247,7 +237,7 @@ namespace GeometryGym.Ifc
 			obj["SameSense"] = SameSense;
 		}
 	}
-	public partial class IfcGroup : IfcObject //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
+	public partial class IfcGroup
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

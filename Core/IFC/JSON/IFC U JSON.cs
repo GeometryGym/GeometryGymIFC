@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcUnitaryEquipment : IfcEnergyConversionDevice
+	public partial class IfcUnitaryEquipment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -52,7 +52,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcUnitaryEquipmentType : IfcEnergyConversionDeviceType
+	public partial class IfcUnitaryEquipmentType 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -68,7 +68,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public partial class IfcUnitAssignment : BaseClassIfc
+	public partial class IfcUnitAssignment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -84,35 +84,19 @@ namespace GeometryGym.Ifc
 			obj["Units"] = array;
 		}
 	}
-	public partial class IfcUShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcUShapeProfileDef
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["Depth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mDepth);
-			node = obj["FlangeWidth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeWidth);
-			node = obj["WebThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mWebThickness);
-			node = obj["FlangeThickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeThickness);
-			node = obj["FilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFilletRadius);
-			node = obj["EdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mEdgeRadius);
-			node = obj["FlangeSlope"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFlangeSlope);
-			node = obj["mCentreOfGravityInX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mCentreOfGravityInX);
+			mDepth = extractDouble(obj["Depth"]);
+			mFlangeWidth = extractDouble(obj["FlangeWidth"]);
+			mWebThickness = extractDouble(obj["WebThickness"]);
+			mFlangeThickness = extractDouble(obj["FlangeThickness"]);
+			mFilletRadius = extractDouble(obj["FilletRadius"]);
+			mEdgeRadius = extractDouble(obj["EdgeRadius"]);
+			mFlangeSlope =	extractDouble(obj["FlangeSlope"]);
+			mCentreOfGravityInX = extractDouble(obj["mCentreOfGravityInX"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

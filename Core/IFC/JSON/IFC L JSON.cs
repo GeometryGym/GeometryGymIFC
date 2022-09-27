@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcLibraryInformation : IfcExternalInformation
+	public partial class IfcLibraryInformation
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -62,7 +62,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Description", Description);
 		}
 	}
-	public partial class IfcLibraryReference : IfcExternalReference, IfcLibrarySelect
+	public partial class IfcLibraryReference
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -105,7 +105,7 @@ namespace GeometryGym.Ifc
 				Dir = mDatabase.ParseJsonObject<IfcVector>(jobj);
 		}
 	}
-	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
+	public partial class IfcLinearAxisWithInclination
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -124,7 +124,7 @@ namespace GeometryGym.Ifc
 				Inclinating = mDatabase.ParseJsonObject<IfcAxisLateralInclination>(jobj);
 		}
 	}
-	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -137,7 +137,7 @@ namespace GeometryGym.Ifc
 			obj["Axis"] = Axis.getJson(this, options);
 		}
 	}
-	internal partial class IfcLinearSpanPlacement : IfcLinearPlacement
+	internal partial class IfcLinearSpanPlacement
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -152,7 +152,7 @@ namespace GeometryGym.Ifc
 				mSpan = node.GetValue<double>();
 		}
 	}
-	public partial class IfcLiquidTerminal : IfcFlowTerminal
+	public partial class IfcLiquidTerminal
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -168,7 +168,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLiquidTerminalTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcLiquidTerminalType : IfcFlowTerminalType
+	public partial class IfcLiquidTerminalType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLiquidTerminalTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcLocalPlacement : IfcObjectPlacement
+	public partial class IfcLocalPlacement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -197,35 +197,19 @@ namespace GeometryGym.Ifc
 			obj["RelativePlacement"] = mRelativePlacement.getJson(this, options);
 		}
 	}
-	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcLShapeProfileDef 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["Depth"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mDepth);
-			node = obj["Width"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mWidth);
-			node = obj["Thickness"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mThickness);
-			node = obj["FilletRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mFilletRadius);
-			node = obj["EdgeRadius"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mEdgeRadius);
-			node = obj["LegSlope"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mLegSlope);
-			node = obj["CentreOfGravityInX"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mCentreOfGravityInX);
-			node = obj["CentreOfGravityInY"];
-			if (node != null)
-				double.TryParse(node.GetValue<string>(), out mCentreOfGravityInY);
+			mDepth = extractDouble(obj["Depth"]);
+			mWidth = extractDouble(obj["Width"]);
+			mThickness = extractDouble(obj["Thickness"]);
+			mFilletRadius = extractDouble(obj["FilletRadius"]);
+			mEdgeRadius = extractDouble(obj["EdgeRadius"]);
+			mLegSlope =	extractDouble(obj["LegSlope"]);
+			mCentreOfGravityInX = extractDouble(obj["CentreOfGravityInX"]);
+			mCentreOfGravityInY = extractDouble(obj["CentreOfGravityInY"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

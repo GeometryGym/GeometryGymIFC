@@ -25,12 +25,13 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using JsonObject = Newtonsoft.Json.Linq.JObject;
 using JsonArray = Newtonsoft.Json.Linq.JArray;
+using JsonNode = Newtonsoft.Json.Linq.JToken;
 #else
 using System.Text.Json.Nodes;
 #endif
@@ -217,6 +218,66 @@ namespace GeometryGym.Ifc
 #else
 		protected string extractString(JsonNode node) { return (node == null ? "" : node.GetValue<string>()); }
 #endif
+		protected double extractDouble(JsonNode node)
+		{
+			if (node == null)
+				return double.NaN;
+			try
+			{
+				return node.GetValue<double>();
+			}
+			catch { }
+			try
+			{
+				string str = node.GetValue<string>();
+
+				if (double.TryParse(str, out double d))
+					return d;
+			}
+			catch { }
+
+			return double.NaN;
+		}
+		protected int extractInt(JsonNode node, int defaultValue)
+		{
+			if (node == null)
+				return defaultValue;
+			try
+			{
+				return node.GetValue<int>();
+			}
+			catch { }
+			try
+			{
+				string str = node.GetValue<string>();
+
+				if (int.TryParse(str, out int i))
+					return i;
+			}
+			catch { }
+
+			return defaultValue;
+		}
+		protected bool extractBool(JsonNode node)
+		{
+			if (node == null)
+				return false;
+			try
+			{
+				return node.GetValue<bool>();
+			}
+			catch { }
+			try
+			{
+				string str = node.GetValue<string>();
+
+				if (bool.TryParse(str, out bool b))
+					return b;
+			}
+			catch { }
+
+			return false;
+		}
 		protected void setAttribute(JsonObject obj, string attribute, string value)
 		{
 			if (!string.IsNullOrEmpty(value))

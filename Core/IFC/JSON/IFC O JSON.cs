@@ -26,7 +26,7 @@ using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,7 +38,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcObject : IfcObjectDefinition //ABSTRACT SUPERTYPE OF (ONEOF (IfcActor ,IfcControl ,IfcGroup ,IfcProcess ,IfcProduct ,IfcProject ,IfcResource))
+	public abstract partial class IfcObject 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -63,7 +63,7 @@ namespace GeometryGym.Ifc
 		//private IfcRelDefinesByType mIsTypedBy = null;
 		//internal List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
 	}
-	public abstract partial class IfcObjectDefinition : IfcRoot, IfcDefinitionSelect  //ABSTRACT SUPERTYPE OF (ONEOF ((IfcContext, IfcObject, IfcTypeObject))))
+	public abstract partial class IfcObjectDefinition 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -134,7 +134,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcObjective : IfcConstraint
+	public partial class IfcObjective
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -169,7 +169,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "UserDefinedQualifier", UserDefinedQualifier);
 		}
 	}
-	public abstract partial class IfcObjectPlacement : BaseClassIfc  //	 ABSTRACT SUPERTYPE OF (ONEOF (IfcGridPlacement ,IfcLocalPlacement));
+	public abstract partial class IfcObjectPlacement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 				obj["PlacementRelTo"] = PlacementRelTo.getJson(this, options);
 		}
 	}
-	public partial class IfcOpeningElement : IfcFeatureElementSubtraction //SUPERTYPE OF(IfcOpeningStandardCase)
+	public partial class IfcOpeningElement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -212,7 +212,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcOrganization : BaseClassIfc, IfcActorSelect, IfcResourceObjectSelect
+	public partial class IfcOrganization
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -257,7 +257,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcOwnerHistory : BaseClassIfc
+	public partial class IfcOwnerHistory
 	{
 		protected override string genRepositoryName { get { return IfcDateTime.FormatSTEP(LastModifiedDate == DateTime.MinValue ? CreationDate : LastModifiedDate).Replace("'", "") + " " + mChangeAction.ToString(); } }
 		internal override void parseJsonObject(JsonObject obj)

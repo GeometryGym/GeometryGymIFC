@@ -26,7 +26,7 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

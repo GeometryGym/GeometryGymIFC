@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcDerivedUnit : BaseClassIfc, IfcUnit
+	public partial class IfcDerivedUnit
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -45,12 +45,8 @@ namespace GeometryGym.Ifc
 			var node = obj["UnitType"];
 			if (node != null)
 				Enum.TryParse<IfcDerivedUnitEnum>(node.GetValue<string>(), true, out mUnitType);
-			node = obj["UserDefinedType"];
-			if (node != null)
-				UserDefinedType = node.GetValue<string>();
-			node = obj["Name"];
-			if (node != null)
-				Name = node.GetValue<string>();
+			UserDefinedType = extractString(obj["UserDefinedType"]);
+			Name = extractString(obj["Name"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -68,7 +64,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public partial class IfcDerivedUnitElement : BaseClassIfc
+	public partial class IfcDerivedUnitElement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -77,9 +73,7 @@ namespace GeometryGym.Ifc
 			JsonObject jobj = obj["Unit"] as JsonObject;
 			if (jobj != null)
 				Unit = extractObject<IfcNamedUnit>(jobj);
-			var node = obj["Exponent"];
-			if (node != null)
-				Exponent = node.GetValue<int>();
+			mExponent = extractInt(obj["Exponent"], 0);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -88,33 +82,18 @@ namespace GeometryGym.Ifc
 			obj["Exponent"] = mExponent;
 		}
 	}
-	public partial class IfcDimensionalExponents : BaseClassIfc
+	public partial class IfcDimensionalExponents
 	{
-		//		internal int mLengthExponent, mMassExponent, mTimeExponent, mElectricCurrentExponent, mThermodynamicTemperatureExponent, mAmountOfSubstanceExponent, mLuminousIntensityExponent;// : INTEGER;
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["LengthExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mLengthExponent);
-			node = obj["MassExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mMassExponent);
-			node = obj["TimeExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mTimeExponent);
-			node = obj["ElectricCurrentExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mElectricCurrentExponent);
-			node = obj["ThermodynamicTemperatureExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mThermodynamicTemperatureExponent);
-			node = obj["AmountOfSubstanceExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mAmountOfSubstanceExponent);
-			node = obj["LuminousIntensityExponent"];
-			if (node != null)
-				int.TryParse(node.GetValue<string>(), out mLuminousIntensityExponent);
+			mLengthExponent = extractInt(obj["LengthExponent"], 0);
+			mMassExponent = extractInt(obj["MassExponent"], 0);
+			mTimeExponent = extractInt(obj["TimeExponent"], 0);
+			mElectricCurrentExponent = extractInt(obj["ElectricCurrentExponent"], 0);
+			mThermodynamicTemperatureExponent = extractInt(obj["ThermodynamicTemperatureExponent"], 0);
+			mAmountOfSubstanceExponent = extractInt(obj["AmountOfSubstanceExponent"], 0);
+			mLuminousIntensityExponent = extractInt(obj["LuminousIntensityExponent"], 0);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -135,7 +114,7 @@ namespace GeometryGym.Ifc
 				obj["LuminousIntensityExponent"] = mLuminousIntensityExponent;
 		}
 	}
-	public partial class IfcDirection : IfcGeometricRepresentationItem
+	public partial class IfcDirection
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -176,7 +155,7 @@ namespace GeometryGym.Ifc
 			obj["DirectionRatios"] = mDirectionRatioX + (double.IsNaN(mDirectionRatioY) ? "" : (" " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ))));
 		}
 	}
-	public abstract partial class IfcDirectrixCurveSweptAreaSolid : IfcSweptAreaSolid
+	public abstract partial class IfcDirectrixCurveSweptAreaSolid 
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -186,10 +165,10 @@ namespace GeometryGym.Ifc
 			{
 				IfcParameterValue startParameter = mStartParam as IfcParameterValue;
 				if(startParameter != null)
-					obj["StartParam"] = startParameter.Measure.ToString();
+					obj["StartParam"] = startParameter.Measure;
 				IfcParameterValue endParameter = mEndParam as IfcParameterValue;
 				if(endParameter != null)
-					obj["EndParam"] = endParameter.Measure.ToString();
+					obj["EndParam"] = endParameter.Measure;
 			}
 		}
 		internal override void parseJsonObject(JsonObject obj)
@@ -206,7 +185,7 @@ namespace GeometryGym.Ifc
 				mEndParam = new	IfcParameterValue(node.GetValue<double>());
 		}
 	}
-	public partial class IfcDistributionBoard : IfcFlowController
+	public partial class IfcDistributionBoard
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -222,7 +201,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionBoardTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionBoardType : IfcFlowControllerType
+	public partial class IfcDistributionBoardType
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -237,7 +216,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDistributionBoardTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public partial class IfcDistributionPort : IfcPort
+	public partial class IfcDistributionPort
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -263,7 +242,7 @@ namespace GeometryGym.Ifc
 				obj["SystemType"] = mSystemType.ToString();
 		}
 	}
-	public partial class IfcDocumentInformation : IfcExternalInformation, IfcDocumentSelect
+	public partial class IfcDocumentInformation
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -318,7 +297,7 @@ namespace GeometryGym.Ifc
 				obj["Status"] = mStatus.ToString();
 		}
 	}
-	public partial class IfcDocumentReference : IfcExternalReference, IfcDocumentSelect
+	public partial class IfcDocumentReference
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -336,20 +315,16 @@ namespace GeometryGym.Ifc
 				obj["ReferencedDocument"] = ReferencedDocument.getJson(this, options);
 		}
 	}
-	public partial class IfcDoorPanelProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
+	public partial class IfcDoorPanelProperties
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["PanelDepth"];
-			if (node != null)
-				mPanelDepth = node.GetValue<double>();
-			node = obj["OperationType"];
+			mPanelDepth = extractDouble(obj["PanelDepth"]);
+			var node = obj["OperationType"];
 			if (node != null)
 				Enum.TryParse<IfcDoorPanelOperationEnum>(node.GetValue<string>(), true, out mOperationType);
-			node = obj["PanelWidth"];
-			if (node != null)
-				mPanelWidth = node.GetValue<double>();
+			mPanelWidth = extractDouble(obj["PanelWidth"]);
 			node = obj["PanelPosition"];
 			if (node != null)
 				Enum.TryParse<IfcDoorPanelPositionEnum>(node.GetValue<string>(), true, out mPanelPosition);

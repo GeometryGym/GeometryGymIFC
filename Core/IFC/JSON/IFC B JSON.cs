@@ -24,7 +24,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 
-#if (!NOIFCJSON)
+#if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -73,9 +73,9 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["XLength"] = XLength.ToString();
-			obj["YLength"] = YLength.ToString();
-			obj["ZLength"] = ZLength.ToString();
+			obj["XLength"] = XLength;
+			obj["YLength"] = YLength;
+			obj["ZLength"] = ZLength;
 		}
 	}
 	public partial class IfcBoiler
@@ -307,12 +307,8 @@ namespace GeometryGym.Ifc
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["ElevationOfRefHeight"];
-			if (node != null)
-				ElevationOfRefHeight = node.GetValue<double>();
-			node = obj["ElevationOfTerrain"];
-			if (node != null)
-				ElevationOfTerrain = node.GetValue<double>();
+			mElevationOfRefHeight = extractDouble(obj["ElevationOfRefHeight"]);
+			mElevationOfTerrain = extractDouble(obj["ElevationOfTerrain"]);
 			JsonObject jobj = obj["BuildingAddress"] as JsonObject;
 			if (jobj != null)
 				BuildingAddress = mDatabase.ParseJsonObject<IfcPostalAddress>(jobj);
@@ -321,14 +317,14 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mElevationOfRefHeight))
-				obj["ElevationOfRefHeight"] = ElevationOfRefHeight.ToString();
+				obj["ElevationOfRefHeight"] = ElevationOfRefHeight;
 			if (!double.IsNaN(mElevationOfTerrain))
-				obj["ElevationOfTerrain"] = ElevationOfTerrain.ToString();
+				obj["ElevationOfTerrain"] = ElevationOfTerrain;
 			if (mBuildingAddress != null) 
 				obj["BuildingAddress"] = BuildingAddress.getJson(this, options);
 		}
 	}
-	public partial class IfcBuildingStorey : IfcSpatialStructureElement
+	public partial class IfcBuildingStorey
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -341,7 +337,7 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			if (!double.IsNaN(mElevation))
-				obj["Elevation"] = Elevation.ToString();
+				obj["Elevation"] = Elevation;
 		}
 	}
 }
