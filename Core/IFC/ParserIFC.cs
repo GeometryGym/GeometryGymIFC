@@ -485,13 +485,23 @@ namespace GeometryGym.Ifc
 				return new IfcText((str[9] == '$' || s == null ? "" : ParserIfc.Decode(s)));
 			}
 			if (str.StartsWith("IFCURIREFERENCE("))
-			{
 				return new IfcURIReference(str[16] == '$' ? "" : ParserIfc.Decode(str.Substring(17, str.Length - 19)));
+			if(str.StartsWith("IFCDATE("))
+			{
+				string valueString = str.Substring(9, str.Length - 11);
+				if (DateTime.TryParse(valueString, out DateTime dateTime))
+					return new IfcDate(dateTime);
+				return new IfcLabel(valueString);
+			}
+			if(str.StartsWith("IFCDATETIME("))
+			{
+				string valueString = str.Substring(13, str.Length - 15);
+				if (DateTime.TryParse(valueString, out DateTime dateTime))
+					return new IfcDateTime(dateTime);
+				return new IfcLabel(valueString);
 			}
 			if(str.StartsWith("IFCDURATION("))
-			{
 				return IfcDuration.Convert(str.Substring(13, str.Length - 15));
-			}
 			int i = 0;
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);
@@ -547,14 +557,15 @@ namespace GeometryGym.Ifc
 		}
 		internal static IfcValue parseValue(string str)
 		{
-			if (string.Compare(str, "$", true) == 0)
+			if (string.IsNullOrEmpty(str) || string.Compare(str, "$", true) == 0)
 				return null;
+			IfcSimpleValue sv = parseSimpleValue(str);
+			if (sv != null)
+				return sv;
 			IfcMeasureValue mv = parseMeasureValue(str);
 			if (mv != null)
 				return mv;
-			IfcSimpleValue sv = parseSimpleValue(str);
-			if (sv != null)
-				return sv; 
+			
 			return parseDerivedMeasureValue(str);
 		}
 		internal static IfcValue extractValue(string keyword, string value)

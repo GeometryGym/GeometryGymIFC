@@ -82,7 +82,7 @@ namespace GeometryGym.Ifc
 	{
 		private IfcCartesianPointList mPoints; // IfcCartesianPointList
 		internal LIST<IfcSegmentIndexSelect> mSegments = new LIST<IfcSegmentIndexSelect>();// OPTIONAL LIST [1:?] OF IfcSegmentIndexSelect;
-		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// Optional IfcLogical
+		internal IfcLogicalEnum mSelfIntersect = IfcLogicalEnum.UNKNOWN;// IfcLogical
 
 		public IfcCartesianPointList Points { get { return mPoints; } set { mPoints = value; } }
 		public LIST<IfcSegmentIndexSelect> Segments { get { return mSegments; } }
