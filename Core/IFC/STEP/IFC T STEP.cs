@@ -411,12 +411,15 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTextLiteralWithExtent
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mExtent.StepId + ",'" + mBoxAlignment + "'"; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{ 
+			return base.BuildStringSTEP(release) + ",#" + mExtent.StepId + ",'" + mBoxAlignment.ToString().ToLower().Replace("_","-") + "'";
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mExtent = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPlanarExtent;
-			mBoxAlignment = ParserSTEP.StripString(str, ref pos, len);
+			Enum.TryParse<IfcBoxAlignment>(ParserSTEP.StripString(str, ref pos, len).Replace("-","_"), true, out mBoxAlignment);
 		}
 	}
 	public partial class IfcTextStyle

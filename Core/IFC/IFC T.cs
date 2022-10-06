@@ -413,7 +413,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement mPlacement;// : IfcAxis2Placement;
 		internal IfcTextPath mPath;// : IfcTextPath;
 
-		public string Literal { get { return ParserIfc.Decode(mLiteral); } set { mLiteral = ParserIfc.Encode(value); } }
+		public string Literal { get { return mLiteral; } set { mLiteral = value; } }
 		public IfcAxis2Placement Placement { get { return mPlacement; } }
 		public IfcTextPath Path { get { return mPath; } set { mPath = value; } }
 
@@ -424,16 +424,29 @@ namespace GeometryGym.Ifc
 			mPlacement = db.Factory.Duplicate<IfcAxis2Placement>(l.mPlacement);
 			mPath = l.mPath; 
 		}
+		public IfcTextLiteral(string literal, IfcAxis2Placement placement, IfcTextPath path)
+			: base(placement.Database)
+		{
+			Literal = literal;
+			mPlacement = placement;
+			mPath = path;
+		}
 	}
 	[Serializable]
 	public partial class IfcTextLiteralWithExtent : IfcTextLiteral
 	{
 		internal IfcPlanarExtent mExtent;// : IfcPlanarExtent;
-		internal string mBoxAlignment = "";// : IfcBoxAlignment; 
+		internal IfcBoxAlignment mBoxAlignment = IfcBoxAlignment.CENTER;// : IfcBoxAlignment; 
 
 		public IfcPlanarExtent Extent { get { return mExtent; } set { mExtent = value; } }
 
 		internal IfcTextLiteralWithExtent() : base() { }
+		public IfcTextLiteralWithExtent(string literal, IfcAxis2Placement placement, IfcTextPath path, IfcPlanarExtent extent, IfcBoxAlignment alignment)
+			: base(literal, placement, path)
+		{
+			mExtent = extent;
+			mBoxAlignment = alignment;
+		}
 	}
 	[Serializable]
 	public partial class IfcTextStyle : IfcPresentationStyle, IfcPresentationStyleSelect
