@@ -722,16 +722,34 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
-				mUpperBoundValue = ParserIfc.parseValue(s);
+			{
+				try
+				{
+					mUpperBoundValue = ParserIfc.parseValue(s);
+				}
+				catch { }
+			}
 			s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
-				mLowerBoundValue = ParserIfc.parseValue(s);
+			{
+				try
+				{
+					mLowerBoundValue = ParserIfc.parseValue(s);
+				}
+				catch { }
+			}
 			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
 			if (release > ReleaseVersion.IFC2x3)
 			{
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s != "$")
-					mSetPointValue = ParserIfc.parseValue(s);
+				{
+					try
+					{
+						mSetPointValue = ParserIfc.parseValue(s);
+					}
+					catch { }
+				}
 			}
 		}
 	}

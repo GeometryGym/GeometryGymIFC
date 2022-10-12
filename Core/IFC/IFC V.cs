@@ -682,6 +682,12 @@ namespace GeometryGym.Ifc
 			IfcDuration duration = new IfcDuration();
 			if (string.IsNullOrEmpty(s))
 				return duration;
+			if (s[0] != 'P')
+			{
+				if (int.TryParse(s, out int i))
+					return new IfcDuration() { Days = i };
+				return null;
+			}
 			int stringLength = s.Length;
 			bool inTime = false;
 			for(int icounter = 1; icounter < stringLength; icounter++)

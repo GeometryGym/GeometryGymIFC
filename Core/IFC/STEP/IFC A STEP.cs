@@ -519,10 +519,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleOptionalToString(mStartHeight) + "," +
-			ParserSTEP.DoubleToString(mStartGradient) + "," + ParserSTEP.DoubleToString(mEndGradient) +
-			"," + ParserSTEP.DoubleOptionalToString(mRadiusOfCurvature) + ",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP(release) + "," + formatLength(mStartDistAlong) + "," + formatLength(mHorizontalLength) + "," + 
+				formatLength(mStartHeight) + "," + ParserSTEP.DoubleToString(mStartGradient) + "," + 
+				ParserSTEP.DoubleToString(mEndGradient) + "," + formatLength(mRadiusOfCurvature) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

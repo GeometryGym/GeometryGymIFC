@@ -638,8 +638,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcPolyLoop : IfcLoop
 	{
 		private LIST<IfcCartesianPoint> mPolygon = new LIST<IfcCartesianPoint> ();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
-		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } 
-			set { mPolygon = value; } }
+		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } set { mPolygon = value; } }
 
 		internal IfcPolyLoop() : base() { }
 		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l, DuplicateOptions options) : base(db, l, options) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x) as IfcCartesianPoint)); }
@@ -1263,13 +1262,17 @@ namespace GeometryGym.Ifc
 			IfcSpatialElement spatialElement = this as IfcSpatialElement;
 			if (spatialElement != null)
 			{
-				if (spatialElement.mContainsElements.Count == 0)
+				IfcSpatialElement productAsSpatial = product as IfcSpatialElement;
+				if (productAsSpatial == null)
 				{
-					new IfcRelContainedInSpatialStructure(product, spatialElement);
+					if (spatialElement.mContainsElements.Count == 0)
+					{
+						new IfcRelContainedInSpatialStructure(product, spatialElement);
+					}
+					else
+						spatialElement.ContainsElements.First().RelatedElements.Add(product);
+					return;
 				}
-				else
-					spatialElement.ContainsElements.First().RelatedElements.Add(product);
-				return;
 			}
 			if (mIsDecomposedBy.Count > 0)
 				mIsDecomposedBy.First().RelatedObjects.Add(product);
@@ -1641,6 +1644,11 @@ namespace GeometryGym.Ifc
 			if (s != null)
 				return s.IsDecomposedBy.SelectMany(x=>x.RelatedObjects).OfType<IfcBuilding>().FirstOrDefault();
 			return null;
+		}
+		public IfcProject DuplicateProject(DuplicateOptions options)
+		{
+			DatabaseIfc db = new DatabaseIfc(mDatabase);
+			return db.Factory.Duplicate(this, options);
 		}
 	}
 	[Serializable]

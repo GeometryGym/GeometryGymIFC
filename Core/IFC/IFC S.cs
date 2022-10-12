@@ -1832,8 +1832,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadLinearForce : IfcStructuralLoadStatic
 	{
-		private double mLinearForceX = 0, mLinearForceY = 0, mLinearForceZ = 0; // : OPTIONAL IfcLinearForceMeasure
-		private double mLinearMomentX = 0, mLinearMomentY = 0, mLinearMomentZ = 0;// : OPTIONAL IfcLinearMomentMeasure; 
+		private double mLinearForceX = double.NaN, mLinearForceY = double.NaN, mLinearForceZ = double.NaN; // : OPTIONAL IfcLinearForceMeasure
+		private double mLinearMomentX = double.NaN, mLinearMomentY = double.NaN, mLinearMomentZ = double.NaN;// : OPTIONAL IfcLinearMomentMeasure; 
 
 		public double LinearForceX { get { return double.IsNaN(mLinearForceX) ? 0 : mLinearForceX; } set { mLinearForceX = value; } }
 		public double LinearForceY { get { return double.IsNaN(mLinearForceY) ? 0 : mLinearForceY; } set { mLinearForceY = value; } }
@@ -1874,8 +1874,8 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadSingleForce : IfcStructuralLoadStatic
 	{
-		internal double mForceX = double.NaN, mForceY = double.NaN, mForceZ = double.NaN;// : OPTIONAL IfcForceMeasure;
-		internal double mMomentX = double.NaN, mMomentY = double.NaN, mMomentZ = double.NaN;// : OPTIONAL IfcTorqueMeasure; 
+		private double mForceX = double.NaN, mForceY = double.NaN, mForceZ = double.NaN;// : OPTIONAL IfcForceMeasure;
+		private double mMomentX = double.NaN, mMomentY = double.NaN, mMomentZ = double.NaN;// : OPTIONAL IfcTorqueMeasure; 
 
 		public double ForceX { get { return double.IsNaN(mForceX) ? 0 : mForceX; } set { mForceX = value; } }
 		public double ForceY { get { return double.IsNaN(mForceY) ? 0 : mForceY; } set { mForceY = value; } }

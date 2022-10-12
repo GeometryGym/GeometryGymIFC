@@ -612,7 +612,7 @@ namespace GeometryGym.Ifc
 					spatial.ReferenceElement(this);
 			}
 		}
-		public IfcGroup(List<IfcObjectDefinition> ods) : base(ods[0].mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
+		public IfcGroup(IEnumerable<IfcObjectDefinition> ods) : base(ods.First().mDatabase) { mIsGroupedBy.Add(new IfcRelAssignsToGroup(ods, this)); }
 
 		public void AddRelated(IfcObjectDefinition related)
 		{

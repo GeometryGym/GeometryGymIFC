@@ -378,6 +378,7 @@ namespace GeometryGym.Ifc
 			}
 
 #endif
+			Encoding encoding = SerializationIfcSTEP.StepFileEncoding();
 #if (!NOIFCZIP)
 			bool zip = ExtensionHelper.ExtensionEquals(filePath, ".ifczip");
 			ZipArchive za = null;
@@ -387,11 +388,11 @@ namespace GeometryGym.Ifc
 					File.Delete(path);
 				za = ZipFile.Open(path, System.IO.Compression.ZipArchiveMode.Create);
 				ZipArchiveEntry zae = za.CreateEntry(Path.GetFileNameWithoutExtension(path) + ".ifc");
-				sw = new StreamWriter(zae.Open());
+				sw = new StreamWriter(zae.Open(), encoding);
 			}
 			else
 #endif
-				sw = new StreamWriter(FileName);
+				sw = new StreamWriter(FileName, false, encoding);
 			bool result = new SerializationIfcSTEP(this).WriteSTEP(sw, path);
 			sw.Close();
 			
@@ -1961,12 +1962,13 @@ namespace GeometryGym.Ifc
 					mTextReader.Close();
 			}
 		}
+	
 		private FormatIfcSerialization detectFormat(string fileName)
 		{
-			if (ExtensionHelper.ExtensionEquals(fileName, ".xml"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".xml") || ExtensionHelper.ExtensionEquals(fileName, ".ifcxml"))
 				return FormatIfcSerialization.XML;
 #if (!NOIFCJSON)
-			if (ExtensionHelper.ExtensionEquals(fileName, ".json"))
+			if (ExtensionHelper.ExtensionEquals(fileName, ".json") || ExtensionHelper.ExtensionEquals(fileName, "ifcjson"))
 				return FormatIfcSerialization.JSON;
 #endif
 			return FormatIfcSerialization.STEP;
@@ -1975,6 +1977,8 @@ namespace GeometryGym.Ifc
 		{
 			mDatabase.FileName = fileName;
 			mDatabase.FolderPath = Path.GetDirectoryName(fileName);
+			
+			StreamReader streamReader = null;
 #if (!NOIFCZIP)
 			if (ExtensionHelper.ExtensionEquals(fileName, ".zip") || ExtensionHelper.ExtensionEquals(fileName, ".ifczip"))
 			{
@@ -1985,15 +1989,25 @@ namespace GeometryGym.Ifc
 				}
 				string filename = za.Entries[0].Name.ToLower();
 				FormatIfcSerialization fformat = detectFormat(filename);
-				StreamReader str = (fformat == FormatIfcSerialization.STEP ? new StreamReader(za.Entries[0].Open(), Encoding.GetEncoding("windows-1252")) :
-					new StreamReader(za.Entries[0].Open()));
-				return new FileStreamIfc(fformat, str);
+				if (fformat == FormatIfcSerialization.STEP)
+				{
+					Encoding encoding = SerializationIfcSTEP.StepFileEncoding();
+					streamReader = new StreamReader(za.Entries[0].Open(), encoding);
+				}
+				else
+					streamReader = new StreamReader(za.Entries[0].Open());
+				return new FileStreamIfc(fformat, streamReader);
 			}
 #endif
 			FormatIfcSerialization format = detectFormat(fileName);
-			StreamReader sr = format == FormatIfcSerialization.STEP ? new StreamReader(fileName, Encoding.GetEncoding("windows-1252")) :
-				new StreamReader(fileName);
-			return new FileStreamIfc(format, sr);
+			if (format == FormatIfcSerialization.STEP)
+			{
+				Encoding encoding = SerializationIfcSTEP.StepFileEncoding();
+				streamReader = new StreamReader(fileName, encoding);
+			}
+			else
+				streamReader = new StreamReader(fileName);
+			return new FileStreamIfc(format, streamReader);
 		}
 
 		internal void ReadFile(string filePath)
@@ -2083,6 +2097,14 @@ namespace GeometryGym.Ifc
 
 		CancellationTokenSource mCancellationTokenSource = new CancellationTokenSource();
 
+		internal static Encoding StepFileEncoding()
+		{
+#if (NETCOREAPP)
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+			Encoding encoding = Encoding.GetEncoding(1252);
+			return encoding;
+		}
 		private class ConstructorClass
 		{
 			internal BaseClassIfc Object { get; }
@@ -2570,7 +2592,8 @@ namespace GeometryGym.Ifc
 		public bool WriteSTEPFile(string filePath, SetProgressBarCallback progressBarCallback)
 		{
 			mDatabase.FileName = filePath;
-			StreamWriter sw = new StreamWriter(filePath);
+			Encoding encoding = StepFileEncoding();
+			StreamWriter sw = new StreamWriter(filePath, false, encoding);
 			mCachedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			sw.Write(getHeaderString(filePath) + "\r\n");
@@ -2601,7 +2624,8 @@ namespace GeometryGym.Ifc
 		public bool WriteSTEPFile(string filePath, BackgroundWorker worker, DoWorkEventArgs e)
 		{
 			mDatabase.FileName = filePath;
-			StreamWriter sw = new StreamWriter(filePath);
+			Encoding encoding = StepFileEncoding();
+			StreamWriter sw = new StreamWriter(filePath, false, encoding);
 			mCachedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 			sw.Write(getHeaderString(filePath) + "\r\n");

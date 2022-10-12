@@ -369,7 +369,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public static class JsonIFCExtensions
+	public static partial class JsonIFCExtensions
 	{
 
 #if (NEWTONSOFT)
