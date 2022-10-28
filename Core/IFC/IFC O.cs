@@ -1052,7 +1052,7 @@ namespace GeometryGym.Ifc
 					return mOrganization;
 				try
 				{
-#if (!NETSTANDARD2_0)
+#if (!NETSTANDARD2_0 && !NETSTANDARD2_1)
 					string name = ((string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion", "RegisteredOrganization", "")).Replace("'", "");
 					if (!string.IsNullOrEmpty(name) && string.Compare(name, "Microsoft", true) != 0 && string.Compare(name, "HP Inc.",true) != 0)
 						return name;

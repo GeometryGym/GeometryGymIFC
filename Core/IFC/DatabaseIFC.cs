@@ -143,8 +143,8 @@ namespace GeometryGym.Ifc
 				{
 					if (existing is IfcRoot existingRoot)
 					{
-						BaseClassIfc obj = null;
-						mDictionary.TryRemove(existingRoot.GlobalId, out obj);
+						if(!string.IsNullOrEmpty(existingRoot.mGlobalId))
+							mDictionary.TryRemove(existingRoot.GlobalId, out BaseClassIfc obj);
 					}
 					else if (existing is IfcClassificationReference existingClassificationReference)
 						mClassificationReferences.Remove(existingClassificationReference);
@@ -153,7 +153,10 @@ namespace GeometryGym.Ifc
 				}
 				if (value is IfcRoot root)
 				{
-					mDictionary[root.GlobalId] = value;
+					if (!string.IsNullOrEmpty(root.mGlobalId))
+					{
+						mDictionary[root.GlobalId] = value;
+					}
 				}
 				else if (value is IfcClassificationReference classificationReference)
 					mClassificationReferences.Add(classificationReference);
@@ -371,7 +374,7 @@ namespace GeometryGym.Ifc
 				return true;
 			}
 #if (NET || !NOIFCJSON)
-			else if (ExtensionHelper.ExtensionEquals(filePath, ".json"))
+			else if (ExtensionHelper.ExtensionEquals(filePath, ".json") || ExtensionHelper.ExtensionEquals(filePath, ".ifcjson"))
 			{
 				ToJSON(path);
 				return true;

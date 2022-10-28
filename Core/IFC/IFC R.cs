@@ -2782,7 +2782,8 @@ namespace GeometryGym.Ifc
 					{
 						if (mDatabase != null)
 						{
-							mDatabase.mDictionary.TryRemove(mGlobalId, out BaseClassIfc obj);
+							if(!string.IsNullOrEmpty(mGlobalId))
+								mDatabase.mDictionary.TryRemove(mGlobalId, out BaseClassIfc obj);
 							mDatabase.mDictionary[value] = this;
 						}
 						setGlobalId(value);

@@ -292,7 +292,7 @@ namespace GeometryGym.Ifc
 			{
 				var jsonObject = o.getJson(host, options);
 				if(jsonObject != null)
-					array.Append(jsonObject);
+					array.Add(jsonObject);
 			}	
 			obj[name] = array;
 		}

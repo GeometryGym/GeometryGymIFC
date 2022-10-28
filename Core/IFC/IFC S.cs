@@ -1906,13 +1906,14 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadTemperature : IfcStructuralLoadStatic
 	{
-		internal double mDeltaT_Constant, mDeltaT_Y, mDeltaT_Z;// : OPTIONAL IfcThermodynamicTemperatureMeasure; 
+		internal double mDeltaT_Constant = double.NaN, mDeltaT_Y = double.NaN, mDeltaT_Z = double.NaN;// : OPTIONAL IfcThermodynamicTemperatureMeasure; 
 		public double DeltaT_Constant { get { return mDeltaT_Constant; } set { mDeltaT_Constant = value; } }
 		public double DeltaT_Y { get { return mDeltaT_Y; } set { mDeltaT_Y = value; } }
 		public double DeltaT_Z { get { return mDeltaT_Z; } set { mDeltaT_Z = value; } }
 
 		internal IfcStructuralLoadTemperature() : base() { }
 		internal IfcStructuralLoadTemperature(DatabaseIfc db, IfcStructuralLoadTemperature t) : base(db,t) { mDeltaT_Constant = t.mDeltaT_Constant; mDeltaT_Y = t.mDeltaT_Y; mDeltaT_Z = t.mDeltaT_Z; }
+		public IfcStructuralLoadTemperature(DatabaseIfc db) : base(db) { }
 		public IfcStructuralLoadTemperature(DatabaseIfc db, double T, double TY, double TZ) : base(db) { mDeltaT_Constant = T; mDeltaT_Y = TY; mDeltaT_Z = TZ; }
 	}
 	[Serializable]

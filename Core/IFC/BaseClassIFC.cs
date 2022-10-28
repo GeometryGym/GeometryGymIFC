@@ -59,12 +59,15 @@ namespace GeometryGym.Ifc
 #endif
 		protected BaseClassIfc(DatabaseIfc db, BaseClassIfc e) : base()
 		{
-			mGlobalId = e.mGlobalId;
 			if (db != null)
 			{
+				if (e.mDatabase != null && string.Compare(db.id, e.mDatabase.id, false) != 0)
+					mGlobalId = e.mGlobalId;
 				db.appendObject(this);
 				db.Factory.mDuplicateMapping.AddObject(e, mStepId);
 			}
+			else
+				mGlobalId = e.mGlobalId;
 		}
 		protected BaseClassIfc(DatabaseIfc db) : base()
 		{
