@@ -506,7 +506,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set {  mName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string Specification { get { return mSpecification; } set { mSpecification = value; } }
-		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserIfc.Decode(x)); } }
+		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserSTEP.Decode(x)); } }
 		public SET<IfcRelAssociatesClassification> ClassificationForObjects { get { return mClassificationForObjects; } }
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 
@@ -1658,7 +1658,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcExternalReferenceRelationship> HasExternalReference { get { return mHasExternalReference; } }
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = ParserIfc.Encode(value); } }
+		public string Name { get { return ParserSTEP.Decode(mName); } set { mName = ParserSTEP.Encode(value); } }
 		public IfcMeasureWithUnit ConversionFactor { get { return mConversionFactor; } set { mConversionFactor = value; } }
 		
 		internal IfcConversionBasedUnit() : base() { }

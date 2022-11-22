@@ -1850,7 +1850,10 @@ additional types	some additional representation types are given:
 	[Serializable]
 	public partial class IfcStructuralLoadPlanarForce : IfcStructuralLoadStatic
 	{
-		internal double mPlanarForceX = 0, mPlanarForceY = 0, mPlanarForceZ = 0;// : OPTIONAL IfcPlanarForceMeasure; 
+		private double mPlanarForceX = double.NaN, mPlanarForceY = double.NaN, mPlanarForceZ = double.NaN;// : OPTIONAL IfcPlanarForceMeasure; 
+		public double PlanarForceX { get { return double.IsNaN(mPlanarForceX) ? 0 : mPlanarForceX; } set { mPlanarForceX = value; } }
+		public double PlanarForceY { get { return double.IsNaN(mPlanarForceY) ? 0 : mPlanarForceY; } set { mPlanarForceY = value; } }
+		public double PlanarForceZ { get { return double.IsNaN(mPlanarForceZ) ? 0 : mPlanarForceZ; } set { mPlanarForceZ = value; } }
 		internal IfcStructuralLoadPlanarForce() : base() { }
 		internal IfcStructuralLoadPlanarForce(DatabaseIfc db, IfcStructuralLoadPlanarForce f) : base(db,f) { mPlanarForceX = f.mPlanarForceX; mPlanarForceY = f.mPlanarForceY; mPlanarForceZ = f.mPlanarForceZ; }
 		public IfcStructuralLoadPlanarForce(DatabaseIfc db) : base(db) { }
@@ -1921,7 +1924,7 @@ additional types	some additional representation types are given:
 	{
 		//INVERSE
 		internal SET<IfcRelConnectsStructuralMember> mConnectedBy = new SET<IfcRelConnectsStructuralMember>();// : SET [0:?] OF IfcRelConnectsStructuralMember FOR RelatingStructuralMember 
-		internal IfcRelConnectsStructuralElement mStructuralMemberForGG = null;
+		internal IfcRelConnectsStructuralElement mStructuralMemberFor = null; // GG attribute
 
 		public SET<IfcRelConnectsStructuralMember> ConnectedBy { get { return mConnectedBy; } }
 

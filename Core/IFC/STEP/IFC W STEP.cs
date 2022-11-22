@@ -102,7 +102,7 @@ namespace GeometryGym.Ifc
 		{ 
 			return base.BuildStringSTEP(release) + "," + formatLength(mOverallHeight) + "," + formatLength(mOverallWidth) + 
 				(release < ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + 
-				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ".,$" : ".,'" + ParserIfc.Encode(mUserDefinedPartitioningType) + "'"));
+				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ".,$" : ".,'" + ParserSTEP.Encode(mUserDefinedPartitioningType) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 				s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcWindowTypePartitioningEnum>(s.Replace(".", ""), true, out mPartitioningType);
-				mUserDefinedPartitioningType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mUserDefinedPartitioningType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			}
 		}
 	}
@@ -195,7 +195,7 @@ namespace GeometryGym.Ifc
 				ParserSTEP.BoolToString(mParameterTakesPrecedence) + "," + ParserSTEP.BoolToString(false) : 
 				base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".,." + mPartitioningType.ToString() + ".," + 
 				ParserSTEP.BoolToString(mParameterTakesPrecedence) + 
-				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ",$" : ",'" + ParserIfc.Encode(mUserDefinedPartitioningType) + "'"));
+				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ",$" : ",'" + ParserSTEP.Encode(mUserDefinedPartitioningType) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -203,7 +203,7 @@ namespace GeometryGym.Ifc
 			Enum.TryParse<IfcWindowTypeEnum>(ParserSTEP.StripField(str,ref pos, len).Replace(".", ""), true, out mPredefinedType);
 			Enum.TryParse<IfcWindowTypePartitioningEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPartitioningType);
 			mParameterTakesPrecedence = ParserSTEP.StripBool(str, ref pos, len);
-			mUserDefinedPartitioningType = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mUserDefinedPartitioningType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcWorkCalendar
@@ -232,10 +232,10 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			if (release < ReleaseVersion.IFC4)
 			{
-				mIdentification = ParserSTEP.StripString(str, ref pos, len);
+				mIdentification = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mSSCreationDate = dictionary[ ParserSTEP.StripLink(str, ref pos, len)] as IfcDateTimeSelect;
 				Creators.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcPerson));
-				mPurpose = ParserSTEP.StripString(str, ref pos, len);
+				mPurpose = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mSSDuration = ParserSTEP.StripDouble(str, ref pos, len);
 				mSSTotalFloat = ParserSTEP.StripDouble(str, ref pos, len);
 				mSSStartTime = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDateTimeSelect;
@@ -243,13 +243,13 @@ namespace GeometryGym.Ifc
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcWorkControlTypeEnum>(s.Replace(".", ""), true, out mWorkControlType);
-				mUserDefinedControlType = ParserSTEP.StripString(str, ref pos, len);
+				mUserDefinedControlType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			}
 			else
 			{
 				mCreationDate = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 				Creators.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcPerson));
-				mPurpose = ParserSTEP.StripString(str, ref pos, len);
+				mPurpose = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mDuration = ParserSTEP.StripString(str, ref pos, len);
 				mTotalFloat = ParserSTEP.StripString(str, ref pos, len);
 				mStartTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
@@ -258,11 +258,16 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4 ? "'" + mIdentification + "'," + ParserSTEP.ObjToLinkString(mSSCreationDate) : IfcDateTime.STEPAttribute(mCreationDate)) +
+			return base.BuildStringSTEP(release) + "," + (release < ReleaseVersion.IFC4 ? "'" + ParserSTEP.Encode(mIdentification) + "'," +
+				ParserSTEP.ObjToLinkString(mSSCreationDate) : IfcDateTime.STEPAttribute(mCreationDate)) +
 				(mCreators.Count > 0 ? ",(" + string.Join(",", Creators.ConvertAll(x=>"#" + x.StepId)) + ")," : ",$,") +
-				(release < ReleaseVersion.IFC4 ? (mPurpose == "$" ? "$," : "'" + mPurpose + "',") + ParserSTEP.DoubleOptionalToString(mSSDuration) + "," + ParserSTEP.DoubleOptionalToString(mSSTotalFloat) + "," +
-					ParserSTEP.ObjToLinkString(mSSStartTime) + "," + ParserSTEP.ObjToLinkString(mSSFinishTime) + ",." + mWorkControlType.ToString() + (mUserDefinedControlType == "$" ? ".,$" : ".,'" + mUserDefinedControlType + "'") :
-				(mPurpose == "$" ? "$," : "'" + mPurpose + "',") + mDuration + "," + mTotalFloat + "," + IfcDateTime.STEPAttribute(mStartTime) + "," + IfcDateTime.STEPAttribute(mFinishTime));
+				(release < ReleaseVersion.IFC4 ? (mPurpose == "$" ? "$," : "'" + ParserSTEP.Encode(mPurpose) + "',") + 
+				ParserSTEP.DoubleOptionalToString(mSSDuration) + "," + ParserSTEP.DoubleOptionalToString(mSSTotalFloat) + "," +
+				ParserSTEP.ObjToLinkString(mSSStartTime) + "," + ParserSTEP.ObjToLinkString(mSSFinishTime) + ",." + mWorkControlType.ToString() + 
+				(mUserDefinedControlType == "$" ? ".,$" : ".,'" + mUserDefinedControlType + "'") :
+				(string.IsNullOrEmpty(mPurpose) ? "$," : "'" + ParserSTEP.Encode(mPurpose) + "',") + 
+				(string.IsNullOrEmpty(mDuration) ? "$," : mDuration + ",") + (string.IsNullOrEmpty(mTotalFloat) ? "$," : mTotalFloat + ",") + 
+				IfcDateTime.STEPAttribute(mStartTime) + "," + IfcDateTime.STEPAttribute(mFinishTime));
 		}
 	}
 	public partial class IfcWorkPlan

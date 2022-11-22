@@ -295,21 +295,21 @@ namespace GeometryGym.Ifc
 		//internal string mIdentifier	 : 	IfcIdentifier; IFC4 moved to control
 		internal DateTime mCreationDate;// : IfcDateTime;
 		internal SET<IfcPerson> mCreators = new SET<IfcPerson>();// : OPTIONAL SET [1:?] OF IfcPerson;
-		internal string mPurpose = "$";// : OPTIONAL IfcLabel;
-		internal string mDuration = "$", mTotalFloat = "$";// : OPTIONAL IfcDuration; IFC4
+		internal string mPurpose = "";// : OPTIONAL IfcLabel;
+		internal string mDuration = "", mTotalFloat = "";// : OPTIONAL IfcDuration; IFC4
 		internal DateTime mStartTime;// : IfcDateTime;
 		internal DateTime mFinishTime = DateTime.MinValue;// : OPTIONAL IfcDateTime;  IFC4
 		internal double mSSDuration = 0, mSSTotalFloat = 0; //: 	OPTIONAL IfcTimeMeasure; 
 		internal IfcDateTimeSelect mSSCreationDate, mSSStartTime; //: 	IfcDateTimeSelect;
 		internal IfcDateTimeSelect mSSFinishTime; //: OPTIONAL IfcDateTimeSelect;
 		internal IfcWorkControlTypeEnum mWorkControlType = IfcWorkControlTypeEnum.NOTDEFINED;//	 : 	OPTIONAL IfcWorkControlTypeEnum; IFC2x3
-		internal string mUserDefinedControlType = "$";//	 : 	OPTIONAL IfcLabel;
+		internal string mUserDefinedControlType = "";//	 : 	OPTIONAL IfcLabel;
 
 		public DateTime CreationDate { get { return mCreationDate; } set { mCreationDate = value; } }
 		public SET<IfcPerson> Creators { get { return mCreators; } } 
 		public DateTime StartTime { get { return mStartTime; } set { mStartTime = value; } }
 		public DateTime FinishTime { get { return mFinishTime; } set { mFinishTime = value; } }
-		public string Purpose { get { return (mPurpose == "$" ? "" : ParserIfc.Decode(mPurpose)); } set { mPurpose = (string.IsNullOrEmpty(value) ? "$" : ParserIfc.Encode(value)); } }
+		public string Purpose { get { return mPurpose; } set { mPurpose = value; } }
 
 		protected IfcWorkControl() : base() { mCreationDate = DateTime.Now; mStartTime = DateTime.Now; }
 		protected IfcWorkControl(DatabaseIfc db) : base(db)

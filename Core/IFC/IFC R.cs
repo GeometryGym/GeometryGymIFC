@@ -470,7 +470,7 @@ namespace GeometryGym.Ifc
 		internal double mBarCount = double.NaN; // : OPTIONAL IfcCountMeasure; 
 
 		public double TotalCrossSectionArea { get { return mTotalCrossSectionArea; } set { mTotalCrossSectionArea = value; } }
-		public string SteelGrade { get { return ParserIfc.Decode(mSteelGrade); } set { mSteelGrade = ParserIfc.Encode(value); } }
+		public string SteelGrade { get { return mSteelGrade; } set { mSteelGrade = string.IsNullOrEmpty(value) ? "Unknown" : value; } }
 		public IfcReinforcingBarSurfaceEnum BarSurface { get { return mBarSurface; } set { mBarSurface = value; } }
 		public double EffectiveDepth { get { return mEffectiveDepth; } set { mEffectiveDepth = value; } }
 		public double NominalBarDiameter { get { return mNominalBarDiameter; } set { mNominalBarDiameter = value; } }
@@ -1327,7 +1327,7 @@ namespace GeometryGym.Ifc
 		internal IfcStructuralMember mRelatedStructuralMember;// : IfcStructuralMember; 
 
 		public IfcElement RelatingElement { get { return mRelatingElement as IfcElement; } set { mRelatingElement = value; value.mHasStructuralMember.Add(this); } }
-		public IfcStructuralMember RelatedStructuralMember { get { return mRelatedStructuralMember as IfcStructuralMember; } set { mRelatedStructuralMember = value; value.mStructuralMemberForGG = this; } }
+		public IfcStructuralMember RelatedStructuralMember { get { return mRelatedStructuralMember as IfcStructuralMember; } set { mRelatedStructuralMember = value; value.mStructuralMemberFor = this; } }
 
 		internal IfcRelConnectsStructuralElement() : base() { }
 		internal IfcRelConnectsStructuralElement(DatabaseIfc db, IfcRelConnectsStructuralElement c, DuplicateOptions options) : base(db, c, options)

@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mAreaValue) + 
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityCount
@@ -58,7 +58,7 @@ namespace GeometryGym.Ifc
 		{ 
 			return base.BuildStringSTEP(release) + "," + 
 				(release < ReleaseVersion.IFC4X3 ? ParserSTEP.DoubleToString(CountValueDouble) : CountValue.ToString()) + 
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty( mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'")); }
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty( mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'")); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -86,7 +86,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityLength
@@ -94,7 +94,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(Math.Max(0, mLengthValue)) +
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -109,7 +109,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityNumber
@@ -117,7 +117,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mNumberValue) +
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -131,7 +131,7 @@ namespace GeometryGym.Ifc
 					double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mNumberValue);
 				}
 			}
-			mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityTime
@@ -139,14 +139,14 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString( mTimeValue) +
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			double.TryParse(ParserSTEP.StripField(str, ref pos, len), System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out mTimeValue);
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityVolume
@@ -154,7 +154,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mVolumeValue) +
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -167,7 +167,7 @@ namespace GeometryGym.Ifc
 					mVolumeValue = mv.Measure;
 			}
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcQuantityWeight
@@ -175,7 +175,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mWeightValue) +
-				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserIfc.Encode(mFormula) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mFormula) ? ",$" : ",'" + ParserSTEP.Encode(mFormula) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -188,7 +188,7 @@ namespace GeometryGym.Ifc
 					mWeightValue = mv.Measure;
 			}
 			if (release > ReleaseVersion.IFC2x3)
-				mFormula = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mFormula = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 }

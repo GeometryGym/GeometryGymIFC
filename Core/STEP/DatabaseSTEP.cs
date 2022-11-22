@@ -29,16 +29,16 @@ using System.Text;
 using System.Threading;
 using GeometryGym.STEP;
 using System.Collections;
-
+using GeometryGym.Ifc;
 
 namespace GeometryGym.STEP
 {
 	public partial class DatabaseSTEP<T> : IEnumerable<T> where T : STEPEntity//, new()
 	{
 		public string FolderPath { get; set; }
-		public string OriginatingSystem { get; set; }
-		public DateTime TimeStamp { get; set; } = DateTime.MinValue;
 
+		public STEPFileInformation OriginatingFileInformation = null;
+	
 		public List<string> Comments { get; } = new List<string>();
 
 		internal string mFileName = "";
@@ -105,7 +105,68 @@ namespace GeometryGym.STEP
 		internal void logParseError(string str) { string error = "XX Error " + str;  if (!mParsingErrors.Contains(error)) mParsingErrors.Add(error); }
 		internal void logParseWarning(string str) { string warning = "!! Warning " + str; if (!mParsingWarnings.Contains(warning)) mParsingWarnings.Add(warning); }
 
-	
+
+		internal virtual bool processFileHeaderLine(string line)
+		{
+			
+			string trimmedLine = ParserSTEP.StripComments(line).Trim();
+			ParserSTEP.GetKeyWord(trimmedLine, out int stepID, out string keyword, out string def);
+			int pos = 0, len = def.Length;
+			if (string.Compare(keyword, "FILE_DESCRIPTION", true) == 0)
+			{
+				if (OriginatingFileInformation == null)
+					OriginatingFileInformation = new STEPFileInformation();
+				string field = ParserSTEP.StripField(def, ref pos, len);
+				List<string> fields = ParserSTEP.SplitListStrings(field);
+				OriginatingFileInformation.FileDescriptions.AddRange(fields.Select(x => ParserSTEP.Decode(x)));
+				OriginatingFileInformation.FileImplementationLevel = ParserSTEP.StripString(def, ref pos, len);
+				ProcessFileDescription();
+				return true;
+			}
+			if (string.Compare(keyword, "FILE_NAME", true) == 0)
+			{
+				if (OriginatingFileInformation == null)
+					OriginatingFileInformation = new STEPFileInformation();
+				try
+				{
+					string str = ParserSTEP.StripString(def, ref pos, len);
+					OriginatingFileInformation.FileName = ParserSTEP.Decode(str);
+					str = ParserSTEP.StripString(def, ref pos, len);
+					if (DateTime.TryParse(str, out DateTime dateTime))
+						OriginatingFileInformation.TimeStamp = dateTime;
+					str = ParserSTEP.StripField(def, ref pos, len);
+					OriginatingFileInformation.Author.AddRange(ParserSTEP.SplitListStrings(str).Select(x=>ParserSTEP.Decode(x)));
+					str = ParserSTEP.StripField(def, ref pos, len);
+					OriginatingFileInformation.Organization.AddRange(ParserSTEP.SplitListStrings(str).Select(x=>ParserSTEP.Decode(x)));
+					str = ParserSTEP.StripString(def, ref pos, len);
+					OriginatingFileInformation.PreProcessorVersion = ParserSTEP.Decode(str);
+					str = ParserSTEP.StripString(def, ref pos, len);
+					OriginatingFileInformation.OriginatingSystem = ParserSTEP.Decode(str);
+					str = ParserSTEP.StripString(def, ref pos, len);
+					OriginatingFileInformation.Authorization = ParserSTEP.Decode(str);
+				}
+				catch { }
+				return true;
+			}
+			return false;
+		}
+		internal virtual void ProcessFileDescription() { }
+	}
+
+	public class STEPFileInformation
+	{
+		public List<string> FileDescriptionViewDefinition { get; set; } = new List<string>();
+		public List<string> FileDescriptionExchangeRequirements { get; set; } = new List<string>();
+
+		public List<string> FileDescriptions { get; set; } = new List<string>();
+		public string FileImplementationLevel { get; set; } = "";
+		public string FileName { get; set; } = "";
+		public DateTime TimeStamp { get; set; } = DateTime.MinValue;
+		public List<string> Author { get; set; } = new List<string>();
+		public List<string> Organization { get; set; } = new List<string>();
+		public string PreProcessorVersion { get; set; } = "";
+		public string OriginatingSystem { get; set; } = "";
+		public string Authorization { get; set; } = ""; 
 	}
 }
 

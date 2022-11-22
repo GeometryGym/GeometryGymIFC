@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mVertexGeometry.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
 		{ 
-			mVertexGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, str.Length)] as IfcPoint;
+			VertexGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, str.Length)] as IfcPoint;
 		}
 	}
 	public partial class IfcVibrationDamper

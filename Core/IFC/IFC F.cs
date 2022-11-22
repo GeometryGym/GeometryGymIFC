@@ -154,7 +154,7 @@ namespace GeometryGym.Ifc
 		public IfcFacetedBrepWithVoids(IfcClosedShell s, IEnumerable<IfcClosedShell> voids) : base(s) { mVoids.AddRange(voids); }
 	}
 	[Serializable]
-	public partial class IfcFacility : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBridge, IfcBuilding)
+	public partial class IfcFacility : IfcSpatialStructureElement //SUPERTYPE OF(IfcBridge , IfcBuilding , IfcMarineFacility , IfcRailway , IfcRoad)
 	{
 		internal IfcFacility() : base() { }
 		public IfcFacility(DatabaseIfc db) : base(db.Factory.RootPlacement) { }

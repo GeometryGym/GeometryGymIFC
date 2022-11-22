@@ -1459,9 +1459,9 @@ namespace GeometryGym.Ifc
 		internal string mApplicationIdentifier;// : IfcIdentifier; 
 		
 		public IfcOrganization ApplicationDeveloper { get { return mApplicationDeveloper; } set { mApplicationDeveloper = value; } }
-		public string Version { get { return mVersion; } set { mVersion = ParserIfc.Encode(value); } }
-		public string ApplicationFullName { get { return ParserIfc.Decode(mApplicationFullName); } set { mApplicationFullName =  ParserIfc.Encode(value); } }
-		public string ApplicationIdentifier { get { return ParserIfc.Decode(mApplicationIdentifier); } set { mApplicationIdentifier =  ParserIfc.Encode(value); } }
+		public string Version { get { return mVersion; } set { mVersion = ParserSTEP.Encode(value); } }
+		public string ApplicationFullName { get { return ParserSTEP.Decode(mApplicationFullName); } set { mApplicationFullName =  ParserSTEP.Encode(value); } }
+		public string ApplicationIdentifier { get { return ParserSTEP.Decode(mApplicationIdentifier); } set { mApplicationIdentifier =  ParserSTEP.Encode(value); } }
 
 		public string Name { get { return ApplicationFullName; } set { ApplicationFullName = value; } }
 

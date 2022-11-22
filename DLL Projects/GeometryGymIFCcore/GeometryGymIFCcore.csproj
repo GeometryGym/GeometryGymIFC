@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>GeometryGymIFC_Core</PackageId>
-    <Version>0.2.06</Version>
+    <Version>0.2.07</Version>
     <Authors>Geometry Gym</Authors>
     <Product>GeometryGymIFC_Core</Product>
     <Description>.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
@@ -14,13 +14,17 @@ License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Descr
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/GeometryGym/GeometryGymIFC</RepositoryUrl>
     <PackageTags>BIM, IFC, openBIM</PackageTags>
-    <AssemblyVersion>0.2.06.0</AssemblyVersion>
-    <FileVersion>0.2.06.0</FileVersion>
+    <AssemblyVersion>0.2.07.0</AssemblyVersion>
+    <FileVersion>0.2.07.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD2_0 NOIFCJSON</DefineConstants>
+    <DefineConstants>TRACE;NETSTANDARD2_0;NOIFCJSON</DefineConstants>
     <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;NOIFCJSON</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

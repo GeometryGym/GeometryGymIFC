@@ -87,7 +87,7 @@ namespace GeometryGym.Ifc
 		}
 		internal string removeFileNameIllegal(string filename)
 		{
-			return ParserIfc.Encode(filename).Replace("*", "x").Replace(".", "_").Replace("\"", "").Replace("/", "_").Replace("\\", "_").Replace("[", "(").Replace("]", ")").Replace(":", "-").Replace(";", "-").Replace("|", "-").Replace("=", "-").Replace(",", "_").Replace("<", "(").Replace(">", ")");
+			return ParserSTEP.Encode(filename).Replace("*", "x").Replace(".", "_").Replace("\"", "").Replace("/", "_").Replace("\\", "_").Replace("[", "(").Replace("]", ")").Replace(":", "-").Replace(";", "-").Replace("|", "-").Replace("=", "-").Replace(",", "_").Replace("<", "(").Replace(">", ")");
 		}
 		internal string RepositoryName { get { return removeFileNameIllegal(genRepositoryName); } }
 		protected string RepositoryNameStub { get { return mGlobalId; } }

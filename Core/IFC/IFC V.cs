@@ -131,8 +131,8 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcVertexPoint : IfcVertex, IfcPointOrVertexPoint
 	{
-		internal IfcPoint mVertexGeometry;// : IfcPoint; 
-		public IfcPoint VertexGeometry { get { return mVertexGeometry; } set { mVertexGeometry = value; } }
+		private IfcPoint mVertexGeometry;// : IfcPoint; 
+		public IfcPoint VertexGeometry { get { return mVertexGeometry; } set { mVertexGeometry = value; if (value != null) value.mOfVertex = this; } }
 		
 		internal IfcVertexPoint() : base() { }
 		internal IfcVertexPoint(DatabaseIfc db, IfcVertexPoint v, DuplicateOptions options) : base(db, v, options) { VertexGeometry = db.Factory.Duplicate(v.VertexGeometry) as IfcPoint; }
@@ -761,7 +761,7 @@ namespace GeometryGym.Ifc
 		public override object Value { get { return Identifier; } set { Identifier = value.ToString(); } }
 		public override Type ValueType { get { return typeof(string); } }
 		public IfcIdentifier(string value) { Identifier = value; }
-		public override string ToString() { return "IFCIDENTIFIER('" + ParserIfc.Encode( Identifier) + "')"; }
+		public override string ToString() { return "IFCIDENTIFIER('" + ParserSTEP.Encode( Identifier) + "')"; }
 	}
 	[Serializable]
 	public partial class IfcInteger : IfcSimpleValue
@@ -779,7 +779,7 @@ namespace GeometryGym.Ifc
 		public override object Value { get { return Label; } set { Label = value.ToString(); } }
 		public override Type ValueType { get { return typeof(string); } }
 		public IfcLabel(string value) { Label = value; }
-		public override string ToString() { return "IFCLABEL('" + ParserIfc.Encode(Label) + "')"; }
+		public override string ToString() { return "IFCLABEL('" + ParserSTEP.Encode(Label) + "')"; }
 	}
 	[Serializable]
 	public partial class IfcLogical : IfcSimpleValue
@@ -830,7 +830,7 @@ namespace GeometryGym.Ifc
 		public override object Value { get { return Text; } set { Text = value.ToString(); } }
 		public override Type ValueType { get { return typeof(string); } }
 		public IfcText(string value) { Text = value; }
-		public override string ToString() { return "IFCTEXT('" + ParserIfc.Encode(Text) + "')"; }
+		public override string ToString() { return "IFCTEXT('" + ParserSTEP.Encode(Text) + "')"; }
 	}
 	[Serializable]
 	public partial class IfcTime : IfcSimpleValue
@@ -906,7 +906,7 @@ namespace GeometryGym.Ifc
 		}
 		public override Type ValueType { get { return typeof(Uri); } }
 		public IfcURIReference(string value) { mValue = value; }
-		public override string ToString() { return "IFCURIREFERENCE('" + ParserIfc.Encode(mValue) + "')"; }
+		public override string ToString() { return "IFCURIREFERENCE('" + ParserSTEP.Encode(mValue) + "')"; }
 	}
 
 	[Serializable]

@@ -31,11 +31,11 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcImageTexture
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + ParserIfc.Encode(mUrlReference) + "'"; }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",'" + ParserSTEP.Encode(mUrlReference) + "'"; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mUrlReference = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mUrlReference = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcIndexedColourMap

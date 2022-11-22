@@ -352,7 +352,7 @@ namespace GeometryGym.Ifc
 
 		public abstract IfcMeasureValue MeasureValue { get; }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC2x2)]
 	public partial class IfcPile : IfcDeepFoundation
 	{
 		private IfcPileTypeEnum mPredefinedType = IfcPileTypeEnum.NOTDEFINED;// OPTIONAL : IfcPileTypeEnum;
@@ -510,6 +510,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
 	{
+		//INVERSE
+		internal IfcVertexPoint mOfVertex = null; // GG attribute
+
 		protected IfcPoint() : base() { }
 		protected IfcPoint(DatabaseIfc db) : base(db) { }
 		protected IfcPoint(DatabaseIfc db, IfcPoint p, DuplicateOptions options) : base(db, p, options) { }
@@ -1658,7 +1661,7 @@ namespace GeometryGym.Ifc
 		internal string mMapZone = "";// : OPTIONAL IfcIdentifier 
 		internal IfcNamedUnit mMapUnit = null;// :	OPTIONAL IfcNamedUnit;
 
-		public string MapProjection { get { return mMapProjection; } set { mMapProjection = ParserIfc.Encode(value); } }
+		public string MapProjection { get { return mMapProjection; } set { mMapProjection = value; } }
 		public string MapZone { get { return mMapZone; } set { mMapZone = value; } }
 		public IfcNamedUnit MapUnit { get { return mMapUnit; } set { mMapUnit = value; } }
 
@@ -1976,7 +1979,7 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcValue> mEnumerationValues = new LIST<IfcValue>();// :	LIST [1:?] OF UNIQUE IfcValue
 		internal IfcUnit mUnit; //	 :	OPTIONAL IfcUnit;
 
-		public string Name { get { return ParserIfc.Decode(mName); } set { mName = (string.IsNullOrEmpty(value) ? "Unknown" : ParserIfc.Encode(value)); } }
+		public string Name { get { return mName; } set { mName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
 		public LIST<IfcValue> EnumerationValues { get { return mEnumerationValues; } }
 		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
 

@@ -204,6 +204,21 @@ namespace GeometryGym.Ifc
 				return ReleaseVersion.IFC4X3;
 			return ReleaseVersion.IFC4A2;
 		}
+
+		internal override void ProcessFileDescription()
+		{
+			base.ProcessFileDescription();
+			foreach (string description in OriginatingFileInformation.FileDescriptions)
+			{
+				string modelView = description.ToLower();
+				if (modelView.Contains("coordination"))
+					ModelView = ModelView.Ifc2x3Coordination;
+				else if (modelView.Contains("referenceview"))
+					ModelView = ModelView.Ifc4Reference;
+				else if (modelView.Contains("designtransfer"))
+					ModelView = ModelView.Ifc4DesignTransfer;
+			}
+		}
 		public double Tolerance
 		{
 			get { return mModelTolerance; }
@@ -462,6 +477,8 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 	}
+
+
 	public class DuplicateMapping
 	{
 		private Dictionary<string, int> mDictionary = new Dictionary<string, int>();
@@ -2482,13 +2499,13 @@ namespace GeometryGym.Ifc
 						if(obj is IfcRoot root)
 							root.GlobalId = ParserSTEP.StripString(def, ref pos, def.Length);
 						else if(obj is IfcProperty property)
-							property.Name = ParserIfc.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
+							property.Name = ParserSTEP.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
 						else if(obj is IfcPropertyTemplate propertyTemplate)
-							propertyTemplate.Name = ParserIfc.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
+							propertyTemplate.Name = ParserSTEP.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
 						else if(obj is IfcPhysicalQuantity quantity)
-							quantity.Name = ParserIfc.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
+							quantity.Name = ParserSTEP.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
 						else if(obj is IfcMaterialConstituent materialConstituent)
-							materialConstituent.Name = ParserIfc.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
+							materialConstituent.Name = ParserSTEP.Decode(ParserSTEP.StripString(def, ref pos, def.Length));
 					}
 				}
 				catch (Exception) { }
@@ -2509,86 +2526,47 @@ namespace GeometryGym.Ifc
 		}
 		internal bool processFileHeaderLine(string line)
 		{
-			string ts = line.Replace(" ", "");
-			if (ts.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
-					ts.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
+			string lineNoSpaces = ParserSTEP.StripComments(line).Replace(" ", "");
+			if(lineNoSpaces.StartsWith("FILE_SCHEMA"))
 			{
-				if (ts.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X1;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X2;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture) ||
-					ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3_RC1;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC2", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC3", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
-				else if (ts.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
-					mDatabase.Release = ReleaseVersion.IFC4X3;
-				else
-					mDatabase.Release = ReleaseVersion.IFC4;
-				if (mDatabase.Release > ReleaseVersion.IFC2x3)
+				if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
+						lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
 				{
-					if (mDatabase.Release == ReleaseVersion.IFC4X1)
-						mDatabase.ModelView = ModelView.Ifc4X1NotAssigned;
-					else if (mDatabase.Release == ReleaseVersion.IFC4X2)
-						mDatabase.ModelView = ModelView.Ifc4X2NotAssigned;
-					else if(mDatabase.Release > ReleaseVersion.IFC4X2)
+					if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X1;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X2;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture) ||
+						lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X3_RC1;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC2", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC3", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
+					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
+						mDatabase.Release = ReleaseVersion.IFC4X3;
+					else
+						mDatabase.Release = ReleaseVersion.IFC4;
+					if (mDatabase.Release > ReleaseVersion.IFC2x3)
 					{
-						mDatabase.ModelView = ModelView.Ifc4X3NotAssigned;
-					}
-					else if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
-						mDatabase.ModelView = ModelView.Ifc4NotAssigned;
-				}
-				return true;
-			}
-			if (ts.StartsWith("FILE_DESCRIPTION", true, System.Globalization.CultureInfo.CurrentCulture))
-			{
-				int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
-				if (pos1 > 1 && pos2 > pos1)
-				{
-					string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
-					List<string> fields = ParserSTEP.SplitLineFields(str);
-					if(fields.Count > 0)
-					{
-						string modelView = fields[0].ToLower();
-						if (modelView.Contains("coordination"))
-							mDatabase.ModelView = ModelView.Ifc2x3Coordination;
-						else if (modelView.Contains("referenceview"))
-							mDatabase.ModelView = ModelView.Ifc4Reference;
-						else if (modelView.Contains("designtransfer"))
-							mDatabase.ModelView = ModelView.Ifc4DesignTransfer;
-					}
-				}
-				return true;
-			}
-			if (ts.StartsWith("FILE_NAME", true, System.Globalization.CultureInfo.CurrentCulture))
-			{
-				try
-				{
-					int pos1 = ts.IndexOf('('), pos2 = ts.LastIndexOf(')');
-					if (pos1 > 1 && pos2 > pos1)
-					{
-						string str = ts.Substring(pos1 + 1, pos2 - pos1 - 2);
-						List<string> fields = ParserSTEP.SplitLineFields(str);
-						if (fields.Count > 1)
+						if (mDatabase.Release == ReleaseVersion.IFC4X1)
+							mDatabase.ModelView = ModelView.Ifc4X1NotAssigned;
+						else if (mDatabase.Release == ReleaseVersion.IFC4X2)
+							mDatabase.ModelView = ModelView.Ifc4X2NotAssigned;
+						else if (mDatabase.Release > ReleaseVersion.IFC4X2)
 						{
-							string field = ParserSTEP.StripComments(fields[1].Replace("'", "").Trim());
-							DateTime dateTime = DateTime.MinValue;
-							if (DateTime.TryParse(field, out dateTime))
-								mDatabase.TimeStamp = dateTime;
-							if(fields.Count > 5)
-								mDatabase.OriginatingSystem = ParserSTEP.StripComments(fields[5].Replace("'", ""));
+							mDatabase.ModelView = ModelView.Ifc4X3NotAssigned;
 						}
+						else if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
+							mDatabase.ModelView = ModelView.Ifc4NotAssigned;
 					}
+					return true;
 				}
-				catch { }
-				return true;
 			}
-			return false;
+			
+			return mDatabase.processFileHeaderLine(line);
 		}
 
 
@@ -2743,27 +2721,27 @@ namespace GeometryGym.Ifc
 			lines.Add("ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + modelView + "]'),'2;1');");
 			
 			lines.Add("FILE_NAME(");
-			lines.Add("/* name */ '" + ParserIfc.Encode(fileName) + "',");
+			lines.Add("/* name */ '" + ParserSTEP.Encode(fileName) + "',");
 			DateTime now = DateTime.Now;
 			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
 			IfcPerson person = mDatabase.Factory.mPerson;
 			string authorName = person == null ? mDatabase.Factory.PersonIdentification() : person.Name;
-			lines.Add("/* author */ ('" + ParserIfc.Encode(authorName) + "'),");
+			lines.Add("/* author */ ('" + ParserSTEP.Encode(authorName) + "'),");
 			string organizationName = IfcOrganization.Organization;
 			IfcOrganization organization = mDatabase.Factory.Organization;
 			if (organization != null)
 				organizationName = organization.Name; 
-			lines.Add("/* organization */ ('" + ParserIfc.Encode(organizationName) + "'),");
-			lines.Add("/* preprocessor_version */ '" + ParserIfc.Encode(mDatabase.Factory.ToolkitName) + "',");
-			lines.Add("/* originating_system */ '" + ParserIfc.Encode(mDatabase.Factory.ApplicationFullName) + "',");
+			lines.Add("/* organization */ ('" + ParserSTEP.Encode(organizationName) + "'),");
+			lines.Add("/* preprocessor_version */ '" + ParserSTEP.Encode(mDatabase.Factory.ToolkitName) + "',");
+			lines.Add("/* originating_system */ '" + ParserSTEP.Encode(mDatabase.Factory.ApplicationFullName) + "',");
 
-			lines.Add("/* authorization */ '" + (string.IsNullOrEmpty(mDatabase.Authorization) ? "None" : ParserIfc.Encode(mDatabase.Authorization)) + "'");
+			lines.Add("/* authorization */ '" + (string.IsNullOrEmpty(mDatabase.Authorization) ? "None" : ParserSTEP.Encode(mDatabase.Authorization)) + "'");
 			if(mDatabase.Comments.Count > 0)
 			{
 				foreach (string comment in mDatabase.Comments)
 				{
 					if(!string.IsNullOrEmpty(comment))
-						lines.Add("/* " + ParserIfc.Encode(comment) + "*/");
+						lines.Add("/* " + ParserSTEP.Encode(comment) + "*/");
 				}
 			}
 			lines.Add(");");

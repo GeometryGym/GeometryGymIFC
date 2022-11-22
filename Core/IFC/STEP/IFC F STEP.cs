@@ -380,7 +380,7 @@ namespace GeometryGym.Ifc
 				(mVelocityTimeSeries == null ? ",$" : ",#" + mVelocityTimeSeries.StepId) +
 				(mFlowrateTimeSeries == null ? ",$" : ",#" + mFlowrateTimeSeries.StepId) + ",#" + mFluid.StepId +  
 				(mPressureTimeSeries == null ? ",$"  : ",#" + mPressureTimeSeries.StepId) + 
-				(string.IsNullOrEmpty(mUserDefinedPropertySource) ? ",$," : ",'" + ParserIfc.Encode(mUserDefinedPropertySource) + "',") + 
+				(string.IsNullOrEmpty(mUserDefinedPropertySource) ? ",$," : ",'" + ParserSTEP.Encode(mUserDefinedPropertySource) + "',") + 
 				ParserSTEP.DoubleOptionalToString(mTemperatureSingleValue) + "," + ParserSTEP.DoubleOptionalToString(mWetBulbTemperatureSingleValue) + "," + 
 				(mWetBulbTemperatureTimeSeries == null ? ",$" : ",#" + mWetBulbTemperatureTimeSeries.StepId) +
 				(mTemperatureTimeSeries == null ? ",$" :",#" + mTemperatureTimeSeries.StepId) + "," + 
@@ -396,7 +396,7 @@ namespace GeometryGym.Ifc
 			mFlowrateTimeSeries = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTimeSeries;
 			mFluid = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
 			mPressureTimeSeries = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTimeSeries;
-			mUserDefinedPropertySource = ParserIfc.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mUserDefinedPropertySource = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mTemperatureSingleValue = ParserSTEP.StripLink(str, ref pos, len);
 			mWetBulbTemperatureSingleValue = ParserSTEP.StripLink(str, ref pos, len);
 			mWetBulbTemperatureTimeSeries = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcTimeSeries;
