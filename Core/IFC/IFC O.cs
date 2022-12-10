@@ -707,6 +707,7 @@ namespace GeometryGym.Ifc
 		{
 			public bool CheckRelatedObjects = true;
 			public double Tolerance = 1e-5;
+			public bool IgnoreTypeRepresentationMaps = false;
 			public OptionsTestDuplicate(double tol)
 			{
 				Tolerance = tol;
@@ -821,7 +822,14 @@ namespace GeometryGym.Ifc
 		}
 		protected virtual IfcObjectPlacement DuplicateWorker(DatabaseIfc db) { return null; }
 
-		internal virtual bool isXYPlane(double tol) { return false; }
+		internal bool isXYPlane(double tol)
+		{
+			IfcSpatialStructureElement spatial = PlacesObject.OfType<IfcSpatialStructureElement>().FirstOrDefault() as IfcSpatialStructureElement;
+			if (spatial != null && spatial.WorkingInLocalCoordinates())
+				return true;
+			return isXYPlaneWorker(tol);
+		}
+		internal abstract bool isXYPlaneWorker(double tol);
 	}
 	[Serializable]
 	public partial class IfcObjective : IfcConstraint

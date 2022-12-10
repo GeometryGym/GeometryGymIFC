@@ -1632,7 +1632,7 @@ namespace GeometryGym.Ifc
 				Name = "UNKNOWN PROJECT";
 		}
 
-		public IfcSpatialElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSpatialElement);  }
+		public IfcSpatialStructureElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSpatialStructureElement);  }
 		internal IfcSite getSite() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSite); }
 		public IfcSite UppermostSite() { return getSite(); }
 		public IfcBuilding UppermostBuilding()

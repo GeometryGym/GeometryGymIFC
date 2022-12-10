@@ -1169,7 +1169,17 @@ additional types	some additional representation types are given:
 			host.AddAggregated(this);
 		}
 		protected IfcSpatialElement(IfcObjectPlacement placement) : base(placement) { }
-		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		protected IfcSpatialElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) 
+		{ 
+			if(placement == null)
+			{
+				IfcAxis2Placement3D relativePlacement = mDatabase.Factory.XYPlanePlacement;
+				if (host is IfcProduct product && product.ObjectPlacement != null)
+					ObjectPlacement = new IfcLocalPlacement(product.ObjectPlacement, relativePlacement);
+				else
+					ObjectPlacement = new IfcLocalPlacement(relativePlacement);
+			}
+		}
 		protected override void initialize()
 		{
 			base.initialize();
@@ -1290,6 +1300,11 @@ additional types	some additional representation types are given:
 		protected IfcSpatialStructureElement(DatabaseIfc db, IfcSpatialStructureElement e, DuplicateOptions options) : base(db, e, options) { mCompositionType = e.mCompositionType; }
 		protected IfcSpatialStructureElement(IfcSpatialStructureElement host, string name) : base(host,name) { if (mDatabase.mRelease < ReleaseVersion.IFC4) mCompositionType = IfcElementCompositionEnum.ELEMENT; }
 		protected IfcSpatialStructureElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+
+		private bool mWorkInLocalCoordinates = false;  //Identify Transform when ignoring placement for Site
+		public void EnableLocalCoordinates() { mWorkInLocalCoordinates = true; }
+		public void DisableLocalCoordinates() { mWorkInLocalCoordinates = false; }
+		public bool WorkingInLocalCoordinates() { return mWorkInLocalCoordinates; }
 	}
 	[Serializable]
 	public abstract partial class IfcSpatialStructureElementType : IfcSpatialElementType //ABSTRACT SUPERTYPE OF (ONEOF (IfcSpaceType))

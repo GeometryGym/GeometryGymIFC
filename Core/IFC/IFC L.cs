@@ -402,6 +402,10 @@ namespace GeometryGym.Ifc
 			PlacementMeasuredAlong = placementMeasuredAlong;
 			Distance = distance;
 		}
+		internal override bool isXYPlaneWorker(double tol)
+		{
+			return false;
+		}
 	}
 	[Serializable]
 	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
@@ -530,7 +534,7 @@ namespace GeometryGym.Ifc
 				PlacementRelTo = relativeTo;
 		}
 
-		internal override bool isXYPlane(double tol)
+		internal override bool isXYPlaneWorker(double tol)
 		{
 			IfcLocalPlacement placement = PlacementRelTo as IfcLocalPlacement;
 			if (RelativePlacement.IsXYPlane(tol) && (placement == null || placement.isXYPlane(tol)))

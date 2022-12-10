@@ -749,23 +749,19 @@ namespace GeometryGym.Ifc
 
 		internal IfcDoorType() : base() { }
 		internal IfcDoorType(DatabaseIfc db, IfcDoorType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; mOperationType = t.mOperationType; mParameterTakesPrecedence = t.mParameterTakesPrecedence; mUserDefinedOperationType = t.mUserDefinedOperationType; }
-		public IfcDoorType(DatabaseIfc db, string name, IfcDoorTypeEnum type) : this(db, name, type, IfcDoorTypeOperationEnum.NOTDEFINED, false) { }
+		public IfcDoorType(DatabaseIfc db, string name, IfcDoorTypeEnum type) : base(db, name) { mPredefinedType = type; }
 		internal IfcDoorType(DatabaseIfc db, string name, IfcDoorTypeEnum type, IfcDoorTypeOperationEnum operation, IfcDoorLiningProperties lp, List<IfcDoorPanelProperties> pps)
-			: base(db)
+			: this(db, name, type)
 		{
-			Name = name;
 			if (lp != null) mHasPropertySets.Add(lp);
 			if (pps != null && pps.Count > 0) mHasPropertySets.AddRange(pps);
-			PredefinedType = type;
 			mOperationType = operation;
 			mParameterTakesPrecedence = true;
 			 
 		}
 		internal IfcDoorType(DatabaseIfc db, string name, IfcDoorTypeEnum type, IfcDoorTypeOperationEnum operation, bool parameterTakesPrecendence)
-			: base(db)
+			: this(db, name, type)
 		{
-			Name = name;
-			PredefinedType = type;
 			mOperationType = operation;
 			mParameterTakesPrecedence = parameterTakesPrecendence;
 		}

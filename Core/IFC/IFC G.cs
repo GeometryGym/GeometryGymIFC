@@ -574,6 +574,11 @@ namespace GeometryGym.Ifc
 			if (p.mPlacementRefDirection != null)
 				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcGridPlacementDirectionSelect;
 		}
+
+		internal override bool isXYPlaneWorker(double tol)
+		{
+			return false;
+		}
 	}
 	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);
 	[Serializable]

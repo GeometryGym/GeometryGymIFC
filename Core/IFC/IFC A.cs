@@ -532,7 +532,7 @@ namespace GeometryGym.Ifc
 		protected IfcAlignment2DSegment(DatabaseIfc db) : base(db) { }
 		protected IfcAlignment2DSegment(DatabaseIfc db, IfcAlignment2DSegment s, DuplicateOptions options) : base(db, s, options)
 		{
-			TangentialContinuity = s.TangentialContinuity;
+			mTangentialContinuity = s.mTangentialContinuity;
 			StartTag = s.StartTag;
 			EndTag = s.EndTag;
 		}

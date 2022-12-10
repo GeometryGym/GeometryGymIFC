@@ -1599,7 +1599,7 @@ namespace GeometryGym.STEP
 			{
 				pos = icounter + 1;
 				progressToNext(s, ref pos, len);
-				return "$";
+				return "";
 			}
 			string result = stripstring(s, ref icounter, len);
 			pos = icounter;

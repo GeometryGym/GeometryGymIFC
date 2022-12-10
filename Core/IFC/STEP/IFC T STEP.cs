@@ -1121,7 +1121,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			List<IfcPropertySetDefinition> psets = HasPropertySets.Where(x => !x.isEmpty).ToList();
-			return base.BuildStringSTEP(release) + (mApplicableOccurrence == "$" ? ",$," : ",'" + mApplicableOccurrence + "',") +(psets.Count == 0 ? "$" : "(" + string.Join("," , psets.ConvertAll(x=>"#" + x.StepId)) + ")");
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mApplicableOccurrence) ? ",$," : ",'" + mApplicableOccurrence + "',") +
+				(psets.Count == 0 ? "$" : "(" + string.Join("," , psets.ConvertAll(x=>"#" + x.StepId)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

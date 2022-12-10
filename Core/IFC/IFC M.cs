@@ -240,12 +240,16 @@ namespace GeometryGym.Ifc
 			foreach (IfcMaterialConstituent constituent in m.MaterialConstituents.Values)
 				MaterialConstituents[constituent.Name] = db.Factory.Duplicate(constituent) as IfcMaterialConstituent;
 		}
-		public IfcMaterialConstituentSet(string name, IEnumerable<IfcMaterialConstituent> materialConstituents)
+		public IfcMaterialConstituentSet(IEnumerable<IfcMaterialConstituent> materialConstituents)
 			: base(materialConstituents.First().Database)
 		{
-			Name = name;
 			foreach (IfcMaterialConstituent constituent in materialConstituents)
 				mMaterialConstituents[constituent.Name] = constituent;
+		}
+		public IfcMaterialConstituentSet(string name, IEnumerable<IfcMaterialConstituent> materialConstituents)
+			: this(materialConstituents)
+		{
+			Name = name;
 		}
 	}
 	[Serializable]
@@ -484,9 +488,8 @@ namespace GeometryGym.Ifc
 		public IfcMaterial PrimaryMaterial() {  return mMaterials.First(); }
 
 		internal IfcMaterialList() : base() { }
-		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) 
-		{ 
-			Materials.AddRange(m.Materials.Select(x=>db.Factory.Duplicate(x))); }
+		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) { Materials.AddRange(m.Materials.Select(x=>db.Factory.Duplicate(x))); }
+		public IfcMaterialList(IEnumerable<IfcMaterial> materials) : base(materials.First().Database) { Materials.AddRange(materials); }
 		protected override void initialize()
 		{
 			base.initialize();

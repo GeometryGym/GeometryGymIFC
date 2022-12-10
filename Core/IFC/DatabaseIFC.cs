@@ -34,7 +34,6 @@ using System.Xml;
 
 using GeometryGym.STEP;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 #if (NET || !NOIFCJSON)
 #if (NEWTONSOFT)
@@ -111,7 +110,11 @@ namespace GeometryGym.Ifc
 		public FactoryIfc Factory { get { return mFactory; } }
 
 		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
-		public DatabaseIfc(string filePath) : this() { SourceFilePath = filePath; new SerializationIfc(this).ReadFile(filePath); }
+		public DatabaseIfc(string filePath) : this() 
+		{
+			SourceFilePath = filePath;
+			new SerializationIfc(this).ReadFile(filePath);
+		}
 		public DatabaseIfc(TextReader stream) : this() { new SerializationIfc(this).ReadFile(stream); }
 		public DatabaseIfc(ModelView view) : this(versionFromModelView(view), view) { }
 		public DatabaseIfc(ReleaseVersion schema) : this(schema, schema < ReleaseVersion.IFC4 ? ModelView.Ifc2x3NotAssigned : ModelView.Ifc4NotAssigned) { }
@@ -2724,18 +2727,33 @@ namespace GeometryGym.Ifc
 			lines.Add("/* name */ '" + ParserSTEP.Encode(fileName) + "',");
 			DateTime now = DateTime.Now;
 			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
-			IfcPerson person = mDatabase.Factory.mPerson;
-			string authorName = person == null ? mDatabase.Factory.PersonIdentification() : person.Name;
+			string authorName = "", organizationName = "", authorization = "None";
+			if (mDatabase.OriginatingFileInformation != null)
+			{
+				authorName = mDatabase.OriginatingFileInformation.Author.First();
+				organizationName = mDatabase.OriginatingFileInformation.Organization.First();
+				authorization = mDatabase.OriginatingFileInformation.Authorization;
+			}
+			if (!string.IsNullOrEmpty(mDatabase.Authorization))
+				authorization = mDatabase.Authorization;
+			if (string.IsNullOrEmpty(authorName))
+			{
+				IfcPerson person = mDatabase.Factory.mPerson;
+				authorName = person == null ? mDatabase.Factory.PersonIdentification() : person.Name;
+			}
+			if(string.IsNullOrEmpty(organizationName))
+			{
+				organizationName = IfcOrganization.Organization;
+				IfcOrganization organization = mDatabase.Factory.Organization;
+				if (organization != null)
+					organizationName = organization.Name; 
+			}
 			lines.Add("/* author */ ('" + ParserSTEP.Encode(authorName) + "'),");
-			string organizationName = IfcOrganization.Organization;
-			IfcOrganization organization = mDatabase.Factory.Organization;
-			if (organization != null)
-				organizationName = organization.Name; 
 			lines.Add("/* organization */ ('" + ParserSTEP.Encode(organizationName) + "'),");
 			lines.Add("/* preprocessor_version */ '" + ParserSTEP.Encode(mDatabase.Factory.ToolkitName) + "',");
 			lines.Add("/* originating_system */ '" + ParserSTEP.Encode(mDatabase.Factory.ApplicationFullName) + "',");
 
-			lines.Add("/* authorization */ '" + (string.IsNullOrEmpty(mDatabase.Authorization) ? "None" : ParserSTEP.Encode(mDatabase.Authorization)) + "'");
+			lines.Add("/* authorization */ '" + ParserSTEP.Encode(authorization) + "'");
 			if(mDatabase.Comments.Count > 0)
 			{
 				foreach (string comment in mDatabase.Comments)
