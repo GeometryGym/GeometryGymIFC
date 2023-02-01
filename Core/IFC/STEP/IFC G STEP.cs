@@ -73,6 +73,23 @@ namespace GeometryGym.Ifc
 			mCrossSectionArea = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcGeographicCRS
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3_ADD1)
+				return "";
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mGeodeticDatum) ? ",$," : ",'" + ParserSTEP.Encode(mGeodeticDatum) + "',") +
+				(string.IsNullOrEmpty(mPrimeMeridian) ? "$," : "'" + ParserSTEP.Encode(mPrimeMeridian) + "',") + (mMapUnit == null ? "$" : "#" + mMapUnit.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mGeodeticDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mPrimeMeridian = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mMapUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcNamedUnit;
+		}
+	}
 	public partial class IfcGeographicElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
@@ -143,6 +160,45 @@ namespace GeometryGym.Ifc
 			Elements.AddRange(stepIds.ConvertAll(x => dictionary[x] as IfcGeometricSetSelect));
 		}
 	}
+	public partial class IfcGeoScienceFeature
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) +  ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGeoScienceFeatureTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcGeoScienceModel
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGeoScienceModelTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcGeoScienceObservation
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mPredefinedType == IfcGeoScienceObservationTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGeoScienceObservationTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcGeotechnicalStratum
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3 ? "" : (mPredefinedType == IfcGeotechnicalStratumTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + ".")); }
@@ -155,6 +211,17 @@ namespace GeometryGym.Ifc
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcGeotechnicalStratumTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
+		}
+	}
+	public partial class IfcGeotechTypicalSection
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (mPredefinedType == IfcGeotechTypicalSectionTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGeotechTypicalSectionTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcGradientCurve
@@ -199,7 +266,7 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcGridAxis
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (string.IsNullOrEmpty(mAxisTag) ? "$," : "'" + ParserSTEP.Encode(mAxisTag) + "',#") + AxisCurve.StepId + "," + ParserSTEP.BoolToString(mSameSense); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (string.IsNullOrEmpty(mAxisTag) ? "$,#" : "'" + ParserSTEP.Encode(mAxisTag) + "',#") + AxisCurve.StepId + "," + ParserSTEP.BoolToString(mSameSense); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mAxisTag = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
@@ -219,6 +286,17 @@ namespace GeometryGym.Ifc
 		{
 			mPlacementLocation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcVirtualGridIntersection;
 			mPlacementRefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcGridPlacementDirectionSelect;
+		}
+	}
+	public partial class IfcGroundReinforcementElement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) +  ",." + mPredefinedType.ToString() + "."; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 }

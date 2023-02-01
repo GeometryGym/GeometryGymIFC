@@ -108,7 +108,6 @@ namespace GeometryGym.STEP
 
 		internal virtual bool processFileHeaderLine(string line)
 		{
-			
 			string trimmedLine = ParserSTEP.StripComments(line).Trim();
 			ParserSTEP.GetKeyWord(trimmedLine, out int stepID, out string keyword, out string def);
 			int pos = 0, len = def.Length;

@@ -32,23 +32,23 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcManifoldSolidBrep
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mOuter.StepId; }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) 
-		{ 
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
 			mOuter = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcClosedShell;
 		}
-	} 
+	}
 	public partial class IfcMapConversion
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) 
+		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			if (release < ReleaseVersion.IFC4)
 				return "";
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," + 
-				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," + 
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," +
+				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," +
 				ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale) +
-				(release < ReleaseVersion.IFC4X3_RC3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
+				(release < ReleaseVersion.IFC4X3_RC3 || release >= ReleaseVersion.IFC4X3_ADD1 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
 		}
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mEastings = ParserSTEP.StripDouble(str, ref pos, len);
@@ -57,11 +57,27 @@ namespace GeometryGym.Ifc
 			mXAxisAbscissa = ParserSTEP.StripDouble(str, ref pos, len);
 			mXAxisOrdinate = ParserSTEP.StripDouble(str, ref pos, len);
 			mScale = ParserSTEP.StripDouble(str, ref pos, len);
-			if(release >= ReleaseVersion.IFC4X3_RC3)
+			if (release >= ReleaseVersion.IFC4X3_RC3 && release < ReleaseVersion.IFC4X3_ADD1)
 			{
 				mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
 				mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);
 			}
+		}
+	}
+	public partial class IfcMapConversionScaled
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3_ADD1)
+				return "";
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mScaleX) + "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mScaleX = ParserSTEP.StripDouble(str, ref pos, len);
+			mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
+			mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcMappedItem
@@ -77,7 +93,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mPredefinedType == IfcMarineFacilityTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -118,7 +134,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			if (release != ReleaseVersion.IFC2x3)
+			if (release > ReleaseVersion.IFC2x3)
 			{
 				try
 				{

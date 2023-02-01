@@ -64,10 +64,34 @@ namespace GeometryGym.Ifc
 		[Obsolete("Obsolete", false)] IFC4X3_RC2,
 		[Obsolete("Obsolete", false)] IFC4X3_RC3,
 		[Obsolete("Obsolete", false)] IFC4X3_RC4, 
-		IFC4X3 
+		IFC4X3,
+		/// <summary>
+		/// Development version of Standard, not yet to be used for Production 
+		/// </summary>
+		[Description("Development version of Standard, not yet to be used for Production")] IFC4X3_ADD1, 
+		/// <summary>
+		/// Draft Release for IfcTunnel Deployment Testing, not to be used for Production
+		/// </summary>
+		[Description("Draft Release for IfcTunnel Deployment Testing, not to be used for Production")] IFC4X4_DRAFT
+
 	}; // Alpha Releases IFC1.0, IFC1.5, IFC1.5.1, IFC2.0, 
 	
-	public enum ModelView { Ifc4Reference, Ifc4DesignTransfer, Ifc4NotAssigned, Ifc2x3Coordination, Ifc2x3NotAssigned, Ifc4X1NotAssigned, Ifc4X2NotAssigned, Ifc4X3NotAssigned };
+	public enum ModelView 
+	{ 
+		Ifc4Reference,
+		Ifc4DesignTransfer, 
+		Ifc4NotAssigned, 
+		Ifc2x3Coordination, 
+		Ifc2x3NotAssigned,
+		Ifc4X1NotAssigned,
+		Ifc4X2NotAssigned,
+		Ifc4X3NotAssigned,
+		/// <summary>
+		/// Draft Release for IfcTunnel Deployment Testing, not to be used for Production
+		/// </summary>
+		[Description("Draft Release for IfcTunnel Deployment Testing, not to be used for Production")]
+		Ifc4X4NotAssigned
+	};
 
 	public class Triple<T>
 	{
@@ -205,6 +229,8 @@ namespace GeometryGym.Ifc
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
 				return ReleaseVersion.IFC4X3;
+			if ((modelView == ModelView.Ifc4X4NotAssigned))
+				return ReleaseVersion.IFC4X4_DRAFT;
 			return ReleaseVersion.IFC4A2;
 		}
 
@@ -575,6 +601,10 @@ namespace GeometryGym.Ifc
 			{
 				if (typeof(IfcFacilityPart) == type)
 					type = typeof(IfcFacilityPartCommon);
+			}
+			if(type.IsAbstract && typeof(IfcElement).IsAssignableFrom(type))
+			{
+				type = typeof(IfcBuildingElementProxy);
 			}
 			IfcProduct product = construct(type, host, placement, representation, system);
 			if (product == null)
@@ -2529,44 +2559,54 @@ namespace GeometryGym.Ifc
 		}
 		internal bool processFileHeaderLine(string line)
 		{
-			string lineNoSpaces = ParserSTEP.StripComments(line).Replace(" ", "");
-			if(lineNoSpaces.StartsWith("FILE_SCHEMA"))
+			string trimmedLine = ParserSTEP.StripComments(line).Trim();
+			ParserSTEP.GetKeyWord(trimmedLine, out int stepID, out string keyword, out string def);
+			int pos = 0, len = def.Length;
+			if (string.Compare(keyword, "FILE_SCHEMA", true) == 0)
 			{
-				if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC2X4", true, CultureInfo.CurrentCulture) ||
-						lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4", true, CultureInfo.CurrentCulture))
+				string field = ParserSTEP.StripField(def, ref pos, len);
+				List<string> fields = ParserSTEP.SplitListStrings(field);
+				if (fields.Count > 0)
 				{
-					if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X1", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X1;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X2", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X2;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture) ||
-						lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC1", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X3_RC1;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC2", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X3_RC2;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC3", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X3_RC3;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3_RC4", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X3_RC4;
-					else if (lineNoSpaces.StartsWith("FILE_SCHEMA(('IFC4X3", true, CultureInfo.CurrentCulture))
-						mDatabase.Release = ReleaseVersion.IFC4X3;
+					string schemaId = fields[0].Replace("'", "").Trim();
+					if (Enum.TryParse<ReleaseVersion>(schemaId, true, out ReleaseVersion release))
+						mDatabase.Release = release;
 					else
-						mDatabase.Release = ReleaseVersion.IFC4;
-					if (mDatabase.Release > ReleaseVersion.IFC2x3)
 					{
-						if (mDatabase.Release == ReleaseVersion.IFC4X1)
-							mDatabase.ModelView = ModelView.Ifc4X1NotAssigned;
-						else if (mDatabase.Release == ReleaseVersion.IFC4X2)
-							mDatabase.ModelView = ModelView.Ifc4X2NotAssigned;
-						else if (mDatabase.Release > ReleaseVersion.IFC4X2)
+						if (schemaId.StartsWith("IFC2X4", true, CultureInfo.CurrentCulture))
+							mDatabase.Release = ReleaseVersion.IFC4;
+						else if (schemaId.StartsWith("IFC4X4", true, CultureInfo.CurrentCulture))
+							mDatabase.Release = ReleaseVersion.IFC4X4_DRAFT;
+						else
 						{
-							mDatabase.ModelView = ModelView.Ifc4X3NotAssigned;
+							string[] schemas = Enum.GetNames(typeof(ReleaseVersion));
+							foreach (string schema in schemas)
+							{
+								if (schemaId.StartsWith(schema))
+								{
+									Enum.TryParse<ReleaseVersion>(schemaId, out release);
+									mDatabase.Release = release;
+									break;
+								}
+							}
 						}
-						else if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
-							mDatabase.ModelView = ModelView.Ifc4NotAssigned;
 					}
-					return true;
 				}
+
+				if (mDatabase.Release > ReleaseVersion.IFC2x3)
+				{
+					if (mDatabase.Release == ReleaseVersion.IFC4X1)
+						mDatabase.ModelView = ModelView.Ifc4X1NotAssigned;
+					else if (mDatabase.Release == ReleaseVersion.IFC4X2)
+						mDatabase.ModelView = ModelView.Ifc4X2NotAssigned;
+					else if (mDatabase.Release > ReleaseVersion.IFC4X2)
+					{
+						mDatabase.ModelView = ModelView.Ifc4X3NotAssigned;
+					}
+					else if (mDatabase.ModelView == ModelView.Ifc2x3Coordination || mDatabase.ModelView == ModelView.Ifc2x3NotAssigned)
+						mDatabase.ModelView = ModelView.Ifc4NotAssigned;
+				}
+				return true;
 			}
 			
 			return mDatabase.processFileHeaderLine(line);
@@ -2730,8 +2770,8 @@ namespace GeometryGym.Ifc
 			string authorName = "", organizationName = "", authorization = "None";
 			if (mDatabase.OriginatingFileInformation != null)
 			{
-				authorName = mDatabase.OriginatingFileInformation.Author.First();
-				organizationName = mDatabase.OriginatingFileInformation.Organization.First();
+				authorName = mDatabase.OriginatingFileInformation.Author.FirstOrDefault();
+				organizationName = mDatabase.OriginatingFileInformation.Organization.FirstOrDefault();
 				authorization = mDatabase.OriginatingFileInformation.Authorization;
 			}
 			if (!string.IsNullOrEmpty(mDatabase.Authorization))

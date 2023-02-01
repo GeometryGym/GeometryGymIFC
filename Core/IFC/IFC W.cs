@@ -138,6 +138,24 @@ namespace GeometryGym.Ifc
 		internal IfcWaterStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) 
 			: base(host, placement, shape) { PredefinedType = IfcGeotechnicalStratumTypeEnum.WATER; }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
+	public partial class IfcWellKnownText : BaseClassIfc
+	{
+		internal string mWellKnownText = "";// : IfcWellKnownTextLiteral;
+		internal IfcCoordinateReferenceSystem mCoordinateReferenceSystem = null;// : IfcCoordinateReferenceSystem;
+		public string WellKnownText { get { return mWellKnownText; } set { mWellKnownText = value; } }
+		public IfcCoordinateReferenceSystem CoordinateReferenceSystem { get { return mCoordinateReferenceSystem; } set { mCoordinateReferenceSystem = value; if (value != null) value.WellKnownText = this; } }
+
+		internal IfcWellKnownText() : base() { }
+		internal IfcWellKnownText(DatabaseIfc db) : base(db) { }
+		internal IfcWellKnownText(DatabaseIfc db, IfcWellKnownText w, DuplicateOptions options) : base(db) { mWellKnownText = w.mWellKnownText; mCoordinateReferenceSystem = db.Factory.Duplicate(w.mCoordinateReferenceSystem, options); }
+		public IfcWellKnownText(string wellKnownText, IfcCoordinateReferenceSystem coordinateReferenceSystem) 
+			: base(coordinateReferenceSystem.Database) 
+		{
+			mWellKnownText = wellKnownText;
+			mCoordinateReferenceSystem = coordinateReferenceSystem;
+		}
+	}
 	[Serializable]
 	public partial class IfcWindow : IfcBuiltElement
 	{

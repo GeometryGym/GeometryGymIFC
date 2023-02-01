@@ -448,7 +448,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP(release) + (mFontFamily.Count == 0 ? ",$," : ",(" + string.Join(",", mFontFamily.Select(x=>ParserSTEP.Encode(x)) + "),")) +
 				(string.IsNullOrEmpty(mFontStyle) ? "$," : "'" + ParserSTEP.Encode(mFontStyle) + "',") + 
 				(string.IsNullOrEmpty(mFontVariant) ? "$," : "'" + ParserSTEP.Encode(mFontVariant) + "',") + 
-				(string.IsNullOrEmpty(mFontWeight) ? "$," : "'" + ParserSTEP.Encode(mFontWeight) + "',") + mFontSize;
+				(string.IsNullOrEmpty(mFontWeight) ? "$," : "'" + ParserSTEP.Encode(mFontWeight) + "',") + mFontSize.ToString();
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -463,7 +463,7 @@ namespace GeometryGym.Ifc
 			mFontStyle = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mFontVariant = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mFontWeight = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			mFontSize = ParserSTEP.StripField(str, ref pos, len);
+			mFontSize = ParserIfc.parseSimpleValue(ParserSTEP.StripField(str, ref pos, len)) as IfcSizeSelect;
 		}
 	}
 	public partial class IfcTextStyleForDefinedFont
@@ -1105,6 +1105,37 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcTubeBundleTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcTunnel
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcTunnelTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcTunnelPart
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+			{
+				if (Enum.TryParse<IfcTunnelPartTypeEnum>(s.Replace(".", ""), true, out IfcTunnelPartTypeEnum partType))
+					PredefinedType = partType;
+			}
 		}
 	}
 	public partial class IfcTwoDirectionRepeatFactor

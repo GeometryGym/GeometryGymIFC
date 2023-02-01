@@ -471,15 +471,19 @@ namespace GeometryGym.Ifc
 		internal string mFontStyle = "";// : OPTIONAL IfcFontStyle; ['normal','italic','oblique'];
 		internal string mFontVariant = "";// : OPTIONAL IfcFontVariant; ['normal','small-caps'];
 		internal string mFontWeight = "";// : OPTIONAL IfcFontWeight; // ['normal','small-caps','100','200','300','400','500','600','700','800','900'];
-		internal string mFontSize;// : IfcSizeSelect; IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);
+		internal IfcSizeSelect mFontSize = null;// : IfcSizeSelect; IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);
 		internal IfcTextStyleFontModel() : base() { }
 		internal IfcTextStyleFontModel(DatabaseIfc db, IfcTextStyleFontModel m) : base(db, m)
 		{
-			//		mFontFamily = new List<string>(i.mFontFamily.ToArray());
+			mFontFamily.AddRange(m.mFontFamily);
 			mFontStyle = m.mFontStyle;
 			mFontVariant = m.mFontVariant;
 			mFontWeight = m.mFontWeight;
 			mFontSize = m.mFontSize;
+		}
+		public IfcTextStyleFontModel(DatabaseIfc db, string name, IfcSizeSelect size) : base(db, name)
+		{
+			mFontSize = size; 
 		}
 	}
 	[Serializable]
@@ -1152,6 +1156,29 @@ namespace GeometryGym.Ifc
 		internal IfcTubeBundleType() : base() { }
 		internal IfcTubeBundleType(DatabaseIfc db, IfcTubeBundleType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
 		public IfcTubeBundleType(DatabaseIfc db, string name, IfcTubeBundleTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcTunnel : IfcFacility
+	{
+		private IfcTunnelTypeEnum mPredefinedType = IfcTunnelTypeEnum.NOTDEFINED; //: IfcTunnelTypeEnum;
+		public IfcTunnelTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcTunnelTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		public IfcTunnel() : base() { }
+		public IfcTunnel(DatabaseIfc db) : base(db) { }
+		public IfcTunnel(DatabaseIfc db, IfcTunnel tunnel, DuplicateOptions options) : base(db, tunnel, options) { PredefinedType = tunnel.PredefinedType; }
+		public IfcTunnel(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcTunnel(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
+		internal IfcTunnel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcTunnelPart : IfcFacilityPart
+	{
+		private IfcTunnelPartTypeEnum mPredefinedType = IfcTunnelPartTypeEnum.NOTDEFINED; //: IfcTunnelTypeEnum;
+		public IfcTunnelPartTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcTunnelPartTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+		public IfcTunnelPart() : base() { }
+		public IfcTunnelPart(DatabaseIfc db) : base(db) { }
+		public IfcTunnelPart(DatabaseIfc db, IfcTunnelPart tunnelPart, DuplicateOptions options) : base(db, tunnelPart, options) { }
+		public IfcTunnelPart(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]

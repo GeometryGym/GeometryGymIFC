@@ -51,6 +51,19 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcDamperTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
+	public partial class IfcDatasetInformation
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X4_DRAFT)
+				return "";
+			return (string.IsNullOrEmpty(mSchemaReference) ? "$," : "'" + ParserSTEP.Encode(mSchemaReference) + "'");
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mSchemaReference = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+		}
+	}
 	public partial class IfcDateAndTime
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mDateComponent.StepId + ",#" + mTimeComponent.StepId; }
@@ -354,20 +367,34 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4)
 			{
-				return "";//to be implemented
+				return "'" + ParserSTEP.Encode(mIdentification) + "','" + ParserSTEP.Encode(mName) +
+					(string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserSTEP.Encode(mDescription) + "',") +
+					(mDocumentReferences.Count == 0 ? "$," : "(#" + string.Join(",#", mDocumentReferences) + "),") +
+					(string.IsNullOrEmpty(mPurpose) ? "$," : "'" + ParserSTEP.Encode(mPurpose) + "',") + 
+					(string.IsNullOrEmpty(mIntendedUse) ? "$," : "'" + ParserSTEP.Encode(mIntendedUse) + "',") +
+					(string.IsNullOrEmpty(mScope) ? "$," : "'" + ParserSTEP.Encode(mScope) + "',") +
+					(string.IsNullOrEmpty(mRevision) ? "$," : "'" + ParserSTEP.Encode(mRevision) + "',") +
+					(mDocumentOwner == null ? "$" : "#" + mDocumentOwner.StepId) +
+					(mEditors.Count == 0 ? ",$," : ",(" + string.Join(",", mEditors.Select(x => "#" + x.StepId) + "),")) +
+					ParserSTEP.ObjToLinkString(mSSCreationTime) + "," + ParserSTEP.ObjToLinkString(mSSLastRevisionTime) + "," +
+					ParserSTEP.ObjToLinkString(mSSElectronicFormat) + "," + ParserSTEP.ObjToLinkString(mSSValidFrom) + "," + 
+					ParserSTEP.ObjToLinkString(mSSValidUntil) + "," + 
+					(mConfidentiality == IfcDocumentConfidentialityEnum.NOTDEFINED ? ",$," : ",." + mConfidentiality.ToString() + ".,") + 
+					(mStatus == IfcDocumentStatusEnum.NOTDEFINED ? "$" : "." + mStatus.ToString() + ".");
 			}
 			return "'" + ParserSTEP.Encode(mIdentification) + "','" + ParserSTEP.Encode(mName) +
-				(string.IsNullOrEmpty(mDescription) ? "',$," :  "','" + ParserSTEP.Encode(mDescription) + "',") + 
-				(release < ReleaseVersion.IFC4 ? (mDocumentReferences.Count == 0 ? "$," : "(#" + string.Join(",#", mDocumentReferences) + "),") : 
-				(string.IsNullOrEmpty(mLocation) ? "$," : "'" + ParserSTEP.Encode(mLocation) + "',")) +
-				(string.IsNullOrEmpty(mPurpose) ? "$," : "'" + ParserSTEP.Encode(mPurpose) + "',") + (string.IsNullOrEmpty(mIntendedUse) ? "$," : "'" + ParserSTEP.Encode(mIntendedUse) + "',") + 
-				(string.IsNullOrEmpty(mScope) ? "$," : "'" + ParserSTEP.Encode(mScope) + "',") +  
+				(string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserSTEP.Encode(mDescription) + "',") + 
+				(string.IsNullOrEmpty(mLocation) ? "$," : "'" + ParserSTEP.Encode(mLocation) + "',") +
+				(string.IsNullOrEmpty(mPurpose) ? "$," : "'" + ParserSTEP.Encode(mPurpose) + "',") +
+				(string.IsNullOrEmpty(mIntendedUse) ? "$," : "'" + ParserSTEP.Encode(mIntendedUse) + "',") +
+				(string.IsNullOrEmpty(mScope) ? "$," : "'" + ParserSTEP.Encode(mScope) + "',") +
 				(string.IsNullOrEmpty(mRevision) ? "$," : "'" + ParserSTEP.Encode(mRevision) + "',") +
 				(mDocumentOwner == null ? "$" : "#" + mDocumentOwner.StepId) + 
-				(mEditors.Count == 0 ? ",$," : ",(" + string.Join(",", mEditors.Select(x=>"#" + x.StepId) + "),") + IfcDateTime.STEPAttribute(mCreationTime) + "," + IfcDateTime.STEPAttribute(mLastRevisionTime) + "," + 
-				(release < ReleaseVersion.IFC4 ? (mSSElectronicFormat == null ? "$" : "#" + mSSElectronicFormat.StepId) : (string.IsNullOrEmpty(mElectronicFormat) ? "$" : "'" + ParserSTEP.Encode(mElectronicFormat) + "'")) +
-				(release < ReleaseVersion.IFC4 ? ",$,$" : "," + IfcDate.STEPAttribute(mValidFrom) + "," + IfcDate.STEPAttribute(mValidUntil)) +
-				(mConfidentiality == IfcDocumentConfidentialityEnum.NOTDEFINED ? ",$," : ",." + mConfidentiality.ToString() + ".,") + (mStatus == IfcDocumentStatusEnum.NOTDEFINED ? "$" : "." + mStatus.ToString() + "."));
+				(mEditors.Count == 0 ? ",$," : ",(" + string.Join(",", mEditors.Select(x=>"#" + x.StepId)) + "),") + IfcDateTime.STEPAttribute(mCreationTime) + "," + IfcDateTime.STEPAttribute(mLastRevisionTime) + "," + 
+				(string.IsNullOrEmpty(mElectronicFormat) ? "$" : "'" + ParserSTEP.Encode(mElectronicFormat) + "'") + "," +
+				IfcDate.STEPAttribute(mValidFrom) + "," + IfcDate.STEPAttribute(mValidUntil) +
+				(mConfidentiality == IfcDocumentConfidentialityEnum.NOTDEFINED ? ",$," : ",." + mConfidentiality.ToString() + ".,") + 
+				(mStatus == IfcDocumentStatusEnum.NOTDEFINED ? "$" : "." + mStatus.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -384,14 +411,22 @@ namespace GeometryGym.Ifc
 			mRevision = ParserSTEP.StripString(str, ref pos, len);
 			mDocumentOwner = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcActorSelect;
 			Editors.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcActorSelect));
-			mCreationTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
-			mLastRevisionTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 			if (release < ReleaseVersion.IFC4)
+			{
+				mSSCreationTime = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDateAndTime;
+				mSSLastRevisionTime = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDateAndTime;
 				mSSElectronicFormat = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDocumentElectronicFormat;
+				mSSValidFrom = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCalendarDate;
+				mSSValidUntil = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCalendarDate;
+			}
 			else
+			{
+				mCreationTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+				mLastRevisionTime = IfcDateTime.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
 				mElectronicFormat = ParserSTEP.StripString(str, ref pos, len);
-			mValidFrom = IfcDate.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
-			mValidUntil = IfcDate.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+				mValidFrom = IfcDate.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+				mValidUntil = IfcDate.ParseSTEP(ParserSTEP.StripField(str, ref pos, len));
+			}
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s[0] == '.')
 				Enum.TryParse<IfcDocumentConfidentialityEnum>(s.Replace(".", ""), true, out mConfidentiality);

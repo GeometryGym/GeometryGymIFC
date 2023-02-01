@@ -25,6 +25,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
+using System.Collections.Specialized;
 
 namespace GeometryGym.Ifc
 {
@@ -48,6 +49,69 @@ namespace GeometryGym.Ifc
 		internal IfcDamperType(DatabaseIfc db, IfcDamperType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
 		public IfcDamperType(DatabaseIfc db, string name, IfcDamperTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcDatasetInformation : IfcDocumentInformation, IfcDatasetSelect
+	{ 
+		private string mSchemaReference = "";//  :	OPTIONAL IfcURIReference; 
+		//INVERSE  
+		private SET<IfcRelAssociatesDataset> mDatasetInfoForObjects = new SET<IfcRelAssociatesDataset>(); //SET [0:?] OF IfcRelAssociatesDataset FOR RelatingDataset;	
+		internal SET<IfcDatasetReference> mHasDatasetReferences = new SET<IfcDatasetReference>(); // SET [0:?] OF IfcDatasetReference FOR ReferencedDataset;
+
+		public string SchemaReference { get { return mSchemaReference; } set { mSchemaReference = value; } }
+		public SET<IfcRelAssociatesDataset> DatasetInfoForObjects { get { return mDatasetInfoForObjects; } }
+		public SET<IfcDatasetReference> HasDatasetReferences { get { return mHasDatasetReferences; } }
+
+		internal IfcDatasetInformation() : base() { }
+		protected IfcDatasetInformation(DatabaseIfc db, IfcDatasetInformation r)
+			: base(db, r) { mSchemaReference = r.mSchemaReference; }
+		public IfcDatasetInformation(DatabaseIfc db, string identification, string name) : base(db, identification, name) { }
+	
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcDatasetInformation dataset = e as IfcDatasetInformation;
+			if (dataset == null || !base.isDuplicate(e, tol))
+				return false;
+
+			if (string.Compare(SchemaReference, dataset.SchemaReference, false) != 0)
+				return false;
+			return true;
+		}
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcDatasetReference : IfcExternalReference, IfcDatasetSelect
+	{  
+		private string mDescription = "";//  :	OPTIONAL IfcText
+		private IfcDatasetInformation mReferencedDataset;// :	OPTIONAL  IfcDatasetInformation
+		private string mFilter = "";//  :OPTIONAL IfcText
+		//INVERSE  
+		private SET<IfcRelAssociatesDataset> mDatasetRefForObjects = new SET<IfcRelAssociatesDataset>(); //SET [0:?] OF IfcRelAssociatesDataset FOR RelatingDataset;	
+
+		public string Description { get { return mDescription; } set { mDescription = value; } }
+		public IfcDatasetInformation ReferencedDataset { get { return mReferencedDataset; } set { mReferencedDataset = value; } }
+		public string Filter { get { return mFilter; } set { mFilter = value; } }
+		public SET<IfcRelAssociatesDataset> DatasetRefForObjects { get { return mDatasetRefForObjects; } }
+
+		internal IfcDatasetReference() : base() { }
+		internal IfcDatasetReference(DatabaseIfc db, IfcDatasetReference r)
+			: base(db, r) { mDescription = r.mDescription; mReferencedDataset = db.Factory.Duplicate(r.ReferencedDataset); mFilter = r.mFilter; }
+		 public IfcDatasetReference(IfcDatasetInformation referencedDataset) : base(referencedDataset.Database) { ReferencedDataset = referencedDataset; }
+		 public IfcDatasetReference(DatabaseIfc db, string name) : base(db) { Name = name; }
+		
+		internal override bool isDuplicate(BaseClassIfc e, double tol)
+		{
+			IfcDatasetReference datasetReference = e as IfcDatasetReference;
+			if (datasetReference == null || !base.isDuplicate(e, tol))
+				return false;
+			if (!ReferencedDataset.isDuplicate(datasetReference.ReferencedDataset, tol))
+				return false;
+			if (string.Compare(Description, datasetReference.Description, false) != 0)
+				return false;
+			if (string.Compare(Identification, datasetReference.Identification, false) != 0)
+				return false;
+			return true;
+		}
+	}
+	public interface IfcDatasetSelect : NamedObjectIfc { }
 	[Obsolete("DELETED IFC4", false)]
 	[Serializable]
 	public partial class IfcDateAndTime : BaseClassIfc, IfcDateTimeSelect // DELETED IFC4
@@ -512,10 +576,11 @@ namespace GeometryGym.Ifc
 		internal IfcActorSelect mDocumentOwner;// : OPTIONAL IfcActorSelect;
 		internal SET<IfcActorSelect> mEditors = new SET<IfcActorSelect>();// : OPTIONAL SET [1:?] OF IfcActorSelect;
 		internal DateTime mCreationTime = DateTime.MinValue, mLastRevisionTime = DateTime.MinValue;// : OPTIONAL IFC4 IfcDateTime;
+		internal IfcDateAndTime mSSCreationTime = null, mSSLastRevisionTime = null;
 		internal string mElectronicFormat = "";// IFC4	 :	OPTIONAL IfcIdentifier; IFC4
 		internal IfcDocumentElectronicFormat mSSElectronicFormat;// IFC2x3 : OPTIONAL IfcDocumentElectronicFormat;
 		internal DateTime mValidFrom = DateTime.MinValue, mValidUntil = DateTime.MinValue;// : OPTIONAL Ifc2x3 IfcCalendarDate; IFC4 IfcDate
-		internal IfcCalendarDate mSSValidFrom = null, mSSVAlidUntil = null;
+		internal IfcCalendarDate mSSValidFrom = null, mSSValidUntil = null;
 		internal IfcDocumentConfidentialityEnum mConfidentiality = IfcDocumentConfidentialityEnum.NOTDEFINED;// : OPTIONAL IfcDocumentConfidentialityEnum;
 		internal IfcDocumentStatusEnum mStatus = IfcDocumentStatusEnum.NOTDEFINED;// : OPTIONAL IfcDocumentStatusEnum; 
 		//INVERSE

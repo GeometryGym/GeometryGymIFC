@@ -29,6 +29,21 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcLabelVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mValues.Select(x => "'" + ParserSTEP.Encode(x) + "'")) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mValues = arrNodes.ConvertAll(x => ParserSTEP.Decode(x)).ToArray();
+		}
+	}
 	public partial class IfcLaborResource
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
@@ -409,6 +424,21 @@ namespace GeometryGym.Ifc
 			mSecondComponent = ParserSTEP.StripDouble(str, ref pos, len);
 			mZone = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCoordinatedUniversalTimeOffset;
 			mDaylightSavingOffset = ParserSTEP.StripInt(str, ref pos, len);
+		}
+	}
+	public partial class IfcLogicalVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mValues.Select(x => ParserIfc.LogicalToString(x.Logical))) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mValues = arrNodes.ConvertAll(x => new IfcLogical(ParserIfc.ParseIFCLogical(x))).ToArray();
 		}
 	}
 	public partial class IfcLShapeProfileDef

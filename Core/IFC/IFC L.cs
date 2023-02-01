@@ -24,6 +24,18 @@ using System.Linq;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcLabelVoxelData : IfcVoxelData
+	{
+		internal string[] mValues = new string[0];// :	ARRAY [1:?] OF IfcLabel;
+
+		public string[] Values { get { return mValues; } set { mValues = value; } }
+
+		internal IfcLabelVoxelData() : base() { }
+		internal IfcLabelVoxelData(DatabaseIfc db, IfcLabelVoxelData d, DuplicateOptions options) : base(db, d, options) { mValues = d.mValues;  }
+		public IfcLabelVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, string[] values)
+			: base(host, placement, representation) { Values = values; }
+	}
 	[Serializable]
 	public partial class IfcLaborResource : IfcConstructionResource
 	{
@@ -408,7 +420,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement : IfcPositioningElement 
 	{
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		protected IfcLinearAxisSelect mAxis;// : IfcCurve;
@@ -467,6 +479,13 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcLinearSpanPlacement(IfcCurve placementMeasuredAlong, IfcPointByDistanceExpression distance, double span)
 			: base(placementMeasuredAlong, distance) { Span = span; }
+	}
+	public abstract partial class IfcLinearZone : IfcLinearElement
+	{
+		public IfcLinearZone() : base() { }
+		protected IfcLinearZone(DatabaseIfc db, IfcLinearZone zone, DuplicateOptions options)
+		: base(db, zone, options) { }
+		public IfcLinearZone(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
 	public partial class IfcLineIndex : List<int>, IfcSegmentIndexSelect
@@ -578,6 +597,18 @@ namespace GeometryGym.Ifc
 				return new DateTime(0, 0, 0, mHourComponent, mMinuteComponent, (int)mSecondComponent);
 			}
 		}
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcLogicalVoxelData : IfcVoxelData
+	{
+		internal IfcLogical[] mValues = new IfcLogical[0];// :	ARRAY [1:?] OF IfcLogical;
+
+		public IfcLogical[] Values { get { return mValues; } set { mValues = value; } }
+
+		internal IfcLogicalVoxelData() : base() { }
+		internal IfcLogicalVoxelData(DatabaseIfc db, IfcLogicalVoxelData d, DuplicateOptions options) : base(db, d, options) { mValues = d.mValues; }
+		public IfcLogicalVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcLogical[] values)
+			: base(host, placement, representation) { Values = values; }
 	}
 	[Serializable]
 	public abstract partial class IfcLoop : IfcTopologicalRepresentationItem /*SUPERTYPE OF (ONEOF (IfcEdgeLoop ,IfcPolyLoop ,IfcVertexLoop))*/

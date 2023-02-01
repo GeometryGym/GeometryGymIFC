@@ -193,11 +193,14 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
-	public partial class IfcBorehole : IfcGeotechnicalAssembly
+	public partial class IfcBorehole : IfcGeoScienceElement
 	{
+		private IfcBoreholeTypeEnum mPredefinedType = IfcBoreholeTypeEnum.NOTDEFINED; //: OPTIONAL IfcBoreholeTypeEnum;
+		public IfcBoreholeTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcBoreholeTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
 		public IfcBorehole() : base() { }
 		public IfcBorehole(DatabaseIfc db) : base(db) { }
-		public IfcBorehole(DatabaseIfc db, IfcBorehole borehole, DuplicateOptions options) : base(db, borehole, options) { }
+		public IfcBorehole(DatabaseIfc db, IfcBorehole borehole, DuplicateOptions options) : base(db, borehole, options) { PredefinedType = borehole.PredefinedType; }
 		public IfcBorehole(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
@@ -399,7 +402,7 @@ namespace GeometryGym.Ifc
 
 		public IfcBridge() : base() { }
 		public IfcBridge(DatabaseIfc db) : base(db) { }
-		public IfcBridge(DatabaseIfc db, IfcBridge bridge, DuplicateOptions options) : base(db, bridge, options) { }
+		public IfcBridge(DatabaseIfc db, IfcBridge bridge, DuplicateOptions options) : base(db, bridge, options) { PredefinedType = bridge.PredefinedType; }
 		public IfcBridge(DatabaseIfc db, string name) : base(db, name) { }
 		public IfcBridge(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 		internal IfcBridge(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }

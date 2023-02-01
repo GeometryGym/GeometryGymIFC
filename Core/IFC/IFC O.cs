@@ -872,6 +872,13 @@ namespace GeometryGym.Ifc
 	{
 		
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcObservation : IfcComplementaryData
+	{
+		internal IfcObservation() : base() { }
+		internal IfcObservation(DatabaseIfc db, IfcObservation o, DuplicateOptions options) : base(db, o, options) {  }
+		public IfcObservation(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	[Serializable]
 	public partial class IfcOccupant : IfcActor
 	{

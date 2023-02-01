@@ -75,6 +75,19 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p, DuplicateOptions options) : base(db, p, options) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	public partial class IfcGeographicCRS : IfcCoordinateReferenceSystem //IFC4
+	{
+		internal string mPrimeMeridian = "";// : OPTIONAL IfcIdentifier 
+		internal IfcNamedUnit mMapUnit = null;// :	OPTIONAL IfcNamedUnit;
+
+		public string PrimeMeridian { get { return mPrimeMeridian; } set { mPrimeMeridian = value; } }
+		public IfcNamedUnit MapUnit { get { return mMapUnit; } set { mMapUnit = value; } }
+
+		internal IfcGeographicCRS() : base() { }
+		internal IfcGeographicCRS(DatabaseIfc db, IfcGeographicCRS p) : base(db, p) { mPrimeMeridian = p.mPrimeMeridian; if (p.MapUnit != null) MapUnit = db.Factory.Duplicate(p.MapUnit); }
+		public IfcGeographicCRS(DatabaseIfc db, string name) : base(db) { Name = name; }
+	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
 	public partial class IfcGeographicElement : IfcElement  //IFC4
 	{
@@ -260,6 +273,55 @@ namespace GeometryGym.Ifc
 		public IfcGeomodel(DatabaseIfc db) : base(db) { }
 		public IfcGeomodel(DatabaseIfc db, IfcGeomodel geomodel, DuplicateOptions options) : base(db, geomodel, options) {  }
 		public IfcGeomodel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public abstract partial class IfcGeoScienceElement : IfcElement
+	{
+		protected IfcGeoScienceElement() : base() { }
+		protected IfcGeoScienceElement(DatabaseIfc db) : base(db) { }
+		protected IfcGeoScienceElement(DatabaseIfc db, IfcGeoScienceElement geotechnicalElement, DuplicateOptions options) : base(db, geotechnicalElement, options) { }
+		protected IfcGeoScienceElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcGeoScienceFeature : IfcGeoScienceElement
+	{
+		private IfcGeoScienceFeatureTypeEnum mPredefinedType = IfcGeoScienceFeatureTypeEnum.NOTDEFINED; //: OPTIONAL IfcBoreholeTypeEnum;
+		public IfcGeoScienceFeatureTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGeoScienceFeatureTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		public IfcGeoScienceFeature() : base() { }
+		public IfcGeoScienceFeature(DatabaseIfc db) : base(db) { }
+		public IfcGeoScienceFeature(DatabaseIfc db, IfcGeoScienceFeature feature, DuplicateOptions options) : base(db, feature, options) { PredefinedType = feature.PredefinedType; }
+		public IfcGeoScienceFeature(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	public partial class IfcGeoScienceModel : IfcGeoScienceElement
+	{
+		private IfcGeoScienceModelTypeEnum mPredefinedType = IfcGeoScienceModelTypeEnum.NOTDEFINED; //: OPTIONAL IfcBoreholeTypeEnum;
+		public IfcGeoScienceModelTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGeoScienceModelTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		public IfcGeoScienceModel() : base() { }
+		public IfcGeoScienceModel(DatabaseIfc db) : base(db) { }
+		public IfcGeoScienceModel(DatabaseIfc db, IfcGeoScienceModel model, DuplicateOptions options) : base(db, model, options) { PredefinedType = model.PredefinedType; }
+		public IfcGeoScienceModel(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcGeoScienceObservation : IfcObservation 
+	{
+		private IfcGeoScienceObservationTypeEnum mPredefinedType = IfcGeoScienceObservationTypeEnum.NOTDEFINED;// OPTIONAL : IfcOutletTypeEnum;
+		public IfcGeoScienceObservationTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGeoScienceObservationTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+
+		internal IfcGeoScienceObservation() : base() { }
+		internal IfcGeoScienceObservation(DatabaseIfc db, IfcGeoScienceObservation o, DuplicateOptions options) : base(db, o, options) { PredefinedType = o.PredefinedType; }
+		public IfcGeoScienceObservation(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcGeotechTypicalSection : IfcLinearZone
+	{
+		private IfcGeotechTypicalSectionTypeEnum mPredefinedType = IfcGeotechTypicalSectionTypeEnum.NOTDEFINED;// OPTIONAL : IfcOutletTypeEnum;
+		public IfcGeotechTypicalSectionTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGeotechTypicalSectionTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcGeotechTypicalSection() : base() { }
+		internal IfcGeotechTypicalSection(DatabaseIfc db, IfcGeotechTypicalSection o, DuplicateOptions options) : base(db, o, options) { PredefinedType = o.PredefinedType; }
+		public IfcGeotechTypicalSection(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcGeoslice : IfcGeotechnicalAssembly
@@ -581,6 +643,16 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);
+	[Serializable]
+	public partial class IfcGroundReinforcementElement : IfcBuiltElement
+	{
+		private IfcGroundReinforcementElementTypeEnum mPredefinedType = IfcGroundReinforcementElementTypeEnum.NOTDEFINED;//: IfcGroundReinforcementElementTypeEnum; 
+		public IfcGroundReinforcementElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGroundReinforcementElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcGroundReinforcementElement() : base() { }
+		internal IfcGroundReinforcementElement(DatabaseIfc db, IfcGroundReinforcementElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
+		public IfcGroundReinforcementElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	[Serializable]
 	public partial class IfcGroup : IfcObject, IfcSpatialReferenceSelect //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))
 	{

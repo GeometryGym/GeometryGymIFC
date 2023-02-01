@@ -83,7 +83,17 @@ namespace GeometryGym.Ifc
 			}
 			else if (mPredefinedType == IfcAlignmentHorizontalSegmentTypeEnum.CLOTHOID)
 			{
-
+#if (!OPEN_SOURCE)
+				TransitionSetout transitionSetout = new TransitionSetout(this, mDatabase.Tolerance);
+				Point2d origin = transitionSetout.computePoint(length);
+				Vector3d xAxis = transitionSetout.mPlane.XAxis * (transitionSetout.mReversed ? -1 : 1);
+				Vector3d yAxis = Vector3d.CrossProduct(Vector3d.ZAxis, xAxis);
+				plane = new Plane(new Point3d(origin.X, origin.Y, 0), xAxis, yAxis);
+				double angleLength = transitionSetout.calcBasisDistance(length);
+				double angle = transitionSetout.computeAngle(angleLength);
+				plane.Rotate(angle, transitionSetout.mPlane.ZAxis, plane.Origin);
+				return plane;
+#endif
 			}
 			throw new NotImplementedException("Plane at length for " + PredefinedType + " not implemented yet!");
 		}

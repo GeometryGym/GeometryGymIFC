@@ -182,6 +182,20 @@ namespace GeometryGym.Ifc
 				mWeightsData.Add(list);
 		}
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcRealVoxelData : IfcVoxelData
+	{
+		internal double[] mValues = new double[0];// :	ARRAY [1:?] OF IfcReal;
+		internal IfcUnit mUnit = null;// :	OPTIONAL IfcUnit;
+
+		public double[] Values { get { return mValues; } set { mValues = value; } }
+		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
+
+		internal IfcRealVoxelData() : base() { }
+		internal IfcRealVoxelData(DatabaseIfc db, IfcRealVoxelData d, DuplicateOptions options) : base(db, d, options) { mValues = d.mValues; if (d.Unit != null) Unit = db.Factory.Duplicate(d.Unit); }
+		public IfcRealVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, double[] values)
+			: base(host, placement, representation) { Values = values; }
+	}
 	[Serializable]
 	public partial class IfcRectangleHollowProfileDef : IfcRectangleProfileDef
 	{
@@ -448,7 +462,7 @@ namespace GeometryGym.Ifc
 			Values.AddRange(values);
 		}
 	}
-	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3), Obsolete("DEPRECATED IFC4X4", false)]
 	public partial class IfcReinforcedSoil : IfcEarthworksElement
 	{
 		private IfcReinforcedSoilTypeEnum mPredefinedType = IfcReinforcedSoilTypeEnum.NOTDEFINED; //: OPTIONAL IfcReinforcedSoilTypeEnum;
@@ -546,8 +560,8 @@ namespace GeometryGym.Ifc
 	public partial class IfcReinforcingBarType : IfcReinforcingElementType  //IFC4
 	{
 		private IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarTypeEnum; //IFC4
-		private double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
-		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
+		private double mNominalDiameter = 0;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
+		internal double mCrossSectionArea = 0;// : IfcAreaMeasure; IFC4 OPTIONAL
 		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NOTDEFINED;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
 		internal string mBendingShapeCode = "";//	:	OPTIONAL IfcLabel;
@@ -572,12 +586,15 @@ namespace GeometryGym.Ifc
 			mBendingShapeCode = t.mBendingShapeCode;
 			mBendingParameters.AddRange(t.mBendingParameters);
 		}
-
-		public IfcReinforcingBarType(DatabaseIfc db, string name, IfcReinforcingBarTypeEnum type, double diameter)
-			: base(db)
+		public IfcReinforcingBarType(DatabaseIfc db, string name, IfcReinforcingBarTypeEnum type)
+				: base(db)
 		{
 			Name = name;
 			PredefinedType = type;
+		}
+		public IfcReinforcingBarType(DatabaseIfc db, string name, IfcReinforcingBarTypeEnum type, double diameter)
+			: this(db, name, type)
+		{
 			mNominalDiameter = diameter;
 		}
 	}
@@ -1069,10 +1086,8 @@ namespace GeometryGym.Ifc
 		public override NamedObjectIfc Relating() { return RelatingClassification; } 
 
 		internal IfcRelAssociatesClassification() : base() { }
-		internal IfcRelAssociatesClassification(DatabaseIfc db, IfcRelAssociatesClassification r, DuplicateOptions options) : base(db, r, options)
-		{
-			RelatingClassification = db.Factory.Duplicate(r.RelatingClassification) as IfcClassificationSelect;
-		}
+		internal IfcRelAssociatesClassification(DatabaseIfc db, IfcRelAssociatesClassification r, DuplicateOptions options) 
+			: base(db, r, options) { RelatingClassification = db.Factory.Duplicate(r.RelatingClassification); }
 		public IfcRelAssociatesClassification(IfcClassificationSelect classification) : base(classification.Database) { RelatingClassification = classification; }
 		public IfcRelAssociatesClassification(IfcClassificationSelect classification, IfcDefinitionSelect related) : base(related) { RelatingClassification = classification; }
 		public IfcRelAssociatesClassification(IfcClassificationSelect classification, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingClassification = classification; }
@@ -1092,6 +1107,37 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssociatesConstraint(DatabaseIfc db, IfcRelAssociatesConstraint c, DuplicateOptions options) : base(db, c, options) { RelatingConstraint = db.Factory.Duplicate(c.RelatingConstraint) as IfcConstraint; }
 		public IfcRelAssociatesConstraint(IfcConstraint c) : base(c.mDatabase) { RelatingConstraint = c; }
 		public IfcRelAssociatesConstraint(IfcDefinitionSelect related, IfcConstraint constraint) : base(related) { RelatingConstraint = constraint; }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcRelAssociatesDataset : IfcRelAssociates
+	{
+		internal IfcDatasetSelect mRelatingDataset;// : IfcDatasetSelect;
+		public IfcDatasetSelect RelatingDataset
+		{
+			get { return mRelatingDataset; }
+			set
+			{
+				mRelatingDataset = value;
+				IfcDatasetInformation datasetInformation = value as IfcDatasetInformation;
+				if (datasetInformation != null)
+					datasetInformation.DatasetInfoForObjects.Add(this);
+				else
+				{
+					IfcDatasetReference datasetReference = value as IfcDatasetReference;
+					if (datasetReference != null)
+						datasetReference.DatasetRefForObjects.Add(this);
+				}
+			}
+		}
+
+		public override NamedObjectIfc Relating() { return RelatingDataset; }
+
+		internal IfcRelAssociatesDataset() : base() { }
+		internal IfcRelAssociatesDataset(DatabaseIfc db, IfcRelAssociatesDataset r, DuplicateOptions options) 
+			: base(db, r, options) { RelatingDataset = db.Factory.Duplicate(r.RelatingDataset); }
+		public IfcRelAssociatesDataset(IfcDatasetSelect dataset) : base(dataset.Database) { RelatingDataset = dataset; }
+		public IfcRelAssociatesDataset(IfcDatasetSelect dataset, IfcDefinitionSelect related) : base(related) { RelatingDataset = dataset; }
+		public IfcRelAssociatesDataset(IfcDatasetSelect dataset, IEnumerable<IfcDefinitionSelect> related) : base(related) { RelatingDataset = dataset; }
 	}
 	[Serializable]
 	public partial class IfcRelAssociatesDocument : IfcRelAssociates
@@ -2182,8 +2228,8 @@ namespace GeometryGym.Ifc
 		}
 		public IfcRelSequence(IfcProcess relating, IfcProcess related) : base(relating.mDatabase)
 		{
-			mRelatingProcess = relating;
-			mRelatedProcess = related;
+			RelatingProcess = relating;
+			RelatedProcess = related;
 		}
 	}
 	[Serializable]
@@ -2719,6 +2765,32 @@ namespace GeometryGym.Ifc
 		internal double mHeight, mRadius;// : IfcPositiveLengthMeasure;
 		internal IfcRightCircularCylinder() : base() { }
 		internal IfcRightCircularCylinder(DatabaseIfc db, IfcRightCircularCylinder c, DuplicateOptions options) : base(db, c, options) { mHeight = c.mHeight; mRadius = c.mRadius; }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	public partial class IfcRigidOperation : IfcCoordinateOperation
+	{
+		internal IfcMeasureValue mFirstCoordinate, mSecondCoordinate;// :  	IfcMeasureValue;
+		internal double mHeight = double.NaN;// 	:	IfcLengthMeasure;
+		public IfcMeasureValue FirstCoordinate { get { return mFirstCoordinate; } set { mFirstCoordinate = value; } }  //IfcMeasureValue
+		public IfcMeasureValue SecondCoordinate { get { return mSecondCoordinate; } set { mSecondCoordinate = value; } }  //IfcMeasureValue
+		public double Height { get { return mHeight; } set { mHeight = value; } }  //IfcLengthMeasure
+
+		internal IfcRigidOperation() : base() { }
+		internal IfcRigidOperation(DatabaseIfc db, IfcRigidOperation o) : base(db, o) { mFirstCoordinate = o.mFirstCoordinate; mSecondCoordinate = o.mSecondCoordinate; mHeight = o.mHeight; }
+		public IfcRigidOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, IfcLengthMeasure firstCoordinate, IfcLengthMeasure secondCoordinate, double height)
+			: base(source, target)
+		{
+			FirstCoordinate = firstCoordinate;		
+			SecondCoordinate = secondCoordinate;
+			Height = height;	
+		}
+		public IfcRigidOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, IfcPlaneAngleMeasure firstCoordinate, IfcPlaneAngleMeasure secondCoordinate, double height)
+			: base(source, target)
+		{
+			FirstCoordinate = firstCoordinate;
+			SecondCoordinate = secondCoordinate;
+			Height = height;
+		}
 	}
 	[Serializable]
 	public partial class IfcRoad : IfcFacility

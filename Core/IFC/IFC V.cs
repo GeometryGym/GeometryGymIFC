@@ -74,6 +74,20 @@ namespace GeometryGym.Ifc
 		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.mDatabase) { Orientation = orientation; Magnitude = magnitude; }
 	}
 	public interface IfcVectorOrDirection : IBaseClassIfc { } // SELECT(IfcDirection, IfcVector);
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcVectorVoxelData : IfcVoxelData
+	{
+		internal IfcVector[] mValues = new IfcVector[0];// :	ARRAY [1:?] OF IfcVector;
+		internal IfcUnit mUnit = null;// :	OPTIONAL IfcUnit;
+
+		public IfcVector[] Values { get { return mValues; } set { mValues = value; } }
+		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
+
+		internal IfcVectorVoxelData() : base() { }
+		internal IfcVectorVoxelData(DatabaseIfc db, IfcVectorVoxelData d, DuplicateOptions options) : base(db, d, options) { mValues = d.mValues; if (d.Unit != null) Unit = db.Factory.Duplicate(d.Unit); }
+		public IfcVectorVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcVector[] values)
+			: base(host, placement, representation) { Values = values; }
+	}
 	[Serializable]
 	public partial class IfcVehicle : IfcTransportationDevice
 	{
@@ -164,7 +178,7 @@ namespace GeometryGym.Ifc
 		public IfcVibrationDamperType() : base() { }
 		public IfcVibrationDamperType(DatabaseIfc db, string name) : base(db, name) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X4", false)]
 	public partial class IfcVibrationIsolator : IfcElementComponent
 	{
 		private IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : OPTIONAL IfcVibrationIsolatorTypeEnum;
@@ -174,7 +188,7 @@ namespace GeometryGym.Ifc
 		internal IfcVibrationIsolator(DatabaseIfc db, IfcVibrationIsolator i, DuplicateOptions options) : base(db, i, options) { PredefinedType = i.PredefinedType; }
 		public IfcVibrationIsolator(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X4", false)]
 	public partial class IfcVibrationIsolatorType : IfcElementComponentType
 	{
 		private IfcVibrationIsolatorTypeEnum mPredefinedType = IfcVibrationIsolatorTypeEnum.NOTDEFINED;// : IfcVibrationIsolatorTypeEnum
@@ -226,9 +240,56 @@ namespace GeometryGym.Ifc
 		public IfcVoidStratum(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) 
 			: base(host, placement, shape) { PredefinedType = IfcGeotechnicalStratumTypeEnum.VOID; }
 	}
-
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public abstract partial class IfcVoxelData : IfcComplementaryData
+	{
+		private string mValueType = ""; //: OPTIONAL IfcLabel;
+		public string ValueType { get { return mValueType; } set { mValueType = value; } }
+		internal IfcVoxelData() : base() { }
+		internal IfcVoxelData(DatabaseIfc db, IfcVoxelData o, DuplicateOptions options) : base(db, o, options) { mValueType = o.mValueType; }
+		protected IfcVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
+			: base(host.Database) { new IfcRelAssignsToProduct(this, host); }
+	}
 	[Serializable]
-	public abstract class IfcDerivedMeasureValue : IfcValue
+	public partial class IfcVoxelGrid : IfcSolidModel
+	{
+		internal double mVoxelSizeX, mVoxelSizeY = double.NaN, mVoxelSizeZ = double.NaN;// : IfcNonNegativeLengthMeasure;
+		internal int mNumberOfVoxelsX, mNumberOfVoxelsY = int.MinValue, mNumberOfVoxelsZ = int.MinValue;// : OPTIONAL IfcInteger;
+		internal List<bool> mVoxels = new List<bool>();
+
+		public double VoxelSizeX { get { return mVoxelSizeX; } set { mVoxelSizeX = value; } }
+		public double VoxelSizeY { get { return (double.IsNaN(mVoxelSizeY) ? mVoxelSizeX : mVoxelSizeY); } set { mVoxelSizeY = value; } }
+		public double VoxelSizeZ { get { return (double.IsNaN(mVoxelSizeZ) ? mVoxelSizeX : mVoxelSizeZ); } set { mVoxelSizeZ = value; } }
+		public int NumberOfVoxelsX { get { return mNumberOfVoxelsX; } set { mNumberOfVoxelsX = value; } }
+		public int NumberOfVoxelsY { get { return (mNumberOfVoxelsY == int.MinValue ? mNumberOfVoxelsX : mNumberOfVoxelsY); } set { mNumberOfVoxelsY = value; } }
+		public int NumberOfVoxelsZ { get { return (mNumberOfVoxelsZ == int.MinValue ? mNumberOfVoxelsX : mNumberOfVoxelsZ); } set { mNumberOfVoxelsZ = value; } }
+		public List<bool> Voxels { get { return mVoxels; } }
+
+		internal IfcVoxelGrid() : base() { }
+		internal IfcVoxelGrid(DatabaseIfc db, IfcVoxelGrid g, DuplicateOptions options) : base(db, g, options)
+		{
+			mVoxelSizeX = g.mVoxelSizeX;
+			mVoxelSizeY = g.mVoxelSizeY;
+			mVoxelSizeZ = g.mVoxelSizeZ;
+			mNumberOfVoxelsX = g.mNumberOfVoxelsX;
+			mNumberOfVoxelsY = g.mNumberOfVoxelsY;
+			mNumberOfVoxelsZ = g.mNumberOfVoxelsZ;
+			mVoxels.AddRange(g.mVoxels);
+		}
+		public IfcVoxelGrid(DatabaseIfc db, double sizeX, double sizeY, double sizeZ, int numberX, int numberY, int numberZ, List<bool> voxels) 
+			: base(db) 
+		{
+			mVoxelSizeX = sizeX;
+			mVoxelSizeY = sizeY;
+			mVoxelSizeZ = sizeZ;
+			mNumberOfVoxelsX = numberX;
+			mNumberOfVoxelsY = numberY;
+			mNumberOfVoxelsZ = numberZ;
+			mVoxels.AddRange(voxels);
+		}
+	}
+	[Serializable]
+	public abstract partial class IfcDerivedMeasureValue : IfcValue
 	{
 		internal double mValue;
 		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
@@ -447,7 +508,7 @@ namespace GeometryGym.Ifc
 	public class IfcWarpingMomentMeasure : IfcDerivedMeasureValue { public IfcWarpingMomentMeasure(double value) : base(value) { } }
 
 	[Serializable]
-	public abstract class IfcMeasureValue : IfcValue //TYPE IfcMeasureValue = SELECT (IfcVolumeMeasure,IfcTimeMeasure ,IfcThermodynamicTemperatureMeasure ,IfcSolidAngleMeasure ,IfcPositiveRatioMeasure
+	public abstract partial class IfcMeasureValue : IfcValue //TYPE IfcMeasureValue = SELECT (IfcVolumeMeasure,IfcTimeMeasure ,IfcThermodynamicTemperatureMeasure ,IfcSolidAngleMeasure ,IfcPositiveRatioMeasure
 	{ //,IfcRatioMeasure ,IfcPositivePlaneAngleMeasure ,IfcPlaneAngleMeasure ,IfcParameterValue ,IfcNumericMeasure ,IfcMassMeasure ,IfcPositiveLengthMeasure,IfcLengthMeasure ,IfcElectricCurrentMeasure ,
       //IfcDescriptiveMeasure ,IfcCountMeasure ,IfcContextDependentMeasure ,IfcAreaMeasure ,IfcAmountOfSubstanceMeasure ,IfcLuminousIntensityMeasure ,IfcNormalisedRatioMeasure ,IfcComplexNumber);
 		internal double mValue;
@@ -572,7 +633,7 @@ namespace GeometryGym.Ifc
 	public class IfcVolumeMeasure : IfcMeasureValue { public IfcVolumeMeasure(double value) : base(value) { } }
 
 	[Serializable]
-	public abstract class IfcSimpleValue : IfcValue // = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
+	public abstract partial class IfcSimpleValue : IfcValue // = SELECT(IfcInteger,IfcReal,IfcBoolean,IfcIdentifier,IfcText,IfcLabel,IfcLogical,IfcBinary);
 	{
 		public override string ValueString { get { return Value.ToString(); } }
 	}

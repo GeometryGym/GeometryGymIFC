@@ -48,7 +48,7 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1) return "IfcFacility"; return base.StepClassName; } }
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? "" : (mPredefinedType == IfcRailwayTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? "" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -224,6 +224,22 @@ namespace GeometryGym.Ifc
 				mWeightsData.Add(weights);
 		}
 	}
+	public partial class IfcRealVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mValues.Select(x => ParserSTEP.DoubleToString(x))) + (mUnit == null ? "),$" : "),#" + mUnit.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mValues = arrNodes.ConvertAll(x => ParserSTEP.ParseDouble(x)).ToArray();
+			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
+		}
+	}
 	public partial class IfcRectangleHollowProfileDef
 	{
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -279,7 +295,7 @@ namespace GeometryGym.Ifc
 				(mMonthComponent.Count == 0 ? "$," : "(" + string.Join(",", mMonthComponent) + "),") +
 				 (mInterval == int.MinValue ? "$" : mInterval.ToString()) + (mPosition == int.MinValue ? ",$" : "," + mPosition) +
 				 (mOccurrences == int.MinValue ? ",$" :"," + mOccurrences) + 
-				 (mTimePeriods.Count == 0 ? ",$" : string.Join(",", mTimePeriods.Select(x=>"#" + x.StepId)) + ")");
+				 (mTimePeriods.Count == 0 ? ",$" : "," + string.Join(",", mTimePeriods.Select(x=>"#" + x.StepId)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1452,12 +1468,28 @@ namespace GeometryGym.Ifc
 			mRadius = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcRigidOperation
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4X3_ADD1)
+				return "";
+			return base.BuildStringSTEP(release) + "," + mFirstCoordinate.ToString() + "," + mSecondCoordinate.ToString() + "," + ParserSTEP.DoubleToString(mHeight);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mFirstCoordinate = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len));
+			mSecondCoordinate = ParserIfc.parseMeasureValue(ParserSTEP.StripField(str, ref pos, len));
+			mHeight = ParserSTEP.StripDouble(str, ref pos, len);
+		}
+	}
 	public partial class IfcRoad
 	{
 		public override string StepClassName { get { if (mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4X3_RC1) return "IfcFacility"; return base.StepClassName; } }
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? "" : (mPredefinedType == IfcRoadTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + "."));
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_RC3 ? "" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

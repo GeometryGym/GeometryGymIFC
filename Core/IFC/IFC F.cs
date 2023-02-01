@@ -154,7 +154,7 @@ namespace GeometryGym.Ifc
 		public IfcFacetedBrepWithVoids(IfcClosedShell s, IEnumerable<IfcClosedShell> voids) : base(s) { mVoids.AddRange(voids); }
 	}
 	[Serializable]
-	public partial class IfcFacility : IfcSpatialStructureElement //SUPERTYPE OF(IfcBridge , IfcBuilding , IfcMarineFacility , IfcRailway , IfcRoad)
+	public partial class IfcFacility : IfcSpatialStructureElement //SUPERTYPE OF(IfcBridge , IfcBuilding , IfcMarineFacility , IfcRailway , IfcRoad, IfcTunnel)
 	{
 		internal IfcFacility() : base() { }
 		public IfcFacility(DatabaseIfc db) : base(db.Factory.RootPlacement) { }
@@ -360,6 +360,26 @@ namespace GeometryGym.Ifc
 			Tiles.AddRange(tiles);
 			TilingScale = tilingScale;
 		}
+	}
+	[Serializable]
+	public partial class IfcFillElement : IfcBuiltElement
+	{
+		private IfcFillElementTypeEnum mPredefinedType = IfcFillElementTypeEnum.NOTDEFINED;//: OPTIONAL IfcCurtainWallTypeEnum; 
+		public IfcFillElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcFillElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+
+		internal IfcFillElement() : base() { }
+		internal IfcFillElement(DatabaseIfc db, IfcFillElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
+		public IfcFillElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable]
+	public partial class IfcFillElementType : IfcBuiltElementType
+	{
+		private IfcFillElementTypeEnum mPredefinedType = IfcFillElementTypeEnum.NOTDEFINED;
+		public IfcFillElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcFillElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+
+		internal IfcFillElementType() : base() { }
+		internal IfcFillElementType(DatabaseIfc db, IfcFillElementType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcFillElementType(DatabaseIfc db, string name, IfcFillElementTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	public interface IfcFillStyleSelect : IBaseClassIfc { } // SELECT ( IfcFillAreaStyleHatching, IfcFillAreaStyleTiles, IfcExternallyDefinedHatchStyle, IfcColour);
 	[Obsolete("DEPRECATED IFC4", false)]

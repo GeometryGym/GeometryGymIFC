@@ -29,8 +29,28 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcEarthingElement : IfcFlowTerminal
+	{
+		private IfcEarthingElementTypeEnum mPredefinedType = IfcEarthingElementTypeEnum.NOTDEFINED;// OPTIONAL : IfcEarthingElementTypeEnum;
+		public IfcEarthingElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcEarthingElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcEarthingElement() : base() { }
+		internal IfcEarthingElement(DatabaseIfc db, IfcEarthingElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
+		public IfcEarthingElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system) : base(host, placement, representation, system) { }
+	}
+	[Serializable]
+	public partial class IfcEarthingElementType : IfcFlowTerminalType
+	{
+		private IfcEarthingElementTypeEnum mPredefinedType = IfcEarthingElementTypeEnum.NOTDEFINED;// : IfcEarthingElementTypeEnum;
+		public IfcEarthingElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcEarthingElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcEarthingElementType() : base() { }
+		internal IfcEarthingElementType(DatabaseIfc db, IfcEarthingElementType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcEarthingElementType(DatabaseIfc db, string name, IfcEarthingElementTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
+	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
-	public partial class IfcEarthworksCut : IfcFeatureElementSubtraction
+	public partial class IfcEarthworksCut : IfcExcavation
 	{
 		private IfcEarthworksCutTypeEnum mPredefinedType = IfcEarthworksCutTypeEnum.NOTDEFINED; //: OPTIONAL IfcEarthworksCutTypeEnum;
 		public IfcEarthworksCutTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcEarthworksCutTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
@@ -183,7 +203,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcElectricApplianceType : IfcFlowTerminalType
 	{
-		private IfcElectricApplianceTypeEnum mPredefinedType = IfcElectricApplianceTypeEnum.NOTDEFINED;// : IfcDuctFittingTypeEnum;
+		private IfcElectricApplianceTypeEnum mPredefinedType = IfcElectricApplianceTypeEnum.NOTDEFINED;// : IfcElectricApplianceTypeEnum;
 		public IfcElectricApplianceTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcElectricApplianceTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcElectricApplianceType() : base() { }
@@ -986,6 +1006,14 @@ namespace GeometryGym.Ifc
 		public IfcEventType(DatabaseIfc db, string name, IfcEventTypeEnum t, IfcEventTriggerTypeEnum trigger)
 			: base(db) { Name = name; PredefinedType = t; mEventTriggerType = trigger; }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public abstract partial class IfcExcavation : IfcFeatureElementSubtraction
+	{
+		public IfcExcavation() : base() { }
+		public IfcExcavation(DatabaseIfc db) : base(db) { }
+		public IfcExcavation(DatabaseIfc db, IfcExcavation excavation, DuplicateOptions options) : base(db, excavation, options) { }
+		public IfcExcavation(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcExtendedMaterialProperties : IfcMaterialProperties   // DEPRECATED IFC4
@@ -1175,11 +1203,11 @@ namespace GeometryGym.Ifc
 			if (externalReference == null || !base.isDuplicate(e, tol))
 				return false;
 
-			if (string.Compare(Location, externalReference.Location, true) != 0)
+			if (string.Compare(Location, externalReference.Location, false) != 0)
 				return false;
-			if (string.Compare(Name, externalReference.Name, true) != 0)
+			if (string.Compare(Name, externalReference.Name, false) != 0)
 				return false;
-			if (string.Compare(Identification, externalReference.Identification, true) != 0)
+			if (string.Compare(Identification, externalReference.Identification, false) != 0)
 				return false;
 			return true;
 		}

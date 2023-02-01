@@ -96,6 +96,18 @@ namespace GeometryGym.Ifc
 			mDissolvedSolidsContent = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcWellKnownText
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return "'" + ParserSTEP.Encode(mWellKnownText) + "',#" + mCoordinateReferenceSystem.StepId;
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mWellKnownText = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			CoordinateReferenceSystem = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCoordinateReferenceSystem;
+		}
+	}
 	public partial class IfcWindow
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -211,7 +223,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) +
-				(mWorkingTimes.Count == 0 ? ".,$," : ".,(" + string.Join(",", mWorkingTimes.Select(x => "#" + x.StepId)) + "),") +
+				(mWorkingTimes.Count == 0 ? ",$," : ",(" + string.Join(",", mWorkingTimes.Select(x => "#" + x.StepId)) + "),") +
 				(mExceptionTimes.Count == 0 ? "$," : "(" + string.Join(",", mWorkingTimes.Select(x => "#" + x.StepId)) + "),") +
 				(mPredefinedType == IfcWorkCalendarTypeEnum.NOTDEFINED ? "$" : "." + mPredefinedType.ToString() + ".");
 		}

@@ -758,7 +758,10 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcClassificationReferenceSelect : IBaseClassIfc { SET<IfcClassificationReference> HasReferences { get; } } // SELECT ( IfcClassificationReference, IfcClassification);
-	public interface IfcClassificationSelect : NamedObjectIfc { IfcClassificationReference FindItem(string identification, bool prefixHierarchy); } // IFC4 rename IfcClassification,IfcClassificationReference 
+	public interface IfcClassificationSelect : NamedObjectIfc // IFC4 rename IfcClassification,IfcClassificationReference
+	{
+		IfcClassificationReference FindItem(string identification, bool prefixHierarchy);
+	}  
 	[Serializable]
 	public partial class IfcClosedShell : IfcConnectedFaceSet, IfcShell, IfcSolidOrShell
 	{
@@ -867,6 +870,24 @@ namespace GeometryGym.Ifc
 				mTapering = ps;
 			else
 				MaterialSelect = ps;
+		}
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcComplementaryData : IfcProduct
+	{
+		internal IfcComplementaryData() : base() { }
+		public IfcComplementaryData(DatabaseIfc db) : base(db) { }
+		internal IfcComplementaryData(DatabaseIfc db, IfcComplementaryData d, DuplicateOptions options) : base(db, d, options) { }
+		public IfcComplementaryData(IfcProduct host) : base(host.mDatabase) { host.AddElement(this); }
+		public IfcComplementaryData(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
+			: base(host.Database)
+		{
+			if (host is IfcSpatialElement spatialElement)
+				spatialElement.AddElement(this);
+			else
+				host.AddAggregated(this);
+			ObjectPlacement = placement;
+			Representation = representation;
 		}
 	}
 	[Serializable]
@@ -1774,7 +1795,7 @@ namespace GeometryGym.Ifc
 		//internal IfcCoordinatedUniversalTimeOffset(IfcCoordinatedUniversalTimeOffset v) : base() { mHourOffset = v.mHourOffset; mMinuteOffset = v.mMinuteOffset; mSense = v.mSense; }
 		internal IfcCoordinatedUniversalTimeOffset() : base() { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
 	public abstract partial class IfcCoordinateOperation : BaseClassIfc // IFC4 	ABSTRACT SUPERTYPE OF(IfcMapConversion);
 	{
 		internal IfcCoordinateReferenceSystemSelect mSourceCRS;// :	IfcCoordinateReferenceSystemSelect;
@@ -1788,7 +1809,7 @@ namespace GeometryGym.Ifc
 		protected IfcCoordinateOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target) : base(source.Database) { SourceCRS = source; TargetCRS = target; }
 	}
 	[Serializable]
-	public abstract partial class IfcCoordinateReferenceSystem : BaseClassIfc, IfcCoordinateReferenceSystemSelect, NamedObjectIfc  // IFC4 	ABSTRACT SUPERTYPE OF(IfcProjectedCRS);
+	public abstract partial class IfcCoordinateReferenceSystem : BaseClassIfc, IfcCoordinateReferenceSystemSelect, NamedObjectIfc  // IFC4 	ABSTRACT SUPERTYPE OF(IfcGeographicCRS, IfcProjectedCRS);
 	{
 		internal string mName;//	:	OPTIONAL IfcLabel;
 		internal string mDescription = "";//	:	OPTIONAL IfcText;
@@ -1796,16 +1817,19 @@ namespace GeometryGym.Ifc
 		internal string mVerticalDatum = "";	//:	OPTIONAL IfcIdentifier;
 		//INVERSE
 		private IfcCoordinateOperation mHasCoordinateOperation = null;
+		private IfcWellKnownText mWellKnownText = null;
 
 		public string Name { get { return mName; } set { mName = string.IsNullOrEmpty(value) ? "Unknown" :  value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string GeodeticDatum { get { return  mGeodeticDatum; } set { mGeodeticDatum = value; } }
 		public string VerticalDatum { get { return mVerticalDatum; } set { mVerticalDatum = value; } }
 		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; value.SourceCRS = this; } }
+		public IfcWellKnownText WellKnownText { get { return mWellKnownText; } set { mWellKnownText = value; } }
 
 		protected IfcCoordinateReferenceSystem() : base() { }
 		protected IfcCoordinateReferenceSystem(DatabaseIfc db, IfcCoordinateReferenceSystem p) : base(db,p) { mName = p.mName; mDescription = p.mDescription; mGeodeticDatum = p.mGeodeticDatum; mVerticalDatum = p.mVerticalDatum; }
-		protected IfcCoordinateReferenceSystem(DatabaseIfc db, string name) : base(db) { Name = name; }
+		protected IfcCoordinateReferenceSystem(DatabaseIfc db) : base(db) { }
+
 	}
 	public interface IfcCoordinateReferenceSystemSelect : IBaseClassIfc // IfcCoordinateReferenceSystem, IfcGeometricRepresentationContext
 	{

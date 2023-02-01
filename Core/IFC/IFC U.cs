@@ -28,6 +28,17 @@ using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcUndergroundExcavation : IfcExcavation
+	{
+		private IfcUndergroundExcavationTypeEnum mPredefinedType = IfcUndergroundExcavationTypeEnum.NOTDEFINED; //: OPTIONAL IfcUndergroundExcavationTypeEnum;
+		public IfcUndergroundExcavationTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcUndergroundExcavationTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+
+		public IfcUndergroundExcavation() : base() { }
+		public IfcUndergroundExcavation(DatabaseIfc db) : base(db) { }
+		public IfcUndergroundExcavation(DatabaseIfc db, IfcUndergroundExcavation excavation, DuplicateOptions options) : base(db, excavation, options) { PredefinedType = excavation.PredefinedType; }
+		public IfcUndergroundExcavation(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	public partial interface IfcUnit : IBaseClassIfc { } // = SELECT(IfcDerivedUnit, IfcNamedUnit, IfcMonetaryUnit);
 	[Serializable]
 	public partial class IfcUnitaryControlElement : IfcDistributionControlElement //IFC4  

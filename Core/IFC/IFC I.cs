@@ -60,6 +60,17 @@ namespace GeometryGym.Ifc
 		public IfcImpactProtectionDeviceType(DatabaseIfc db, string name, IfcImpactProtectionDeviceTypeEnum predefinedType)
 			: base(db, name) { PredefinedType = predefinedType; }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
+	public partial class IfcImprovedGround : IfcEarthworksElement
+	{
+		private IfcImprovedGroundTypeEnum mPredefinedType = IfcImprovedGroundTypeEnum.NOTDEFINED; //: IfcImprovedGroundTypeEnum
+		public IfcImprovedGroundTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcImprovedGroundTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		public IfcImprovedGround() : base() { }
+		public IfcImprovedGround(DatabaseIfc db) : base(db) { }
+		public IfcImprovedGround(DatabaseIfc db, IfcImprovedGround ground, DuplicateOptions options) : base(db, ground, options) { PredefinedType = ground.PredefinedType; }
+		public IfcImprovedGround(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
 	[Serializable]
 	public partial class IfcIndexedColourMap : IfcPresentationItem
 	{
@@ -162,6 +173,20 @@ namespace GeometryGym.Ifc
 		internal IfcIndexedTriangleTextureMap() : base() { }
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db) : base(db) { }
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcIntegerVoxelData : IfcVoxelData
+	{
+		internal int[] mValues = new int[0];// :	ARRAY [1:?] OF IfcInteger;
+		internal IfcUnit mUnit = null;// :	OPTIONAL IfcUnit;
+
+		public int[] Values { get { return mValues; } set { mValues = value; } }
+		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
+
+		internal IfcIntegerVoxelData() : base() { }
+		internal IfcIntegerVoxelData(DatabaseIfc db, IfcIntegerVoxelData d, DuplicateOptions options) : base(db, d, options) { mValues = d.mValues; if (d.Unit != null) Unit = db.Factory.Duplicate(d.Unit); }
+		public IfcIntegerVoxelData(IfcProduct host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, int[] values)
+			: base(host, placement, representation) { Values = values; }
 	}
 	[Serializable]
 	public partial class IfcInterceptor : IfcFlowTreatmentDevice //IFC4  

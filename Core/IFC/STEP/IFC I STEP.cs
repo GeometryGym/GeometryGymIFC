@@ -38,6 +38,20 @@ namespace GeometryGym.Ifc
 			mUrlReference = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
+	public partial class IfcImprovedGround
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcImprovedGroundTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcIndexedColourMap
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -147,7 +161,24 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mTexCoordList.AddRange(ParserSTEP.SplitListSTPIntTriple(ParserSTEP.StripField(str,ref pos, len))); }
+			mTexCoordList.AddRange(ParserSTEP.SplitListSTPIntTriple(ParserSTEP.StripField(str,ref pos, len))); 
+		}
+	}
+	public partial class IfcIntegerVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mValues.Select(x => x.ToString())) + (mUnit== null ? "),$" : "),#" + mUnit.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mValues = arrNodes.ConvertAll(x => ParserSTEP.ParseInt(x)).ToArray();
+			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
+		}
 	}
 	public partial class IfcInterceptor  
 	{

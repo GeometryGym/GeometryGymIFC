@@ -60,6 +60,22 @@ namespace GeometryGym.Ifc
 			mMagnitude = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
+	public partial class IfcVectorVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + ",(" +
+				string.Join(",", mValues.Select(x => "#" + x.StepId)) + (mUnit == null ? "),$" : "),#" + mUnit.StepId);
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mValues = arrNodes.ConvertAll(x => dictionary[ParserSTEP.ParseLink(x)] as IfcVector).ToArray();
+			mUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnit;
+		}
+	}
 	public partial class IfcVehicle
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
@@ -212,6 +228,36 @@ namespace GeometryGym.Ifc
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcVoidingFeatureTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 			}
+		}
+	}
+	public partial class IfcVoxelData
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mValueType) ?  ",$" : ",'" + ParserSTEP.Encode(mValueType) + "'"); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			mValueType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+		}
+	}
+	public partial class IfcVoxelGrid
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return ParserSTEP.DoubleToString(mVoxelSizeX) + "," + ParserSTEP.DoubleOptionalToString(mVoxelSizeY) + "," +
+				ParserSTEP.DoubleOptionalToString(mVoxelSizeZ) + "," + mNumberOfVoxelsX + "," + ParserSTEP.IntOptionalToString(mNumberOfVoxelsY) + ',' +
+				ParserSTEP.IntOptionalToString(mNumberOfVoxelsZ) + ",(" + String.Join(",", mVoxels.Select(x => ParserSTEP.BoolToString(x))) + ")";
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mVoxelSizeX = ParserSTEP.StripDouble(str, ref pos, len);
+			mVoxelSizeY = ParserSTEP.StripDouble(str, ref pos, len);
+			mVoxelSizeZ = ParserSTEP.StripDouble(str, ref pos, len);
+			mNumberOfVoxelsX = ParserSTEP.StripInt(str, ref pos, len);
+			mNumberOfVoxelsY = ParserSTEP.StripInt(str, ref pos, len);
+			mNumberOfVoxelsZ = ParserSTEP.StripInt(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			List<string> arrNodes = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
+			mVoxels.AddRange(arrNodes.ConvertAll(x => ParserSTEP.ParseBool(x)));
 		}
 	}
 }

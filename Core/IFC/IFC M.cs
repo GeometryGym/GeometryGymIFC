@@ -45,9 +45,9 @@ namespace GeometryGym.Ifc
 			result.AddRange(Outer.Extract<T>());
 			return result;
 		}
-	} 
-	[Serializable]
-	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
+	public partial class IfcMapConversion : IfcCoordinateOperation 
 	{
 		internal double mEastings, mNorthings, mOrthogonalHeight;// :  	IfcLengthMeasure;
 		internal double mXAxisAbscissa = double.NaN, mXAxisOrdinate = double.NaN, mScale = double.NaN, mScaleY = double.NaN, mScaleZ = double.NaN;// 	:	OPTIONAL IfcReal;
@@ -56,12 +56,12 @@ namespace GeometryGym.Ifc
 		public double OrthogonalHeight { get { return mOrthogonalHeight; } set { mOrthogonalHeight = value; } }  //IfcLengthMeasure
 		public double XAxisAbscissa { get { return mXAxisAbscissa; } set { mXAxisAbscissa = value; } }  // OPTIONAL  IfcReal
 		public double XAxisOrdinate { get { return mXAxisOrdinate; } set { mXAxisOrdinate = value; } }  // OPTIONAL IfcReal
-		public double Scale { get { return double.IsNaN( mScale) ? 1 : mScale; } set { mScale = value; } }  // OPTIONAL  IfcReal
-		public double ScaleY { get { return double.IsNaN( mScaleY) ? 1 : mScaleY; } set { mScaleY = value; } }  // OPTIONAL  IfcReal
-		public double ScaleZ { get { return double.IsNaN( mScaleZ) ? 1 : mScaleZ; } set { mScaleZ = value; } }  // OPTIONAL  IfcReal
+		public double Scale { get { return double.IsNaN(mScale) ? 1 : mScale; } set { mScale = value; } }  // OPTIONAL  IfcReal
+		public double ScaleY { get { return double.IsNaN(mScaleY) ? 1 : mScaleY; } set { mScaleY = value; } }  // OPTIONAL  IfcReal
+		public double ScaleZ { get { return double.IsNaN(mScaleZ) ? 1 : mScaleZ; } set { mScaleZ = value; } }  // OPTIONAL  IfcReal
 
 		internal IfcMapConversion() : base() { }
-		internal IfcMapConversion(DatabaseIfc db, IfcMapConversion c) : base(db, c) { mEastings = c.mEastings; mNorthings = c.mNorthings; mOrthogonalHeight = c.mOrthogonalHeight; mXAxisAbscissa = c.mXAxisAbscissa; mXAxisOrdinate = c.mXAxisOrdinate; mScale = c.mScale; }
+		internal IfcMapConversion(DatabaseIfc db, IfcMapConversion c) : base(db, c) { mEastings = c.mEastings; mNorthings = c.mNorthings; mOrthogonalHeight = c.mOrthogonalHeight; mXAxisAbscissa = c.mXAxisAbscissa; mXAxisOrdinate = c.mXAxisOrdinate; mScale = c.mScale; mScaleY = c.mScaleY; mScaleZ = c.mScaleY; }
 		public IfcMapConversion(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, double eastings, double northings, double orthogonalHeight)
 			: base(source, target)
 		{
@@ -69,6 +69,17 @@ namespace GeometryGym.Ifc
 			mNorthings = northings;
 			mOrthogonalHeight = orthogonalHeight;
 		}
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	public partial class IfcMapConversionScaled : IfcMapConversion
+	{
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3_ADD1 ? "IfcMapConversion" : base.StepClassName); } }
+		internal double mScaleX = double.NaN;
+		public double ScaleX { get { return double.IsNaN(mScaleX) ? 1 : mScaleX; } set { mScaleX = value; } }  // OPTIONAL  IfcReal
+		internal IfcMapConversionScaled() : base() { }
+		internal IfcMapConversionScaled(DatabaseIfc db, IfcMapConversionScaled c) : base(db, c) { mScaleX = c.mScaleX; }
+		public IfcMapConversionScaled(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, double eastings, double northings, double orthogonalHeight)
+			: base(source, target, eastings, northings, orthogonalHeight) { }
 	}
 	[Serializable]
 	public partial class IfcMappedItem : IfcRepresentationItem

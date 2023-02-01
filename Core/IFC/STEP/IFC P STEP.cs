@@ -643,12 +643,18 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4)
 				return "";
-			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mMapProjection) ? ",$," : ",'" + ParserSTEP.Encode(mMapProjection) + "',") +
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X3_ADD1 ? "" : (string.IsNullOrEmpty(mGeodeticDatum) ? "$" : "'" + ParserSTEP.Encode(mGeodeticDatum) + "'") + (string.IsNullOrEmpty(mVerticalDatum) ? ",$" : ",'" + ParserSTEP.Encode(mVerticalDatum) + "'")) + 
+				(string.IsNullOrEmpty(mMapProjection) ? ",$," : ",'" + ParserSTEP.Encode(mMapProjection) + "',") +
 				(string.IsNullOrEmpty(mMapZone) ? "$," : "'" + ParserSTEP.Encode(mMapZone) + "',") + (mMapUnit == null ? "$" : "#" + mMapUnit.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
+			if(release >= ReleaseVersion.IFC4X3_ADD1)
+			{
+				mGeodeticDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+				mVerticalDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			}
 			mMapProjection = ParserSTEP.Decode( ParserSTEP.StripString(str, ref pos, len));
 			mMapZone = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mMapUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcNamedUnit;

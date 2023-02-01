@@ -470,6 +470,11 @@ namespace GeometryGym.Ifc
 		public double SizeInY { get { return mSizeInY; } set { mSizeInY = value; } }
 		internal IfcPlanarExtent() : base() { }
 		internal IfcPlanarExtent(DatabaseIfc db, IfcPlanarExtent p, DuplicateOptions options) : base(db, p, options) { mSizeInX = p.mSizeInX; mSizeInY = p.mSizeInY; }
+		public IfcPlanarExtent(DatabaseIfc db, double sizeInX, double sizeInY) : base(db)
+		{
+			SizeInX = sizeInX;
+			SizeInY = sizeInY;
+		}
 	}
 	[Serializable]
 	public partial class IfcPlane : IfcElementarySurface
@@ -774,7 +779,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public abstract partial class IfcPositioningElement : IfcProduct //IFC4.1
+	public abstract partial class IfcPositioningElement : IfcProduct 
 	{   // ABSTRACT SUPERTYPE OF(ONEOF(IfcGrid, IfcLinearPositioningElement, IfcReferent))
 		//INVERSE
 		private SET<IfcRelPositions> mPositions = new SET<IfcRelPositions>();//: SET[0:?] OF IfcRelPositions FOR RelatingPositioningElement; 
@@ -818,6 +823,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set { mName = value; } }
 
 		protected IfcPreDefinedItem() : base() { }
+		protected IfcPreDefinedItem(DatabaseIfc db, string name) : base(db) { Name = name; }
 		protected IfcPreDefinedItem(DatabaseIfc db, IfcPreDefinedItem i) : base(db, i) { mName = i.mName; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
@@ -859,6 +865,7 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPreDefinedTextFont : IfcPreDefinedItem, IfcTextFontSelect
 	{
 		protected IfcPreDefinedTextFont() : base() { }
+		protected IfcPreDefinedTextFont(DatabaseIfc db, string name) : base(db, name) { }
 		protected IfcPreDefinedTextFont(DatabaseIfc db, IfcPreDefinedTextFont f) : base(db, f) { }
 	}
 	[Serializable]
@@ -1666,8 +1673,8 @@ namespace GeometryGym.Ifc
 		public IfcNamedUnit MapUnit { get { return mMapUnit; } set { mMapUnit = value; } }
 
 		internal IfcProjectedCRS() : base() { }
-		internal IfcProjectedCRS(DatabaseIfc db, IfcProjectedCRS p) : base(db, p) { mName = p.mName; mMapZone = p.mMapZone; if (p != null) MapUnit = db.Factory.Duplicate(p.MapUnit) as IfcNamedUnit; }
-		public IfcProjectedCRS(DatabaseIfc db, string name) : base(db, name) { }
+		internal IfcProjectedCRS(DatabaseIfc db, IfcProjectedCRS p) : base(db, p) { mName = p.mName; mMapZone = p.mMapZone; if (p.MapUnit != null) MapUnit = db.Factory.Duplicate(p.MapUnit); }
+		public IfcProjectedCRS(DatabaseIfc db, string name) : base(db) { Name = name; }
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcProjectionCurve // DEPRECATED IFC4
