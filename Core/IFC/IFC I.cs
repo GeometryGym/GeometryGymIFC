@@ -35,7 +35,7 @@ namespace GeometryGym.Ifc
 		public string UrlReference { get { return mUrlReference; } set { mUrlReference = value; } }
 
 		internal IfcImageTexture() : base() { }
-		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t) : base(db, t) { mUrlReference = t.mUrlReference; }
+		internal IfcImageTexture(DatabaseIfc db, IfcImageTexture t, DuplicateOptions options) : base(db, t, options) { mUrlReference = t.mUrlReference; }
 		public IfcImageTexture(DatabaseIfc db, bool repeatS, bool repeatT, string urlReference) : base(db, repeatS, repeatT) { UrlReference = urlReference; }
 	}
 	[Serializable]
@@ -84,7 +84,7 @@ namespace GeometryGym.Ifc
 		public IfcColourRgbList Colours { get { return mColours; } set { mColours = value; } }
 
 		internal IfcIndexedColourMap() : base() { }
-		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
+		internal IfcIndexedColourMap(DatabaseIfc db, IfcIndexedColourMap m, DuplicateOptions options) : base(db, m, options) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; Colours = db.Factory.Duplicate(m.Colours) as IfcColourRgbList; mColourIndex.AddRange(m.mColourIndex); }
 		public IfcIndexedColourMap(IfcTessellatedFaceSet fs, IfcColourRgbList colours, IEnumerable<int> colourindex)
 			: base(fs.mDatabase) { MappedTo = fs; mColours = colours; mColourIndex.AddRange(colourindex); }
 	}
@@ -146,7 +146,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcIndexedPolygonalTextureMap() : base() { }
 		internal IfcIndexedPolygonalTextureMap(DatabaseIfc db) : base(db) { }
-		internal IfcIndexedPolygonalTextureMap(DatabaseIfc db, IfcIndexedPolygonalTextureMap m) : base(db, m)
+		internal IfcIndexedPolygonalTextureMap(DatabaseIfc db, IfcIndexedPolygonalTextureMap m, DuplicateOptions options) : base(db, m, options)
 		{
 			foreach (IfcTextureCoordinateIndices i in m.mTexCoordIndices)
 				TexCoordIndices.Add(db.Factory.Duplicate(i) as IfcTextureCoordinateIndices);
@@ -163,7 +163,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcIndexedTextureMap() : base() { }
 		protected IfcIndexedTextureMap(DatabaseIfc db) : base(db) { }
-		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m) : base(db, m) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; }
+		protected IfcIndexedTextureMap(DatabaseIfc db, IfcIndexedTextureMap m, DuplicateOptions options) : base(db, m, options) { MappedTo = db.Factory.Duplicate(m.MappedTo) as IfcTessellatedFaceSet; TexCoords = db.Factory.Duplicate(m.TexCoords) as IfcTextureVertexList; }
 	}
 	[Serializable]
 	public partial class IfcIndexedTriangleTextureMap : IfcIndexedTextureMap
@@ -172,7 +172,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcIndexedTriangleTextureMap() : base() { }
 		internal IfcIndexedTriangleTextureMap(DatabaseIfc db) : base(db) { }
-		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m) : base(db, m) { mTexCoordList = m.mTexCoordList; }
+		internal IfcIndexedTriangleTextureMap(DatabaseIfc db, IfcIndexedTriangleTextureMap m, DuplicateOptions options) : base(db, m, options) { mTexCoordList = m.mTexCoordList; }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
 	public partial class IfcIntegerVoxelData : IfcVoxelData

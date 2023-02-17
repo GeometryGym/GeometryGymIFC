@@ -436,7 +436,7 @@ namespace GeometryGym.Ifc
 		public int ColourComponents { get { return mColourComponents; } set { mColourComponents = value; } }
 
 		internal IfcPixelTexture() : base() { }
-		internal IfcPixelTexture(DatabaseIfc db, IfcPixelTexture t) : base(db, t) { mWidth = t.mWidth; mHeight = t.mHeight; mColourComponents = t.mColourComponents; mPixel.AddRange(t.mPixel); }
+		internal IfcPixelTexture(DatabaseIfc db, IfcPixelTexture t, DuplicateOptions options) : base(db, t, options) { mWidth = t.mWidth; mHeight = t.mHeight; mColourComponents = t.mColourComponents; mPixel.AddRange(t.mPixel); }
 		public IfcPixelTexture(DatabaseIfc db, bool repeatS, bool repeatT, int width, int height, int colourComponents, List<string> pixel) : base(db, repeatS, repeatT) { mWidth = width; mHeight = height; mColourComponents = colourComponents; mPixel = pixel; }
 	}
 	[Serializable]
@@ -801,20 +801,20 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPreDefinedColour : IfcPreDefinedItem, IfcColour //	ABSTRACT SUPERTYPE OF(IfcDraughtingPreDefinedColour)
 	{
 		protected IfcPreDefinedColour() : base() { }
-		protected IfcPreDefinedColour(DatabaseIfc db, IfcPreDefinedColour c) : base(db, c) { }
+		protected IfcPreDefinedColour(DatabaseIfc db, IfcPreDefinedColour c, DuplicateOptions options) : base(db, c, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedCurveFont : IfcPreDefinedItem, IfcCurveStyleFontSelect
 	{
 		protected IfcPreDefinedCurveFont() : base() { }
-		protected IfcPreDefinedCurveFont(DatabaseIfc db, IfcPreDefinedCurveFont f) : base(db, f) { }
+		protected IfcPreDefinedCurveFont(DatabaseIfc db, IfcPreDefinedCurveFont f, DuplicateOptions options) : base(db, f, options) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcPreDefinedDimensionSymbol : IfcPreDefinedSymbol // DEPRECATED IFC4
 	{
 		internal IfcPreDefinedDimensionSymbol() : base() { }
-		internal IfcPreDefinedDimensionSymbol(DatabaseIfc db, IfcPreDefinedDimensionSymbol s) : base(db, s) { }
+		internal IfcPreDefinedDimensionSymbol(DatabaseIfc db, IfcPreDefinedDimensionSymbol s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedItem : IfcPresentationItem, NamedObjectIfc
@@ -824,14 +824,14 @@ namespace GeometryGym.Ifc
 
 		protected IfcPreDefinedItem() : base() { }
 		protected IfcPreDefinedItem(DatabaseIfc db, string name) : base(db) { Name = name; }
-		protected IfcPreDefinedItem(DatabaseIfc db, IfcPreDefinedItem i) : base(db, i) { mName = i.mName; }
+		protected IfcPreDefinedItem(DatabaseIfc db, IfcPreDefinedItem i, DuplicateOptions options) : base(db, i, options) { mName = i.mName; }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcPreDefinedPointMarkerSymbol : IfcPreDefinedSymbol // DEPRECATED IFC4
 	{
 		internal IfcPreDefinedPointMarkerSymbol() : base() { }
-		internal IfcPreDefinedPointMarkerSymbol(DatabaseIfc db, IfcPreDefinedPointMarkerSymbol s) : base(db, s) { }
+		internal IfcPreDefinedPointMarkerSymbol(DatabaseIfc db, IfcPreDefinedPointMarkerSymbol s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedProperties : IfcPropertyAbstraction // IFC4 ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcementBarProperties, IfcSectionProperties, IfcSectionReinforcementProperties))
@@ -852,28 +852,28 @@ namespace GeometryGym.Ifc
 	public abstract partial class IfcPreDefinedSymbol : IfcPreDefinedItem // DEPRECATED IFC4
 	{
 		protected IfcPreDefinedSymbol() : base() { }
-		protected IfcPreDefinedSymbol(DatabaseIfc db, IfcPreDefinedSymbol s) : base(db, s) { }
+		protected IfcPreDefinedSymbol(DatabaseIfc db, IfcPreDefinedSymbol s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
 	public partial class IfcPreDefinedTerminatorSymbol : IfcPreDefinedSymbol // DEPRECATED IFC4
 	{
 		internal IfcPreDefinedTerminatorSymbol() : base() { }
-		internal IfcPreDefinedTerminatorSymbol(DatabaseIfc db, IfcPreDefinedTerminatorSymbol s) : base(db, s) { }
+		internal IfcPreDefinedTerminatorSymbol(DatabaseIfc db, IfcPreDefinedTerminatorSymbol s, DuplicateOptions options) : base(db, s, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPreDefinedTextFont : IfcPreDefinedItem, IfcTextFontSelect
 	{
 		protected IfcPreDefinedTextFont() : base() { }
 		protected IfcPreDefinedTextFont(DatabaseIfc db, string name) : base(db, name) { }
-		protected IfcPreDefinedTextFont(DatabaseIfc db, IfcPreDefinedTextFont f) : base(db, f) { }
+		protected IfcPreDefinedTextFont(DatabaseIfc db, IfcPreDefinedTextFont f, DuplicateOptions options) : base(db, f, options) { }
 	}
 	[Serializable]
 	public abstract partial class IfcPresentationItem : BaseClassIfc //	ABSTRACT SUPERTYPE OF(ONEOF(IfcColourRgbList, IfcColourSpecification,
 	{ // IfcCurveStyleFont, IfcCurveStyleFontAndScaling, IfcCurveStyleFontPattern, IfcIndexedColourMap, IfcPreDefinedItem, IfcSurfaceStyleLighting, IfcSurfaceStyleRefraction, IfcSurfaceStyleShading, IfcSurfaceStyleWithTextures, IfcSurfaceTexture, IfcTextStyleForDefinedFont, IfcTextStyleTextModel, IfcTextureCoordinate, IfcTextureVertex, IfcTextureVertexList));
 		protected IfcPresentationItem() : base() { }
 		protected IfcPresentationItem(DatabaseIfc db) : base(db) { }
-		protected IfcPresentationItem(DatabaseIfc db, IfcPresentationItem i) : base(db, i) { }
+		protected IfcPresentationItem(DatabaseIfc db, IfcPresentationItem i, DuplicateOptions options) : base(db, i) { }
 	}
 	[Serializable]
 	public partial class IfcPresentationLayerAssignment : BaseClassIfc, NamedObjectIfc  //SUPERTYPE OF	(IfcPresentationLayerWithStyle);
@@ -1021,7 +1021,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcStyledItem> StyledItems { get { return mStyledItems; } }
 
 		internal IfcPresentationStyleAssignment() : base() { }
-		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s) : base(db, s) { Styles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x) as IfcPresentationStyleSelect)); }
+		internal IfcPresentationStyleAssignment(DatabaseIfc db, IfcPresentationStyleAssignment s, DuplicateOptions options) : base(db, s) 
+		{ 
+			Styles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x, options))); 
+		}
 		public IfcPresentationStyleAssignment(IfcPresentationStyleSelect style) : base(style.Database) { Styles.Add(style); }
 		public IfcPresentationStyleAssignment(IEnumerable<IfcPresentationStyleSelect> styles) : base(styles.First().Database) { Styles.AddRange(styles); }
 	}
@@ -1664,16 +1667,26 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcProjectedCRS : IfcCoordinateReferenceSystem //IFC4
 	{
+		internal string mVerticalDatum = "";	//:	OPTIONAL IfcIdentifier;
 		internal string mMapProjection = "";// :	OPTIONAL IfcIdentifier;
 		internal string mMapZone = "";// : OPTIONAL IfcIdentifier 
 		internal IfcNamedUnit mMapUnit = null;// :	OPTIONAL IfcNamedUnit;
 
+		public string GeodeticDatum { get { return  mGeodeticDatum; } set { mGeodeticDatum = value; } }
+		public string VerticalDatum { get { return mVerticalDatum; } set { mVerticalDatum = value; } }
 		public string MapProjection { get { return mMapProjection; } set { mMapProjection = value; } }
 		public string MapZone { get { return mMapZone; } set { mMapZone = value; } }
 		public IfcNamedUnit MapUnit { get { return mMapUnit; } set { mMapUnit = value; } }
 
 		internal IfcProjectedCRS() : base() { }
-		internal IfcProjectedCRS(DatabaseIfc db, IfcProjectedCRS p) : base(db, p) { mName = p.mName; mMapZone = p.mMapZone; if (p.MapUnit != null) MapUnit = db.Factory.Duplicate(p.MapUnit); }
+		internal IfcProjectedCRS(DatabaseIfc db, IfcProjectedCRS p) : base(db, p) 
+		{
+			mVerticalDatum = p.mVerticalDatum;
+			mName = p.mName; 
+			mMapZone = p.mMapZone; 
+			if (p.MapUnit != null)
+				MapUnit = db.Factory.Duplicate(p.MapUnit);
+		}
 		public IfcProjectedCRS(DatabaseIfc db, string name) : base(db) { Name = name; }
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
@@ -2004,38 +2017,38 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcPropertyListValue : IfcSimpleProperty
 	{
-		private LIST<IfcValue> mNominalValue = new LIST<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
+		private LIST<IfcValue> mListValues = new LIST<IfcValue>();// :	OPTIONAL LIST [1:?] OF IfcValue;
 		private IfcUnit mUnit;// : OPTIONAL IfcUnit; 
 
-		public LIST<IfcValue> NominalValue { get { return mNominalValue; } }
+		public LIST<IfcValue> ListValues { get { return mListValues; } }
 		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
 
 		internal IfcPropertyListValue() : base() { }
 		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue p, DuplicateOptions options) : base(db, p, options)
 		{
-			mNominalValue.AddRange(p.mNominalValue);
+			mListValues.AddRange(p.mListValues);
 			if (p.mUnit != null)
 				Unit = db.Factory.Duplicate(p.mUnit as BaseClassIfc, options) as IfcUnit;
 		}
 		public IfcPropertyListValue(DatabaseIfc db, string name, IEnumerable<IfcValue> values)
-			: base(db, name) { mNominalValue.AddRange(values); }
+			: base(db, name) { mListValues.AddRange(values); }
 	}
 	[Serializable]
 	public partial class IfcPropertyListValue<T> : IfcSimpleProperty where T : IfcValue
 	{
-		private List<T> mNominalValue = new List<T>();// :	OPTIONAL LIST [1:?] OF IfcValue;
+		private List<T> mListValues = new List<T>();// :	OPTIONAL LIST [1:?] OF IfcValue;
 		private IfcUnit mUnit;// : OPTIONAL IfcUnit; 
 
-		public List<T> NominalValue { get { return mNominalValue; } }
+		public List<T> ListValues { get { return mListValues; } }
 		public IfcUnit Unit { get { return mUnit; } set { mUnit = value; } }
 
 		internal IfcPropertyListValue() : base() { }
 		public IfcPropertyListValue(DatabaseIfc db, string name, IEnumerable<T> values)
-			: base(db, name) { mNominalValue.AddRange(values); }
+			: base(db, name) { mListValues.AddRange(values); }
 
 		internal IfcPropertyListValue(DatabaseIfc db, IfcPropertyListValue<T> p, DuplicateOptions options) : base(db, p, options)
 		{
-			mNominalValue.AddRange(p.mNominalValue);
+			mListValues.AddRange(p.mListValues);
 			if (p.mUnit != null)
 				Unit = db.Factory.Duplicate(p.mUnit as BaseClassIfc, options) as IfcUnit;
 		}

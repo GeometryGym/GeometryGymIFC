@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 			obj["CoordList"] = string.Join(" ", mCoordList.Select(x => x.Item1 + " " + x.Item2 + " " + x.Item3));
 		}
 	}
-	public abstract partial class IfcCartesianTransformationOperator
+	public partial class IfcCartesianTransformationOperator
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -310,7 +310,7 @@ namespace GeometryGym.Ifc
 			obj["Blue"] = mBlue;
 		}
 	}
-	public abstract partial class IfcColourSpecification
+	public partial class IfcColourSpecification
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -391,7 +391,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "CfsFaces", CfsFaces, this, options);
 		}
 	}
-	public abstract partial class IfcConstraint
+	public partial class IfcConstraint
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -454,7 +454,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "UserDefinedGrade", UserDefinedGrade);
 		}
 	}
-	public abstract partial class IfcContext
+	public partial class IfcContext
 	{
 		public string Json
 		{
@@ -578,7 +578,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcConveyorSegmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public abstract partial class IfcCoordinateOperation
+	public partial class IfcCoordinateOperation
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -586,8 +586,15 @@ namespace GeometryGym.Ifc
 			obj["TargetCRS"] = TargetCRS.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcCoordinateReferenceSystem
+	public partial class IfcCoordinateReferenceSystem
 	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			Name = extractString(obj["Name"]);
+			Description = extractString(obj["Description"]);
+			GeodeticDatum = extractString(obj["GeodeticDatum"]);
+		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
@@ -597,10 +604,9 @@ namespace GeometryGym.Ifc
 			str = Description;
 			if (!string.IsNullOrEmpty(str))
 				obj["Description"] = str;
-			obj["GeodeticDatum"] = GeodeticDatum;
-			str = VerticalDatum;
-			if (!string.IsNullOrEmpty(str))
-				obj["VerticalDatum"] = str;
+			str = GeodeticDatum;
+			if (str != null)
+				obj["GeodeticDatum"] = str;
 		}
 	}
 	public partial class IfcCosineSpiral
@@ -682,7 +688,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcCsgPrimitive3D
+	public partial class IfcCsgPrimitive3D
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -782,7 +788,7 @@ namespace GeometryGym.Ifc
 				ParentCurve = mDatabase.ParseJsonObject<IfcCurve>(jobj);
 		}
 	}
-	public abstract partial class IfcCurveSegment2D
+	public partial class IfcCurveSegment2D
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

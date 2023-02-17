@@ -2481,7 +2481,7 @@ namespace GeometryGym.Ifc
 			}
 			if (options.DuplicatePresentationStyling && i.mStyledByItem != null)
 			{
-				IfcStyledItem si = db.Factory.Duplicate(i.mStyledByItem) as IfcStyledItem;
+				IfcStyledItem si = db.Factory.Duplicate(i.mStyledByItem, options) as IfcStyledItem;
 				si.Item = this;
 			}
 		}

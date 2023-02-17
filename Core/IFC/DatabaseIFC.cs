@@ -836,20 +836,23 @@ namespace GeometryGym.Ifc
 		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
 		{
 			BaseClassIfc result = null;
-			if (mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
+			if (mDatabase.Release != entity.mDatabase.Release)
 			{
-				if (mDatabase.Release < ReleaseVersion.IFC4X2)
+				if (mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
 				{
-					if (mDatabase.Release < ReleaseVersion.IFC4X1)
+					if (mDatabase.Release < ReleaseVersion.IFC4X2)
 					{
-						if (mDatabase.Release < ReleaseVersion.IFC4)
+						if (mDatabase.Release < ReleaseVersion.IFC4X1)
 						{
-							IfcSpatialZone spatialZone = entity as IfcSpatialZone;
-							if (spatialZone != null)
+							if (mDatabase.Release < ReleaseVersion.IFC4)
 							{
-								IfcSite site = new IfcSite(mDatabase, spatialZone, options);
-								NominateDuplicate(entity, site);
-								return site;
+								IfcSpatialZone spatialZone = entity as IfcSpatialZone;
+								if (spatialZone != null)
+								{
+									IfcSite site = new IfcSite(mDatabase, spatialZone, options);
+									NominateDuplicate(entity, site);
+									return site;
+								}
 							}
 						}
 					}
@@ -1671,8 +1674,15 @@ namespace GeometryGym.Ifc
 				if (result != null)
 					return result;
 			}
+			
+			if(nature == IfcGeometricRepresentationContext.GeometricContextIdentifier.Plan)
+			{
+				dimension = 2;
+			}
 
-			result = new IfcGeometricRepresentationContext(mDatabase, dimension, mDatabase.Tolerance) { ContextType = type };
+			result = new IfcGeometricRepresentationContext(mDatabase, dimension, mDatabase.Tolerance);
+			result.ContextType = type;
+			result.ContextIdentifier = dimension + "D";
 			if (context != null && !context.RepresentationContexts.Contains(result))
 				context.RepresentationContexts.Add(result);
 			mContexts.Add(nature, result);
@@ -2808,6 +2818,8 @@ namespace GeometryGym.Ifc
 			string version = release.ToString().ToUpper();
 			if (release == ReleaseVersion.IFC4A1 || release == ReleaseVersion.IFC4A2)
 				version = "IFC4";
+			else if (release == ReleaseVersion.IFC4X4_DRAFT)
+				version = "IFC4X4_17239AAA";
 			lines.Add("FILE_SCHEMA (('" + version + "'));");
 			lines.Add("ENDSEC;");
 			lines.Add("");

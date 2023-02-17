@@ -23,7 +23,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcObject
+	public partial class IfcObject
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mIsTypedBy.GetXML(xml.OwnerDocument, "IsTypedBy", this, processed));
 		}
 	}
-	public abstract partial class IfcObjectDefinition
+	public partial class IfcObjectDefinition
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -189,7 +189,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	public abstract partial class IfcObjectPlacement
+	public partial class IfcObjectPlacement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

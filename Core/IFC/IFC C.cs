@@ -509,6 +509,8 @@ namespace GeometryGym.Ifc
 		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserSTEP.Decode(x)); } }
 		public SET<IfcRelAssociatesClassification> ClassificationForObjects { get { return mClassificationForObjects; } }
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
+		[Obsolete("RENAMED IFC4X3 to Specification", false)]
+		public string Location { get { return mSpecification; } set { mSpecification = value; } }
 
 		internal IfcClassification() : base() { }
 		internal IfcClassification(DatabaseIfc db, IfcClassification c) 
@@ -813,7 +815,7 @@ namespace GeometryGym.Ifc
 		public double Blue { get { return mBlue; } set { mBlue = value; } }
 		
 		internal IfcColourRgb() : base() { }
-		internal IfcColourRgb(DatabaseIfc db, IfcColourRgb c) : base(db, c) { mRed = c.mRed; mGreen = c.mGreen; mBlue = c.mBlue; }
+		internal IfcColourRgb(DatabaseIfc db, IfcColourRgb c, DuplicateOptions options) : base(db, c, options) { mRed = c.mRed; mGreen = c.mGreen; mBlue = c.mBlue; }
 		public IfcColourRgb(DatabaseIfc db, double red, double green, double blue) : base(db) { mRed = red; mGreen = green; mBlue = blue; }		
 	}
 	[Serializable]
@@ -821,7 +823,7 @@ namespace GeometryGym.Ifc
 	{
 		internal List<Tuple<double, double, double>> mColourList = new List<Tuple<double, double, double>>();//	: LIST [1:?] OF LIST [3:3] OF IfcNormalisedRatioMeasure; 
 		internal IfcColourRgbList() : base() { }
-		internal IfcColourRgbList(DatabaseIfc db,IfcColourRgbList l) : base(db,l) { mColourList.AddRange(l.mColourList); }
+		internal IfcColourRgbList(DatabaseIfc db, IfcColourRgbList l, DuplicateOptions options) : base(db,l, options) { mColourList.AddRange(l.mColourList); }
 	}
 	[Serializable]
 	public abstract partial class IfcColourSpecification : IfcPresentationItem, IfcColour, NamedObjectIfc //	ABSTRACT SUPERTYPE OF(IfcColourRgb)
@@ -830,7 +832,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set { mName = value; } }
 
 		protected IfcColourSpecification() : base() { }
-		protected IfcColourSpecification(DatabaseIfc db, IfcColourSpecification s) : base(db, s) { mName = s.mName; }
+		protected IfcColourSpecification(DatabaseIfc db, IfcColourSpecification s, DuplicateOptions options) : base(db, s, options) { mName = s.mName; }
 		protected IfcColourSpecification(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1814,20 +1816,23 @@ namespace GeometryGym.Ifc
 		internal string mName;//	:	OPTIONAL IfcLabel;
 		internal string mDescription = "";//	:	OPTIONAL IfcText;
 		internal string mGeodeticDatum = ""; //	: OPTIONAL IfcIdentifier;
-		internal string mVerticalDatum = "";	//:	OPTIONAL IfcIdentifier;
 		//INVERSE
 		private IfcCoordinateOperation mHasCoordinateOperation = null;
 		private IfcWellKnownText mWellKnownText = null;
 
 		public string Name { get { return mName; } set { mName = string.IsNullOrEmpty(value) ? "Unknown" :  value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
-		public string GeodeticDatum { get { return  mGeodeticDatum; } set { mGeodeticDatum = value; } }
-		public string VerticalDatum { get { return mVerticalDatum; } set { mVerticalDatum = value; } }
+		public string GeodeticDatum { get { return mGeodeticDatum; } set { mGeodeticDatum = value; } }
 		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; value.SourceCRS = this; } }
 		public IfcWellKnownText WellKnownText { get { return mWellKnownText; } set { mWellKnownText = value; } }
 
 		protected IfcCoordinateReferenceSystem() : base() { }
-		protected IfcCoordinateReferenceSystem(DatabaseIfc db, IfcCoordinateReferenceSystem p) : base(db,p) { mName = p.mName; mDescription = p.mDescription; mGeodeticDatum = p.mGeodeticDatum; mVerticalDatum = p.mVerticalDatum; }
+		protected IfcCoordinateReferenceSystem(DatabaseIfc db, IfcCoordinateReferenceSystem p) : base(db,p)
+		{ 
+			mName = p.mName; 
+			mDescription = p.mDescription;
+			mGeodeticDatum = p.mGeodeticDatum;
+		}
 		protected IfcCoordinateReferenceSystem(DatabaseIfc db) : base(db) { }
 
 	}
@@ -2289,7 +2294,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set { mName = value; } }
 
 		internal IfcCurveStyleFont() : base() { }
-		internal IfcCurveStyleFont(DatabaseIfc db, IfcCurveStyleFont f) : base(db, f)
+		internal IfcCurveStyleFont(DatabaseIfc db, IfcCurveStyleFont f, DuplicateOptions options) : base(db, f, options)
 		{
 			mName = f.mName;
 			mPatternList.AddRange(f.mPatternList.Select(x => db.Factory.Duplicate(x) as IfcCurveStyleFontPattern));
@@ -2302,7 +2307,7 @@ namespace GeometryGym.Ifc
 		internal IfcCurveStyleFontSelect mCurveStyleFont;// : 	IfcCurveStyleFontSelect;
 		internal double mCurveFontScaling;//: 	IfcPositiveRatioMeasure;
 		internal IfcCurveStyleFontAndScaling() : base() { }
-		internal IfcCurveStyleFontAndScaling(DatabaseIfc db, IfcCurveStyleFontAndScaling f) : base(db, f)
+		internal IfcCurveStyleFontAndScaling(DatabaseIfc db, IfcCurveStyleFontAndScaling f, DuplicateOptions options) : base(db, f, options)
 		{
 			mName = f.mName;
 			mCurveStyleFont = db.Factory.Duplicate(f.mCurveStyleFont);
@@ -2321,7 +2326,7 @@ namespace GeometryGym.Ifc
 		internal double mVisibleSegmentLength;// : IfcLengthMeasure;
 		internal double mInvisibleSegmentLength;//: IfcPositiveLengthMeasure;	
 		internal IfcCurveStyleFontPattern() : base() { }
-		internal IfcCurveStyleFontPattern(DatabaseIfc db, IfcCurveStyleFontPattern p) : base(db, p) 
+		internal IfcCurveStyleFontPattern(DatabaseIfc db, IfcCurveStyleFontPattern p, DuplicateOptions options) : base(db, p, options) 
 		{ 
 			mVisibleSegmentLength = p.mVisibleSegmentLength; 
 			mInvisibleSegmentLength = p.mInvisibleSegmentLength; 

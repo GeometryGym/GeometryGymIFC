@@ -23,7 +23,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcManifoldSolidBrep : IfcSolidModel //ABSTRACT SUPERTYPE OF(ONEOF(IfcAdvancedBrep, IfcFacetedBrep))
+	public partial class IfcManifoldSolidBrep
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -41,7 +41,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Outer.GetXML(xml.OwnerDocument, "Outer", this, processed));
 		}
 	}
-	public partial class IfcMapConversion : IfcCoordinateOperation //IFC4
+	public partial class IfcMapConversion
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -76,7 +76,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "ScaleZ", mScaleZ);
 		}
 	}
-	public partial class IfcMarineFacility : IfcFacility
+	public partial class IfcMarineFacility
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -91,7 +91,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMarineFacilityTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcMaterial : IfcMaterialDefinition
+	public partial class IfcMaterial
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -122,7 +122,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(mHasRepresentation.GetXML(xml.OwnerDocument, "HasRepresentation", this, processed));
 		}
 	}
-	public abstract partial class IfcMaterialDefinition
+	public partial class IfcMaterialDefinition
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -152,7 +152,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcMaterialDefinitionRepresentation : IfcProductRepresentation<IfcStyledRepresentation, IfcStyledItem>
+	public partial class IfcMaterialDefinitionRepresentation
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -170,7 +170,7 @@ namespace GeometryGym.Ifc
 			//xml.AppendChild(RepresentedMaterial.GetXML(xml.OwnerDocument, "RepresentedMaterial", this, processed));
 		}
 	}
-	public partial class IfcMaterialLayer : IfcMaterialDefinition
+	public partial class IfcMaterialLayer
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -212,7 +212,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcMaterialLayerSet : IfcMaterialDefinition
+	public partial class IfcMaterialLayerSet
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -246,7 +246,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 		}
 	}
-	public partial class IfcMaterialLayerSetUsage : IfcMaterialUsageDefinition
+	public partial class IfcMaterialLayerSetUsage
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -277,7 +277,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("ReferenceExtent", mReferenceExtent.ToString());
 		}
 	}
-	public partial class IfcMaterialProfile : IfcMaterialDefinition // IFC4
+	public partial class IfcMaterialProfile
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -313,7 +313,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Category", Category);
 		}
 	}
-	public partial class IfcMaterialProfileSet : IfcMaterialDefinition //IFC4
+	public partial class IfcMaterialProfileSet
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -328,7 +328,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(CompositeProfile.GetXML(xml.OwnerDocument, "CompositeProfile", this, processed));
 		}
 	}
-	public partial class IfcMaterialProfileSetUsage : IfcMaterialUsageDefinition //IFC4
+	public partial class IfcMaterialProfileSetUsage
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -340,7 +340,7 @@ namespace GeometryGym.Ifc
 				setAttribute(xml, "ReferenceExtent", ReferenceExtent);
 		}
 	}
-	public partial class IfcMeasureWithUnit : BaseClassIfc, IfcAppliedValueSelect
+	public partial class IfcMeasureWithUnit
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -361,7 +361,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild((mUnitComponent as BaseClassIfc).GetXML(xml.OwnerDocument, "UnitComponent", this, processed));
 		}
 	}
-	public partial class IfcMetric : IfcConstraint
+	public partial class IfcMetric
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -404,7 +404,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(ReferencePath.GetXML(xml.OwnerDocument, "ReferencePath", this, processed));
 		}
 	}
-	public partial class IfcMobileTelecommunicationsAppliance : IfcFlowTerminal
+	public partial class IfcMobileTelecommunicationsAppliance
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -420,7 +420,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcMobileTelecommunicationsApplianceType : IfcFlowTerminalType
+	public partial class IfcMobileTelecommunicationsApplianceType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -435,7 +435,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcMooringDevice : IfcBuiltElement
+	public partial class IfcMooringDevice
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -451,7 +451,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcMooringDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcMooringDeviceType : IfcBuiltElementType
+	public partial class IfcMooringDeviceType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

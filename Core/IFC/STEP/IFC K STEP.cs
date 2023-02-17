@@ -32,24 +32,28 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + (mMountable ? ".T." : ".F.");
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcKerbTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Mountable = ParserSTEP.StripBool(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcKerbTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 	public partial class IfcKerbType
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + (mMountable ? ".T." : ".F");
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; ;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			Mountable = ParserSTEP.StripBool(str, ref pos, len);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcKerbTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
 		}
 	}
 }

@@ -39,32 +39,33 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcKerb
 	{
-		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
-		{
-			base.setJSON(obj, host, options);
-			obj["Mountable"] = mMountable;
-		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["Mountable"];
+			var node = obj["PredefinedType"];
 			if (node != null)
-				mMountable = node.GetValue<bool>();
+				Enum.TryParse<IfcKerbTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcKerbTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
 	public partial class IfcKerbType
 	{
-		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
-		{
-			base.setJSON(obj, host, options);
-			obj["Mountable"] = mMountable;
-		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
 			base.parseJsonObject(obj);
-			var node = obj["Mountable"];
+			var node = obj["PredefinedType"];
 			if (node != null)
-				mMountable = node.GetValue<bool>();
+				Enum.TryParse<IfcKerbTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
 }

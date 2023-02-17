@@ -2234,7 +2234,7 @@ additional types	some additional representation types are given:
 		internal IfcStyledItem(DatabaseIfc db, IfcStyledItem i, DuplicateOptions options) : base(db, i, options)
 		{
 			foreach(IfcStyleAssignmentSelect style in i.Styles)
-				addStyle(db.Factory.Duplicate(style) as IfcStyleAssignmentSelect);
+				addStyle(db.Factory.Duplicate(style, options) as IfcStyleAssignmentSelect);
 			mName = i.mName;
 		}
 		public IfcStyledItem(IfcStyleAssignmentSelect style) : base(style.Database) { addStyle(style); }
@@ -2480,7 +2480,11 @@ additional types	some additional representation types are given:
 		public SET<IfcSurfaceStyleElementSelect> Styles { get { return mStyles; } }
 
 		internal IfcSurfaceStyle() : base() { }
-		internal IfcSurfaceStyle(DatabaseIfc db, IfcSurfaceStyle s) : base(db,s) { mSide = s.mSide; mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceStyleElementSelect)); }
+		internal IfcSurfaceStyle(DatabaseIfc db, IfcSurfaceStyle s, DuplicateOptions options) : base(db, s) 
+		{ 
+			mSide = s.mSide; 
+			mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x, options) as IfcSurfaceStyleElementSelect));
+		}
 		internal IfcSurfaceStyle(DatabaseIfc db) : base(db) { }
 		public IfcSurfaceStyle(IfcSurfaceStyleShading shading) : base(shading.mDatabase) { mStyles.Add(shading); }
 		public IfcSurfaceStyle(IfcSurfaceStyleLighting lighting) : base(lighting.mDatabase) { mStyles.Add(lighting); }
@@ -2521,7 +2525,7 @@ additional types	some additional representation types are given:
 		public IfcColourRgb TransmissionColour {  get { return mTransmissionColour; } set { mTransmissionColour = value; } }
 		public IfcColourRgb ReflectanceColour {  get { return mReflectanceColour; } set { mReflectanceColour = value; } }
 		internal IfcSurfaceStyleLighting() : base() { }
-		internal IfcSurfaceStyleLighting(DatabaseIfc db, IfcSurfaceStyleLighting i) : base(db,i)
+		internal IfcSurfaceStyleLighting(DatabaseIfc db, IfcSurfaceStyleLighting i, DuplicateOptions options) : base(db, i, options)
 		{
 			mDiffuseTransmissionColour = db.Factory.Duplicate(i.mDiffuseTransmissionColour);
 			mDiffuseReflectionColour = db.Factory.Duplicate(i.mDiffuseReflectionColour);
@@ -2546,7 +2550,7 @@ additional types	some additional representation types are given:
 
 		internal IfcSurfaceStyleRefraction() : base() { }
 		public IfcSurfaceStyleRefraction(DatabaseIfc db) : base(db) { }
-		internal IfcSurfaceStyleRefraction(DatabaseIfc db, IfcSurfaceStyleRefraction s) : base(db, s)
+		internal IfcSurfaceStyleRefraction(DatabaseIfc db, IfcSurfaceStyleRefraction s, DuplicateOptions options) : base(db, s, options)
 		{
 			mRefractionIndex = s.mRefractionIndex;
 			mDispersionFactor = s.mDispersionFactor;
@@ -2568,35 +2572,35 @@ additional types	some additional representation types are given:
 		public IfcReflectanceMethodEnum ReflectanceMethod { get { return mReflectanceMethod; } set { mReflectanceMethod = value; } }
 
 		internal IfcSurfaceStyleRendering() : base() { }
-		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r) : base(db, r)
+		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r, DuplicateOptions options) : base(db, r, options)
 		{
 			IfcColourRgb colourRgb = r.mDiffuseColour as IfcColourRgb;
 			if (colourRgb != null)
-				mDiffuseColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+				mDiffuseColour = db.Factory.Duplicate(colourRgb, options);
 			else
 				mDiffuseColour = r.mDiffuseColour;
 
 			colourRgb = r.mTransmissionColour as IfcColourRgb;
 			if (colourRgb != null)
-				mTransmissionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+				mTransmissionColour = db.Factory.Duplicate(colourRgb, options);
 			else
 				mTransmissionColour = r.mTransmissionColour;
 
 			colourRgb = r.mDiffuseTransmissionColour as IfcColourRgb;
 			if (colourRgb != null)
-				mDiffuseTransmissionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+				mDiffuseTransmissionColour = db.Factory.Duplicate(colourRgb, options);
 			else
 				mDiffuseTransmissionColour = r.mDiffuseTransmissionColour;
 
 			colourRgb = r.mReflectionColour as IfcColourRgb;
 			if (colourRgb != null)
-				mReflectionColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+				mReflectionColour = db.Factory.Duplicate(colourRgb, options);
 			else
 				mReflectionColour = r.mReflectionColour;
 
 			colourRgb = r.mSpecularColour as IfcColourRgb;
 			if (colourRgb != null)
-				mSpecularColour = db.Factory.Duplicate(colourRgb) as IfcColourRgb;
+				mSpecularColour = db.Factory.Duplicate(colourRgb);
 			else
 				mSpecularColour = r.mSpecularColour;
 
@@ -2615,9 +2619,9 @@ additional types	some additional representation types are given:
 		public double Transparency { get { return mTransparency; } set { mTransparency = value; } }
 
 		internal IfcSurfaceStyleShading() : base() { }
-		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s) : base(db,s) 
+		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s, DuplicateOptions options) : base(db,s, options) 
 		{
-			SurfaceColour = db.Factory.Duplicate( s.SurfaceColour) as IfcColourRgb;
+			SurfaceColour = db.Factory.Duplicate(s.SurfaceColour, options) as IfcColourRgb;
 			mTransparency = s.mTransparency;
 		}
 		public IfcSurfaceStyleShading(IfcColourRgb surfaceColour) : base(surfaceColour.mDatabase) { SurfaceColour = surfaceColour; }
@@ -2647,10 +2651,9 @@ additional types	some additional representation types are given:
 		public List<string> Parameter { get { return mParameter; } }
 
 		protected IfcSurfaceTexture() : base() { }
-		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t) : base(db,t) { mRepeatS = t.mRepeatS; mRepeatT = t.mRepeatT; mMode = t.mMode; mTextureTransform = t.mTextureTransform; }
 		protected IfcSurfaceTexture(DatabaseIfc db,bool repeatS, bool repeatT) : base(db) { mRepeatS = repeatS; mRepeatT = repeatT; }
 		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t, DuplicateOptions options)
-			: base(db, t) 
+			: base(db, t, options) 
 		{ 
 			mRepeatS = t.mRepeatS; 
 			mRepeatT = t.mRepeatT; 

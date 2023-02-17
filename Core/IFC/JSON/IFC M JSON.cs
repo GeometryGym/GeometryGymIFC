@@ -37,7 +37,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcManifoldSolidBrep 
+	public partial class IfcManifoldSolidBrep 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -181,7 +181,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Description", Description);
 		}
 	}
-	public abstract partial class IfcMaterialDefinition 
+	public partial class IfcMaterialDefinition 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

@@ -28,7 +28,7 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcCartesianPoint : IfcPoint
+	public partial class IfcCartesianPoint
 	{
 		public override Point3d Location { get { return new Point3d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY, double.IsNaN(mCoordinateZ) ? 0 : mCoordinateZ); } }
 		public Point2d Location2d() { return new Point2d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY); }
@@ -44,11 +44,11 @@ namespace GeometryGym.Ifc
 		}
 		internal IfcCartesianPoint(DatabaseIfc m, Point2d pt) : base(m) { Coordinates2d = pt; }
 	}
-	public abstract partial class IfcCartesianPointList : IfcGeometricRepresentationItem //IFC4
+	public partial class IfcCartesianPointList
 	{
 		public abstract List<Point3d> Points();
 	}
-	public partial class IfcCartesianPointList2D : IfcCartesianPointList //IFC4
+	public partial class IfcCartesianPointList2D
 	{
 		public IfcCartesianPointList2D(DatabaseIfc db, IEnumerable<Point2d> coordList) : base(db)
 		{
@@ -56,14 +56,14 @@ namespace GeometryGym.Ifc
 		}
 		public override List<Point3d> Points() { return mCoordList.Select(x => new Point3d(x.Item1, x.Item2, 0)).ToList(); }
 	}
-	public partial class IfcCartesianPointList3D : IfcCartesianPointList //IFC4
+	public partial class IfcCartesianPointList3D
 	{
 		public IfcCartesianPointList3D(DatabaseIfc db, IEnumerable<Point3d> coordList) : base(db) 
 		{
 			mCoordList.AddRange(coordList.Select(x=> new Tuple<double, double, double>(x.X, x.Y, x.Z))); }
 		public override List<Point3d> Points() { return mCoordList.Select(x => new Point3d(x.Item1, x.Item2, x.Item3)).ToList(); } 
 	}
-	public abstract partial class IfcCartesianTransformationOperator
+	public partial class IfcCartesianTransformationOperator
 	{
 		public Transform Transform()
 		{

@@ -228,7 +228,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "WWWHomePageURL", WWWHomePageURL);
 		}
 	}
-	public abstract partial class IfcTessellatedFaceSet
+	public partial class IfcTessellatedFaceSet
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

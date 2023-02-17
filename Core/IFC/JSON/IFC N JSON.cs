@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcNamedUnit
+	public partial class IfcNamedUnit
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

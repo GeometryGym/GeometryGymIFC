@@ -23,7 +23,7 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcParameterizedProfileDef 
+	public partial class IfcParameterizedProfileDef 
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -164,7 +164,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(TheOrganization.GetXML(xml.OwnerDocument, "TheOrganization", this, processed));
 		}
 	}
-	public abstract partial class IfcPhysicalQuantity
+	public partial class IfcPhysicalQuantity
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -196,7 +196,7 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
-	public abstract partial class IfcPlacement
+	public partial class IfcPlacement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -557,7 +557,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcPresentationStyle 
+	public partial class IfcPresentationStyle 
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -600,7 +600,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild((item as BaseClassIfc).GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public abstract partial class IfcProduct
+	public partial class IfcProduct
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -765,6 +765,8 @@ namespace GeometryGym.Ifc
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
+			if (xml.HasAttribute("VerticalDatum"))
+				VerticalDatum = xml.Attributes["VerticalDatum"].Value;
 			if (xml.HasAttribute("MapProjection"))
 				MapProjection = xml.Attributes["MapProjection"].Value;
 			if (xml.HasAttribute("MapZone"))
@@ -780,13 +782,14 @@ namespace GeometryGym.Ifc
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
 			base.SetXML(xml, host, processed);
+			setAttribute(xml, "VerticalDatum", VerticalDatum);
 			setAttribute(xml, "MapProjection", MapProjection);
 			setAttribute(xml, "MapZone", MapZone);
 			if (mMapUnit != null)
 				xml.AppendChild(MapUnit.GetXML(xml.OwnerDocument, "MapUnit", this, processed));
 		}
 	}
-	public abstract partial class IfcProperty
+	public partial class IfcProperty
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -848,7 +851,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(convert(xml.OwnerDocument, mSetPointValue, "SetPointValue", mDatabase.mXmlNamespace));
 		}
 	}
-	public abstract partial class IfcPropertyDefinition
+	public partial class IfcPropertyDefinition
 	{ 
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -884,7 +887,7 @@ namespace GeometryGym.Ifc
         //}
 
     }
-    public abstract partial class IfcPropertyAbstraction
+    public partial class IfcPropertyAbstraction
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

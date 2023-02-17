@@ -473,7 +473,7 @@ namespace GeometryGym.Ifc
 		internal string mFontWeight = "";// : OPTIONAL IfcFontWeight; // ['normal','small-caps','100','200','300','400','500','600','700','800','900'];
 		internal IfcSizeSelect mFontSize = null;// : IfcSizeSelect; IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);
 		internal IfcTextStyleFontModel() : base() { }
-		internal IfcTextStyleFontModel(DatabaseIfc db, IfcTextStyleFontModel m) : base(db, m)
+		internal IfcTextStyleFontModel(DatabaseIfc db, IfcTextStyleFontModel m, DuplicateOptions options) : base(db, m, options)
 		{
 			mFontFamily.AddRange(m.mFontFamily);
 			mFontStyle = m.mFontStyle;
@@ -545,7 +545,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcTextureCoordinate() : base() { }
 		protected IfcTextureCoordinate(DatabaseIfc db) : base(db) { }
-		protected IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c) : base(db, c) { Maps.AddRange(c.Maps.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
+		protected IfcTextureCoordinate(DatabaseIfc db, IfcTextureCoordinate c, DuplicateOptions options) : base(db, c, options) { Maps.AddRange(c.Maps.Select(x=> db.Factory.Duplicate(x) as IfcSurfaceTexture)); }
 		protected IfcTextureCoordinate(IEnumerable<IfcSurfaceTexture> maps) : base(maps.First().Database) { mMaps.AddRange(maps); }
 	}
 	[Serializable]
@@ -631,7 +631,7 @@ namespace GeometryGym.Ifc
 		public List<Tuple<double, double>> TexCoordsList {  get { return mTexCoordsList; } }
 
 		internal IfcTextureVertexList() : base() { }
-		internal IfcTextureVertexList(DatabaseIfc db, IfcTextureVertexList l) : base(db, l) { mTexCoordsList = l.mTexCoordsList; }
+		internal IfcTextureVertexList(DatabaseIfc db, IfcTextureVertexList l, DuplicateOptions options) : base(db, l, options) { mTexCoordsList = l.mTexCoordsList; }
 		public IfcTextureVertexList(DatabaseIfc db, IEnumerable<Tuple<double, double>> coords) : base(db) { mTexCoordsList.AddRange(coords); }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]

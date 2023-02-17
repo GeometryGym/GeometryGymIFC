@@ -79,15 +79,17 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4X3_ADD1)
 				return "";
-			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mGeodeticDatum) ? ",$," : ",'" + ParserSTEP.Encode(mGeodeticDatum) + "',") +
-				(string.IsNullOrEmpty(mPrimeMeridian) ? "$," : "'" + ParserSTEP.Encode(mPrimeMeridian) + "',") + (mMapUnit == null ? "$" : "#" + mMapUnit.StepId);
+			return base.BuildStringSTEP(release) + 
+				(string.IsNullOrEmpty(mPrimeMeridian) ? "$," : "'" + ParserSTEP.Encode(mPrimeMeridian) + "',") +
+				(mAngleUnit == null ? "$" : "#" + mAngleUnit.StepId) + (mHeightUnit == null ? "$" : "#" + mHeightUnit.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mGeodeticDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mPrimeMeridian = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			mMapUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcNamedUnit;
+			mAngleUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcNamedUnit;
+			if(release >= ReleaseVersion.IFC4X4_DRAFT)
+				mHeightUnit = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcNamedUnit;
 		}
 	}
 	public partial class IfcGeographicElement
@@ -291,6 +293,17 @@ namespace GeometryGym.Ifc
 	public partial class IfcGroundReinforcementElement
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) +  ",." + mPredefinedType.ToString() + "."; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcGroundReinforcementElementType
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4X4_DRAFT ? "" : base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);

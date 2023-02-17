@@ -796,6 +796,31 @@ namespace GeometryGym.Ifc
 			mInnerCurves.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcCurve));
 		}
 	}
+	public partial class IfcArchElement
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return (release < ReleaseVersion.IFC4X4_DRAFT ? "" : base.BuildStringSTEP(release) + (mPredefinedType == IfcArchElementTypeEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType + "."));
+		}
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcArchElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcArchElementType
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4X4_DRAFT ? "" : base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			string s = ParserSTEP.StripField(str, ref pos, len);
+			if (s.StartsWith("."))
+				Enum.TryParse<IfcArchElementTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
 	public partial class IfcAsset
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)

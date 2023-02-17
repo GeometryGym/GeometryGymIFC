@@ -680,7 +680,7 @@ namespace GeometryGym.Ifc
 				obj["LayerAssignment"] = new JsonArray(mLayerAssignment.getJson(this, options));
 		}
 	}
-	public abstract partial class IfcRepresentationContext
+	public partial class IfcRepresentationContext
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -707,7 +707,7 @@ namespace GeometryGym.Ifc
 				obj["ContextType"] = contextType;
 		}
 	}
-	public abstract partial class IfcRepresentationItem 
+	public partial class IfcRepresentationItem 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -800,7 +800,7 @@ namespace GeometryGym.Ifc
 			obj["Angle"] = mAngle;
 		}
 	}
-	public abstract partial class IfcRoot
+	public partial class IfcRoot
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

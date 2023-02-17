@@ -1237,18 +1237,14 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return (string.IsNullOrEmpty(mName) ? "$," : "'" + ParserSTEP.Encode(mName) + "',") + 
-				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") +
-				(release < ReleaseVersion.IFC4X3_ADD1 ? (string.IsNullOrEmpty(mGeodeticDatum) ? "$" : "'" + ParserSTEP.Encode(mGeodeticDatum) + "'") + (string.IsNullOrEmpty(mVerticalDatum) ? ",$" : ",'" + ParserSTEP.Encode(mVerticalDatum) + "'") : "");
+				(string.IsNullOrEmpty(mDescription) ? "$" : "'" + ParserSTEP.Encode(mDescription) + "'") +
+				(string.IsNullOrEmpty(mGeodeticDatum) ? ",$" : ",'" + ParserSTEP.Encode(mGeodeticDatum) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			if (release < ReleaseVersion.IFC4X3_ADD1)
-			{
-				mGeodeticDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-				mVerticalDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			}
+			mGeodeticDatum = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcCosineSpiral

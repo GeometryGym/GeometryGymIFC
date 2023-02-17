@@ -129,7 +129,7 @@ namespace GeometryGym.Ifc
 			obj["SecondOperand"] = mSecondOperand.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcBoundaryCondition 
+	public partial class IfcBoundaryCondition 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -220,7 +220,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcBSplineCurve
+	public partial class IfcBSplineCurve
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -253,7 +253,7 @@ namespace GeometryGym.Ifc
 			obj["KnotSpec"] = mKnotSpec.ToString();
 		}
 	}
-	public abstract partial class IfcBSplineSurface
+	public partial class IfcBSplineSurface
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

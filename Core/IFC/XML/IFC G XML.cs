@@ -24,6 +24,33 @@ using System.Xml;
 
 namespace GeometryGym.Ifc
 {
+	public partial class IfcGeographicCRS
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PrimeMeridian"))
+				PrimeMeridian = xml.Attributes["PrimeMeridian"].Value;
+
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "AngleUnit") == 0)
+					AngleUnit = mDatabase.ParseXml<IfcNamedUnit>(child as XmlElement);
+				else if (string.Compare(name, "HeightUnit") == 0)
+					HeightUnit = mDatabase.ParseXml<IfcNamedUnit>(child as XmlElement);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			setAttribute(xml, "PrimeMeridian", PrimeMeridian);
+			if (mAngleUnit != null)
+				xml.AppendChild(AngleUnit.GetXML(xml.OwnerDocument, "AngleUnit", this, processed));
+			if (mHeightUnit != null)
+				xml.AppendChild(AngleUnit.GetXML(xml.OwnerDocument, "HeightUnit", this, processed));
+		}
+	}
 	public partial class IfcGeometricRepresentationContext
 	{
 		internal override void ParseXml(XmlElement xml)
@@ -245,6 +272,48 @@ namespace GeometryGym.Ifc
 				xml.SetAttribute("AxisTag", mAxisTag);
 			xml.SetAttribute("SameSense", mSameSense.ToString().ToLower());
 			xml.AppendChild(AxisCurve.GetXML(xml.OwnerDocument, "AxisCurve", this, processed));
+		}
+	}
+	public partial class IfcGroundReinforcementElement
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcGroundReinforcementElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
+	public partial class IfcGroundReinforcementElementType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcGroundReinforcementElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 	public partial class IfcGroup

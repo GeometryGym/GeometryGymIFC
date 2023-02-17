@@ -62,6 +62,34 @@ namespace GeometryGym.Ifc
 				obj["CrossSectionArea"] = mCrossSectionArea;
 		}
 	}
+	public partial class IfcGeographicCRS
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			PrimeMeridian = extractString(obj["PrimeMeridian"]);
+			JsonObject jobj = obj["AngleUnit"] as JsonObject;
+			if (jobj != null)
+				AngleUnit = mDatabase.ParseJsonObject<IfcNamedUnit>(jobj);
+			jobj = obj["HeightUnit"] as JsonObject;
+			if (jobj != null)
+				HeightUnit = mDatabase.ParseJsonObject<IfcNamedUnit>(jobj);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			string str = PrimeMeridian;
+			if (!string.IsNullOrEmpty(str))
+				obj["PrimeMeridian"] = str;
+			
+			IfcNamedUnit unit = AngleUnit;
+			if (unit != null)
+				obj["AngleUnit"] = unit.getJson(this, options);
+			unit = HeightUnit;
+			if (unit != null)
+				obj["HeightUnit"] = unit.getJson(this, options);
+		}
+	}
 	public partial class IfcGeographicElement
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -235,6 +263,37 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "AxisTag", AxisTag);
 			obj["AxisCurve"] = AxisCurve.getJson(this, options);
 			obj["SameSense"] = SameSense;
+		}
+	}
+	public partial class IfcGroundReinforcementElement
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcGroundReinforcementElementTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
+	public partial class IfcGroundReinforcementElementType
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcGroundReinforcementElementTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
 	public partial class IfcGroup

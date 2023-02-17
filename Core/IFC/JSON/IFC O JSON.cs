@@ -38,7 +38,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcObject 
+	public partial class IfcObject 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -63,7 +63,7 @@ namespace GeometryGym.Ifc
 		//private IfcRelDefinesByType mIsTypedBy = null;
 		//internal List<IfcRelDefinesByProperties> mIsDefinedBy = new List<IfcRelDefinesByProperties>();
 	}
-	public abstract partial class IfcObjectDefinition 
+	public partial class IfcObjectDefinition 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -169,7 +169,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "UserDefinedQualifier", UserDefinedQualifier);
 		}
 	}
-	public abstract partial class IfcObjectPlacement
+	public partial class IfcObjectPlacement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

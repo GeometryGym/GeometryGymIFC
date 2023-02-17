@@ -27,7 +27,7 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcDirection : IfcGeometricRepresentationItem
+	public partial class IfcDirection
 	{
 		public Vector3d Vector3d { get { return new Vector3d(mDirectionRatioX, mDirectionRatioY, double.IsNaN(mDirectionRatioZ) ? 0 : mDirectionRatioZ); } }
 		public IfcDirection(DatabaseIfc db, Vector3d v) : base(db)

@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcTessellatedFaceSet
+	public partial class IfcTessellatedFaceSet
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{

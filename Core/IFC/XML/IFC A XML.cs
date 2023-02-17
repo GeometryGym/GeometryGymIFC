@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 		}
 	}
-	public abstract partial class IfcAddress
+	public partial class IfcAddress
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -240,7 +240,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(CurveGeometry.GetXML(xml.OwnerDocument, "CurveGeometry", this, processed));
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment
+	public partial class IfcAlignment2DSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -298,7 +298,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "IsConvex", IsConvex.ToString());
 		}
 	}
-	public abstract partial class IfcAlignment2DVerticalSegment
+	public partial class IfcAlignment2DVerticalSegment
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -517,7 +517,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcAlignmentParameterSegment
+	public partial class IfcAlignmentParameterSegment
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -877,6 +877,48 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(element);
 			foreach (IfcCurve c in InnerCurves)
 				element.AppendChild(c.GetXML(xml.OwnerDocument, "", this, processed));
+		}
+	}
+	public partial class IfcArchElement
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcArchElementTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcArchElementTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcArchElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
+		}
+	}
+	public partial class IfcArchElementType
+	{
+		internal override void ParseXml(XmlElement xml)
+		{
+			base.ParseXml(xml);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcArchElementTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+			foreach (XmlNode child in xml.ChildNodes)
+			{
+				string name = child.Name;
+				if (string.Compare(name, "PredefinedType", true) == 0)
+					Enum.TryParse<IfcArchElementTypeEnum>(child.InnerText, true, out mPredefinedType);
+			}
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcArchElementTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 	public partial class IfcAsymmetricIShapeProfileDef

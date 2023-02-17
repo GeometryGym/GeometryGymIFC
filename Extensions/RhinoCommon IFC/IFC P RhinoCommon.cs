@@ -27,11 +27,11 @@ using Rhino.Geometry;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcPlacement : IfcGeometricRepresentationItem /*ABSTRACT SUPERTYPE OF (ONEOF (IfcAxis1Placement ,IfcAxis2Placement2D ,IfcAxis2Placement3D))*/
+	public partial class IfcPlacement
 	{
 		internal Point3d LocationPoint { get { return mLocation.Location; } }
 	}
-	public abstract partial class IfcPoint : IfcGeometricRepresentationItem, IfcGeometricSetSelect, IfcPointOrVertexPoint /*ABSTRACT SUPERTYPE OF (ONEOF (IfcCartesianPoint ,IfcPointOnCurve ,IfcPointOnSurface))*/
+	public partial class IfcPoint
 	{
 		public virtual Point3d Location { get { return Point3d.Unset; } }
 	}
@@ -53,8 +53,8 @@ namespace GeometryGym.Ifc
 				Points = new STEP.LIST<IfcCartesianPoint>(pl.ConvertAll(x => new IfcCartesianPoint(db, x)));
 		}
 	}
-	public partial class IfcProfileDef : BaseClassIfc, IfcResourceObjectSelect // SUPERTYPE OF (ONEOF (IfcArbitraryClosedProfileDef ,IfcArbitraryOpenProfileDef
-	{  //,IfcCompositeProfileDef ,IfcDerivedProfileDef ,IfcParameterizedProfileDef));  IFC2x3 abstract 
+	public partial class IfcProfileDef
+	{  		
 		internal virtual Transform Transform() { return Rhino.Geometry.Transform.Identity; }
 	}
 }

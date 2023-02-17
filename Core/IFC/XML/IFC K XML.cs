@@ -25,32 +25,31 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcKerb
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
-		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string mountable = xml.GetAttribute("Mountable");
-			if (!string.IsNullOrEmpty(mountable))
-				bool.TryParse(mountable, out mMountable);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcKerbTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			if (mPredefinedType != IfcKerbTypeEnum.NOTDEFINED)
+				xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 	public partial class IfcKerbType
 	{
-		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
-		{
-			base.SetXML(xml, host, processed);
-			xml.SetAttribute("Mountable", (mMountable ? "true" : "false"));
-		}
 		internal override void ParseXml(XmlElement xml)
 		{
 			base.ParseXml(xml);
-			string mountable = xml.GetAttribute("Mountable");
-			if (!string.IsNullOrEmpty(mountable))
-				bool.TryParse(mountable, out mMountable);
+			if (xml.HasAttribute("PredefinedType"))
+				Enum.TryParse<IfcKerbTypeEnum>(xml.Attributes["PredefinedType"].Value, true, out mPredefinedType);
+		}
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.SetAttribute("PredefinedType", mPredefinedType.ToString().ToLower());
 		}
 	}
 }

@@ -254,7 +254,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(od.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public abstract partial class IfcRelAssigns
+	public partial class IfcRelAssigns
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -333,7 +333,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public abstract partial class IfcRelAssociates
+	public partial class IfcRelAssociates
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -810,7 +810,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcRepresentationContext
+	public partial class IfcRepresentationContext
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -835,7 +835,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "ContextType", ContextType);
 		}
 	}
-	public abstract partial class IfcRepresentationItem
+	public partial class IfcRepresentationItem
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -944,7 +944,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(element);
 		}
 	}
-	public abstract partial class IfcResourceLevelRelationship
+	public partial class IfcResourceLevelRelationship
 	{ 
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -1016,7 +1016,11 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("Radius", mRadius.ToString());
 		}
 	}
-	public abstract partial class IfcRoot
+	public partial class IfcRigidOperation
+	{
+
+	}
+	public partial class IfcRoot
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

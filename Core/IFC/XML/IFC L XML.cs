@@ -56,7 +56,7 @@ namespace GeometryGym.Ifc
 			setAttribute(xml, "Description", Description);
 		}
 	}
-	public partial class IfcLibraryReference : IfcExternalReference, IfcLibrarySelect
+	public partial class IfcLibraryReference
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -83,7 +83,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(ReferencedLibrary.GetXML(xml.OwnerDocument, "ReferencedLibrary", this, processed));	
 		}
 	}
-	public partial class IfcLine : IfcCurve
+	public partial class IfcLine
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -105,7 +105,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Dir.GetXML(xml.OwnerDocument, "Dir", this, processed));
 		}
 	}
-	public partial class IfcLinearAxisWithInclination : IfcGeometricRepresentationItem
+	public partial class IfcLinearAxisWithInclination
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -126,7 +126,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public partial class IfcLinearPositioningElement : IfcPositioningElement //IFC4.1
+	public partial class IfcLinearPositioningElement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -145,7 +145,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild((Axis as BaseClassIfc).GetXML(xml.OwnerDocument, "Axis", this, processed));
 		}
 	}
-	public partial class IfcLinearPlacement : IfcObjectPlacement
+	public partial class IfcLinearPlacement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 				double.TryParse(span, out mSpan);
 		}
 	}
-	public partial class IfcLiquidTerminal : IfcFlowTerminal
+	public partial class IfcLiquidTerminal
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -199,7 +199,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLiquidTerminalTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcLiquidTerminalType : IfcFlowTerminalType
+	public partial class IfcLiquidTerminalType
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -214,7 +214,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcLiquidTerminalTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public partial class IfcLocalPlacement : IfcObjectPlacement
+	public partial class IfcLocalPlacement
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -233,7 +233,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild((mRelativePlacement as BaseClassIfc).GetXML(xml.OwnerDocument, "RelativePlacement", this, processed));
 		}
 	}
-	public partial class IfcLShapeProfileDef : IfcParameterizedProfileDef
+	public partial class IfcLShapeProfileDef
 	{
 		internal override void ParseXml(XmlElement xml)
 		{

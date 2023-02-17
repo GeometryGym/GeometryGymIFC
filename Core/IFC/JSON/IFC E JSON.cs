@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public abstract partial class IfcElement
+	public partial class IfcElement
 	{  
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -183,7 +183,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcElementarySurface
+	public partial class IfcElementarySurface
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -196,7 +196,7 @@ namespace GeometryGym.Ifc
 			obj["Position"] = Position.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcElementType 
+	public partial class IfcElementType 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -226,7 +226,7 @@ namespace GeometryGym.Ifc
 			obj["SemiAxis2"] = SemiAxis2;
 		}
 	}
-	public abstract partial class IfcExtendedProperties
+	public partial class IfcExtendedProperties
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -251,7 +251,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcExternalReference 
+	public partial class IfcExternalReference 
 	{ 
 		internal override void parseJsonObject(JsonObject obj)
 		{

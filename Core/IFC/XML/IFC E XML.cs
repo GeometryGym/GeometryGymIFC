@@ -110,7 +110,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcElectricFlowTreatmentDeviceTypeEnum>(predefinedType.Value, out mPredefinedType);
 		}
 	}
-	public abstract partial class IfcElement
+	public partial class IfcElement
 	{ 		
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -180,7 +180,7 @@ namespace GeometryGym.Ifc
 			setChild(xml, "Quantities", Quantities.Values, processed);
 		}
 	}
-	public abstract partial class IfcElementarySurface
+	public partial class IfcElementarySurface
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -199,7 +199,7 @@ namespace GeometryGym.Ifc
 			xml.AppendChild(Position.GetXML(xml.OwnerDocument, "Position", this, processed));
 		}
 	}
-	public abstract partial class IfcElementType
+	public partial class IfcElementType
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -230,7 +230,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("SemiAxis2", mSemiAxis2.ToString());
 		}
 	}
-	public abstract partial class IfcExtendedProperties
+	public partial class IfcExtendedProperties
 	{
 		internal override void ParseXml(XmlElement xml)
 		{
@@ -264,7 +264,7 @@ namespace GeometryGym.Ifc
 				element.AppendChild(p.GetXML(xml.OwnerDocument, "", this, processed));
 		}
 	}
-	public abstract partial class IfcExternalReference
+	public partial class IfcExternalReference
 	{  
 		internal override void ParseXml(XmlElement xml)
 		{

@@ -812,7 +812,7 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			ConnectionGeometry = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConnectionGeometry;
 			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
-			mRelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
+			RelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcElement;
 		}
 	}
 	public partial class IfcRelConnectsPathElements
@@ -1225,11 +1225,13 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelSpaceBoundary
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
-		{ 
-			return ((release > ReleaseVersion.IFC2x3 && mRelatedBuildingElement == null) || mRelatingSpace == null ? "" : 
-				base.BuildStringSTEP(release) + ",#" + mRelatingSpace.StepId + ",#" + mRelatedBuildingElement.StepId + 
-				(mConnectionGeometry == null ? ",$" : ",#" + mConnectionGeometry.StepId) + ",." + mPhysicalOrVirtualBoundary.ToString() + ".,." +
-				mInternalOrExternalBoundary.ToString() + ".");
+		{
+			if ((release > ReleaseVersion.IFC2x3 && mRelatedBuildingElement == null) || mRelatingSpace == null)
+				return ""; 
+			return	base.BuildStringSTEP(release) + ",#" + mRelatingSpace.StepId +
+				(mRelatedBuildingElement == null ? ",$" : ",#" + mRelatedBuildingElement.StepId) + 
+				(mConnectionGeometry == null ? ",$" : ",#" + mConnectionGeometry.StepId) + ",." + 
+				mPhysicalOrVirtualBoundary.ToString() + ".,." + mInternalOrExternalBoundary.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

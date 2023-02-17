@@ -36,7 +36,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcValue
+	public partial class IfcValue
 	{
 		public JsonObject getJson(BaseClassIfc host, BaseClassIfc.SetJsonOptions options)
 		{

@@ -114,7 +114,7 @@ namespace GeometryGym.Ifc
 			obj["CurveGeometry"] = CurveGeometry.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcAlignment2DSegment
+	public partial class IfcAlignment2DSegment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -164,7 +164,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "Segments", Segments, this, options);
 		}
 	}
-	public abstract partial class IfcAlignment2DVerticalSegment
+	public partial class IfcAlignment2DVerticalSegment
 	{
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
@@ -291,7 +291,7 @@ namespace GeometryGym.Ifc
 				Enum.TryParse<IfcAlignmentHorizontalSegmentTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
 		}
 	}
-	public abstract partial class IfcAlignmentParameterSegment
+	public partial class IfcAlignmentParameterSegment
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -480,6 +480,37 @@ namespace GeometryGym.Ifc
 		{
 			base.setJSON(obj, host, options);
 			obj["OuterCurve"] = OuterCurve.getJson(this, options);
+		}
+	}
+	public partial class IfcArchElement
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcArchElementTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			if (mPredefinedType != IfcArchElementTypeEnum.NOTDEFINED)
+				obj["PredefinedType"] = mPredefinedType.ToString();
+		}
+	}
+	public partial class IfcArchElementType
+	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			var node = obj["PredefinedType"];
+			if (node != null)
+				Enum.TryParse<IfcArchElementTypeEnum>(node.GetValue<string>(), true, out mPredefinedType);
+		}
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
 	public partial class IfcAsymmetricIShapeProfileDef 

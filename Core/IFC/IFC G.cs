@@ -79,13 +79,22 @@ namespace GeometryGym.Ifc
 	public partial class IfcGeographicCRS : IfcCoordinateReferenceSystem //IFC4
 	{
 		internal string mPrimeMeridian = "";// : OPTIONAL IfcIdentifier 
-		internal IfcNamedUnit mMapUnit = null;// :	OPTIONAL IfcNamedUnit;
+		internal IfcNamedUnit mAngleUnit = null;// :	OPTIONAL IfcNamedUnit;
+		internal IfcNamedUnit mHeightUnit = null;// :	OPTIONAL IfcNamedUnit;
 
 		public string PrimeMeridian { get { return mPrimeMeridian; } set { mPrimeMeridian = value; } }
-		public IfcNamedUnit MapUnit { get { return mMapUnit; } set { mMapUnit = value; } }
+		public IfcNamedUnit AngleUnit { get { return mAngleUnit; } set { mAngleUnit = value; } }
+		public IfcNamedUnit HeightUnit { get { return mHeightUnit; } set { mHeightUnit = value; } }
 
 		internal IfcGeographicCRS() : base() { }
-		internal IfcGeographicCRS(DatabaseIfc db, IfcGeographicCRS p) : base(db, p) { mPrimeMeridian = p.mPrimeMeridian; if (p.MapUnit != null) MapUnit = db.Factory.Duplicate(p.MapUnit); }
+		internal IfcGeographicCRS(DatabaseIfc db, IfcGeographicCRS p) : base(db, p) 
+		{ 
+			mPrimeMeridian = p.mPrimeMeridian; 
+			if (p.AngleUnit != null) 
+				AngleUnit = db.Factory.Duplicate(p.AngleUnit);
+			if (p.HeightUnit != null) 
+				AngleUnit = db.Factory.Duplicate(p.HeightUnit); 
+		}
 		public IfcGeographicCRS(DatabaseIfc db, string name) : base(db) { Name = name; }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
@@ -643,7 +652,7 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcGridPlacementDirectionSelect : IBaseClassIfc { } // SELECT(IfcVirtualGridIntersection, IfcDirection);
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
 	public partial class IfcGroundReinforcementElement : IfcBuiltElement
 	{
 		private IfcGroundReinforcementElementTypeEnum mPredefinedType = IfcGroundReinforcementElementTypeEnum.NOTDEFINED;//: IfcGroundReinforcementElementTypeEnum; 
@@ -652,6 +661,16 @@ namespace GeometryGym.Ifc
 		internal IfcGroundReinforcementElement() : base() { }
 		internal IfcGroundReinforcementElement(DatabaseIfc db, IfcGroundReinforcementElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
 		public IfcGroundReinforcementElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcGroundReinforcementElementType : IfcBuiltElementType 
+	{
+		private IfcGroundReinforcementElementTypeEnum mPredefinedType = IfcGroundReinforcementElementTypeEnum.NOTDEFINED;// IfcGroundReinforcementElementTypeEnum; 
+		public IfcGroundReinforcementElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcGroundReinforcementElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcGroundReinforcementElementType() : base() { }
+		internal IfcGroundReinforcementElementType(DatabaseIfc db, IfcGroundReinforcementElementType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcGroundReinforcementElementType(DatabaseIfc db, string name, IfcGroundReinforcementElementTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
 	}
 	[Serializable]
 	public partial class IfcGroup : IfcObject, IfcSpatialReferenceSelect //SUPERTYPE OF (ONEOF (IfcAsset ,IfcCondition ,IfcInventory ,IfcStructuralLoadGroup ,IfcStructuralResultGroup ,IfcSystem ,IfcZone))

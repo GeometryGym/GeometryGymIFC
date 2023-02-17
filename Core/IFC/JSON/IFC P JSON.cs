@@ -38,7 +38,7 @@ using System.Text.Json.Nodes;
 
 namespace GeometryGym.Ifc
 {
-	public abstract partial class IfcParameterizedProfileDef 
+	public partial class IfcParameterizedProfileDef 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -185,7 +185,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcPhysicalQuantity
+	public partial class IfcPhysicalQuantity
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -220,7 +220,7 @@ namespace GeometryGym.Ifc
 				obj["PredefinedType"] = mPredefinedType.ToString();
 		}
 	}
-	public abstract partial class IfcPlacement
+	public partial class IfcPlacement
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -324,7 +324,7 @@ namespace GeometryGym.Ifc
 			createArray(obj, "LayerStyles", LayerStyles, this, options);
 		}
 	}
-	public abstract partial class IfcPresentationStyle
+	public partial class IfcPresentationStyle
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -355,7 +355,7 @@ namespace GeometryGym.Ifc
 			obj["Styles"] = array;
 		}
 	}
-	public abstract partial class IfcProduct
+	public partial class IfcProduct
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -513,10 +513,23 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcProjectedCRS 
 	{
+		internal override void parseJsonObject(JsonObject obj)
+		{
+			base.parseJsonObject(obj);
+			VerticalDatum = extractString(obj["VerticalDatum"]);
+			MapProjection = extractString(obj["MapProjection"]);
+			MapZone = extractString(obj["MapZone"]);
+			JsonObject jobj = obj["MapUnit"] as JsonObject;
+			if (jobj != null)
+				MapUnit = mDatabase.ParseJsonObject<IfcNamedUnit>(jobj);
+		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			string str = MapProjection;
+			string str = VerticalDatum;
+			if (!string.IsNullOrEmpty(str))
+				obj["VerticalDatum"] = str;
+			str = MapProjection;
 			if (!string.IsNullOrEmpty(str))
 				obj["MapProjection"] = str;
 			str = MapZone;
@@ -527,7 +540,7 @@ namespace GeometryGym.Ifc
 				obj["MapUnit"] = unit.getJson(this, options);
 		}
 	}
-	public abstract partial class IfcProperty
+	public partial class IfcProperty
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -556,7 +569,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	public abstract partial class IfcPropertyAbstraction 
+	public partial class IfcPropertyAbstraction 
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{
@@ -604,7 +617,7 @@ namespace GeometryGym.Ifc
 				obj["SetPointValue"] = DatabaseIfc.extract(SetPointValue);
 		}
 	}
-	public abstract partial class IfcPropertyDefinition
+	public partial class IfcPropertyDefinition
 	{
 		internal override void parseJsonObject(JsonObject obj)
 		{

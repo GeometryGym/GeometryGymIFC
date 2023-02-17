@@ -1809,6 +1809,27 @@ namespace GeometryGym.Ifc
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IfcCurve inner) : base(name, perim) { mInnerCurves.Add(inner); }
 		public IfcArbitraryProfileDefWithVoids(string name, IfcCurve perim, IEnumerable<IfcCurve> inner) : base(name, perim) { mInnerCurves.AddRange(inner); }
 	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcArchElement : IfcBuiltElement  
+	{
+		private IfcArchElementTypeEnum mPredefinedType = IfcArchElementTypeEnum.NOTDEFINED;// OPTIONAL IfcArchElementTypeEnum; 
+		public IfcArchElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcArchElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcArchElement() : base() { }
+		internal IfcArchElement(DatabaseIfc db) : base(db) { }
+		internal IfcArchElement(DatabaseIfc db, IfcArchElement e, DuplicateOptions options) : base(db, e, options) { PredefinedType = e.PredefinedType; }
+		public IfcArchElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+	}
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X4_DRAFT)]
+	public partial class IfcArchElementType : IfcBuiltElementType 
+	{
+		private IfcArchElementTypeEnum mPredefinedType = IfcArchElementTypeEnum.NOTDEFINED;// IfcArchElementTypeEnum; 
+		public IfcArchElementTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcArchElementTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X4_DRAFT : mDatabase.Release); } }
+
+		internal IfcArchElementType() : base() { }
+		internal IfcArchElementType(DatabaseIfc db, IfcArchElementType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
+		public IfcArchElementType(DatabaseIfc db, string name, IfcArchElementTypeEnum type) : base(db) { Name = name; PredefinedType = type; }
+	}
 	[Serializable]
 	public partial class IfcArcIndex : List<int>, IfcSegmentIndexSelect
 	{

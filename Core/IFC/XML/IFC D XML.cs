@@ -173,7 +173,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("DirectionRatios", RoundRatio(mDirectionRatioX) + " " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ)));
 		}
 	}
-	public abstract partial class IfcDirectrixCurveSweptAreaSolid
+	public partial class IfcDirectrixCurveSweptAreaSolid
 	{
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{

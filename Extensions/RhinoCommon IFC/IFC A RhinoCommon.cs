@@ -50,7 +50,7 @@ namespace GeometryGym.Ifc
 			return Plane.Unset;
 		}
 	}
-	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
+	public partial class IfcAlignmentHorizontalSegment
 	{
 		public Vector2d StartTangent2d()
 		{
@@ -98,11 +98,11 @@ namespace GeometryGym.Ifc
 			throw new NotImplementedException("Plane at length for " + PredefinedType + " not implemented yet!");
 		}
 	}
-	public partial class IfcAxis1Placement : IfcPlacement
+	public partial class IfcAxis1Placement
 	{
 		internal Vector3d AxisVector { get { return (mAxis != null ? Axis.Vector3d : Vector3d.XAxis); } }
 	}
-	public partial class IfcAxis2Placement2D : IfcPlacement, IfcAxis2Placement
+	public partial class IfcAxis2Placement2D
 	{
 		internal Vector3d DirectionVector { get { return (mRefDirection != null ? RefDirection.Vector3d : Vector3d.XAxis); } }
 

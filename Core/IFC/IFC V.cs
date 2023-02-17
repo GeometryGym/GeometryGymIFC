@@ -374,7 +374,8 @@ namespace GeometryGym.Ifc
 		}
 		public double Angle()
 		{
-			double compound = Math.Abs(mMinutes) / 60.0 + Math.Abs(mSeconds) / 3600.0 + Math.Abs(mMicroSeconds) / 3600 * 1e-6;
+			double minutes = Math.Abs(mMinutes) / 60.0, seconds = Math.Abs(mSeconds) / 3600.0, microSeconds = Math.Abs(mMicroSeconds) / 3600000000.0;
+			double compound = minutes + seconds + microSeconds;
 			double multiplier = (mDegrees == 0 ? (mMinutes == 0 ? (mSeconds == 0 ? (mMicroSeconds > 0 ? 1 : -1) : (mSeconds > 0 ? 1 : -1)) : (mMinutes > 0 ? 1 : -1)) : (mDegrees > 0 ? 1 : -1));
 			return mDegrees + multiplier  * compound;
 		}

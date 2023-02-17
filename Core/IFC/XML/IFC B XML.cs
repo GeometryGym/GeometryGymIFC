@@ -124,7 +124,7 @@ namespace GeometryGym.Ifc
 			xml.SetAttribute("ZDim", mZDim.ToString());
 		}
 	}
-	public abstract partial class IfcBSplineSurface
+	public partial class IfcBSplineSurface
 	{
 		//internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		//{

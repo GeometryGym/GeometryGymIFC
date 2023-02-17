@@ -28,14 +28,14 @@ using Rhino.Geometry.Intersect;
 
 namespace GeometryGym.Ifc
 {
-	public partial class IfcVector : IfcGeometricRepresentationItem
+	public partial class IfcVector
 	{
 		internal Vector3d Vector { get { return Orientation.Vector3d * mMagnitude; } }
 
 		public IfcVector(DatabaseIfc db, Vector2d v) : base(db) { Orientation = new IfcDirection(db, v); mMagnitude = v.Length; }
 		public IfcVector(DatabaseIfc db, Vector3d v) : base(db) { Orientation = new IfcDirection(db, v); mMagnitude = v.Length; }
 	}
-	public partial class IfcVirtualGridIntersection : BaseClassIfc
+	public partial class IfcVirtualGridIntersection
 	{
 		internal Vector3d OffsetVector { get { return new Vector3d(mOffsetDistances.Item1, mOffsetDistances.Item2, double.IsNaN(mOffsetDistances.Item3) ? 0 : mOffsetDistances.Item3); } }
 	}

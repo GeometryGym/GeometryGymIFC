@@ -30,23 +30,23 @@ namespace GeometryGym.Ifc
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcKerb : IfcBuiltElement
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
+		private IfcKerbTypeEnum mPredefinedType = IfcKerbTypeEnum.NOTDEFINED;// OPTIONAL : IfcKerbTypeEnum;
+		public IfcKerbTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcKerbTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcKerb() : base() { }
-		public IfcKerb(DatabaseIfc db, bool mountable) : base(db) { Mountable = mountable; }
-		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { Mountable = kerb.Mountable; }
+		public IfcKerb(DatabaseIfc db) : base(db) { ; }
+		public IfcKerb(DatabaseIfc db, IfcKerb kerb, DuplicateOptions options) : base(db, kerb, options) { PredefinedType = kerb.PredefinedType; }
 		public IfcKerb(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcKerbType : IfcBuiltElementType
 	{
-		private bool mMountable = false; //: IfcBoolean;
-		public bool Mountable { get { return mMountable; } set { mMountable = value; } }
+		private IfcKerbTypeEnum mPredefinedType = IfcKerbTypeEnum.NOTDEFINED;// : IfcKerbTypeEnum; 
+		public IfcKerbTypeEnum PredefinedType { get { return mPredefinedType; } set { mPredefinedType = validPredefinedType<IfcKerbTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcKerbType() : base() { }
-		public IfcKerbType(DatabaseIfc db, IfcKerbType kerbType, DuplicateOptions options) : base(db, kerbType, options) { Mountable = kerbType.Mountable; }
-		public IfcKerbType(DatabaseIfc db, string name, bool mountable)
-			: base(db, name) { Mountable = mountable; }
+		public IfcKerbType(DatabaseIfc db, IfcKerbType kerbType, DuplicateOptions options) : base(db, kerbType, options) { PredefinedType = kerbType.PredefinedType; }
+		public IfcKerbType(DatabaseIfc db, string name, IfcKerbTypeEnum type)
+			: base(db, name) { PredefinedType = type; }
 	}
 }
