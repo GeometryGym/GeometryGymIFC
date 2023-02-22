@@ -207,7 +207,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return "(" + string.Join(",", mCoordList.Select(x => "(" + formatLength(x.Item1) + "," + formatLength(x.Item2) + ")")) + ")" +
-				(release < ReleaseVersion.IFC4X1 ? "" : (mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x=> (string.IsNullOrEmpty(x) ? "$" : "'" + ParserSTEP.Encode(x) + "'"))) + ")" ));
+				(release < ReleaseVersion.IFC4X1 ? "" : (mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x=> (string.IsNullOrEmpty(x) ? "''" : "'" + ParserSTEP.Encode(x) + "'"))) + ")" ));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -260,7 +260,7 @@ namespace GeometryGym.Ifc
 			textWriter.Write("))");
 			
 			if(release >= ReleaseVersion.IFC4X1)
-				textWriter.Write(mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => (string.IsNullOrEmpty(x) ? "$" : "'" + ParserSTEP.Encode(x) + "'"))) + ")");
+				textWriter.Write(mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => (string.IsNullOrEmpty(x) ? "''" : "'" + ParserSTEP.Encode(x) + "'"))) + ")");
 
 			WriteStepLineWorkerSuffix(textWriter);
 		}
@@ -286,7 +286,7 @@ namespace GeometryGym.Ifc
 			}
 			stringBuilder.Append("))");
 			return stringBuilder.ToString() + 
-				(release < ReleaseVersion.IFC4X1 ? "" : (mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => (string.IsNullOrEmpty(x) ? "$" : "'" + ParserSTEP.Encode(x) + "'"))) + ")")); 
+				(release < ReleaseVersion.IFC4X1 ? "" : (mTagList == null || mTagList.Count == 0 ? ",$" : ",(" + string.Join(",", mTagList.Select(x => (string.IsNullOrEmpty(x) ? "''" : "'" + ParserSTEP.Encode(x) + "'"))) + ")")); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

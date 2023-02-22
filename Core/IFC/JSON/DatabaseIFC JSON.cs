@@ -371,7 +371,6 @@ namespace GeometryGym.Ifc
 
 	public static partial class JsonIFCExtensions
 	{
-
 #if (NEWTONSOFT)
 		public static T GetValue<T>(this JToken node)
 		{

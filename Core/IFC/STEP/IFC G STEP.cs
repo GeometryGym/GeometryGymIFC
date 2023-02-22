@@ -80,8 +80,8 @@ namespace GeometryGym.Ifc
 			if (release < ReleaseVersion.IFC4X3_ADD1)
 				return "";
 			return base.BuildStringSTEP(release) + 
-				(string.IsNullOrEmpty(mPrimeMeridian) ? "$," : "'" + ParserSTEP.Encode(mPrimeMeridian) + "',") +
-				(mAngleUnit == null ? "$" : "#" + mAngleUnit.StepId) + (mHeightUnit == null ? "$" : "#" + mHeightUnit.StepId);
+				(string.IsNullOrEmpty(mPrimeMeridian) ? ",$," : ",'" + ParserSTEP.Encode(mPrimeMeridian) + "',") +
+				(mAngleUnit == null ? "$" : "#" + mAngleUnit.StepId) + (mHeightUnit == null ? ",$" : ",#" + mHeightUnit.StepId);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

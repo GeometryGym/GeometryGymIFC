@@ -532,26 +532,6 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcShapeRepresentation : IfcShapeModel
 	{
-		/*Curve2D	2 dimensional curve
-Curve3D	3 dimensional curve
-Surface2D	2 dimensional surface (a region on ground view)
-Surface3D	3 dimensional surface
-GeometricSet	points, curves, surfaces (2 or 3 dimensional)
-	GeometricCurveSet	points, curves (2 or 3 dimensional)
-Annotation2D	points, curves (2 or 3 dimensional), hatches and text (2 dimensional)
-SurfaceModel	face based and shell based surface model
-SolidModel	including swept solid, Boolean results and Brep bodies
-more specific types are:
-	SweptSolid	swept area solids, by extrusion and revolution, excluding tapered sweeps
-	AdvancedSweptSolid	swept area solids created by sweeping a profile aint a directrix, and tapered sweeps
-	Brep	faceted Brep's with and without voids
-	AdvancedBrep	Brep's based on advanced faces, with b-spline surface geometry, with and without voids
-	CSG	Boolean results of operations between solid models, half spaces and Boolean results
-	Clipping	Boolean differences between swept area solids, half spaces and Boolean results
-additional types	some additional representation types are given:
-	BoundingBox	simplistic 3D representation by a bounding box
-	SectionedSpine	cross section based representation of a spine curve and planar cross sections. It can represent a surface or a solid and the interpolations of the between the cross sections is not defined
-	MappedRepresentation*/
 		internal IfcShapeRepresentation() : base() { }
 		internal IfcShapeRepresentation(DatabaseIfc db, IfcShapeRepresentation r, DuplicateOptions options) : base(db, r, options) { }
 		public IfcShapeRepresentation(IfcGeometricRepresentationItem representation, ShapeRepresentationType representationType) : base(representation.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Body), representation) { RepresentationType = representationType.ToString(); }
@@ -587,9 +567,10 @@ additional types	some additional representation types are given:
 			{
 				IfcProfileDef pd = spine.CrossSections[0];
 				if (pd.mProfileType == IfcProfileTypeEnum.CURVE)
-					RepresentationType = "Surface3D";
+					RepresentationType = ShapeRepresentationType.Surface3D.ToString();
 			}
 		}
+		public IfcShapeRepresentation(IfcSectionedSurface surface) : base(surface) { RepresentationType = ShapeRepresentationType.SectionedSurface.ToString(); }
 		public IfcShapeRepresentation(IfcShellBasedSurfaceModel surface) : base(surface) { RepresentationType = ShapeRepresentationType.SurfaceModel.ToString(); }
 		public IfcShapeRepresentation(IfcSurface surface) : base(surface) { RepresentationType = ShapeRepresentationType.Surface3D.ToString(); }
 		public IfcShapeRepresentation(IfcExtrudedAreaSolid extrudedAreaSolid) : base(extrudedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }

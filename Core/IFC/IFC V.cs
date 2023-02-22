@@ -324,7 +324,7 @@ namespace GeometryGym.Ifc
 	public class IfcCompoundPlaneAngleMeasure //: IfcDerivedMeasureValue
 	{
 		internal int mDegrees = 0, mMinutes = 0, mSeconds = 0, mMicroSeconds = 0;
-		public IfcCompoundPlaneAngleMeasure(double angleDegrees) //: base(angleDegrees)
+		public IfcCompoundPlaneAngleMeasure(double angleDegrees) 
 		{
 			double ang = Math.Abs(angleDegrees);
 			int sign = angleDegrees < 0 ? -1 : 1;

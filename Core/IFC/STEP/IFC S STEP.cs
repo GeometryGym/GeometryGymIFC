@@ -146,7 +146,7 @@ namespace GeometryGym.Ifc
 				result += ",(" + string.Join(",", mCrossSectionPositionMeasures_OBSOLETE.ConvertAll(x => "#" + x.ToString()));
 			else
 				result += ",(" + string.Join(",", CrossSectionPositions.Select(x => "#" + x.StepId));
-			return result + (release < ReleaseVersion.IFC4X3 ? (mFixedAxisVertical ? "),.T." : "),.F.") : "");	
+			return result + (release < ReleaseVersion.IFC4X3 ? (mFixedAxisVertical ? "),.T." : "),.F.") : ")");	
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

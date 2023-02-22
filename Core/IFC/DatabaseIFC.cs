@@ -836,7 +836,7 @@ namespace GeometryGym.Ifc
 		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
 		{
 			BaseClassIfc result = null;
-			if (mDatabase.Release != entity.mDatabase.Release)
+			if (entity.mDatabase == null || mDatabase.Release != entity.mDatabase.Release)
 			{
 				if (mDatabase.Release < ReleaseVersion.IFC4X3_RC1)
 				{

@@ -1077,7 +1077,7 @@ namespace GeometryGym.Ifc
 				throw new NotImplementedException("XX Not Implemented horizontal segment " + PredefinedType.ToString());
 			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTSAMEGRADIENTSAMECURVATURE, placement, start, length, parentCurve);
 			if (mDesignerOf != null)
-				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Segment));
 
 			return curveSegment;
 		}
@@ -1302,7 +1302,7 @@ namespace GeometryGym.Ifc
 				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());
 
 			if (mDesignerOf != null)
-				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve2D));
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Segment));
 			return curveSegment;
 		}
 

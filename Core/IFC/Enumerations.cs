@@ -23,10 +23,17 @@ namespace GeometryGym.Ifc
 {
 	public enum ShapeRepresentationType
 	{
-		Curve2D, Annotation2D, GeometricSet, GeometricCurveSet, SurfaceModel, SolidModel, SweptSolid, CSG, Clipping, AdvancedSweptSolid, Brep, BoundingBox, SectionedSpine, MappedRepresentation,
-		[VersionAdded(ReleaseVersion.IFC4)] Point, [VersionAdded(ReleaseVersion.IFC4)] PointCloud, [VersionAdded(ReleaseVersion.IFC4)] Curve, [VersionAdded(ReleaseVersion.IFC4)] Curve3D,
-		[VersionAdded(ReleaseVersion.IFC4)] Surface, [VersionAdded(ReleaseVersion.IFC4)] Surface2D, [VersionAdded(ReleaseVersion.IFC4)] Surface3D, [VersionAdded(ReleaseVersion.IFC4)] FillArea,
-		[VersionAdded(ReleaseVersion.IFC4)] Text, [VersionAdded(ReleaseVersion.IFC4)] Tessellation, [VersionAdded(ReleaseVersion.IFC4)] AdvancedBrep, [VersionAdded(ReleaseVersion.IFC4)] LightSource
+		Curve2D, Annotation2D, GeometricSet, GeometricCurveSet, SurfaceModel, SolidModel, SweptSolid, CSG, Clipping, 
+		AdvancedSweptSolid, Brep, BoundingBox, SectionedSpine, MappedRepresentation,
+		[VersionAdded(ReleaseVersion.IFC4)] Point, [VersionAdded(ReleaseVersion.IFC4)] PointCloud, 
+		[VersionAdded(ReleaseVersion.IFC4)] Curve, [VersionAdded(ReleaseVersion.IFC4)] Curve3D,
+		[VersionAdded(ReleaseVersion.IFC4)] Surface, [VersionAdded(ReleaseVersion.IFC4)] Surface2D, 
+		[VersionAdded(ReleaseVersion.IFC4)] Surface3D, [VersionAdded(ReleaseVersion.IFC4)] FillArea,
+		[VersionAdded(ReleaseVersion.IFC4)] Text, [VersionAdded(ReleaseVersion.IFC4)] Tessellation, 
+		[VersionAdded(ReleaseVersion.IFC4)] AdvancedBrep, [VersionAdded(ReleaseVersion.IFC4)] AdvancedSurface, 
+		[VersionAdded(ReleaseVersion.IFC4)] LightSource, [VersionAdded(ReleaseVersion.IFC4)] SurfaceOrSolidModel ,
+		[VersionAdded(ReleaseVersion.IFC4X3)] SectionedSurface, [VersionAdded(ReleaseVersion.IFC4X3)] Segment
+		
 	};
 
 	[VersionAdded(ReleaseVersion.IFC4)]

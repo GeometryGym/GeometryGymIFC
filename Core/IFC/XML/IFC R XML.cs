@@ -1018,7 +1018,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcRigidOperation
 	{
-
+		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
+		{
+			base.SetXML(xml, host, processed);
+			xml.AppendChild(convert(xml.OwnerDocument, FirstCoordinate as IfcValue, "FirstCoordinate", mDatabase.mXmlNamespace));
+			xml.AppendChild(convert(xml.OwnerDocument, SecondCoordinate as IfcValue, "SecondCoordinate", mDatabase.mXmlNamespace));
+			xml.SetAttribute("Height", mHeight.ToString());
+		}
 	}
 	public partial class IfcRoot
 	{
