@@ -71,7 +71,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return "#" + mPoints.StepId + (mSegments.Count == 0 ? ",$," : ",(" + string.Join(",", mSegments) + "),") + ParserIfc.LogicalToString(mSelfIntersect);
+			return "#" + mPoints.StepId + 
+				(mSegments.Count == 0 ? ",$," : ",(" + string.Join(",", mSegments) + "),") +
+				(mSelfIntersect == IfcLogicalEnum.UNKNOWN ? "$" : ParserIfc.LogicalToString(mSelfIntersect));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

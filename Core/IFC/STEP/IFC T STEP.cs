@@ -382,17 +382,18 @@ namespace GeometryGym.Ifc
 		protected virtual void WriteStepLineWorker(TextWriter textWriter, ReleaseVersion release)
 		{
 			textWriter.Write("#" + mCoordinates.StepId);
-			if(release >= ReleaseVersion.IFC4X3)
+			if(release == ReleaseVersion.IFC4X3)
 				textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 		}
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{
-			return "#" + mCoordinates.StepId + (release >= ReleaseVersion.IFC4X3 ? (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed)) : "");
+			return "#" + mCoordinates.StepId +
+				(release == ReleaseVersion.IFC4X3 ? (mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed)) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary) 
 		{
 			mCoordinates = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianPointList;
-			if(release >= ReleaseVersion.IFC4X3)
+			if(release == ReleaseVersion.IFC4X3)
 				mClosed = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
@@ -847,7 +848,7 @@ namespace GeometryGym.Ifc
 				textWriter.Write(",$");
 			else
 				textWriter.Write(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + ")");
-			if (release < ReleaseVersion.IFC4X3)
+			if (release != ReleaseVersion.IFC4X3)
 				textWriter.Write(mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 
 			textWriter.Write(",((");
@@ -888,7 +889,7 @@ namespace GeometryGym.Ifc
 				sb.Append(",$");
 			else
 				sb.Append(",(" + string.Join(",", mNormals.Select(x => "(" + ParserSTEP.DoubleToString(x.Item1) + "," + ParserSTEP.DoubleToString(x.Item2) + "," + ParserSTEP.DoubleToString(x.Item3) + ")")) + ")");
-			if(release < ReleaseVersion.IFC4X3)
+			if(release != ReleaseVersion.IFC4X3)
 				sb.Append( mClosed == IfcLogicalEnum.UNKNOWN ? ",$" : "," + ParserSTEP.BoolToString(Closed));
 
 
@@ -930,7 +931,7 @@ namespace GeometryGym.Ifc
 			string field = ParserSTEP.StripField(str, ref pos, len);
 			if (field.StartsWith("("))
 				mNormals = ParserSTEP.SplitListDoubleTriple(field);
-			if(release < ReleaseVersion.IFC4X3)
+			if(release != ReleaseVersion.IFC4X3)
 				mClosed = ParserIfc.StripLogical(str, ref pos, len);
 			mCoordIndex.AddRange(ParserSTEP.StripListSTPIntTriple(str, ref pos, len));
 			if (release <= ReleaseVersion.IFC4A1)
