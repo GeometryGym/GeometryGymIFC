@@ -728,6 +728,15 @@ namespace GeometryGym.Ifc
 			RelatingConstraint = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConstraint;
 		}
 	}
+	public partial class IfcRelAssociatesDataset
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mRelatingDataset.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			base.parse(str, ref pos, release, len, dictionary);
+			RelatingDataset = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDatasetSelect;
+		}
+	}
 	public partial class IfcRelAssociatesDocument
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",#" + mRelatingDocument.StepId; }
