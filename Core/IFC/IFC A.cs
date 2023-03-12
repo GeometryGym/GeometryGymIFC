@@ -245,8 +245,8 @@ namespace GeometryGym.Ifc
 		internal IfcAlarmType(DatabaseIfc db, IfcAlarmType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }
 		public IfcAlarmType(DatabaseIfc db, string name, IfcAlarmTypeEnum t) : base(db) { Name = name; PredefinedType = t; }
 	}
-	[Serializable]
-	public partial class IfcAlignment : IfcLinearPositioningElement //IFC4.1
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X1)]
+	public partial class IfcAlignment : IfcLinearPositioningElement 
 	{
 		private IfcAlignmentTypeEnum mPredefinedType = IfcAlignmentTypeEnum.NOTDEFINED;// : OPTIONAL IfcAlignmentTypeEnum;
 		public IfcAlignmentTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcAlignmentTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
@@ -293,8 +293,7 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e, options);
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DCant : IfcAxisLateralInclination
 	{
 		private LIST<IfcAlignment2DCantSegment> mSegments = new LIST<IfcAlignment2DCantSegment>(); //: LIST[1:?] OF IfcAlignment2DCantSegment;
@@ -316,8 +315,7 @@ namespace GeometryGym.Ifc
 			RailHeadDistance = railHeadDistance;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DCantSegLine : IfcAlignment2DCantSegment
 	{
 		public IfcAlignment2DCantSegLine() : base() { }
@@ -325,8 +323,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment2DCantSegLine(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight)
 			: base(db, startDistAlong, horizontalLength, startCantLeft, startCantRight) { }
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public abstract partial class IfcAlignment2DCantSegment : IfcAlignment2DSegment
 	{
 		private double mStartDistAlong = 0; //: IfcPositiveLengthMeasure;
@@ -360,8 +357,7 @@ namespace GeometryGym.Ifc
 			StartCantRight = startCantRight;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DCantSegConstant : IfcAlignment2DCantSegment
 	{
 		public IfcAlignment2DCantSegConstant() : base() { }
@@ -370,8 +366,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment2DCantSegConstant(DatabaseIfc db, double startDistAlong, double horizontalLength, double startCantLeft, double startCantRight, bool isStartRadiusCCW, bool isEndRadiusCCW, IfcTransitionCurveType transitionCurveType, double endCantLeft, double endCantRight)
 			: base(db, startDistAlong, horizontalLength, startCantLeft, startCantRight) { }
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DCantSegTransition : IfcAlignment2DCantSegment
 	{
 		private double mEndCantLeft = double.NaN; //: OPTIONAL IfcLengthMeasure;
@@ -393,8 +388,7 @@ namespace GeometryGym.Ifc
 			EndCantRight = endCantRight;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DCantSegTransitionNonLinear : IfcAlignment2DCantSegTransition
 	{
 		private double mStartRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
@@ -427,8 +421,7 @@ namespace GeometryGym.Ifc
 
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DVerSegTransition : IfcAlignment2DVerticalSegment
 	{
 		private double mStartRadius = double.NaN; //: OPTIONAL IfcPositiveLengthMeasure;
@@ -460,8 +453,7 @@ namespace GeometryGym.Ifc
 			TransitionCurveType = transitionCurveType;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DHorizontal : IfcGeometricRepresentationItem //IFC4.1
 	{
 		internal double mStartDistAlong = double.NaN;// : OPTIONAL IfcLengthMeasure;
@@ -501,8 +493,7 @@ namespace GeometryGym.Ifc
 			}
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DHorizontalSegment : IfcAlignment2DSegment //IFC4.1
 	{
 		private IfcCurveSegment2D mCurveGeometry;// : IfcCurveSegment2D;
@@ -516,8 +507,7 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment2DHorizontalSegment(DatabaseIfc db, IfcAlignment2DHorizontalSegment s, DuplicateOptions options) : base(db, s, options) { CurveGeometry = db.Factory.Duplicate(s.CurveGeometry) as IfcCurveSegment2D; }
 		public IfcAlignment2DHorizontalSegment(IfcCurveSegment2D seg) : base(seg.mDatabase) { CurveGeometry = seg; }
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public abstract partial class IfcAlignment2DSegment : IfcGeometricRepresentationItem //IFC4.1 ABSTRACT SUPERTYPE OF(ONEOF(IfcAlignment2DHorizontalSegment, IfcAlignment2DVerticalSegment))
 	{
 		internal IfcLogicalEnum mTangentialContinuity = IfcLogicalEnum.UNKNOWN;// : OPTIONAL IfcBoolean;
@@ -537,8 +527,7 @@ namespace GeometryGym.Ifc
 			EndTag = s.EndTag;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DVerSegCircularArc : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
 		private double mRadius;// : IfcPositiveLengthMeasure;
@@ -560,17 +549,15 @@ namespace GeometryGym.Ifc
 			mIsConvex = isConvex;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
-	public partial class IfcAlignment2DVerSegLine : IfcAlignment2DVerticalSegment  //IFC4.1
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
+	public partial class IfcAlignment2DVerSegLine : IfcAlignment2DVerticalSegment 
 	{
 		internal IfcAlignment2DVerSegLine() : base() { }
 		internal IfcAlignment2DVerSegLine(DatabaseIfc db, IfcAlignment2DVerSegLine alignment2DVerSegLine, DuplicateOptions options) : base(db, alignment2DVerSegLine, options) { }
 		public IfcAlignment2DVerSegLine(DatabaseIfc db, double startDist, double horizontalLength, double startHeight, double startGradient)
 			: base(db, startDist, horizontalLength, startHeight, startGradient) { }
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignment2DVerSegParabolicArc : IfcAlignment2DVerticalSegment  //IFC4.1
 	{
 		private double mParabolaConstant;// : IfcPositiveLengthMeasure;
@@ -592,9 +579,8 @@ namespace GeometryGym.Ifc
 			mIsConvex = isConvex;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
-	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem //IFC4.1
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
+	public partial class IfcAlignment2DVertical : IfcGeometricRepresentationItem 
 	{
 		internal LIST<IfcAlignment2DVerticalSegment> mSegments = new LIST<IfcAlignment2DVerticalSegment>();// : LIST [1:?] OF IfcAlignment2DVerticalSegment;
 		//INVERSE
@@ -609,9 +595,8 @@ namespace GeometryGym.Ifc
 		}
 		public IfcAlignment2DVertical(IEnumerable<IfcAlignment2DVerticalSegment> segments) : base(segments.First().Database) { Segments.AddRange(segments); }
 	}
-	[Obsolete("DEPRECATED IFC4X3", false)]
-	[Serializable]
-	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment //IFC4.1
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
+	public abstract partial class IfcAlignment2DVerticalSegment : IfcAlignment2DSegment 
 	{
 		internal double mStartDistAlong;// : IfcLengthMeasure;
 		internal double mHorizontalLength;// : IfcPositiveLengthMeasure;
@@ -639,7 +624,7 @@ namespace GeometryGym.Ifc
 			mStartGradient = startGradient;
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentCant : IfcLinearElement
 	{
 		private double mRailHeadDistance = 0; //: IfcPositiveLengthMeasure;
@@ -680,7 +665,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentCantSegment : IfcAlignmentParameterSegment
 	{
 		private double mStartDistAlong = 0; //: IfcLengthMeasure;
@@ -787,8 +772,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
-	[Obsolete("DEPRECATED IFC4X3", false)]
+	[Serializable, Obsolete("DEPRECATED IFC4X3", false), VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcAlignmentCurve : IfcBoundedCurve //IFC4.1
 	{
 		internal IfcAlignment2DHorizontal mHorizontal = null;// : OPTIONAL IfcAlignment2DHorizontal;
@@ -813,7 +797,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignmentCurve(IfcAlignment2DVertical vertical) : base(vertical.Database) { Vertical = vertical; }
 		public IfcAlignmentCurve(IfcAlignment2DHorizontal horizontal, IfcAlignment2DVertical vertical) : this(horizontal) { Vertical = vertical; }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentHorizontal : IfcLinearElement
 	{
 		[Obsolete("Removed IFC4x3RC4", false)]
@@ -904,7 +888,7 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e, options);
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentHorizontalSegment : IfcAlignmentParameterSegment
 	{
 		private IfcCartesianPoint mStartPoint;// : IfcCartesianPoint;
@@ -1104,7 +1088,7 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e, tol);
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public abstract partial class IfcAlignmentParameterSegment : BaseClassIfc
 	{
 		private string mStartTag = ""; //: OPTIONAL IfcLabel;
@@ -1140,7 +1124,7 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e, tol);
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentSegment : IfcLinearElement
 	{
 		private IfcAlignmentParameterSegment mDesignParameters = null;// : IfcAlignmentParameterSegment;
@@ -1182,7 +1166,7 @@ namespace GeometryGym.Ifc
 			return base.isDuplicate(e, options);
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentVertical : IfcLinearElement
 	{
 		[Obsolete("Interim during IFC4x3RC2", false)]
@@ -1221,7 +1205,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcAlignmentVerticalSegment : IfcAlignmentParameterSegment
 	{
 		private double mStartDistAlong = 0; //: IfcLengthMeasure;
@@ -1348,9 +1332,8 @@ namespace GeometryGym.Ifc
 			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
 		}
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout //IFC4 DEPRECATED
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
+	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout 
 	{
 		internal IfcAngularDimension() : base() { }
 	}

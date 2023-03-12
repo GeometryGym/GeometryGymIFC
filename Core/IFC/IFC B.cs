@@ -356,6 +356,17 @@ namespace GeometryGym.Ifc
 			}
 			return new IfcIndexedPolyCurve(new IfcCartesianPointList2D(db, points), segments);
 		}
+
+		internal T representationOf<T>() where T : IfcProduct
+		{
+			IfcShapeModel shapeModel = Represents.FirstOrDefault();
+			if (shapeModel != null)
+			{
+				var ofRepresentation = shapeModel.OfProductRepresentation.SelectMany(x => x.ShapeOfProduct);
+				return ofRepresentation.OfType<T>().FirstOrDefault();
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public abstract partial class IfcBoundedSurface : IfcSurface //	ABSTRACT SUPERTYPE OF (ONEOF(IfcCurveBoundedPlane,IfcRectangularTrimmedSurface))

@@ -357,6 +357,15 @@ namespace GeometryGym.Ifc
 		{
 			BaseCurve = db.Factory.Duplicate(segmentedReferenceCurve.BaseCurve, options) as IfcBoundedCurve;
 			EndPoint = db.Factory.Duplicate(segmentedReferenceCurve.EndPoint, options) as IfcPlacement;
+			IfcLinearElement linearElement = segmentedReferenceCurve.representationOf<IfcLinearElement>();
+			if (linearElement != null)
+				db.Factory.Duplicate(linearElement, new DuplicateOptions(options) {  DuplicateHost = true });
+			else
+			{
+				IfcPositioningElement positioningElement = segmentedReferenceCurve.representationOf<IfcPositioningElement>();
+				if (positioningElement != null)
+					db.Factory.Duplicate(positioningElement, new DuplicateOptions(options) { DuplicateHost = true });
+			}
 		}
 		public IfcSegmentedReferenceCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
 			: base(segments) { BaseCurve = baseCurve; }

@@ -1005,6 +1005,15 @@ namespace GeometryGym.Ifc
 		{
 			Segments.AddRange(c.Segments.Select(x => db.Factory.Duplicate(x) as IfcSegment));
 			mSelfIntersect = c.mSelfIntersect;
+			IfcLinearElement linearElement = representationOf<IfcLinearElement>();
+			if (linearElement != null)
+				db.Factory.Duplicate(linearElement, new DuplicateOptions(options) { DuplicateHost = true });
+			else
+			{
+				IfcPositioningElement positioningElement = c.representationOf<IfcPositioningElement>();
+				if (positioningElement != null)
+					db.Factory.Duplicate(positioningElement, new DuplicateOptions(options) { DuplicateHost = true });
+			}
 		}
 		public IfcCompositeCurve(IEnumerable<IfcSegment> segments) : base(segments.First().mDatabase) { mSegments.AddRange(segments); }
 		public IfcCompositeCurve(params IfcSegment[] segments) : base(segments[0].mDatabase) { mSegments.AddRange(segments); }

@@ -79,7 +79,7 @@ namespace GeometryGym.Ifc
 			return result;
 		}
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcFaceBasedSurfaceModel : IfcGeometricRepresentationItem, IfcSurfaceOrFaceSurface
 	{
 		private SET<IfcConnectedFaceSet> mFbsmFaces = new SET<IfcConnectedFaceSet>();// : SET [1:?] OF IfcConnectedFaceSet;

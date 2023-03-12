@@ -2532,7 +2532,7 @@ namespace GeometryGym.Ifc
 		public IfcShapeModel MappedRepresentation
 		{
 			get { return mMappedRepresentation; }
-			set { mMappedRepresentation = value; value.mRepresentationMap = this; }
+			set { mMappedRepresentation = value; if(value != null) value.mRepresentationMap = this; }
 		}  
 		public SET<IfcShapeAspect> HasShapeAspects { get { return mHasShapeAspects; } }
 		public SET<IfcMappedItem> MapUsage { get { return mMapUsage; } }

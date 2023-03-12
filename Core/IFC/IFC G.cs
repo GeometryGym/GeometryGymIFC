@@ -411,6 +411,15 @@ namespace GeometryGym.Ifc
 		{
 			mBaseCurve = db.Factory.Duplicate(c.mBaseCurve) as IfcBoundedCurve;
 			mEndPoint = db.Factory.Duplicate(c.mEndPoint) as IfcPlacement;
+			IfcLinearElement linearElement = c.representationOf<IfcLinearElement>();
+			if (linearElement != null)
+				db.Factory.Duplicate(linearElement, new DuplicateOptions(options) { DuplicateHost = true });
+			else
+			{
+				IfcPositioningElement positioningElement = c.representationOf<IfcPositioningElement>();
+				if(positioningElement != null)
+					db.Factory.Duplicate(positioningElement, new DuplicateOptions(options) { DuplicateHost = true });
+			}
 		}
 		public IfcGradientCurve(IfcBoundedCurve baseCurve, IEnumerable<IfcCurveSegment> segments)
 			: base(segments) { BaseCurve = baseCurve; }
