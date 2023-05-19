@@ -96,15 +96,17 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mDistance) + "," + ParserIfc.LogicalToString(mSelfIntersect);  }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);
 			SelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 		}
 	}
 	public partial class IfcOffsetCurve3D
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mDistance) + "," + ParserIfc.LogicalToString(mSelfIntersect); }
+		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + formatLength(mDistance) + "," + ParserIfc.LogicalToString(mSelfIntersect) + ",#" + mRefDirection.StepId; }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
+			base.parse(str, ref pos, release, len, dictionary);
 			Distance = ParserSTEP.StripDouble(str, ref pos, len);
 			SelfIntersect = ParserIfc.StripLogical(str, ref pos, len);
 			RefDirection = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDirection;

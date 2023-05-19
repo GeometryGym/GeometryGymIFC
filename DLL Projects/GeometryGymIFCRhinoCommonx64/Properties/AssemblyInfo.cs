@@ -20,8 +20,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.2.14.0")]
-[assembly: AssemblyFileVersion("0.2.14.0")]
+[assembly: AssemblyVersion("0.2.16.0")]
+[assembly: AssemblyFileVersion("0.2.16.0")]
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.

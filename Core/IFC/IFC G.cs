@@ -18,12 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
+using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -167,9 +164,9 @@ namespace GeometryGym.Ifc
 			mCoordinateSpaceDimension = c.mCoordinateSpaceDimension;
 			mPrecision = c.mPrecision;
 			if(c.mWorldCoordinateSystem != null)
-				WorldCoordinateSystem = db.Factory.Duplicate<IfcAxis2Placement>(c.mWorldCoordinateSystem);
+				WorldCoordinateSystem = db.Factory.Duplicate(c.mWorldCoordinateSystem, options);
 			if (c.mTrueNorth != null)
-				TrueNorth = db.Factory.Duplicate(c.TrueNorth) as IfcDirection;
+				TrueNorth = db.Factory.Duplicate(c.TrueNorth, options);
 
 			if (options.DuplicateDownstream)
 			{
@@ -192,13 +189,16 @@ namespace GeometryGym.Ifc
 					db.Context.RepresentationContexts.Add(this);
 			}
 		}
-		internal IfcGeometricRepresentationContext(DatabaseIfc db, int SpaceDimension, double precision) : base(db)
+		internal IfcGeometricRepresentationContext(DatabaseIfc db, int spaceDimension, double precision) : base(db)
 		{
 			if (db.Context != null)
 				db.Context.RepresentationContexts.Add(this);
-			mCoordinateSpaceDimension = SpaceDimension;
+			mCoordinateSpaceDimension = spaceDimension;
 			mPrecision = Math.Max(1e-8, precision);
-			WorldCoordinateSystem = new IfcAxis2Placement3D(new IfcCartesianPoint(db,0,0,0));
+			if(spaceDimension == 2)
+				WorldCoordinateSystem = new IfcAxis2Placement2D(new IfcCartesianPoint(db, 0, 0));
+			else
+				WorldCoordinateSystem = new IfcAxis2Placement3D(new IfcCartesianPoint(db, 0, 0, 0));
 			TrueNorth = new IfcDirection(mDatabase, 0, 1);
 		}
 		public IfcGeometricRepresentationContext(int coordinateSpaceDimension, IfcAxis2Placement worldCoordinateSystem) : base(worldCoordinateSystem.Database) { mCoordinateSpaceDimension = coordinateSpaceDimension; WorldCoordinateSystem = worldCoordinateSystem; }
@@ -270,7 +270,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcGeometricSetSelect> Elements { get { return mElements; } }
 
 		internal IfcGeometricSet() : base() { }
-		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) { mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate<IfcGeometricSetSelect>(x))); }
+		internal IfcGeometricSet(DatabaseIfc db, IfcGeometricSet s, DuplicateOptions options) : base(db, s, options) 
+		{
+			mElements.AddRange(s.mElements.ConvertAll(x=>db.Factory.Duplicate(x, options)));
+		}
 		public IfcGeometricSet(IfcGeometricSetSelect element) : base(element.Database) { mElements.Add(element); }
 		public IfcGeometricSet(IEnumerable<IfcGeometricSetSelect> set) : base(set.First().Database) { mElements.AddRange(set); }
 	}
@@ -441,9 +444,9 @@ namespace GeometryGym.Ifc
 		internal IfcGrid() : base() { }
 		internal IfcGrid(DatabaseIfc db, IfcGrid g, DuplicateOptions options) : base(db, g, options)
 		{
-			UAxes.AddRange(g.UAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
-			VAxes.AddRange(g.VAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
-			WAxes.AddRange(g.WAxes.ConvertAll(x => db.Factory.Duplicate(x) as IfcGridAxis));
+			UAxes.AddRange(g.UAxes.Select(x => db.Factory.Duplicate(x, options)));
+			VAxes.AddRange(g.VAxes.Select(x => db.Factory.Duplicate(x, options)));
+			WAxes.AddRange(g.WAxes.Select(x => db.Factory.Duplicate(x, options)));
 			PredefinedType = g.PredefinedType;
 		}
 		public IfcGrid(IfcSpatialElement host, IfcAxis2Placement3D placement, List<IfcGridAxis> uAxes, List<IfcGridAxis> vAxes) 
@@ -635,7 +638,12 @@ namespace GeometryGym.Ifc
 		public bool SameSense { get { return mSameSense; } set { mSameSense = value; } }
 
 		internal IfcGridAxis() : base() { }
-		internal IfcGridAxis(DatabaseIfc db, IfcGridAxis a) : base(db) { mAxisTag = a.mAxisTag; AxisCurve = db.Factory.Duplicate(a.AxisCurve) as IfcCurve; mSameSense = a.mSameSense; }
+		internal IfcGridAxis(DatabaseIfc db, IfcGridAxis a, DuplicateOptions options) : base(db) 
+		{
+			mAxisTag = a.mAxisTag;
+			AxisCurve = db.Factory.Duplicate(a.AxisCurve, options);
+			mSameSense = a.mSameSense; 
+		}
 		public IfcGridAxis(string tag, IfcCurve axis, bool sameSense) : base(axis.mDatabase) { if (!string.IsNullOrEmpty(tag)) mAxisTag = tag.Replace("'", ""); AxisCurve = axis; mSameSense = sameSense; }
 	}
 	[Serializable]
@@ -648,11 +656,11 @@ namespace GeometryGym.Ifc
 		public IfcGridPlacementDirectionSelect PlacementRefDirection { get { return mPlacementRefDirection; } set { mPlacementRefDirection = value; } }
 
 		internal IfcGridPlacement() : base() { }
-		internal IfcGridPlacement(DatabaseIfc db, IfcGridPlacement p) : base(db, p)
+		internal IfcGridPlacement(DatabaseIfc db, IfcGridPlacement p, DuplicateOptions options) : base(db, p, options)
 		{
-			PlacementLocation = db.Factory.Duplicate(p.PlacementLocation) as IfcVirtualGridIntersection;
+			PlacementLocation = db.Factory.Duplicate(p.PlacementLocation, options);
 			if (p.mPlacementRefDirection != null)
-				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection) as IfcGridPlacementDirectionSelect;
+				PlacementRefDirection = db.Factory.Duplicate(p.PlacementRefDirection, options);
 		}
 
 		internal override bool isXYPlaneWorker(double tol)

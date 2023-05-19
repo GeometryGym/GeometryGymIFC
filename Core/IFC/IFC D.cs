@@ -18,14 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
-using System.Collections.Specialized;
 
 namespace GeometryGym.Ifc
 {
@@ -162,9 +158,30 @@ namespace GeometryGym.Ifc
 		public IfcDeepFoundationType(DatabaseIfc db, string name) : base(db, name) { }
 		internal IfcDeepFoundationType(DatabaseIfc db, IfcDeepFoundationType t, DuplicateOptions options) : base(db, t, options) { }
 	}
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDefinedSymbol : IfcGeometricRepresentationItem
+	{
+		private IfcDefinedSymbolSelect mDefinition;// : IfcDefinedSymbolSelect;
+		private IfcCartesianTransformationOperator2D mTarget;// : IfcCartesianTransformationOperator2D;
 
-	//[Obsolete("DEPRECATED IFC4", false)]
-	//ENTITY IfcDefinedSymbol  // DEPRECATED IFC4
+		public IfcDefinedSymbolSelect Definition { get { return mDefinition; } set { mDefinition = value; } }
+		public IfcCartesianTransformationOperator2D Target { get { return mTarget; } set { mTarget = value; } }
+
+		internal IfcDefinedSymbol() : base() { }
+		internal IfcDefinedSymbol(DatabaseIfc db, IfcDefinedSymbol s, DuplicateOptions options) : base(db, s, options)
+		{
+			mDefinition = db.Factory.Duplicate(s.mDefinition) as IfcDefinedSymbolSelect; 
+			mTarget = db.Factory.Duplicate(s.mTarget) as IfcCartesianTransformationOperator2D;
+		}
+		public IfcDefinedSymbol(IfcDefinedSymbolSelect definition, IfcCartesianTransformationOperator2D target) 
+			: base(definition.Database)
+		{
+			mDefinition = definition;
+			mTarget = target;
+		}
+
+	}
+	public interface IfcDefinedSymbolSelect : NamedObjectIfc { }
 	public interface IfcDefinitionSelect : IBaseClassIfc // IFC4 SELECT ( IfcObjectDefinition,  IfcPropertyDefinition);
 	{
 		IfcRelDeclares HasContext { get; set; }
@@ -205,9 +222,9 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set { mName = value; } }
 
 		internal IfcDerivedUnit() : base() { }
-		internal IfcDerivedUnit(DatabaseIfc db, IfcDerivedUnit u) : base(db) 
+		internal IfcDerivedUnit(DatabaseIfc db, IfcDerivedUnit u, DuplicateOptions options) : base(db) 
 		{ 
-			Elements.AddRange(u.Elements.ConvertAll(x=>db.Factory.Duplicate(x) as IfcDerivedUnitElement)); 
+			Elements.AddRange(u.Elements.ConvertAll(x=>db.Factory.Duplicate(x, options))); 
 			mUnitType = u.mUnitType; 
 			mUserDefinedType = u.mUserDefinedType; 
 		}
@@ -240,15 +257,15 @@ namespace GeometryGym.Ifc
 		public int Exponent { get { return mExponent; } set { mExponent = value; } } 
 
 		internal IfcDerivedUnitElement() : base() { }
-		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e) : base(db) { Unit = db.Factory.Duplicate(e.Unit) as IfcNamedUnit; mExponent = e.mExponent; }
+		internal IfcDerivedUnitElement(DatabaseIfc db, IfcDerivedUnitElement e, DuplicateOptions options) : base(db) { Unit = db.Factory.Duplicate(e.Unit, options); mExponent = e.mExponent; }
 		public IfcDerivedUnitElement(IfcNamedUnit u, int exponent) : base(u.mDatabase) { Unit = u; mExponent = exponent; }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDiameterDimension : IfcDimensionCurveDirectedCallout // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDiameterDimension : IfcDimensionCurveDirectedCallout 
 	{
 		internal IfcDiameterDimension() : base() { }
-		//internal IfcDiameterDimension(IfcDiameterDimension el) : base(el) { }
+		public IfcDiameterDimension(IfcDraughtingCalloutElement content) : base(content) { }
+		public IfcDiameterDimension(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents) { }
 	}
 	[Serializable]
 	public partial class IfcDimensionalExponents : BaseClassIfc
@@ -283,45 +300,47 @@ namespace GeometryGym.Ifc
 			mLuminousIntensityExponent = luminous;
 		}
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDimensionCalloutRelationship : IfcDraughtingCalloutRelationship // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDimensionCalloutRelationship : IfcDraughtingCalloutRelationship
 	{
 		internal IfcDimensionCalloutRelationship() : base() { }
-		//internal IfcDimensionCalloutRelationship(DatabaseIfc db, IfcDimensionCalloutRelationship r) : base(db,r) { }
+		public IfcDimensionCalloutRelationship(IfcDraughtingCallout relatingDraughtingCallout, IfcDraughtingCallout relatedDraughtingCallout)
+		: base(relatingDraughtingCallout, relatedDraughtingCallout) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDimensionCurve : IfcAnnotationCurveOccurrence // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDimensionCurve : IfcAnnotationCurveOccurrence
 	{
 		internal SET<IfcTerminatorSymbol> mAnnotatedBySymbols = new SET<IfcTerminatorSymbol>();// SET [0:2] OF IfcTerminatorSymbol FOR AnnotatedCurve; 
 		public SET<IfcTerminatorSymbol> AnnotatedBySymbols { get { return mAnnotatedBySymbols; } }
 		internal IfcDimensionCurve() : base() { }
-		public IfcDimensionCurve(DatabaseIfc db) : base(db) { }
-		public IfcDimensionCurve(IfcTerminatorSymbol symbol) : base(symbol.Database) { mAnnotatedBySymbols.Add(symbol); }
-		public IfcDimensionCurve(IfcTerminatorSymbol symbol1, IfcTerminatorSymbol symbol2) : this(symbol1) { mAnnotatedBySymbols.Add(symbol2); }
+		public IfcDimensionCurve(IfcPresentationStyleAssignment style, IfcTerminatorSymbol symbol) 
+			: base(style) { mAnnotatedBySymbols.Add(symbol); }
+		public IfcDimensionCurve(IfcPresentationStyleAssignment style, IfcTerminatorSymbol symbol1, IfcTerminatorSymbol symbol2) 
+			: this(style, symbol1) { mAnnotatedBySymbols.Add(symbol2); }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDimensionCurveDirectedCallout : IfcDraughtingCallout // DEPRECATED IFC4 SUPERTYPE OF (ONEOF (IfcAngularDimension ,IfcDiameterDimension ,IfcLinearDimension ,IfcRadiusDimension))
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDimensionCurveDirectedCallout : IfcDraughtingCallout // SUPERTYPE OF (ONEOF (IfcAngularDimension ,IfcDiameterDimension ,IfcLinearDimension ,IfcRadiusDimension))
 	{
 		internal IfcDimensionCurveDirectedCallout() : base() { }
 		internal IfcDimensionCurveDirectedCallout(DatabaseIfc db, IfcDimensionCurveDirectedCallout c, DuplicateOptions options) : base(db, c, options) { }
+		public IfcDimensionCurveDirectedCallout(IfcDraughtingCalloutElement content) : base(content) { }
+		public IfcDimensionCurveDirectedCallout(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDimensionCurveTerminator : IfcTerminatorSymbol 
 	{
 		internal IfcDimensionExtentUsage mRole;// : IfcDimensionExtentUsage;
+		public IfcDimensionExtentUsage Role { get { return mRole; } set { mRole = value; } }
 		internal IfcDimensionCurveTerminator() : base() { }
-	//	internal IfcDimensionCurveTerminator(IfcDimensionCurveTerminator i) : base(i) { mRole = i.mRole; }
+		public IfcDimensionCurveTerminator(IfcPresentationStyleAssignment style, IfcAnnotationCurveOccurrence curve, IfcDimensionExtentUsage role) 
+			: base(style, curve) { mRole = role;  }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDimensionPair : IfcDraughtingCalloutRelationship // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDimensionPair : IfcDraughtingCalloutRelationship
 	{
 		internal IfcDimensionPair() : base() { }
-		//internal IfcDimensionPair(IfcDimensionPair i) : base((IfcDraughtingCalloutRelationship)i) { }
+		public IfcDimensionPair(IfcDraughtingCallout relatingDraughtingCallout, IfcDraughtingCallout relatedDraughtingCallout)
+		: base(relatingDraughtingCallout, relatedDraughtingCallout) { }
 	}
 	[Serializable]
 	public partial class IfcDirection : IfcGeometricRepresentationItem, IfcGridPlacementDirectionSelect, IfcOrientationSelect, IfcVectorOrDirection
@@ -836,23 +855,34 @@ namespace GeometryGym.Ifc
 	public partial class IfcDraughtingCallout : IfcGeometricRepresentationItem // DEPRECATED IFC4 SUPERTYPE OF (ONEOF (IfcDimensionCurveDirectedCallout ,IfcStructuredDimensionCallout))
 	{
 		internal SET<IfcDraughtingCalloutElement> mContents = new SET<IfcDraughtingCalloutElement>(); //: SET [1:?] OF IfcDraughtingCalloutElement 
+		public SET<IfcDraughtingCalloutElement> Contents { get { return mContents; } }
 		internal IfcDraughtingCallout() : base() { }
 		internal IfcDraughtingCallout(DatabaseIfc db, IfcDraughtingCallout el, DuplicateOptions options) : base(db, el, options) 
 		{
 			mContents.AddRange(el.mContents.Select(x => db.Factory.Duplicate(x)));
 		}
-	}
+		public IfcDraughtingCallout(IfcDraughtingCalloutElement content) : base(content.Database) { mContents.Add(content); }
+		public IfcDraughtingCallout(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents.First().Database) {  }
+	} 
 	public interface IfcDraughtingCalloutElement : IBaseClassIfc { } //SELECT (IfcAnnotationCurveOccurrence ,IfcAnnotationTextOccurrence ,IfcAnnotationSymbolOccurrence);
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcDraughtingCalloutRelationship : BaseClassIfc, NamedObjectIfc
 	{
 		internal string mName = "";// : OPTIONAL IfcLabel;
 		internal string mDescription = "";// : OPTIONAL IfcText;
-		internal int mRelatingDraughtingCallout;// : IfcDraughtingCallout;
-		internal int mRelatedDraughtingCallout;// : IfcDraughtingCallout;
+		internal IfcDraughtingCallout mRelatingDraughtingCallout = null;// : IfcDraughtingCallout;
+		internal IfcDraughtingCallout mRelatedDraughtingCallout = null;// : IfcDraughtingCallout;
+
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 		internal IfcDraughtingCalloutRelationship() : base() { }
-	//	internal IfcDraughtingCalloutRelationship(IfcDraughtingCalloutRelationship o) : base() { mName = o.mName; mDescription = o.mDescription; mRelatingDraughtingCallout = o.mRelatingDraughtingCallout; mRelatedDraughtingCallout = o.mRelatedDraughtingCallout; }
+
+		public IfcDraughtingCalloutRelationship(IfcDraughtingCallout relatingDraughtingCallout, IfcDraughtingCallout relatedDraughtingCallout)
+			: base(relatedDraughtingCallout.Database)
+		{
+			mRelatingDraughtingCallout = relatingDraughtingCallout;
+			mRelatedDraughtingCallout = relatedDraughtingCallout;
+		}
 	}
 	[Serializable]
 	public partial class IfcDraughtingPreDefinedColour : IfcPreDefinedColour

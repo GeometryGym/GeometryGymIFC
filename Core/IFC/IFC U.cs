@@ -18,11 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -89,7 +86,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcUnit> Units { get { return mUnits; } }
 
 		internal IfcUnitAssignment() : base() { }
-		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u) : base(db) { Units.AddRange(u.Units.Select(x => db.Factory.Duplicate<IfcUnit>(x))); }
+		internal IfcUnitAssignment(DatabaseIfc db, IfcUnitAssignment u, DuplicateOptions options) : base(db) { Units.AddRange(u.Units.Select(x => db.Factory.Duplicate(x, options))); }
 		public IfcUnitAssignment(DatabaseIfc db) : base(db) { }
 		public IfcUnitAssignment(DatabaseIfc db, Length length) : base(db) { SetUnits(length); }
 		public IfcUnitAssignment(params IfcUnit[] units) : base(units.First().Database) { Units.AddRange(units); }

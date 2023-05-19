@@ -93,6 +93,15 @@ namespace GeometryGym.Ifc
 			mTimeComponent = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcLocalTime;
 		}
 	}
+	public partial class IfcDefinedSymbol
+	{
+		protected override string BuildStringSTEP(ReleaseVersion release) { return "#" + mDefinition.StepId + ",#" + mTarget.StepId; }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
+		{
+			mDefinition = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDefinedSymbolSelect;
+			mTarget = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcCartesianTransformationOperator2D;
+		}
+	}
 	public partial class IfcDerivedProfileDef
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
@@ -609,15 +618,15 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return (string.IsNullOrEmpty(mName) ? "$," : "'" + ParserSTEP.Encode(mName) + "',") + 
-				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") + 
-				ParserSTEP.LinkToString(mRelatingDraughtingCallout) + "," + ParserSTEP.LinkToString(mRelatedDraughtingCallout);
+				(string.IsNullOrEmpty(mDescription) ? "$,#" : "'" + ParserSTEP.Encode(mDescription) + "',#") + 
+				mRelatingDraughtingCallout.StepId + ",#" + mRelatedDraughtingCallout.StepId;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			mRelatingDraughtingCallout = ParserSTEP.StripLink(str, ref pos, len);
-			mRelatedDraughtingCallout = ParserSTEP.StripLink(str, ref pos, len);
+			mRelatingDraughtingCallout = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as	IfcDraughtingCallout;
+			mRelatedDraughtingCallout = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcDraughtingCallout;
 		}
 	}
 	public partial class IfcDuctFitting

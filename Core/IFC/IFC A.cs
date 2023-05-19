@@ -18,12 +18,8 @@
 
 using System;  
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -35,6 +31,11 @@ namespace GeometryGym.Ifc
 		//internal string mRequestID;// : IfcIdentifier; IFC4 relocated
 		internal IfcActionRequest() : base() { }
 		internal IfcActionRequest(DatabaseIfc db, IfcActionRequest r, DuplicateOptions options) : base(db,r, options) { }
+
+		public IfcActionRequest(IfcProject project) : base(project.Database)
+		{
+			project.AddDeclared(this);
+		}
 	}
 	[Serializable]
 	public partial class IfcActor : IfcObject // SUPERTYPE OF(IfcOccupant)
@@ -254,6 +255,8 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment() : base() { }
 		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, DuplicateOptions options) 
 			: base(db, alignment, new DuplicateOptions(options) { DuplicateDownstream = true }) { PredefinedType = alignment.PredefinedType; }
+		public IfcAlignment(IfcProject host) : base(host) { }
+		public IfcAlignment(IfcAlignment host) : base(host) { }
 		public IfcAlignment(IfcSite host) : base(host) { }
 		public IfcAlignment(IfcFacility host) : base(host) { }
 		public IfcAlignment(IfcFacilityPart host) : base(host) { }
@@ -720,18 +723,26 @@ namespace GeometryGym.Ifc
 				throw new NotImplementedException("XX Not Implemented cant segment " + PredefinedType.ToString());
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;
-			double deltaStartCant = StartCantLeft - StartCantRight;
+			double startCantLeft = double.IsNaN(StartCantLeft) ? 0 : StartCantLeft, startCantRight = double.IsNaN(StartCantRight) ? 0 : StartCantRight;
+
+			double deltaStartCant = startCantLeft - startCantRight;
 			double theta = Math.Asin(deltaStartCant / railHeadDistance);
 			double yOffset = StartCantLeft - (deltaStartCant / 2);
 			double segmentLength = HorizontalLength;
 			IfcCartesianPoint startPoint = new IfcCartesianPoint(db, StartDistAlong, yOffset, 0);
 			IfcAxis2Placement3D segmentPlacement = new IfcAxis2Placement3D(startPoint);
 
-			double endCantLeft = double.IsNaN(EndCantLeft) ? 0 : EndCantLeft, endCantRight = double.IsNaN(EndCantRight) ? 0 : EndCantRight;
-			if (Math.Abs(endCantLeft - StartCantLeft) > tol && Math.Abs(endCantRight - StartCantRight) > tol)
+			IfcCurve parentCurve = null;
+			if(PredefinedType == IfcAlignmentCantSegmentTypeEnum.CONSTANTCANT)
 			{
+				parentCurve = db.Factory.LineX2d;
+				segmentPlacement.Axis = (Math.Abs(deltaStartCant) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
+				segmentPlacement.RefDirection = db.Factory.XAxis;
+			}
+			else if(PredefinedType == IfcAlignmentCantSegmentTypeEnum.LINEARTRANSITION)
+			{ 
+				double endCantLeft = double.IsNaN(EndCantLeft) ? 0 : EndCantLeft, endCantRight = double.IsNaN(EndCantRight) ? 0 : EndCantRight;
 				double deltaEndCant = endCantLeft - endCantRight;
-				double thetaEnd = Math.Asin(deltaEndCant / railHeadDistance);
 				double endYOffset = endCantLeft - (deltaEndCant / 2);
 				double deltaY = endYOffset - yOffset;
 				segmentLength = Math.Sqrt(deltaY * deltaY + HorizontalLength * HorizontalLength);
@@ -744,14 +755,16 @@ namespace GeometryGym.Ifc
 				}
 				segmentPlacement.Axis = new IfcDirection(db, cosTheta * sinAlpha, cosTheta * cosAlpha, sinTheta);
 				segmentPlacement.RefDirection = new IfcDirection(db, cosAlpha, sinAlpha, 0);
+
+				double factor = ((endCantLeft + endCantRight) - (startCantLeft + startCantRight)) / 2.0;
+				double constantTerm = (startCantLeft + startCantRight) / 2.0;
+				double linearTerm = factor;
+
+				double clothoidConstant = HorizontalLength * Math.Pow(Math.Abs(linearTerm), -0.5) * linearTerm / Math.Abs(linearTerm);
+				parentCurve = new IfcClothoid(db.Factory.Origin2dPlace, clothoidConstant);
 			}
-			else
-			{
-				segmentPlacement.Axis = (Math.Abs(deltaStartCant) > tol ? new IfcDirection(db, 0, Math.Cos(theta), Math.Sin(theta)) : db.Factory.YAxis);
-				segmentPlacement.RefDirection = db.Factory.XAxis;
-			}
-			IfcLine line = db.Factory.LineX2d;
-			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), line);
+		
+			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), parentCurve);
 			if(mDesignerOf != null)
 				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve3D));
 			return curveSegment;
@@ -1332,10 +1345,12 @@ namespace GeometryGym.Ifc
 			throw new NotImplementedException("Computation of height for " + PredefinedType + " not implemented yet!");
 		}
 	}
-	[Serializable, Obsolete("DEPRECATED IFC4", false)]
+	[Serializable, Obsolete("DELETED IFC4", false)]
 	public partial class IfcAngularDimension : IfcDimensionCurveDirectedCallout 
 	{
 		internal IfcAngularDimension() : base() { }
+		public IfcAngularDimension(IfcDraughtingCalloutElement content) : base(content) { }
+		public IfcAngularDimension(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents) { }
 	}
 	[Serializable]
 	public partial class IfcAnnotation : IfcProduct
@@ -1359,12 +1374,11 @@ namespace GeometryGym.Ifc
 		}
 
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public abstract partial class IfcAnnotationCurveOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public abstract partial class IfcAnnotationCurveOccurrence : IfcAnnotationOccurrence
 	{
 		protected IfcAnnotationCurveOccurrence() : base() { }
-		protected IfcAnnotationCurveOccurrence(DatabaseIfc db) : base(db) { }
+		protected IfcAnnotationCurveOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
 	[Serializable]
 	public partial class IfcAnnotationFillArea : IfcGeometricRepresentationItem  
@@ -1380,27 +1394,27 @@ namespace GeometryGym.Ifc
 		public IfcAnnotationFillArea(IfcCurve outerBoundary) : base(outerBoundary.mDatabase) { OuterBoundary = outerBoundary; }
 		public IfcAnnotationFillArea(IfcCurve outerBoundary, List<IfcCurve> innerBoundaries) : this(outerBoundary) { InnerBoundaries.AddRange(innerBoundaries); }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAnnotationFillAreaOccurrence : IfcAnnotationOccurrence
 	{
 		internal IfcPoint mFillStyleTarget;// : OPTIONAL IfcPoint;
-		internal IfcGlobalOrLocalEnum?  mGlobalOrLocal;// : OPTIONAL IfcGlobalOrLocalEnum; 
+		internal IfcGlobalOrLocalEnum  mGlobalOrLocal = IfcGlobalOrLocalEnum.NOTDEFINED;// : OPTIONAL IfcGlobalOrLocalEnum; 
+		public IfcPoint FillStyleTarget { get { return mFillStyleTarget; } set { mFillStyleTarget = value; } }
+		public IfcGlobalOrLocalEnum GlobalOrLocal { get { return mGlobalOrLocal; } set { mGlobalOrLocal = value; } }
 
 		internal IfcAnnotationFillAreaOccurrence() : base() { }
 		internal IfcAnnotationFillAreaOccurrence(DatabaseIfc db, IfcAnnotationFillAreaOccurrence f, DuplicateOptions options) : base(db, f, options) { }
+		public IfcAnnotationFillAreaOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public abstract partial class IfcAnnotationOccurrence : IfcStyledItem //DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public abstract partial class IfcAnnotationOccurrence : IfcStyledItem 
 	{
 		protected IfcAnnotationOccurrence(DatabaseIfc db, IfcAnnotationOccurrence o, DuplicateOptions options) : base(db, o, options) { }
 		protected IfcAnnotationOccurrence() : base() { }
-		protected IfcAnnotationOccurrence(DatabaseIfc db) : base(db) { }
+		protected IfcAnnotationOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem //DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAnnotationSurface : IfcGeometricRepresentationItem 
 	{
 		internal IfcGeometricRepresentationItem mItem;// : IfcGeometricRepresentationItem;
 		internal IfcTextureCoordinate mTextureCoordinates;// OPTIONAL IfcTextureCoordinate;
@@ -1410,28 +1424,28 @@ namespace GeometryGym.Ifc
 
 		internal IfcAnnotationSurface() : base() { } 
 		internal IfcAnnotationSurface(DatabaseIfc db, IfcAnnotationSurface a, DuplicateOptions options) : base(db, a, options) { Item = a.Item.Duplicate(db, options) as IfcGeometricRepresentationItem; if(a.mTextureCoordinates != null) TextureCoordinates = db.Factory.Duplicate(a.TextureCoordinates) as IfcTextureCoordinate; }
+		public IfcAnnotationSurface(IfcGeometricRepresentationItem item) : base(item.Database) { mItem = item; }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAnnotationSurfaceOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAnnotationSurfaceOccurrence : IfcAnnotationOccurrence 
 	{
 		internal IfcAnnotationSurfaceOccurrence() : base() { }
 		internal IfcAnnotationSurfaceOccurrence(DatabaseIfc db, IfcAnnotationSurfaceOccurrence o, DuplicateOptions options) : base(db, o, options) { }
+		public IfcAnnotationSurfaceOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAnnotationSymbolOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAnnotationSymbolOccurrence : IfcAnnotationOccurrence
 	{
 		internal IfcAnnotationSymbolOccurrence() : base() { }
-		internal IfcAnnotationSymbolOccurrence(DatabaseIfc db) : base(db) { }
 		internal IfcAnnotationSymbolOccurrence(DatabaseIfc db, IfcAnnotationSymbolOccurrence o, DuplicateOptions options) : base(db, o, options) { }
+		public IfcAnnotationSymbolOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence //IFC4 DEPRECATED
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAnnotationTextOccurrence : IfcAnnotationOccurrence
 	{
 		internal IfcAnnotationTextOccurrence() : base() { }
 		internal IfcAnnotationTextOccurrence(DatabaseIfc db, IfcAnnotationTextOccurrence o, DuplicateOptions options) : base(db, o, options) { }
+		public IfcAnnotationTextOccurrence(IfcPresentationStyleAssignment style) : base(style) { }
 	}
 	[Serializable]
 	public partial class IfcApplication : BaseClassIfc, NamedObjectIfc
@@ -1450,9 +1464,9 @@ namespace GeometryGym.Ifc
 
 		internal IfcApplication() : base() { }
 		private IfcApplication(DatabaseIfc db) : base(db) { }
-		internal IfcApplication(DatabaseIfc db, IfcApplication a) : base(db,a)
+		internal IfcApplication(DatabaseIfc db, IfcApplication a, DuplicateOptions options) : base(db,a)
 		{
-			ApplicationDeveloper = db.Factory.Duplicate(a.ApplicationDeveloper) as IfcOrganization;
+			ApplicationDeveloper = db.Factory.Duplicate(a.ApplicationDeveloper, options);
 			mVersion = a.mVersion;
 			mApplicationFullName = a.mApplicationFullName;
 			mApplicationIdentifier = a.mApplicationIdentifier;
@@ -1627,28 +1641,29 @@ namespace GeometryGym.Ifc
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcAppliedValueRelationship : BaseClassIfc //DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcAppliedValueRelationship : BaseClassIfc, NamedObjectIfc
 	{
 		internal IfcAppliedValue mComponentOfTotal;// : IfcAppliedValue;
 		internal SET<IfcAppliedValue> mComponents = new SET<IfcAppliedValue>();// : SET [1:?] OF IfcAppliedValue;
 		internal IfcArithmeticOperatorEnum mArithmeticOperator;// : IfcArithmeticOperatorEnum;
-		internal string mName;// : OPTIONAL IfcLabel;
-		internal string mDescription;// : OPTIONAL IfcText 
+		internal string mName = "";// : OPTIONAL IfcLabel;
+		internal string mDescription = "";// : OPTIONAL IfcText 
 
 		public IfcAppliedValue ComponentOfTotal { get { return mComponentOfTotal; } set { mComponentOfTotal = value; } }
-		public SET<IfcAppliedValue> Components { get { return mComponents; } } 
+		public SET<IfcAppliedValue> Components { get { return mComponents; } }
+		public IfcArithmeticOperatorEnum ArithmeticOperator { get { return mArithmeticOperator; } set { mArithmeticOperator = value; } }
+		public string Name { get { return mName; } set { mName = value; } }
+		public string Description { get { return mDescription; } set { mDescription = value; } }
 
 		internal IfcAppliedValueRelationship() : base() { }
-		//internal IfcAppliedValueRelationship(IfcAppliedValueRelationship o) : base()
-		//{
-		//	mComponentOfTotal = o.mComponentOfTotal;
-		//	mComponents = new List<int>(o.mComponents.ToArray());
-		//	mArithmeticOperator = o.mArithmeticOperator;
-		//	mName = o.mName;
-		//	mDescription = o.mDescription;
-		//}
+		public IfcAppliedValueRelationship(IfcAppliedValue componentOfTotal, IEnumerable<IfcAppliedValue> components, IfcArithmeticOperatorEnum arithmeticOperator)
+			: base(componentOfTotal.Database)
+		{
+			mComponentOfTotal = componentOfTotal;
+			mComponents.AddRange(components);
+			mArithmeticOperator = arithmeticOperator;
+		}
 	}
 	public interface IfcAppliedValueSelect : IBaseClassIfc  //	IfcMeasureWithUnit, IfcValue, IfcReference); IFC2x3 //IfcRatioMeasure, IfcMeasureWithUnit, IfcMonetaryMeasure); 
 	{
@@ -1686,6 +1701,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		internal IfcApproval() : base() { }
+		public IfcApproval(DatabaseIfc db) : base(db) { }
 		//internal IfcApproval(IfcApproval o) : base()
 		//{
 		//	mDescription = o.mDescription;
@@ -1722,38 +1738,39 @@ namespace GeometryGym.Ifc
 		}
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}
-	[Obsolete("DELETED IFC4", false)]
-	[Serializable]
-	public partial class IfcApprovalActorRelationship : BaseClassIfc //DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcApprovalActorRelationship : BaseClassIfc 
 	{
 		internal IfcActorSelect mActor;// : IfcActorSelect;
 		internal IfcApproval mApproval;// : IfcApproval;
 		internal IfcActorRole mRole;// : IfcActorRole; 
 		internal IfcApprovalActorRelationship() : base() { }
-		internal IfcApprovalActorRelationship(DatabaseIfc db) : base(db) { }
-		internal IfcApprovalActorRelationship(IfcActorSelect actor, IfcApproval approval, IfcActorRole role)
+		public IfcApprovalActorRelationship(IfcActorSelect actor, IfcApproval approval, IfcActorRole role)
 			: base(actor.Database) { mActor = actor; mApproval = approval; mRole = role; }
 	}
-	[Obsolete("DELETED IFC4", false)]
-	[Serializable]
-	public partial class IfcApprovalPropertyRelationship : BaseClassIfc //DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcApprovalPropertyRelationship : BaseClassIfc 
 	{
 		internal SET<IfcProperty> mApprovedProperties = new SET<IfcProperty>();// : SET [1:?] OF IfcProperty;
 		internal IfcApproval mApproval;// : IfcApproval; 
 		internal IfcApprovalPropertyRelationship() : base() { }
 		internal IfcApprovalPropertyRelationship(DatabaseIfc db) : base(db) { }
-		internal IfcApprovalPropertyRelationship(IEnumerable<IfcProperty> properties, IfcApproval approval) 
+		public IfcApprovalPropertyRelationship(IEnumerable<IfcProperty> properties, IfcApproval approval) 
 			: base(approval.Database) { mApprovedProperties.AddRange(properties); mApproval = approval; }
 	}
 	[Serializable]
 	public partial class IfcApprovalRelationship : IfcResourceLevelRelationship //IFC4Change
 	{
 		internal IfcApproval mRelatedApproval;// : IfcApproval;
-		internal IfcApproval mRelatingApproval;// : IfcApproval; 
+		internal SET<IfcApproval> mRelatingApprovals = new SET<IfcApproval>();// SET [1:?] OF IfcApproval; 
+		public IfcApproval RelatedApproval { get { return mRelatedApproval; } set { mRelatedApproval = value; } }
+		public SET<IfcApproval> RelatingApprovals { get { return mRelatingApprovals; } }
 		internal IfcApprovalRelationship() : base() { }
 		internal IfcApprovalRelationship(DatabaseIfc db) : base(db) { }
-		internal IfcApprovalRelationship(IfcApproval related, IfcApproval relating) 
-			: base(related.Database) { mRelatedApproval = related; mRelatingApproval = relating; }
+		public IfcApprovalRelationship(IfcApproval related, IfcApproval relating) 
+			: base(related.Database) { mRelatedApproval = related; mRelatingApprovals.Add(relating); }
+		public IfcApprovalRelationship(IfcApproval related, IEnumerable<IfcApproval> relating) 
+			: base(related.Database) { mRelatedApproval = related; mRelatingApprovals.AddRange(relating); }
 	}
 	[Serializable]
 	public partial class IfcArbitraryClosedProfileDef : IfcProfileDef //SUPERTYPE OF(IfcArbitraryProfileDefWithVoids)
@@ -1766,6 +1783,8 @@ namespace GeometryGym.Ifc
 			: base(db, p, options) { OuterCurve = p.OuterCurve.Duplicate(db, options) as IfcCurve; }
 		public IfcArbitraryClosedProfileDef(string name, IfcCurve boundedCurve) 
 			: base(boundedCurve.mDatabase,name) { mOuterCurve = boundedCurve; }
+
+		public override string StepClassName { get { return (this is IfcArbitraryProfileDefWithVoids profileWithVoids && profileWithVoids.InnerCurves.Count == 0 ? "IfcArbitraryClosedProfileDef" : base.StepClassName); } }
 	}
 	[Serializable]
 	public partial class IfcArbitraryOpenProfileDef : IfcProfileDef //	SUPERTYPE OF(IfcCenterLineProfileDef)
@@ -1946,7 +1965,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcAxis1Placement() : base() { }
 		internal IfcAxis1Placement(DatabaseIfc db, IfcAxis1Placement p, DuplicateOptions options)
-			: base(db, p, options) { if(p.mAxis != null) Axis = db.Factory.Duplicate( p.Axis) as IfcDirection; }
+			: base(db, p, options) { if(p.mAxis != null) Axis = db.Factory.Duplicate(p.Axis, options); }
 		public IfcAxis1Placement(DatabaseIfc db) : base(db) { }
 		public IfcAxis1Placement(IfcCartesianPoint location) : base(location) { }
 		public IfcAxis1Placement(IfcDirection axis) : base(axis.mDatabase) { Axis = axis; }
@@ -1965,7 +1984,7 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement2D(DatabaseIfc db, IfcAxis2Placement2D p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mRefDirection != null)
-				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
+				RefDirection = db.Factory.Duplicate(p.RefDirection, options);
 		}
 		public IfcAxis2Placement2D(DatabaseIfc db) : base(db.Factory.Origin2d) { }
 		public IfcAxis2Placement2D(IfcCartesianPoint location) : base(location) { }
@@ -2024,9 +2043,9 @@ namespace GeometryGym.Ifc
 		internal IfcAxis2Placement3D(DatabaseIfc db, IfcAxis2Placement3D p, DuplicateOptions options) : base(db, p, options)
 		{
 			if (p.mAxis != null)
-				Axis = db.Factory.Duplicate(p.Axis) as IfcDirection;
+				Axis = db.Factory.Duplicate(p.Axis, options);
 			if (p.mRefDirection != null)
-				RefDirection = db.Factory.Duplicate(p.RefDirection) as IfcDirection;
+				RefDirection = db.Factory.Duplicate(p.RefDirection, options);
 		}
 		public IfcAxis2Placement3D(IfcCartesianPoint location) : base(location) { }
 		public IfcAxis2Placement3D(IfcCartesianPoint location, IfcDirection axis, IfcDirection refDirection) : base(location) { Axis = axis; RefDirection = refDirection; }

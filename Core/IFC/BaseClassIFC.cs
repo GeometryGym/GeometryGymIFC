@@ -469,6 +469,7 @@ namespace GeometryGym.Ifc
 		// any use of it should be carefully checked.
 		internal virtual bool isDuplicate(BaseClassIfc e, double tol) { return true; }
 
+		internal virtual BaseClassIfc DuplicateCommon(DatabaseIfc db, DuplicateOptions options) { return null; }	
 		internal class RepositoryAttributes
 		{
 			internal DateTime Created { get; set; }

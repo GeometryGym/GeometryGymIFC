@@ -18,12 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -91,7 +87,11 @@ namespace GeometryGym.Ifc
 		public IfcCartesianTransformationOperator MappingTarget { get { return mMappingTarget; } set { mMappingTarget = value;  } }
 
 		internal IfcMappedItem() : base() { }
-		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i, DuplicateOptions options) : base(db, i, options) { MappingSource = db.Factory.Duplicate(i.MappingSource) as IfcRepresentationMap; MappingTarget = db.Factory.Duplicate(i.MappingTarget) as IfcCartesianTransformationOperator; }
+		internal IfcMappedItem(DatabaseIfc db, IfcMappedItem i, DuplicateOptions options) : base(db, i, options) 
+		{
+			MappingSource = db.Factory.Duplicate(i.MappingSource, options);
+			MappingTarget = db.Factory.Duplicate(i.MappingTarget, options);
+		}
 		public IfcMappedItem(IfcRepresentationMap source, IfcCartesianTransformationOperator target) : base(source.mDatabase) { MappingSource = source; MappingTarget = target; }
 	}
 	[Serializable]
@@ -141,14 +141,14 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return this;  }
 
 		public IfcMaterial() : base() { }
-		internal IfcMaterial(DatabaseIfc db, IfcMaterial m) : base(db, m)
+		internal IfcMaterial(DatabaseIfc db, IfcMaterial m, DuplicateOptions options) : base(db, m, options)
 		{
 			mName = m.mName;
 			mDescription = m.mDescription;
 			mCategory = m.mCategory;
 
 			if(m.mHasRepresentation != null)
-				db.Factory.Duplicate(m.mHasRepresentation);
+				db.Factory.Duplicate(m.mHasRepresentation, options);
 		}
 		public IfcMaterial(DatabaseIfc db, string name) : base(db) { Name = name; }
 
@@ -222,7 +222,14 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return Material; }
 		
 		internal IfcMaterialConstituent() : base() { }
-		internal IfcMaterialConstituent(DatabaseIfc db, IfcMaterialConstituent m) : base(db, m) { mName = m.mName; mDescription = m.mDescription; Material = db.Factory.Duplicate(m.Material) as IfcMaterial; mFraction = m.mFraction; mCategory = m.mCategory; }
+		internal IfcMaterialConstituent(DatabaseIfc db, IfcMaterialConstituent m, DuplicateOptions options) : base(db, m, options) 
+		{
+			mName = m.mName; 
+			mDescription = m.mDescription;
+			Material = db.Factory.Duplicate(m.Material, options);
+			mFraction = m.mFraction;
+			mCategory = m.mCategory;
+		}
 		public IfcMaterialConstituent(string name, IfcMaterial mat)
 			: base(mat.mDatabase)
 		{
@@ -244,12 +251,12 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return MaterialConstituents.First().Value.PrimaryMaterial(); }
 
 		internal IfcMaterialConstituentSet() : base() { }
-		internal IfcMaterialConstituentSet(DatabaseIfc db, IfcMaterialConstituentSet m) : base(db, m)
+		internal IfcMaterialConstituentSet(DatabaseIfc db, IfcMaterialConstituentSet m, DuplicateOptions options) : base(db, m, options)
 		{
 			mName = m.mName;
 			mDescription = m.mDescription;
 			foreach (IfcMaterialConstituent constituent in m.MaterialConstituents.Values)
-				MaterialConstituents[constituent.Name] = db.Factory.Duplicate(constituent) as IfcMaterialConstituent;
+				MaterialConstituents[constituent.Name] = db.Factory.Duplicate(constituent, options);
 		}
 		public IfcMaterialConstituentSet(IEnumerable<IfcMaterialConstituent> materialConstituents)
 			: base(materialConstituents.First().Database)
@@ -283,7 +290,7 @@ namespace GeometryGym.Ifc
 		protected IfcMaterialDefinition() : base() { }
 
 		protected IfcMaterialDefinition(DatabaseIfc db) : base(db) { }
-		protected IfcMaterialDefinition(DatabaseIfc db, IfcMaterialDefinition m) : base(db, m) { }
+		protected IfcMaterialDefinition(DatabaseIfc db, IfcMaterialDefinition m, DuplicateOptions options) : base(db, m) { }
 		protected override void initialize()
 		{
 			base.initialize();
@@ -360,7 +367,7 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialDefinitionRepresentation() : base() { }
 		internal IfcMaterialDefinitionRepresentation(DatabaseIfc db, IfcMaterialDefinitionRepresentation r, DuplicateOptions options) : base(db, r, options)
 		{
-			RepresentedMaterial = db.Factory.Duplicate(r.RepresentedMaterial) as IfcMaterial;
+			RepresentedMaterial = db.Factory.Duplicate(r.RepresentedMaterial, options);
 		}
 		public IfcMaterialDefinitionRepresentation(IfcStyledRepresentation representation, IfcMaterial mat) : base(representation) { RepresentedMaterial = mat; }
 		public IfcMaterialDefinitionRepresentation(IEnumerable<IfcStyledRepresentation> representations, IfcMaterial mat) : base(representations) { RepresentedMaterial = mat; }
@@ -387,7 +394,12 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return Material; }
 
 		internal IfcMaterialLayer() : base() { }
-		internal IfcMaterialLayer(DatabaseIfc db, IfcMaterialLayer m) : base(db, m) { Material = db.Factory.Duplicate(m.Material) as IfcMaterial; mLayerThickness = m.mLayerThickness; mIsVentilated = m.mIsVentilated; }
+		internal IfcMaterialLayer(DatabaseIfc db, IfcMaterialLayer m, DuplicateOptions options) : base(db, m, options) 
+		{ 
+			Material = db.Factory.Duplicate(m.Material, options);
+			mLayerThickness = m.mLayerThickness; 
+			mIsVentilated = m.mIsVentilated;
+		}
 		public IfcMaterialLayer(DatabaseIfc db, double thickness, string name) : base(db) { mLayerThickness = Math.Abs(thickness); Name = name; }
 		public IfcMaterialLayer(IfcMaterial mat, double thickness, string name) : base(mat.mDatabase)
 		{
@@ -410,10 +422,10 @@ namespace GeometryGym.Ifc
 		public override string Name { get { return LayerSetName; } set { LayerSetName = value; } }
 		public override IfcMaterial PrimaryMaterial() { return (mMaterialLayers.Count != 1 ? null : MaterialLayers[0].Material); }
 	 	
-		internal IfcMaterialLayerSet() : base() { }
-		internal IfcMaterialLayerSet(DatabaseIfc db, IfcMaterialLayerSet m) : base(db, m) 
+		internal IfcMaterialLayerSet() : base() { } 
+		internal IfcMaterialLayerSet(DatabaseIfc db, IfcMaterialLayerSet m, DuplicateOptions options) : base(db, m, options) 
 		{
-			MaterialLayers.AddRange(m.MaterialLayers.Select(x=> db.Factory.Duplicate(x) as IfcMaterialLayer)); 
+			MaterialLayers.AddRange(m.MaterialLayers.Select(x=> db.Factory.Duplicate(x, options))); 
 			mLayerSetName = m.mLayerSetName; 
 			mDescription = m.mDescription;
 		}
@@ -445,7 +457,14 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return ForLayerSet.PrimaryMaterial(); }	
 		
 		internal IfcMaterialLayerSetUsage() : base() { }
-		internal IfcMaterialLayerSetUsage(DatabaseIfc db, IfcMaterialLayerSetUsage m) : base(db, m) { ForLayerSet = db.Factory.Duplicate(m.ForLayerSet) as IfcMaterialLayerSet; mLayerSetDirection = m.mLayerSetDirection; mDirectionSense = m.mDirectionSense; mOffsetFromReferenceLine = m.mOffsetFromReferenceLine; mReferenceExtent = m.mReferenceExtent; }
+		internal IfcMaterialLayerSetUsage(DatabaseIfc db, IfcMaterialLayerSetUsage m, DuplicateOptions options) : base(db, m, options) 
+		{ 
+			ForLayerSet = db.Factory.Duplicate(m.ForLayerSet, options); 
+			mLayerSetDirection = m.mLayerSetDirection;
+			mDirectionSense = m.mDirectionSense; 
+			mOffsetFromReferenceLine = m.mOffsetFromReferenceLine; 
+			mReferenceExtent = m.mReferenceExtent; 
+		}
 		public IfcMaterialLayerSetUsage(IfcMaterialLayerSet ls, IfcLayerSetDirectionEnum dir, IfcDirectionSenseEnum sense, double offset) : base(ls.mDatabase)
 		{
 			mForLayerSet = ls;
@@ -461,7 +480,7 @@ namespace GeometryGym.Ifc
 		internal double[] mOffsetValues = new double[2];// LIST [1:2] OF IfcLengthMeasure; 
 
 		internal IfcMaterialLayerSetWithOffsets() : base() { }
-		internal IfcMaterialLayerSetWithOffsets(DatabaseIfc db, IfcMaterialLayerSetWithOffsets m) : base(db, m) { mOffsetDirection = m.mOffsetDirection; mOffsetValues = m.mOffsetValues.ToArray(); }
+		internal IfcMaterialLayerSetWithOffsets(DatabaseIfc db, IfcMaterialLayerSetWithOffsets m, DuplicateOptions options) : base(db, m, options) { mOffsetDirection = m.mOffsetDirection; mOffsetValues = m.mOffsetValues.ToArray(); }
 		internal IfcMaterialLayerSetWithOffsets(IfcMaterialLayer layer, string name, IfcLayerSetDirectionEnum dir, double offset)
 			: base(layer, name) { mOffsetDirection = dir; mOffsetValues[0] = offset; }
 		internal IfcMaterialLayerSetWithOffsets(IfcMaterialLayer layer, string name, IfcLayerSetDirectionEnum dir, double offset1, double offset2)
@@ -478,7 +497,11 @@ namespace GeometryGym.Ifc
 		internal double[] mOffsetValues = new double[2];// : ARRAY [1:2] OF IfcLengthMeasure; 
 
 		internal IfcMaterialLayerWithOffsets() : base() { }
-		internal IfcMaterialLayerWithOffsets(DatabaseIfc db, IfcMaterialLayerWithOffsets m) : base(db, m) { mOffsetDirection = m.mOffsetDirection; mOffsetValues = m.mOffsetValues.ToArray(); }
+		internal IfcMaterialLayerWithOffsets(DatabaseIfc db, IfcMaterialLayerWithOffsets m, DuplicateOptions options) : base(db, m, options) 
+		{ 
+			mOffsetDirection = m.mOffsetDirection; 
+			mOffsetValues = m.mOffsetValues.ToArray();
+		}
 		internal IfcMaterialLayerWithOffsets(IfcMaterial mat, double thickness, string name, IfcLayerSetDirectionEnum d, double startOffset)
 			: base(mat, thickness, name) { mOffsetDirection = d; mOffsetValues = new double[]{ startOffset}; }
 		internal IfcMaterialLayerWithOffsets(IfcMaterial mat, double thickness, string name, IfcLayerSetDirectionEnum d, double startOffset,double endOffset)
@@ -499,7 +522,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterial PrimaryMaterial() {  return mMaterials.First(); }
 
 		internal IfcMaterialList() : base() { }
-		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m) : base(db) { Materials.AddRange(m.Materials.Select(x=>db.Factory.Duplicate(x))); }
+		internal IfcMaterialList(DatabaseIfc db, IfcMaterialList m, DuplicateOptions options) : base(db) { Materials.AddRange(m.Materials.Select(x=>db.Factory.Duplicate(x, options))); }
 		public IfcMaterialList(IEnumerable<IfcMaterial> materials) : base(materials.First().Database) { Materials.AddRange(materials); }
 		protected override void initialize()
 		{
@@ -559,14 +582,14 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return Material; }
 
 		internal IfcMaterialProfile() : base() { }
-		internal IfcMaterialProfile(DatabaseIfc db, IfcMaterialProfile p) : base(db, p)
+		internal IfcMaterialProfile(DatabaseIfc db, IfcMaterialProfile p, DuplicateOptions options) : base(db, p, options)
 		{
 			mName = p.mName;
 			mDescription = p.mDescription;
 			if (p.mMaterial != null)
-				Material = db.Factory.Duplicate(p.Material) as IfcMaterial;
+				Material = db.Factory.Duplicate(p.Material, options);
 			if (p.mProfile != null)
-				Profile = db.Factory.Duplicate(p.Profile) as IfcProfileDef;
+				Profile = db.Factory.Duplicate(p.Profile, options);
 			mPriority = p.mPriority;
 			mCategory = p.mCategory;
 		}
@@ -597,7 +620,14 @@ namespace GeometryGym.Ifc
 		internal IfcMaterialProfileSet mTaperEnd = null;
 
 		internal IfcMaterialProfileSet() : base() { }
-		internal IfcMaterialProfileSet(DatabaseIfc db, IfcMaterialProfileSet m) : base(db, m) { mName = m.mName; mDescription = m.mDescription; MaterialProfiles.AddRange(m.mMaterialProfiles.ConvertAll(x => db.Factory.Duplicate(x) as IfcMaterialProfile)); if (m.mCompositeProfile != null) CompositeProfile = db.Factory.Duplicate(m.CompositeProfile) as IfcCompositeProfileDef; }
+		internal IfcMaterialProfileSet(DatabaseIfc db, IfcMaterialProfileSet m, DuplicateOptions options) : base(db, m, options) 
+		{
+			mName = m.mName;
+			mDescription = m.mDescription; 
+			MaterialProfiles.AddRange(m.mMaterialProfiles.ConvertAll(x => db.Factory.Duplicate(x, options)));
+			if (m.mCompositeProfile != null) 
+				CompositeProfile = db.Factory.Duplicate(m.CompositeProfile, options);
+		}
 		private IfcMaterialProfileSet(DatabaseIfc db, string name) : base(db) { Name = name; }
 		public IfcMaterialProfileSet(string name, IfcMaterialProfile profile) : base(profile.mDatabase)
 		{
@@ -637,7 +667,12 @@ namespace GeometryGym.Ifc
 		public override IfcMaterial PrimaryMaterial() { return ForProfileSet.PrimaryMaterial(); }
 
 		internal IfcMaterialProfileSetUsage() : base() { }
-		internal IfcMaterialProfileSetUsage(DatabaseIfc db, IfcMaterialProfileSetUsage m) : base(db,m) { ForProfileSet = db.Factory.Duplicate( m.ForProfileSet) as IfcMaterialProfileSet; mCardinalPoint = m.mCardinalPoint; mReferenceExtent = m.mReferenceExtent; }
+		internal IfcMaterialProfileSetUsage(DatabaseIfc db, IfcMaterialProfileSetUsage m, DuplicateOptions options) : base(db, m, options) 
+		{
+			ForProfileSet = db.Factory.Duplicate(m.ForProfileSet, options);
+			mCardinalPoint = m.mCardinalPoint; 
+			mReferenceExtent = m.mReferenceExtent;
+		}
 		public IfcMaterialProfileSetUsage(IfcMaterialProfile profile) : base(profile.mDatabase) { ForProfileSet = new IfcMaterialProfileSet(profile.Name, profile); }
 		public IfcMaterialProfileSetUsage(IfcMaterialProfileSet ps) 
 			: base(ps.mDatabase) { ForProfileSet = ps; }
@@ -654,7 +689,11 @@ namespace GeometryGym.Ifc
 		public IfcCardinalPointReference CardinalEndPoint { get { return mCardinalEndPoint; } set { mCardinalEndPoint = value; } }
 
 		internal IfcMaterialProfileSetUsageTapering() : base() { }
-		internal IfcMaterialProfileSetUsageTapering(DatabaseIfc db, IfcMaterialProfileSetUsageTapering m) : base(db,m) { ForProfileEndSet = db.Factory.Duplicate(m.ForProfileEndSet) as IfcMaterialProfileSet; }
+		internal IfcMaterialProfileSetUsageTapering(DatabaseIfc db, IfcMaterialProfileSetUsageTapering m, DuplicateOptions options) 
+			: base(db, m, options) 
+		{
+			ForProfileEndSet = db.Factory.Duplicate(m.ForProfileEndSet, options);
+		}
 		public IfcMaterialProfileSetUsageTapering(IfcMaterialProfileSet ps, IfcCardinalPointReference ip, IfcMaterialProfileSet eps, IfcCardinalPointReference eip)
 			: base(ps, ip) { mForProfileEndSet = eps; mCardinalEndPoint = eip; }
 	}
@@ -665,7 +704,10 @@ namespace GeometryGym.Ifc
 		public double[] OffsetValues { get { return mOffsetValues; } set { mOffsetValues = value; } }
 
 		internal IfcMaterialProfileWithOffsets() : base() { }
-		internal IfcMaterialProfileWithOffsets(DatabaseIfc db, IfcMaterialProfileWithOffsets m) : base(db, m) { mOffsetValues = m.mOffsetValues.ToArray(); }
+		internal IfcMaterialProfileWithOffsets(DatabaseIfc db, IfcMaterialProfileWithOffsets m, DuplicateOptions options) : base(db, m, options)
+		{
+			mOffsetValues = m.mOffsetValues.ToArray();
+		}
 		public IfcMaterialProfileWithOffsets(string name, IfcMaterial mat, IfcProfileDef p, double startOffset)
 			: base(name, mat, p) { mOffsetValues = new double[] { startOffset }; }
 		public IfcMaterialProfileWithOffsets(string name, IfcMaterial mat, IfcProfileDef p, double startOffset,double endOffset)
@@ -726,7 +768,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcMaterialUsageDefinition() : base() { }
 		protected IfcMaterialUsageDefinition(DatabaseIfc db) : base(db) { }
-		protected IfcMaterialUsageDefinition(DatabaseIfc db, IfcMaterialUsageDefinition d) : base(db,d) { }
+		protected IfcMaterialUsageDefinition(DatabaseIfc db, IfcMaterialUsageDefinition d, DuplicateOptions options) : base(db,d) { }
 
 		protected override void initialize()
 		{
@@ -772,7 +814,7 @@ namespace GeometryGym.Ifc
 		public IfcUnit UnitComponent { get { return mUnitComponent; } set { mUnitComponent = value; } }
 
 		internal IfcMeasureWithUnit() : base() { }
-		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m) : base(db) { mValueComponent = m.mValueComponent; mVal = m.mVal;  UnitComponent = db.Factory.Duplicate(m.mUnitComponent); }
+		internal IfcMeasureWithUnit(DatabaseIfc db, IfcMeasureWithUnit m, DuplicateOptions options) : base(db) { mValueComponent = m.mValueComponent; mVal = m.mVal;  UnitComponent = db.Factory.Duplicate(m.mUnitComponent, options); }
 		public IfcMeasureWithUnit(IfcValue v, IfcUnit u) : base(u.Database) { mValueComponent = v; mUnitComponent = u; }
 		internal IfcMeasureWithUnit(double value, IfcUnit u) : base(u.Database) { mValueComponent = new IfcReal(value); mUnitComponent = u;  }
 		public double SIFactor()

@@ -18,12 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -40,7 +36,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcTextureMap> HasTextureMaps { get { return mHasTextureMaps; } }
 
 		internal IfcFace() : base() { }
-		internal IfcFace(DatabaseIfc db, IfcFace f, DuplicateOptions options) : base(db, f, options) { Bounds.AddRange(f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFaceBound)); }
+		internal IfcFace(DatabaseIfc db, IfcFace f, DuplicateOptions options) : base(db, f, options) { Bounds.AddRange(f.Bounds.ConvertAll(x=>db.Factory.Duplicate(x, options))); }
 		public IfcFace(IfcFaceOuterBound outer) : base(outer.mDatabase) { mBounds.Add(outer); }
 		public IfcFace(IfcFaceOuterBound outer, IfcFaceBound inner) : this(outer) { mBounds.Add(inner); }
 		public IfcFace(List<IfcFaceBound> bounds) : base(bounds[0].mDatabase) { mBounds.AddRange(bounds); }
@@ -86,7 +82,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcConnectedFaceSet> FbsmFaces { get { return mFbsmFaces; } }
 
 		internal IfcFaceBasedSurfaceModel() : base() { }
-		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s, DuplicateOptions options) : base(db, s, options) { FbsmFaces.AddRange(s.FbsmFaces.Select(x => db.Factory.Duplicate(x) as IfcConnectedFaceSet)); }
+		internal IfcFaceBasedSurfaceModel(DatabaseIfc db, IfcFaceBasedSurfaceModel s, DuplicateOptions options) : base(db, s, options) { FbsmFaces.AddRange(s.FbsmFaces.Select(x => db.Factory.Duplicate(x, options))); }
 		public IfcFaceBasedSurfaceModel(IfcConnectedFaceSet faceSet) : base(faceSet.mDatabase) { mFbsmFaces.Add(faceSet); }
 		public IfcFaceBasedSurfaceModel(IEnumerable<IfcConnectedFaceSet> faceSets) : base(faceSets.First().mDatabase) { mFbsmFaces.AddRange(faceSets); }
 	}
@@ -102,7 +98,7 @@ namespace GeometryGym.Ifc
 		public bool Orientation { get { return mOrientation; } set { mOrientation = value; } }
 
 		internal IfcFaceBound() : base() { }
-		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b, DuplicateOptions options) : base(db, b, options) { Bound = db.Factory.Duplicate(b.Bound) as IfcLoop; mOrientation = b.mOrientation; }
+		internal IfcFaceBound(DatabaseIfc db, IfcFaceBound b, DuplicateOptions options) : base(db, b, options) { Bound = db.Factory.Duplicate(b.Bound, options); mOrientation = b.mOrientation; }
 		public IfcFaceBound(IfcLoop l, bool orientation) : base(l.mDatabase) { Bound = l; mOrientation = orientation; }
 		protected override List<T> Extract<T>(Type type)
 		{
@@ -311,7 +307,10 @@ namespace GeometryGym.Ifc
 		internal IfcFillAreaStyle() : base() { }
 		public IfcFillAreaStyle(IfcFillStyleSelect style) : base(style.Database) { mFillStyles.Add(style); }
 		public IfcFillAreaStyle(IEnumerable<IfcFillStyleSelect> styles) : base(styles.First().Database) { mFillStyles.AddRange(styles); }
-		internal IfcFillAreaStyle(DatabaseIfc db, IfcFillAreaStyle fillAreaStyle) : base(db, fillAreaStyle) { FillStyles.AddRange(fillAreaStyle.FillStyles.Select(x => db.Factory.Duplicate(x) as IfcFillStyleSelect)); }
+		internal IfcFillAreaStyle(DatabaseIfc db, IfcFillAreaStyle fillAreaStyle, DuplicateOptions options) : base(db, fillAreaStyle, options) 
+		{
+			FillStyles.AddRange(fillAreaStyle.FillStyles.Select(x => db.Factory.Duplicate(x, options)));
+		}
 	}
 	[Serializable]
 	public partial class IfcFillAreaStyleHatching : IfcGeometricRepresentationItem, IfcFillStyleSelect

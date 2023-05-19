@@ -18,10 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -37,7 +35,7 @@ namespace GeometryGym.Ifc
 		public IfcUnitEnum UnitType { get { return mUnitType; } set { mUnitType = value; } }
 
 		protected IfcNamedUnit() : base() { }
-		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u) : base(db, u) { if (u.mDimensions != null) Dimensions = db.Factory.Duplicate(u.Dimensions) as IfcDimensionalExponents; mUnitType = u.mUnitType; }
+		protected IfcNamedUnit(DatabaseIfc db, IfcNamedUnit u, DuplicateOptions options) : base(db, u) { if (u.mDimensions != null) Dimensions = db.Factory.Duplicate(u.Dimensions, options); mUnitType = u.mUnitType; }
 		protected IfcNamedUnit(DatabaseIfc db, IfcUnitEnum unitEnum, bool gendims) : base(db)
 		{
 			mUnitType = unitEnum;

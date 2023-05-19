@@ -18,23 +18,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
-using System.Diagnostics;
 
 namespace GeometryGym.Ifc
 {
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcRadiusDimension : IfcDimensionCurveDirectedCallout // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcRadiusDimension : IfcDimensionCurveDirectedCallout
 	{
 		internal IfcRadiusDimension() : base() { }
+		public IfcRadiusDimension(IfcDraughtingCalloutElement content) : base(content) { }
+		public IfcRadiusDimension(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents) { }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcRail : IfcBuiltElement
@@ -918,7 +914,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelAssignsToGroup() : base() { }
 		internal IfcRelAssignsToGroup(DatabaseIfc db, IfcRelAssignsToGroup a, DuplicateOptions options) : base(db, a, options)
 		{
-			RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcGroup;
+			RelatingGroup = db.Factory.Duplicate(a.RelatingGroup, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcGroup;
 		}
 		public IfcRelAssignsToGroup(IfcGroup relgroup) : base(relgroup.mDatabase) { RelatingGroup = relgroup; }
 		public IfcRelAssignsToGroup(IfcObjectDefinition related, IfcGroup relating) : base(related) { RelatingGroup = relating; }
@@ -2017,7 +2013,11 @@ namespace GeometryGym.Ifc
 		{
 			RelatingObject = db.Factory.Duplicate(n.RelatingObject, options) as IfcObjectDefinition;
 			DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
-			RelatedObjects.AddRange(n.RelatedObjects.Select(x => db.Factory.Duplicate(x, optionsNoHost) as IfcObjectDefinition));
+			foreach(IfcObjectDefinition od in n.RelatedObjects)
+			{
+				IfcObjectDefinition duplicate = db.Factory.Duplicate(od, optionsNoHost);
+				RelatedObjects.Add(duplicate);
+			}
 		}
 		public IfcRelNests(IfcObjectDefinition relatingObject) : base(relatingObject.mDatabase)
 		{
@@ -2029,7 +2029,12 @@ namespace GeometryGym.Ifc
 		{
 			relatedObject.Nests = this;
 		}
-		public IfcRelNests(IfcObjectDefinition relatingObject, IfcObjectDefinition ro, IfcObjectDefinition ro2) : this(relatingObject, ro) { ro2.Nests = this; }
+		public IfcRelNests(IfcObjectDefinition relatingObject, params IfcObjectDefinition[] relatedObjects)
+			: this(relatingObject)
+		{
+			foreach (IfcObjectDefinition related in relatedObjects)
+				related.Nests = this;
+		}
 		public IfcRelNests(IfcObjectDefinition relatingObject, IEnumerable<IfcObjectDefinition> relatedObjects) : base(relatingObject.mDatabase)
 		{
 			mRelatingObject = relatingObject;
@@ -2331,7 +2336,7 @@ namespace GeometryGym.Ifc
 		internal IfcRelVoidsElement() : base() { }
 		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, DuplicateOptions options) : base(db, v, options)
 		{
-			RelatingBuildingElement = db.Factory.Duplicate(v.RelatingBuildingElement) as IfcElement;
+			RelatingBuildingElement = db.Factory.Duplicate(v.RelatingBuildingElement, options);
 			RelatedOpeningElement = db.Factory.Duplicate(v.RelatedOpeningElement, options) as IfcFeatureElementSubtraction;
 		}
 		public IfcRelVoidsElement(IfcElement host, IfcFeatureElementSubtraction fes)
@@ -2394,7 +2399,7 @@ namespace GeometryGym.Ifc
 				}
 			}
 			if(ContextOfItems == null)
-				ContextOfItems = db.Factory.Duplicate(r.ContextOfItems) as IfcRepresentationContext;
+				ContextOfItems = db.Factory.Duplicate(r.ContextOfItems, options);
 
 			mRepresentationIdentifier = r.mRepresentationIdentifier;
 			mRepresentationType = r.mRepresentationType;

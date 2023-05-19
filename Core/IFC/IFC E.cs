@@ -18,13 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -430,13 +426,13 @@ namespace GeometryGym.Ifc
 				int relatingIndex = db.Factory.mDuplicateMapping.FindExisting(relating), relatedIndex = db.Factory.mDuplicateMapping.FindExisting(related);
 				if (relating != e && relatingIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false });
 					rce.RelatedElement = this;
 					rce.RelatingElement = db[relatingIndex] as IfcElement;
 				}
 				else if (related != e && relatedIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options.DeviationTolerance) { DuplicateDownstream = false }) as IfcRelConnectsElements;
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false });
 					rce.RelatingElement = this;
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
@@ -637,7 +633,7 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D Position { get { return mPosition; } set { mPosition = value; } }
 
 		protected IfcElementarySurface() : base() { }
-		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s, DuplicateOptions options) : base(db, s, options) { Position = db.Factory.Duplicate(s.Position) as IfcAxis2Placement3D; }
+		protected IfcElementarySurface(DatabaseIfc db, IfcElementarySurface s, DuplicateOptions options) : base(db, s, options) { Position = db.Factory.Duplicate(s.Position, options); }
 		protected IfcElementarySurface(IfcAxis2Placement3D position) : base(position.mDatabase) { mPosition = position; }
 	}
 	[Serializable]
@@ -1032,7 +1028,7 @@ namespace GeometryGym.Ifc
 
 		public string Name { get { return mName; } set { mName = value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
-		public ReadOnlyDictionary<string, IfcProperty> Properties { get { return new ReadOnlyDictionary<string, IfcProperty>( mProperties); } }
+		public Dictionary<string, IfcProperty> Properties { get { return mProperties; } }
 
 		protected override void initialize()
 		{
@@ -1046,7 +1042,7 @@ namespace GeometryGym.Ifc
 		{ 
 			mName = p.mName; 
 			mDescription = p.mDescription;
-			p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.DuplicateProperty(x)));  
+			p.Properties.Values.ToList().ForEach(x => AddProperty( db.Factory.DuplicateProperty(x, options)));  
 		}
 		public IfcExtendedProperties(IEnumerable<IfcProperty> properties) : base(properties.First().mDatabase)
 		{
@@ -1128,8 +1124,13 @@ namespace GeometryGym.Ifc
 		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db, IfcExternallyDefinedSurfaceStyle s) : base(db, s) { }
 		public IfcExternallyDefinedSurfaceStyle(DatabaseIfc db) : base(db) { }
 	}
-	//[Obsolete("DEPRECATED IFC4", false)]
-	//ENTITY IfcExternallyDefinedSymbol // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcExternallyDefinedSymbol : IfcExternalReference, IfcDefinedSymbolSelect
+	{
+		internal IfcExternallyDefinedSymbol() : base() { }
+		internal IfcExternallyDefinedSymbol(DatabaseIfc db, IfcExternallyDefinedTextFont f) : base(db, f) { }
+		public IfcExternallyDefinedSymbol(DatabaseIfc db) : base(db) { }
+	}
 	[Serializable]
 	public partial class IfcExternallyDefinedTextFont : IfcExternalReference, IfcTextFontSelect
 	{
@@ -1293,7 +1294,7 @@ namespace GeometryGym.Ifc
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }
-		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e, DuplicateOptions options) : base(db, e, options) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection) as IfcDirection; mDepth = e.mDepth; }
+		internal IfcExtrudedAreaSolid(DatabaseIfc db, IfcExtrudedAreaSolid e, DuplicateOptions options) : base(db, e, options) { ExtrudedDirection = db.Factory.Duplicate(e.ExtrudedDirection, options); mDepth = e.mDepth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, double depth) : base(prof) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcDirection dir, double depth) : base(prof) { mExtrudedDirection = dir; mDepth = depth; }
 		public IfcExtrudedAreaSolid(IfcProfileDef prof, IfcAxis2Placement3D position, double depth) : base(prof, position) { ExtrudedDirection = mDatabase.Factory.ZAxis; mDepth = depth; }

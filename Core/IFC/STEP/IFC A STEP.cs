@@ -569,7 +569,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return base.BuildStringSTEP(release) + (mFillStyleTarget == null ? ",$" : ",#" + mFillStyleTarget) +
-				(mGlobalOrLocal == null ? ",$" : ",." + mGlobalOrLocal.Value.ToString() + "."); 
+				(mGlobalOrLocal == IfcGlobalOrLocalEnum.NOTDEFINED ? ",$" : ",." + mGlobalOrLocal.ToString() + "."); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -664,16 +664,18 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return "#" + mComponentOfTotal.StepId + ",(" + 
-				string.Join(",", mComponents.Select(x=> "#" + x.StepId))+ "),." + mArithmeticOperator.ToString() + ".," + mName + "," + mDescription;
+			return "#" + mComponentOfTotal.StepId + ",(" + string.Join(",", mComponents.Select(x=> "#" + x.StepId)) +
+				"),." + mArithmeticOperator.ToString() + 
+				(string.IsNullOrEmpty(mName) ? ".,$," : ".,'" + ParserSTEP.Encode(mName) + "',") + 
+				(string.IsNullOrEmpty(mDescription) ? "$" : "'" + ParserSTEP.Encode(mDescription) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			ComponentOfTotal = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAppliedValue;
 			Components.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcAppliedValue));
 			Enum.TryParse<IfcArithmeticOperatorEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mArithmeticOperator);
-			mName = ParserSTEP.StripString(str, ref pos, len);
-			mDescription = ParserSTEP.StripString(str, ref pos, len);
+			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}
 	public partial class IfcApproval
@@ -750,17 +752,23 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
-			return base.BuildStringSTEP(release) + ",#" + mRelatedApproval.StepId + ",#" + mRelatingApproval.StepId + 
-				(release < ReleaseVersion.IFC4 ? (string.IsNullOrEmpty(mDescription) ? ",$,'" : ",'" + ParserSTEP.Encode(mDescription) + "','") + ParserSTEP.Encode(mName)  + "'": ""); }
+			return base.BuildStringSTEP(release) + ",#" + mRelatedApproval.StepId +  
+				(release < ReleaseVersion.IFC4 ? ",#" + mRelatingApprovals.First().StepId + 
+				(string.IsNullOrEmpty(mDescription) ? ",$,'" : ",'" + ParserSTEP.Encode(mDescription) + "','") + 
+				ParserSTEP.Encode(mName)  + "'" : ",(" + string.Join(",", mRelatingApprovals.Select(x=>"#" + x.StepId)) + ")"); }
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			mRelatedApproval = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApproval; 
-			mRelatingApproval = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApproval;
 			if (release < ReleaseVersion.IFC4)
 			{
+				mRelatingApprovals.Add(dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApproval);
 				mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			}
+			else
+			{
+				mRelatingApprovals.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcApproval));
 			}
 		}
 	}
@@ -855,17 +863,17 @@ namespace GeometryGym.Ifc
 		{
 			if (mDatabase.Release < ReleaseVersion.IFC4)
 			{
-				return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mBottomFlangeWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," + 
-					ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mBottomFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeFilletRadius) + "," +
-					ParserSTEP.DoubleToString(mTopFlangeWidth) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeThickness) + "," +
-					ParserSTEP.DoubleOptionalToString(mTopFlangeFilletRadius) +  "," + ParserSTEP.DoubleOptionalToString(mCentreOfGravityInY);
+				return base.BuildStringSTEP(release) + "," + formatLength(mBottomFlangeWidth) + "," + formatLength(mOverallDepth) + "," +
+					formatLength(mWebThickness) + "," + formatLength(mBottomFlangeThickness) + "," + formatLength(mBottomFlangeFilletRadius) + "," +
+					formatLength(mTopFlangeWidth) + "," + formatLength(mTopFlangeThickness) + "," +
+					formatLength(mTopFlangeFilletRadius) +  "," + formatLength(mCentreOfGravityInY);
 			}
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mBottomFlangeWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," +
-					ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mBottomFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeFilletRadius) + "," +
-				ParserSTEP.DoubleToString(mTopFlangeWidth) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeThickness) + "," +
-				ParserSTEP.DoubleOptionalToString(mTopFlangeFilletRadius) + "," + ParserSTEP.DoubleOptionalToString(mBottomFlangeEdgeRadius) + "," +
-				ParserSTEP.DoubleOptionalToString(mBottomFlangeSlope) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeEdgeRadius) + "," +
-				ParserSTEP.DoubleOptionalToString(mTopFlangeSlope);
+			return base.BuildStringSTEP(release) + "," + formatLength(mBottomFlangeWidth) + "," + formatLength(mOverallDepth) + "," +
+					formatLength(mWebThickness) + "," + formatLength(mBottomFlangeThickness) + "," + formatLength(mBottomFlangeFilletRadius) + "," +
+					formatLength(mTopFlangeWidth) + "," + formatLength(mTopFlangeThickness) + "," +
+					formatLength(mTopFlangeFilletRadius) + "," + formatLength(mBottomFlangeEdgeRadius) + "," +
+					ParserSTEP.DoubleOptionalToString(mBottomFlangeSlope) + "," + ParserSTEP.DoubleOptionalToString(mTopFlangeEdgeRadius) + "," +
+					ParserSTEP.DoubleOptionalToString(mTopFlangeSlope);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

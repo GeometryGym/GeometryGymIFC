@@ -16,11 +16,12 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using GeometryGym.STEP;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Reflection;
 using System.Linq;
+using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
 {
@@ -333,7 +334,7 @@ namespace GeometryGym.Ifc
 		public IfcVector Dir { get { return mDir; } set { mDir = value; } }
 
 		internal IfcLine() : base() { }
-		internal IfcLine(DatabaseIfc db, IfcLine l, DuplicateOptions options) : base(db, l, options) { Pnt = db.Factory.Duplicate(l.Pnt) as IfcCartesianPoint; Dir = db.Factory.Duplicate(l.Dir) as IfcVector; }
+		internal IfcLine(DatabaseIfc db, IfcLine l, DuplicateOptions options) : base(db, l, options) { Pnt = db.Factory.Duplicate(l.Pnt, options); Dir = db.Factory.Duplicate(l.Dir, options); }
 		public IfcLine(IfcCartesianPoint point, IfcVector dir) : base(point.mDatabase) { Pnt = point; Dir = dir; }
 	}
 	[Obsolete("DEPRECATED IFC4X3", false)]
@@ -357,12 +358,12 @@ namespace GeometryGym.Ifc
 
 
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcLinearDimension : IfcDimensionCurveDirectedCallout // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcLinearDimension : IfcDimensionCurveDirectedCallout
 	{
 		internal IfcLinearDimension() : base() { }
-		//internal IfcLinearDimension(IfcAngularDimension el) : base((IfcDimensionCurveDirectedCallout)el) { }
+		public IfcLinearDimension(IfcDraughtingCalloutElement content) : base(content) { }
+		public IfcLinearDimension(IEnumerable<IfcDraughtingCalloutElement> contents) : base(contents) { }
 	}
 	[Serializable]
 	public partial class IfcLinearElement : IfcProduct
@@ -394,16 +395,17 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D CartesianPosition { get { return mCartesianPosition; } set { mCartesianPosition = value; } }
 
 		public IfcLinearPlacement() : base() { }
-		internal IfcLinearPlacement(DatabaseIfc db, IfcLinearPlacement linearPlacement) : base(db, linearPlacement)
+		internal IfcLinearPlacement(DatabaseIfc db, IfcLinearPlacement linearPlacement, DuplicateOptions options) 
+			: base(db, linearPlacement, options)
 		{
-			PlacementMeasuredAlong = db.Factory.Duplicate(linearPlacement.PlacementMeasuredAlong) as IfcCurve;
-			Distance = db.Factory.Duplicate(linearPlacement.Distance) as IfcPointByDistanceExpression;
+			PlacementMeasuredAlong = db.Factory.Duplicate(linearPlacement.PlacementMeasuredAlong, options);
+			Distance = db.Factory.Duplicate(linearPlacement.Distance, options);
 			if (linearPlacement.Orientation != null)
-				Orientation = db.Factory.Duplicate(linearPlacement.Orientation) as IfcOrientationExpression;
+				Orientation = db.Factory.Duplicate(linearPlacement.Orientation, options);
 			if (linearPlacement.mRelativePlacement != null)
-				RelativePlacement = db.Factory.Duplicate(linearPlacement.RelativePlacement) as IfcAxis2PlacementLinear;
+				RelativePlacement = db.Factory.Duplicate(linearPlacement.RelativePlacement, options);
 			if (linearPlacement.CartesianPosition != null)
-				CartesianPosition = db.Factory.Duplicate(linearPlacement.CartesianPosition) as IfcAxis2Placement3D;
+				CartesianPosition = db.Factory.Duplicate(linearPlacement.CartesianPosition, options);
 		}
 		public IfcLinearPlacement(IfcAxis2PlacementLinear p) : base(p.Database) { RelativePlacement = p; }
 		public IfcLinearPlacement(IfcObjectPlacement refPlacement, IfcAxis2PlacementLinear p) : base(refPlacement) { RelativePlacement = p; }
@@ -438,6 +440,8 @@ namespace GeometryGym.Ifc
 		}
 
 		public IfcLinearPositioningElement() : base() { }
+		protected IfcLinearPositioningElement(IfcProject host) : base(host) { }
+		protected IfcLinearPositioningElement(IfcLinearPositioningElement host) : base(host) { }
 		protected IfcLinearPositioningElement(IfcSpatialStructureElement host) : base(host) { }
 		public IfcLinearPositioningElement(IfcSpatialStructureElement host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape ) {  }
 		[Obsolete("DEPRECATED IFC4X3", false)]
@@ -473,7 +477,8 @@ namespace GeometryGym.Ifc
 		public double Span { get { return mSpan; } set { mSpan = value; } }
 
 		internal IfcLinearSpanPlacement() : base() { }
-		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement) : base(db, linearSpanPlacement)
+		internal IfcLinearSpanPlacement(DatabaseIfc db, IfcLinearSpanPlacement linearSpanPlacement, DuplicateOptions options) 
+			: base(db, linearSpanPlacement, options)
 		{
 			Span = linearSpanPlacement.Span;
 		}
@@ -542,9 +547,9 @@ namespace GeometryGym.Ifc
 		}
 
 		internal IfcLocalPlacement() : base() { }
-		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p) : base(db, p)
+		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p, DuplicateOptions options) : base(db, p, options)
 		{
-			RelativePlacement = db.Factory.Duplicate(p.mRelativePlacement) as IfcAxis2Placement;
+			RelativePlacement = db.Factory.Duplicate(p.mRelativePlacement, options);
 		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)

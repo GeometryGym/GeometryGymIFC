@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 		{
 			return "#" + mPoints.StepId + 
 				(mSegments.Count == 0 ? ",$," : ",(" + string.Join(",", mSegments) + "),") +
-				(mSelfIntersect == IfcLogicalEnum.UNKNOWN ? "$" : ParserIfc.LogicalToString(mSelfIntersect));
+				(mSelfIntersect == IfcLogicalEnum.UNKNOWN && release != ReleaseVersion.IFC4X3 ? "$" : ParserIfc.LogicalToString(mSelfIntersect));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -294,8 +294,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mOverallWidth) + "," + ParserSTEP.DoubleToString(mOverallDepth) + "," + ParserSTEP.DoubleToString(mWebThickness) + "," + ParserSTEP.DoubleToString(mFlangeThickness) + "," + ParserSTEP.DoubleOptionalToString(mFilletRadius)
-				+ (release <= ReleaseVersion.IFC2x3 ? "" : "," + ParserSTEP.DoubleOptionalToString(mFlangeEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope));
+			return base.BuildStringSTEP(release) + "," + formatLength(mOverallWidth) + "," + formatLength(mOverallDepth) + "," + formatLength(mWebThickness) + "," + formatLength(mFlangeThickness) + "," + formatLength(mFilletRadius)
+				+ (release <= ReleaseVersion.IFC2x3 ? "" : "," + formatLength(mFlangeEdgeRadius) + "," + ParserSTEP.DoubleOptionalToString(mFlangeSlope));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

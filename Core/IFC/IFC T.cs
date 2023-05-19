@@ -18,13 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -330,7 +326,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTendonConduit : IfcReinforcingElement
 	{
-		private IfcTendonConduitTypeEnum mPredefinedType = IfcTendonConduitTypeEnum.NOTDEFINED; //: IfcTendonConduitTypeEnum;
+		private IfcTendonConduitTypeEnum mPredefinedType = IfcTendonConduitTypeEnum.NOTDEFINED; //: OPTIONAL IfcTendonConduitTypeEnum;
 		public IfcTendonConduitTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcTendonConduitTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcTendonConduit() : base() { }
@@ -370,14 +366,17 @@ namespace GeometryGym.Ifc
 		public IfcTendonType(DatabaseIfc db, string name, IfcTendonTypeEnum type) 
 			: base(db) { Name = name; PredefinedType = type; }
 	}
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
+	[Serializable, Obsolete("DELETED IFC4", false)]
 	public partial class IfcTerminatorSymbol : IfcAnnotationSymbolOccurrence // DEPRECATED IFC4
 	{
 		internal IfcAnnotationCurveOccurrence  mAnnotatedCurve;// : IfcAnnotationCurveOccurrence; 
+		public IfcAnnotationCurveOccurrence AnnotatedCurve {  get { return mAnnotatedCurve; } set { mAnnotatedCurve = value; } } 
 		internal IfcTerminatorSymbol() : base() { }
-		internal IfcTerminatorSymbol(IfcAnnotationCurveOccurrence curve) : base(curve.Database) { mAnnotatedCurve = curve; }
 		internal IfcTerminatorSymbol(DatabaseIfc db, IfcTerminatorSymbol s, DuplicateOptions options) : base(db, s, options) { mAnnotatedCurve = db.Factory.Duplicate(s.mAnnotatedCurve); }
+		public IfcTerminatorSymbol(IfcPresentationStyleAssignment style, IfcAnnotationCurveOccurrence curve)
+			: base(style) { mAnnotatedCurve = curve; }
+
+
 	}
 	[Serializable]
 	public abstract partial class IfcTessellatedFaceSet : IfcTessellatedItem, IfcBooleanOperand //ABSTRACT SUPERTYPE OF(IfcTriangulatedFaceSet, IfcPolygonalFaceSet )
@@ -456,11 +455,11 @@ namespace GeometryGym.Ifc
 		internal IfcTextFontSelect mTextFontStyle;// : IfcTextFontSelect; 
 		internal bool mModelOrDraughting = true;//	:	OPTIONAL BOOLEAN; IFC4CHANGE
 		internal IfcTextStyle() : base() { }
-		internal IfcTextStyle(DatabaseIfc db, IfcTextStyle v) : base(db, v) 
+		internal IfcTextStyle(DatabaseIfc db, IfcTextStyle v, DuplicateOptions options) : base(db, v, options) 
 		{
-			mTextCharacterAppearance = db.Factory.Duplicate<IfcCharacterStyleSelect>(v.mTextCharacterAppearance); 
-			mTextStyle = db.Factory.Duplicate<IfcTextStyleSelect>(v.mTextStyle);
-			mTextFontStyle = db.Factory.Duplicate<IfcTextFontSelect>(v.mTextFontStyle);
+			mTextCharacterAppearance = db.Factory.Duplicate(v.mTextCharacterAppearance, options); 
+			mTextStyle = db.Factory.Duplicate(v.mTextStyle, options);
+			mTextFontStyle = db.Factory.Duplicate(v.mTextFontStyle, options);
 			mModelOrDraughting = v.mModelOrDraughting; 
 		}
 	}
@@ -1009,13 +1008,13 @@ namespace GeometryGym.Ifc
 		internal IfcTrimmedCurve(DatabaseIfc db) : base(db) { }
 		internal IfcTrimmedCurve(DatabaseIfc db, IfcTrimmedCurve c, DuplicateOptions options) : base(db, c, options)
 		{
-			BasisCurve = db.Factory.Duplicate(c.BasisCurve) as IfcCurve;
+			BasisCurve = db.Factory.Duplicate(c.BasisCurve, options);
 			mTrim1 = new IfcTrimmingSelect(c.mTrim1.ParameterValue);
 			mTrim2 = new IfcTrimmingSelect(c.mTrim2.ParameterValue);
 			if (c.mTrim1.CartesianPoint != null)
-				mTrim1.CartesianPoint = db.Factory.Duplicate(c.mTrim1.CartesianPoint);
+				mTrim1.CartesianPoint = db.Factory.Duplicate(c.mTrim1.CartesianPoint, options);
 			if (c.mTrim2.CartesianPoint != null)
-				mTrim2.CartesianPoint = db.Factory.Duplicate(c.mTrim2.CartesianPoint);
+				mTrim2.CartesianPoint = db.Factory.Duplicate(c.mTrim2.CartesianPoint, options);
 			mSenseAgreement = c.mSenseAgreement;
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
@@ -1505,8 +1504,22 @@ namespace GeometryGym.Ifc
 		protected IfcTypeProduct() : base() { }
 		protected IfcTypeProduct(DatabaseIfc db, IfcTypeProduct t, DuplicateOptions options) : base(db, t, options)
 		{
-			if(options.DuplicateRepresentation)
-				RepresentationMaps.AddRange(t.RepresentationMaps.ConvertAll(x=> db.Factory.Duplicate(x) as IfcRepresentationMap));
+			if (options.DuplicateRepresentation)
+			{
+				if(!options.DuplicateAxisRepresentations && t.RepresentationMaps.Count > 0)
+				{
+					foreach(IfcRepresentationMap representationMap in t.RepresentationMaps)
+					{
+						if (representationMap.MappedRepresentation is IfcShapeModel shapeModel &&
+							string.Compare(shapeModel.RepresentationIdentifier, "Axis", true) == 0)
+							continue;
+						RepresentationMaps.Add(db.Factory.Duplicate(representationMap, options));
+					}
+
+				}
+				else
+					RepresentationMaps.AddRange(t.RepresentationMaps.Select(x => db.Factory.Duplicate(x, options)));
+			}
 			mTag = t.mTag;
 		}
 		public IfcTypeProduct(DatabaseIfc db) : base(db) {  }
@@ -1561,6 +1574,8 @@ namespace GeometryGym.Ifc
 		
 		internal IfcProduct GenerateMappedProduct(IfcProduct host, IfcAxis2Placement3D relativePlacement)
 		{
+			if (RepresentationMaps.Count != 1)
+				return null;
 			DatabaseIfc db = host.Database;
 			string typename = this.GetType().Name;
 			typename = typename.Substring(0, typename.Length - 4);

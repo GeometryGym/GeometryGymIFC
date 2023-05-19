@@ -19,11 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -290,7 +286,16 @@ namespace GeometryGym.Ifc
 			{
 				foreach (IfcRelAssociates associates in o.mHasAssociations)
 				{
-					IfcRelAssociates dup = db.Factory.Duplicate(associates, new DuplicateOptions(options) { DuplicateDownstream = true }) as IfcRelAssociates;
+					if(associates is IfcRelAssociatesMaterial associatesMaterial)
+					{
+						IfcMaterialSelect relatingMaterial = db.Factory.Duplicate(associatesMaterial.RelatingMaterial, options);
+						if(relatingMaterial != null && relatingMaterial.AssociatedTo.Count > 0)
+						{
+							relatingMaterial.Associate(this);
+							continue;
+						}
+					}
+					IfcRelAssociates dup = db.Factory.Duplicate(associates, new DuplicateOptions(options) { DuplicateDownstream = true });
 					dup.RelatedObjects.Add(this);
 				}
 			}
@@ -313,10 +318,15 @@ namespace GeometryGym.Ifc
 			}
 			if (options.DuplicateDownstream)
 			{
+				DuplicateOptions downstreamOptions = new DuplicateOptions(options) { DuplicateHost = true };
+
 				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
-					mDatabase.Factory.Duplicate(rag, options);
+				{
+					foreach(IfcObjectDefinition obj in rag.RelatedObjects)
+						mDatabase.Factory.Duplicate(obj, downstreamOptions);
+				}
 				foreach (IfcRelNests rn in o.mIsNestedBy)
-					mDatabase.Factory.Duplicate(rn, options);
+					mDatabase.Factory.Duplicate(rn, downstreamOptions);
 			}
 		}
 		protected override void initialize()
@@ -807,18 +817,18 @@ namespace GeometryGym.Ifc
 					mPlacesObject.Add(p);
 			}
 		}
-		protected IfcObjectPlacement(DatabaseIfc db, IfcObjectPlacement p) : base(db,p)
+		protected IfcObjectPlacement(DatabaseIfc db, IfcObjectPlacement p, DuplicateOptions options) : base(db,p)
 		{
 			if (p.mPlacementRelTo != null)
-				PlacementRelTo = db.Factory.Duplicate(p.mPlacementRelTo) as IfcObjectPlacement;
+				PlacementRelTo = db.Factory.Duplicate(p.mPlacementRelTo, options);
 		}
 
-		internal IfcObjectPlacement Duplicate(DatabaseIfc db)
+		internal IfcObjectPlacement Duplicate(DatabaseIfc db, DuplicateOptions options)
 		{
 			IfcObjectPlacement result = DuplicateWorker(db);
 			if (result != null)
 				return result;
-			return db.Factory.Duplicate(this) as IfcObjectPlacement;
+			return db.Factory.Duplicate(this, options);
 		}
 		protected virtual IfcObjectPlacement DuplicateWorker(DatabaseIfc db) { return null; }
 
@@ -923,7 +933,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcOffsetCurve3D() : base() { }
 		internal IfcOffsetCurve3D(DatabaseIfc db, IfcOffsetCurve2D c, DuplicateOptions options) : base(db, c, options) { Distance = c.Distance; SelfIntersect = c.SelfIntersect; }
-		public IfcOffsetCurve3D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect, IfcDirection refDirection) : base(basis) { Distance = distance; SelfIntersect = selfIntersect; RefDirection = RefDirection; }
+		public IfcOffsetCurve3D(IfcCurve basis, double distance, IfcLogicalEnum selfIntersect, IfcDirection refDirection) : base(basis) { Distance = distance; SelfIntersect = selfIntersect; RefDirection = refDirection; }
 	}
 	[Serializable]
 	public partial class IfcOffsetCurveByDistances : IfcOffsetCurve
@@ -1262,20 +1272,20 @@ namespace GeometryGym.Ifc
 
 		private DateTime zeroTime() { return new DateTime(1970, 1, 1, 0, 0, 0); } 
 		internal IfcOwnerHistory() : base() { }
-		internal IfcOwnerHistory(DatabaseIfc db, IfcOwnerHistory o) : base(db, o)
+		internal IfcOwnerHistory(DatabaseIfc db, IfcOwnerHistory o, DuplicateOptions options) : base(db, o)
 		{
-			OwningUser = db.Factory.Duplicate(o.OwningUser) as IfcPersonAndOrganization;
+			OwningUser = db.Factory.Duplicate(o.OwningUser, options);
 
 			OwningApplication = o.OwningApplication.SeekExisting(db);
 			if(OwningApplication == null)
-				OwningApplication = new IfcApplication(db, o.OwningApplication);
+				OwningApplication = new IfcApplication(db, o.OwningApplication, options);
 			mState = o.mState;
 			mChangeAction = o.mChangeAction;
 			mLastModifiedDate = o.mLastModifiedDate;
 			if(o.mLastModifyingUser != null)
-				LastModifyingUser = db.Factory.Duplicate( o.LastModifyingUser) as IfcPersonAndOrganization;
+				LastModifyingUser = db.Factory.Duplicate(o.LastModifyingUser, options);
 			if (o.mLastModifyingApplication != null)
-				LastModifyingApplication = db.Factory.Duplicate(o.LastModifyingApplication) as IfcApplication;
+				LastModifyingApplication = db.Factory.Duplicate(o.LastModifyingApplication, options);
 			mCreationDate = o.mCreationDate;
 		}
 		public IfcOwnerHistory(IfcPersonAndOrganization owningUser, IfcApplication owningApplication, IfcChangeActionEnum action) : base(owningUser.mDatabase)

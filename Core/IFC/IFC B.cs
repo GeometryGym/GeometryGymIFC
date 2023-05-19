@@ -18,11 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -95,21 +92,25 @@ namespace GeometryGym.Ifc
 		}
 	}
 	public interface IfcBendingParameterSelect { } // 	IfcLengthMeasure, IfcPlaneAngleMeasure
-	[Obsolete("DEPRECATED IFC4", false)]
-	[Serializable]
-	public partial class IfcBezierCurve : IfcBSplineCurve // DEPRECATED IFC4
+	[Serializable, Obsolete("DELETED IFC4", false)]
+	public partial class IfcBezierCurve : IfcBSplineCurve 
 	{
 		internal IfcBezierCurve() : base() { }
 		internal IfcBezierCurve(DatabaseIfc db, IfcBezierCurve c, DuplicateOptions options) : base(db, c, options) { }
+		public IfcBezierCurve(int degree, IEnumerable<IfcCartesianPoint> controlPoints) : base(degree, controlPoints) { }
 	}	
 	[Serializable]
 	public partial class IfcBlobTexture : IfcSurfaceTexture
 	{
-		internal string mRasterFormat;// : IfcIdentifier;
-		internal string mRasterCode;// : IfcBinary;	
+		internal string mRasterFormat = "";// : IfcIdentifier;
+		internal IfcBinary mRasterCode = null;// : IfcBinary;	
+		public string RasterFormat { get { return mRasterFormat; } set { mRasterFormat = value; } }
+		public IfcBinary RasterCode { get { return mRasterCode; } set { mRasterCode = value; } }
 		internal IfcBlobTexture() : base() { }
 		internal IfcBlobTexture(DatabaseIfc db, IfcBlobTexture t, DuplicateOptions options)
 			: base(db, t, options) { mRasterFormat = t.mRasterFormat;  mRasterCode = t.mRasterCode; }
+		public IfcBlobTexture(DatabaseIfc db, bool repeatS, bool repeatT, string rasterFormat, IfcBinary rasterCode) 
+			: base(db, repeatS, repeatT) { mRasterFormat = rasterFormat; mRasterCode = rasterCode; }
 	}
 	[Serializable]
 	public partial class IfcBlock : IfcCsgPrimitive3D
@@ -167,8 +168,8 @@ namespace GeometryGym.Ifc
 		internal IfcBooleanResult(DatabaseIfc db, IfcBooleanResult b, DuplicateOptions options) : base(db, b, options)
 		{
 			mOperator = b.mOperator;
-			FirstOperand = db.Factory.Duplicate(b.FirstOperand) as IfcBooleanOperand;
-			SecondOperand = db.Factory.Duplicate(b.SecondOperand) as IfcBooleanOperand;
+			FirstOperand = db.Factory.Duplicate(b.FirstOperand, options);
+			SecondOperand = db.Factory.Duplicate(b.SecondOperand, options);
 		}
 		public IfcBooleanResult(IfcBooleanOperator op, IfcBooleanOperand first, IfcBooleanOperand second) : base(first.Database)
 		{
@@ -577,7 +578,7 @@ namespace GeometryGym.Ifc
 			mElevationOfRefHeight = b.mElevationOfRefHeight;
 			mElevationOfTerrain = b.mElevationOfTerrain;
 			if (b.mBuildingAddress != null)
-				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress) as IfcPostalAddress;
+				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress, options);
 		}
 		public IfcBuilding(DatabaseIfc db, string name) : base(db, name) { setDefaultAddress();  }
 		public IfcBuilding(IfcSpatialStructureElement host, string name) : base(host, name) { }

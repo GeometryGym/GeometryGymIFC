@@ -18,11 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
 using System.Linq;
 using GeometryGym.STEP;
 
@@ -70,7 +67,7 @@ namespace GeometryGym.Ifc
 		public double Magnitude { get { return mMagnitude; } set { mMagnitude = value; } }
 
 		internal IfcVector() : base() { }
-		internal IfcVector(DatabaseIfc db, IfcVector v, DuplicateOptions options) : base(db, v, options) { Orientation = db.Factory.Duplicate( v.Orientation) as IfcDirection; mMagnitude = v.mMagnitude; }
+		internal IfcVector(DatabaseIfc db, IfcVector v, DuplicateOptions options) : base(db, v, options) { Orientation = db.Factory.Duplicate(v.Orientation, options); mMagnitude = v.mMagnitude; }
 		public IfcVector(IfcDirection orientation, double magnitude) : base(orientation.mDatabase) { Orientation = orientation; Magnitude = magnitude; }
 	}
 	public interface IfcVectorOrDirection : IBaseClassIfc { } // SELECT(IfcDirection, IfcVector);
@@ -897,11 +894,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTime : IfcSimpleValue
 	{
-		internal string mTime = "";
-		public override string ToString() { return mTime; }
-		public override object Value { get { return parseSTEP(mTime); } set { mTime = formatSTEP(Convert.ToDateTime(value)); } }
+		internal DateTime mTime = DateTime.MinValue;
+		public override string ToString() { return "IFCTIME(" + (mTime == DateTime.MinValue ? "$)" : "'" + FormatSTEP(mTime) + "')"); }
+		public override object Value { get { return mTime; } set { mTime = Convert.ToDateTime(value); } }
 		public override Type ValueType { get { return typeof(DateTime); } }
-		internal static string formatSTEP(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? ":0" : ":") + date.Minute + (date.Second < 10 ? ":0" : ":") + date.Second + "'"; }
+		public static string FormatSTEP(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? ":0" : ":") + date.Minute + (date.Second < 10 ? ":0" : ":") + date.Second; }
 		internal static DateTime parseSTEP(string str)
 		{
 			string value = str.Replace("'", "");
@@ -918,7 +915,7 @@ namespace GeometryGym.Ifc
 			DateTime result = DateTime.MinValue;
 			return (DateTime.TryParse(value, out result) ? result : DateTime.MinValue);
 		}
-		internal static string convert(DateTime date) { return (date.Hour < 10 ? "T0" : "T") + date.Hour + (date.Minute < 10 ? "-0" : "-") + date.Minute + (date.Second < 10 ? "-0" : "-") + date.Second; }
+		public override string ValueString { get { return FormatSTEP(mTime); } }
 	}
 	[Serializable]
 	public class IfcTimeStamp : IfcSimpleValue

@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using GeometryGym.Ifc;
 
 namespace GeometryGym.STEP
 {
@@ -289,6 +290,41 @@ namespace GeometryGym.STEP
 			sb.Append("\"");
 			return sb.ToString();
 		}
+		public static IfcBinary ParseBinaryString(string str)
+		{
+			int len = (str.Length - 3) / 2; // subtract surrounding quotes and modulus character
+			byte[] array = new byte[len];
+			int modulo = 0; // not used for IFC -- always byte-aligned
+
+			int offset;
+			if (str.Length % 2 == 0)
+			{
+				modulo = Convert.ToInt32(str[1]) + 4;
+				offset = 1;
+
+				char ch = str[2];
+				array[0] = (ch >= 'A' ? (byte)(ch - 'A' + 10) : (byte)ch);
+			}
+			else
+			{
+				modulo = Convert.ToInt32((str[1] - '0')); // [0] is quote; [1] is modulo
+				offset = 0;
+			}
+
+			for (int i = offset; i < len; i++)
+			{
+				char hi = str[i * 2 + 2 - offset];
+				char lo = str[i * 2 + 3 - offset];
+
+				byte val = (byte)(
+					((hi >= 'A' ? +(int)(hi - 'A' + 10) : (int)(hi - '0')) << 4) +
+					((lo >= 'A' ? +(int)(lo - 'A' + 10) : (int)(lo - '0'))));
+
+				array[i] = val;
+			}
+
+			return new IfcBinary(array);
+		}
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
 		public static string DoubleToString(double d) 
 		{ 
@@ -299,9 +335,10 @@ namespace GeometryGym.STEP
 		public static string DoubleExponentialString(double d) 
 		{
 			double abs = Math.Abs(d);
-			if (abs < 1000 && (abs < double.Epsilon || abs > 0.001))
+			if (abs < 1000000 && (abs < double.Epsilon || abs > 1e-7))
 				return DoubleToString(d);
-			return String.Format(CultureInfo.InvariantCulture, "{0:0.########E+00}", d);
+
+			return String.Format(CultureInfo.InvariantCulture, "{0:0.0################E+00}", d);
 		}
 		public static string DoubleOptionalToString(double d) { return (double.IsNaN(d) || double.IsInfinity(d) ? "$" : String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d)); }
 		public static string IntToString(int i)

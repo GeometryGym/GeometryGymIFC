@@ -229,7 +229,7 @@ namespace GeometryGym.Ifc
 		[VersionAdded(ReleaseVersion.IFC4X4_DRAFT)] GEOPHYSICALSURVEYRESULT }
 	public enum IfcGeotechnicalStratumTypeEnum { NOTDEFINED, USERDEFINED, SOLID, VOID, WATER };
 	public enum IfcGeotechTypicalSectionTypeEnum { NOTDEFINED, USERDEFINED }
-	public enum IfcGlobalOrLocalEnum { GLOBAL_COORDS, LOCAL_COORDS };
+	public enum IfcGlobalOrLocalEnum { NOTDEFINED, GLOBAL_COORDS, LOCAL_COORDS };
 	public enum IfcGridTypeEnum { NOTDEFINED, USERDEFINED, RECTANGULAR, RADIAL, TRIANGULAR, IRREGULAR };
 	public enum IfcGroundReinforcementElementTypeEnum { NOTDEFINED, USERDEFINED, SPILINGBOLT, ROCKSUPPORTBOLT };
 	public enum IfcHeatExchangerTypeEnum { NOTDEFINED, USERDEFINED, PLATE, SHELLANDTUBE, [VersionAdded(ReleaseVersion.IFC4X3)] TURNOUTHEATING };

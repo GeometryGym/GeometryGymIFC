@@ -18,14 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Reflection;
-using System.IO;
-using System.ComponentModel;
+using System.Linq;
 using GeometryGym.STEP;
 
 namespace GeometryGym.Ifc
@@ -207,8 +202,8 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcAxis2Placement3D> mCrossSectionPositions = new LIST<IfcAxis2Placement3D>();// : LIST [2:?] OF IfcAxis2Placement3D; 
 
 		public IfcCompositeCurve SpineCurve { get { return mSpineCurve; } set { mSpineCurve = value; } }
-		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
-		public LIST<IfcAxis2Placement3D> CrossSectionPositions { get { return mCrossSectionPositions; } set { mCrossSectionPositions.Clear(); if(value != null) mCrossSectionPositions = value; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } }
+		public LIST<IfcAxis2Placement3D> CrossSectionPositions { get { return mCrossSectionPositions; } }
 
 		internal IfcSectionedSpine() : base() { }
 		internal IfcSectionedSpine(DatabaseIfc db, IfcSectionedSpine s, DuplicateOptions options) : base(db, s, options)
@@ -216,6 +211,12 @@ namespace GeometryGym.Ifc
 			SpineCurve = db.Factory.Duplicate(s.SpineCurve) as IfcCompositeCurve;
 			CrossSections.AddRange(s.CrossSections.ConvertAll(x => db.Factory.Duplicate(x) as IfcProfileDef));
 			CrossSectionPositions.AddRange(s.CrossSectionPositions.ConvertAll(x=>db.Factory.Duplicate(x) as IfcAxis2Placement3D));
+		}
+		public IfcSectionedSpine(IfcCompositeCurve spine, IEnumerable<IfcProfileDef> crossSections, IEnumerable<IfcAxis2Placement3D> positions)
+		{
+			SpineCurve = spine;
+			CrossSections.AddRange(crossSections);
+			CrossSectionPositions.AddRange(positions);
 		}
 	}
 	[Serializable]
@@ -674,7 +675,7 @@ namespace GeometryGym.Ifc
 			if (mappedItem != null)
 				return new IfcShapeRepresentation(mappedItem);
 
-			Trace.WriteLine("XX Error Can't identify " + representationItem.ToString() + " as shape representation!");
+			System.Diagnostics.Trace.WriteLine("XX Error Can't identify " + representationItem.ToString() + " as shape representation!");
 			return null;
 		}
 
@@ -691,9 +692,9 @@ namespace GeometryGym.Ifc
 		public SET<IfcShell> SbsmBoundary { get { return mSbsmBoundary; } }
 
 		internal IfcShellBasedSurfaceModel() : base() { }
-		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m, DuplicateOptions options) : base(db,m, options)
+		internal IfcShellBasedSurfaceModel(DatabaseIfc db, IfcShellBasedSurfaceModel m, DuplicateOptions options) : base(db, m, options)
 		{
-			mSbsmBoundary.AddRange(m.mSbsmBoundary.Select(x => db.Factory.Duplicate(x) as IfcShell));
+			mSbsmBoundary.AddRange(m.mSbsmBoundary.Select(x => db.Factory.Duplicate(x, options)));
 		}
 		public IfcShellBasedSurfaceModel(IfcShell shell) : base(shell.Database) { mSbsmBoundary.Add(shell); }
 		public IfcShellBasedSurfaceModel(List<IfcShell> shells) : base(shells[0].Database) { mSbsmBoundary.AddRange(shells); }
@@ -846,7 +847,7 @@ namespace GeometryGym.Ifc
 			mRefElevation = site.mRefElevation; 
 			mLandTitleNumber = site.mLandTitleNumber; 
 			if (site.mSiteAddress != null) 
-				SiteAddress = db.Factory.Duplicate(site.SiteAddress); 
+				SiteAddress = db.Factory.Duplicate(site.SiteAddress, options); 
 		}
 		public IfcSite(DatabaseIfc db, string name) : base(db.Factory.RootPlacement) { Name = name; }
 		public IfcSite(string name, IfcObjectPlacement placement) : base(placement) { Name = name; }
@@ -864,7 +865,7 @@ namespace GeometryGym.Ifc
 		public IfcSIUnitName Name { get { return mName; } set { mName = value; } }
 
 		internal IfcSIUnit() : base() { }
-		internal IfcSIUnit(DatabaseIfc db, IfcSIUnit u) : base(db, u) { mPrefix = u.mPrefix; mName = u.mName; }
+		internal IfcSIUnit(DatabaseIfc db, IfcSIUnit u, DuplicateOptions options) : base(db, u, options) { mPrefix = u.mPrefix; mName = u.mName; }
 		public IfcSIUnit(DatabaseIfc db, IfcUnitEnum unitEnum, IfcSIPrefix prefix, IfcSIUnitName name) : base(db, unitEnum, false) { mPrefix = prefix; mName = name; }
 		public override double SIFactor
 		{
@@ -1123,7 +1124,10 @@ namespace GeometryGym.Ifc
 			if (options.DuplicateDownstream)
 			{
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
-					db.Factory.Duplicate(css, options);
+				{
+					foreach(IfcProduct obj in css.RelatedElements)
+						db.Factory.Duplicate(obj, options);
+				}
 				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
@@ -2220,7 +2224,6 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set { mName = value; } }
 
 		internal IfcStyledItem() : base() { }
-		internal IfcStyledItem(DatabaseIfc db) : base(db) { }
 		internal IfcStyledItem(DatabaseIfc db, IfcStyledItem i, DuplicateOptions options) : base(db, i, options)
 		{
 			foreach(IfcStyleAssignmentSelect style in i.Styles)
@@ -2470,10 +2473,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcSurfaceStyleElementSelect> Styles { get { return mStyles; } }
 
 		internal IfcSurfaceStyle() : base() { }
-		internal IfcSurfaceStyle(DatabaseIfc db, IfcSurfaceStyle s, DuplicateOptions options) : base(db, s) 
+		internal IfcSurfaceStyle(DatabaseIfc db, IfcSurfaceStyle s, DuplicateOptions options) : base(db, s, options) 
 		{ 
 			mSide = s.mSide; 
-			mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x, options) as IfcSurfaceStyleElementSelect));
+			mStyles.AddRange(s.mStyles.Select(x=> db.Factory.Duplicate(x, options)));
 		}
 		internal IfcSurfaceStyle(DatabaseIfc db) : base(db) { }
 		public IfcSurfaceStyle(IfcSurfaceStyleShading shading) : base(shading.mDatabase) { mStyles.Add(shading); }
@@ -2641,7 +2644,6 @@ namespace GeometryGym.Ifc
 		public List<string> Parameter { get { return mParameter; } }
 
 		protected IfcSurfaceTexture() : base() { }
-		protected IfcSurfaceTexture(DatabaseIfc db,bool repeatS, bool repeatT) : base(db) { mRepeatS = repeatS; mRepeatT = repeatT; }
 		protected IfcSurfaceTexture(DatabaseIfc db, IfcSurfaceTexture t, DuplicateOptions options)
 			: base(db, t, options) 
 		{ 
@@ -2652,6 +2654,7 @@ namespace GeometryGym.Ifc
 				TextureTransform = db.Factory.Duplicate(t.TextureTransform, options) as IfcCartesianTransformationOperator2D;
 			mParameter.AddRange(t.mParameter);
 		}
+		protected IfcSurfaceTexture(DatabaseIfc db, bool repeatS, bool repeatT) : base(db) { mRepeatS = repeatS; mRepeatT = repeatT; }
 	}
 	[Serializable]
 	public abstract partial class IfcSweptAreaSolid : IfcSolidModel  /*ABSTRACT SUPERTYPE OF (ONEOF (IfcExtrudedAreaSolid, IfcFixedReferenceSweptAreaSolid ,IfcRevolvedAreaSolid ,IfcSurfaceCurveSweptAreaSolid))*/

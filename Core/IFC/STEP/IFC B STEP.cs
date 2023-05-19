@@ -89,13 +89,14 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{
-			return base.BuildStringSTEP(release) + ",'" + mRasterFormat + "','" + mRasterCode + "'"; 
+			return base.BuildStringSTEP(release) + ",'" + ParserSTEP.Encode(mRasterFormat) + "','" + mRasterCode.ValueString + "'"; 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mRasterFormat = ParserSTEP.StripString(str, ref pos, len);
-			mRasterCode = ParserSTEP.StripString(str, ref pos, len);
+			mRasterFormat = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
+			string field = ParserSTEP.StripField(str, ref pos, len);
+			mRasterCode = ParserSTEP.ParseBinaryString(field);
 		}
 	}
 	public partial class IfcBlock

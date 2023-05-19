@@ -16,12 +16,12 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using GeometryGym.STEP;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Reflection;
 using System.Linq;
+using GeometryGym.STEP;
 
 
 namespace GeometryGym.Ifc
@@ -285,12 +285,12 @@ namespace GeometryGym.Ifc
 		protected IfcDirection mAxis1;// : OPTIONAL IfcDirection
 		protected IfcDirection mAxis2;// : OPTIONAL IfcDirection;
 		private IfcCartesianPoint mLocalOrigin;// : IfcCartesianPoint;
-		private double mScale = 1;// : OPTIONAL REAL;
+		private double mScale = double.NaN;// : OPTIONAL REAL;
 
 		public IfcDirection Axis1 { get { return mAxis1; } set { mAxis1 = value; } }
 		public IfcDirection Axis2 { get { return mAxis2; } set { mAxis2 = value; } }
 		public IfcCartesianPoint LocalOrigin { get { return mLocalOrigin; } set { mLocalOrigin = value; } }
-		public double Scale { get { return mScale; } set { mScale = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
+		public double Scale { get { return double.IsNaN(mScale) ? 1 : mScale; } set { mScale = value; } }
 
 		protected IfcCartesianTransformationOperator() { }
 		protected IfcCartesianTransformationOperator(IfcCartesianPoint p) : base(p.mDatabase) { LocalOrigin = p; }
@@ -298,7 +298,16 @@ namespace GeometryGym.Ifc
 		{
 			LocalOrigin = db.Factory.Origin;
 		}
-		protected IfcCartesianTransformationOperator(DatabaseIfc db, IfcCartesianTransformationOperator o, DuplicateOptions options) : base(db, o, options) { if(o.mAxis1 != null) Axis1 = db.Factory.Duplicate( o.Axis1) as IfcDirection; if(o.mAxis2 != null) Axis2 = db.Factory.Duplicate( o.Axis2) as IfcDirection; LocalOrigin = db.Factory.Duplicate(o.LocalOrigin) as IfcCartesianPoint; mScale = o.mScale; }
+		protected IfcCartesianTransformationOperator(DatabaseIfc db, IfcCartesianTransformationOperator o, DuplicateOptions options) 
+			: base(db, o, options)
+		{
+			if (o.mAxis1 != null)
+				Axis1 = db.Factory.Duplicate(o.Axis1, options);
+			if (o.mAxis2 != null)
+				Axis2 = db.Factory.Duplicate(o.Axis2, options);
+			LocalOrigin = db.Factory.Duplicate(o.LocalOrigin, options);
+			mScale = o.mScale;
+		}
 	}
 	[Serializable]
 	public partial class IfcCartesianTransformationOperator2D : IfcCartesianTransformationOperator // SUPERTYPE OF(IfcCartesianTransformationOperator2DnonUniform)
@@ -306,16 +315,17 @@ namespace GeometryGym.Ifc
 		internal IfcCartesianTransformationOperator2D() : base() { }
 		internal IfcCartesianTransformationOperator2D(DatabaseIfc db, IfcCartesianTransformationOperator2D o, DuplicateOptions options) : base(db, o, options) { }
 		public IfcCartesianTransformationOperator2D(IfcCartesianPoint cp) : base(cp) { }
-		public IfcCartesianTransformationOperator2D(DatabaseIfc db) : base(new IfcCartesianPoint(db,0,0)) { }
+		public IfcCartesianTransformationOperator2D(DatabaseIfc db) : base(new IfcCartesianPoint(db, 0, 0)) { }
 	}
 	[Serializable]
 	public partial class IfcCartesianTransformationOperator2DnonUniform : IfcCartesianTransformationOperator2D
 	{
 		private double mScale2 = double.NaN; //OPTIONAL REAL;
-		public double Scale2 { get { return mScale2; } set { mScale2 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
+		public double Scale2 { get { return double.IsNaN(mScale2) ? Scale : mScale2; } set { mScale2 = value; } }
 
 		internal IfcCartesianTransformationOperator2DnonUniform() : base() { }
 		internal IfcCartesianTransformationOperator2DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator2DnonUniform o, DuplicateOptions options) : base(db, o, options) { mScale2 = o.mScale2; }
+		public IfcCartesianTransformationOperator2DnonUniform(IfcCartesianPoint cp) : base(cp) { }
 	}
 	[Serializable]
 	public partial class IfcCartesianTransformationOperator3D : IfcCartesianTransformationOperator //SUPERTYPE OF(IfcCartesianTransformationOperator3DnonUniform)
@@ -341,11 +351,12 @@ namespace GeometryGym.Ifc
 		private double mScale2 = 1;// : OPTIONAL REAL;
 		private double mScale3 = 1;// : OPTIONAL REAL; 
 
-		public double Scale2 { get { return mScale2; } set { mScale2 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
-		public double Scale3 { get { return mScale3; } set { mScale3 = double.IsNaN(value) || Math.Abs(value) < 1e-12 ? 1 : value; } }
+		public double Scale2 { get { return (double.IsNaN(mScale2) ? Scale : mScale2); } set { mScale2 = value; } }
+		public double Scale3 { get { return double.IsNaN(mScale3) ? Scale : mScale3; } set { mScale3 = value; } }
 
 		internal IfcCartesianTransformationOperator3DnonUniform() { }
 		internal IfcCartesianTransformationOperator3DnonUniform(DatabaseIfc db, IfcCartesianTransformationOperator3DnonUniform o, DuplicateOptions options) : base(db, o, options) { mScale2 = o.mScale2; mScale3 = o.mScale3; }
+		public IfcCartesianTransformationOperator3DnonUniform(IfcCartesianPoint localOrigin) : base(localOrigin) { }
 	}
 	[Serializable]
 	public partial class IfcCenterLineProfileDef : IfcArbitraryOpenProfileDef
@@ -903,7 +914,12 @@ namespace GeometryGym.Ifc
 		public Dictionary<string, IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcComplexProperty() : base() { }
-		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p, DuplicateOptions options) : base(db, p, options) { mUsageName = p.mUsageName; foreach(IfcProperty prop in p.HasProperties.Values) addProperty( db.Factory.DuplicateProperty(prop)); }
+		internal IfcComplexProperty(DatabaseIfc db, IfcComplexProperty p, DuplicateOptions options) : base(db, p, options) 
+		{ 
+			mUsageName = p.mUsageName; 
+			foreach(IfcProperty prop in p.HasProperties.Values) 
+				addProperty(db.Factory.DuplicateProperty(prop, options)); 
+		}
 		public IfcComplexProperty(DatabaseIfc db, string name, string usageName) : base(db, name) { UsageName = usageName; }
 		public IfcComplexProperty(DatabaseIfc db, string name, string usageName, IEnumerable<IfcProperty> properties) : this(db, name, usageName) { foreach (IfcProperty p in properties) addProperty(p); }
 		
@@ -1003,7 +1019,7 @@ namespace GeometryGym.Ifc
 		internal IfcCompositeCurve() : base() { }
 		internal IfcCompositeCurve(DatabaseIfc db, IfcCompositeCurve c, DuplicateOptions options) : base(db, c, options)
 		{
-			Segments.AddRange(c.Segments.Select(x => db.Factory.Duplicate(x) as IfcSegment));
+			Segments.AddRange(c.Segments.Select(x => db.Factory.Duplicate(x, options)));
 			mSelfIntersect = c.mSelfIntersect;
 			IfcLinearElement linearElement = representationOf<IfcLinearElement>();
 			if (linearElement != null)
@@ -1038,7 +1054,7 @@ namespace GeometryGym.Ifc
 		public IfcBoundedCurve ParentCurve { get { return mParentCurve as IfcBoundedCurve; } set { mParentCurve = value; } }
 
 		internal IfcCompositeCurveSegment() : base() { }
-		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s, DuplicateOptions options) : base(db, s, options) { mSameSense = s.mSameSense; mParentCurve = db.Factory.Duplicate(s.mParentCurve) as IfcCurve; }
+		internal IfcCompositeCurveSegment(DatabaseIfc db, IfcCompositeCurveSegment s, DuplicateOptions options) : base(db, s, options) { mSameSense = s.mSameSense; mParentCurve = db.Factory.Duplicate(s.mParentCurve, options); }
 		public IfcCompositeCurveSegment(IfcTransitionCode tc, bool sense, IfcBoundedCurve bc) : base(bc.mDatabase, tc) { mSameSense = sense;  ParentCurve = bc; }
 	}
 	[Serializable]
@@ -1147,7 +1163,7 @@ namespace GeometryGym.Ifc
 
 		protected IfcConic() : base() { }
 		protected IfcConic(IfcAxis2Placement ap) : base(ap.Database) { mPosition = ap; }
-		protected IfcConic(DatabaseIfc db, IfcConic c, DuplicateOptions options) : base(db, c, options) { Position = db.Factory.Duplicate(c.mPosition) as IfcAxis2Placement; }
+		protected IfcConic(DatabaseIfc db, IfcConic c, DuplicateOptions options) : base(db, c, options) { Position = db.Factory.Duplicate(c.mPosition, options); }
 	}
 	[Serializable]
 	public partial class IfcConnectedFaceSet : IfcTopologicalRepresentationItem //SUPERTYPE OF (ONEOF (IfcClosedShell ,IfcOpenShell))
@@ -1156,7 +1172,10 @@ namespace GeometryGym.Ifc
 		public SET<IfcFace> CfsFaces { get { return mCfsFaces; } }
 
 		internal IfcConnectedFaceSet() : base() { }
-		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c, DuplicateOptions options) : base(db, c, options) { CfsFaces.AddRange(c.CfsFaces.ConvertAll(x=>db.Factory.Duplicate(x) as IfcFace)); }
+		internal IfcConnectedFaceSet(DatabaseIfc db, IfcConnectedFaceSet c, DuplicateOptions options) : base(db, c, options) 
+		{ 
+			CfsFaces.AddRange(c.CfsFaces.ConvertAll(x=>db.Factory.Duplicate(x, options))); 
+		}
 		public IfcConnectedFaceSet(IEnumerable<IfcFace> faces) : base(faces.First().mDatabase) { mCfsFaces.AddRange(faces); }
 
 		protected override List<T> Extract<T>(Type type)
@@ -1479,7 +1498,7 @@ namespace GeometryGym.Ifc
 			mPhase = c.mPhase;
 			RepresentationContexts.AddRange(c.RepresentationContexts.ConvertAll(x => db.Factory.Duplicate(x, options) as IfcRepresentationContext));
 			if (c.mUnitsInContext != null)
-				UnitsInContext = db.Factory.Duplicate(c.UnitsInContext) as IfcUnitAssignment;
+				UnitsInContext = db.Factory.Duplicate(c.UnitsInContext, options);
 			if(options.DuplicateDownstream)
 			{
 				foreach(IfcRelDeclares declares in c.Declares)
@@ -1694,7 +1713,11 @@ namespace GeometryGym.Ifc
 		public IfcMeasureWithUnit ConversionFactor { get { return mConversionFactor; } set { mConversionFactor = value; } }
 		
 		internal IfcConversionBasedUnit() : base() { }
-		internal IfcConversionBasedUnit(DatabaseIfc db, IfcConversionBasedUnit u) : base(db,u) { mName = u.mName; ConversionFactor = db.Factory.Duplicate( u.ConversionFactor); }
+		internal IfcConversionBasedUnit(DatabaseIfc db, IfcConversionBasedUnit u, DuplicateOptions options) : base(db, u, options) 
+		{
+			mName = u.mName; 
+			ConversionFactor = db.Factory.Duplicate(u.ConversionFactor, options); 
+		}
 		public IfcConversionBasedUnit(IfcUnitEnum unit, string name, IfcMeasureWithUnit mu)
 			: base(mu.mDatabase, unit, true) { Name = name.Replace("'", ""); mConversionFactor = mu; }
 		protected override void initialize()
@@ -1732,7 +1755,7 @@ namespace GeometryGym.Ifc
 		public double ConversionOffset { get { return mConversionOffset; } set { mConversionOffset = value; } }
 		
 		internal IfcConversionBasedUnitWithOffset() : base() { }
-		internal IfcConversionBasedUnitWithOffset(DatabaseIfc db, IfcConversionBasedUnitWithOffset u) : base(db,u) { mConversionOffset = u.mConversionOffset; }
+		internal IfcConversionBasedUnitWithOffset(DatabaseIfc db, IfcConversionBasedUnitWithOffset u, DuplicateOptions options) : base(db, u, options) { mConversionOffset = u.mConversionOffset; }
 		public IfcConversionBasedUnitWithOffset(IfcUnitEnum unit, string name, IfcMeasureWithUnit mu, double offset)
 			: base(unit, name, mu) { mConversionOffset = offset; }
 	}
@@ -1875,9 +1898,9 @@ namespace GeometryGym.Ifc
 
 		internal IfcCostItem() : base() { } 
 		internal IfcCostItem(DatabaseIfc db, IfcCostItem i, DuplicateOptions options) : base(db, i, options) { PredefinedType = i.PredefinedType; }
-		internal IfcCostItem(IfcCostSchedule s, IfcCostItemTypeEnum t)
+		public IfcCostItem(IfcCostSchedule s, IfcCostItemTypeEnum t)
 			: base(s.mDatabase) { s.AddAggregated(this); PredefinedType = t; }
-		internal IfcCostItem(IfcCostItem i, IfcCostItemTypeEnum t)
+		public IfcCostItem(IfcCostItem i, IfcCostItemTypeEnum t)
 			: base(i.mDatabase) { i.AddNested(this); PredefinedType = t; }
 	}
 	[Serializable]
@@ -2283,13 +2306,13 @@ namespace GeometryGym.Ifc
 		public bool ModelOrDraughting { get { return mModelOrDraughting == IfcLogicalEnum.TRUE; } set { mModelOrDraughting = value ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE; } }
 
 		internal IfcCurveStyle() : base() { }
-		internal IfcCurveStyle(DatabaseIfc db, IfcCurveStyle s) : base(db,s)
+		internal IfcCurveStyle(DatabaseIfc db, IfcCurveStyle s, DuplicateOptions options) : base(db, s, options)
 		{
 			if(s.mCurveFont != null)
-				CurveFont = db.Factory.Duplicate<IfcCurveFontOrScaledCurveFontSelect>(s.mCurveFont);
+				CurveFont = db.Factory.Duplicate(s.mCurveFont, options);
 			mCurveWidth = s.mCurveWidth;
 			if(s.mCurveColour != null)
-				CurveColour = db.Factory.Duplicate<IfcColour>(s.mCurveColour);
+				CurveColour = db.Factory.Duplicate(s.mCurveColour, options);
 			mModelOrDraughting = s.mModelOrDraughting;
 		}
 		public IfcCurveStyle(DatabaseIfc db) : base(db) { }

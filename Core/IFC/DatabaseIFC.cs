@@ -65,6 +65,7 @@ namespace GeometryGym.Ifc
 		[Obsolete("Obsolete", false)] IFC4X3_RC3,
 		[Obsolete("Obsolete", false)] IFC4X3_RC4, 
 		IFC4X3,
+		IFC4X3_TC1,
 		/// <summary>
 		/// Development version of Standard, not yet to be used for Production 
 		/// </summary>
@@ -515,9 +516,8 @@ namespace GeometryGym.Ifc
 		{
 			if (obj == null || obj.mDatabase == null)
 				return 0;
-			int result = 0;
 			string keyValue = key(obj);
-			mDictionary.TryGetValue(keyValue, out result);
+			mDictionary.TryGetValue(keyValue, out int result);
 			return result;
 		}
 		internal void AddObject(BaseClassIfc obj, int index) 
@@ -739,6 +739,10 @@ namespace GeometryGym.Ifc
 					return result;
 			}
 
+			result = obj.DuplicateCommon(mDatabase, options) as T;
+			if (result != null)
+				return result;
+
 			if(entity is IfcClassification classification)
 				result = findExistingClassification(classification) as T;
 			else if(entity is IfcClassificationReference classificationReference)
@@ -788,11 +792,14 @@ namespace GeometryGym.Ifc
 			{
 				if (mDatabase.mDictionary.TryGetValue(obj.mGlobalId, out BaseClassIfc existing))
 				{
-					result = existing as T;
-					if (result != null)
+					if (string.Compare(existing.StepClassName, entity.StepClassName, true) == 0)
 					{
-						mDuplicateMapping.AddObject(obj, result.StepId);
-						return result;
+						result = existing as T;
+						if (result != null)
+						{
+							mDuplicateMapping.AddObject(obj, result.StepId);
+							return result;
+						}
 					}
 				}
 			}
@@ -833,7 +840,7 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
-		private BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
+		internal BaseClassIfc duplicateWorker(BaseClassIfc entity, DuplicateOptions options)
 		{
 			BaseClassIfc result = null;
 			if (entity.mDatabase == null || mDatabase.Release != entity.mDatabase.Release)
@@ -892,10 +899,11 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
-		
-		public T DuplicateProperty<T>(T property) where T : IfcProperty { return duplicateProperty(property) as T; }
-		public IfcProperty DuplicateProperty(IfcProperty property) { return duplicateProperty(property); }
-		private IfcProperty duplicateProperty(IfcProperty property)
+		public T DuplicateProperty<T>(T property) where T : IfcProperty { return duplicateProperty(property, new DuplicateOptions(mDatabase.Tolerance)) as T; }
+		public T DuplicateProperty<T>(T property, DuplicateOptions options) where T : IfcProperty { return duplicateProperty(property, options) as T; }
+		public IfcProperty DuplicateProperty(IfcProperty property) { return duplicateProperty(property, new DuplicateOptions(mDatabase.Tolerance)); }
+		public IfcProperty DuplicateProperty(IfcProperty property, DuplicateOptions options) { return duplicateProperty(property, options); }
+		private IfcProperty duplicateProperty(IfcProperty property, DuplicateOptions options)
 		{
 			int index = mDuplicateMapping.FindExisting(property);
 			if (index > 0)
@@ -923,7 +931,7 @@ namespace GeometryGym.Ifc
 					psv.NominalValue = val; 
 				return result;
 			}
-			result = Duplicate(property, new DuplicateOptions(mDatabase.Tolerance) { DuplicateDownstream = true }) as IfcProperty;
+			result = Duplicate(property, new DuplicateOptions(options) { DuplicateDownstream = true });
 			if (psv != null && val != null)
 				psv.NominalValue = val; 
 			mProperties[stepString] = result;
@@ -967,7 +975,7 @@ namespace GeometryGym.Ifc
 			foreach (IfcProperty property in propertySet.HasProperties.Values)
 			{
 				if (!options.IgnoredPropertyNames.Contains(property.Name))
-					properties.Add(duplicateProperty(property));
+					properties.Add(duplicateProperty(property, options));
 
 			}
 			if (options.CommonPropertySets)
@@ -1619,10 +1627,11 @@ namespace GeometryGym.Ifc
 		public IfcOwnerHistory OwnerHistory(IfcChangeActionEnum action, IfcRoot original, IfcRoot revision)
 		{
 			IfcOwnerHistory ownerHistory = (original == null ? null : original.OwnerHistory), revised = (revision == null ? null : revision.OwnerHistory);
+			DuplicateOptions options = new DuplicateOptions(mDatabase.Tolerance);
 			if (ownerHistory == null && original != null)
 				return null;
 			else if (ownerHistory != null && ownerHistory.mDatabase != mDatabase)
-				ownerHistory = Duplicate(ownerHistory) as IfcOwnerHistory;
+				ownerHistory = Duplicate(ownerHistory, options);
 			IfcPersonAndOrganization owner = ownerHistory == null ? PersonOrganization : ownerHistory.OwningUser;
 			IfcApplication owningApplication = ownerHistory == null ? Application : ownerHistory.OwningApplication;
 			DateTime created = ownerHistory == null ? DateTime.UtcNow : ownerHistory.CreationDate;
@@ -1636,12 +1645,12 @@ namespace GeometryGym.Ifc
 				else if (ownerHistory != null)
 				{
 					if (revised.OwningUser.isDuplicate(ownerHistory.OwningUser))
-						modifier = Duplicate(ownerHistory.OwningUser);
+						modifier = Duplicate(ownerHistory.OwningUser, options);
 					else
-						modifier = Duplicate(revised.OwningUser);
+						modifier = Duplicate(revised.OwningUser, options);
 				}
 				else
-					modifier = Duplicate(revised.OwningUser);
+					modifier = Duplicate(revised.OwningUser, options);
 			}
 			IfcApplication application = null;
 			if (revised == null)
@@ -1649,12 +1658,12 @@ namespace GeometryGym.Ifc
 			else if (ownerHistory != null)
 			{
 				if (revised.OwningApplication.isDuplicate(ownerHistory.OwningApplication))
-					application = Duplicate(ownerHistory.OwningApplication);
+					application = Duplicate(ownerHistory.OwningApplication, options);
 				else
-					application = Duplicate(revised.OwningApplication);
+					application = Duplicate(revised.OwningApplication, options);
 			}
 			else
-				application = Duplicate(revised.OwningApplication);
+				application = Duplicate(revised.OwningApplication, options);
 			DateTime modified = (revised == null ? (action == IfcChangeActionEnum.ADDED ? DateTime.MinValue : DateTime.Now) : revised.CreationDate);
 			return OwnerHistory(action, owner, owningApplication, modifier, application, modified, created);
 		}
@@ -1885,20 +1894,23 @@ namespace GeometryGym.Ifc
 		}
 	}
 
-	public class DuplicateOptions
+	public partial class DuplicateOptions
 	{
 		public bool DuplicateHost { get; set; } 
 		public bool DuplicateDownstream { get; set; }
 		public bool DuplicateProperties { get; set; } = true;
 		public bool CommonPropertySets { get; set; } = true;
+		public bool CommonGeometry { get; set; } = false;
 		public bool DuplicateAssociations { get; set; } = true;
 		public bool DuplicateRepresentation { get; set; } = true;
+		public bool DuplicateAxisRepresentations { get; set; } = true;
 		public bool DuplicatePresentationStyling { get; set; } = true;
 		public double DeviationTolerance { get; set; }
 		public IfcOwnerHistory OwnerHistory { get; set; }
 		public bool DuplicateOwnerHistory { get; set; } = true;
 
 		public HashSet<string> IgnoredPropertyNames = new HashSet<string>();
+		internal DuplicateCommonDictionaries mCommonObjects = new DuplicateCommonDictionaries();
 
 		public DuplicateOptions(double deviationTolerance) 
 		{
@@ -1912,8 +1924,10 @@ namespace GeometryGym.Ifc
 			DuplicateDownstream = options.DuplicateDownstream;
 			DuplicateProperties = options.DuplicateProperties;
 			CommonPropertySets = options.CommonPropertySets;
+			CommonGeometry = options.CommonGeometry;
 			DuplicateAssociations = options.DuplicateAssociations;
 			DuplicateRepresentation = options.DuplicateRepresentation;
+			DuplicateAxisRepresentations = options.DuplicateAxisRepresentations;
 			DuplicatePresentationStyling = options.DuplicatePresentationStyling;
 			DeviationTolerance = options.DeviationTolerance;
 			OwnerHistory = options.OwnerHistory;
@@ -1921,7 +1935,40 @@ namespace GeometryGym.Ifc
 
 			foreach(string propertyName in options.IgnoredPropertyNames)
 				IgnoredPropertyNames.Add(propertyName);
+
+			mCommonObjects = options.mCommonObjects;
 		}
+	}
+	internal class DuplicateCommonDictionaries
+	{
+		internal Dictionary<string, IfcCartesianPoint> mPoints = new Dictionary<string, IfcCartesianPoint>();
+		internal Dictionary<string, IfcVector> mVectors = new Dictionary<string, IfcVector>();
+
+		internal Dictionary<string, IfcLine> mLines = new Dictionary<string, IfcLine>();
+		internal Dictionary<string, IfcCircle> mCircles = new Dictionary<string, IfcCircle>();
+		internal Dictionary<string, IfcPolyline> mPolylines = new Dictionary<string, IfcPolyline>();
+		internal Dictionary<string, IfcCompositeCurve> mCompositeCurves = new Dictionary<string, IfcCompositeCurve>();
+		internal Dictionary<string, IfcCompositeCurveSegment> mCompositeCurveSegments = new Dictionary<string, IfcCompositeCurveSegment>();
+		internal Dictionary<string, IfcTrimmedCurve> mTrimmedCurves = new Dictionary<string, IfcTrimmedCurve>();
+
+		internal Dictionary<string, IfcPolyLoop> mLoops = new Dictionary<string, IfcPolyLoop>();
+		internal Dictionary<string, IfcFaceBound> mFaceBounds = new Dictionary<string, IfcFaceBound>();
+		internal Dictionary<string, IfcFace> mFaces = new Dictionary<string, IfcFace>();
+		internal Dictionary<string, IfcConnectedFaceSet> mFaceSets = new Dictionary<string, IfcConnectedFaceSet>();
+
+		internal Dictionary<string, IfcAxis2Placement3D> mPlacements3D = new Dictionary<string, IfcAxis2Placement3D>();
+		internal Dictionary<string, IfcAxis2Placement2D> mPlacements2D = new Dictionary<string, IfcAxis2Placement2D>();
+
+		internal Dictionary<string, IfcMaterialLayer> mMaterialLayers = new Dictionary<string, IfcMaterialLayer>();
+		internal Dictionary<string, IfcMaterialLayerSet> mMaterialLayerSets = new Dictionary<string, IfcMaterialLayerSet>();
+		internal Dictionary<string, IfcMaterialLayerSetUsage> mMaterialLayerSetUsages = new Dictionary<string, IfcMaterialLayerSetUsage>();
+
+		internal Dictionary<string, IfcProfileDef> mProfiles = new Dictionary<string, IfcProfileDef>();
+
+		internal Dictionary<string, IfcColourRgb> mColours = new Dictionary<string, IfcColourRgb>(); 
+		internal Dictionary<string, IfcPresentationStyle> mPresentationStyles = new Dictionary<string, IfcPresentationStyle>(); 
+		internal Dictionary<string, IfcPresentationStyleAssignment> mPresentationStyleAssignments = new Dictionary<string, IfcPresentationStyleAssignment>(); 
+		internal DuplicateCommonDictionaries() { }
 	}
 	public class ApplicableFilter
 	{
@@ -1936,8 +1983,8 @@ namespace GeometryGym.Ifc
 			{
 				if (string.IsNullOrEmpty(str))
 					continue;
-				string[] pair = str.Trim().Split("/".ToCharArray());
-				string typename = (pair == null ? str.Trim() : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[0];
+				string[] pair = str.Trim().Split("/.".ToCharArray());
+				string typename = (pair == null ? str.Trim() : pair[0]), predefined = pair == null || pair.Length < 2 ? "" : pair[1];
 				Type type = BaseClassIfc.GetType(typename); 
 				if (type == null)
 					continue;
@@ -2819,7 +2866,7 @@ namespace GeometryGym.Ifc
 			if (release == ReleaseVersion.IFC4A1 || release == ReleaseVersion.IFC4A2)
 				version = "IFC4";
 			else if (release == ReleaseVersion.IFC4X4_DRAFT)
-				version = "IFC4X4_17239AAA";
+				version = "IFC4X4_B072BCCA";
 			lines.Add("FILE_SCHEMA (('" + version + "'));");
 			lines.Add("ENDSEC;");
 			lines.Add("");
