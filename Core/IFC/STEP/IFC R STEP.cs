@@ -1103,10 +1103,11 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + ",#" + mRelatingElement.StepId + ",#" + mRelatedElement.StepId +
-				(mInterferenceGeometry == null ? ",$" : ",#" + mInterferenceGeometry.StepId) + 
+				(mInterferenceGeometry == null ? ",$" : ",#" + mInterferenceGeometry.StepId) +
+				(release == ReleaseVersion.IFC4X3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "") +
 				(string.IsNullOrEmpty( mInterferenceType) ? ",$," : ",'" + ParserSTEP.Encode(mInterferenceType) + "',") + 
 				ParserIfc.LogicalToString(mImpliedOrder) +
-				(release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "");
+				(release != ReleaseVersion.IFC4X3 && release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -1114,9 +1115,11 @@ namespace GeometryGym.Ifc
 			RelatingElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			RelatedElement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcInterferenceSelect;
 			InterferenceGeometry =dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcConnectionGeometry;
+			if(release == ReleaseVersion.IFC4X3)
+				mInterferenceSpace = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialZone;
 			mInterferenceType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mImpliedOrder = ParserIfc.StripLogical(str, ref pos, len);
-			if (release > ReleaseVersion.IFC4X3_RC3)
+			if (release != ReleaseVersion.IFC4X3 && release > ReleaseVersion.IFC4X3_RC3)
 				mInterferenceSpace = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcSpatialZone;
 		}
 	}
@@ -1575,8 +1578,9 @@ namespace GeometryGym.Ifc
 		}
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			string name = Name;
 			return "'" + mGlobalId + (mOwnerHistory == null ? "',$" : "',#" + mOwnerHistory.StepId) + 
-				(string.IsNullOrEmpty(mName) ? ",$," :  ",'" + ParserSTEP.Encode(mName) + "',") + 
+				(string.IsNullOrEmpty(name) ? ",$," :  ",'" + ParserSTEP.Encode(name) + "',") + 
 				(string.IsNullOrEmpty(mDescription) ? "$" : "'" + ParserSTEP.Encode(mDescription) + "'");
 		}
 	}

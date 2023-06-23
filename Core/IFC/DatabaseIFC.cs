@@ -120,7 +120,7 @@ namespace GeometryGym.Ifc
 
 	public partial class DatabaseIfc : DatabaseSTEP<BaseClassIfc>
 	{
-		internal string id = ParserIfc.EncodeGuid(Guid.NewGuid());
+		internal string id { private set; get; }
 
 		private bool mIsDisposed = false;
 		internal bool IsDisposed() { return mIsDisposed; }
@@ -134,7 +134,11 @@ namespace GeometryGym.Ifc
 		private FactoryIfc mFactory = null;
 		public FactoryIfc Factory { get { return mFactory; } }
 
-		public DatabaseIfc() : base() { mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; }
+		public DatabaseIfc() : base() 
+		{
+			id = ParserIfc.EncodeGuid(Guid.NewGuid());
+			mFactory = new FactoryIfc(this); Format = FormatIfcSerialization.STEP; 
+		}
 		public DatabaseIfc(string filePath) : this() 
 		{
 			SourceFilePath = filePath;
@@ -193,7 +197,7 @@ namespace GeometryGym.Ifc
 
 			
 				base[index] = value;
-				if(value != null)
+				if (value != null)
 					value.mDatabase = this;
 			}
 		}
@@ -1729,7 +1733,7 @@ namespace GeometryGym.Ifc
 			//	identifier = "PVI";
 			//	projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
 			//}
-			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox)
+			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Box)
 			{
 				projection = IfcGeometricProjectionEnum.MODEL_VIEW;
 				identifier = "Box";

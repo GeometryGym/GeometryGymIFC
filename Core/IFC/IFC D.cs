@@ -88,8 +88,8 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelAssociatesDataset> DatasetRefForObjects { get { return mDatasetRefForObjects; } }
 
 		internal IfcDatasetReference() : base() { }
-		internal IfcDatasetReference(DatabaseIfc db, IfcDatasetReference r)
-			: base(db, r) { mDescription = r.mDescription; mReferencedDataset = db.Factory.Duplicate(r.ReferencedDataset); mFilter = r.mFilter; }
+		internal IfcDatasetReference(DatabaseIfc db, IfcDatasetReference r, DuplicateOptions options)
+			: base(db, r, options) { mDescription = r.mDescription; mReferencedDataset = db.Factory.Duplicate(r.ReferencedDataset, options); mFilter = r.mFilter; }
 		 public IfcDatasetReference(IfcDatasetInformation referencedDataset) : base(referencedDataset.Database) { ReferencedDataset = referencedDataset; }
 		 public IfcDatasetReference(DatabaseIfc db, string name) : base(db) { Name = name; }
 		
@@ -690,11 +690,11 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelAssociatesDocument> DocumentForObjects { get { return mDocumentRefForObjects; } }
 
 		internal IfcDocumentReference() : base() { }
-		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r) : base(db,r) 
+		internal IfcDocumentReference(DatabaseIfc db, IfcDocumentReference r, DuplicateOptions options) : base(db, r, options) 
 		{
 			mDescription = r.mDescription; 
 			if(r.mReferencedDocument != null)
-				ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument) as IfcDocumentInformation; 
+				ReferencedDocument = db.Factory.Duplicate(r.ReferencedDocument, options); 
 		}
 		public IfcDocumentReference(DatabaseIfc db) : base(db) { }
 

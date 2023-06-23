@@ -1114,28 +1114,28 @@ namespace GeometryGym.Ifc
 	public partial class IfcExternallyDefinedHatchStyle : IfcExternalReference, IfcFillStyleSelect
 	{
 		internal IfcExternallyDefinedHatchStyle() : base() { }
-		internal IfcExternallyDefinedHatchStyle(DatabaseIfc db, IfcExternallyDefinedHatchStyle s) : base(db, s) { }
+		internal IfcExternallyDefinedHatchStyle(DatabaseIfc db, IfcExternallyDefinedHatchStyle s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcExternallyDefinedHatchStyle(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcExternallyDefinedSurfaceStyle : IfcExternalReference, IfcSurfaceStyleElementSelect
 	{
 		internal IfcExternallyDefinedSurfaceStyle() : base() { }
-		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db, IfcExternallyDefinedSurfaceStyle s) : base(db, s) { }
+		internal IfcExternallyDefinedSurfaceStyle(DatabaseIfc db, IfcExternallyDefinedSurfaceStyle s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcExternallyDefinedSurfaceStyle(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable, Obsolete("DELETED IFC4", false)]
 	public partial class IfcExternallyDefinedSymbol : IfcExternalReference, IfcDefinedSymbolSelect
 	{
 		internal IfcExternallyDefinedSymbol() : base() { }
-		internal IfcExternallyDefinedSymbol(DatabaseIfc db, IfcExternallyDefinedTextFont f) : base(db, f) { }
+		internal IfcExternallyDefinedSymbol(DatabaseIfc db, IfcExternallyDefinedTextFont f, DuplicateOptions options) : base(db, f, options) { }
 		public IfcExternallyDefinedSymbol(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcExternallyDefinedTextFont : IfcExternalReference, IfcTextFontSelect
 	{
 		internal IfcExternallyDefinedTextFont() : base() { }
-		internal IfcExternallyDefinedTextFont(DatabaseIfc db, IfcExternallyDefinedTextFont f) : base(db, f) { }
+		internal IfcExternallyDefinedTextFont(DatabaseIfc db, IfcExternallyDefinedTextFont f, DuplicateOptions options) : base(db, f, options) { }
 		public IfcExternallyDefinedTextFont(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -1157,8 +1157,8 @@ namespace GeometryGym.Ifc
 		public SET<IfcExternalReferenceRelationship> ExternalReferenceForResources { get { return mExternalReferenceForResources; } }
 
 		protected IfcExternalReference() : base() { }
-		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r) 
-			: base(db,r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
+		protected IfcExternalReference(DatabaseIfc db, IfcExternalReference r, DuplicateOptions options) 
+			: base(db, r) { mLocation = r.mLocation; mIdentification = r.mIdentification; mName = r.mName; }
 		protected IfcExternalReference(DatabaseIfc db) : base(db) { }
 		protected override void initialize()
 		{

@@ -551,7 +551,7 @@ namespace GeometryGym.Ifc
 		public IfcShapeRepresentation(IfcAdvancedBrep brep) : base(brep) { RepresentationType = ShapeRepresentationType.AdvancedBrep.ToString(); }
 		public IfcShapeRepresentation(IfcAnnotationFillArea area) : base(area.mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.PlanSymbol2d), area) { RepresentationType = ShapeRepresentationType.FillArea.ToString(); }
 		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? ShapeRepresentationType.Clipping.ToString() : ShapeRepresentationType.CSG.ToString(); }
-		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.BoundingBox), boundingBox) { RepresentationType = ShapeRepresentationType.BoundingBox.ToString(); }
+		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Box), boundingBox) { RepresentationType = ShapeRepresentationType.BoundingBox.ToString(); }
 		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
 		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
 		public IfcShapeRepresentation(IfcCurve curve) : base(curve) { RepresentationType = ShapeRepresentationType.Curve.ToString(); }
@@ -591,7 +591,7 @@ namespace GeometryGym.Ifc
 		public IfcShapeRepresentation(IfcSectionedSolid sectionedSolid) : base(sectionedSolid) { RepresentationType = ShapeRepresentationType.SectionedSpine.ToString(); }
 		public IfcShapeRepresentation(IfcSolidModel solid) : base(solid)
 		{
-			//ABSTRACT SUPERTYPE OF (ONEOF(IfcCsgSolid ,IfcManifoldSolidBrep,IfcSweptAreaSolid,IfcSweptDiskSolid))
+			RepresentationType = ShapeRepresentationType.SolidModel.ToString();
 			IfcCsgSolid cs = solid as IfcCsgSolid;
 			if (cs != null)
 				RepresentationType = ShapeRepresentationType.CSG.ToString(); 
@@ -2565,7 +2565,8 @@ namespace GeometryGym.Ifc
 		public IfcReflectanceMethodEnum ReflectanceMethod { get { return mReflectanceMethod; } set { mReflectanceMethod = value; } }
 
 		internal IfcSurfaceStyleRendering() : base() { }
-		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r, DuplicateOptions options) : base(db, r, options)
+		internal IfcSurfaceStyleRendering(DatabaseIfc db, IfcSurfaceStyleRendering r, DuplicateOptions options)
+			: base(db, r, options)
 		{
 			IfcColourRgb colourRgb = r.mDiffuseColour as IfcColourRgb;
 			if (colourRgb != null)
@@ -2614,7 +2615,7 @@ namespace GeometryGym.Ifc
 		internal IfcSurfaceStyleShading() : base() { }
 		internal IfcSurfaceStyleShading(DatabaseIfc db, IfcSurfaceStyleShading s, DuplicateOptions options) : base(db,s, options) 
 		{
-			SurfaceColour = db.Factory.Duplicate(s.SurfaceColour, options) as IfcColourRgb;
+			SurfaceColour = db.Factory.Duplicate(s.SurfaceColour, options);
 			mTransparency = s.mTransparency;
 		}
 		public IfcSurfaceStyleShading(IfcColourRgb surfaceColour) : base(surfaceColour.mDatabase) { SurfaceColour = surfaceColour; }
@@ -2707,7 +2708,7 @@ namespace GeometryGym.Ifc
 			mEndParam = s.mEndParam; 
 		}
 		public IfcSweptDiskSolid(IfcCurve directrix, double radius) : base(directrix.mDatabase) { Directrix = directrix; mRadius = radius; }
-		public IfcSweptDiskSolid(IfcCurve directrix, double radius, double innerRadius) : base(directrix.mDatabase) { Directrix = directrix; mRadius = radius; mInnerRadius = innerRadius; }
+		public IfcSweptDiskSolid(IfcCurve directrix, double radius, double innerRadius) : this(directrix, radius) { mInnerRadius = innerRadius; }
 	}
 	[Serializable]
 	public partial class IfcSweptDiskSolidPolygonal : IfcSweptDiskSolid

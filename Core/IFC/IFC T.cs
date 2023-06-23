@@ -440,6 +440,11 @@ namespace GeometryGym.Ifc
 		public IfcPlanarExtent Extent { get { return mExtent; } set { mExtent = value; } }
 
 		internal IfcTextLiteralWithExtent() : base() { }
+		internal IfcTextLiteralWithExtent(DatabaseIfc db, IfcTextLiteralWithExtent s, DuplicateOptions options) : base(db, s, options)
+		{
+			mExtent = db.Factory.Duplicate(s.mExtent);
+			mBoxAlignment = s.mBoxAlignment;
+		}
 		public IfcTextLiteralWithExtent(string literal, IfcAxis2Placement placement, IfcTextPath path, IfcPlanarExtent extent, IfcBoxAlignment alignment)
 			: base(literal, placement, path)
 		{
@@ -454,6 +459,10 @@ namespace GeometryGym.Ifc
 		internal IfcTextStyleSelect mTextStyle;// : OPTIONAL IfcTextStyleSelect;
 		internal IfcTextFontSelect mTextFontStyle;// : IfcTextFontSelect; 
 		internal bool mModelOrDraughting = true;//	:	OPTIONAL BOOLEAN; IFC4CHANGE
+
+		public IfcCharacterStyleSelect TextCharacterAppearance { get { return mTextCharacterAppearance; } set { mTextCharacterAppearance = value; } }
+		public IfcTextStyleSelect TextStyle { get { return mTextStyle; } set { mTextStyle = value; } }
+		public IfcTextFontSelect TextFontStyle { get { return mTextFontStyle; } set { mTextFontStyle = value; } }
 		internal IfcTextStyle() : base() { }
 		internal IfcTextStyle(DatabaseIfc db, IfcTextStyle v, DuplicateOptions options) : base(db, v, options) 
 		{
@@ -462,15 +471,23 @@ namespace GeometryGym.Ifc
 			mTextFontStyle = db.Factory.Duplicate(v.mTextFontStyle, options);
 			mModelOrDraughting = v.mModelOrDraughting; 
 		}
+		public IfcTextStyle(IfcTextFontSelect style) : base(style.Database)
+		{
+			mTextFontStyle = style;
+		}
 	}
 	[Serializable]
 	public partial class IfcTextStyleFontModel : IfcPreDefinedTextFont
 	{
-		internal List<string> mFontFamily = new List<string>(1);// : OPTIONAL LIST [1:?] OF IfcTextFontName;
+		internal List<string> mFontFamily = new List<string>(1);// : LIST [1:?] OF IfcTextFontName;
 		internal string mFontStyle = "";// : OPTIONAL IfcFontStyle; ['normal','italic','oblique'];
 		internal string mFontVariant = "";// : OPTIONAL IfcFontVariant; ['normal','small-caps'];
 		internal string mFontWeight = "";// : OPTIONAL IfcFontWeight; // ['normal','small-caps','100','200','300','400','500','600','700','800','900'];
 		internal IfcSizeSelect mFontSize = null;// : IfcSizeSelect; IfcSizeSelect = SELECT (IfcRatioMeasure ,IfcLengthMeasure ,IfcDescriptiveMeasure ,IfcPositiveLengthMeasure ,IfcNormalisedRatioMeasure ,IfcPositiveRatioMeasure);
+		public List<string> FontFamily { get { return mFontFamily; } }
+		public string FontStyle { get { return mFontStyle; } set { mFontStyle = value; } }
+		public string FontVariant { get { return mFontVariant; } set { mFontVariant = value; } }
+		public string FontWeight { get { return mFontWeight; } set { mFontWeight = value; } }
 		internal IfcTextStyleFontModel() : base() { }
 		internal IfcTextStyleFontModel(DatabaseIfc db, IfcTextStyleFontModel m, DuplicateOptions options) : base(db, m, options)
 		{
@@ -480,9 +497,11 @@ namespace GeometryGym.Ifc
 			mFontWeight = m.mFontWeight;
 			mFontSize = m.mFontSize;
 		}
-		public IfcTextStyleFontModel(DatabaseIfc db, string name, IfcSizeSelect size) : base(db, name)
+		public IfcTextStyleFontModel(DatabaseIfc db, string name, IEnumerable<string> fontFamily, IfcSizeSelect size) : base(db, name)
 		{
-			mFontSize = size; 
+			if (fontFamily != null)
+				mFontFamily.AddRange(fontFamily);
+			mFontSize = size;
 		}
 	}
 	[Serializable]
@@ -491,7 +510,13 @@ namespace GeometryGym.Ifc
 		internal IfcColour mColour;// : IfcColour;
 		internal IfcColour mBackgroundColour;// : OPTIONAL IfcColour;
 		internal IfcTextStyleForDefinedFont() : base() { }
-		//	internal IfcTextStyleForDefinedFont(IfcTextStyleForDefinedFont o) : base() { mColour = o.mColour; mBackgroundColour = o.mBackgroundColour; }
+		internal IfcTextStyleForDefinedFont(DatabaseIfc db, IfcTextStyleForDefinedFont s, DuplicateOptions options) : base(db, s, options)
+		{
+			mColour = db.Factory.Duplicate(s.mColour, options);
+			if (s.mBackgroundColour != null)
+				mBackgroundColour = db.Factory.Duplicate(s.mBackgroundColour, options);
+		}
+		public IfcTextStyleForDefinedFont(IfcColour colour) : base(colour.Database) { mColour = colour; }
 	}
 	public interface IfcTextStyleSelect : IBaseClassIfc { } // SELECT(IfcTextStyleWithBoxCharacteristics, IfcTextStyleTextModel);
 	[Serializable]

@@ -416,6 +416,7 @@ namespace GeometryGym.Ifc
 			PredefinedType = r.PredefinedType;
 			mRestartDistance = r.mRestartDistance;
 		}
+		public IfcReferent(DatabaseIfc db) : base(db) { }
 		public IfcReferent(IfcAlignment alignment) : base(alignment.Database)
 		{
 			IfcRelNests relNests = alignment.IsNestedBy.Where(x => x.RelatedObjects.FirstOrDefault() is IfcReferent).FirstOrDefault();

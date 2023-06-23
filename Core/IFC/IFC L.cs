@@ -184,7 +184,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcRelAssociatesLibrary> LibraryRefForObjects { get { return mLibraryRefForObjects; } }
 
 		internal IfcLibraryReference() : base() { }
-		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r) : base(db, r) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
+		internal IfcLibraryReference(DatabaseIfc db, IfcLibraryReference r, DuplicateOptions options) : base(db, r, options) { mDescription = r.mDescription; mLanguage = r.mLanguage; ReferencedLibrary = db.Factory.Duplicate(r.ReferencedLibrary) as IfcLibraryInformation; }
 		public IfcLibraryReference(DatabaseIfc db) : base(db) { }
 		public IfcLibraryReference(IfcLibraryInformation referenced) : base(referenced.mDatabase) { ReferencedLibrary = referenced; }
 	}

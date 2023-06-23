@@ -555,7 +555,7 @@ namespace GeometryGym.Ifc
 			BasisCurve = db.Factory.Duplicate(e.BasisCurve, options) as IfcCurve;
 		}
 		public IfcPointByDistanceExpression(IfcCurveMeasureSelect distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = distanceAlong; BasisCurve = basisCurve; }
-		public IfcPointByDistanceExpression(double nonNegativeLength, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(nonNegativeLength); BasisCurve = basisCurve; }
+		public IfcPointByDistanceExpression(double distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); BasisCurve = basisCurve; }
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcPointByDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
 
@@ -788,7 +788,7 @@ namespace GeometryGym.Ifc
 	{   // ABSTRACT SUPERTYPE OF(ONEOF(IfcGrid, IfcLinearPositioningElement, IfcReferent))
 		//INVERSE
 		private SET<IfcRelPositions> mPositions = new SET<IfcRelPositions>();//: SET[0:?] OF IfcRelPositions FOR RelatingPositioningElement; 
-		public IfcRelContainedInSpatialStructure ContainedinStructure { get { return mContainedInStructure; } }
+		public IfcRelContainedInSpatialStructure ContainedInStructure { get { return mContainedInStructure; } }
 		public SET<IfcRelPositions> Positions { get { return mPositions; } } 
 
 		protected IfcPositioningElement() : base() { }
@@ -2510,6 +2510,13 @@ namespace GeometryGym.Ifc
 		internal IfcUnit mDefinedUnit = null;// : :	OPTIONAL IfcUnit;
 		internal IfcCurveInterpolationEnum mCurveInterpolation = IfcCurveInterpolationEnum.NOTDEFINED;// : :	OPTIONAL IfcCurveInterpolationEnum; 
 
+		public List<IfcValue> DefiningValues { get { return mDefiningValues; } }
+		public List<IfcValue> DefinedValues { get { return mDefinedValues; } }
+		public string Expression { get { return mExpression; } set { mExpression = value; } }
+		public IfcUnit DefiningUnit { get { return mDefiningUnit; } set { mDefiningUnit = value; } }
+		public IfcUnit DefinedUnit { get { return mDefinedUnit; } set { mDefinedUnit = value; } }
+		public IfcCurveInterpolationEnum CurveInterpolation { get { return mCurveInterpolation; } set { mCurveInterpolation = value; } }
+
 		internal IfcPropertyTableValue() : base() { }
 		internal IfcPropertyTableValue(DatabaseIfc db, IfcPropertyTableValue p, DuplicateOptions options) : base(db, p, options)
 		{
@@ -2531,6 +2538,13 @@ namespace GeometryGym.Ifc
 		internal IfcUnit mDefiningUnit;//:	OPTIONAL IfcUnit;   
 		internal IfcUnit mDefinedUnit;//:	OPTIONAL IfcUnit;
 		internal IfcCurveInterpolationEnum mCurveInterpolation = IfcCurveInterpolationEnum.NOTDEFINED;// : :	OPTIONAL IfcCurveInterpolationEnum; 
+
+		public List<T> DefiningValues { get { return mDefiningValues; } }
+		public List<U> DefinedValues { get { return mDefinedValues; } }
+		public string Expression { get { return mExpression; } set { mExpression = value; } }
+		public IfcUnit DefiningUnit { get { return mDefiningUnit; } set { mDefiningUnit = value; } }
+		public IfcUnit DefinedUnit { get { return mDefinedUnit; } set { mDefinedUnit = value; } }
+		public IfcCurveInterpolationEnum CurveInterpolation { get { return mCurveInterpolation; } set { mCurveInterpolation = value; } }
 
 		internal IfcPropertyTableValue() : base() { }
 		public IfcPropertyTableValue(DatabaseIfc db, string name) : base(db, name) { }

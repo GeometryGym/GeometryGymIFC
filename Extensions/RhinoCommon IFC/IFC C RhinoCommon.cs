@@ -82,6 +82,7 @@ namespace GeometryGym.Ifc
 			if (mAxis1 != null)
 			{
 				vx = Axis1.Vector3d;
+				vx.Unitize();
 				tr.M00 = vx.X;
 				tr.M10 = vx.Y;
 				tr.M20 = vx.Z;
@@ -92,15 +93,30 @@ namespace GeometryGym.Ifc
 			}
 			else
 			{
-				IfcCartesianTransformationOperator2D placement2D = this as IfcCartesianTransformationOperator2D;
-				if(placement2D != null)
+				IfcCartesianTransformationOperator2D operator2D = this as IfcCartesianTransformationOperator2D;
+				if(operator2D != null)
 				{
 					vy = Vector3d.CrossProduct(Vector3d.ZAxis, vx);
 				}
 			}
+			vy.Unitize();
 			tr.M01 = vy.X;
 			tr.M11 = vy.Y;
 			tr.M21 = vy.Z;
+			Vector3d vz = Vector3d.CrossProduct(vx, vy);
+			IfcCartesianTransformationOperator3D operator3d = this as IfcCartesianTransformationOperator3D;
+			if(operator3d != null)
+			{
+				if (operator3d.Axis3 != null)
+				{
+					vz = operator3d.Axis3.Vector3d;
+					vz.Unitize();
+				}
+			}
+			tr.M02 = vz.X;
+			tr.M12 = vz.Y;
+			tr.M22 = vz.Z;
+
 			return tr;
 		}
 	}

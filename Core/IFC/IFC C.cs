@@ -673,7 +673,7 @@ namespace GeometryGym.Ifc
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 
 		internal IfcClassificationReference() : base() { }
-		internal IfcClassificationReference(DatabaseIfc db, IfcClassificationReference r, DuplicateOptions options) : base(db, r)
+		internal IfcClassificationReference(DatabaseIfc db, IfcClassificationReference r, DuplicateOptions options) : base(db, r, options)
 		{
 			if (options.DuplicateHost)
 			{
