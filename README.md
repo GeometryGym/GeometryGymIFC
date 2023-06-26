@@ -5,7 +5,7 @@ These classes simultaneously support IFC2x3, IFC4 and Infrastructure extensions 
 We provide early support for IFC extension projects and new versions.
 
 Documentation on these classes is available on Building Smart websites, such as
-[http://www.buildingsmart-tech.org/ifc/IFC4/Add1/html/](https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/) (Browse Alphabetical Listings)
+[https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/](https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/) (Browse Alphabetical Listings)
 Documentation for other versions of IFC are available https://technical.buildingsmart.org/standards/ifc/ifc-schema-specifications/
  
 
