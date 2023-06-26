@@ -1654,6 +1654,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcStructuralCurveReaction() : base() { }
 		internal IfcStructuralCurveReaction(DatabaseIfc db, IfcStructuralCurveReaction r, DuplicateOptions options) : base(db, r, options) { PredefinedType = r.PredefinedType; }
+		public IfcStructuralCurveReaction(IfcStructuralLoad appliedLoad, IfcGlobalOrLocalEnum globalOrLocal, IfcStructuralCurveActivityTypeEnum predefinedType)
+			: base(appliedLoad, globalOrLocal) { mPredefinedType = predefinedType; }
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralItem : IfcProduct, IfcStructuralActivityAssignmentSelect // ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralConnection ,IfcStructuralMember))
@@ -2008,6 +2010,8 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcStructuralPointReaction() : base() { }
 		internal IfcStructuralPointReaction(DatabaseIfc db, IfcStructuralPointReaction r, DuplicateOptions options) : base(db, r, options) { }
+		public IfcStructuralPointReaction(IfcStructuralLoad appliedLoad, IfcGlobalOrLocalEnum globalOrLocal)
+		: base(appliedLoad, globalOrLocal) { }
 	}
 	[Obsolete("DEPRECATED IFC4", false)]
 	[Serializable]
@@ -2062,8 +2066,7 @@ namespace GeometryGym.Ifc
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralReaction : IfcStructuralActivity
-	{   //INVERSE 
-		//internal List<int> mCauses = new List<int>();// : OPTIONAL IfcStructuralReaction;
+	{    
 		protected IfcStructuralReaction() : base() { }
 		protected IfcStructuralReaction(DatabaseIfc db, IfcStructuralReaction p, DuplicateOptions options) : base(db, p, options) { }
 		protected IfcStructuralReaction(IfcStructuralLoad appliedLoad, IfcGlobalOrLocalEnum globalOrLocal)
