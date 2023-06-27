@@ -144,7 +144,7 @@ namespace GeometryGym.Ifc
 		internal LIST<IfcProfileDef> mCrossSections = new LIST<IfcProfileDef>();// : LIST [2:?] OF IfcProfileDef;
 
 		public IfcCurve Directrix { get { return mDirectrix; } set { mDirectrix = value; value.mDirectrixOfSectionedSolids.Add(this); } }
-		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } set { mCrossSections.Clear(); if (value != null) CrossSections = value; } }
+		public LIST<IfcProfileDef> CrossSections { get { return mCrossSections; } }
 
 		protected IfcSectionedSolid() : base() { }
 		protected IfcSectionedSolid(DatabaseIfc db, IfcSectionedSolid s, DuplicateOptions options) : base(db, s, options)
@@ -1067,7 +1067,12 @@ namespace GeometryGym.Ifc
 		internal double mMaxRequiredArea, mMinRequiredArea;// : OPTIONAL IfcAreaMeasure;
 		internal IfcSpatialStructureElement mRequestedLocation;// : OPTIONAL IfcSpatialStructureElement;
 		internal double mStandardRequiredArea;// : IfcAreaMeasure; 
+
+		public string SpaceProgramIdentifier { get { return mSpaceProgramIdentifier; } set { mSpaceProgramIdentifier = value; } }
+		public double MaxRequiredArea { get { return mMaxRequiredArea; } set { mMaxRequiredArea = value; } }
+		public double MinRequiredArea { get { return mMinRequiredArea; } set { mMinRequiredArea = value; } }
 		public IfcSpatialStructureElement RequestedLocation { get { return mRequestedLocation; } set { mRequestedLocation = value; } }
+		public double StandardRequiredArea { get { return mStandardRequiredArea; } set { mStandardRequiredArea = value; } }
 		internal IfcSpaceProgram() : base() { }
 		internal IfcSpaceProgram(DatabaseIfc db, IfcSpaceProgram p, DuplicateOptions options) : base(db, p, options)
 		{
@@ -1077,6 +1082,12 @@ namespace GeometryGym.Ifc
 			if(p.mRequestedLocation != null)
 				RequestedLocation = db.Factory.Duplicate( p.RequestedLocation);
 			mStandardRequiredArea = p.mStandardRequiredArea;
+		}
+		public IfcSpaceProgram(DatabaseIfc db, string identifier, double standardRequiredArea)
+			: base(db)
+		{
+			mSpaceProgramIdentifier = identifier;
+			mStandardRequiredArea = standardRequiredArea;
 		}
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
@@ -1400,6 +1411,11 @@ namespace GeometryGym.Ifc
 		internal double mTreadLength = double.NaN;//	:	OPTIONAL IfcPositiveLengthMeasure;
 		private IfcStairFlightTypeEnum mPredefinedType = IfcStairFlightTypeEnum.NOTDEFINED;//: OPTIONAL IfcStairFlightTypeEnum; IFC4
 
+		public int NumberOfRiser { get { return mNumberOfRiser; } set { mNumberOfRiser = value; } }
+		public int NumberOfTreads { get { return mNumberOfTreads; } set { mNumberOfTreads = value; } }
+		public double RiserHeight { get { return mRiserHeight; } set { mRiserHeight = value; } }
+		public double TreadLength { get { return mTreadLength; } set { mTreadLength = value; } }
+
 		public IfcStairFlightTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcStairFlightTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		internal IfcStairFlight() : base() { }
@@ -1552,7 +1568,7 @@ namespace GeometryGym.Ifc
 		{ 
 			AppliedCondition = db.Factory.Duplicate(c.AppliedCondition);
 		}
-		protected IfcStructuralConnection(IfcStructuralAnalysisModel sm) : base(sm) {  }
+		protected IfcStructuralConnection(IfcStructuralAnalysisModel model) : base(model) {  }
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralConnectionCondition : BaseClassIfc, NamedObjectIfc //ABSTRACT SUPERTYPE OF (ONEOF (IfcFailureConnectionCondition ,IfcSlippageConnectionCondition));
@@ -1587,6 +1603,10 @@ namespace GeometryGym.Ifc
 		public IfcDirection AxisDirection { get { return mAxisDirection; } set { mAxisDirection = value; } }
 		internal IfcStructuralCurveConnection() : base() { }
 		internal IfcStructuralCurveConnection(DatabaseIfc db, IfcStructuralCurveConnection c, DuplicateOptions options) : base(db, c, options) { }
+		public IfcStructuralCurveConnection(IfcStructuralAnalysisModel model, IfcDirection axisDirection) : base(model)
+		{
+			AxisDirection = axisDirection;
+		}
 	}
 	[Serializable]
 	public partial class IfcStructuralCurveMember : IfcStructuralMember
@@ -1600,6 +1620,7 @@ namespace GeometryGym.Ifc
 		internal IfcEdgeCurve EdgeCurve { get; set; } //Used for load applications in ifc2x3
 
 		public IfcStructuralCurveMember() : base() { }
+		protected IfcStructuralCurveMember(IfcStructuralAnalysisModel model, int id) : base(model, null, id) { }
 		internal IfcStructuralCurveMember(DatabaseIfc db, IfcStructuralCurveMember m, DuplicateOptions options) : base(db,m, options) { PredefinedType = m.PredefinedType; Axis = db.Factory.Duplicate(m.Axis) as IfcDirection; }
 		public IfcStructuralCurveMember(IfcStructuralAnalysisModel sm, IfcStructuralPointConnection A, IfcStructuralPointConnection B, IfcMaterialProfileSetUsage mp, IfcDirection dir, int id)
 			: this(sm,A,null,B,null,mp,dir,id) { }
@@ -1645,6 +1666,12 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcStructuralCurveMemberVarying() : base() { }
 		internal IfcStructuralCurveMemberVarying(DatabaseIfc db, IfcStructuralCurveMemberVarying m, DuplicateOptions options) : base(db, m, options) { }
+		internal IfcStructuralCurveMemberVarying(IfcStructuralAnalysisModel model, int id, IEnumerable<IfcStructuralCurveMember> subordinates)
+			: base(model, id)
+		{
+			foreach (IfcStructuralCurveMember member in subordinates)
+				AddAggregated(member);
+		}
 	}
 	[Serializable]
 	public partial class IfcStructuralCurveReaction : IfcStructuralReaction
@@ -1672,9 +1699,10 @@ namespace GeometryGym.Ifc
 				rc.RelatingElement = this;
 			}
 		}
-		protected IfcStructuralItem(IfcStructuralAnalysisModel sm) : base(sm.mDatabase.mRelease < ReleaseVersion.IFC4 ? new IfcLocalPlacement(sm.SharedPlacement,sm.mDatabase.Factory.XYPlanePlacement) : sm.SharedPlacement ,null)
+		protected IfcStructuralItem(IfcStructuralAnalysisModel model) 
+			: base(model.mDatabase.mRelease < ReleaseVersion.IFC4 ? new IfcLocalPlacement(model.SharedPlacement, model.mDatabase.Factory.XYPlanePlacement) : model.SharedPlacement)
 		{
-			sm.AddRelated(this);
+			model.AddRelated(this);
 			mDatabase.mContext.setStructuralUnits();
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
@@ -1882,8 +1910,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcStructuralLoadSingleDisplacementDistortion : IfcStructuralLoadSingleDisplacement
 	{
 		internal double mDistortion;// : OPTIONAL IfcCurvatureMeasure;
+		public double Distortion { get { return mDistortion; } set { mDistortion = value; } }
 		internal IfcStructuralLoadSingleDisplacementDistortion() : base() { }
 		internal IfcStructuralLoadSingleDisplacementDistortion(DatabaseIfc db, IfcStructuralLoadSingleDisplacementDistortion d) : base(db,d) { mDistortion = d.mDistortion; }
+		public IfcStructuralLoadSingleDisplacementDistortion(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralLoadSingleForce : IfcStructuralLoadStatic
@@ -1907,8 +1937,10 @@ namespace GeometryGym.Ifc
 	public partial class IfcStructuralLoadSingleForceWarping : IfcStructuralLoadSingleForce
 	{
 		internal double mWarpingMoment;// : OPTIONAL IfcWarpingMomentMeasure;
+		public double WarpingMoment { get { return mWarpingMoment; } set { mWarpingMoment = value; } }
 		internal IfcStructuralLoadSingleForceWarping() : base() { }
 		internal IfcStructuralLoadSingleForceWarping(DatabaseIfc db, IfcStructuralLoadSingleForceWarping w) : base(db,w) { mWarpingMoment = w.mWarpingMoment; }
+		public IfcStructuralLoadSingleForceWarping(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
 	public abstract partial class IfcStructuralLoadStatic : IfcStructuralLoadOrResult /*ABSTRACT SUPERTYPE OF (ONEOF (IfcStructuralLoadLinearForce ,IfcStructuralLoadPlanarForce ,IfcStructuralLoadSingleDisplacement ,IfcStructuralLoadSingleForce ,IfcStructuralLoadTemperature))*/
@@ -2081,6 +2113,7 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		internal IfcStructuralAnalysisModel mResultGroupFor = null;// : SET[0:1] OF IfcStructuralAnalysisModel FOR HasResults;
 
+		public IfcAnalysisTheoryTypeEnum TheoryType { get { return mTheoryType; } set { mTheoryType = value; } }
 		public IfcStructuralLoadGroup ResultForLoadGroup { get { return mResultForLoadGroup; } set { mResultForLoadGroup = value; value.mSourceOfResultGroup = this; } }
 		public IfcStructuralAnalysisModel ResultGroupFor { get { return mResultGroupFor; } set { mResultGroupFor = value; } }
 
@@ -2110,6 +2143,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcStructuralSteelProfileProperties() : base() { }
 		internal IfcStructuralSteelProfileProperties(DatabaseIfc db, IfcStructuralSteelProfileProperties p, DuplicateOptions options) : base(db, p, options) { mShearAreaZ = p.mShearAreaZ; mShearAreaY = p.mShearAreaY; mPlasticShapeFactorY = p.mPlasticShapeFactorY; mPlasticShapeFactorZ = p.mPlasticShapeFactorZ; }
+		public IfcStructuralSteelProfileProperties(IfcProfileDef profile) : base(profile) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralSurfaceAction : IfcStructuralAction //IFC4 SUPERTYPE OF(IfcStructuralPlanarAction)
@@ -2145,6 +2179,7 @@ namespace GeometryGym.Ifc
 	{
 		internal IfcStructuralSurfaceConnection() : base() { }
 		internal IfcStructuralSurfaceConnection(DatabaseIfc db, IfcStructuralSurfaceConnection c, DuplicateOptions options) : base(db, c, options) { }
+		public IfcStructuralSurfaceConnection(IfcStructuralAnalysisModel model) : base(model) { }
 	}
 	[Serializable]
 	public partial class IfcStructuralSurfaceMember : IfcStructuralMember
@@ -2156,6 +2191,7 @@ namespace GeometryGym.Ifc
 		public double Thickness { get { return mThickness; } set { mThickness = value; } }
 
 		public IfcStructuralSurfaceMember() : base() { }
+		protected IfcStructuralSurfaceMember(IfcStructuralAnalysisModel model, int id) : base(model, null, id) { }
 		internal IfcStructuralSurfaceMember(DatabaseIfc db, IfcStructuralSurfaceMember m, DuplicateOptions options) : base(db, m, options) { PredefinedType = m.PredefinedType; mThickness = m.mThickness; }
 		public IfcStructuralSurfaceMember(IfcStructuralAnalysisModel sm, IfcFaceSurface f, IfcMaterial material, int id, double thickness)
 			: base(sm, material, id)
@@ -2174,13 +2210,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcStructuralSurfaceMemberVarying : IfcStructuralSurfaceMember
 	{
+		[Obsolete("DELETED IFC4", false)]
 		internal List<double> mSubsequentThickness = new List<double>();// : LIST [2:?] OF IfcPositiveLengthMeasure;
+		[Obsolete("DELETED IFC4", false)]
 		internal IfcShapeAspect mVaryingThicknessLocation;// : IfcShapeAspect; 
 
 		public IfcShapeAspect VaryingThicknessLocation { get { return mVaryingThicknessLocation; } set { mVaryingThicknessLocation = value; } }
 
 		internal IfcStructuralSurfaceMemberVarying() : base() { }
 		internal IfcStructuralSurfaceMemberVarying(DatabaseIfc db, IfcStructuralSurfaceMemberVarying m, DuplicateOptions options) : base(db, m, options) { mSubsequentThickness.AddRange(m.mSubsequentThickness); mVaryingThicknessLocation = m.mVaryingThicknessLocation; }
+		public IfcStructuralSurfaceMemberVarying(IfcStructuralAnalysisModel model, int id, IEnumerable<IfcStructuralSurfaceMemberVarying> subordinates) 
+			: base(model, id)
+		{
+			foreach(IfcStructuralSurfaceMember surface in subordinates)
+			{
+				AddAggregated(surface);
+			}
+		}
 	}
 	[Serializable]
 	public partial class IfcStructuralSurfaceReaction : IfcStructuralReaction
@@ -2387,13 +2433,13 @@ namespace GeometryGym.Ifc
 			AssociatedGeometry.AddRange(c.AssociatedGeometry.Select(x => db.Factory.Duplicate(x) as IfcPcurve));
 			mMasterRepresentation = c.mMasterRepresentation;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve3D.mDatabase)
+		public IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPreferredSurfaceCurveRepresentation cr) : base(curve3D.mDatabase)
 		{
 			Curve3D = curve3D;
 			AssociatedGeometry.Add(p1);
 			mMasterRepresentation = cr;
 		}
-		internal IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : this(curve3D, p1, cr)
+		public IfcSurfaceCurve(IfcCurve curve3D, IfcPcurve p1, IfcPcurve p2, IfcPreferredSurfaceCurveRepresentation cr) : this(curve3D, p1, cr)
 		{
 			AssociatedGeometry.Add(p2);
 		}
@@ -2450,6 +2496,10 @@ namespace GeometryGym.Ifc
 
 		internal IfcSurfaceOfRevolution() : base() { }
 		internal IfcSurfaceOfRevolution(DatabaseIfc db, IfcSurfaceOfRevolution s, DuplicateOptions options) : base(db, s, options) { AxisPosition = db.Factory.Duplicate(s.AxisPosition) as IfcAxis1Placement; }
+		public IfcSurfaceOfRevolution(IfcProfileDef sweptCurve, IfcAxis1Placement axisPosition) : base(sweptCurve)
+		{
+			AxisPosition = axisPosition;
+		}
 	}
 	public interface IfcSurfaceOrFaceSurface : IBaseClassIfc { }  // = SELECT (	IfcSurface, IfcFaceSurface, IfcFaceBasedSurfaceModel);
 	[Serializable]
@@ -2719,6 +2769,8 @@ namespace GeometryGym.Ifc
 		internal double mFilletRadius;// : OPTIONAL IfcPositiveLengthMeasure; 
 		internal IfcSweptDiskSolidPolygonal() : base() { }
 		internal IfcSweptDiskSolidPolygonal(DatabaseIfc db, IfcSweptDiskSolidPolygonal p, DuplicateOptions options) : base(db, p, options) { mFilletRadius = p.mFilletRadius; }
+		public IfcSweptDiskSolidPolygonal(IfcCurve directrix, double radius) : base(directrix, radius) { }
+		public IfcSweptDiskSolidPolygonal(IfcCurve directrix, double radius, double innerRadius) : base(directrix, radius, innerRadius) { }
 	}
 	[Serializable]
 	public abstract partial class IfcSweptSurface : IfcSurface /*	ABSTRACT SUPERTYPE OF (ONEOF (IfcSurfaceOfLinearExtrusion ,IfcSurfaceOfRevolution))*/

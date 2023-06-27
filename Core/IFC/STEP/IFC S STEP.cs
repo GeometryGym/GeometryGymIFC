@@ -1180,14 +1180,19 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + ",(" + 
-				string.Join(",", mSubsequentThickness.Select(x=>ParserSTEP.DoubleToString(x))) + ")" + ",#" + mVaryingThicknessLocation.StepId;
+			string str = base.BuildStringSTEP(release);
+			if(release < ReleaseVersion.IFC4)
+				str += ",(" + string.Join(",", mSubsequentThickness.Select(x=>ParserSTEP.DoubleToString(x))) + ")" + ",#" + mVaryingThicknessLocation.StepId;
+			return str;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mSubsequentThickness = ParserSTEP.StripListDouble(str, ref pos, len);
-			mVaryingThicknessLocation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcShapeAspect;
+			if (release < ReleaseVersion.IFC4)
+			{
+				mSubsequentThickness = ParserSTEP.StripListDouble(str, ref pos, len);
+				mVaryingThicknessLocation = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcShapeAspect;
+			}
 		}
 	}
 	public partial class IfcStructuralSurfaceReaction
