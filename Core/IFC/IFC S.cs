@@ -478,8 +478,9 @@ namespace GeometryGym.Ifc
 			mDescription = a.mDescription;
 			mProductDefinitional = a.mProductDefinitional;
 		}
-		public IfcShapeAspect(List<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations[0].Database) { mShapeRepresentations.AddRange(shapeRepresentations); }
 		public IfcShapeAspect(IfcShapeModel shapeRepresentation) : base(shapeRepresentation.mDatabase) { mShapeRepresentations.Add(shapeRepresentation); }
+		public IfcShapeAspect(IEnumerable<IfcShapeModel> shapeRepresentations) : base(shapeRepresentations.First().Database) { mShapeRepresentations.AddRange(shapeRepresentations); }
+		public IfcShapeAspect(params IfcShapeModel[] shapeRepresentations) : base(shapeRepresentations.First().Database) { mShapeRepresentations.AddRange(shapeRepresentations); }
 
 		protected override void initialize()
 		{
@@ -1752,10 +1753,9 @@ namespace GeometryGym.Ifc
 			: base(lc, member, start, global, projected, IfcStructuralCurveActivityTypeEnum.LINEAR)
 		{
 			IfcCurve curve = member.EdgeCurve.EdgeGeometry;
-			List<IfcShapeModel> aspects = new List<IfcShapeModel>();
-			aspects.Add( new IfcShapeRepresentation(new IfcPointOnCurve(curve, 0)));
-			aspects.Add(new IfcShapeRepresentation(new IfcPointOnCurve(curve, 1)));
-			VaryingAppliedLoadLocation = new IfcShapeAspect(aspects);
+			IfcShapeRepresentation startShape = new IfcShapeRepresentation(new IfcPointOnCurve(curve, 0));
+			IfcShapeRepresentation endShape = new IfcShapeRepresentation(new IfcPointOnCurve(curve, 1));
+			VaryingAppliedLoadLocation = new IfcShapeAspect(startShape, endShape);
 		}
 	}
 	[Serializable]
