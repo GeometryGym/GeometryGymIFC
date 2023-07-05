@@ -428,8 +428,7 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{ 
 			return base.BuildStringSTEP(release) + (mTextCharacterAppearance == null ? ",$" : ",#" + mTextCharacterAppearance) +
-				(mTextStyle == null ? ",$" : ",#" + mTextStyle.StepId) + (mTextStyle == null ? ",$" : ",#" + mTextStyle.StepId) + "," +
-				(mTextFontStyle == null ? ",$" : ",#" + mTextFontStyle.StepId) + 
+				(mTextStyle == null ? ",$" : ",#" + mTextStyle.StepId) + (mTextFontStyle == null ? ",$" : ",#" + mTextFontStyle.StepId) + 
 				(release > ReleaseVersion.IFC2x3 ? "," + ParserSTEP.BoolToString(mModelOrDraughting) : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -446,7 +445,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (mFontFamily.Count == 0 ? ",$," : ",(" + string.Join(",", mFontFamily.Select(x=>ParserSTEP.Encode(x)) + "),")) +
+			return base.BuildStringSTEP(release) + (mFontFamily.Count == 0 ? ",$," :
+				",(" + string.Join(",", mFontFamily.Select(x=>"'" + ParserSTEP.Encode(x) + "'")) + "),") +
 				(string.IsNullOrEmpty(mFontStyle) ? "$," : "'" + ParserSTEP.Encode(mFontStyle) + "',") + 
 				(string.IsNullOrEmpty(mFontVariant) ? "$," : "'" + ParserSTEP.Encode(mFontVariant) + "',") + 
 				(string.IsNullOrEmpty(mFontWeight) ? "$," : "'" + ParserSTEP.Encode(mFontWeight) + "',") + mFontSize.ToString();
@@ -457,14 +457,14 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s != "$")
 			{
-				List<string> lst = ParserSTEP.SplitLineFields(s.Substring(1, s.Length - 2));
-				for (int icounter = 0; icounter < lst.Count; icounter++)
-					mFontFamily.Add(lst[icounter]);
+				List<string> fontFamilies = ParserSTEP.SplitListStrings(s);
+				foreach(string fontFamily in fontFamilies)
+					mFontFamily.Add(ParserSTEP.Decode(fontFamily));
 			}
 			mFontStyle = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mFontVariant = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mFontWeight = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-			mFontSize = ParserIfc.parseSimpleValue(ParserSTEP.StripField(str, ref pos, len)) as IfcSizeSelect;
+			mFontSize = ParserIfc.parseValue(ParserSTEP.StripField(str, ref pos, len)) as IfcSizeSelect;
 		}
 	}
 	public partial class IfcTextStyleForDefinedFont

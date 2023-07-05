@@ -659,13 +659,36 @@ namespace GeometryGym.Ifc
 			ObjectPlacement = alignment.ObjectPlacement;
 			RailHeadDistance = railHeadDistance;
 		}
-		public IfcSegmentedReferenceCurve ComputeGeometry(IfcGradientCurve gradientCurve)
+		public IfcSegmentedReferenceCurve ComputeCantGeometry(IfcAlignment alignment, IfcGradientCurve gradientCurve)
 		{
 			List<IfcCurveSegment> curveSegments = CantSegments.Select(x => x.generateCurveSegment(RailHeadDistance)).ToList();
-			IfcSegmentedReferenceCurve result = new IfcSegmentedReferenceCurve(gradientCurve, curveSegments);
-			result.EndPoint = CantSegments.Last().ComputeEndPlacement(RailHeadDistance);
-			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve3D));
-			return result;
+			IfcSegmentedReferenceCurve segmentedReferenceCurve = new IfcSegmentedReferenceCurve(gradientCurve, curveSegments);
+			segmentedReferenceCurve.EndPoint = CantSegments.Last().ComputeEndPlacement(RailHeadDistance);
+			if (alignment != null)
+			{
+				var context = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis);
+				if (alignment.Representation == null)
+				{
+					IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(context, segmentedReferenceCurve, ShapeRepresentationType.Curve3D);
+					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
+				}
+				else
+				{
+					IfcShapeRepresentation axisRepresentation = alignment.Representation.Representations.
+						OfType<IfcShapeRepresentation>().
+						Where(x => string.Compare(x.RepresentationIdentifier, context.ContextIdentifier, true) == 0).
+						FirstOrDefault();
+
+					if (axisRepresentation == null)
+					{
+						axisRepresentation = new IfcShapeRepresentation(context, segmentedReferenceCurve, ShapeRepresentationType.Curve3D);
+						alignment.Representation.Representations.Add(axisRepresentation);
+					}
+					else
+						axisRepresentation.Items.Add(segmentedReferenceCurve);
+				}
+			}
+			return segmentedReferenceCurve;
 		}
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
@@ -757,7 +780,6 @@ namespace GeometryGym.Ifc
 				segmentPlacement.RefDirection = new IfcDirection(db, cosAlpha, sinAlpha, 0);
 
 				double factor = ((endCantLeft + endCantRight) - (startCantLeft + startCantRight)) / 2.0;
-				double constantTerm = (startCantLeft + startCantRight) / 2.0;
 				double linearTerm = factor;
 
 				double clothoidConstant = HorizontalLength * Math.Pow(Math.Abs(linearTerm), -0.5) * linearTerm / Math.Abs(linearTerm);
@@ -766,7 +788,7 @@ namespace GeometryGym.Ifc
 		
 			IfcCurveSegment curveSegment = new IfcCurveSegment(IfcTransitionCode.CONTINUOUS, segmentPlacement, new IfcNonNegativeLengthMeasure(0), new IfcNonNegativeLengthMeasure(segmentLength), parentCurve);
 			if(mDesignerOf != null)
-				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Curve3D));
+				mDesignerOf.Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment, ShapeRepresentationType.Segment));
 			return curveSegment;
 		}
 		public IfcPlacement ComputeEndPlacement(double railHeadDistance)
@@ -845,8 +867,7 @@ namespace GeometryGym.Ifc
 			alignment.AddNested(this);
 			ObjectPlacement = alignment.ObjectPlacement;
 		}
-
-		public IfcCompositeCurve ComputeGeometry()
+		public IfcCompositeCurve ComputeHorizontalGeometry(IfcAlignment alignment)
 		{
 			double tol = mDatabase.Tolerance;
 			List<IfcCurveSegment> curveSegments = new List<IfcCurveSegment>();
@@ -863,9 +884,17 @@ namespace GeometryGym.Ifc
 				}
 				catch (Exception) { }
 			}
-			IfcCompositeCurve result = new IfcCompositeCurve(curveSegments);
-			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve2D));
-			return result;
+			IfcCompositeCurve compositeCurve = new IfcCompositeCurve(curveSegments);
+			if (alignment != null)
+			{
+				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint);
+				IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, compositeCurve, ShapeRepresentationType.Curve2D);
+				if (alignment.Representation == null)
+					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
+				else
+					alignment.Representation.Representations.Add(shapeRepresentation);
+			}
+			return compositeCurve;
 		}
 
 		public bool IsDuplicateWorkInProgress(IfcAlignmentHorizontal horizontal, double tol)
@@ -1210,12 +1239,20 @@ namespace GeometryGym.Ifc
 			ObjectPlacement = alignment.ObjectPlacement;
 		}
 	
-		public IfcGradientCurve ComputeGeometry(IfcCompositeCurve horizontalCurve)
+		public IfcGradientCurve ComputeVerticalGeometry(IfcAlignment alignment, IfcCompositeCurve horizontalCurve)
 		{
 			List<IfcCurveSegment> segments = VerticalSegments.Select(x => x.generateCurveSegment()).ToList();
-			IfcGradientCurve result = new IfcGradientCurve(horizontalCurve, segments); 
-			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), result, ShapeRepresentationType.Curve3D));
-			return result;
+			IfcGradientCurve gradientCurve = new IfcGradientCurve(horizontalCurve, segments);
+			if (alignment != null)
+			{
+				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis);
+				IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, gradientCurve, ShapeRepresentationType.Curve3D);
+				if (alignment.Representation == null)
+					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
+				else
+					alignment.Representation.Representations.Add(shapeRepresentation);
+			}
+			return gradientCurve;
 		}
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]

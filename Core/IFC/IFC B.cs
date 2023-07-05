@@ -581,6 +581,7 @@ namespace GeometryGym.Ifc
 				BuildingAddress = db.Factory.Duplicate(b.BuildingAddress, options);
 		}
 		public IfcBuilding(DatabaseIfc db, string name) : base(db, name) { setDefaultAddress();  }
+		public IfcBuilding(IfcPostalAddress address, string name) : base(address.mDatabase, name) { BuildingAddress = address; }
 		public IfcBuilding(IfcSpatialStructureElement host, string name) : base(host, name) { }
 		public IfcBuilding(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, name, placement, representation) { setDefaultAddress(); }
 		internal IfcBuilding(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { setDefaultAddress(); }

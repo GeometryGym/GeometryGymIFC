@@ -828,15 +828,17 @@ namespace GeometryGym.Ifc
 		internal IfcCompoundPlaneAngleMeasure mRefLatitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
 		internal IfcCompoundPlaneAngleMeasure mRefLongitude = null;// : OPTIONAL IfcCompoundPlaneAngleMeasure;
 		internal double mRefElevation = double.NaN;// : OPTIONAL IfcLengthMeasure;
-		[Obsolete("DEPRECATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		internal string mLandTitleNumber = "";// : OPTIONAL IfcLabel;
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		internal IfcPostalAddress mSiteAddress;// : OPTIONAL IfcPostalAddress; 
 
 		public IfcCompoundPlaneAngleMeasure RefLatitude { get { return mRefLatitude; } set { mRefLatitude = value; } }
 		public IfcCompoundPlaneAngleMeasure RefLongitude { get { return mRefLongitude; } set { mRefLongitude = value; } }
 		public double RefElevation { get { return mRefElevation; } set { mRefElevation = value; } }
-		[Obsolete("DEPRECATED IFC4", false)]
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public string LandTitleNumber { get { return mLandTitleNumber; } set { mLandTitleNumber = value; } }
+		[Obsolete("DEPRECATED IFC4X3", false)]
 		public IfcPostalAddress SiteAddress { get { return mSiteAddress; } set { mSiteAddress = value; } }
 
 		internal IfcSite() : base() { }

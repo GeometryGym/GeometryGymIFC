@@ -413,7 +413,7 @@ namespace GeometryGym.Ifc
 		internal IfcTextPath mPath;// : IfcTextPath;
 
 		public string Literal { get { return mLiteral; } set { mLiteral = value; } }
-		public IfcAxis2Placement Placement { get { return mPlacement; } }
+		public IfcAxis2Placement Placement { get { return mPlacement; } set { mPlacement = value; } }
 		public IfcTextPath Path { get { return mPath; } set { mPath = value; } }
 
 		internal IfcTextLiteral() : base() { }
