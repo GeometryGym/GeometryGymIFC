@@ -674,10 +674,8 @@ namespace GeometryGym.Ifc
 				}
 				else
 				{
-					IfcShapeRepresentation axisRepresentation = alignment.Representation.Representations.
-						OfType<IfcShapeRepresentation>().
-						Where(x => string.Compare(x.RepresentationIdentifier, context.ContextIdentifier, true) == 0).
-						FirstOrDefault();
+					IfcShapeRepresentation axisRepresentation = alignment.Representation.Representations.OfType<IfcShapeRepresentation>().
+						Where(x => string.Compare(x.RepresentationIdentifier, context.ContextIdentifier, true) == 0).FirstOrDefault();
 
 					if (axisRepresentation == null)
 					{
@@ -685,7 +683,10 @@ namespace GeometryGym.Ifc
 						alignment.Representation.Representations.Add(axisRepresentation);
 					}
 					else
+					{
+						axisRepresentation.Items.Clear();
 						axisRepresentation.Items.Add(segmentedReferenceCurve);
+					}
 				}
 			}
 			return segmentedReferenceCurve;
@@ -869,7 +870,6 @@ namespace GeometryGym.Ifc
 		}
 		public IfcCompositeCurve ComputeHorizontalGeometry(IfcAlignment alignment)
 		{
-			double tol = mDatabase.Tolerance;
 			List<IfcCurveSegment> curveSegments = new List<IfcCurveSegment>();
 			List<IfcAlignmentHorizontalSegment> horizontalSegments = HorizontalSegments.ToList();
 			if (horizontalSegments.Count == 0)
@@ -880,14 +880,16 @@ namespace GeometryGym.Ifc
 				try
 				{
 					IfcAlignmentHorizontalSegment nextSegment = counter + 1 < segmentCount ? horizontalSegments[counter + 1] : null;
-					curveSegments.Add(horizontalSegments[counter].generateCurveSegment(nextSegment));
+					IfcCurveSegment curveSegment = horizontalSegments[counter].generateCurveSegment(nextSegment);
+					if(curveSegment != null)
+						curveSegments.Add(curveSegment);
 				}
 				catch (Exception) { }
 			}
 			IfcCompositeCurve compositeCurve = new IfcCompositeCurve(curveSegments);
 			if (alignment != null)
 			{
-				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint);
+				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis);
 				IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, compositeCurve, ShapeRepresentationType.Curve2D);
 				if (alignment.Representation == null)
 					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
@@ -980,8 +982,9 @@ namespace GeometryGym.Ifc
 		{
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;
+			if (SegmentLength < tol)
+				return null;
 			Tuple<double, double> startTangent = StartTangent();
-
 			IfcCartesianPoint startPoint = StartPoint;
 
 			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(startPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
@@ -1246,11 +1249,21 @@ namespace GeometryGym.Ifc
 			if (alignment != null)
 			{
 				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis);
+
 				IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, gradientCurve, ShapeRepresentationType.Curve3D);
 				if (alignment.Representation == null)
 					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
 				else
+				{
+					IfcShapeRepresentation axisShape = alignment.Representation.Representations.Where(x => string.Compare(x.RepresentationIdentifier, "Axis", true) == 0).FirstOrDefault() as IfcShapeRepresentation;
+					if(axisShape != null)
+					{
+						var footPrintContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint);
+						axisShape.ContextOfItems = footPrintContext;
+						axisShape.RepresentationIdentifier = footPrintContext.ContextIdentifier;
+					}
 					alignment.Representation.Representations.Add(shapeRepresentation);
+				}
 			}
 			return gradientCurve;
 		}

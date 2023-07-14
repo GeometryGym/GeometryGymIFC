@@ -1508,7 +1508,8 @@ namespace GeometryGym.Ifc
 		internal IfcRelContainedInSpatialStructure(DatabaseIfc db, IfcRelContainedInSpatialStructure r, DuplicateOptions options) 
 			: base(db, r, options)
 		{
-			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, new DuplicateOptions(options) { DuplicateDownstream = false });
+			DuplicateOptions relatingOptions = new DuplicateOptions(options) { DuplicateDownstream = options.mSpatialElementsToDuplicate.Contains(r.RelatingStructure) };
+			RelatingStructure = db.Factory.Duplicate(r.RelatingStructure, relatingOptions);
 			if (options.DuplicateDownstream)
 			{
 				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };

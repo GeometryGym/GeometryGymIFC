@@ -1915,6 +1915,7 @@ namespace GeometryGym.Ifc
 
 		public HashSet<string> IgnoredPropertyNames = new HashSet<string>();
 		internal DuplicateCommonDictionaries mCommonObjects = new DuplicateCommonDictionaries();
+		internal HashSet<IfcSpatialElement> mSpatialElementsToDuplicate = new HashSet<IfcSpatialElement>();
 
 		public DuplicateOptions(double deviationTolerance) 
 		{
@@ -1941,6 +1942,7 @@ namespace GeometryGym.Ifc
 				IgnoredPropertyNames.Add(propertyName);
 
 			mCommonObjects = options.mCommonObjects;
+			mSpatialElementsToDuplicate = options.mSpatialElementsToDuplicate;
 		}
 	}
 	internal class DuplicateCommonDictionaries

@@ -320,6 +320,12 @@ namespace GeometryGym.Ifc
 			{
 				DuplicateOptions downstreamOptions = new DuplicateOptions(options) { DuplicateHost = true };
 
+				if(o is IfcSpatialElement spatialElement && !options.mSpatialElementsToDuplicate.Contains(spatialElement))
+				{
+					List<IfcSpatialElement> nestedSpatialElements = spatialElement.Extract<IfcSpatialElement>();
+					foreach(IfcSpatialElement spatial in nestedSpatialElements)
+						downstreamOptions.mSpatialElementsToDuplicate.Add(spatial); 
+				}
 				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
 				{
 					foreach(IfcObjectDefinition obj in rag.RelatedObjects)
