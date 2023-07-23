@@ -549,7 +549,10 @@ namespace GeometryGym.Ifc
 		internal IfcLocalPlacement() : base() { }
 		internal IfcLocalPlacement(DatabaseIfc db, IfcLocalPlacement p, DuplicateOptions options) : base(db, p, options)
 		{
-			RelativePlacement = db.Factory.Duplicate(p.mRelativePlacement, options);
+			if (p.mRelativePlacement is IfcAxis2Placement3D axis2Placement3D)
+				RelativePlacement = db.Factory.DuplicateAxis(axis2Placement3D, options);
+			else
+				RelativePlacement = db.Factory.Duplicate(p.mRelativePlacement, options);
 		}
 		public IfcLocalPlacement(IfcAxis2Placement placement) : base(placement.Database) { RelativePlacement = placement; }
 		public IfcLocalPlacement(IfcObjectPlacement relativeTo, IfcAxis2Placement placement) : this(placement)

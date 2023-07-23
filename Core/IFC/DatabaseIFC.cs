@@ -733,6 +733,12 @@ namespace GeometryGym.Ifc
 			BaseClassIfc obj = entity as BaseClassIfc;
 			if (obj.Database != null && obj.Database.id == mDatabase.id)
 				return entity;
+
+			if(entity is IfcProduct product)
+			{
+				if (options.mProductsToExclude.Contains(product.GlobalId))
+					return null;
+			}
 			
 			T result = null;
 			int index = mDuplicateMapping.FindExisting(obj);
@@ -1916,6 +1922,7 @@ namespace GeometryGym.Ifc
 		public HashSet<string> IgnoredPropertyNames = new HashSet<string>();
 		internal DuplicateCommonDictionaries mCommonObjects = new DuplicateCommonDictionaries();
 		internal HashSet<IfcSpatialElement> mSpatialElementsToDuplicate = new HashSet<IfcSpatialElement>();
+		internal HashSet<string> mProductsToExclude = new HashSet<string>();
 
 		public DuplicateOptions(double deviationTolerance) 
 		{
@@ -1943,6 +1950,7 @@ namespace GeometryGym.Ifc
 
 			mCommonObjects = options.mCommonObjects;
 			mSpatialElementsToDuplicate = options.mSpatialElementsToDuplicate;
+			mProductsToExclude = options.mProductsToExclude;
 		}
 	}
 	internal class DuplicateCommonDictionaries
@@ -2011,6 +2019,10 @@ namespace GeometryGym.Ifc
 			}
 			return false;
 		}
+		public List<string> ApplicableEntities()
+		{
+			return mApplicableTypes.ConvertAll(x => x.ApplicableTypeString());
+		}
 	}
 	internal class ApplicableType
 	{
@@ -2049,6 +2061,10 @@ namespace GeometryGym.Ifc
 			return false;
 		}
 
+		internal string ApplicableTypeString()
+		{
+			return mType.Name + (string.IsNullOrEmpty(mPredefined) ? "" : "\\" + mPredefined);
+		}
 	}
 
 	internal class SerializationIfc
@@ -2830,12 +2846,14 @@ namespace GeometryGym.Ifc
 			lines.Add("/* name */ '" + ParserSTEP.Encode(fileName) + "',");
 			DateTime now = DateTime.Now;
 			lines.Add("/* time_stamp */ '" + now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second + "',");
-			string authorName = "", organizationName = "", authorization = "None";
-			if (mDatabase.OriginatingFileInformation != null)
+			string authorName = "", organizationName = "", authorization = "None", originatingSystem = "";
+			var fileInformation = mDatabase.OriginatingFileInformation;
+			if (fileInformation != null)
 			{
-				authorName = mDatabase.OriginatingFileInformation.Author.FirstOrDefault();
-				organizationName = mDatabase.OriginatingFileInformation.Organization.FirstOrDefault();
-				authorization = mDatabase.OriginatingFileInformation.Authorization;
+				authorName = fileInformation.Author.FirstOrDefault();
+				organizationName = fileInformation.Organization.FirstOrDefault();
+				authorization = fileInformation.Authorization;
+				originatingSystem = fileInformation.OriginatingSystem;
 			}
 			if (!string.IsNullOrEmpty(mDatabase.Authorization))
 				authorization = mDatabase.Authorization;
@@ -2851,10 +2869,14 @@ namespace GeometryGym.Ifc
 				if (organization != null)
 					organizationName = organization.Name; 
 			}
+			if(string.IsNullOrEmpty(originatingSystem))
+			{
+				originatingSystem = ParserSTEP.Encode(mDatabase.Factory.ApplicationFullName);
+			}
 			lines.Add("/* author */ ('" + ParserSTEP.Encode(authorName) + "'),");
 			lines.Add("/* organization */ ('" + ParserSTEP.Encode(organizationName) + "'),");
 			lines.Add("/* preprocessor_version */ '" + ParserSTEP.Encode(mDatabase.Factory.ToolkitName) + "',");
-			lines.Add("/* originating_system */ '" + ParserSTEP.Encode(mDatabase.Factory.ApplicationFullName) + "',");
+			lines.Add("/* originating_system */ '" + originatingSystem + "',");
 
 			lines.Add("/* authorization */ '" + ParserSTEP.Encode(authorization) + "'");
 			if(mDatabase.Comments.Count > 0)

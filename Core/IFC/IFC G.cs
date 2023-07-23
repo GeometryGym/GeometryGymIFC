@@ -437,9 +437,9 @@ namespace GeometryGym.Ifc
 		//INVERSE
 		public IfcGridTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcGridTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
-		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } set { mUAxes.Clear(); if (value != null) { mUAxes.CollectionChanged -= mUAxes_CollectionChanged; mUAxes = value; mUAxes.CollectionChanged += mUAxes_CollectionChanged; } } }
-		public LIST<IfcGridAxis> VAxes { get { return mVAxes; } set { mVAxes.Clear(); if (value != null) { mVAxes.CollectionChanged -= mVAxes_CollectionChanged; mVAxes = value; mVAxes.CollectionChanged += mVAxes_CollectionChanged; } } }
-		public LIST<IfcGridAxis> WAxes { get { return mWAxes; } set { mWAxes.Clear(); if (value != null) { mWAxes.CollectionChanged -= mWAxes_CollectionChanged; mWAxes = value; mWAxes.CollectionChanged += mWAxes_CollectionChanged; } } }
+		public LIST<IfcGridAxis> UAxes { get { return mUAxes; } }
+		public LIST<IfcGridAxis> VAxes { get { return mVAxes; } }
+		public LIST<IfcGridAxis> WAxes { get { return mWAxes; } }
 
 		internal IfcGrid() : base() { }
 		internal IfcGrid(DatabaseIfc db, IfcGrid g, DuplicateOptions options) : base(db, g, options)

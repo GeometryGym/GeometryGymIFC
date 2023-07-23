@@ -600,6 +600,14 @@ namespace GeometryGym.Ifc
 		public string AssessmentDescription { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AssessmentDescription", new IfcText(value))); } }
 		public Pset_Condition(IfcElement instance) : base(instance) { }
 	}
+	public partial class Pset_ConstructionOccurence : IfcPropertySet
+	{
+		public DateTime InstallationDate { set { AddProperty(new IfcPropertySingleValue(mDatabase, "InstallationDate", new IfcDate(value))); } }
+		public string ModelNumber { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ModelNumber", new IfcLabel(value))); } }
+		public string TagNumber { set { AddProperty(new IfcPropertySingleValue(mDatabase, "TagNumber", new IfcLabel(value))); } }
+		public string AssetIdentifier { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AssetIdentifier", new IfcLabel(value))); } }
+		public Pset_ConstructionOccurence(IfcElement instance) : base(instance) { }
+	}
 	//Pset_ConstructionResource
 	//Pset_ControllerPHistory
 	//Pset_ControllerTypeCommon

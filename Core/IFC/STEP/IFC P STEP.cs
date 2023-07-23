@@ -838,11 +838,11 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			string s = ParserSTEP.StripField(str, ref pos, len);
-			List<string> values = ParserSTEP.SplitLineFields(str.Substring(1, str.Length - 2));
-			for (int icounter = 0; icounter < values.Count; icounter++)
+			string field = ParserSTEP.StripField(str, ref pos, len).Trim();
+			List<string> values = ParserSTEP.SplitLineFields(field.Substring(1, field.Length - 2));
+			foreach(string stringValue in values)
 			{
-				IfcValue value = ParserIfc.parseValue(values[icounter]);
+				IfcValue value = ParserIfc.parseValue(stringValue);
 				if (value != null)
 					mListValues.Add(value);
 			}

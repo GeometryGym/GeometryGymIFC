@@ -651,7 +651,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcPolyLoop : IfcLoop
 	{
 		private LIST<IfcCartesianPoint> mPolygon = new LIST<IfcCartesianPoint> ();// : LIST [3:?] OF UNIQUE IfcCartesianPoint;
-		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } set { mPolygon = value; } }
+		public LIST<IfcCartesianPoint> Polygon { get { return mPolygon; } }
 
 		internal IfcPolyLoop() : base() { }
 		internal IfcPolyLoop(DatabaseIfc db, IfcPolyLoop l, DuplicateOptions options) : base(db, l, options) { mPolygon.AddRange(l.Polygon.ConvertAll(x=> db.Factory.Duplicate(x, options))); }
@@ -1684,6 +1684,7 @@ namespace GeometryGym.Ifc
 		public IfcProject DuplicateProject(DuplicateOptions options)
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
+			db.OriginatingFileInformation = mDatabase.OriginatingFileInformation;
 			return db.Factory.Duplicate(this, options);
 		}
 	}

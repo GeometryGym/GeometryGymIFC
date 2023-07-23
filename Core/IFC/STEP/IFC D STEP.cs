@@ -122,14 +122,14 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return "(" + string.Join(",", mElements.Select(x=> "#" +x.StepId)) +
-				"),." + mUnitType.ToString() + (mUserDefinedType == "$" ? ".,$" : ".,'" + mUserDefinedType + "'") +
+				"),." + mUnitType.ToString() + (string.IsNullOrEmpty(mUserDefinedType) ? ".,$" : ".,'" + ParserSTEP.Encode(mUserDefinedType) + "'") +
 				(release >= ReleaseVersion.IFC4X3 ? (string.IsNullOrEmpty(mName) ? ",$" : ",'" + ParserSTEP.Encode(mName) + "'") : "");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			Elements.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcDerivedUnitElement));
 			Enum.TryParse<IfcDerivedUnitEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mUnitType);
-			mUserDefinedType = ParserSTEP.StripString(str, ref pos, len);
+			mUserDefinedType = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			if(release >= ReleaseVersion.IFC4X3)
 				mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
