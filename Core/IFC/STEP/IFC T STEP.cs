@@ -314,7 +314,12 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTendonAnchorType
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + "."; }
+		protected override string BuildStringSTEP(ReleaseVersion release) 
+		{
+			if (release <= ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() + ".";
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
@@ -341,6 +346,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if (release <= ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
 			return base.BuildStringSTEP(release) +  ",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
@@ -355,10 +362,10 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string result = base.BuildStringSTEP(release);
-			result += ",." + mPredefinedType + ".," + ParserSTEP.DoubleOptionalToString(mNominalDiameter) + ",";
-			result += ParserSTEP.DoubleOptionalToString(mCrossSectionArea) + "," + ParserSTEP.DoubleOptionalToString(mSheathDiameter);
-			return result;
+			if (release <= ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType + ".," + ParserSTEP.DoubleOptionalToString(mNominalDiameter) + "," +
+				ParserSTEP.DoubleOptionalToString(mCrossSectionArea) + "," + ParserSTEP.DoubleOptionalToString(mSheathDiameter);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -764,26 +771,13 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcTranslationalStiffnessSelect
 	{
-		public override string ToString() { return (mStiffness == null ? "IFCBOOLEAN(" + ParserSTEP.BoolToString(mRigid) + ")" : mStiffness.ToString()); }
-		internal static IfcTranslationalStiffnessSelect Parse(string str,ReleaseVersion version)
+		internal static IfcTranslationalStiffnessSelect Parse(string str, ReleaseVersion version)
 		{
 			if (str == "$")
 				return null;
-			if (str.StartsWith("IFCBOOL"))
-				return new IfcTranslationalStiffnessSelect(((IfcBoolean)ParserIfc.parseSimpleValue(str)).Boolean);
-			if (str.StartsWith("IFCLIN"))
-				return new IfcTranslationalStiffnessSelect((IfcLinearStiffnessMeasure)ParserIfc.parseDerivedMeasureValue(str));
-			if (str.StartsWith("."))
-				return new IfcTranslationalStiffnessSelect(ParserSTEP.ParseBool(str));
-			double d = ParserSTEP.ParseDouble(str), tol = 1e-9;
-			if (version < ReleaseVersion.IFC4)
-			{
-				if (Math.Abs(d + 1) < tol)
-					return new IfcTranslationalStiffnessSelect(true) { mStiffness = new IfcLinearStiffnessMeasure(-1) };
-				if (Math.Abs(d) < tol)
-					return new IfcTranslationalStiffnessSelect(false) { mStiffness = new IfcLinearStiffnessMeasure(0) };
-			}
-			return new IfcTranslationalStiffnessSelect(new IfcLinearStiffnessMeasure(d));
+			IfcTranslationalStiffnessSelect stiffness = new IfcTranslationalStiffnessSelect();
+			stiffness.ParseValue(str, version);
+			return stiffness;
 		}
 	}
 	public partial class IfcTransportElement

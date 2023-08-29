@@ -532,4 +532,17 @@ namespace GeometryGym.Ifc
 		DatabaseIfc Database { get; }
 	}
 	public interface NamedObjectIfc : IBaseClassIfc { string Name { get; } } // GG interface
+
+	public abstract partial class StiffnessSelect<T> where T : IfcDerivedMeasureValue, new()
+	{
+		internal bool mRigid = false;
+		internal T mStiffness = null;
+
+		public bool Rigid { get { return mRigid; } set { mRigid = value; } }
+		public T Stiffness { get { return mStiffness; } set { mStiffness = value; } }
+
+		public StiffnessSelect() { }
+		public StiffnessSelect(bool fix) { mRigid = fix; }
+		public StiffnessSelect(T stiff) { mStiffness = stiff; }
+	}
 }

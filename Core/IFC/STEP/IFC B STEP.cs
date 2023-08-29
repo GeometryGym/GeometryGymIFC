@@ -172,27 +172,52 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcBoundaryEdgeCondition
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByLengthX) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByLengthY) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByLengthZ) + "," + ParserSTEP.DoubleOptionalToString(mRotationalStiffnessByLengthX) + "," + ParserSTEP.DoubleOptionalToString(mRotationalStiffnessByLengthY) + "," + ParserSTEP.DoubleOptionalToString(mRotationalStiffnessByLengthZ); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4)
+				return base.BuildStringSTEP(release) + "," + (mLinearStiffnessByLengthX == null ? "$" : ParserSTEP.DoubleToString(mLinearStiffnessByLengthX.mStiffness.mValue)) + "," +
+					(mLinearStiffnessByLengthY == null ? "$" : ParserSTEP.DoubleToString(mLinearStiffnessByLengthY.mStiffness.mValue)) + "," +
+					(mLinearStiffnessByLengthZ == null ? "$" : ParserSTEP.DoubleToString(mLinearStiffnessByLengthZ.mStiffness.mValue)) + "," +
+					(mRotationalStiffnessByLengthX == null ? "$" : ParserSTEP.DoubleToString(mRotationalStiffnessByLengthX.mStiffness.mValue)) + "," +
+					(mRotationalStiffnessByLengthY == null ? "$" : ParserSTEP.DoubleToString(mRotationalStiffnessByLengthY.mStiffness.mValue)) + "," +
+					(mRotationalStiffnessByLengthZ == null ? "$" : ParserSTEP.DoubleToString(mRotationalStiffnessByLengthZ.mStiffness.mValue));
+			return base.BuildStringSTEP(release) + "," + (mLinearStiffnessByLengthX == null ? "$" : mLinearStiffnessByLengthX.ToString()) + "," +
+				(mLinearStiffnessByLengthY == null ? "$" : mLinearStiffnessByLengthY.ToString()) + "," +
+				(mLinearStiffnessByLengthZ == null ? "$" : mLinearStiffnessByLengthZ.ToString()) + "," +
+				(mRotationalStiffnessByLengthX == null ? "$" : mRotationalStiffnessByLengthX.ToString()) + "," +
+				(mRotationalStiffnessByLengthY == null ? "$" : mRotationalStiffnessByLengthY.ToString()) + "," +
+				(mRotationalStiffnessByLengthZ == null ? "$" : mRotationalStiffnessByLengthZ.ToString());
+		}
+
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mLinearStiffnessByLengthX = ParserSTEP.StripDouble(str, ref pos, len);
-			mLinearStiffnessByLengthY = ParserSTEP.StripDouble(str, ref pos, len);
-			mLinearStiffnessByLengthZ = ParserSTEP.StripDouble(str, ref pos, len);
-			mRotationalStiffnessByLengthX = ParserSTEP.StripDouble(str, ref pos, len);
-			mRotationalStiffnessByLengthY = ParserSTEP.StripDouble(str, ref pos, len);
-			mRotationalStiffnessByLengthZ = ParserSTEP.StripDouble(str, ref pos, len);
+			mLinearStiffnessByLengthX = IfcModulusOfTranslationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mLinearStiffnessByLengthY = IfcModulusOfTranslationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mLinearStiffnessByLengthZ = IfcModulusOfTranslationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mRotationalStiffnessByLengthX = IfcModulusOfRotationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mRotationalStiffnessByLengthY = IfcModulusOfRotationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mRotationalStiffnessByLengthZ = IfcModulusOfRotationalSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
 		}
 	}
 	public partial class IfcBoundaryFaceCondition
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByAreaX) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByAreaY) + "," + ParserSTEP.DoubleOptionalToString(mLinearStiffnessByAreaZ); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4)
+				return base.BuildStringSTEP(release) + "," + (mTranslationalStiffnessByAreaX == null ? "$" : ParserSTEP.DoubleToString(mTranslationalStiffnessByAreaX.mStiffness.mValue)) + "," +
+					(mTranslationalStiffnessByAreaY == null ? "$" : ParserSTEP.DoubleToString(mTranslationalStiffnessByAreaY.mStiffness.mValue)) + "," +
+					(mTranslationalStiffnessByAreaZ == null ? "$" : ParserSTEP.DoubleToString(mTranslationalStiffnessByAreaZ.mStiffness.mValue));
+			return base.BuildStringSTEP(release) + "," + (mTranslationalStiffnessByAreaX == null ? "$" : mTranslationalStiffnessByAreaX.ToString()) + "," +
+				(mTranslationalStiffnessByAreaY == null ? "$" : mTranslationalStiffnessByAreaY.ToString()) + "," +
+				(mTranslationalStiffnessByAreaZ == null ? "$" : mTranslationalStiffnessByAreaZ.ToString());
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mLinearStiffnessByAreaX = ParserSTEP.StripDouble(str, ref pos, len);
-			mLinearStiffnessByAreaY = ParserSTEP.StripDouble(str, ref pos, len);
-			mLinearStiffnessByAreaZ = ParserSTEP.StripDouble(str, ref pos, len);
+			mTranslationalStiffnessByAreaX = IfcModulusOfSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mTranslationalStiffnessByAreaY = IfcModulusOfSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
+			mTranslationalStiffnessByAreaZ = IfcModulusOfSubgradeReactionSelect.Parse(ParserSTEP.StripField(str, ref pos, len), release);
 		}
 	}
 	public partial class IfcBoundaryNodeCondition 

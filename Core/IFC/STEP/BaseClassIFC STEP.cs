@@ -63,7 +63,42 @@ namespace GeometryGym.Ifc
 			}
 			catch (Exception) { }
 		}
-
-		
+	}
+	public partial class StiffnessSelect<T>
+	{
+		public override string ToString() { return (mStiffness == null ? "IFCBOOLEAN(" + ParserSTEP.BoolToString(mRigid) + ")" : mStiffness.ToString()); }
+		protected void ParseValue(string str, ReleaseVersion version)
+		{
+			if (str.StartsWith("IFCBOOL"))
+				mRigid = ((IfcBoolean)ParserIfc.parseSimpleValue(str)).Boolean;
+			if (str.StartsWith("IFC"))
+				mStiffness = ((T)ParserIfc.parseDerivedMeasureValue(str));
+			if (str.StartsWith("."))
+				mRigid = ParserSTEP.ParseBool(str);
+			double d = ParserSTEP.ParseDouble(str), tol = 1e-9;
+			if (!double.IsNaN(d))
+			{
+				if (version < ReleaseVersion.IFC4)
+				{
+					if (Math.Abs(d + 1) < tol)
+					{
+						mStiffness = new T();
+						mStiffness.Measure = -1;
+						mRigid = true;
+					}
+					else if (Math.Abs(d) < tol)
+					{
+						mStiffness = new T();
+						mStiffness.Measure = 0;
+						mRigid = false;
+					}
+				}
+				else
+				{
+					mStiffness = new T();
+					mStiffness.Measure = d;
+				}
+			}
+		}
 	}
 }

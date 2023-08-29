@@ -1068,9 +1068,30 @@ namespace GeometryGym.Ifc
 		public IfcMobileTelecommunicationsApplianceType(DatabaseIfc db, string name, IfcMobileTelecommunicationsApplianceTypeEnum predefinedType)
 			: base(db) { Name = name; PredefinedType = predefinedType; }
 	}
-	public interface IfcModulusOfRotationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfRotationalSubgradeReactionMeasure);
-	public interface IfcModulusOfSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfSubgradeReactionMeasure);
-	public interface IfcModulusOfTranslationalSubgradeReactionSelect : IBaseClassIfc { } // SELECT(IfcBoolean, IfcModulusOfLinearSubgradeReactionMeasure);
+	[Serializable]
+	public partial class IfcModulusOfRotationalSubgradeReactionSelect : StiffnessSelect<IfcModulusOfRotationalSubgradeReactionMeasure>
+	{
+		public IfcModulusOfRotationalSubgradeReactionSelect() : base() { }
+		public IfcModulusOfRotationalSubgradeReactionSelect(bool fix) : base(fix) { }
+		public IfcModulusOfRotationalSubgradeReactionSelect(double stiffness) : base(new IfcModulusOfRotationalSubgradeReactionMeasure(stiffness)) { }
+		public IfcModulusOfRotationalSubgradeReactionSelect(IfcModulusOfRotationalSubgradeReactionMeasure stiffness) : base(stiffness) { }
+	}
+	[Serializable]
+	public partial class IfcModulusOfSubgradeReactionSelect : StiffnessSelect<IfcModulusOfSubgradeReactionMeasure>
+	{
+		public IfcModulusOfSubgradeReactionSelect() : base() { }
+		public IfcModulusOfSubgradeReactionSelect(bool fix) : base(fix) { }
+		public IfcModulusOfSubgradeReactionSelect(double stiffness) : base(new IfcModulusOfSubgradeReactionMeasure(stiffness)) { }
+		public IfcModulusOfSubgradeReactionSelect(IfcModulusOfSubgradeReactionMeasure stiffness) : base(stiffness) { }
+	}
+	[Serializable]
+	public partial class IfcModulusOfTranslationalSubgradeReactionSelect : StiffnessSelect<IfcModulusOfLinearSubgradeReactionMeasure>
+	{
+		public IfcModulusOfTranslationalSubgradeReactionSelect() : base() { }
+		public IfcModulusOfTranslationalSubgradeReactionSelect(bool fix) : base(fix) { }
+		public IfcModulusOfTranslationalSubgradeReactionSelect(double stiffness) : base(new IfcModulusOfLinearSubgradeReactionMeasure(stiffness)) { }
+		public IfcModulusOfTranslationalSubgradeReactionSelect(IfcModulusOfLinearSubgradeReactionMeasure stiffness) : base(stiffness) { }
+	}
 	[Serializable]
 	public partial class IfcMonetaryUnit : BaseClassIfc, IfcUnit
 	{

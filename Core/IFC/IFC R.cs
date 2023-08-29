@@ -399,7 +399,7 @@ namespace GeometryGym.Ifc
 	}
 	//[Obsolete("DEPRECATED IFC4", false)]
 	//ENTITY IfcReferencesValueDocument; // DEPRECATED IFC4
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X1)]
 	public partial class IfcReferent : IfcPositioningElement
 	{
 		private IfcReferentTypeEnum mPredefinedType = IfcReferentTypeEnum.NOTDEFINED; //: OPTIONAL IfcReferentTypeEnum;
@@ -554,12 +554,12 @@ namespace GeometryGym.Ifc
 		public IfcReinforcingBar(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
 	[Serializable]
-	public partial class IfcReinforcingBarType : IfcReinforcingElementType  //IFC4
+	public partial class IfcReinforcingBarType : IfcReinforcingElementType  
 	{
-		private IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarTypeEnum; //IFC4
-		private double mNominalDiameter = 0;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
-		internal double mCrossSectionArea = 0;// : IfcAreaMeasure; IFC4 OPTIONAL
-		internal double mBarLength;// : OPTIONAL IfcPositiveLengthMeasure;
+		private IfcReinforcingBarTypeEnum mPredefinedType = IfcReinforcingBarTypeEnum.NOTDEFINED;// : IfcReinforcingBarTypeEnum; 
+		private double mNominalDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure; 
+		internal double mCrossSectionArea = double.NaN;// : OPTIONAL IfcAreaMeasure; 
+		internal double mBarLength = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal IfcReinforcingBarSurfaceEnum mBarSurface = IfcReinforcingBarSurfaceEnum.NOTDEFINED;// //: OPTIONAL IfcReinforcingBarSurfaceEnum; 
 		internal string mBendingShapeCode = "";//	:	OPTIONAL IfcLabel;
 		internal List<IfcBendingParameterSelect> mBendingParameters = new List<IfcBendingParameterSelect>();//	:	OPTIONAL LIST [1:?] OF IfcBendingParameterSelect;
@@ -610,6 +610,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcReinforcingElementType : IfcElementComponentType //IFC4 ABSTRACT SUPERTYPE OF(ONEOF(IfcReinforcingBarType, IfcReinforcingMeshType, IfcTendonAnchorType, IfcTendonType))
 	{
+		public override string StepClassName { get { return (mDatabase.mRelease <= ReleaseVersion.IFC2x3 ? "IfcTypeProduct" : base.StepClassName); } }
 		protected IfcReinforcingElementType() : base() { }
 		protected IfcReinforcingElementType(DatabaseIfc db) : base(db) { }
 		protected IfcReinforcingElementType(DatabaseIfc db, string name) : base(db) { Name = name; }
@@ -2090,7 +2091,7 @@ namespace GeometryGym.Ifc
 		public IfcRelOverridesProperties(IfcObjectDefinition od, IfcPropertySetDefinition ifcproperty) : base(od, ifcproperty) { }
 		public IfcRelOverridesProperties(List<IfcObjectDefinition> objs, IfcPropertySetDefinition ifcproperty) : base(objs, ifcproperty) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcRelPositions : IfcRelConnects
 	{
 		private IfcPositioningElement mRelatingPositioningElement = null; //: IfcPositioningElement;

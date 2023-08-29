@@ -292,6 +292,7 @@ namespace GeometryGym.Ifc
 		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
 		public override Type ValueType { get { return typeof(double); } }
 		public double Measure { get { return mValue; } set { mValue = value; } }
+		protected IfcDerivedMeasureValue() { }
 		protected IfcDerivedMeasureValue(double value) { mValue = value; }
 		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
 		public override string ValueString { get { return Value.ToString(); } }
@@ -423,7 +424,11 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcLinearMomentMeasure : IfcDerivedMeasureValue { public IfcLinearMomentMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue { public IfcLinearStiffnessMeasure(double value) : base(value) { } }
+	public class IfcLinearStiffnessMeasure : IfcDerivedMeasureValue 
+	{
+		public IfcLinearStiffnessMeasure() : base() { }
+		public IfcLinearStiffnessMeasure(double value) : base(value) { }
+	}
 	[Serializable]
 	public class IfcLinearVelocityMeasure : IfcDerivedMeasureValue { public IfcLinearVelocityMeasure(double value) : base(value) { } }
 	[Serializable]
@@ -445,9 +450,23 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcModulusOfElasticityMeasure : IfcDerivedMeasureValue { public IfcModulusOfElasticityMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcModulusOfSubgradeReactionMeasure : IfcDerivedMeasureValue { public IfcModulusOfSubgradeReactionMeasure(double value) : base(value) { } }
+	public class IfcModulusOfSubgradeReactionMeasure : IfcDerivedMeasureValue 
+	{
+		public IfcModulusOfSubgradeReactionMeasure() { }
+		public IfcModulusOfSubgradeReactionMeasure(double value) : base(value) { } 
+	}
 	[Serializable]
-	public class IfcModulusOfRotationalSubgradeReactionMeasure : IfcDerivedMeasureValue { public IfcModulusOfRotationalSubgradeReactionMeasure(double value) : base(value) { } }
+	public class IfcModulusOfLinearSubgradeReactionMeasure : IfcDerivedMeasureValue 
+	{ 
+		public IfcModulusOfLinearSubgradeReactionMeasure() { } 
+		public IfcModulusOfLinearSubgradeReactionMeasure(double value) : base(value) { } 
+	}
+	[Serializable]
+	public class IfcModulusOfRotationalSubgradeReactionMeasure : IfcDerivedMeasureValue 
+	{ 
+		public IfcModulusOfRotationalSubgradeReactionMeasure() { }
+		public IfcModulusOfRotationalSubgradeReactionMeasure(double value) : base(value) { }
+	}
 	[Serializable]
 	public class IfcMoistureDiffusivityMeasure : IfcDerivedMeasureValue { public IfcMoistureDiffusivityMeasure(double value) : base(value) { } }
 	[Serializable]
@@ -544,7 +563,10 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public class IfcElectricCurrentMeasure : IfcMeasureValue { public IfcElectricCurrentMeasure(double value) : base(value) { } }
 	[Serializable]
-	public class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect { public IfcLengthMeasure(double value) : base(value) { } }
+	public class IfcLengthMeasure : IfcMeasureValue, IfcSizeSelect, IfcBendingParameterSelect, IfcCurveMeasureSelect 
+	{
+		public IfcLengthMeasure(double value) : base(value) { } 
+	}
 	[Serializable]
 	public class IfcLuminousIntensityMeasure : IfcMeasureValue { public IfcLuminousIntensityMeasure(double value) : base(value) { } }
 	[Serializable]

@@ -354,12 +354,19 @@ namespace GeometryGym.Ifc
 	}
 	public partial class IfcMaterialProfileSetUsageTapering
 	{
-		protected override string BuildStringSTEP(ReleaseVersion release) { return (release < ReleaseVersion.IFC4 || AssociatedTo.SelectMany(x => x.mRelatedObjects).Count() == 0 ? "" : base.BuildStringSTEP(release) + ",#" + ForProfileEndSet.StepId + "," + (int)mCardinalEndPoint); }
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			if (release < ReleaseVersion.IFC4 || AssociatedTo.SelectMany(x => x.mRelatedObjects).Count() == 0)
+				return "";
+			return base.BuildStringSTEP(release) + ",#" + ForProfileEndSet.StepId + "," + (mCardinalEndPoint == IfcCardinalPointReference.DEFAULT ? "$" : ((int)mCardinalEndPoint).ToString());
+		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			ForProfileEndSet = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterialProfileSet;
-			mCardinalEndPoint = (IfcCardinalPointReference)ParserSTEP.StripInt(str, ref pos, len);
+			int i = ParserSTEP.StripInt(str, ref pos, len);
+			if (i > 0)
+				CardinalEndPoint = (IfcCardinalPointReference)i;
 		}
 	}
 	public partial class IfcMaterialProfileWithOffsets
@@ -596,6 +603,39 @@ namespace GeometryGym.Ifc
 			string s = ParserSTEP.StripField(str, ref pos, len);
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcMobileTelecommunicationsApplianceTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
+		}
+	}
+	public partial class IfcModulusOfRotationalSubgradeReactionSelect
+	{
+		internal static IfcModulusOfRotationalSubgradeReactionSelect Parse(string str, ReleaseVersion version)
+		{
+			if (str == "$")
+				return null;
+			IfcModulusOfRotationalSubgradeReactionSelect stiffness = new IfcModulusOfRotationalSubgradeReactionSelect();
+			stiffness.ParseValue(str, version);
+			return stiffness;
+		}
+	}
+	public partial class IfcModulusOfSubgradeReactionSelect
+	{
+		internal static IfcModulusOfSubgradeReactionSelect Parse(string str, ReleaseVersion version)
+		{
+			if (str == "$")
+				return null;
+			IfcModulusOfSubgradeReactionSelect stiffness = new IfcModulusOfSubgradeReactionSelect();
+			stiffness.ParseValue(str, version);
+			return stiffness;
+		}
+	}
+	public partial class IfcModulusOfTranslationalSubgradeReactionSelect
+	{
+		internal static IfcModulusOfTranslationalSubgradeReactionSelect Parse(string str, ReleaseVersion version)
+		{
+			if (str == "$")
+				return null;
+			IfcModulusOfTranslationalSubgradeReactionSelect stiffness = new IfcModulusOfTranslationalSubgradeReactionSelect();
+			stiffness.ParseValue(str, version);
+			return stiffness;
 		}
 	}
 	public partial class IfcMonetaryUnit

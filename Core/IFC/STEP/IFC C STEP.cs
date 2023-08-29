@@ -465,12 +465,14 @@ namespace GeometryGym.Ifc
 		{
 			string tokens = "$";
 			if (mReferenceTokens.Count > 0)
-				tokens = "('" + string.Join("','", mReferenceTokens) + "')";
+				tokens = "(" + string.Join(",", mReferenceTokens.Select(x=> "'" + ParserSTEP.Encode(x) + "'")) + ")";
 			bool older = mDatabase.Release <= ReleaseVersion.IFC2x3;
 			return (string.IsNullOrEmpty(mSource) ? (older ? "'Unknown'," : "$,") : "'" + ParserSTEP.Encode(mSource) + "',") +
 				(string.IsNullOrEmpty(mEdition) ? (older ? "'Unknown'," : "$,") : "'" + ParserSTEP.Encode(mEdition) + "',") + 
 				(older ? (mEditionDateSS == null ? "$" : "#" + mEditionDateSS.StepId) : IfcDate.STEPAttribute(mEditionDate)) + ",'" + 
-				ParserSTEP.Encode(mName) + (older ? "'" : (string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserSTEP.Encode(mDescription) + "',") + (string.IsNullOrEmpty(mSpecification) ? "$," : "'" + ParserSTEP.Encode(mSpecification) + "',") + tokens);
+				ParserSTEP.Encode(mName) + 
+				(older ? "'" : (string.IsNullOrEmpty(mDescription) ? "',$," : "','" + ParserSTEP.Encode(mDescription) + "',") + 
+				(string.IsNullOrEmpty(mSpecification) ? "$," : "'" + ParserSTEP.Encode(mSpecification) + "',") + tokens);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -487,7 +489,7 @@ namespace GeometryGym.Ifc
 				mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 				mSpecification = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-				mReferenceTokens = ParserSTEP.SplitListStrings(ParserSTEP.StripField(str, ref pos, len));
+				mReferenceTokens.AddRange(ParserSTEP.SplitListStrings(ParserSTEP.StripField(str, ref pos, len)).Select(x=>ParserSTEP.Decode(x)));
 			}
 		}
 	}
@@ -1263,41 +1265,22 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string s = base.BuildStringSTEP(release);
-			if (release != ReleaseVersion.IFC2x3)
-			{
-				s += ",." + mPredefinedType.ToString();
-				if (mCostValues.Count == 0)
-					s += ".,$,";
-				else
-				{
-					s += ".,(" + ParserSTEP.LinkToString(mCostValues[0]);
-					for (int icounter = 1; icounter < mCostValues.Count; icounter++)
-						s += "," + ParserSTEP.LinkToString(mCostValues[icounter]);
-					s += "),";
-				}
-				if (mCostQuantities.Count == 0)
-					s += "$";
-				else
-				{
-					s += "(" + ParserSTEP.LinkToString(mCostQuantities[0]);
-					for (int icounter = 1; icounter < mCostQuantities.Count; icounter++)
-						s += "," + ParserSTEP.LinkToString(mCostQuantities[icounter]);
-					s += ")";
-				}
-			}
-			return s;
+			if (release == ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + ",." + mPredefinedType.ToString() +
+				(mCostValues.Count == 0 ? ".,$," : ".,(" + string.Join(",", mCostValues.Select(x => "#" + x.StepId)) + "),") +
+				(mCostQuantities.Count == 0 ? "$" : "(" + string.Join(",", mCostQuantities.Select(x => "#" + x.StepId)) + ")"); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			if (release != ReleaseVersion.IFC2x3)
+			if (release > ReleaseVersion.IFC2x3)
 			{
 				string s = ParserSTEP.StripField(str, ref pos, len);
 				if (s.StartsWith("."))
 					Enum.TryParse<IfcCostItemTypeEnum>(s.Replace(".", ""), true, out mPredefinedType);
-				mCostValues = ParserSTEP.StripListLink(str, ref pos, len);
-				mCostQuantities = ParserSTEP.StripListLink(str, ref pos, len);
+				mCostValues.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcCostValue));
+				mCostQuantities.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcPhysicalQuantity));
 			}
 		}
 	}

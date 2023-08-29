@@ -589,10 +589,13 @@ namespace GeometryGym.Ifc
 			else if (release < ReleaseVersion.IFC4X3_RC1)
 			{
 				if (string.Compare(str, "IfcBuiltElement", true) == 0)
+				{
 					type = typeof(IfcBuildingElementProxy);
+					str = "IfcBuildingElementProxy";
+				}
 				else if (release < ReleaseVersion.IFC4X2)
 				{
-					if(typeof(IfcFacility).IsAssignableFrom(type) && !typeof(IfcBuilding).IsAssignableFrom(type))
+					if (typeof(IfcFacility).IsAssignableFrom(type) && !typeof(IfcBuilding).IsAssignableFrom(type))
 					{
 						if (release < ReleaseVersion.IFC4X1)
 							type = host is IfcBuilding ? typeof(IfcBuilding) : typeof(IfcSite);
@@ -718,12 +721,33 @@ namespace GeometryGym.Ifc
 		{
 			if (placement == null)
 				return null;
-			int index = mDuplicateMapping.FindExisting(placement);
-			if (index > 0)
-				return mDatabase[index] as IfcAxis2Placement3D;
+			int stepId = mDuplicateMapping.FindExisting(placement);
+			if (stepId > 0)
+				return mDatabase[stepId] as IfcAxis2Placement3D;
 			if (placement.IsXYPlane(mDatabase.Tolerance))
 				return XYPlanePlacement;
 			return Duplicate<IfcAxis2Placement3D>(placement, options);
+		}
+		public IfcDirection DuplicateDirection(IfcDirection direction, DuplicateOptions options)
+		{
+			if (direction == null)
+				return null;
+			int stepId = mDuplicateMapping.FindExisting(direction);
+			if (stepId > 0)
+				return mDatabase[stepId] as IfcDirection;
+			if (direction.DirectionRatios.Count == 2)
+			{
+				IfcDirection result = Direction(direction.DirectionRatios[0], direction.DirectionRatios[1]);
+				mDuplicateMapping.AddObject(direction, result.StepId);
+				return result;
+			}
+			else if (direction.DirectionRatios.Count == 3)
+			{
+				IfcDirection result = Direction(direction.DirectionRatios[0], direction.DirectionRatios[1], direction.DirectionRatios[2]);
+				mDuplicateMapping.AddObject(direction, result.StepId);
+				return result;
+			}
+			return Duplicate(direction, options);
 		}
 		public T Duplicate<T>(T entity, DuplicateOptions options) where T : class, IBaseClassIfc
 		{
@@ -1405,6 +1429,7 @@ namespace GeometryGym.Ifc
 		public IfcSIUnit SIVolume { get { if(mSIVolume == null) mSIVolume = new IfcSIUnit(mDatabase, IfcUnitEnum.VOLUMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.CUBIC_METRE); return mSIVolume; } }
 
 		internal IfcDirection mXAxis, mYAxis, mZAxis, mNegXAxis, mNegYAxis, mNegZAxis;
+		internal IfcDirection mXAxis2d, mYAxis2d, mNegXAxis2d, mNegYAxis2d;
 		internal IfcLine mLineX2d = null;
 
 		public IfcDirection Direction(double x, double y, double z)
@@ -1435,6 +1460,24 @@ namespace GeometryGym.Ifc
 		public IfcDirection YAxisNegative { get { if (mNegYAxis == null) mNegYAxis = new IfcDirection(mDatabase, 0, -1, 0); return mNegYAxis; } }
 		public IfcDirection ZAxisNegative { get { if (mNegZAxis == null) mNegZAxis = new IfcDirection(mDatabase, 0, 0, -1); return mNegZAxis; } }
 
+		public IfcDirection Direction(double x, double y)
+		{
+			double length = Math.Sqrt(x * x + y * y), tol = 1e-6;
+			double dx = x / length, dy = y / length;
+			if (Math.Abs(dx - 1) < tol)
+				return XAxis2d;
+			if (Math.Abs(dy - 1) < tol)
+				return YAxis2d;
+			if (Math.Abs(dx + 1) < tol)
+				return XAxisNegative2d;
+			if (Math.Abs(dy + 1) < tol)
+				return YAxisNegative2d;
+			return new IfcDirection(mDatabase, x, y);
+		}
+		public IfcDirection XAxis2d { get { if (mXAxis2d == null) mXAxis2d = new IfcDirection(mDatabase, 1, 0); return mXAxis2d; } }
+		public IfcDirection YAxis2d { get { if (mYAxis2d == null) mYAxis2d = new IfcDirection(mDatabase, 0, 1); return mYAxis2d; } }
+		public IfcDirection XAxisNegative2d { get { if (mNegXAxis2d == null) mNegXAxis2d = new IfcDirection(mDatabase, -1, 0); return mNegXAxis2d; } }
+		public IfcDirection YAxisNegative2d { get { if (mNegYAxis2d == null) mNegYAxis2d = new IfcDirection(mDatabase, 0, -1); return mNegYAxis2d; } }
 		public IfcLine LineX2d { get { if (mLineX2d == null) mLineX2d = new IfcLine(Origin2d, new IfcVector(new IfcDirection(mDatabase, 1, 0), 1));  return mLineX2d; } }
 
 		partial void getApplicationFullName(ref string app);

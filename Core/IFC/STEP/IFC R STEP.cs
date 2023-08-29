@@ -450,6 +450,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if (release <= ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
 			return base.BuildStringSTEP(release) + ",." + mPredefinedType + ".," + ParserSTEP.DoubleOptionalToString(mNominalDiameter) + "," +
 				ParserSTEP.DoubleOptionalToString(mCrossSectionArea) + "," + ParserSTEP.DoubleOptionalToString(mBarLength) +
 				(mBarSurface == IfcReinforcingBarSurfaceEnum.NOTDEFINED ? ",$," : ",." + mBarSurface.ToString() + ".,") +
@@ -508,8 +510,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mDatabase.Release < ReleaseVersion.IFC4)
-				return "";
+			if (release <= ReleaseVersion.IFC2x3)
+				return base.BuildStringSTEP(release);
 			return base.BuildStringSTEP(release) + ",." + mPredefinedType + ".," + ParserSTEP.DoubleOptionalToString(mMeshLength) + "," +
 				ParserSTEP.DoubleOptionalToString(mMeshWidth) + "," + ParserSTEP.DoubleToString(mLongitudinalBarNominalDiameter) + "," +
 				ParserSTEP.DoubleToString(mTransverseBarNominalDiameter) + "," + ParserSTEP.DoubleToString(mLongitudinalBarCrossSectionArea) + "," +
@@ -1157,6 +1159,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if (release < ReleaseVersion.IFC4X2)
+				return "";
 			return base.BuildStringSTEP(release) +
 			",#" + mRelatingPositioningElement.StepId +
 			",(#" + string.Join(",#", mRelatedProducts.ConvertAll(x => x.StepId.ToString())) + ")";

@@ -676,9 +676,9 @@ namespace GeometryGym.Ifc
 		private LIST<double> mCoefficientsZ = new LIST<double>();//: OPTIONAL LIST[2:?] OF IfcReal;
 
 		public IfcPlacement Position { get { return mPosition; } set { mPosition = value; } }
-		public LIST<double> CoefficientsX { get { return mCoefficientsX; } set { mCoefficientsX = value; } }
-		public LIST<double> CoefficientsY { get { return mCoefficientsY; } set { mCoefficientsY = value; } }
-		public LIST<double> CoefficientsZ { get { return mCoefficientsZ; } set { mCoefficientsZ = value; } }
+		public LIST<double> CoefficientsX { get { return mCoefficientsX; } }
+		public LIST<double> CoefficientsY { get { return mCoefficientsY; } }
+		public LIST<double> CoefficientsZ { get { return mCoefficientsZ; } }
 
 		public IfcPolynomialCurve() : base() { }
 		internal IfcPolynomialCurve(DatabaseIfc db, IfcPolynomialCurve polynomial, DuplicateOptions options)
@@ -1666,17 +1666,14 @@ namespace GeometryGym.Ifc
 		}
 
 		public IfcSpatialStructureElement RootElement() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSpatialStructureElement);  }
-		internal IfcSite getSite() { return (mIsDecomposedBy.Count == 0 ? null : mIsDecomposedBy.First().RelatedObjects.First() as IfcSite); }
+		internal IfcSite getSite() { return mIsDecomposedBy.SelectMany(x=>x.RelatedObjects).OfType<IfcSite>().FirstOrDefault(); }
 		public IfcSite UppermostSite() { return getSite(); }
 		public IfcBuilding UppermostBuilding()
 		{
-			if (mIsDecomposedBy.Count == 0)
-				return null;
-			BaseClassIfc ent = mIsDecomposedBy.First().mRelatedObjects.First();
-			IfcBuilding result = ent as IfcBuilding;
+			IfcBuilding result = mIsDecomposedBy.SelectMany(x => x.RelatedObjects).OfType<IfcBuilding>().FirstOrDefault();
 			if (result != null)
 				return result;
-			IfcSite s = ent as IfcSite;
+			IfcSite s = UppermostSite();
 			if (s != null)
 				return s.IsDecomposedBy.SelectMany(x=>x.RelatedObjects).OfType<IfcBuilding>().FirstOrDefault();
 			return null;

@@ -898,17 +898,12 @@ namespace GeometryGym.Ifc
 		internal IfcTransitionCurveSegment2D(DatabaseIfc db, IfcTransitionCurveSegment2D s, DuplicateOptions options) : base(db, s, options) { mStartRadius = s.mStartRadius; mEndRadius = s.mEndRadius; mIsStartRadiusCCW = s.mIsStartRadiusCCW; mIsEndRadiusCCW = s.mIsEndRadiusCCW; mTransitionCurveType = s.mTransitionCurveType; }
 	}
 	[Serializable]
-	public partial class IfcTranslationalStiffnessSelect
+	public partial class IfcTranslationalStiffnessSelect : StiffnessSelect<IfcLinearStiffnessMeasure>
 	{
-		internal bool mRigid = false;
-		internal IfcLinearStiffnessMeasure mStiffness = null;
-
-		public bool Rigid { get { return mRigid; } }
-		public IfcLinearStiffnessMeasure Stiffness { get { return mStiffness; } }
-
-		public IfcTranslationalStiffnessSelect(bool fix) { mRigid = fix; }
-		public IfcTranslationalStiffnessSelect(double stiff) { mStiffness = new IfcLinearStiffnessMeasure(stiff); }
-		public IfcTranslationalStiffnessSelect(IfcLinearStiffnessMeasure stiff) { mStiffness = stiff; }
+		public IfcTranslationalStiffnessSelect() : base() { }
+		public IfcTranslationalStiffnessSelect(bool fix) : base(fix) { }
+		public IfcTranslationalStiffnessSelect(double stiffness) : base(new IfcLinearStiffnessMeasure(stiffness)) { }
+		public IfcTranslationalStiffnessSelect(IfcLinearStiffnessMeasure stiffness) : base(stiffness) { }
 	}
 	public partial class IfcTransportationDevice : IfcElement //ABSTRACT SUPERTYPE OF (ONEOF (IfcTransportElement , IfcVehicle))
 	{

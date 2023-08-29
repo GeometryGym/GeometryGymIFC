@@ -223,8 +223,15 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBoundaryEdgeCondition : IfcBoundaryCondition
 	{
-		internal double mLinearStiffnessByLengthX, mLinearStiffnessByLengthY, mLinearStiffnessByLengthZ;// : OPTIONAL IfcModulusOfLinearSubgradeReactionMeasure;
-		internal double mRotationalStiffnessByLengthX, mRotationalStiffnessByLengthY, mRotationalStiffnessByLengthZ;// : OPTIONAL IfcModulusOfRotationalSubgradeReactionMeasure; 
+		private IfcModulusOfTranslationalSubgradeReactionSelect mLinearStiffnessByLengthX, mLinearStiffnessByLengthY, mLinearStiffnessByLengthZ;// : OPTIONAL IfcModulusOfTranslationalSubgradeReactionSelect;
+		private IfcModulusOfRotationalSubgradeReactionSelect mRotationalStiffnessByLengthX, mRotationalStiffnessByLengthY, mRotationalStiffnessByLengthZ;// : OPTIONAL IfcModulusOfRotationalSubgradeReactionSelect; 
+		public IfcModulusOfTranslationalSubgradeReactionSelect LinearStiffnessByLengthX { get { return mLinearStiffnessByLengthX; } set { mLinearStiffnessByLengthX = value; } }
+		public IfcModulusOfTranslationalSubgradeReactionSelect LinearStiffnessByLengthY { get { return mLinearStiffnessByLengthY; } set { mLinearStiffnessByLengthY = value; } }
+		public IfcModulusOfTranslationalSubgradeReactionSelect LinearStiffnessByLengthZ { get { return mLinearStiffnessByLengthZ; } set { mLinearStiffnessByLengthZ = value; } }
+		public IfcModulusOfRotationalSubgradeReactionSelect RotationalStiffnessByLengthX { get { return mRotationalStiffnessByLengthX; } set { mRotationalStiffnessByLengthX = value; } }
+		public IfcModulusOfRotationalSubgradeReactionSelect RotationalStiffnessByLengthY { get { return mRotationalStiffnessByLengthY; } set { mRotationalStiffnessByLengthY = value; } }
+		public IfcModulusOfRotationalSubgradeReactionSelect RotationalStiffnessByLengthZ { get { return mRotationalStiffnessByLengthZ; } set { mRotationalStiffnessByLengthZ = value; } }
+
 		internal IfcBoundaryEdgeCondition() : base() { }
 		internal IfcBoundaryEdgeCondition(DatabaseIfc db, IfcBoundaryEdgeCondition b) : base(db,b) { mLinearStiffnessByLengthX = b.mLinearStiffnessByLengthX; mLinearStiffnessByLengthY = b.mLinearStiffnessByLengthY; mLinearStiffnessByLengthZ = b.mLinearStiffnessByLengthZ; mRotationalStiffnessByLengthX = b.mRotationalStiffnessByLengthX; mRotationalStiffnessByLengthY = b.mRotationalStiffnessByLengthY; mRotationalStiffnessByLengthZ = b.mRotationalStiffnessByLengthZ; }
 		public IfcBoundaryEdgeCondition(DatabaseIfc db) : base(db) {  }
@@ -232,9 +239,9 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcBoundaryFaceCondition : IfcBoundaryCondition
 	{
-		internal double mLinearStiffnessByAreaX, mLinearStiffnessByAreaY, mLinearStiffnessByAreaZ;// : OPTIONAL IfcModulusOfSubgradeReactionMeasure 
+		internal IfcModulusOfSubgradeReactionSelect mTranslationalStiffnessByAreaX, mTranslationalStiffnessByAreaY, mTranslationalStiffnessByAreaZ;// : OPTIONAL IfcModulusOfSubgradeReactionSelect 
 		internal IfcBoundaryFaceCondition() : base() { }
-		internal IfcBoundaryFaceCondition(DatabaseIfc db, IfcBoundaryFaceCondition c) : base(db,c) { mLinearStiffnessByAreaX = c.mLinearStiffnessByAreaX; mLinearStiffnessByAreaY = c.mLinearStiffnessByAreaY; mLinearStiffnessByAreaZ = c.mLinearStiffnessByAreaZ; }
+		internal IfcBoundaryFaceCondition(DatabaseIfc db, IfcBoundaryFaceCondition c) : base(db,c) { mTranslationalStiffnessByAreaX = c.mTranslationalStiffnessByAreaX; mTranslationalStiffnessByAreaY = c.mTranslationalStiffnessByAreaY; mTranslationalStiffnessByAreaZ = c.mTranslationalStiffnessByAreaZ; }
 		public IfcBoundaryFaceCondition(DatabaseIfc db) : base(db) { }
 	}
 	[Serializable]
@@ -356,17 +363,6 @@ namespace GeometryGym.Ifc
 				return new IfcCompositeCurve(segs);
 			}
 			return new IfcIndexedPolyCurve(new IfcCartesianPointList2D(db, points), segments);
-		}
-
-		internal T representationOf<T>() where T : IfcProduct
-		{
-			IfcShapeModel shapeModel = Represents.FirstOrDefault();
-			if (shapeModel != null)
-			{
-				var ofRepresentation = shapeModel.OfProductRepresentation.SelectMany(x => x.ShapeOfProduct);
-				return ofRepresentation.OfType<T>().FirstOrDefault();
-			}
-			return null;
 		}
 	}
 	[Serializable]

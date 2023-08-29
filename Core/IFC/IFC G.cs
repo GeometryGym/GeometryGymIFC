@@ -215,6 +215,16 @@ namespace GeometryGym.Ifc
 		protected IfcGeometricRepresentationItem() : base() { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db) : base(db) { }
 		protected IfcGeometricRepresentationItem(DatabaseIfc db, IfcGeometricRepresentationItem i, DuplicateOptions options) : base(db, i, options) { }
+		internal T representationOf<T>() where T : IfcProduct
+		{
+			IfcShapeModel shapeModel = Represents.FirstOrDefault();
+			if (shapeModel != null)
+			{
+				var ofRepresentation = shapeModel.OfProductRepresentation.SelectMany(x => x.ShapeOfProduct);
+				return ofRepresentation.OfType<T>().FirstOrDefault();
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext

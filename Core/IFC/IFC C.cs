@@ -517,7 +517,7 @@ namespace GeometryGym.Ifc
 		public string Name { get { return mName; } set {  mName = (string.IsNullOrEmpty(value) ? "Unknown" : value); } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string Specification { get { return mSpecification; } set { mSpecification = value; } }
-		public List<string> ReferenceTokens { get { return mReferenceTokens.ConvertAll(x => ParserSTEP.Decode(x)); } }
+		public List<string> ReferenceTokens { get { return mReferenceTokens; } }
 		public SET<IfcRelAssociatesClassification> ClassificationForObjects { get { return mClassificationForObjects; } }
 		public SET<IfcClassificationReference> HasReferences { get { return mHasReferences; } }
 		[Obsolete("RENAMED IFC4X3 to Specification", false)]
@@ -1891,10 +1891,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcCostItem : IfcControl
 	{
 		private IfcCostItemTypeEnum mPredefinedType = IfcCostItemTypeEnum.NOTDEFINED; // IFC4
-		internal List<int> mCostValues = new List<int>();//	 : OPTIONAL LIST [1:?] OF IfcCostValue; IFC4
-		internal List<int> mCostQuantities = new List<int>();//	 : OPTIONAL LIST [1:?] OF IfcPhysicalQuantity; IFC4
+		private LIST<IfcCostValue> mCostValues = new LIST<IfcCostValue>();//	 : OPTIONAL LIST [1:?] OF IfcCostValue; IFC4
+		private LIST<IfcPhysicalQuantity> mCostQuantities = new LIST<IfcPhysicalQuantity>();//	 : OPTIONAL LIST [1:?] OF IfcPhysicalQuantity; IFC4
 
 		public IfcCostItemTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcCostItemTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+		public LIST<IfcCostValue> CostValues { get { return mCostValues; } }
+		public LIST<IfcPhysicalQuantity> CostQuantities { get { return mCostQuantities; } }
 
 		internal IfcCostItem() : base() { } 
 		internal IfcCostItem(DatabaseIfc db, IfcCostItem i, DuplicateOptions options) : base(db, i, options) { PredefinedType = i.PredefinedType; }
@@ -2234,7 +2236,7 @@ namespace GeometryGym.Ifc
 		public IfcCurveBoundedSurface(DatabaseIfc db, IfcSurface s, List<IfcBoundaryCurve> bounds)
 			: base(db) { BasisSurface = s; Boundaries.AddRange(bounds); mImplicitOuter = false; }
 	}
-	public interface IfcCurveMeasureSelect : IBaseClassIfc { } // SELECT(IfcParameterValue, IfcNonNegativeLengthMeasure);
+	public interface IfcCurveMeasureSelect : IBaseClassIfc { } // SELECT(IfcParameterValue, IfcLengthMeasure) IFC4.3.0 IfcNonNegativeLengthMeasure);
 	public interface IfcCurveOnSurface : IBaseClassIfc { } // SELECT(IfcCompositeCurveOnSurface, IfcPcurve, IfcSurfaceCurve);
 	public interface IfcCurveOrEdgeCurve : IBaseClassIfc { }  // = SELECT (	IfcBoundedCurve, IfcEdgeCurve);
 	[Serializable]

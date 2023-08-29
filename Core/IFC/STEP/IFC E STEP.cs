@@ -373,7 +373,9 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 && (this as IfcDoorType != null || this as IfcWindowType != null) ? "" : (string.IsNullOrEmpty(mElementType) ? ",$" : ",'" + ParserSTEP.Encode(mElementType) + "'"));
+			if (release <= ReleaseVersion.IFC2x3 && (this is IfcDoorType || this is IfcWindowType || this is IfcReinforcingElementType))
+				return base.BuildStringSTEP(release);
+			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mElementType) ? ",$" : ",'" + ParserSTEP.Encode(mElementType) + "'");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
