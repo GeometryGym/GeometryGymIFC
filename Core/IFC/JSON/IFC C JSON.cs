@@ -472,8 +472,8 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parseJsonObject(JsonObject obj)
 		{
-			if (mDatabase.mContext == null || this as IfcProjectLibrary == null)
-				mDatabase.mContext = this;
+			if (mDatabase.Context == null || this as IfcProjectLibrary == null)
+				mDatabase.SetContext(this);
 
 			var node = obj["ObjectType"];
 			if (node != null)

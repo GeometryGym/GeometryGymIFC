@@ -348,7 +348,7 @@ namespace GeometryGym.Ifc
 		{
 			if (release <= ReleaseVersion.IFC2x3)
 				return base.BuildStringSTEP(release);
-			return base.BuildStringSTEP(release) +  ",." + mPredefinedType.ToString() + ".";
+			return base.BuildStringSTEP(release) + (mPredefinedType == IfcTendonConduitTypeEnum.NOTDEFINED ? ",$" :  ",." + mPredefinedType.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{

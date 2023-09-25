@@ -1073,8 +1073,8 @@ namespace GeometryGym.Ifc
 			RepresentationContexts.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcRepresentationContext));
 			mUnitsInContext = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcUnitAssignment;
 
-			if (mDatabase.mContext == null || !(this is IfcProjectLibrary))
-				mDatabase.mContext = this;
+			if (mDatabase.Context == null || !(this is IfcProjectLibrary))
+				mDatabase.SetContext(this);
 		}
 	}
 	public partial class IfcContextDependentUnit

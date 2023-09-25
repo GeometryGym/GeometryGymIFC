@@ -437,13 +437,10 @@ namespace GeometryGym.Ifc
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
 			}
-			if (options.DuplicateDownstream)
+			foreach (IfcRelVoidsElement ve in e.mHasOpenings)
 			{
-				foreach (IfcRelVoidsElement ve in e.mHasOpenings)
-				{
-					IfcRelVoidsElement rv = db.Factory.Duplicate(ve, options) as IfcRelVoidsElement;
-					rv.RelatingBuildingElement = this;
-				}
+				IfcRelVoidsElement rv = db.Factory.Duplicate(ve, options) as IfcRelVoidsElement;
+				rv.RelatingBuildingElement = this;
 			}
 		
 			foreach (IfcRelConnectsStructuralActivity rcss in e.mAssignedStructuralActivity)
@@ -513,7 +510,7 @@ namespace GeometryGym.Ifc
 			IfcProfileDef pd = mp.Profile;
 			DatabaseIfc db = host.mDatabase;
 			List<IfcShapeModel> reps = new List<IfcShapeModel>();
-			double length = Math.Sqrt(Math.Pow(arcOrigin.Item1, 2) + Math.Pow(arcOrigin.Item2, 2)), angMultipler = 1 / mDatabase.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
+			double length = Math.Sqrt(Math.Pow(arcOrigin.Item1, 2) + Math.Pow(arcOrigin.Item2, 2)), angMultipler = 1 / mDatabase.Context.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			Tuple<double, double> normal = new Tuple<double, double>(-arcOrigin.Item2 / length, arcOrigin.Item1 / length);
 			reps.Add(new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcTrimmedCurve(new IfcCircle(new IfcAxis2Placement3D(new IfcCartesianPoint(db, arcOrigin.Item1, arcOrigin.Item2, 0), new IfcDirection(db, normal.Item1, normal.Item2, 0), new IfcDirection(db, -arcOrigin.Item1, -arcOrigin.Item2, 0)), length), new IfcTrimmingSelect(0), new IfcTrimmingSelect(arcAngle * angMultipler), true, IfcTrimmingPreference.PARAMETER), ShapeRepresentationType.Curve2D));
 			IfcAxis2Placement3D translation = pd.CalculateTransform(profile.CardinalPoint);

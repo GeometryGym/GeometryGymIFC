@@ -67,9 +67,13 @@ namespace GeometryGym.Ifc
 		IFC4X3,
 		IFC4X3_TC1,
 		/// <summary>
+		/// Development version of Standard, not to be used for Production 
+		/// </summary>
+		[Description("Development version of Standard, not yet to be used for Production")] IFC4X3_ADD1,
+		/// <summary>
 		/// Development version of Standard, not yet to be used for Production 
 		/// </summary>
-		[Description("Development version of Standard, not yet to be used for Production")] IFC4X3_ADD1, 
+		[Description("Development version of Standard, not yet to be used for Production")] IFC4X3_ADD2,
 		/// <summary>
 		/// Draft Release for IfcTunnel Deployment Testing, not to be used for Production
 		/// </summary>
@@ -233,7 +237,7 @@ namespace GeometryGym.Ifc
 			if (modelView == ModelView.Ifc4X2NotAssigned)
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
-				return ReleaseVersion.IFC4X3;
+				return ReleaseVersion.IFC4X3_ADD2;
 			if ((modelView == ModelView.Ifc4X4NotAssigned))
 				return ReleaseVersion.IFC4X4_DRAFT;
 			return ReleaseVersion.IFC4A2;
@@ -311,7 +315,11 @@ namespace GeometryGym.Ifc
 		public IfcContext Context { get { return mContext; } }
 		public IfcProject Project { get { return mContext as IfcProject; } }
 		
-		internal IfcContext mContext = null;
+		private IfcContext mContext = null;
+		internal void SetContext(IfcContext context)
+		{
+			mContext = context;
+		}
 		
 		internal ConcurrentDictionary<string, BaseClassIfc> mDictionary = new ConcurrentDictionary<string, BaseClassIfc>();
 		internal HashSet<IfcClassificationReference> mClassificationReferences = new HashSet<IfcClassificationReference>();
@@ -579,7 +587,7 @@ namespace GeometryGym.Ifc
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant);
+			str = ParserIfc.IdentifyIfcClass(str, out predefinedTypeConstant);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -631,7 +639,7 @@ namespace GeometryGym.Ifc
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
-			str = BaseClassIfc.identifyIfcClass(str, out predefinedTypeConstant);
+			str = ParserIfc.IdentifyIfcClass(str, out predefinedTypeConstant);
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
@@ -2701,12 +2709,12 @@ namespace GeometryGym.Ifc
 							mDatabase.Release = ReleaseVersion.IFC4X4_DRAFT;
 						else
 						{
-							string[] schemas = Enum.GetNames(typeof(ReleaseVersion));
+							List<string> schemas = Enum.GetNames(typeof(ReleaseVersion)).Reverse().ToList();
 							foreach (string schema in schemas)
 							{
 								if (schemaId.StartsWith(schema))
 								{
-									Enum.TryParse<ReleaseVersion>(schemaId, out release);
+									Enum.TryParse<ReleaseVersion>(schema, out release);
 									mDatabase.Release = release;
 									break;
 								}

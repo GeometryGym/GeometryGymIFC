@@ -408,43 +408,6 @@ namespace GeometryGym.Ifc
 			return constructor.Invoke(new object[] { }) as BaseClassIfc;
 		}
 
-		internal static string identifyIfcClass(string className, out string predefinedConstant)
-		{
-			predefinedConstant = "";
-			if (string.IsNullOrEmpty(className))
-				return "";
-			int index = className.IndexOf('.');
-			if (index < 0)
-				index = className.IndexOf('\\');
-			if (index < 0)
-				index = className.IndexOf('/');
-
-			string result = className;
-			if (index > 0)
-			{
-				result = className.Substring(0, index);
-				string remainder = predefinedConstant = className.Substring(index + 1);
-				index = remainder.IndexOf('(');
-				if (index > 0)
-				{
-					int startIndex = remainder.IndexOf('.'), endIndex = remainder.IndexOf(')');
-					if (startIndex < index)
-						startIndex = index;
-					else
-						endIndex = remainder.IndexOf('.', startIndex + 1);
-
-					predefinedConstant = remainder.Substring(startIndex + 1, endIndex - startIndex - 1).Trim();
-				}
-			}
-
-			if (result.EndsWith("Type"))
-				result = result.Substring(0, result.Length - 4);
-			else if (result.EndsWith("TypeEnum"))
-				result = result.Substring(0, result.Length - 8);
-
-			return result;
-		}
-
 		internal string formatLength(double length)
 		{
 			if (double.IsNaN(length))

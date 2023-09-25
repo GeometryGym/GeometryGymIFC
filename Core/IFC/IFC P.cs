@@ -1532,10 +1532,6 @@ namespace GeometryGym.Ifc
 		public IfcProfileDef(DatabaseIfc db, string name) : base(db)
 		{
 			ProfileName = name;
-			if (db != null && db.mRelease < ReleaseVersion.IFC4)
-			{
-				new IfcGeneralProfileProperties(this);
-			}
 		}
 
 		protected override void initialize()

@@ -337,7 +337,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcTendonConduitType : IfcReinforcingElementType
 	{
-		private IfcTendonConduitTypeEnum mPredefinedType = IfcTendonConduitTypeEnum.NOTDEFINED; //: IfcTendonConduitTypeEnum;
+		private IfcTendonConduitTypeEnum mPredefinedType = IfcTendonConduitTypeEnum.NOTDEFINED; //: OPTIONAL IfcTendonConduitTypeEnum;
 		public IfcTendonConduitTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcTendonConduitTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 
 		public IfcTendonConduitType() : base() { }
@@ -1095,7 +1095,7 @@ namespace GeometryGym.Ifc
 			double t3 = Math.Atan2(pt3[1] - y, pt3[0] - x), t1 = Math.Atan2(pt1[1] - y, pt1[0] - x);
 			if (t3 < 0)
 				t3 = 2 * Math.PI + t3;
-			mTrim2 = new IfcTrimmingSelect((t3 - t1 ) / db.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT), end );
+			mTrim2 = new IfcTrimmingSelect((t3 - t1 ) / db.Context.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT), end );
 			mMasterRepresentation = IfcTrimmingPreference.PARAMETER;
 		}	
 	}

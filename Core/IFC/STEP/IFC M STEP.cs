@@ -70,14 +70,14 @@ namespace GeometryGym.Ifc
 		{
 			if (release < ReleaseVersion.IFC4X3_ADD1)
 				return "";
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mScaleX) + "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ);
+			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mFactorX) + "," + ParserSTEP.DoubleOptionalToString(mFactorY) + "," + ParserSTEP.DoubleOptionalToString(mFactorZ);
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
 			base.parse(str, ref pos, release, len, dictionary);
-			mScaleX = ParserSTEP.StripDouble(str, ref pos, len);
-			mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
-			mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);
+			mFactorX = ParserSTEP.StripDouble(str, ref pos, len);
+			mFactorY = ParserSTEP.StripDouble(str, ref pos, len);
+			mFactorZ = ParserSTEP.StripDouble(str, ref pos, len);
 		}
 	}
 	public partial class IfcMappedItem

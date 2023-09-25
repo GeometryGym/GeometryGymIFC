@@ -66,16 +66,31 @@ namespace GeometryGym.Ifc
 			mOrthogonalHeight = orthogonalHeight;
 		}
 	}
-	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD2)]
 	public partial class IfcMapConversionScaled : IfcMapConversion
 	{
 		public override string StepClassName { get { return (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3_ADD1 ? "IfcMapConversion" : base.StepClassName); } }
-		internal double mScaleX = double.NaN;
-		public double ScaleX { get { return double.IsNaN(mScaleX) ? 1 : mScaleX; } set { mScaleX = value; } }  // OPTIONAL  IfcReal
+		internal double mFactorX = 1; //: IfcReal;
+		internal double mFactorY = 1; //: IfcReal;
+		internal double mFactorZ = 1; //: IfcReal;
+		public double FactorX { get { return mFactorX; } set { mFactorX = value; } }  //: IfcReal
+		public double FactorY { get { return mFactorY; } set { mFactorY = value; } }  //: IfcReal
+		public double FactorZ { get { return mFactorZ; } set { mFactorZ = value; } }  //: IfcReal
 		internal IfcMapConversionScaled() : base() { }
-		internal IfcMapConversionScaled(DatabaseIfc db, IfcMapConversionScaled c) : base(db, c) { mScaleX = c.mScaleX; }
-		public IfcMapConversionScaled(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, double eastings, double northings, double orthogonalHeight)
-			: base(source, target, eastings, northings, orthogonalHeight) { }
+		internal IfcMapConversionScaled(DatabaseIfc db, IfcMapConversionScaled c) : base(db, c) 
+		{
+			mFactorX = c.mFactorX;
+			mFactorY = c.mFactorY;
+			mFactorZ = c.mFactorZ;
+		}
+		public IfcMapConversionScaled(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target, 
+			double eastings, double northings, double orthogonalHeight, double factorX, double factorY, double factorZ)
+			: base(source, target, eastings, northings, orthogonalHeight)
+		{
+			mFactorX = factorX;
+			mFactorY = factorY;
+			mFactorZ = factorZ;
+		}
 	}
 	[Serializable]
 	public partial class IfcMappedItem : IfcRepresentationItem

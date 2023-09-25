@@ -73,7 +73,7 @@ namespace GeometryGym.Ifc
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
-	public partial class IfcGeographicCRS : IfcCoordinateReferenceSystem //IFC4
+	public partial class IfcGeographicCRS : IfcCoordinateReferenceSystem 
 	{
 		internal string mPrimeMeridian = "";// : OPTIONAL IfcIdentifier 
 		internal IfcNamedUnit mAngleUnit = null;// :	OPTIONAL IfcNamedUnit;

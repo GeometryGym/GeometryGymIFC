@@ -1491,8 +1491,8 @@ namespace GeometryGym.Ifc
 		protected IfcContext() : base() { }
 		protected IfcContext(DatabaseIfc db, IfcContext c, DuplicateOptions options) : base(db, c, options)
 		{
-			if(db.mContext == null)
-				db.mContext = this;
+			if(db.Context == null)
+				db.SetContext(this);
 			mObjectType = c.mObjectType;
 			mLongName = c.mLongName;
 			mPhase = c.mPhase;
@@ -1523,7 +1523,7 @@ namespace GeometryGym.Ifc
 		{
 			Name = name;
 			RepresentationContexts.AddRange(db.Factory.mContexts.Values);
-			db.mContext = this;
+			db.SetContext(this);
 		}
 		
 		internal void setStructuralUnits()

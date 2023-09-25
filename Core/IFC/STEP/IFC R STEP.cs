@@ -1107,7 +1107,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP(release) + ",#" + mRelatingElement.StepId + ",#" + mRelatedElement.StepId +
 				(mInterferenceGeometry == null ? ",$" : ",#" + mInterferenceGeometry.StepId) +
 				(release == ReleaseVersion.IFC4X3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "") +
-				(string.IsNullOrEmpty( mInterferenceType) ? ",$," : ",'" + ParserSTEP.Encode(mInterferenceType) + "',") + 
+				(string.IsNullOrEmpty(mInterferenceType) ? ",$," : ",'" + ParserSTEP.Encode(mInterferenceType) + "',") + 
 				ParserIfc.LogicalToString(mImpliedOrder) +
 				(release != ReleaseVersion.IFC4X3 && release > ReleaseVersion.IFC4X3_RC3 ? "," + ParserSTEP.ObjToLinkString(mInterferenceSpace) : "");
 		}

@@ -54,7 +54,7 @@ namespace GeometryGym.Ifc
 		{
 			Point3d o = a.Plane.Origin, s = a.StartPoint, e = a.EndPoint;
 			Vector3d x = s - o;
-			double angleFactor = mDatabase.mContext.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
+			double angleFactor = mDatabase.Context.UnitsInContext.ScaleSI(IfcUnitEnum.PLANEANGLEUNIT);
 			mSenseAgreement = true;
 			if (twoD)
 			{

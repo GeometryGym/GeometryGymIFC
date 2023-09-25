@@ -1706,7 +1706,7 @@ namespace GeometryGym.Ifc
 			: base(model.mDatabase.mRelease < ReleaseVersion.IFC4 ? new IfcLocalPlacement(model.SharedPlacement, model.mDatabase.Factory.XYPlanePlacement) : model.SharedPlacement)
 		{
 			model.AddRelated(this);
-			mDatabase.mContext.setStructuralUnits();
+			mDatabase.Context.setStructuralUnits();
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
 		{

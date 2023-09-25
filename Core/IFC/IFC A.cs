@@ -652,6 +652,7 @@ namespace GeometryGym.Ifc
 			RailHeadDistance = alignmentCant.RailHeadDistance;
 			mCantSegments.AddRange(alignmentCant.mCantSegments.Select(x => db.Factory.Duplicate(x, options) as IfcAlignmentCantSegment));
 		}
+		public IfcAlignmentCant(DatabaseIfc db, double railHeadDistance) : base(db) { RailHeadDistance = railHeadDistance; }
 		public IfcAlignmentCant(IfcAlignment alignment, double railHeadDistance)
 			: base(alignment.Database)
 		{
@@ -768,15 +769,15 @@ namespace GeometryGym.Ifc
 				double endZOffset = endCantLeft - (deltaEndCant / 2);
 				double deltaZ = endZOffset - zOffset;
 				segmentLength = Math.Sqrt(deltaZ * deltaZ + HorizontalLength * HorizontalLength);
-				double cosAlpha = HorizontalLength / segmentLength, sinAlpha = deltaZ / HorizontalLength;
+				double refDirectionX = HorizontalLength / segmentLength, refDirectionZ = deltaZ / HorizontalLength;
 				double cosTheta = 1, sinTheta = 0;
 				if (Math.Abs(deltaStartCant) > tol)
 				{
 					cosTheta = Math.Cos(theta);
 					sinTheta = Math.Sin(theta);
 				}
-				segmentPlacement.Axis = new IfcDirection(db, cosTheta * sinAlpha, sinTheta, cosTheta * cosAlpha);
-				segmentPlacement.RefDirection = new IfcDirection(db, cosAlpha, 0, sinAlpha);
+				segmentPlacement.Axis = new IfcDirection(db, cosTheta * refDirectionZ, sinTheta, cosTheta * refDirectionX);
+				segmentPlacement.RefDirection = new IfcDirection(db, refDirectionX, 0, refDirectionZ);
 
 				double factor = ((endCantLeft + endCantRight) - (startCantLeft + startCantRight)) / 2.0;
 				double linearTerm = factor;
@@ -786,7 +787,7 @@ namespace GeometryGym.Ifc
 			}
 
 			IfcCurveMeasureSelect start = new IfcLengthMeasure(0), length = new IfcLengthMeasure(segmentLength);
-			bool useNonNegativeLengthMeasures = true;// db.Release < ReleaseVersion.IFC4X3_ADD1;
+			bool useNonNegativeLengthMeasures = db.Release < ReleaseVersion.IFC4X3_ADD2;
 			if (useNonNegativeLengthMeasures)
 			{
 				start = new IfcNonNegativeLengthMeasure(0);
@@ -988,7 +989,7 @@ namespace GeometryGym.Ifc
 		{
 			DatabaseIfc db = mDatabase;
 			double tol = db.Tolerance;
-			bool useNonNegativeLengthMeasures = true;// db.Release < ReleaseVersion.IFC4X3_ADD1;
+			bool useNonNegativeLengthMeasures = db.Release < ReleaseVersion.IFC4X3_ADD2;
 			Tuple<double, double> startTangent = StartTangent();
 			IfcCartesianPoint startPoint = StartPoint;
 			IfcAxis2Placement2D placement = new IfcAxis2Placement2D(startPoint) { RefDirection = new IfcDirection(db, startTangent.Item1, startTangent.Item2) };
@@ -1026,7 +1027,11 @@ namespace GeometryGym.Ifc
 				{
 					clothoidConstant = Math.Sqrt(Math.Abs(StartRadiusOfCurvature) * SegmentLength) * (StartRadiusOfCurvature > 0 ? -1 : 1);
 					if (useNonNegativeLengthMeasures)
-						start = new IfcParameterValue(-SegmentLength / (Math.Abs(clothoidConstant) * Math.Sqrt(Math.PI)));
+					{
+						double parameterValue = SegmentLength / (Math.Abs(clothoidConstant) * Math.Sqrt(Math.PI));
+						start = new IfcParameterValue((clothoidConstant > 0 ? -1 : 1) * parameterValue);
+						length = new IfcParameterValue((clothoidConstant > 0 ? 1 : -1) * parameterValue);
+					}
 					else
 						start = new IfcLengthMeasure(-SegmentLength);
 				}
@@ -1059,19 +1064,38 @@ namespace GeometryGym.Ifc
 					double offsetLength = SegmentLength / ((EndRadiusOfCurvature / StartRadiusOfCurvature) - 1);
 					if (StartRadiusOfCurvature > 0 && EndRadiusOfCurvature > 0)
 					{
-						clothoidConstant = -Math.Sqrt(EndRadiusOfCurvature * offsetLength);
+						if (StartRadiusOfCurvature < EndRadiusOfCurvature)
+							clothoidConstant = -Math.Sqrt(EndRadiusOfCurvature * offsetLength);
+						else
+							clothoidConstant = Math.Sqrt(EndRadiusOfCurvature * offsetLength);
 						if (useNonNegativeLengthMeasures)
-							start = new IfcParameterValue(-offsetLength - SegmentLength);
+						{
+							double parameterValue = (-offsetLength - SegmentLength) / (clothoidConstant * Math.Sqrt(Math.PI));
+							start = new IfcParameterValue(parameterValue);
+							parameterValue = SegmentLength / (clothoidConstant * Math.Sqrt(Math.PI));
+							length = new IfcParameterValue(parameterValue);
+						}
 						else
 							start = new IfcLengthMeasure(-offsetLength - SegmentLength);
+						
 					}
 					else if (StartRadiusOfCurvature < 0 && EndRadiusOfCurvature < 0)
 					{
-						clothoidConstant = Math.Sqrt(-EndRadiusOfCurvature * offsetLength);
-						if (useNonNegativeLengthMeasures)
-							start = new IfcParameterValue(-offsetLength - SegmentLength);
+						if (StartRadiusOfCurvature < EndRadiusOfCurvature)
+							clothoidConstant = -Math.Sqrt(-EndRadiusOfCurvature * offsetLength);
 						else
+							clothoidConstant = Math.Sqrt(-EndRadiusOfCurvature * offsetLength);
+						if (useNonNegativeLengthMeasures)
+						{
+							double parameterValue = (-offsetLength - SegmentLength) / (clothoidConstant * Math.Sqrt(Math.PI));
+							start = new IfcParameterValue(parameterValue);
+							parameterValue = SegmentLength / (clothoidConstant * Math.Sqrt(Math.PI));
+							length = new IfcParameterValue(parameterValue);
+						}
+						else
+						{
 							start = new IfcLengthMeasure(-offsetLength - SegmentLength);
+						}
 					}
 					else
 					{
@@ -1352,7 +1376,7 @@ namespace GeometryGym.Ifc
 			IfcAxis2Placement2D axis2Placement2D = new IfcAxis2Placement2D(startPoint) { RefDirection = refDirection };
 			IfcTransitionCode transitionCode = IfcTransitionCode.CONTSAMEGRADIENTSAMECURVATURE;
 			IfcCurveSegment curveSegment = null;
-			bool useNonNegativeLengthMeasures = true;// db.Release < ReleaseVersion.IFC4X3_ADD1;
+			bool useNonNegativeLengthMeasures = db.Release < ReleaseVersion.IFC4X3_ADD2;
 			if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.CONSTANTGRADIENT)
 			{
 				double segmentLength = HorizontalLength / Math.Cos(theta);
@@ -1380,10 +1404,12 @@ namespace GeometryGym.Ifc
 			else if (PredefinedType == IfcAlignmentVerticalSegmentTypeEnum.PARABOLICARC)
 			{
 				double m = (EndGradient - StartGradient) / (2 * HorizontalLength);
-				IfcPolynomialCurve seriesParameterCurve = new IfcPolynomialCurve(db.Factory.Origin2dPlace, new List<double>() { 0, 1 }, new List<double>() { 0, 0, m });
-				IfcParameterValue start = new IfcParameterValue(StartGradient / (2*m));
-				IfcParameterValue end = new IfcParameterValue(HorizontalLength);
-				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, start, end, seriesParameterCurve);
+				var coefficientsX = new List<double>() { 0, 1 };
+				var coefficientsY = new List<double>() { StartHeight, StartGradient, m };
+				IfcPolynomialCurve seriesParameterCurve = new IfcPolynomialCurve(db.Factory.Origin2dPlace, coefficientsX, coefficientsY);
+				IfcParameterValue start = new IfcParameterValue(0);
+				IfcParameterValue segmentLength = new IfcParameterValue(HorizontalLength);
+				curveSegment = new IfcCurveSegment(transitionCode, axis2Placement2D, start, segmentLength, seriesParameterCurve);
 			}
 			else
 				throw new NotImplementedException("XX Not Implemented vertical segment " + PredefinedType.ToString());

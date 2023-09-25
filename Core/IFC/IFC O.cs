@@ -559,16 +559,17 @@ namespace GeometryGym.Ifc
 					if (profileDef.mHasProperties.Count == 0)
 					{
 						IfcGeneralProfileProperties generalProfileProperties = new IfcGeneralProfileProperties(profileDef);
-						generalProfileProperties.mAssociates.RelatedObjects.Add(this);
+						new IfcRelAssociatesProfileProperties(this, generalProfileProperties);
 					}
 					else
 					{
-						if (profileDef.mHasProperties.First().mAssociates == null)
+						IfcRelAssociatesProfileProperties associates = profileDef.mHasProperties.First().mAssociates;
+						if (associates == null)
 						{
 							new IfcRelAssociatesProfileProperties(this, profileDef.mHasProperties.First());
 						}
 						else
-							profileDef.mHasProperties.First().mAssociates.RelatedObjects.Add(this);
+							associates.RelatedObjects.Add(this);
 					}
 				}
 			}
