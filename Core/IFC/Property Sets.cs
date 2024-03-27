@@ -1464,6 +1464,7 @@ namespace GeometryGym.Ifc
 	{
 		public double IncomingStation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IncomingStation", new IfcLengthMeasure(value))); } }
 		public double Station { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Station", new IfcLengthMeasure(value))); } }
+		public bool HasIncreasingStation { set { AddProperty(new IfcPropertySingleValue(mDatabase, "HasIncreasingStation", new IfcBoolean(value))); } }
 		public Pset_Stationing(IfcReferent instance) : base(instance) { }
 	}
 	//Pset_StackTerminalTypeCommon

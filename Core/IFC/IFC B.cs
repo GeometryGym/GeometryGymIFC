@@ -402,7 +402,7 @@ namespace GeometryGym.Ifc
 		internal IfcBoxedHalfSpace() : base() { }
 		internal IfcBoxedHalfSpace(DatabaseIfc db, IfcBoxedHalfSpace s, DuplicateOptions options) : base(db, s, options) { Enclosure = db.Factory.Duplicate(s.Enclosure) as IfcBoundingBox; }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcBridge : IfcFacility
 	{
 		private IfcBridgeTypeEnum mPredefinedType = IfcBridgeTypeEnum.NOTDEFINED; //: OPTIONAL IfcBridgeTypeEnum;
@@ -415,7 +415,7 @@ namespace GeometryGym.Ifc
 		public IfcBridge(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 		internal IfcBridge(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcBridgePart : IfcFacilityPart
 	{
 		private IfcBridgePartTypeEnum mPredefinedType = IfcBridgePartTypeEnum.NOTDEFINED; //: OPTIONAL IfcBridgeTypeEnum;

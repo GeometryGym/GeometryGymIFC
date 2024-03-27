@@ -1490,7 +1490,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (release < ReleaseVersion.IFC4X3_ADD1)
+			if (release < ReleaseVersion.IFC4X3_ADD2)
 				return "";
 			return base.BuildStringSTEP(release) + "," + mFirstCoordinate.ToString() + "," + mSecondCoordinate.ToString() + "," + ParserSTEP.DoubleToString(mHeight);
 		}
@@ -1574,7 +1574,7 @@ namespace GeometryGym.Ifc
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
 			string globalId = ParserSTEP.StripString(str, ref pos, len);
-			if (string.Compare(GlobalId, globalId, true) != 0)
+			if (!string.IsNullOrEmpty(globalId) && string.Compare(GlobalId, globalId, true) != 0)
 				GlobalId = globalId;
 			mOwnerHistory = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcOwnerHistory;
 			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));

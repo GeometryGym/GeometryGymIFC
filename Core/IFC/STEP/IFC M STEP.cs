@@ -46,7 +46,7 @@ namespace GeometryGym.Ifc
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mEastings) + "," + ParserSTEP.DoubleToString(mNorthings) + "," +
 				ParserSTEP.DoubleToString(mOrthogonalHeight) + "," + ParserSTEP.DoubleOptionalToString(mXAxisAbscissa) + "," +
 				ParserSTEP.DoubleOptionalToString(mXAxisOrdinate) + "," + ParserSTEP.DoubleOptionalToString(mScale) +
-				(release < ReleaseVersion.IFC4X3_RC3 || release >= ReleaseVersion.IFC4X3_ADD1 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
+				(release < ReleaseVersion.IFC4X3_RC3 || release >= ReleaseVersion.IFC4X3_ADD2 ? "" : "," + ParserSTEP.DoubleOptionalToString(mScaleY) + "," + ParserSTEP.DoubleOptionalToString(mScaleZ));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
@@ -57,7 +57,7 @@ namespace GeometryGym.Ifc
 			mXAxisAbscissa = ParserSTEP.StripDouble(str, ref pos, len);
 			mXAxisOrdinate = ParserSTEP.StripDouble(str, ref pos, len);
 			mScale = ParserSTEP.StripDouble(str, ref pos, len);
-			if (release >= ReleaseVersion.IFC4X3_RC3 && release < ReleaseVersion.IFC4X3_ADD1)
+			if (release >= ReleaseVersion.IFC4X3_RC3 && release < ReleaseVersion.IFC4X3_ADD2)
 			{
 				mScaleY = ParserSTEP.StripDouble(str, ref pos, len);
 				mScaleZ = ParserSTEP.StripDouble(str, ref pos, len);
@@ -68,7 +68,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (release < ReleaseVersion.IFC4X3_ADD1)
+			if (release < ReleaseVersion.IFC4X3_ADD2)
 				return "";
 			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleToString(mFactorX) + "," + ParserSTEP.DoubleOptionalToString(mFactorY) + "," + ParserSTEP.DoubleOptionalToString(mFactorZ);
 		}
@@ -206,7 +206,7 @@ namespace GeometryGym.Ifc
 				(string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserSTEP.Encode(mName) + "',") + 
 				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") + 
 				(string.IsNullOrEmpty(mCategory) ? "$," : "'" + ParserSTEP.Encode(mCategory) + "',") + 
-				ParserSTEP.DoubleOptionalToString(mPriority));
+				ParserSTEP.IntOptionalToString(mPriority));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -220,7 +220,14 @@ namespace GeometryGym.Ifc
 					mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 					mDescription = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 					mCategory = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
-					mPriority = ParserSTEP.StripDouble(str, ref pos, len);
+					string s = ParserSTEP.StripField(str, ref pos, len);
+					if (s.Contains("."))
+					{
+						if (double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out double d)) //Was normalizedRatioMeasure
+							Priority = (int)(d * 100);
+					}
+					else if (s != "$")
+						mPriority = ParserSTEP.ParseInt(s);
 				}
 			}
 			catch (Exception) { }
@@ -302,7 +309,8 @@ namespace GeometryGym.Ifc
 		{ 
 			return (release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mName) ? "$," : "'" + ParserSTEP.Encode(mName) + "',") + 
 				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") + ParserSTEP.ObjToLinkString(mMaterial) + "," +
-				ParserSTEP.ObjToLinkString(mProfile) + (mPriority >= 0 && mPriority <= 100 ? "," + mPriority+ "," : ",$,") + (string.IsNullOrEmpty(mCategory) ? "$" : "'" + ParserSTEP.Encode(mCategory) + "'")); 
+				ParserSTEP.ObjToLinkString(mProfile) + "," + ParserSTEP.IntOptionalToString(mPriority) + "," + 
+				(string.IsNullOrEmpty(mCategory) ? "$" : "'" + ParserSTEP.Encode(mCategory) + "'")); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -311,9 +319,14 @@ namespace GeometryGym.Ifc
 			Material = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcMaterial;
 			Profile = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcProfileDef;
 			string s = ParserSTEP.StripField(str, ref pos, len);
-			double d = 0;
-			if(double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out d)) //Was normalizedRatioMeasure
-				Priority =(int)d;
+			if (s.Contains("."))
+			{
+				if (double.TryParse(s, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out double d)) //Was normalizedRatioMeasure
+					Priority = (int)(d * 100);
+			}
+			else if(s != "$")
+				mPriority = ParserSTEP.ParseInt(s);
+
 			mCategory = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}

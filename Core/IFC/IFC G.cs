@@ -72,7 +72,7 @@ namespace GeometryGym.Ifc
 		internal IfcGeneralProfileProperties(DatabaseIfc db, IfcGeneralProfileProperties p, DuplicateOptions options) : base(db, p, options) { mPhysicalWeight = p.mPhysicalWeight; mPerimeter = p.mPerimeter; mMinimumPlateThickness = p.mMinimumPlateThickness; mMaximumPlateThickness = p.mMaximumPlateThickness; mCrossSectionArea = p.mCrossSectionArea; }
 		public IfcGeneralProfileProperties(IfcProfileDef p) : base(p) { }
 	}
-	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD2)]
 	public partial class IfcGeographicCRS : IfcCoordinateReferenceSystem 
 	{
 		internal string mPrimeMeridian = "";// : OPTIONAL IfcIdentifier 

@@ -1011,7 +1011,12 @@ namespace GeometryGym.Ifc
 				if (StartRadiusOfCurvature < 0)
 				{
 					if (useNonNegativeLengthMeasures)
-						length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
+					{
+						if (Math.Abs(SegmentLength) < tol)
+							length = new IfcLengthMeasure(0);
+						else
+							length = new IfcParameterValue(SegmentLength / StartRadiusOfCurvature / mDatabase.ScaleAngle());
+					}
 					else
 						length = new IfcLengthMeasure(-SegmentLength);
 				}
@@ -1621,7 +1626,7 @@ namespace GeometryGym.Ifc
 				if (assembly != null)
 				{
 					AssemblyName name = assembly.GetName();
-					return " v" + name.Version.ToString();
+					return "v" + name.Version.ToString();
 				}
 			}
 			catch (Exception) { }
@@ -2137,8 +2142,9 @@ namespace GeometryGym.Ifc
 			set
 			{
 				mAxis = value;
-				if (value != null)
+				if (mAxis != null)
 				{
+					mAxis.mAsAxisPlacements3D.Add(this);
 					if (mRefDirection == null && mDatabase != null)
 						RefDirection = (Math.Abs(value.DirectionRatioX - 1) < 1e-3 ? mDatabase.Factory.YAxis : mDatabase.Factory.XAxis);
 				}
@@ -2150,8 +2156,9 @@ namespace GeometryGym.Ifc
 			set
 			{
 				mRefDirection = value;
-				if (value != null)
+				if (mRefDirection != null)
 				{
+					mRefDirection.mAsRefDirectionPlacements3D.Add(this);
 					if (mAxis == null && mDatabase != null)
 						Axis = (Math.Abs(value.DirectionRatioZ - 1) < 1e-3 ? mDatabase.Factory.XAxis : mDatabase.Factory.ZAxis);
 				}
@@ -2185,8 +2192,26 @@ namespace GeometryGym.Ifc
 		private IfcDirection mRefDirection = null;// : OPTIONAL IfcDirection; 
 
 		public IfcPointByDistanceExpression Location { get { return mLocation as IfcPointByDistanceExpression; } set { mLocation = value; } }
-		public IfcDirection Axis { get { return mAxis; } set { mAxis = value; } }
-		public IfcDirection RefDirection { get { return mRefDirection; } set { mRefDirection = value; } }
+		public IfcDirection Axis 
+		{ 
+			get { return mAxis; } 
+			set 
+			{ 
+				mAxis = value; 
+				if(mAxis != null)
+					mAxis.mAsAxisPlacementsLinear.Add(this);
+			} 
+		}
+		public IfcDirection RefDirection 
+		{ 
+			get { return mRefDirection; } 
+			set 
+			{ 
+				mRefDirection = value;
+				if (mRefDirection != null)
+					mRefDirection.mAsRefDirectionPlacementsLinear.Add(this);
+			} 
+		}
 
 		internal IfcAxis2PlacementLinear() : base() { }
 		internal IfcAxis2PlacementLinear(DatabaseIfc db, IfcAxis2PlacementLinear p, DuplicateOptions options) : base(db, p, options)

@@ -192,7 +192,7 @@ namespace GeometryGym.Ifc
 			if (xml.HasAttribute("Category"))
 				Category = xml.Attributes["Category"].Value;
 			if (xml.HasAttribute("Priority"))
-				Priority = double.Parse(xml.Attributes["Priority"].Value);
+				int.TryParse(xml.Attributes["Priority"].Value, out mPriority);
 		}
 		internal override void SetXML(XmlElement xml, BaseClassIfc host, Dictionary<string, XmlElement> processed)
 		{
@@ -308,7 +308,7 @@ namespace GeometryGym.Ifc
 				xml.AppendChild(Material.GetXML(xml.OwnerDocument, "Material", this, processed));
 			if (mProfile != null)
 				xml.AppendChild(Profile.GetXML(xml.OwnerDocument, "Profile", this, processed));
-			if (mPriority != int.MaxValue)
+			if (mPriority != int.MinValue)
 				setAttribute(xml, "Priority", mPriority.ToString());
 			setAttribute(xml, "Category", Category);
 		}

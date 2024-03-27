@@ -66,7 +66,7 @@ namespace GeometryGym.Ifc
 		public IfcNamedUnit(IfcDimensionalExponents dimensions, IfcUnitEnum unitType)
 			: base(dimensions.Database) { Dimensions = dimensions; UnitType = unitType; }
 
-		public abstract double SIFactor { get; }
+		public abstract double SIFactor();
 	}
 	[Serializable]
 	public partial class IfcNavigationElement : IfcBuiltElement

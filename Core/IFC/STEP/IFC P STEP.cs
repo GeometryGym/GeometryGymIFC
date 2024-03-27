@@ -419,10 +419,18 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			if(release != ReleaseVersion.IFC4X3)
 				mClosed = ParserIfc.StripLogical(str, ref pos, len);
-			foreach(IfcIndexedPolygonalFace face in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcIndexedPolygonalFace))
+			foreach(int i in ParserSTEP.StripListLink(str, ref pos, len))
 			{
-				mFaces.Add(face);
-				face.ToFaceSet.Add(this);
+				IfcIndexedPolygonalFace face = dictionary[i] as IfcIndexedPolygonalFace;
+				if (face != null)
+				{
+					mFaces.Add(face);
+					face.ToFaceSet.Add(this);
+				}
+				else
+				{
+					face = null;
+				}
 			}
 			mPnIndex.AddRange(ParserSTEP.StripListInt(str, ref pos, len));
 		}

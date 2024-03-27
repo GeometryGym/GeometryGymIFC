@@ -77,7 +77,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (release < ReleaseVersion.IFC4X3_ADD1)
+			if (release < ReleaseVersion.IFC4X3_ADD2)
 				return "";
 			return base.BuildStringSTEP(release) + 
 				(string.IsNullOrEmpty(mPrimeMeridian) ? ",$," : ",'" + ParserSTEP.Encode(mPrimeMeridian) + "',") +

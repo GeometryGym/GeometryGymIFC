@@ -1001,13 +1001,13 @@ namespace GeometryGym.Ifc
 		internal List<int> mFlags = new List<int>(); // : LIST [1:?] OF IfcInteger;
 		public List<int> Flags { get { return mFlags; } }
 
-		internal IfcTriangulatedIrregularNetwork() : base() { }
+		internal IfcTriangulatedIrregularNetwork() : base() { Closed = false; }
 		internal IfcTriangulatedIrregularNetwork(DatabaseIfc db, IfcTriangulatedIrregularNetwork s, DuplicateOptions options) : base(db, s, options)
 		{
 			mFlags.AddRange(s.mFlags);
 		}
 		public IfcTriangulatedIrregularNetwork(IfcCartesianPointList3D pl, IEnumerable<Tuple<int, int, int>> coords, List<int> flags)
-			: base(pl, coords) { mFlags.AddRange(flags); }
+			: base(pl, coords) { Closed = false; mFlags.AddRange(flags); }
 	}
 	[Serializable]
 	public partial class IfcTrimmedCurve : IfcBoundedCurve

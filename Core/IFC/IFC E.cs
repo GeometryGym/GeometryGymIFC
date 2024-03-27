@@ -1287,7 +1287,16 @@ namespace GeometryGym.Ifc
 		private IfcDirection mExtrudedDirection = null;//: IfcDirection;
 		private double mDepth;// : IfcPositiveLengthMeasure;
 
-		public IfcDirection ExtrudedDirection { get { return mExtrudedDirection; } set { mExtrudedDirection = value; } }
+		public IfcDirection ExtrudedDirection 
+		{ 
+			get { return mExtrudedDirection; } 
+			set 
+			{ 
+				mExtrudedDirection = value;
+				if (mExtrudedDirection != null)
+					mExtrudedDirection.mExtrudedDirections.Add(this);
+			} 
+		}
 		public double Depth { get { return mDepth; } set { mDepth = value; } }
 
 		internal IfcExtrudedAreaSolid() : base() { }

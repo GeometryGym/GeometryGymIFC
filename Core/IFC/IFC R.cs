@@ -2471,12 +2471,22 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public abstract partial class IfcRepresentationItem : BaseClassIfc, IfcLayeredItem /*(IfcGeometricRepresentationItem,IfcMappedItem,IfcStyledItem,IfcTopologicalRepresentationItem));*/
 	{ //INVERSE
-		internal IfcPresentationLayerAssignment mLayerAssignment = null;// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
+		private IfcPresentationLayerAssignment mLayerAssignment = null;// : SET [0:?] OF IfcPresentationLayerAssignment FOR AssignedItems;
 		internal IfcStyledItem mStyledByItem = null;// : SET [0:1] OF IfcStyledItem FOR Item; 
 		private HashSet<IfcShapeModel> mRepresents = new HashSet<IfcShapeModel>(); //GeometryGym Inverse Attribute
 
 		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
-		public IfcStyledItem StyledByItem { get { return mStyledByItem; } set { if (value != null) value.Item = this; else mStyledByItem = null; } }
+		public IfcStyledItem StyledByItem 
+		{ 
+			get { return mStyledByItem; } 
+			set 
+			{ 
+				if (value != null) 
+					value.Item = this; 
+				else 
+					mStyledByItem = null; 
+			}
+		}
 		internal HashSet<IfcShapeModel> Represents { get { return mRepresents; } }
 
 		protected IfcRepresentationItem() : base() { }
@@ -2523,7 +2533,7 @@ namespace GeometryGym.Ifc
 					(db.Factory.Duplicate(mStyledByItem) as IfcStyledItem).Item = result;
 				return result;
 			}
-			return db.Factory.Duplicate(this, options) as IfcRepresentationItem;
+			return db.Factory.Duplicate(this, options);
 		}
 		protected virtual IfcRepresentationItem DuplicateWorker(DatabaseIfc db, DuplicateOptions options) { return null; }
 	}
@@ -2552,12 +2562,12 @@ namespace GeometryGym.Ifc
 		internal IfcRepresentationMap(DatabaseIfc db, IfcRepresentationMap m, DuplicateOptions options) : base(db, m)
 		{
 			DuplicateOptions duplicateDownstream = new DuplicateOptions(options) { DuplicateDownstream = true };
-			MappingOrigin = db.Factory.Duplicate((BaseClassIfc) m.mMappingOrigin, duplicateDownstream) as IfcAxis2Placement;
-			MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation, duplicateDownstream) as IfcShapeModel;
+			MappingOrigin = db.Factory.Duplicate(m.mMappingOrigin, duplicateDownstream);
+			MappedRepresentation = db.Factory.Duplicate(m.MappedRepresentation, duplicateDownstream);
 			if (db.Release > ReleaseVersion.IFC2x3)
 			{
 				foreach (IfcShapeAspect shapeAspect in m.HasShapeAspects)
-					(db.Factory.Duplicate(shapeAspect, duplicateDownstream) as IfcShapeAspect).PartOfProductDefinitionShape = this;
+					db.Factory.Duplicate(shapeAspect, duplicateDownstream).PartOfProductDefinitionShape = this;
 			}
 		}
 		public IfcRepresentationMap(IfcAxis2Placement placement, IfcShapeRepresentation representation) : base(representation.mDatabase) { MappingOrigin = placement; MappedRepresentation = representation; }
@@ -2774,7 +2784,7 @@ namespace GeometryGym.Ifc
 		internal IfcRightCircularCylinder() : base() { }
 		internal IfcRightCircularCylinder(DatabaseIfc db, IfcRightCircularCylinder c, DuplicateOptions options) : base(db, c, options) { mHeight = c.mHeight; mRadius = c.mRadius; }
 	}
-	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD1)]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD2)]
 	public partial class IfcRigidOperation : IfcCoordinateOperation
 	{
 		internal IfcMeasureValue mFirstCoordinate, mSecondCoordinate;// :  	IfcMeasureValue;
@@ -2907,8 +2917,13 @@ namespace GeometryGym.Ifc
 		}
 		protected IfcRoot(DatabaseIfc db, IfcRoot r, DuplicateOptions options) : base(db, r)
 		{
-			if (db[r.GlobalId] == null)
-				GlobalId = r.GlobalId;
+			if (r.GlobalId != GlobalId)
+			{
+				if (db[r.GlobalId] == null)
+					GlobalId = r.GlobalId;
+				else
+					Guid = Guid.NewGuid();
+			}
 			if (options.OwnerHistory != null)
 				OwnerHistory = options.OwnerHistory;
 			else if (options.DuplicateOwnerHistory && r.mOwnerHistory != null)

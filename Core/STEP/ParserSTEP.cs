@@ -247,7 +247,11 @@ namespace GeometryGym.STEP
 				return double.NaN;
 			if (s == "*")
 				return 0;
-			return double.Parse(s, NumberFormat);
+			try
+			{
+				return double.Parse(s, NumberFormat);
+			}
+			catch { return double.NaN; }
 		}
 		public static int ParseInt(string str)
 		{
@@ -345,7 +349,7 @@ namespace GeometryGym.STEP
 		{
 			if (i == 0)
 				return "*";
-			if (i == int.MaxValue)
+			if (i == int.MinValue)
 				return "$";
 			return i.ToString();
 		}
@@ -1018,7 +1022,10 @@ namespace GeometryGym.STEP
 			}
 
 			if (s[icounter++] != '#')
+			{
+				progressToNext(s, ref pos, len);
 				return 0;	
+			}
 			string str = "";
 			while (char.IsDigit(s[icounter]))
 			{

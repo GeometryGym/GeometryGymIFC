@@ -45,7 +45,12 @@ namespace GeometryGym.Ifc
 		internal string mGlobalId { get; private set; } = ""; // :	IfcGloballyUniqueId;
 		internal void setGlobalId(string globalId)
 		{
-			mGlobalId = globalId;
+			if (globalId == null || globalId.Length == 22)
+				mGlobalId = globalId;
+			else if (Guid.TryParse(globalId, out Guid guid))
+				mGlobalId = ParserIfc.EncodeGuid(guid);
+			else
+				mGlobalId = globalId;
 		}
 		
 		[NonSerialized] internal DatabaseIfc mDatabase = null;
@@ -303,7 +308,7 @@ namespace GeometryGym.Ifc
 						shapeModel.Items.Remove(representationItem);
 						shapeModel.Items.Add(revisedItem);
 					}
-					IfcPresentationLayerAssignment layerAssignment = representationItem.mLayerAssignment;
+					IfcPresentationLayerAssignment layerAssignment = representationItem.LayerAssignment;
 					if (layerAssignment != null)
 					{
 						layerAssignment.AssignedItems.Remove(representationItem);

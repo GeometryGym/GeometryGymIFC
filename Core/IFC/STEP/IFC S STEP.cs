@@ -1221,7 +1221,7 @@ namespace GeometryGym.Ifc
 		{
 			Item = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcRepresentationItem;
 			foreach (IfcStyleAssignmentSelect style in ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x => dictionary[x] as IfcStyleAssignmentSelect))
-				addStyle(style);
+				mStyles.Add(style);
 			mName = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
 	}

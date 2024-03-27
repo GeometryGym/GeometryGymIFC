@@ -209,7 +209,7 @@ namespace GeometryGym.Ifc
 			Name = extractString(obj["Name"]);
 			Description = extractString(obj["Description"]);
 			Category = extractString(obj["Category"]);
-			Priority = extractDouble( obj["Priority"]);
+			Priority = extractInt( obj["Priority"], int.MinValue);
 
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -223,7 +223,7 @@ namespace GeometryGym.Ifc
 			setAttribute(obj, "Name", Name);
 			setAttribute(obj, "Description", Description);
 			setAttribute(obj, "Category", Category);
-			if (!double.IsNaN(mPriority))
+			if (mPriority != int.MinValue)
 				obj["Priority"] = mPriority;
 		}
 	}
@@ -285,7 +285,7 @@ namespace GeometryGym.Ifc
 			jobj = obj["Profile"] as JsonObject;
 			if (jobj != null)
 				Profile = mDatabase.ParseJsonObject<IfcProfileDef>(jobj);
-			mPriority = extractInt(obj["Priority"], int.MaxValue);
+			mPriority = extractInt(obj["Priority"], int.MinValue);
 			Category = extractString(obj["Category"]);
 		}
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
@@ -297,7 +297,7 @@ namespace GeometryGym.Ifc
 				obj["Material"] = Material.getJson(this, options);
 			if (mProfile != null)
 				obj["Profile"] = Profile.getJson(this, options);
-			if (mPriority != int.MaxValue)
+			if (mPriority != int.MinValue)
 				obj["Priority"] = Priority;
 			base.setAttribute(obj, "Category", Category);
 		}

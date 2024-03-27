@@ -235,16 +235,16 @@ namespace GeometryGym.Ifc
 		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitEnum type) : base(due1.mDatabase) { Elements.Add(due1); Elements.Add(due2); mUnitType = type;  }
 		public IfcDerivedUnit(IfcDerivedUnitElement due1, IfcDerivedUnitElement due2, IfcDerivedUnitElement due3, IfcDerivedUnitEnum type) : base(due1.mDatabase) { Elements.Add(due1); Elements.Add(due2); Elements.Add(due3); mUnitType = type;  }
 		
-		public double SIFactor
+		public double SIFactor()
 		{
-			get
+			SET<IfcDerivedUnitElement> elements = Elements;
+			double result = 1;
+			foreach (IfcDerivedUnitElement due in elements)
 			{
-				SET<IfcDerivedUnitElement> elements = Elements;
-				double result = 1;
-				foreach (IfcDerivedUnitElement due in elements)
-					result *= Math.Pow(due.Unit.SIFactor, due.Exponent);
-				return result;
+				double derivedUnitFactor = due.Unit.SIFactor();
+				result *= Math.Pow(derivedUnitFactor, due.Exponent);
 			}
+			return result;
 		}
 	}
 	[Serializable]
@@ -346,6 +346,14 @@ namespace GeometryGym.Ifc
 	public partial class IfcDirection : IfcGeometricRepresentationItem, IfcGridPlacementDirectionSelect, IfcOrientationSelect, IfcVectorOrDirection
 	{
 		[NonSerialized] private double mDirectionRatioX = 0, mDirectionRatioY = 0, mDirectionRatioZ = double.NaN; // DirectionRatios : LIST [2:3] OF IfcReal;
+		[NonSerialized] internal SET<IfcCartesianTransformationOperator> mAsAxis1Transformations = new SET<IfcCartesianTransformationOperator>();
+		[NonSerialized] internal SET<IfcCartesianTransformationOperator> mAsAxis2Transformations = new SET<IfcCartesianTransformationOperator>();
+		[NonSerialized] internal SET<IfcCartesianTransformationOperator3D> mAsAxis3Transformations = new SET<IfcCartesianTransformationOperator3D>();
+		[NonSerialized] internal SET<IfcAxis2Placement3D> mAsAxisPlacements3D = new SET<IfcAxis2Placement3D>();
+		[NonSerialized] internal SET<IfcAxis2Placement3D> mAsRefDirectionPlacements3D = new SET<IfcAxis2Placement3D>();
+		[NonSerialized] internal SET<IfcAxis2PlacementLinear> mAsAxisPlacementsLinear = new SET<IfcAxis2PlacementLinear>();
+		[NonSerialized] internal SET<IfcAxis2PlacementLinear> mAsRefDirectionPlacementsLinear = new SET<IfcAxis2PlacementLinear>();
+		[NonSerialized] internal SET<IfcExtrudedAreaSolid> mExtrudedDirections = new SET<IfcExtrudedAreaSolid>();
 
 		public double DirectionRatioX { get { return mDirectionRatioX; } set { mDirectionRatioX = value; } }
 		public double DirectionRatioY { get { return mDirectionRatioY; } set { mDirectionRatioY = value; } }
@@ -356,6 +364,7 @@ namespace GeometryGym.Ifc
 			get { return (is2D ? new LIST<double>() { mDirectionRatioX, mDirectionRatioY } : new LIST<double>() { mDirectionRatioX, mDirectionRatioY, mDirectionRatioZ }); }
 			set { mDirectionRatioX = value[0]; mDirectionRatioY = value[1]; if(value.Count() > 2) mDirectionRatioZ = value[2]; }
 		}
+
 
 		internal IfcDirection() : base() { }
 		internal IfcDirection(DatabaseIfc db, IfcDirection d, DuplicateOptions options) : base(db, d, options) { mDirectionRatioX = d.mDirectionRatioX; mDirectionRatioY = d.mDirectionRatioY; mDirectionRatioZ = d.mDirectionRatioZ; }

@@ -171,7 +171,7 @@ namespace GeometryGym.Ifc
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -2), IfcDerivedUnitEnum.MODULUSOFELASTICITYUNIT));
 
 			IfcNamedUnit time = this[IfcUnitEnum.TIMEUNIT];
-			if (time == null || Math.Abs(time.SIFactor - 1) < mDatabase.Tolerance)
+			if (time == null || Math.Abs(time.SIFactor() - 1) < mDatabase.Tolerance)
 				time = new IfcSIUnit(mDatabase, IfcUnitEnum.TIMEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.SECOND);
 			if(this[IfcDerivedUnitEnum.ACCELERATIONUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(time, -2), IfcDerivedUnitEnum.ACCELERATIONUNIT));
@@ -201,7 +201,7 @@ namespace GeometryGym.Ifc
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, -1), IfcDerivedUnitEnum.LINEARSTIFFNESSUNIT));
 
 			IfcNamedUnit radians = this[IfcUnitEnum.PLANEANGLEUNIT];
-			if (radians == null || Math.Abs(radians.SIFactor - 1) < mDatabase.Tolerance)
+			if (radians == null || Math.Abs(radians.SIFactor() - 1) < mDatabase.Tolerance)
 				radians = new IfcSIUnit(mDatabase, IfcUnitEnum.PLANEANGLEUNIT, IfcSIPrefix.NONE, IfcSIUnitName.RADIAN);
 			if(this[IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT] == null)
 				Units.Add(new IfcDerivedUnit(new IfcDerivedUnitElement(fu, 1), new IfcDerivedUnitElement(lengthSI, 1), new IfcDerivedUnitElement(radians, -1), IfcDerivedUnitEnum.ROTATIONALSTIFFNESSUNIT));
@@ -249,10 +249,10 @@ namespace GeometryGym.Ifc
 			{
 				IfcSIUnit siUnit = namedUnit as IfcSIUnit;
 				if(siUnit != null)
-					return siUnit.SIFactor;
+					return siUnit.SIFactor();
 				IfcConversionBasedUnit conversionBasedUnit = namedUnit as IfcConversionBasedUnit;
 				if(conversionBasedUnit != null)
-					return conversionBasedUnit.SIFactor;
+					return conversionBasedUnit.SIFactor();
 			}
 			return 1;
 		}
@@ -260,7 +260,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcDerivedUnit derivedUnit = this[unitType];
 			if(derivedUnit != null)
-				return derivedUnit.SIFactor;
+				return derivedUnit.SIFactor();
 			return 1;
 		}
 	}

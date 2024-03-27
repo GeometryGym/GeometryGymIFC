@@ -90,7 +90,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcUnitAssignment
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) { return "(" + string.Join(",", mUnits.ConvertAll(x=> "#" + x.StepId)) + ")"; }
-		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { Units.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>Database[x] as IfcUnit)); }
+		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary) { Units.AddRange(ParserSTEP.StripListLink(str, ref pos, len).ConvertAll(x=>dictionary[x] as IfcUnit)); }
 	}
 	public partial class IfcUShapeProfileDef
 	{

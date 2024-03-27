@@ -1082,15 +1082,13 @@ namespace GeometryGym.Ifc
 			{
 				if (!string.IsNullOrEmpty(mOrganization))
 					return mOrganization;
-				try
+
+				string domainName = System.Environment.UserDomainName;
+				HashSet<string> domainsToIgnore = new HashSet<string>() { "AzureAD", "Microsoft", "HP Inc." };
+				if (!string.IsNullOrEmpty(domainName) && !domainsToIgnore.Contains(domainName))
 				{
-#if (!NETSTANDARD2_0 && !NETSTANDARD2_1)
-					string name = ((string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion", "RegisteredOrganization", "")).Replace("'", "");
-					if (!string.IsNullOrEmpty(name) && string.Compare(name, "Microsoft", true) != 0 && string.Compare(name, "HP Inc.",true) != 0)
-						return name;
-#endif
+					return domainName;
 				}
-				catch (Exception) { }
 				return "Unknown";
 			}
 			set

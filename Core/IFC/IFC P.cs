@@ -555,7 +555,15 @@ namespace GeometryGym.Ifc
 			BasisCurve = db.Factory.Duplicate(e.BasisCurve, options) as IfcCurve;
 		}
 		public IfcPointByDistanceExpression(IfcCurveMeasureSelect distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = distanceAlong; BasisCurve = basisCurve; }
-		public IfcPointByDistanceExpression(double distanceAlong, IfcCurve basisCurve) : base(basisCurve.Database) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); BasisCurve = basisCurve; }
+		public IfcPointByDistanceExpression(double distanceAlong, IfcCurve basisCurve)
+			: base(basisCurve.Database) 
+		{
+			if (basisCurve.Database.Release >= ReleaseVersion.IFC4X3_ADD2)
+				DistanceAlong = new IfcLengthMeasure(distanceAlong);
+			else
+				DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong);
+			BasisCurve = basisCurve; 
+		}
 		[Obsolete("DEPRECATED IFC4x3", false)]
 		public IfcPointByDistanceExpression(DatabaseIfc db, double distanceAlong) : base(db) { DistanceAlong = new IfcNonNegativeLengthMeasure(distanceAlong); }
 
@@ -1310,9 +1318,20 @@ namespace GeometryGym.Ifc
 		internal void detachFromHost()
 		{
 			if (mDecomposes != null)
+			{
 				mDecomposes.RelatedObjects.Remove(this);
+				return;
+			}
 			if (mContainedInStructure != null)
+			{
 				mContainedInStructure.RelatedElements.Remove(this);
+				return;
+			}
+			if (mNests != null)
+			{
+				mNests.RelatedObjects.Remove(this);
+				return;
+			}
 		}
 		
 		internal T FindHost<T>() where T : IfcProduct
@@ -1678,6 +1697,23 @@ namespace GeometryGym.Ifc
 		{
 			DatabaseIfc db = new DatabaseIfc(mDatabase);
 			db.OriginatingFileInformation = mDatabase.OriginatingFileInformation;
+			if (mDatabase.Factory.mPerson != null)
+				db.Factory.Person = db.Factory.Duplicate(mDatabase.Factory.Person);
+			if (mDatabase.Factory.Organization != null)
+				db.Factory.Organization = db.Factory.Duplicate(mDatabase.Factory.Organization);
+			if (mDatabase.Factory.mPersonOrganization != null)
+				db.Factory.PersonOrganization = db.Factory.Duplicate(mDatabase.Factory.PersonOrganization);
+			if (!string.IsNullOrEmpty(mDatabase.Factory.mApplicationFullName))
+				db.Factory.ApplicationFullName = mDatabase.Factory.ApplicationFullName;
+			if (!string.IsNullOrEmpty(mDatabase.Factory.mApplicationVersion))
+				db.Factory.ApplicationVersion = mDatabase.Factory.ApplicationVersion;
+			if (!string.IsNullOrEmpty(mDatabase.Factory.mApplicationIdentifier))
+				db.Factory.ApplicationIdentifier = mDatabase.Factory.ApplicationIdentifier;
+
+			IfcApplication application = mDatabase.Factory.mApplication;
+			if (application != null)
+				db.Factory.Application = IfcApplication.Construct(db.Factory.Duplicate(application.ApplicationDeveloper), application.Version, application.ApplicationFullName, application.ApplicationIdentifier);
+			db.Authorization = mDatabase.Authorization;
 			return db.Factory.Duplicate(this, options);
 		}
 	}
@@ -2169,6 +2205,13 @@ namespace GeometryGym.Ifc
 				return;
 			mHasProperties[property.Name] = property;
 			property.mPartOfPset.Add(this);
+		}
+		public void RemoveProperty(string propertyName)
+		{
+			if(!string.IsNullOrEmpty(propertyName))
+			{
+				mHasProperties.Remove(propertyName);
+			}
 		}
 		public void RemoveProperty(IfcProperty property)
 		{

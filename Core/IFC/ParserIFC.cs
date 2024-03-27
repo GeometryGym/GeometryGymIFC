@@ -520,23 +520,34 @@ namespace GeometryGym.Ifc
 			predefinedConstant = "";
 			if (string.IsNullOrEmpty(className))
 				return "";
-			int index = className.IndexOf('.');
-			if (index < 0)
-				index = className.IndexOf('\\');
-			if (index < 0)
-				index = className.IndexOf('/');
+			int indexOf = className.IndexOf('.');
+			int	index = className.IndexOf('\\');
+			if (indexOf < 0)
+				indexOf = index;
+			else if (index > 0)
+				indexOf = Math.Min(indexOf, index);
+			index = className.IndexOf('/');
+			if (indexOf < 0)
+				indexOf = index;
+			else if (index > 0)
+				indexOf = Math.Min(indexOf, index);
+			index = className.IndexOf(":");
+			if (indexOf < 0)
+				indexOf = index;
+			else if (index > 0)
+				indexOf = Math.Min(indexOf, index);
 
 			string result = className;
-			if (index > 0)
+			if (indexOf > 0)
 			{
-				result = className.Substring(0, index);
-				string remainder = predefinedConstant = className.Substring(index + 1);
-				index = remainder.IndexOf('(');
-				if (index > 0)
+				result = className.Substring(0, indexOf);
+				string remainder = predefinedConstant = className.Substring(indexOf + 1);
+				indexOf = remainder.IndexOf('(');
+				if (indexOf > 0)
 				{
 					int startIndex = remainder.IndexOf('.'), endIndex = remainder.IndexOf(')');
-					if (startIndex < index)
-						startIndex = index;
+					if (startIndex < indexOf)
+						startIndex = indexOf;
 					else
 						endIndex = remainder.IndexOf('.', startIndex + 1);
 

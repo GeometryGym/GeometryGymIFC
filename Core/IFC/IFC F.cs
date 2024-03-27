@@ -149,7 +149,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcFacetedBrepWithVoids(IfcClosedShell s, IEnumerable<IfcClosedShell> voids) : base(s) { mVoids.AddRange(voids); }
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
 	public partial class IfcFacility : IfcSpatialStructureElement //SUPERTYPE OF(IfcBridge , IfcBuilding , IfcMarineFacility , IfcRailway , IfcRoad, IfcTunnel)
 	{
 		internal IfcFacility() : base() { }
@@ -160,8 +160,8 @@ namespace GeometryGym.Ifc
 		internal IfcFacility(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcFacility(IfcFacility host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { Name = name; }
 	}
-	[Serializable]
-	public abstract partial class IfcFacilityPart : IfcSpatialStructureElement //IFC4x2 //SUPERTYPE OF(IfcBridgePart)
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X2)]
+	public abstract partial class IfcFacilityPart : IfcSpatialStructureElement //SUPERTYPE OF(IfcBridgePart)
 	{
 		private IfcFacilityUsageEnum mUsageType = IfcFacilityUsageEnum.NOTDEFINED;// : IfcFacilityUsageEnum;
 

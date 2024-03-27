@@ -554,7 +554,13 @@ namespace GeometryGym.Ifc
 		public IfcShapeRepresentation(IfcBooleanResult boolean) : base(boolean) { RepresentationType = boolean is IfcBooleanClippingResult ? ShapeRepresentationType.Clipping.ToString() : ShapeRepresentationType.CSG.ToString(); }
 		public IfcShapeRepresentation(IfcBoundingBox boundingBox) : base(boundingBox.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Box), boundingBox) { RepresentationType = ShapeRepresentationType.BoundingBox.ToString(); }
 		public IfcShapeRepresentation(IfcCsgPrimitive3D csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
-		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) { RepresentationType = ShapeRepresentationType.CSG.ToString(); }
+		public IfcShapeRepresentation(IfcCsgSolid csg) : base(csg) 
+		{ 
+			if(mDatabase.Release > ReleaseVersion.IFC2x3)
+				RepresentationType = ShapeRepresentationType.CSG.ToString(); 
+			else 
+				RepresentationType = ShapeRepresentationType.SolidModel.ToString(); 
+		}
 		public IfcShapeRepresentation(IfcCurve curve) : base(curve) { RepresentationType = ShapeRepresentationType.Curve.ToString(); }
 		public IfcShapeRepresentation(IfcCurveSegment curveSegment, bool isTwoD) 
 			: base(curveSegment.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), curveSegment)
@@ -588,7 +594,13 @@ namespace GeometryGym.Ifc
 		public IfcShapeRepresentation(IfcRevolvedAreaSolid revolvedAreaSolid) : base(revolvedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }
 		public IfcShapeRepresentation(IfcExtrudedAreaSolidTapered extrudedAreaSolidTapered) : base(extrudedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); }
 		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); ; }
-		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); ; }
+		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) 
+		{
+			if(mDatabase.Release < ReleaseVersion.IFC4 && (sweep is IfcExtrudedAreaSolid || sweep is IfcRevolvedAreaSolid))
+				RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); 
+			else
+				RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); 
+		}
 		public IfcShapeRepresentation(IfcSectionedSolid sectionedSolid) : base(sectionedSolid) { RepresentationType = ShapeRepresentationType.SectionedSpine.ToString(); }
 		public IfcShapeRepresentation(IfcSolidModel solid) : base(solid)
 		{
@@ -870,17 +882,19 @@ namespace GeometryGym.Ifc
 		internal IfcSIUnit() : base() { }
 		internal IfcSIUnit(DatabaseIfc db, IfcSIUnit u, DuplicateOptions options) : base(db, u, options) { mPrefix = u.mPrefix; mName = u.mName; }
 		public IfcSIUnit(DatabaseIfc db, IfcUnitEnum unitEnum, IfcSIPrefix prefix, IfcSIUnitName name) : base(db, unitEnum, false) { mPrefix = prefix; mName = name; }
-		public override double SIFactor
+		public override double SIFactor()
 		{
-			get
+			int pow = 1;
+			if (UnitType == IfcUnitEnum.AREAUNIT)
+				pow = 2;
+			else if (UnitType == IfcUnitEnum.VOLUMEUNIT)
+				pow = 3;
+			double factor = Math.Pow(mFactors[(int)mPrefix], pow);
+			if (UnitType == IfcUnitEnum.MASSUNIT)
 			{
-				int pow = 1;
-				if (UnitType == IfcUnitEnum.AREAUNIT)
-					pow = 2;
-				else if (UnitType == IfcUnitEnum.VOLUMEUNIT)
-					pow = 3;
-				return Math.Pow( mFactors[(int)mPrefix], pow);
+				return factor / 1000;
 			}
+			return factor;
 		}
 	}
 	[Serializable]
@@ -1706,7 +1720,7 @@ namespace GeometryGym.Ifc
 			: base(model.mDatabase.mRelease < ReleaseVersion.IFC4 ? new IfcLocalPlacement(model.SharedPlacement, model.mDatabase.Factory.XYPlanePlacement) : model.SharedPlacement)
 		{
 			model.AddRelated(this);
-			mDatabase.Context.setStructuralUnits();
+			mDatabase.Context.SetStructuralUnits();
 		}
 		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
 		{

@@ -287,8 +287,26 @@ namespace GeometryGym.Ifc
 		private IfcCartesianPoint mLocalOrigin;// : IfcCartesianPoint;
 		private double mScale = double.NaN;// : OPTIONAL REAL;
 
-		public IfcDirection Axis1 { get { return mAxis1; } set { mAxis1 = value; } }
-		public IfcDirection Axis2 { get { return mAxis2; } set { mAxis2 = value; } }
+		public IfcDirection Axis1
+		{ 
+			get { return mAxis1; } 
+			set 
+			{ 
+				mAxis1 = value;
+				if (mAxis1 != null)
+					mAxis1.mAsAxis1Transformations.Add(this);
+			} 
+		}
+		public IfcDirection Axis2 
+		{ 
+			get { return mAxis2; } 
+			set 
+			{ 
+				mAxis2 = value;
+				if (mAxis2 != null)
+					mAxis2.mAsAxis2Transformations.Add(this);
+			} 
+		}
 		public IfcCartesianPoint LocalOrigin { get { return mLocalOrigin; } set { mLocalOrigin = value; } }
 		public double Scale { get { return double.IsNaN(mScale) ? 1 : mScale; } set { mScale = value; } }
 
@@ -331,7 +349,16 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianTransformationOperator3D : IfcCartesianTransformationOperator //SUPERTYPE OF(IfcCartesianTransformationOperator3DnonUniform)
 	{
 		private IfcDirection mAxis3;// : OPTIONAL IfcDirection
-		public IfcDirection Axis3 { get { return mAxis3; } set { mAxis3 = value; } }
+		public IfcDirection Axis3 
+		{
+			get { return mAxis3; } 
+			set 
+			{ 
+				mAxis3 = value;
+				if (mAxis3 != null)
+					mAxis3.mAsAxis3Transformations.Add(this);
+			}
+		}
 
 		internal IfcCartesianTransformationOperator3D() { }
 		internal IfcCartesianTransformationOperator3D(DatabaseIfc db, IfcCartesianTransformationOperator3D o, DuplicateOptions options) : base(db, o, options) { if(o.mAxis3 != null) Axis3 = db.Factory.Duplicate( o.Axis3) as IfcDirection; }
@@ -1478,7 +1505,7 @@ namespace GeometryGym.Ifc
 					IfcNamedUnit namedUnit = value[IfcUnitEnum.PLANEANGLEUNIT];
 					if(namedUnit != null)
 					{
-						double scale = namedUnit.SIFactor;
+						double scale = namedUnit.SIFactor();
 						mDatabase.Factory.Options.AngleUnitsInRadians = Math.Abs(1 - scale) < 1e-4;
 					}
 				}
@@ -1526,7 +1553,7 @@ namespace GeometryGym.Ifc
 			db.SetContext(this);
 		}
 		
-		internal void setStructuralUnits()
+		public void SetStructuralUnits()
 		{
 			IfcUnitAssignment ua = UnitsInContext;
 			if (ua != null)
@@ -1549,7 +1576,7 @@ namespace GeometryGym.Ifc
 			{
 				IfcNamedUnit namedUnit = units[IfcUnitEnum.LENGTHUNIT];
 				if (namedUnit != null)
-					mDatabase.ScaleSI = namedUnit.SIFactor;
+					mDatabase.ScaleSI = namedUnit.SIFactor();
 			}
 		}
 		public IfcRelDeclares AddDeclared(IfcDefinitionSelect d)
@@ -1637,7 +1664,7 @@ namespace GeometryGym.Ifc
 			: base(dimensions, unitType) { Name = name; }
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
-		public override double SIFactor { get { return 1; } }
+		public override double SIFactor() { return 1; }
 	}
 	[Serializable]
 	public abstract partial class IfcControl : IfcObject //ABSTRACT SUPERTYPE OF (ONEOF (IfcActionRequest ,IfcConditionCriterion ,IfcCostItem ,IfcCostSchedule,IfcEquipmentStandard ,IfcFurnitureStandard
@@ -1744,7 +1771,7 @@ namespace GeometryGym.Ifc
 					r.RelatedResourceObjects.Remove(this);
 			}
 		}
-		public override double SIFactor { get { return ConversionFactor.SIFactor(); } }
+		public override double SIFactor() { return ConversionFactor.SIFactor(); }
 
 		public void AddConstraintRelationShip(IfcResourceConstraintRelationship constraintRelationship) { mHasConstraintRelationships.Add(constraintRelationship); }
 	}

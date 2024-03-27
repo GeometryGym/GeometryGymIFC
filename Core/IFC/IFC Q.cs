@@ -106,7 +106,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcQuantityTime() : base() { }
 		internal IfcQuantityTime(DatabaseIfc db, IfcQuantityTime q) : base(db,q) { mTimeValue = q.mTimeValue; mFormula = q.mFormula; }
-		internal IfcQuantityTime(DatabaseIfc db, string name, double timeMeasure) : base(db, name) { mTimeValue = timeMeasure; }
+		public IfcQuantityTime(DatabaseIfc db, string name, double timeMeasure) : base(db, name) { mTimeValue = timeMeasure; }
 		
 		public override IfcMeasureValue MeasureValue { get { return new IfcTimeMeasure(mTimeValue); } }
 	}

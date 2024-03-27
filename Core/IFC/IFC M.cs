@@ -69,7 +69,7 @@ namespace GeometryGym.Ifc
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD2)]
 	public partial class IfcMapConversionScaled : IfcMapConversion
 	{
-		public override string StepClassName { get { return (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3_ADD1 ? "IfcMapConversion" : base.StepClassName); } }
+		public override string StepClassName { get { return (mDatabase != null && mDatabase.mRelease < ReleaseVersion.IFC4X3_ADD2 ? "IfcMapConversion" : base.StepClassName); } }
 		internal double mFactorX = 1; //: IfcReal;
 		internal double mFactorY = 1; //: IfcReal;
 		internal double mFactorZ = 1; //: IfcReal;
@@ -396,7 +396,7 @@ namespace GeometryGym.Ifc
 		internal string mName = "";// : OPTIONAL IfcLabel; IFC4
 		internal string mDescription = "";// : OPTIONAL IfcText; IFC4
 		internal string mCategory = "";// : OPTIONAL IfcLabel; IFC4
-		internal double mPriority = double.NaN;//	 :	OPTIONAL IfcNormalisedRatioMeasure;
+		internal int mPriority = int.MinValue;// : OPTIONAL IfcInteger [0..100] was  IfcNormalisedRatioMeasure
 
 		public IfcMaterial Material { get { return mMaterial; } set { mMaterial = value; } }
 		public double LayerThickness { get { return mLayerThickness; } set { mLayerThickness = value; } }
@@ -404,7 +404,7 @@ namespace GeometryGym.Ifc
 		public override string Name { get { return mName; } set { mName = value; } }
 		public string Description { get { return mDescription; } set { mDescription = value; } }
 		public string Category { get { return mCategory; } set { mCategory = value; } }
-		public double Priority { get { return mPriority; } set { mPriority = value; } }
+		public int Priority { get { return mPriority; } set { mPriority = (value >= 0 && value <= 100 ? value : int.MinValue); } }
 
 		public override IfcMaterial PrimaryMaterial() { return Material; }
 
@@ -581,7 +581,7 @@ namespace GeometryGym.Ifc
 		internal string mDescription = "";// : OPTIONAL IfcText;
 		internal IfcMaterial mMaterial = null;// : OPTIONAL IfcMaterial;
 		internal IfcProfileDef mProfile = null;// : OPTIONAL IfcProfileDef;
-		internal int mPriority = int.MaxValue;// : OPTIONAL IfcInteger [0..100] was  IfcNormalisedRatioMeasure
+		internal int mPriority = int.MinValue;// : OPTIONAL IfcInteger [0..100] was  IfcNormalisedRatioMeasure
 		internal string mCategory = "";// : OPTIONAL IfcLabel
 		// INVERSE
 		private IfcMaterialProfileSet mToMaterialProfileSet = null;// : IfcMaterialProfileSet FOR 
@@ -591,7 +591,7 @@ namespace GeometryGym.Ifc
 		public IfcMaterial Material { get { return mMaterial; } set { mMaterial = value; } }
 		public IfcProfileDef Profile { get { return mProfile; } set { mProfile = value; } }
 		public string Category { get { return mCategory; } set { mCategory = value; } }
-		public int Priority { get { return mPriority; } set { mPriority = (value >= 0 && value <= 100 ? value : int.MaxValue); } }
+		public int Priority { get { return mPriority; } set { mPriority = (value >= 0 && value <= 100 ? value : int.MinValue); } }
 		public IfcMaterialProfileSet ToMaterialProfileSet { get { return mToMaterialProfileSet; } set { mToMaterialProfileSet = value; } }
 
 		public override IfcMaterial PrimaryMaterial() { return Material; }
@@ -836,7 +836,7 @@ namespace GeometryGym.Ifc
 		{
 			IfcUnit u = UnitComponent;
 			IfcSIUnit si = u as IfcSIUnit;
-			double sif = (si == null ? 1 : si.SIFactor), d = 1;
+			double sif = (si == null ? 1 : si.SIFactor()), d = 1;
 			if (mValueComponent != null)
 			{
 				IfcMeasureValue m = mValueComponent as IfcMeasureValue;

@@ -72,9 +72,26 @@ namespace GeometryGym.Ifc
 			Transform translation = Rhino.Geometry.Transform.Translation(p.X, p.Y, p.Z);
 			Transform changeBasis = vecsTransform();
 			Transform scale = getScaleTransform();
-			return  translation * changeBasis * scale;
+			Transform result = translation * changeBasis * scale;
+			return result;
 		}
-		internal virtual Transform getScaleTransform() { return double.IsNaN(mScale) ? Rhino.Geometry.Transform.Identity : Rhino.Geometry.Transform.Scale(Point3d.Origin, mScale); }
+
+		internal Plane placementPlane()
+		{
+			IfcCartesianPoint cp = LocalOrigin;
+			Transform changeBasis = vecsTransform();
+			Plane plane = Plane.WorldXY;
+			plane.Transform(changeBasis);
+			if (cp != null)
+				plane.Origin = cp.Location;
+			return plane;
+		}
+		internal virtual Transform getScaleTransform() 
+		{
+			if (double.IsNaN(mScale))
+				return Rhino.Geometry.Transform.Identity;
+			return Rhino.Geometry.Transform.Scale(Point3d.Origin, mScale); 
+		}
 		protected virtual Transform vecsTransform()
 		{
 			Vector3d vx = Vector3d.XAxis, vy = Vector3d.YAxis;
@@ -110,9 +127,9 @@ namespace GeometryGym.Ifc
 				if (operator3d.Axis3 != null)
 				{
 					vz = operator3d.Axis3.Vector3d;
-					vz.Unitize();
 				}
 			}
+			vz.Unitize();
 			tr.M02 = vz.X;
 			tr.M12 = vz.Y;
 			tr.M22 = vz.Z;
@@ -132,23 +149,12 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianTransformationOperator3D
 	{
 		internal Vector3d Axis3Vector { get { return (mAxis3 != null ? Axis3.Vector3d : Vector3d.ZAxis); } }
-		protected override Transform vecsTransform()
-		{
-			Transform tr = base.vecsTransform();
-			Vector3d v = Axis3Vector;
-			tr.M02 = v.X;
-			tr.M12 = v.Y;
-			tr.M22 = v.Z;
-			return tr;
-		}
 	}
 	public partial class IfcCartesianTransformationOperator3DnonUniform
 	{
 		internal override Transform getScaleTransform() 
 		{
-			double scaleX = double.IsNaN(Scale) ? 1 : Scale;
-			double scaleY = double.IsNaN(Scale2) ? scaleX : Scale2;
-			double scaleZ = double.IsNaN(Scale3) ? scaleX : Scale3;
+			double scaleX = Scale, scaleY = Scale2, scaleZ = Scale3;
 			return Rhino.Geometry.Transform.Scale(Plane.WorldXY, scaleX, scaleY, scaleZ);
 		}
 	}
