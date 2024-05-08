@@ -346,7 +346,8 @@ namespace GeometryGym.Ifc
 					}
 				default:
 					{
-						new SerializationIfcSTEP(db).importLines(str.Split('\n'));
+						string[] lines = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+						new SerializationIfcSTEP(db).importLines(lines);
 						break;
 					}
 			}
