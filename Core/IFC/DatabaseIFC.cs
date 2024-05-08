@@ -325,19 +325,30 @@ namespace GeometryGym.Ifc
 				return null;
 
 			DatabaseIfc db = new DatabaseIfc(ModelView.Ifc4NotAssigned);
+			char startingChar = str[0];
+			switch (startingChar)
+			{
 #if (!NOIFCJSON)
-			if (str.StartsWith("{"))
-			{
-				JsonObject jobj = JsonObject.Parse(str) as JsonObject;
-				if (str != null)
-					db.ReadJSON(jobj);
-			}
+				case '{':
+					{
+						JsonObject jobj = JsonObject.Parse(str) as JsonObject;
+						if (str != null)
+							db.ReadJSON(jobj);
+						break;
+					}
 #endif
-			if (str.StartsWith("<"))
-			{
-				System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
-				doc.LoadXml(str);
-				db.ReadXMLDoc(doc);
+				case '<':
+					{
+						System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+						doc.LoadXml(str);
+						db.ReadXMLDoc(doc);
+						break;
+					}
+				default:
+					{
+						new SerializationIfcSTEP(db).importLines(str.Split('\n'));
+						break;
+					}
 			}
 			return db;
 		}
