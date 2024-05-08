@@ -1868,6 +1868,8 @@ namespace GeometryGym.Ifc
 		protected IfcCoordinateOperation() : base() { }
 		protected IfcCoordinateOperation(DatabaseIfc db, IfcCoordinateOperation p) : base(db, p) { SourceCRS = db.Factory.Duplicate(p.mSourceCRS) as IfcCoordinateReferenceSystemSelect; TargetCRS = db.Factory.Duplicate(p.TargetCRS) as IfcCoordinateReferenceSystem; }
 		protected IfcCoordinateOperation(IfcCoordinateReferenceSystemSelect source, IfcCoordinateReferenceSystem target) : base(source.Database) { SourceCRS = source; TargetCRS = target; }
+
+		public abstract IfcCoordinateOperation CreateDuplicate(IfcCoordinateReferenceSystemSelect source);
 	}
 	[Serializable]
 	public abstract partial class IfcCoordinateReferenceSystem : BaseClassIfc, IfcCoordinateReferenceSystemSelect, NamedObjectIfc  // IFC4 	ABSTRACT SUPERTYPE OF(IfcGeographicCRS, IfcProjectedCRS);

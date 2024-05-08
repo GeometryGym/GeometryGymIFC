@@ -65,6 +65,20 @@ namespace GeometryGym.Ifc
 			mNorthings = northings;
 			mOrthogonalHeight = orthogonalHeight;
 		}
+		public override IfcCoordinateOperation CreateDuplicate(IfcCoordinateReferenceSystemSelect source)
+		{
+			var mapConversion = new IfcMapConversion(source, TargetCRS, mEastings, mNorthings, mOrthogonalHeight);
+			mapConversion.setOptionalAttributes(this);
+			return mapConversion;
+		}
+		protected void setOptionalAttributes(IfcMapConversion toDuplicate)
+		{ 
+			mXAxisAbscissa = toDuplicate.mXAxisAbscissa;
+			mXAxisOrdinate = toDuplicate.mXAxisOrdinate;
+			mScale = toDuplicate.mScale;
+			mScaleY = toDuplicate.mScaleY;
+			mScaleZ = toDuplicate.mScaleZ;
+		}
 	}
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3_ADD2)]
 	public partial class IfcMapConversionScaled : IfcMapConversion
@@ -90,6 +104,13 @@ namespace GeometryGym.Ifc
 			mFactorX = factorX;
 			mFactorY = factorY;
 			mFactorZ = factorZ;
+		}
+		public override IfcCoordinateOperation CreateDuplicate(IfcCoordinateReferenceSystemSelect source)
+		{
+			var mapConversion = new IfcMapConversionScaled(source, TargetCRS, mEastings, mNorthings, 
+				mOrthogonalHeight, mFactorX, mFactorY, mFactorZ);
+			mapConversion.setOptionalAttributes(this);
+			return mapConversion;
 		}
 	}
 	[Serializable]

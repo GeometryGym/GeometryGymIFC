@@ -154,7 +154,7 @@ namespace GeometryGym.Ifc
 		}
 		public SET<IfcShapeModel> RepresentationsInContext { get { return mRepresentationsInContext; } }
 		public List<IfcGeometricRepresentationSubContext> HasSubContexts { get { return mHasSubContexts; } }
-		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value.mSourceCRS != this) value.SourceCRS = this; } }
+		public IfcCoordinateOperation HasCoordinateOperation { get { return mHasCoordinateOperation; } set { mHasCoordinateOperation = value; if(value != null && value.mSourceCRS != this) value.SourceCRS = this; } }
 
 
 		internal IfcGeometricRepresentationContext() : base() { }
@@ -229,7 +229,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcGeometricRepresentationSubContext : IfcGeometricRepresentationContext
 	{
-		public enum SubContextIdentifier { Axis, Body, Body_Fallback, Box, Clearance, CoG, FootPrint, Lighting, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline, Surface };
+		public enum SubContextIdentifier { Annotation, Axis, Body, Body_Fallback, Box, Clearance, CoG, FootPrint, Lighting, PlanSymbol3d, PlanSymbol2d, Reference, Profile, Row, Outline, Surface };
 
 		internal IfcGeometricRepresentationContext mParentContext;// : IfcGeometricRepresentationContext;
 		internal double mTargetScale = double.NaN;// : OPTIONAL IfcPositiveRatioMeasure;

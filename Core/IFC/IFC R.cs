@@ -2809,6 +2809,20 @@ namespace GeometryGym.Ifc
 			SecondCoordinate = secondCoordinate;
 			Height = height;
 		}
+		public override IfcCoordinateOperation CreateDuplicate(IfcCoordinateReferenceSystemSelect source)
+		{
+			if (FirstCoordinate is IfcLengthMeasure lengthFirst && SecondCoordinate is IfcLengthMeasure lengthSecond)
+			{
+				var rigidOperation = new IfcRigidOperation(source, TargetCRS, lengthFirst, lengthSecond, Height);
+				return rigidOperation;
+			}
+			if(FirstCoordinate is IfcPlaneAngleMeasure angleFirst && SecondCoordinate is IfcPlaneAngleMeasure angleSecond)
+			{
+				var rigidOperation = new IfcRigidOperation(source, TargetCRS, angleFirst, angleSecond, Height);
+				return rigidOperation;
+			}
+			return null;
+		}
 	}
 	[Serializable]
 	public partial class IfcRoad : IfcFacility

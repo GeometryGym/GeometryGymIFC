@@ -1762,11 +1762,17 @@ namespace GeometryGym.Ifc
 			string type = nature.ToString();
 			int dimension = 3;
 			IfcContext context = mDatabase.Context;
+			IfcCoordinateOperation coordinateOperation = null;
 			if(context != null)
 			{
-				result = context.RepresentationContexts.OfType<IfcGeometricRepresentationContext>().Where(x => string.Compare(x.ContextType, type, true) == 0).FirstOrDefault();
-				if (result != null)
-					return result;
+				foreach (var representationContext in context.RepresentationContexts.OfType<IfcGeometricRepresentationContext>())
+				{
+					if (string.Compare(representationContext.ContextType, type, true) == 0)
+						return representationContext;
+
+					if (representationContext.HasCoordinateOperation != null)
+						coordinateOperation = representationContext.HasCoordinateOperation;
+				}
 			}
 			
 			if(nature == IfcGeometricRepresentationContext.GeometricContextIdentifier.Plan)
@@ -1779,6 +1785,10 @@ namespace GeometryGym.Ifc
 			result.ContextIdentifier = dimension + "D";
 			if (context != null && !context.RepresentationContexts.Contains(result))
 				context.RepresentationContexts.Add(result);
+			if (coordinateOperation != null)
+			{
+				coordinateOperation.CreateDuplicate(result);
+			}
 			mContexts.Add(nature, result);
 			return result;
 		}
@@ -1804,7 +1814,11 @@ namespace GeometryGym.Ifc
 			string identifier = "Body";
 			IfcGeometricProjectionEnum projection = IfcGeometricProjectionEnum.MODEL_VIEW;
 			IfcGeometricRepresentationContext context = null;
-			if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis)
+			if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Annotation)
+			{
+				identifier = "Annotation";
+			}
+			else if (nature == IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis)
 			{
 				identifier = "Axis";
 				projection = IfcGeometricProjectionEnum.GRAPH_VIEW;
@@ -2729,6 +2743,8 @@ namespace GeometryGym.Ifc
 							mDatabase.Release = ReleaseVersion.IFC4;
 						else if (schemaId.StartsWith("IFC4X4", true, CultureInfo.CurrentCulture))
 							mDatabase.Release = ReleaseVersion.IFC4X4_DRAFT;
+						else if (string.Compare(schemaId, "IFC4", true) == 0)
+							mDatabase.Release = ReleaseVersion.IFC4A2;
 						else
 						{
 							List<string> schemas = Enum.GetNames(typeof(ReleaseVersion)).Reverse().ToList();

@@ -206,7 +206,7 @@ namespace GeometryGym.Ifc
 				(string.IsNullOrEmpty(mName) ? ",$," : ",'" + ParserSTEP.Encode(mName) + "',") + 
 				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") + 
 				(string.IsNullOrEmpty(mCategory) ? "$," : "'" + ParserSTEP.Encode(mCategory) + "',") + 
-				ParserSTEP.IntOptionalToString(mPriority));
+				(mPriority == int.MinValue ? "$" : (release < ReleaseVersion.IFC4A1 ? ParserSTEP.DoubleToString(mPriority/100.0) : mPriority.ToString())));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -308,9 +308,10 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
 			return (release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mName) ? "$," : "'" + ParserSTEP.Encode(mName) + "',") + 
-				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") + ParserSTEP.ObjToLinkString(mMaterial) + "," +
-				ParserSTEP.ObjToLinkString(mProfile) + "," + ParserSTEP.IntOptionalToString(mPriority) + "," + 
-				(string.IsNullOrEmpty(mCategory) ? "$" : "'" + ParserSTEP.Encode(mCategory) + "'")); 
+				(string.IsNullOrEmpty(mDescription) ? "$," : "'" + ParserSTEP.Encode(mDescription) + "',") +
+				ParserSTEP.ObjToLinkString(mMaterial) + "," + ParserSTEP.ObjToLinkString(mProfile) +
+				(mPriority == int.MinValue ? ",$" : (release < ReleaseVersion.IFC4A1 ? ParserSTEP.DoubleToString(mPriority / 100.0) : mPriority.ToString())) +
+				(string.IsNullOrEmpty(mCategory) ? ",$" : ",'" + ParserSTEP.Encode(mCategory) + "'")); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

@@ -621,6 +621,8 @@ namespace GeometryGym.Ifc
 				}
 			}
 		}
+		public IfcShapeRepresentation(IfcTextLiteral textLiteral) 
+			: base(textLiteral.Database.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Annotation), textLiteral) { RepresentationType = ShapeRepresentationType.Text.ToString(); }
 		public IfcShapeRepresentation(IfcTessellatedItem item) : base(item) { RepresentationType = ShapeRepresentationType.Tessellation.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, List<IfcMappedItem> reps) : base(context, reps.ConvertAll(x => (IfcRepresentationItem)x)) { RepresentationType = ShapeRepresentationType.MappedRepresentation.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricRepresentationContext context, IfcVertexPoint point) : base(context, point) { RepresentationType = ShapeRepresentationType.Point.ToString(); }
@@ -687,6 +689,8 @@ namespace GeometryGym.Ifc
 			IfcMappedItem mappedItem = representationItem as IfcMappedItem;
 			if (mappedItem != null)
 				return new IfcShapeRepresentation(mappedItem);
+			if (representationItem is IfcTextLiteral textLiteral)
+				return new IfcShapeRepresentation(textLiteral);
 
 			System.Diagnostics.Trace.WriteLine("XX Error Can't identify " + representationItem.ToString() + " as shape representation!");
 			return null;
