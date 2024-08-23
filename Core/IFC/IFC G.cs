@@ -718,10 +718,11 @@ namespace GeometryGym.Ifc
 			}
 		}
 		public IfcGroup(DatabaseIfc db, string name) : base(db) { Name = name; }
-		public IfcGroup(IfcSpatialElement spatial, string name) : base(spatial.Database) 
+		public IfcGroup(IfcSpatialElement spatial, string name) : base(spatial.Database)
 		{
 			Name = name;
-			if (!(this is IfcZone))
+			var release = (spatial.mDatabase == null ? ReleaseVersion.IFC4 : spatial.mDatabase.Release);
+			if (!(release < ReleaseVersion.IFC4 && spatial is IfcZone))
 			{
 				if (spatial.mDatabase.Release <= ReleaseVersion.IFC4X3_RC1)
 				{

@@ -112,9 +112,10 @@ namespace GeometryGym.Ifc
 		}
 		public IfcPhysicalQuantity FindQuantity(string name)
 		{
-			foreach(IfcElementQuantity qset in mIsDefinedBy.ConvertAll(x=>x.RelatingPropertyDefinition).OfType<IfcElementQuantity>())
+			List<IfcElementQuantity> elementQuantities = mIsDefinedBy.SelectMany(x => x.RelatingPropertyDefinition.OfType<IfcElementQuantity>()).ToList();
+			foreach(IfcElementQuantity quantitySet in elementQuantities)
 			{
-				IfcPhysicalQuantity quantity = qset[name];
+				IfcPhysicalQuantity quantity = quantitySet[name];
 				if (quantity != null)
 					return quantity;
 			}
@@ -464,7 +465,7 @@ namespace GeometryGym.Ifc
 				Type enumType = fieldInfo.FieldType;
 				if (enumType != null)
 				{
-					FieldInfo fi = enumType.GetField(predefinedTypeConstant);
+					FieldInfo fi = enumType.GetField(predefinedTypeConstant.ToUpper());
 					if (fi == null)
 					{
 						objectType = predefinedTypeConstant;

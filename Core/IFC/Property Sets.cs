@@ -103,7 +103,7 @@ namespace GeometryGym.Ifc
 		public IfcPropertyListValue<IfcURIReference> MessagingIDs { set { value.Name = "MessagingIDs"; addProperty(value); } }
 		public Pset_Address(IfcBuilding instance) : base(instance) { }
 		public Pset_Address(IfcActor instance) : base(instance) { }
-		public Pset_Address(IfcFacility instance) : base(instance) { }
+		public Pset_Address(IfcSite instance) : base(instance) { }
 	}
 	public partial class Pset_AirSideSystemInformation : IfcPropertySet
 	{

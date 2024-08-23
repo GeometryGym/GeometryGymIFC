@@ -2133,7 +2133,7 @@ namespace GeometryGym.Ifc
 		public Dictionary<string, IfcProperty> HasProperties { get { return mHasProperties; } }
 
 		internal IfcPropertySet() : base() { }
-		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase,"") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
+		protected IfcPropertySet(IfcObjectDefinition obj) : base(obj.mDatabase, "") { Name = this.GetType().Name; new IfcRelDefinesByProperties(obj, this); }
 		protected IfcPropertySet(IfcTypeObject type) : base(type.mDatabase,"") { Name = this.GetType().Name; type.HasPropertySets.Add(this); }
 		public IfcPropertySet(IfcPropertySet pset) : base(pset)
 		{

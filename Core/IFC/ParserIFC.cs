@@ -540,7 +540,7 @@ namespace GeometryGym.Ifc
 			string result = className;
 			if (indexOf > 0)
 			{
-				result = className.Substring(0, indexOf);
+				result = className.Substring(0, indexOf).Trim();
 				string remainder = predefinedConstant = className.Substring(indexOf + 1);
 				indexOf = remainder.IndexOf('(');
 				if (indexOf > 0)

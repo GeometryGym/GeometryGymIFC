@@ -635,13 +635,11 @@ namespace GeometryGym.Ifc
 	{
 		private IfcBuildingElementProxyTypeEnum mPredefinedType = IfcBuildingElementProxyTypeEnum.NOTDEFINED; //	:	OPTIONAL IfcBuildingElementProxyTypeEnum;
 		//Ifc2x3 internal IfcElementCompositionEnum mCompositionType = IfcElementCompositionEnum.NA;// : OPTIONAL IfcElementCompositionEnum; 
-
 		public IfcBuildingElementProxyTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcBuildingElementProxyTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
-		public override string Name { get { return base.Name; } set { base.Name = (string.IsNullOrEmpty(value) ? "NOTDEFINED" : value); } }
 
 		internal IfcBuildingElementProxy() : base() { }
 		internal IfcBuildingElementProxy(DatabaseIfc db, IfcBuildingElementProxy p, DuplicateOptions options) : base(db, p, options) { PredefinedType = p.PredefinedType; }
-		public IfcBuildingElementProxy(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { Name = "NOTDEFINED"; }
+		public IfcBuildingElementProxy(IfcObjectDefinition host, IfcObjectPlacement p, IfcProductDefinitionShape r) : base(host, p, r) { }
 		public IfcBuildingElementProxy(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
 	[Serializable]

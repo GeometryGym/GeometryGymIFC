@@ -2384,6 +2384,7 @@ namespace GeometryGym.Ifc
 		public string RepresentationType { get { return mRepresentationType; } set { mRepresentationType = value; } }
 		public SET<RepresentationItem> Items { get { return mItems; } }
 
+		public IfcRepresentationMap RepresentationMap { get { return mRepresentationMap; } set { mRepresentationMap = value; } }
 		public IfcPresentationLayerAssignment LayerAssignment { get { return mLayerAssignment; } set { mLayerAssignment = value; } }
 		public SET<IfcProductDefinitionShape> OfProductRepresentation { get { return mOfProductRepresentation; } }
 

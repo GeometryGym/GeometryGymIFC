@@ -330,11 +330,15 @@ namespace GeometryGym.STEP
 			return new IfcBinary(array);
 		}
 		public static string BoolToString(bool b) { return (b ? ".T." : ".F."); }
-		public static string DoubleToString(double d) 
+		public static string DoubleToString(double d)
+		{
+			return DoubleToString(d, "{0:0.0################}");
+		}
+		public static string DoubleToString(double d, string format)
 		{ 
 			if (double.IsNaN(d) || double.IsInfinity(d))
 				return "0.0";
-			return String.Format(CultureInfo.InvariantCulture, "{0:0.0################}", d);
+			return String.Format(CultureInfo.InvariantCulture, format, d);
 		}
 		public static string DoubleExponentialString(double d) 
 		{

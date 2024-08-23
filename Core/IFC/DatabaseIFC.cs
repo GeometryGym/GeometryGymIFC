@@ -153,11 +153,13 @@ namespace GeometryGym.Ifc
 			mRelease = schema;
 			mModelView = view;
 #if (RHINO || GH)
-			//mModelSIScale = 1 / Utils.mLengthConversion[(int) GeometryGym.GGRhino.GGRhino.ActiveUnits()];
 			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
 			if (doc != null)
 			{
-				Tolerance = doc.ModelAbsoluteTolerance;
+				double tol = doc.ModelAbsoluteTolerance;
+				if (tol * GGRhino.GGRhino.mScaleFromCAD > 0.0001)
+					tol = 0.0001 / GGRhino.GGRhino.mScaleFromCAD;
+				Tolerance = tol;
 				ToleranceAngleRadians = Math.Min(Math.PI/1800, doc.ModelAngleToleranceRadians);
 			}
 #endif
@@ -590,7 +592,7 @@ namespace GeometryGym.Ifc
 		
 		internal IfcProduct ConstructProduct(string className, IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation, IfcDistributionSystem system)
 		{
-			string str = className, predefinedTypeConstant = "";
+			string str = className.Trim(), predefinedTypeConstant = "";
 			ReleaseVersion release = mDatabase.Release;
 			if (string.IsNullOrEmpty(str))
 				return null;
@@ -2601,7 +2603,7 @@ namespace GeometryGym.Ifc
 					BaseClassIfc o = obj.Object;
 					if (o is IfcPropertySet || o is IfcMaterialConstituentSet || o is IfcPropertySetTemplate)
 						secondPass.Add(obj);
-					else if (o is IfcTessellatedFaceSet || o is IfcPolyLoop || o is IfcFacetedBrep)
+					else if (o is IfcTriangulatedFaceSet || o is IfcPolyLoop || o is IfcFacetedBrep)
 						threadSafeConstructors.Add(obj);
 					else
 						firstPass.Add(obj);

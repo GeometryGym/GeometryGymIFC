@@ -34,7 +34,7 @@ namespace GeometryGym.Ifc
 		public Point2d Location2d() { return new Point2d(mCoordinateX, double.IsNaN( mCoordinateY) ? 0 : mCoordinateY); }
 		internal Point3d Coordinates3d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = value.Z; } }
 		internal Point2d Coordinates2d { set { mCoordinateX = value.X; mCoordinateY = value.Y; mCoordinateZ = double.NaN; } }
-		internal IfcCartesianPoint(DatabaseIfc m, Point3d pt) : base(m) { Coordinates3d = pt; }
+		internal IfcCartesianPoint(DatabaseIfc db, Point3d pt) : base(db) { Coordinates3d = pt; }
 		internal void adopt(Point3d pt)
 		{
 			if (this.is2D)
@@ -42,7 +42,7 @@ namespace GeometryGym.Ifc
 			else
 				Coordinates3d = pt;
 		}
-		internal IfcCartesianPoint(DatabaseIfc m, Point2d pt) : base(m) { Coordinates2d = pt; }
+		internal IfcCartesianPoint(DatabaseIfc db, Point2d pt) : base(db) { Coordinates2d = pt; }
 	}
 	public partial class IfcCartesianPointList
 	{

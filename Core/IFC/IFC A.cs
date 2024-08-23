@@ -895,14 +895,21 @@ namespace GeometryGym.Ifc
 				catch (Exception) { }
 			}
 			IfcCompositeCurve compositeCurve = new IfcCompositeCurve(curveSegments);
+			var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint);
+			IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, compositeCurve, ShapeRepresentationType.Curve2D);
 			if (alignment != null)
 			{
-				var subContext = mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.FootPrint);
-				IfcShapeRepresentation shapeRepresentation = new IfcShapeRepresentation(subContext, compositeCurve, ShapeRepresentationType.Curve2D);
 				if (alignment.Representation == null)
 					alignment.Representation = new IfcProductDefinitionShape(shapeRepresentation);
 				else
 					alignment.Representation.Representations.Add(shapeRepresentation);
+			}
+			else
+			{
+				if(Representation == null)
+					Representation = new IfcProductDefinitionShape(shapeRepresentation);
+				else
+					Representation.Representations.Add(shapeRepresentation);
 			}
 			return compositeCurve;
 		}

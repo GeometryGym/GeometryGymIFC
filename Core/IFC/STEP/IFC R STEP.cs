@@ -1583,6 +1583,8 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			string name = Name;
+			if(string.IsNullOrEmpty(name) && this is IfcBuildingElementProxy)
+				name = "NOTDEFINED";
 			return "'" + mGlobalId + (mOwnerHistory == null ? "',$" : "',#" + mOwnerHistory.StepId) + 
 				(string.IsNullOrEmpty(name) ? ",$," :  ",'" + ParserSTEP.Encode(name) + "',") + 
 				(string.IsNullOrEmpty(mDescription) ? "$" : "'" + ParserSTEP.Encode(mDescription) + "'");

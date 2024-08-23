@@ -29,8 +29,8 @@ namespace GeometryGym.Ifc
 {
 	public partial class IfcBSplineCurve
 	{
-		protected IfcBSplineCurve(DatabaseIfc m, NurbsCurve nonRationalCurve, bool twoD)
-			: this(m, nonRationalCurve.Degree)
+		protected IfcBSplineCurve(DatabaseIfc db, NurbsCurve nonRationalCurve, bool twoD)
+			: this(db, nonRationalCurve.Degree)
 		{
 			int ilast = nonRationalCurve.Points.Count - (nonRationalCurve.IsPeriodic ? mDegree : 0);
 			if (twoD)
@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 				for (int icounter = 0; icounter < ilast; icounter++)
 				{
 					Point3d p3 = nonRationalCurve.Points[icounter].Location;
-					mControlPointsList.Add(new IfcCartesianPoint(m, new Point2d(p3.X, p3.Y)));
+					mControlPointsList.Add(new IfcCartesianPoint(db, new Point2d(p3.X, p3.Y)));
 				}
 				if (nonRationalCurve.IsPeriodic)
 				{
@@ -49,7 +49,7 @@ namespace GeometryGym.Ifc
 			else
 			{
 				for (int icounter = 0; icounter < ilast; icounter++)
-					mControlPointsList.Add(new IfcCartesianPoint(m, nonRationalCurve.Points[icounter].Location));
+					mControlPointsList.Add(new IfcCartesianPoint(db, nonRationalCurve.Points[icounter].Location));
 				if (nonRationalCurve.IsPeriodic)
 				{
 					for (int icounter = 0; icounter < mDegree; icounter++)
@@ -66,16 +66,16 @@ namespace GeometryGym.Ifc
 			mKnotMultiplicities.AddRange(multiplicities);
 			mKnots.AddRange(knots);
 		}
-		internal IfcBSplineCurveWithKnots(DatabaseIfc m, NurbsCurve nc, bool twoD)
-			: base(m, nc, twoD)
+		internal IfcBSplineCurveWithKnots(DatabaseIfc db, NurbsCurve nc, bool twoD)
+			: base(db, nc, twoD)
 		{
 			if (mDatabase.mModelView == ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());
 			ClosedCurve = nc.IsClosed ? IfcLogicalEnum.TRUE : IfcLogicalEnum.FALSE;
 			adoptKnotsAndMultiplicities(nc);
 		}
-		public IfcBSplineCurveWithKnots(DatabaseIfc m, int degree, List<Point2d> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
-			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(m, x)))
+		public IfcBSplineCurveWithKnots(DatabaseIfc db, int degree, List<Point2d> controlPoints, IEnumerable<int> multiplicities, IEnumerable<double> knots, IfcKnotType knotSpec) :
+			base(degree, controlPoints.ConvertAll(x => new IfcCartesianPoint(db, x)))
 		{
 			if (mDatabase.mModelView != ModelView.Ifc4Reference)
 				throw new Exception("Invalid Model View for IfcBSplineCurveWithKnots : " + mDatabase.ModelView.ToString());

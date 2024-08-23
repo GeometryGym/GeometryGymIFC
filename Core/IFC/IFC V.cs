@@ -532,8 +532,9 @@ namespace GeometryGym.Ifc
 		public override object Value { get { return mValue; } set { mValue = Convert.ToDouble(value); } }
 		public override Type ValueType { get { return typeof(double); } }
 		public double Measure { get { return mValue; } set { mValue = value; } }
+		public string Format { get; set; } = "{0:0.0################}";
 		protected IfcMeasureValue(double value) { mValue = value; }
-		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue) + ")"; }
+		public override string ToString() { return this.GetType().Name.ToUpper() + "(" + ParserSTEP.DoubleToString(mValue, Format) + ")"; }
 		public override string ValueString { get { return Value.ToString(); } }
 	}
 	[Serializable]
@@ -901,8 +902,9 @@ namespace GeometryGym.Ifc
 		public double Magnitude { get; set; }
 		public override object Value { get { return Magnitude; } set { Magnitude = Convert.ToDouble(value); } }
 		public override Type ValueType { get { return typeof(double); } }
+		public string Format { get; set; } = "{0:0.0################}";
 		public IfcReal(double value) { Magnitude = value; }
-		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(Magnitude) + ")"; }
+		public override string ToString() { return "IFCREAL(" + ParserSTEP.DoubleToString(Magnitude, Format) + ")"; }
 	}
 	[Serializable]
 	public partial class IfcText : IfcSimpleValue

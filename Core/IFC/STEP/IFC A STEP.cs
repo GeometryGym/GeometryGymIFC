@@ -339,7 +339,8 @@ namespace GeometryGym.Ifc
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
-			mTangentialContinuity = ParserIfc.StripLogical(str, ref pos, len);
+			if (str[0] != '\'')
+				mTangentialContinuity = ParserIfc.StripLogical(str, ref pos, len);
 			mStartTag = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 			mEndTag = ParserSTEP.Decode(ParserSTEP.StripString(str, ref pos, len));
 		}
@@ -403,10 +404,10 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			return base.BuildStringSTEP(release) + "," + ParserSTEP.DoubleOptionalToString(mStartDistAlong) + "," +
-			ParserSTEP.DoubleOptionalToString(mHorizontalLength) + "," + ParserSTEP.DoubleToString(mStartCantLeft) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantLeft) + "," + ParserSTEP.DoubleToString(mStartCantRight) + "," +
-			ParserSTEP.DoubleOptionalToString(mEndCantRight) + (release == ReleaseVersion.IFC4X3_RC3 ? ",$" : "") + 
+			return base.BuildStringSTEP(release) + "," + formatLength(mStartDistAlong) + "," +
+			formatLength(mHorizontalLength) + "," + formatLength(mStartCantLeft) + "," +
+			formatLength(mEndCantLeft) + "," + formatLength(mStartCantRight) + "," +
+			formatLength(mEndCantRight) + (release == ReleaseVersion.IFC4X3_RC3 ? ",$" : "") + 
 			",." + mPredefinedType.ToString() + ".";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int, BaseClassIfc> dictionary)
