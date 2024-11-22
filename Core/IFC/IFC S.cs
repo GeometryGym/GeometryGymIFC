@@ -911,17 +911,17 @@ namespace GeometryGym.Ifc
 		internal IfcSlab(DatabaseIfc db, IfcSlab s, DuplicateOptions options) : base(db, s, options) { PredefinedType = s.PredefinedType; }
 		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcSlabElementedCase : IfcSlab
 	{
-		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
+		public override string StepClassName { get { return "IfcSlab" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcSlabElementedCase() : base() { }
 		internal IfcSlabElementedCase(DatabaseIfc db, IfcSlabElementedCase s, DuplicateOptions options) : base(db, s, options) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcSlabStandardCase : IfcSlab
 	{
-		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 || mDatabase.mModelView == ModelView.Ifc4Reference ? "IfcSlab" : base.StepClassName); } }
+		public override string StepClassName { get { return "IfcSlab" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcSlabStandardCase() : base() { }
 		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, DuplicateOptions options) : base(db, s, options) { }
 		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)

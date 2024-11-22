@@ -273,7 +273,7 @@ namespace GeometryGym.Ifc
 			BaseClassIfc.SetJsonOptions options = new BaseClassIfc.SetJsonOptions() { };
 			return ToJSON(filename, options);
 		}
-		public JsonObject ToJSON(string filename, BaseClassIfc.SetJsonOptions options)
+		public JsonObject ToJSON(string fileName, BaseClassIfc.SetJsonOptions options)
 		{ 
 			CultureInfo current = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
@@ -287,16 +287,20 @@ namespace GeometryGym.Ifc
 			fileDescription["description"] = "ViewDefinition[" + viewDefinition + "]";
 			fileDescription["implementation_level"] = "2;1";
 			header["FILE_DESCRIPTION"] = fileDescription;
-			JsonObject fileName = new JsonObject();
-			fileName["name"] = filename;
+			JsonObject jsonObject = new JsonObject();
+			string strFileName = fileName;
+			if(!WriteFullFilePath)
+				strFileName = System.IO.Path.GetFileName(fileName);
+
+			jsonObject["name"] = strFileName;
 			DateTime now = DateTime.Now;
-			fileName["time_stamp"] = now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second;
-			fileName["author"] = System.Environment.UserName;
-			fileName["organization"] = IfcOrganization.Organization;
-			fileName["preprocessor_version"] = mFactory.ToolkitName;
-			fileName["originating_system"] = Factory.ApplicationFullName;
-			fileName["authorization"] = "None";
-			header["FILE_NAME"] = fileName;
+			jsonObject["time_stamp"] = now.Year + "-" + (now.Month < 10 ? "0" : "") + now.Month + "-" + (now.Day < 10 ? "0" : "") + now.Day + "T" + (now.Hour < 10 ? "0" : "") + now.Hour + ":" + (now.Minute < 10 ? "0" : "") + now.Minute + ":" + (now.Second < 10 ? "0" : "") + now.Second;
+			jsonObject["author"] = System.Environment.UserName;
+			jsonObject["organization"] = IfcOrganization.Organization;
+			jsonObject["preprocessor_version"] = mFactory.ToolkitName;
+			jsonObject["originating_system"] = Factory.ApplicationFullName;
+			jsonObject["authorization"] = "None";
+			header["FILE_NAME"] = jsonObject;
 			JsonObject fileSchema = new JsonObject();
 			fileSchema["schema_identifiers"] = mRelease == ReleaseVersion.IFC2x3 ? "IFC2X3" : "IFC4";
 			header["FILE_SCHEMA"] = fileSchema;
@@ -329,10 +333,10 @@ namespace GeometryGym.Ifc
 				}
 			}
 			ifcFile["DATA"] = data;
-			if (!string.IsNullOrEmpty(filename))
+			if (!string.IsNullOrEmpty(fileName))
 			{
 #if (NEWTONSOFT)
-				StreamWriter sw = new StreamWriter(filename);
+				StreamWriter sw = new StreamWriter(fileName);
 #if (DEBUG)
 				sw.Write(ifcFile.ToString());
 #else
@@ -343,7 +347,7 @@ namespace GeometryGym.Ifc
 				JsonSerializerOptions jsonoptions = new JsonSerializerOptions();
 				jsonoptions.WriteIndented = true;
 				string jsonString = JsonSerializer.Serialize(ifcFile, jsonoptions);
-				File.WriteAllText(filename, jsonString);
+				File.WriteAllText(fileName, jsonString);
 #endif
 			}
 			Thread.CurrentThread.CurrentUICulture = current;

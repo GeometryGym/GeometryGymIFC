@@ -1951,11 +1951,11 @@ namespace GeometryGym.Ifc
 		private IfcElement mRelatedBuildingElement;// :OPTIONAL IfcElement; 
 
 		public IfcOpeningElement RelatingOpeningElement { get { return mRelatingOpeningElement; } set { mRelatingOpeningElement = value; value.mHasFillings.Add(this); } }
-		public IfcElement RelatedBuildingElement { get { return mRelatedBuildingElement; } set { mRelatedBuildingElement = value; value.mFillsVoids.Add(this); } }
+		public IfcElement RelatedBuildingElement { get { return mRelatedBuildingElement; } set { mRelatedBuildingElement = value; value.mFillsVoids = this; } }
 
 		internal IfcRelFillsElement() : base() { }
 		internal IfcRelFillsElement(DatabaseIfc db, IfcRelFillsElement r, DuplicateOptions options) : base(db, r, options) { RelatingOpeningElement = db.Factory.Duplicate(r.RelatingOpeningElement, options); RelatedBuildingElement = db.Factory.Duplicate(r.RelatedBuildingElement, options); }
-		public IfcRelFillsElement(IfcOpeningElement oe, IfcElement e) : base(oe.mDatabase) { mRelatingOpeningElement = oe; mRelatedBuildingElement = e; }
+		public IfcRelFillsElement(IfcOpeningElement oe, IfcElement e) : base(oe.mDatabase) { RelatingOpeningElement = oe; RelatedBuildingElement = e; }
 	}
 	[Serializable]
 	public partial class IfcRelFlowControlElements : IfcRelConnects
@@ -2488,7 +2488,7 @@ namespace GeometryGym.Ifc
 					mStyledByItem = null; 
 			}
 		}
-		internal HashSet<IfcShapeModel> Represents { get { return mRepresents; } }
+		public HashSet<IfcShapeModel> Represents { get { return mRepresents; } }
 
 		protected IfcRepresentationItem() : base() { }
 		protected IfcRepresentationItem(DatabaseIfc db, IfcRepresentationItem i, DuplicateOptions options) : base(db, i)

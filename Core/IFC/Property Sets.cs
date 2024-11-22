@@ -466,12 +466,12 @@ namespace GeometryGym.Ifc
 		public string PlanningControlStatus { set { AddProperty(new IfcPropertySingleValue(mDatabase, "PlanningControlStatus", new IfcLabel(value))); } }
 		public string NarrativeText { set { AddProperty(new IfcPropertySingleValue(mDatabase, "NarrativeText", new IfcText(value))); } }
 		public double VacancyRateInCategoryNow { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VacancyRateInCategoryNow", new IfcPositiveRatioMeasure(value))); } }
-		public IfcPropertyListValue<IfcLabel> TenureModesAvailableNow { set { value.Name = "TenureModesAvailableNow"; addProperty(value); } }
-		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableNow { set { value.Name = "MarketSubCategoriesAvailableNow"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> TenureModesavailableNow { set { value.Name = "TenureModesavailableNow"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesavailableNow { set { value.Name = "MarketSubCategoriesavailableNow"; addProperty(value); } }
 		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryNow { set { value.Name = "RentalRatesInCategoryNow"; addProperty(value); } }
 		public double VacancyRateInCategoryFuture { set { AddProperty(new IfcPropertySingleValue(mDatabase, "VacancyRateInCategoryFuture", new IfcPositiveRatioMeasure(value))); } }
-		public IfcPropertyListValue<IfcLabel> TenureModesAvailableFuture { set { value.Name = "TenureModesAvailableFuture"; addProperty(value); } }
-		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesAvailableFuture { set { value.Name = "MarketSubCategoriesAvailableFuture"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> TenureModesavailableFuture { set { value.Name = "TenureModesavailableFuture"; addProperty(value); } }
+		public IfcPropertyListValue<IfcLabel> MarketSubCategoriesavailableFuture { set { value.Name = "MarketSubCategoriesavailableFuture"; addProperty(value); } }
 		public IfcPropertyBoundedValue<IfcMonetaryMeasure> RentalRatesInCategoryFuture { set { value.Name = "RentalRatesInCategoryFuture"; addProperty(value); } }
 		public Pset_BuildingUse(IfcBuilding instance) : base(instance) { }
 	}
@@ -1291,7 +1291,18 @@ namespace GeometryGym.Ifc
 		public Pset_ReinforcementBarPitchOfWall(IfcWallType type) : base(type) { }
 	}
 	//Pset_Risk
-	//Pset_RoofCommon
+	public partial class Pset_RoofCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public string AcousticRating { set { AddProperty(new IfcPropertySingleValue(mDatabase, "AcousticRating", new IfcLabel(value))); } }
+		public bool IsExternal { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsExternal", new IfcBoolean(value))); } }
+		public double ThermalTransmittance { set { AddProperty(new IfcPropertySingleValue(mDatabase, "ThermalTransmittance", new IfcThermalTransmittanceMeasure(value))); } }
+		public string FireRating { set { AddProperty(new IfcPropertySingleValue(mDatabase, "FireRating", new IfcLabel(value))); } }
+		public bool LoadBearing { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value))); } }
+		public Pset_RoofCommon(IfcRoof instance) : base(instance) { }
+		public Pset_RoofCommon(IfcRoofType type) : base(type) { }
+	}
 	//Pset_SanitaryTerminalTypeBath
 	//Pset_SanitaryTerminalTypeBidet
 	//Pset_SanitaryTerminalTypeCistern

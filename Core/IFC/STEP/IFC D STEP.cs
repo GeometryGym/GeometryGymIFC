@@ -181,8 +181,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{ 
-			return "(" + ParserSTEP.DoubleToString(RoundRatio(mDirectionRatioX)) + "," +
-				ParserSTEP.DoubleToString(RoundRatio(mDirectionRatioY)) + (double.IsNaN(mDirectionRatioZ) ? "" : "," + ParserSTEP.DoubleToString(RoundRatio(mDirectionRatioZ))) + ")";
+			return "(" + FormatRatio(mDirectionRatioX) + "," +
+				(FormatRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : "," + FormatRatio(mDirectionRatioZ))) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
@@ -500,9 +500,10 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
 			return base.BuildStringSTEP(release) + "," + formatLength(mOverallHeight) + "," + formatLength(mOverallWidth) + 
-				(release < ReleaseVersion.IFC4 ? "" : (mPredefinedType == IfcDoorTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType.ToString() + ".,") + 
+				(release < ReleaseVersion.IFC4 ? "" : 
+				(mPredefinedType == IfcDoorTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType.ToString() + ".,") + 
 				(mOperationType == IfcDoorTypeOperationEnum.NOTDEFINED ? "$," : "." + SerializeDoorTypeOperation(mOperationType, release) + ".,") + 
-				(string.IsNullOrEmpty(mUserDefinedOperationType) ? "$" : ",'" + ParserSTEP.Encode(mUserDefinedOperationType) + "'"));
+				(string.IsNullOrEmpty(mUserDefinedOperationType) ? "$" : "'" + ParserSTEP.Encode(mUserDefinedOperationType) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

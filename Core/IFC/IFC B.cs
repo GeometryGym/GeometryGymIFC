@@ -38,7 +38,7 @@ namespace GeometryGym.Ifc
 		public IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 		public IfcBeam(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, Tuple<double, double> arcOrigin, double arcAngle) : base(host, profile, placement, arcOrigin,arcAngle) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcBeamStandardCase : IfcBeam
 	{
 		public override string StepClassName { get { return "IfcBeam"; } }

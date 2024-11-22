@@ -1014,7 +1014,7 @@ namespace GeometryGym.Ifc
 		public IfcMember(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcMember(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcMemberStandardCase : IfcMember
 	{
 		public override string StepClassName { get { return "IfcMember"; } }

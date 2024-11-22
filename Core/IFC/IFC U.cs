@@ -80,7 +80,7 @@ namespace GeometryGym.Ifc
 	[Serializable]
 	public partial class IfcUnitAssignment : BaseClassIfc
 	{
-		public enum Length { Metre, Centimetre, Millimetre, Foot, Inch };
+		public enum Length { Metre, Centimetre, Millimetre, Foot, Inch, USSurveyFoot };
 
 		private SET<IfcUnit> mUnits = new SET<IfcUnit>();// : SET [1:?] OF IfcUnit; 
 		public SET<IfcUnit> Units { get { return mUnits; } }
@@ -102,6 +102,8 @@ namespace GeometryGym.Ifc
 				return 0.0254;
 			if (length == Length.Foot)
 				return FeetToMetre;
+			if (length == Length.USSurveyFoot)
+				return 12000.0 / 3937.0;
 
 			return 1;
 		}
@@ -109,7 +111,7 @@ namespace GeometryGym.Ifc
 		{
 			Units.Add(mDatabase.Factory.LengthUnit(length));
 			double scale = scaleSI(length);
-			if (length == Length.Inch || length == Length.Foot)
+			if (length == Length.Inch || length == Length.Foot || length == Length.USSurveyFoot)
 			{
 				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.CommonUnitName.square_foot));
 				Units.Add(mDatabase.Factory.ConversionUnit(IfcConversionBasedUnit.CommonUnitName.cubic_foot));

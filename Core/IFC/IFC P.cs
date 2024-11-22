@@ -495,8 +495,8 @@ namespace GeometryGym.Ifc
 		public IfcPlate(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcPlate(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double length) : base(host, profile, placement,length) { }
 	}
-	[Serializable]
-	public partial class IfcPlateStandardCase : IfcPlate //IFC4
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
+	public partial class IfcPlateStandardCase : IfcPlate 
 	{
 		public override string StepClassName { get { return "IfcPlate"; } }
 		internal IfcPlateStandardCase() : base() { }
@@ -624,7 +624,7 @@ namespace GeometryGym.Ifc
 			PolygonalBoundary = db.Factory.Duplicate(s.PolygonalBoundary, options); 
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4)]
 	public partial class IfcPolygonalFaceSet : IfcTessellatedFaceSet //IFC4A2
 	{
 		internal LIST<IfcIndexedPolygonalFace> mFaces = new LIST<IfcIndexedPolygonalFace>(); // : LIST [1:?] OF IfcIndexedPolygonalFace;

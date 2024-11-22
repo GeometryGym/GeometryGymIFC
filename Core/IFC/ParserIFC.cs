@@ -729,6 +729,5 @@ namespace GeometryGym.Ifc
 			Guid guid = new Guid(hash);
 			return EncodeGuid(guid);
 		}
-	 
 	}
 }

@@ -376,7 +376,7 @@ namespace GeometryGym.Ifc
 		private string mTag = "";// : OPTIONAL IfcIdentifier;
 
 		//INVERSE  
-		internal SET<IfcRelFillsElement> mFillsVoids = new SET<IfcRelFillsElement>();// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
+		internal IfcRelFillsElement mFillsVoids = null;// : SET [0:1] OF IfcRelFillsElement FOR RelatedBuildingElement;
 		internal SET<IfcRelConnectsElements> mConnectedTo = new SET<IfcRelConnectsElements>();// : SET OF IfcRelConnectsElements FOR RelatingElement;
 		internal SET<IfcRelInterferesElements> mIsInterferedByElements = new SET<IfcRelInterferesElements>();//	 :	SET OF IfcRelInterferesElements FOR RelatedElement;
 		internal SET<IfcRelInterferesElements> mInterferesElements = new SET<IfcRelInterferesElements>();// :	SET OF IfcRelInterferesElements FOR RelatingElement;
@@ -395,7 +395,7 @@ namespace GeometryGym.Ifc
 		internal SET<IfcRelConnectsStructuralElement> mHasStructuralMember = new SET<IfcRelConnectsStructuralElement>();// DEL IFC4	 : 	SET OF IfcRelConnectsStructuralElement FOR RelatingElement;
 
 		public string Tag { get { return mTag; } set { mTag = value; } }
-		public SET<IfcRelFillsElement> FillsVoids { get { return mFillsVoids; } }
+		public IfcRelFillsElement FillsVoids { get { return mFillsVoids; } }
 		public SET<IfcRelConnectsElements> ConnectedTo { get { return mConnectedTo; } }
 		public SET<IfcRelInterferesElements> IsInterferedByElements { get { return mIsInterferedByElements; } }
 		public SET<IfcRelInterferesElements> InterferesElements { get { return mInterferesElements; } }

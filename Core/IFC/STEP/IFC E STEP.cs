@@ -359,6 +359,8 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
+			if (mQuantities.Count == 0)
+				return "";
 			return base.BuildStringSTEP(release) + (string.IsNullOrEmpty(mMethodOfMeasurement) ? ",$,(" : ",'" + ParserSTEP.Encode(mMethodOfMeasurement) + "',(") + string.Join(",", mQuantities.Values.Select(x=>"#" + x.StepId)) + ")";
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)

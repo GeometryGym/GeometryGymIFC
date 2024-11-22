@@ -35,13 +35,13 @@ namespace GeometryGym.Ifc
 		internal IfcWall(DatabaseIfc db, IfcWall w, DuplicateOptions options) : base(db, w, options) { PredefinedType = w.PredefinedType; }
 		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcWallElementedCase : IfcWall
 	{
 		internal IfcWallElementedCase() : base() { }
 		internal IfcWallElementedCase(DatabaseIfc db, IfcWallElementedCase w, DuplicateOptions options) : base(db, w, options) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcWallStandardCase : IfcWall
 	{
 		public override string StepClassName { get { return "IfcWall" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
@@ -188,8 +188,20 @@ namespace GeometryGym.Ifc
 		internal double mFirstTransomOffset = double.NaN, mSecondTransomOffset = double.NaN, mFirstMullionOffset = double.NaN, mSecondMullionOffset = double.NaN;// : OPTIONAL IfcNormalisedRatioMeasure;
 		private IfcShapeAspect mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 DEPRECATED
 		internal double mLiningOffset = double.NaN, mLiningToPanelOffsetX = double.NaN, mLiningToPanelOffsetY = double.NaN;//	 :	OPTIONAL IfcLengthMeasure;
+		public double LiningDepth { get { return mLiningDepth; } set { mLiningDepth = value; } }
+		public double LiningThickness { get { return mLiningThickness; } set { mLiningThickness = value; } }
+		public double TransomThickness { get { return mTransomThickness; } set { mTransomThickness = value; } }
+		public double MullionThickness { get { return mMullionThickness; } set { mMullionThickness = value; } }
+		public double FirstTransomOffset { get { return mFirstTransomOffset; } set { mFirstTransomOffset = value; } }
+		public double SecondTransomOffset { get { return mSecondTransomOffset; } set { mSecondTransomOffset = value; } }
+		public double FirstMullionOffset { get { return mFirstMullionOffset; } set { mFirstMullionOffset = value; } }
+		public double SecondMullionOffset { get { return mSecondMullionOffset; } set { mSecondMullionOffset = value; } }
+		
 		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mShapeAspectStyle; } set { mShapeAspectStyle = value; } }
+		public double LiningOffset { get { return mLiningOffset; } set { mLiningOffset = value; } }
+		public double LiningToPanelOffsetX { get { return mLiningToPanelOffsetX; } set { mLiningToPanelOffsetX = value; } }
+		public double LiningToPanelOffsetY { get { return mLiningToPanelOffsetY; } set { mLiningToPanelOffsetY = value; } }
 		internal IfcWindowLiningProperties() : base() { }
 		internal IfcWindowLiningProperties(DatabaseIfc db, IfcWindowLiningProperties p, DuplicateOptions options) : base(db, p, options)
 		{
@@ -206,22 +218,8 @@ namespace GeometryGym.Ifc
 			mLiningToPanelOffsetX = p.mLiningToPanelOffsetX;
 			mLiningToPanelOffsetY = p.mLiningToPanelOffsetY;
 		}
-		internal IfcWindowLiningProperties(DatabaseIfc db, string name, double lngDpth, double lngThck, double trnsmThck, double mllnThck,
-			double trnsmOffst1, double trnsmOffst2, double mllnOffst1, double mllnOffst2, double lngOffset, double lngToPnlOffstX, double lngToPnlOffstY)
-			: base(db, name)
-		{
-			mLiningDepth = lngDpth;
-			mLiningThickness = lngThck;
-			mTransomThickness = trnsmThck;
-			mMullionThickness = mllnThck;
-			mFirstTransomOffset = Math.Min(1, Math.Max(0, trnsmOffst1));
-			mSecondTransomOffset = Math.Min(1, Math.Max(0, trnsmOffst2));
-			mFirstMullionOffset = Math.Min(1, Math.Max(0, mllnOffst1));
-			mSecondMullionOffset = Math.Min(1, Math.Max(0, mllnOffst2));
-			mLiningOffset = lngOffset;
-			mLiningToPanelOffsetX = lngToPnlOffstX;
-			mLiningToPanelOffsetY = lngToPnlOffstY;
-		}
+		public IfcWindowLiningProperties(DatabaseIfc db)
+			: base(db, "IfcWindowLiningProperties") { }
 	}
 	[Serializable]
 	public partial class IfcWindowPanelProperties : IfcPreDefinedPropertySet //IFC2x3: IfcPropertySetDefinition
@@ -231,6 +229,11 @@ namespace GeometryGym.Ifc
 		internal double mFrameDepth = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		internal double mFrameThickness = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 		private IfcShapeAspect mShapeAspectStyle;// : OPTIONAL IfcShapeAspect; IFC4 DEPRECATED
+
+		public IfcWindowPanelOperationEnum OperationType { get { return mOperationType; } set { mOperationType = value; } }
+		public IfcWindowPanelPositionEnum PanelPosition { get { return mPanelPosition; } set { mPanelPosition = value; } }
+		public double FrameDepth { get { return mFrameDepth; } set { mFrameDepth = value; } }
+		public double FrameThickness { get { return mFrameThickness; } set { mFrameThickness = value; } }
 		[Obsolete("DEPRECATED IFC4", false)]
 		public IfcShapeAspect ShapeAspectStyle { get { return mShapeAspectStyle; } set { mShapeAspectStyle = value; } }
 
@@ -244,14 +247,14 @@ namespace GeometryGym.Ifc
 			if (p.mShapeAspectStyle != null)
 				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle);
 		}
-		public IfcWindowPanelProperties(DatabaseIfc db, string name, IfcWindowPanelOperationEnum op, IfcWindowPanelPositionEnum panel)
-			: base(db, name)
+		public IfcWindowPanelProperties(DatabaseIfc db, IfcWindowPanelOperationEnum op, IfcWindowPanelPositionEnum panel)
+			: base(db, "IfcWindowPanelProperties")
 		{
 			mOperationType = op;
 			mPanelPosition = panel;
 		}
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcWindowStandardCase : IfcWindow
 	{
 		public override string StepClassName { get { return "IfcWindow"; } }

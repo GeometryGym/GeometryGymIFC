@@ -113,8 +113,10 @@ namespace GeometryGym.Ifc
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{ 
 			return base.BuildStringSTEP(release) + "," + formatLength(mOverallHeight) + "," + formatLength(mOverallWidth) + 
-				(release < ReleaseVersion.IFC4 ? "" : ",." + mPredefinedType + ".,." + mPartitioningType + 
-				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? ".,$" : ".,'" + ParserSTEP.Encode(mUserDefinedPartitioningType) + "'"));
+				(release < ReleaseVersion.IFC4 ? "" : 
+				(mPredefinedType == IfcWindowTypeEnum.NOTDEFINED ? ",$," : ",." + mPredefinedType + ".,") + 
+				(mPartitioningType == IfcWindowTypePartitioningEnum.NOTDEFINED ? "$," : "." + mPartitioningType + ".,") +
+				(string.IsNullOrEmpty(mUserDefinedPartitioningType) ? "$" : "'" + ParserSTEP.Encode(mUserDefinedPartitioningType) + "'"));
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

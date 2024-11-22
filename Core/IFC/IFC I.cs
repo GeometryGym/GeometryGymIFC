@@ -229,6 +229,12 @@ namespace GeometryGym.Ifc
 		internal IfcCostValue mOriginalValue;// : OPTIONAL IfcCostValue;
 
 		public IfcInventoryTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcInventoryTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+		public IfcActorSelect Jurisdiction { get { return mJurisdiction; } set { mJurisdiction = value; } }
+		public SET<IfcPerson> ResponsiblePersons { get { return mResponsiblePersons; } }
+		public DateTime LastUpdateDate { get { return mLastUpdateDate; } set { mLastUpdateDate = value; } }
+		public IfcCostValue CurrentValue { get { return mCurrentValue; } set { mCurrentValue = value; } }
+		public IfcCostValue OriginalValue { get { return mOriginalValue; } set { mOriginalValue = value; } }
+
 
 		internal IfcInventory() : base() { }
 		internal IfcInventory(DatabaseIfc db, IfcInventory i, DuplicateOptions options) : base(db, i, options)
@@ -244,7 +250,7 @@ namespace GeometryGym.Ifc
 			if(i.mOriginalValue != null)
 				mOriginalValue = db.Factory.Duplicate(i.mOriginalValue, options);
 		}
-		internal IfcInventory(DatabaseIfc db, string name) : base(db, name) { }
+		public IfcInventory(DatabaseIfc db, string name) : base(db, name) { }
 	}
 	[Serializable]
 	public partial class IfcIrregularTimeSeries : IfcTimeSeries

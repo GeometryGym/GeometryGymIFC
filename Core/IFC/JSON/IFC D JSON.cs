@@ -152,7 +152,7 @@ namespace GeometryGym.Ifc
 		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
 		{
 			base.setJSON(obj, host, options);
-			obj["DirectionRatios"] = mDirectionRatioX + (double.IsNaN(mDirectionRatioY) ? "" : (" " + RoundRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + RoundRatio(mDirectionRatioZ))));
+			obj["DirectionRatios"] = mDirectionRatioX + (double.IsNaN(mDirectionRatioY) ? "" : (" " + FormatRatio(mDirectionRatioY) + (double.IsNaN(mDirectionRatioZ) ? "" : " " + FormatRatio(mDirectionRatioZ))));
 		}
 	}
 	public partial class IfcDirectrixCurveSweptAreaSolid 

@@ -153,7 +153,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcCartesianPoint : IfcPoint
 	{
 		private double mCoordinateX = 0, mCoordinateY = double.NaN, mCoordinateZ = double.NaN;
-
+		[NonSerialized] internal HashSet<IfcPlacement> mAsPlacementsLocation = new HashSet<IfcPlacement>();
 		public double CoordinateX { get { return mCoordinateX; } set { mCoordinateX = value; } }
 		public double CoordinateY { get { return mCoordinateY; } set { mCoordinateY = value; } }
 		public double CoordinateZ { get { return mCoordinateZ; } set { mCoordinateZ = value; } }
@@ -884,7 +884,7 @@ namespace GeometryGym.Ifc
 		public IfcColumn(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
 		public IfcColumn(IfcProduct host, IfcMaterialProfileSetUsage profile, IfcAxis2Placement3D placement, double height) : base(host, profile, placement, height) { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcColumnStandardCase : IfcColumn
 	{
 		public override string StepClassName { get { return "IfcColumn"; } }
@@ -1725,7 +1725,7 @@ namespace GeometryGym.Ifc
 		public enum CommonUnitName
 		{
 			inch, foot, yard, mile, square_inch, square_foot, square_yard, acre, square_mile, cubic_inch, cubic_foot, cubic_yard, litre, fluid_ounce_UK,
-			fluid_ounce_US, pint_UK, pint_US, gallon_UK, gallon_US, degree, ounce, pound, ton_UK, ton_US, lbf, kip, psi, ksi, minute, hour, day, btu
+			fluid_ounce_US, pint_UK, pint_US, gallon_UK, gallon_US, degree, ounce, pound, ton_UK, ton_US, lbf, kip, psi, ksi, minute, hour, day, btu, US_survey_foot
 		};
 		
 		private string mName = "";// : IfcLabel;

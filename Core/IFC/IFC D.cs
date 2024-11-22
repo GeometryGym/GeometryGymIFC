@@ -346,14 +346,14 @@ namespace GeometryGym.Ifc
 	public partial class IfcDirection : IfcGeometricRepresentationItem, IfcGridPlacementDirectionSelect, IfcOrientationSelect, IfcVectorOrDirection
 	{
 		[NonSerialized] private double mDirectionRatioX = 0, mDirectionRatioY = 0, mDirectionRatioZ = double.NaN; // DirectionRatios : LIST [2:3] OF IfcReal;
-		[NonSerialized] internal SET<IfcCartesianTransformationOperator> mAsAxis1Transformations = new SET<IfcCartesianTransformationOperator>();
-		[NonSerialized] internal SET<IfcCartesianTransformationOperator> mAsAxis2Transformations = new SET<IfcCartesianTransformationOperator>();
-		[NonSerialized] internal SET<IfcCartesianTransformationOperator3D> mAsAxis3Transformations = new SET<IfcCartesianTransformationOperator3D>();
-		[NonSerialized] internal SET<IfcAxis2Placement3D> mAsAxisPlacements3D = new SET<IfcAxis2Placement3D>();
-		[NonSerialized] internal SET<IfcAxis2Placement3D> mAsRefDirectionPlacements3D = new SET<IfcAxis2Placement3D>();
-		[NonSerialized] internal SET<IfcAxis2PlacementLinear> mAsAxisPlacementsLinear = new SET<IfcAxis2PlacementLinear>();
-		[NonSerialized] internal SET<IfcAxis2PlacementLinear> mAsRefDirectionPlacementsLinear = new SET<IfcAxis2PlacementLinear>();
-		[NonSerialized] internal SET<IfcExtrudedAreaSolid> mExtrudedDirections = new SET<IfcExtrudedAreaSolid>();
+		[NonSerialized] internal HashSet<IfcCartesianTransformationOperator> mAsAxis1Transformations = new HashSet<IfcCartesianTransformationOperator>();
+		[NonSerialized] internal HashSet<IfcCartesianTransformationOperator> mAsAxis2Transformations = new HashSet<IfcCartesianTransformationOperator>();
+		[NonSerialized] internal HashSet<IfcCartesianTransformationOperator3D> mAsAxis3Transformations = new HashSet<IfcCartesianTransformationOperator3D>();
+		[NonSerialized] internal HashSet<IfcAxis2Placement3D> mAsAxisPlacements3D = new HashSet<IfcAxis2Placement3D>();
+		[NonSerialized] internal HashSet<IfcAxis2Placement3D> mAsRefDirectionPlacements3D = new HashSet<IfcAxis2Placement3D>();
+		[NonSerialized] internal HashSet<IfcAxis2PlacementLinear> mAsAxisPlacementsLinear = new HashSet<IfcAxis2PlacementLinear>();
+		[NonSerialized] internal HashSet<IfcAxis2PlacementLinear> mAsRefDirectionPlacementsLinear = new HashSet<IfcAxis2PlacementLinear>();
+		[NonSerialized] internal HashSet<IfcExtrudedAreaSolid> mExtrudedDirections = new HashSet<IfcExtrudedAreaSolid>();
 
 		public double DirectionRatioX { get { return mDirectionRatioX; } set { mDirectionRatioX = value; } }
 		public double DirectionRatioY { get { return mDirectionRatioY; } set { mDirectionRatioY = value; } }
@@ -371,7 +371,7 @@ namespace GeometryGym.Ifc
 		public IfcDirection(DatabaseIfc db, double x, double y) : base(db) { double length = Math.Sqrt(x * x + y * y); DirectionRatioX = x / length; DirectionRatioY = y / length; DirectionRatioZ = double.NaN; }
 		public IfcDirection(DatabaseIfc db, double x, double y, double z) : base(db) { double length = Math.Sqrt(x * x + y * y +z * z); DirectionRatioX = x / length; DirectionRatioY = y / length; DirectionRatioZ = z / length; }
 
-		private double RoundRatio(double ratio) { return Math.Round(ratio, 8); }
+		private string FormatRatio(double ratio) { return String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0############################}", ratio); }
 
 		internal bool is2D { get { return double.IsNaN(mDirectionRatioZ); } }
 		internal bool isXAxis { get { double tol = 1e-6; return ((Math.Abs(mDirectionRatioX - 1) < tol) && (double.IsNaN(mDirectionRatioY) || Math.Abs(mDirectionRatioY) < tol) && (double.IsNaN(mDirectionRatioZ) || Math.Abs(mDirectionRatioZ) < tol)); } }
@@ -777,6 +777,7 @@ namespace GeometryGym.Ifc
 			mLiningToPanelOffsetX = p.mLiningToPanelOffsetX;
 			mLiningToPanelOffsetY = p.mLiningToPanelOffsetY;
 		}
+		internal IfcDoorLiningProperties(DatabaseIfc db) : base(db, "IfcDoorLiningProperties") { }
 	}
 	[Serializable]
 	public partial class IfcDoorPanelProperties : IfcPreDefinedPropertySet //IFC2x3 IfcPropertySetDefinition
@@ -804,8 +805,9 @@ namespace GeometryGym.Ifc
 			if (p.mShapeAspectStyle != null)
 				ShapeAspectStyle = db.Factory.Duplicate(p.ShapeAspectStyle);
 		}
+		public IfcDoorPanelProperties(DatabaseIfc db) : base(db, "IfcDoorPanelProperties") { }
 	}
-	[Serializable]
+	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcDoorStandardCase : IfcDoor
 	{
 		public override string StepClassName { get { return "IfcDoor"; } }

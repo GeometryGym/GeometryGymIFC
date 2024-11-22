@@ -119,6 +119,14 @@ namespace GeometryGym.Ifc
 		public double Weight { set { addQuantity(new IfcQuantityWeight(mDatabase, "Weight", value)); } }
 		public Qto_ReinforcingElementBaseQuantities(IfcReinforcingElement instance) : base(instance) { }
 	}
+	public partial class Qto_RoofBaseQuantities : IfcElementQuantity
+	{
+		public double GrossArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossArea", value)); } }
+		public double NetArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double ProjectedArea { set { addQuantity(new IfcQuantityArea(mDatabase, "ProjectedArea", value)); } }
+		public Qto_RoofBaseQuantities(IfcRoof instance) : base(instance) { }
+		public Qto_RoofBaseQuantities(IfcRoofType type) : base(type) { }
+	}
 	public partial class Qto_SlabBaseQuantities : IfcElementQuantity
 	{
 		public double Width { set { addQuantity(new IfcQuantityLength(mDatabase, "Width", value)); } }
