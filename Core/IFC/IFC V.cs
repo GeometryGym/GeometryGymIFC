@@ -222,7 +222,8 @@ namespace GeometryGym.Ifc
 		
 		internal IfcVoidingFeature() : base() { }
 		internal IfcVoidingFeature(DatabaseIfc db, IfcVoidingFeature v, DuplicateOptions options) : base(db, v, options) { PredefinedType = v.PredefinedType; }
-		public IfcVoidingFeature(IfcElement host, IfcProductDefinitionShape rep, IfcVoidingFeatureTypeEnum type) : base(host, rep) { PredefinedType = type; }
+		public IfcVoidingFeature(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape rep) 
+			: base(host, placement, rep) { }
 	}
 	[Obsolete("RELEASE CANDIDATE IFC4X3", false)]
 	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]

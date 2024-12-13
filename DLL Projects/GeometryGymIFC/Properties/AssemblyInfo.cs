@@ -20,8 +20,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("24.08.23.0")]
-[assembly: AssemblyFileVersion("24.08.23.0")]
+[assembly: AssemblyVersion("24.12.13.0")]
+[assembly: AssemblyFileVersion("24.12.13.0")]
 
 [assembly: AssemblyTitle("GeometryGymIFC")]
 [assembly: AssemblyDescription("C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files")]

@@ -2825,7 +2825,7 @@ namespace GeometryGym.Ifc
 			return null;
 		}
 	}
-	[Serializable]
+	[Serializable, VersionAdded(ReleaseVersion.IFC4X3)]
 	public partial class IfcRoad : IfcFacility
 	{
 		private IfcRoadTypeEnum mPredefinedType = IfcRoadTypeEnum.NOTDEFINED;// OPTIONAL : IfcRoadTypeEnum

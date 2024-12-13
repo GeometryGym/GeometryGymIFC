@@ -83,6 +83,25 @@ namespace GeometryGym.Ifc
 			mVoids.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcClosedShell));
 		}
 	}
+	public partial class IfcFacility
+	{
+		public override string StepClassName
+		{
+			get
+			{
+				if (mDatabase != null)
+				{
+					if (mDatabase.Release < ReleaseVersion.IFC4X2)
+						return "IfcBuilding";
+				}
+				return base.StepClassName;
+			}
+		}
+		protected override string BuildStringSTEP(ReleaseVersion release)
+		{
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4X2 && this as IfcBuilding == null ? ",$,$,$" : "");
+		}
+	}
 	public partial class IfcFacilityPart
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
