@@ -796,6 +796,7 @@ namespace GeometryGym.Ifc
 		//INVERSE 
 		internal SET<IfcProduct> mPlacesObject = new SET<IfcProduct>();// : SET [0:?] OF IfcProduct FOR ObjectPlacement; ifc2x3 [1:?] 
 		internal SET<IfcObjectPlacement> mReferencedByPlacements = new SET<IfcObjectPlacement>();// : SET [0:?] OF IfcLocalPlacement FOR PlacementRelTo;
+		internal SET<IfcStructuralAnalysisModel> mPlacesAnalysisModels = new SET<IfcStructuralAnalysisModel>();
 		internal IfcProduct mContainerHost = null;
 
 		public IfcObjectPlacement PlacementRelTo

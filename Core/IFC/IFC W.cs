@@ -34,6 +34,21 @@ namespace GeometryGym.Ifc
 		internal IfcWall() : base() { }
 		internal IfcWall(DatabaseIfc db, IfcWall w, DuplicateOptions options) : base(db, w, options) { PredefinedType = w.PredefinedType; }
 		public IfcWall(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcWall(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
+			: base(container, new IfcLocalPlacement(container.ObjectPlacement, placement), null)
+		{
+			DatabaseIfc db = mDatabase;
+			double tol = mDatabase.Tolerance;
+			setMaterial(layerSetUsage);
+
+			IfcShapeRepresentation asr = new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcPolyline(new IfcCartesianPoint(db, 0, 0, 0), new IfcCartesianPoint(db, length, 0, 0)), ShapeRepresentationType.Curve2D);
+			List<IfcShapeModel> reps = new List<IfcShapeModel>();
+			reps.Add(asr);
+			double t = layerSetUsage.ForLayerSet.MaterialLayers.ToList().ConvertAll(x => x.LayerThickness).Sum();
+
+			reps.Add(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(new IfcRectangleProfileDef(db, "", length, t), new IfcAxis2Placement3D(new IfcCartesianPoint(db, length / 2.0, layerSetUsage.OffsetFromReferenceLine + (layerSetUsage.DirectionSense == IfcDirectionSenseEnum.POSITIVE ? 1 : -1) * t / 2.0, 0)), height)));
+			Representation = new IfcProductDefinitionShape(reps);
+		}
 	}
 	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcWallElementedCase : IfcWall
@@ -48,26 +63,26 @@ namespace GeometryGym.Ifc
 		internal IfcWallStandardCase() : base() { }
 		internal IfcWallStandardCase(DatabaseIfc db, IfcWallStandardCase w, DuplicateOptions options) : base(db, w, options) { }
 		public IfcWallStandardCase(IfcProduct container, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, double length, double height)
-			:base(container,new IfcLocalPlacement(container.ObjectPlacement, placement),null)
-		{
-			DatabaseIfc db = mDatabase;
-			double tol = mDatabase.Tolerance;
-			setMaterial(layerSetUsage);
-
-			IfcShapeRepresentation asr = new IfcShapeRepresentation(mDatabase.Factory.SubContext(IfcGeometricRepresentationSubContext.SubContextIdentifier.Axis), new IfcPolyline(new IfcCartesianPoint(db,0,0,0),new IfcCartesianPoint(db,length,0,0)), ShapeRepresentationType.Curve2D);
-			List<IfcShapeModel> reps = new List<IfcShapeModel>();
-			reps.Add(asr);
-			double t = layerSetUsage.ForLayerSet.MaterialLayers.ToList().ConvertAll(x=>x.LayerThickness).Sum();
-
-			reps.Add(new IfcShapeRepresentation( new IfcExtrudedAreaSolid(new IfcRectangleProfileDef(db,"",length, t), new IfcAxis2Placement3D(new IfcCartesianPoint(db,length/2.0, layerSetUsage.OffsetFromReferenceLine + (layerSetUsage.DirectionSense == IfcDirectionSenseEnum.POSITIVE ? 1 : -1) * t/2.0, 0)), height)));
-			Representation = new IfcProductDefinitionShape(reps);
-		}
+			:base(container, layerSetUsage, placement, length, height) { }
 	}
 	[Serializable]
 	public partial class IfcWallType : IfcBuiltElementType
 	{
 		private IfcWallTypeEnum mPredefinedType = IfcWallTypeEnum.NOTDEFINED;
-		public IfcWallTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcWallTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
+		public IfcWallTypeEnum PredefinedType 
+		{ 
+			get { return mPredefinedType; }  
+			set 
+			{ 
+				if(value == IfcWallTypeEnum.STANDARD || value == IfcWallTypeEnum.ELEMENTEDWALL || value == IfcWallTypeEnum.POLYGONAL)
+				{
+					if (string.IsNullOrEmpty(ElementType))
+						ElementType = value.ToString();
+				}
+				else
+					mPredefinedType = validPredefinedType<IfcWallTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); 
+			} 
+		}
 
 		internal IfcWallType() : base() { }
 		internal IfcWallType(DatabaseIfc db, IfcWallType t, DuplicateOptions options) : base(db, t, options) { PredefinedType = t.PredefinedType; }

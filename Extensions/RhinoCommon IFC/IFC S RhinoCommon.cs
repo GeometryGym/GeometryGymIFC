@@ -65,7 +65,7 @@ namespace GeometryGym.Ifc
 	{
 		public Vector3d PlanarForce
 		{
-			get { return new Vector3d(mPlanarForceX, mPlanarForceY, mPlanarForceZ); }
+			get { return new Vector3d(PlanarForceX, PlanarForceY, PlanarForceZ); }
 			set
 			{
 				if (value.IsValid)

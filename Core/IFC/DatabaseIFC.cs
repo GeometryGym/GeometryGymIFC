@@ -82,6 +82,8 @@ namespace GeometryGym.Ifc
 		Ifc2x3NotAssigned,
 		Ifc4X1NotAssigned,
 		Ifc4X2NotAssigned,
+		IFC4X3Reference,
+		IFC4X3AlignmentBasedView,
 		Ifc4X3NotAssigned,
 		/// <summary>
 		/// Draft Release for IfcTunnel Deployment Testing, not to be used for Production
@@ -2458,6 +2460,8 @@ namespace GeometryGym.Ifc
 					}
 					processFileHeaderLine(str);
 				}
+
+				reader.Close();
 			}
 			Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss:ffff") + " - Started Reading Data");
 
@@ -3005,6 +3009,10 @@ namespace GeometryGym.Ifc
 				modelView = "ReferenceView_V1.2";
 			else if (mDatabase.ModelView == ModelView.Ifc4DesignTransfer)
 				modelView = "DesignTransferView_V1.1";
+			else if (mDatabase.ModelView == ModelView.IFC4X3Reference)
+				modelView = "ReferenceView";
+			else if (mDatabase.ModelView == ModelView.IFC4X3AlignmentBasedView)
+				modelView = "Alignment-basedView";
 			lines.Add("ISO-10303-21;\r\nHEADER;\r\nFILE_DESCRIPTION(('ViewDefinition [" + modelView + "]'),'2;1');");
 			
 			lines.Add("FILE_NAME(");

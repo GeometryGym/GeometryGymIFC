@@ -256,9 +256,13 @@ namespace GeometryGym.Ifc
 		internal IfcAlignment(DatabaseIfc db, IfcAlignment alignment, DuplicateOptions options) 
 			: base(db, alignment, new DuplicateOptions(options) { DuplicateDownstream = true }) { PredefinedType = alignment.PredefinedType; }
 		public IfcAlignment(IfcProject host) : base(host) { }
+		public IfcAlignment(IfcProject host, IfcObjectPlacement placement) : base(host, placement, null) { }
 		public IfcAlignment(IfcAlignment host) : base(host) { }
+		public IfcAlignment(IfcAlignment host, IfcObjectPlacement placement) : base(host, placement, null) { }
 		public IfcAlignment(IfcSite host) : base(host) { }
+		public IfcAlignment(IfcSite host, IfcObjectPlacement placement) : base(host, placement, null) { }
 		public IfcAlignment(IfcFacility host) : base(host) { }
+		public IfcAlignment(IfcFacility host, IfcObjectPlacement placement) : base(host, placement, null) { }
 		public IfcAlignment(IfcFacilityPart host) : base(host) { }
 		[Obsolete("DEPRECATED IFC4X3", false)]
 		protected IfcAlignment(IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcSpatialStructureElement host, IfcCurve axis)

@@ -44,7 +44,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0)
+			if (mPlacesObject.Count == 0 && mReferencedByPlacements.Count == 0 && mPlacesAnalysisModels.Count == 0)
 				return "";
 			return (release < ReleaseVersion.IFC4X2 ? "" : ParserSTEP.ObjToLinkString(mPlacementRelTo));
 		}

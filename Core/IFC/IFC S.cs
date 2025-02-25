@@ -910,6 +910,12 @@ namespace GeometryGym.Ifc
 		internal IfcSlab() : base() { }
 		internal IfcSlab(DatabaseIfc db, IfcSlab s, DuplicateOptions options) : base(db, s, options) { PredefinedType = s.PredefinedType; }
 		public IfcSlab(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcSlab(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)
+		{
+			SetMaterial(layerSetUsage);
+			IfcAxis2Placement3D position = (Math.Abs(layerSetUsage.OffsetFromReferenceLine) > mDatabase.Tolerance ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, 0, layerSetUsage.OffsetFromReferenceLine)) : null);
+			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(perimeter, position, layerSetUsage.DirectionSense == IfcDirectionSenseEnum.POSITIVE ? mDatabase.Factory.ZAxis : mDatabase.Factory.ZAxisNegative, layerSetUsage.ForLayerSet.MaterialLayers.Sum(x => x.LayerThickness))));
+		}
 	}
 	[Serializable, Obsolete("DEPRECATED IFC4", false)]
 	public partial class IfcSlabElementedCase : IfcSlab
@@ -924,12 +930,9 @@ namespace GeometryGym.Ifc
 		public override string StepClassName { get { return "IfcSlab" + (mDatabase.mRelease < ReleaseVersion.IFC4 ? "StandardCase" : ""); } }
 		internal IfcSlabStandardCase() : base() { }
 		internal IfcSlabStandardCase(DatabaseIfc db, IfcSlabStandardCase s, DuplicateOptions options) : base(db, s, options) { }
-		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) : base(host, new IfcLocalPlacement(host.ObjectPlacement, placement), null)
-		{
-			SetMaterial(layerSetUsage);
-			IfcAxis2Placement3D position = (Math.Abs(layerSetUsage.OffsetFromReferenceLine) > mDatabase.Tolerance ? new IfcAxis2Placement3D(new IfcCartesianPoint(mDatabase, 0, 0, layerSetUsage.OffsetFromReferenceLine)) : null);
-			Representation = new IfcProductDefinitionShape(new IfcShapeRepresentation(new IfcExtrudedAreaSolid(perimeter, position, layerSetUsage.DirectionSense == IfcDirectionSenseEnum.POSITIVE ? mDatabase.Factory.ZAxis : mDatabase.Factory.ZAxisNegative, layerSetUsage.ForLayerSet.MaterialLayers.Sum(x=>x.LayerThickness))));
-		}
+		[Obsolete("DEPRECATED IFC4", false)]
+		public IfcSlabStandardCase(IfcProduct host, IfcMaterialLayerSetUsage layerSetUsage, IfcAxis2Placement3D placement, IfcProfileDef perimeter) 
+			: base(host, layerSetUsage, placement, perimeter) { }
 	}
 	[Serializable]
 	public partial class IfcSlabType : IfcBuiltElementType
@@ -1539,7 +1542,16 @@ namespace GeometryGym.Ifc
 		public IfcAxis2Placement3D OrientationOf2DPlane { get { return mOrientationOf2DPlane; } set { mOrientationOf2DPlane = value;  } }
 		public SET<IfcStructuralLoadGroup> LoadedBy { get { return mLoadedBy; } }
 		public SET<IfcStructuralResultGroup> HasResults { get { return mHasResults; } } 
-		public IfcObjectPlacement SharedPlacement { get { return mSharedPlacement; } set { mSharedPlacement = value; } }
+		public IfcObjectPlacement SharedPlacement 
+		{ 
+			get { return mSharedPlacement; } 
+			set 
+			{
+				mSharedPlacement = value;
+				if (value != null)
+					value.mPlacesAnalysisModels.Add(this);
+			} 
+		}
 
 		internal IfcStructuralAnalysisModel() : base() { }
 		internal IfcStructuralAnalysisModel(DatabaseIfc db, IfcStructuralAnalysisModel m, DuplicateOptions options) : base(db, m, options)
