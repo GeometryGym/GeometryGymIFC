@@ -1652,20 +1652,28 @@ namespace GeometryGym.Ifc
 			if (type != null)
 			{
 				VersionAddedAttribute versionAdded = type.GetCustomAttribute(typeof(VersionAddedAttribute)) as VersionAddedAttribute;
-				if (versionAdded != null && versionAdded.Release > db.Release)
+				if (versionAdded != null && versionAdded.Release > db.Release || type.IsAbstract)
 					type = typeof(IfcBuildingElementProxyType);
 
 				Type enumType = Type.GetType("GeometryGym.Ifc." + type.Name + "Enum");
 				ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(DatabaseIfc), typeof(string) }, null);
 				if (ctor == null)
 				{
-					ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(DatabaseIfc), typeof(string), enumType }, null);
+					if (enumType != null)
+					{
+						var types = new[] { typeof(DatabaseIfc), typeof(string), enumType };
+						ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, types, null);
+					}
 					if (ctor == null)
 						throw new Exception("XXX Unrecognized Ifc Constructor for " + className);
 					else 
 					{
-						object predefined = Enum.Parse(enumType, "NOTDEFINED");
-						result = ctor.Invoke(new object[] { db, name, predefined}) as IfcTypeProduct;
+						try
+						{
+							object predefined = Enum.Parse(enumType, "NOTDEFINED");
+							result = ctor.Invoke(new object[] { db, name, predefined }) as IfcTypeProduct;
+						}
+						catch { }
 					}
 				}
 				else

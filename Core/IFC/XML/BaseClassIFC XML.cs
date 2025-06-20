@@ -25,7 +25,6 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-//using System.Xml.Linq;
 
 
 using GeometryGym.STEP;

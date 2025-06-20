@@ -1636,6 +1636,8 @@ namespace GeometryGym.STEP
 		}
 		public static string StripString(string s, ref int pos, int len)
 		{
+			if (pos >= len)
+				return "";
 			int icounter = pos;
 			while (char.IsWhiteSpace(s[icounter]))
 			{

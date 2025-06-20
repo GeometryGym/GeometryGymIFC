@@ -1559,8 +1559,11 @@ namespace GeometryGym.Ifc
 			PredefinedType = m.PredefinedType;
 			if(m.mOrientationOf2DPlane != null)
 				OrientationOf2DPlane = db.Factory.Duplicate(m.OrientationOf2DPlane);
-			m.LoadedBy.ToList().ForEach(x => addLoadGroup( db.Factory.Duplicate(x)));
-			m.HasResults.ToList().ForEach(x => addResultGroup( db.Factory.Duplicate(x)));
+			if (options.DuplicateDownstream)
+			{
+				m.LoadedBy.ToList().ForEach(x => addLoadGroup(db.Factory.Duplicate(x)));
+				m.HasResults.ToList().ForEach(x => addResultGroup(db.Factory.Duplicate(x)));
+			}
 			if(m.mSharedPlacement != null)
 				SharedPlacement = db.Factory.Duplicate(m.SharedPlacement);
 		}
@@ -1573,7 +1576,11 @@ namespace GeometryGym.Ifc
 				SharedPlacement = new IfcLocalPlacement(facility.ObjectPlacement, mDatabase.Factory.XYPlanePlacement); 
 		}
 
-		internal void addLoadGroup(IfcStructuralLoadGroup lg) { mLoadedBy.Add(lg); lg.mLoadGroupFor.Add(this); }
+		internal void addLoadGroup(IfcStructuralLoadGroup lg) 
+		{
+			if(mLoadedBy.AddItem(lg))
+				lg.mLoadGroupFor.Add(this);
+		}
 		internal void addResultGroup(IfcStructuralResultGroup lg) { mHasResults.Add(lg); lg.mResultGroupFor = this; }
 
 		protected override List<T> Extract<T>(Type type)
@@ -1738,7 +1745,7 @@ namespace GeometryGym.Ifc
 			model.AddRelated(this);
 			mDatabase.Context.SetStructuralUnits();
 		}
-		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) :this(sm)
+		protected IfcStructuralItem(IfcStructuralAnalysisModel sm, int id) : this(sm)
 		{
 			if (id >= 0)
 				Name = id.ToString();
@@ -1862,7 +1869,24 @@ namespace GeometryGym.Ifc
 		public string Purpose { get { return mPurpose; } set { mPurpose = value; } }
 
 		internal IfcStructuralLoadGroup() : base() { }
-		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, DuplicateOptions options) : base(db, g, options) { PredefinedType = g.PredefinedType; mActionType = g.mActionType; mActionSource = g.mActionSource; mCoefficient = g.mCoefficient; mPurpose = g.mPurpose; }
+		internal IfcStructuralLoadGroup(DatabaseIfc db, IfcStructuralLoadGroup g, DuplicateOptions options) 
+			: base(db, g, options) 
+		{ 
+			PredefinedType = g.PredefinedType; 
+			mActionType = g.mActionType; 
+			mActionSource = g.mActionSource; 
+			mCoefficient = g.mCoefficient; 
+			mPurpose = g.mPurpose;
+			foreach(var model in g.mLoadGroupFor)
+			{
+				var duplicateModel = db.Factory.Duplicate(model, options);
+				duplicateModel.addLoadGroup(this);
+			}
+			if(mSourceOfResultGroup != null)
+			{
+				var source = db.Factory.duplicateWorker(mSourceOfResultGroup, options);
+			}
+		}
 		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, IfcLoadGroupTypeEnum type)
 			: base(sm.mDatabase, name) { mLoadGroupFor.Add(sm); sm.addLoadGroup(this); PredefinedType = type; }
 		public IfcStructuralLoadGroup(IfcStructuralAnalysisModel sm, string name, List<double> factors, List<IfcStructuralLoadGroup> cases, bool ULS)
@@ -2010,8 +2034,8 @@ namespace GeometryGym.Ifc
 				(db.Factory.Duplicate(sm) as IfcRelConnectsStructuralMember).RelatingStructuralMember = this;
 			
 		}
-		protected IfcStructuralMember(IfcStructuralAnalysisModel sm, IfcMaterialSelect ms, int id) : base(sm,id) { MaterialSelect = ms;  }
-		
+		protected IfcStructuralMember(IfcStructuralAnalysisModel sm, IfcMaterialSelect ms, int id) 
+			: base(sm, id) { MaterialSelect = ms;  }
 		public IfcMaterialSelect MaterialSelect
 		{
 			get { return GetMaterialSelect(); }

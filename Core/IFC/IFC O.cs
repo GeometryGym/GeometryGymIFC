@@ -313,7 +313,9 @@ namespace GeometryGym.Ifc
 					}
 					else
 					{
-
+						var duplicate = db.Factory.Duplicate(propertySetDefinition, options);
+						if (duplicate != null)
+							duplicate.RelateObjectDefinition(this);
 					}
 				}
 			}
@@ -1034,9 +1036,9 @@ namespace GeometryGym.Ifc
 		}
 	}
 	[Serializable]
-	public partial class IfcOpeningStandardCase : IfcOpeningElement //IFC4
+	public partial class IfcOpeningStandardCase : IfcOpeningElement 
 	{
-		public override string StepClassName { get { return (mDatabase.mRelease < ReleaseVersion.IFC4 ? "IfcOpeningElement" : base.StepClassName); } }
+		public override string StepClassName { get { return "IfcOpeningElement"; } }
 		internal IfcOpeningStandardCase() : base() { }
 		internal IfcOpeningStandardCase(DatabaseIfc db, IfcOpeningStandardCase o, DuplicateOptions options) : base(db, o, options) { }
 		public IfcOpeningStandardCase(IfcElement host, IfcObjectPlacement placement, IfcExtrudedAreaSolid eas) : base(host, placement, new IfcProductDefinitionShape(new IfcShapeRepresentation(eas))) { }

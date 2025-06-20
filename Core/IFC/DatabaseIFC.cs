@@ -603,8 +603,10 @@ namespace GeometryGym.Ifc
 			Type type = BaseClassIfc.GetType(str);
 			if (type == null)
 				throw new Exception("XXX Unrecognized Ifc Type for " + className);
-			
-			if (release < ReleaseVersion.IFC4X4_DRAFT)
+
+			if (string.Compare(str, "IfcEquipmentElement", true) == 0)
+				type = typeof(IfcBuildingElementProxy);
+			else if (release < ReleaseVersion.IFC4X4_DRAFT)
 			{
 				if (string.Compare(str, "IfcTunnel", true) == 0)
 					type = typeof(IfcFacility);
@@ -1708,7 +1710,7 @@ namespace GeometryGym.Ifc
 					else
 						mPerson.FamilyName = PersonIdentification();
 #if (IFCMODEL && !IFCIMPORTONLY && (RHINO || GH))
-					string str = ggAssembly.mOptions.OwnerRole;
+					string str = ggCore.Instance.mOptions.OwnerRole;
 					if (!string.IsNullOrEmpty(str))
 					{
 						IfcRoleEnum role = IfcRoleEnum.NOTDEFINED;
@@ -2667,7 +2669,7 @@ namespace GeometryGym.Ifc
 				try
 				{
 					BaseClassIfc o = obj.Object;
-					if (o is IfcPropertySet || o is IfcMaterialConstituentSet || o is IfcPropertySetTemplate)
+					if (o is IfcPropertySet || o is IfcMaterialConstituentSet || o is IfcPropertySetTemplate || o is IfcStructuralAnalysisModel)
 						secondPass.Add(obj);
 					else if (o is IfcTriangulatedFaceSet || o is IfcPolyLoop || o is IfcFacetedBrep)
 						threadSafeConstructors.Add(obj);

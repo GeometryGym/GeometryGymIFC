@@ -1270,6 +1270,10 @@ namespace GeometryGym.Ifc
 
 		internal IfcConnectionSurfaceGeometry() : base() { }
 		internal IfcConnectionSurfaceGeometry(DatabaseIfc db, IfcConnectionSurfaceGeometry g) : base(db,g) { SurfaceOnRelatingElement = db.Factory.Duplicate(g.mSurfaceOnRelatingElement) as IfcSurfaceOrFaceSurface; SurfaceOnRelatedElement = db.Factory.Duplicate(g.mSurfaceOnRelatedElement) as IfcSurfaceOrFaceSurface; }
+		public IfcConnectionSurfaceGeometry(IfcSurfaceOrFaceSurface surfaceOnRelatingElement) : base(surfaceOnRelatingElement.Database)
+		{
+			mSurfaceOnRelatingElement = surfaceOnRelatingElement;
+		}
 	}
 	[Serializable]
 	public partial class IfcConnectionVolumeGeometry : IfcConnectionGeometry

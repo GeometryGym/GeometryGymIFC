@@ -878,7 +878,8 @@ namespace GeometryGym.Ifc
 			base.parse(str, ref pos, release, len, dictionary);
 			Enum.TryParse<IfcAnalysisModelTypeEnum>(ParserSTEP.StripField(str, ref pos, len).Replace(".", ""), true, out mPredefinedType);
 			mOrientationOf2DPlane = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcAxis2Placement3D;
-			LoadedBy.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcStructuralLoadGroup));
+			foreach (IfcStructuralLoadGroup loadGroup in ParserSTEP.StripListLink(str, ref pos, len).Select(x => dictionary[x] as IfcStructuralLoadGroup))
+				addLoadGroup(loadGroup);
 			HasResults.AddRange(ParserSTEP.StripListLink(str, ref pos, len).Select(x=>dictionary[x] as IfcStructuralResultGroup));
 			if(release > ReleaseVersion.IFC2x3)
 				SharedPlacement = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcObjectPlacement;

@@ -52,8 +52,17 @@ namespace GeometryGym.STEP
 		}
 		public void Add(T item)
 		{
-			if(add(item) && CollectionChanged != null)
-				CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+			AddItem(item);	
+		}
+		public bool AddItem(T item)
+		{
+			if (add(item))
+			{
+				if (CollectionChanged != null)
+					CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+				return true;
+			}
+			return false;
 		}
 		public void AddRange(IEnumerable<T> collection)
 		{

@@ -606,8 +606,14 @@ namespace GeometryGym.Ifc
 		{
 			ApplicationDeveloper = dictionary[ParserSTEP.StripLink(str,ref pos, len)] as IfcOrganization;
 			mVersion = ParserSTEP.StripString(str, ref pos, len);
+			if (string.IsNullOrEmpty(mVersion))
+				mVersion = "Unknown";
 			mApplicationFullName = ParserSTEP.StripString(str, ref pos, len);
+			if (string.IsNullOrEmpty(mApplicationFullName))
+				mApplicationFullName = "Unknown";
 			mApplicationIdentifier = ParserSTEP.StripString(str, ref pos, len);
+			if(string.IsNullOrEmpty(mApplicationIdentifier))
+				mApplicationIdentifier = "Unknown"; 
 		}
 	}
 	public partial class IfcAppliedValue
