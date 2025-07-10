@@ -1561,7 +1561,8 @@ namespace GeometryGym.Ifc
 
 		internal IfcAnnotation() : base() { }
 		public IfcAnnotation(DatabaseIfc db) : base(db) { }
-		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a, DuplicateOptions options) : base(db, a, options) { }
+		internal IfcAnnotation(DatabaseIfc db, IfcAnnotation a, DuplicateOptions options) 
+			: base(db, a, options) { PredefinedType = a.PredefinedType; }
 		public IfcAnnotation(IfcProduct host) : base(host.mDatabase) { host.AddElement(this); }
 		public IfcAnnotation(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
 			: base(host.Database) 
@@ -1706,7 +1707,7 @@ namespace GeometryGym.Ifc
 				if (assembly != null)
 				{
 					AssemblyName name = assembly.GetName();
-					return "v" + name.Version.ToString();
+					return name.Version.ToString();
 				}
 			}
 			catch (Exception) { }

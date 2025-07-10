@@ -416,8 +416,14 @@ namespace GeometryGym.Ifc
 		protected IfcElement(DatabaseIfc db, IfcElement e, DuplicateOptions options) : base(db, e, options)
 		{
 			mTag = e.mTag;
-#warning todo finish inverse
-			
+
+			if (options.DuplicateDownstream)
+			{
+				foreach(var surfaceFeature in mHasSurfaceFeatures)
+				{
+					db.Factory.duplicateWorker(surfaceFeature, options);
+				}
+			}
 			List<IfcRelConnectsElements> rces = e.ConnectedTo.ToList();
 			rces.AddRange(e.ConnectedFrom);
 			foreach (IfcRelConnectsElements ce in rces)

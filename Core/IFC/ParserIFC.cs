@@ -35,7 +35,6 @@ namespace GeometryGym.Ifc
 {
 	public static class ParserIfc 
 	{
-
 		public static T ParseEnum<T>(string str, string enumName) where T : struct
 		{
 			int start = enumName.Length + 2, end = str.Length - start - 2;
@@ -515,6 +514,15 @@ namespace GeometryGym.Ifc
 			return false;
 		}
 
+		public static string FormatLength(double length, DatabaseIfc db)
+		{
+			if (double.IsNaN(length))
+				return "$";
+			double tol = (db == null ? 1e-6 : db.Tolerance / 100);
+			int digits = (db == null ? 5 : db.mLengthDigits);
+			double result = Math.Round(length, digits);
+			return ParserSTEP.DoubleToString(Math.Abs(result) < tol ? 0 : result);
+		}
 		public static string IdentifyIfcClass(string className, out string predefinedConstant)
 		{
 			predefinedConstant = "";

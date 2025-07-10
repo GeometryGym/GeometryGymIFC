@@ -2529,7 +2529,13 @@ namespace GeometryGym.Ifc
 
 		public IfcSurfaceFeature() : base() { }
 		public IfcSurfaceFeature(DatabaseIfc db) : base(db) { }
-		public IfcSurfaceFeature(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) : base(host, placement, representation) { }
+		public IfcSurfaceFeature(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
+			: base(host.Database) 
+		{
+			new IfcRelAdheresToElement(host, this);
+			ObjectPlacement = placement;
+			Representation = representation;
+		}
 	}
 	[Serializable]
 	public partial class IfcSurfaceOfLinearExtrusion : IfcSweptSurface

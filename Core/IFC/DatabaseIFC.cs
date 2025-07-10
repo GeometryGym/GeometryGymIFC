@@ -235,6 +235,8 @@ namespace GeometryGym.Ifc
 				return ReleaseVersion.IFC4X2;
 			if (modelView == ModelView.Ifc4X3NotAssigned)
 				return ReleaseVersion.IFC4X3_ADD2;
+			if ((modelView == ModelView.IFC4X3AlignmentBasedView || modelView == ModelView.IFC4X3Reference))
+				return ReleaseVersion.IFC4X3_ADD2;
 			if ((modelView == ModelView.Ifc4X4NotAssigned))
 				return ReleaseVersion.IFC4X4_DRAFT;
 			return ReleaseVersion.IFC4A2;

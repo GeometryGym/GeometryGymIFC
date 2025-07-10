@@ -415,12 +415,7 @@ namespace GeometryGym.Ifc
 
 		internal string formatLength(double length)
 		{
-			if (double.IsNaN(length))
-				return "$";
-			double tol = (mDatabase == null ? 1e-6 : mDatabase.Tolerance / 100);
-			int digits = (mDatabase == null ? 5 : mDatabase.mLengthDigits);
-			double result = Math.Round(length, digits);
-			return ParserSTEP.DoubleToString(Math.Abs(result) < tol ? 0 : result);
+			return ParserIfc.FormatLength(length, mDatabase);	
 		}
 		internal static BaseClassIfc LineParser(string className, string str, ReleaseVersion release, ConcurrentDictionary<int, BaseClassIfc> dictionary)
 		{
