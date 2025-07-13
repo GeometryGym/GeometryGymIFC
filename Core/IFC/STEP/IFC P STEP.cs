@@ -960,6 +960,11 @@ namespace GeometryGym.Ifc
 		{
 			base.parse(str, ref pos, release, len, dictionary);
 			string s = ParserSTEP.StripField(str, ref pos, len);
+
+			//check for parentheses around defining values
+			if (!string.IsNullOrEmpty(s) && s.StartsWith("(") && s.EndsWith(")")) // fix
+				s = s.Substring(1, s.Length - 2);
+
 			if (s[0] != '$')
 			{
 				List<string> ss = ParserSTEP.SplitLineFields(s);
@@ -971,6 +976,10 @@ namespace GeometryGym.Ifc
 				}
 			}
 			s = ParserSTEP.StripField(str, ref pos, len);
+			//check for parentheses around defining values
+			if (!string.IsNullOrEmpty(s) && s.StartsWith("(") && s.EndsWith(")")) // fix
+				s = s.Substring(1, s.Length - 2);
+
 			if (s[0] != '$')
 			{
 				List<string> ss = ParserSTEP.SplitLineFields(s);
