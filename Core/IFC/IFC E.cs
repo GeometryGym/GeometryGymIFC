@@ -417,11 +417,12 @@ namespace GeometryGym.Ifc
 		{
 			mTag = e.mTag;
 
-			if (options.DuplicateDownstream)
+			if (options.DuplicateDownstream && e.mHasSurfaceFeatures.Count > 0)
 			{
-				foreach(var surfaceFeature in mHasSurfaceFeatures)
+				DuplicateOptions noHostOptions = new DuplicateOptions(options) { DuplicateHost = false };
+				foreach(var surfaceFeature in e.mHasSurfaceFeatures)
 				{
-					db.Factory.duplicateWorker(surfaceFeature, options);
+					db.Factory.duplicateWorker(surfaceFeature, noHostOptions);
 				}
 			}
 			List<IfcRelConnectsElements> rces = e.ConnectedTo.ToList();

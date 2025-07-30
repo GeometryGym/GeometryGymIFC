@@ -3048,7 +3048,7 @@ namespace GeometryGym.Ifc
 			if(string.IsNullOrEmpty(organizationName))
 			{
 				organizationName = IfcOrganization.Organization;
-				IfcOrganization organization = mDatabase.Factory.Organization;
+				IfcOrganization organization = mDatabase.Factory.mOrganization;
 				if (organization != null)
 					organizationName = organization.Name; 
 			}

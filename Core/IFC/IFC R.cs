@@ -2254,11 +2254,22 @@ namespace GeometryGym.Ifc
 		internal IfcRelServicesBuildings(DatabaseIfc db, IfcRelServicesBuildings s, DuplicateOptions options) : base(db, s, options)
 		{
 			RelatingSystem = db.Factory.Duplicate(s.RelatingSystem, options) as IfcSystem;
-			s.RelatedBuildings.ToList().ForEach(x => addRelated(db.Factory.Duplicate(x, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcSpatialElement));
 		}
 		public IfcRelServicesBuildings(IfcSystem system, IfcSpatialElement se)
-			: base(system.mDatabase) { mRelatingSystem = system; system.mServicesBuildings = this; mRelatedBuildings.Add(se); se.mServicedBySystems.Add(this); }
-
+			: base(system.mDatabase)
+		{
+			mRelatingSystem = system;
+			system.mServicesBuildings = this;
+			addRelated(se);
+		}
+		public IfcRelServicesBuildings(IfcSystem system, IEnumerable<IfcSpatialElement> spatialElements)
+			:base(system.mDatabase)
+		{
+			mRelatingSystem = system;
+			system.mServicesBuildings = this;
+			foreach (var spatialElement in spatialElements)
+				addRelated(spatialElement);
+		}
 		internal void addRelated(IfcSpatialElement spatial)
 		{
 			mRelatedBuildings.Add(spatial);

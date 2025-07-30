@@ -1167,10 +1167,12 @@ namespace GeometryGym.Ifc
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))
 				{
 					IfcSystem sys = db.Factory.Duplicate(system, optionsNoHost) as IfcSystem;
-					if(sys.ServicesBuildings == null)
+					if (sys.ServicesBuildings == null)
 					{
 						new IfcRelServicesBuildings(sys, this);
 					}
+					else if(!sys.ServicesBuildings.RelatedBuildings.Contains(this))
+						sys.ServicesBuildings.addRelated(this);
 				}
 				foreach (var reference in e.ReferencesElements)
 				{
@@ -2529,6 +2531,16 @@ namespace GeometryGym.Ifc
 
 		public IfcSurfaceFeature() : base() { }
 		public IfcSurfaceFeature(DatabaseIfc db) : base(db) { }
+		internal IfcSurfaceFeature(DatabaseIfc db, IfcSurfaceFeature s, DuplicateOptions options) 
+			: base(db, s, options)
+		{
+			PredefinedType = s.PredefinedType;
+			if(options.DuplicateHost)
+			{
+				if(mAdheresToElement != null)
+					db.Factory.Duplicate(mAdheresToElement, options);
+			}
+		}
 		public IfcSurfaceFeature(IfcElement host, IfcObjectPlacement placement, IfcProductDefinitionShape representation) 
 			: base(host.Database) 
 		{
@@ -2885,10 +2897,18 @@ namespace GeometryGym.Ifc
 		internal IfcSystem() : base() { }
 		internal IfcSystem(DatabaseIfc db, IfcSystem s, DuplicateOptions options) : base(db, s, options)
 		{
-			if(options.DuplicateHost && s.mServicesBuildings != null)
+			if (s.mServicesBuildings != null)
 			{
-				IfcRelServicesBuildings rsb = db.Factory.Duplicate(s.mServicesBuildings, new DuplicateOptions(options) { DuplicateDownstream = false }) as IfcRelServicesBuildings;
-				rsb.RelatingSystem = this;
+				List<IfcSpatialElement> spatialElements = new List<IfcSpatialElement>();
+				foreach (var spatialElement in s.mServicesBuildings.RelatedBuildings)
+				{
+					IfcSpatialElement existing = db[spatialElement.GlobalId] as IfcSpatialElement;
+					if (existing != null)
+						spatialElements.Add(existing);
+				}
+				if (spatialElements != null)
+					new IfcRelServicesBuildings(this, spatialElements);
+
 			}
 		}
 		public IfcSystem(DatabaseIfc db, string name) : base(db, name) { }

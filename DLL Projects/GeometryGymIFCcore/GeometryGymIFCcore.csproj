@@ -1,21 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>GeometryGymIFC_Core</PackageId>
-    <Version>25.02.25</Version>
+    <Version>25.7.30.0</Version>
     <Authors>Geometry Gym</Authors>
     <Product>GeometryGymIFC_Core</Product>
     <Description>.Net Standard 2.0 C# classes to generate and parse buildingSMART IFC (Industry Foundation Class) files
-
 License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Description>
     <Copyright>Copyright (c) 2016 Geometry Gym Pty Ltd</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/GeometryGym/GeometryGymIFC</RepositoryUrl>
     <PackageTags>BIM, IFC, openBIM</PackageTags>
-    <AssemblyVersion>25.02.25.0</AssemblyVersion>
-    <FileVersion>25.02.25.0</FileVersion>
+    <AssemblyVersion>25.7.30.0</AssemblyVersion>
+    <FileVersion>25.7.30.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
