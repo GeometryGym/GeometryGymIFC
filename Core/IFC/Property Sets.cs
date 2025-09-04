@@ -808,7 +808,23 @@ namespace GeometryGym.Ifc
 	//Pset_FlowMeterTypeGasMeter
 	//Pset_FlowMeterTypeOilMeter
 	//Pset_FlowMeterTypeWaterMeter
-	//Pset_FootingCommon
+	public partial class Pset_FootingCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public bool LoadBearing { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value))); } }
+
+		public Pset_FootingCommon(IfcFooting instance) : base(instance) { }
+		public Pset_FootingCommon(IfcFootingType type) : base(type) { }
+	}
+	public partial class Pset_FootingTypePadFooting : IfcPropertySet
+	{
+		public double LoadBearingCapacity { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LoadBearingCapacity", new IfcPlanarForceMeasure(value))); } }
+		public bool IsReinforced { set { AddProperty(new IfcPropertySingleValue(mDatabase, "IsReinforced", new IfcBoolean(value))); } }
+
+		public Pset_FootingTypePadFooting(IfcFooting instance) : base(instance) { }
+		public Pset_FootingTypePadFooting(IfcFootingType type) : base(type) { }
+	}
 	//Pset_FurnitureTypeChair
 	//Pset_FurnitureTypeCommon
 	//Pset_FurnitureTypeDesk
@@ -974,7 +990,15 @@ namespace GeometryGym.Ifc
 	//Pset_OutsideDesignCriteria
 	//Pset_PackingInstructions
 	//Pset_Permit
-	//Pset_PileCommon
+	public partial class Pset_PileCommon : IfcPropertySet
+	{
+		public string Reference { set { AddProperty(new IfcPropertySingleValue(mDatabase, "Reference", new IfcIdentifier(value))); } }
+		public PEnum_Status Status { set { AddProperty(new IfcPropertyEnumeratedValue(mDatabase, "Status", new IfcLabel(value.ToString()))); } }
+		public bool LoadBearing { set { AddProperty(new IfcPropertySingleValue(mDatabase, "LoadBearing", new IfcBoolean(value))); } }
+
+		public Pset_PileCommon(IfcPile instance) : base(instance) { }
+		public Pset_PileCommon(IfcPileType type) : base(type) { }
+	}
 	//Pset_PipeConnectionFlanged
 	public partial class Pset_PipeFittingOccurrence : IfcPropertySet
 	{

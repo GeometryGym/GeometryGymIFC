@@ -1568,6 +1568,10 @@ namespace GeometryGym.Ifc
 			}
 			if(m.mSharedPlacement != null)
 				SharedPlacement = db.Factory.Duplicate(m.SharedPlacement);
+			if(db.Project == null)
+			{
+				db.Factory.Duplicate(m.mDatabase.Project, new DuplicateOptions(options) { DuplicateDownstream = false });
+			}
 		}
 		public IfcStructuralAnalysisModel(IfcSpatialElement facility, string name, IfcAnalysisModelTypeEnum type) : base(facility, name)
 		{

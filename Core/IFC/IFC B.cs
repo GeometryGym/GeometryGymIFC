@@ -152,7 +152,7 @@ namespace GeometryGym.Ifc
 		public IfcBooleanClippingResult(IfcBooleanClippingResult bc, IfcHalfSpaceSolid hss) : base(IfcBooleanOperator.DIFFERENCE, bc, hss) { }
 		public IfcBooleanClippingResult(IfcSweptAreaSolid s, IfcHalfSpaceSolid hss) : base(IfcBooleanOperator.DIFFERENCE, s, hss) { }
 	}
-	public partial interface IfcBooleanOperand : IBaseClassIfc { } //  SELECT (IfcSolidModel ,IfcHalfSpaceSolid ,IfcBooleanResult ,IfcCsgPrimitive3D);
+	public partial interface IfcBooleanOperand : IBaseClassIfc { } //  SELECT (IfcSolidModel, IfcHalfSpaceSolid, IfcBooleanResult, IfcCsgPrimitive3D, IfcTessellatedFaceSet);
 	[Serializable]
 	public partial class IfcBooleanResult : IfcGeometricRepresentationItem, IfcBooleanOperand, IfcCsgSelect
 	{
@@ -666,6 +666,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcBuildingStorey : IfcSpatialStructureElement
 	{
 		internal double mElevation = double.NaN;// : OPTIONAL IfcLengthMeasure; 
+		[Obsolete("DEPRECATED IFC4.3", false)]
 		public double Elevation
 		{
 			get { return mElevation; }

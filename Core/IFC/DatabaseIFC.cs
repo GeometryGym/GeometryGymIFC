@@ -155,7 +155,7 @@ namespace GeometryGym.Ifc
 		{
 			mRelease = schema;
 			mModelView = view;
-#if (RHINO || GH)
+#if (IFCMODEL && (RHINO || GH))
 			Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
 			if (doc != null)
 			{
@@ -2179,11 +2179,11 @@ namespace GeometryGym.Ifc
 			}
 		}
 
-		public bool IsApplicable(IfcObjectDefinition obj)
+		public virtual bool IsApplicable(IfcObjectDefinition obj)
 		{
 			return IsApplicable(obj.GetType(), obj.GetObjectDefinitionType());
 		}
-		public bool IsApplicable(Type typeIfc, string predefined)
+		internal bool IsApplicable(Type typeIfc, string predefined)
 		{
 			foreach (ApplicableType t in mApplicableTypes)
 			{

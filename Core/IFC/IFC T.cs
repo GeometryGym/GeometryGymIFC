@@ -349,11 +349,13 @@ namespace GeometryGym.Ifc
 	{
 		private IfcTendonTypeEnum mPredefinedType = IfcTendonTypeEnum.NOTDEFINED;// : IfcTendonType; //IFC4
 		private double mNominalDiameter;// : IfcPositiveLengthMeasure; 	IFC4 OPTIONAL
-		internal double mCrossSectionArea;// : IfcAreaMeasure; IFC4 OPTIONAL
-		internal double mSheathDiameter;// : OPTIONAL IfcPositiveLengthMeasure;
+		internal double mCrossSectionArea = double.NaN;// : IfcAreaMeasure; IFC4 OPTIONAL
+		internal double mSheathDiameter = double.NaN;// : OPTIONAL IfcPositiveLengthMeasure;
 
 		public IfcTendonTypeEnum PredefinedType { get { return mPredefinedType; }  set { mPredefinedType = validPredefinedType<IfcTendonTypeEnum>(value, mDatabase == null ? ReleaseVersion.IFC4X3 : mDatabase.Release); } }
 		public double NominalDiameter { get { return mNominalDiameter; } set { mNominalDiameter = value; } }
+		public double CrossSectionArea { get { return mCrossSectionArea; } set { mCrossSectionArea = value; } }
+		public double SheathDiameter { get { return mSheathDiameter; } set { mSheathDiameter = value; } }
 
 		internal IfcTendonType() : base() { }
 		internal IfcTendonType(DatabaseIfc db, IfcTendonType t, DuplicateOptions options) : base(db, t, options)

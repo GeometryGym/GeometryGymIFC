@@ -106,6 +106,33 @@ namespace GeometryGym.Ifc
 		public Qto_FootingBaseQuantities(IfcFooting instance) : base(instance) { }
 		public Qto_FootingBaseQuantities(IfcFootingType type) : base(type) { }
 	}
+	public partial class Qto_MemberBaseQuantities : IfcElementQuantity
+	{
+		public double Length { set { addQuantity(new IfcQuantityLength(mDatabase, "Length", value)); } }
+		public double CrossSectionArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossArea", value)); } }
+		public double OuterSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double GrossSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double NetSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double GrossVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "GrossVolume", value)); } }
+		public double NetVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "NetVolume", value)); } }
+		public double GrossWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "GrossWeight", value)); } }
+		public double NetWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "NetWeight", value)); } }
+		public Qto_MemberBaseQuantities(IfcMember instance) : base(instance) { }
+		public Qto_MemberBaseQuantities(IfcMemberType type) : base(type) { }
+	}
+	public partial class Qto_PileBaseQuantities : IfcElementQuantity
+	{
+		public double Length { set { addQuantity(new IfcQuantityLength(mDatabase, "Length", value)); } }
+		public double CrossSectionArea { set { addQuantity(new IfcQuantityArea(mDatabase, "GrossArea", value)); } }
+		public double OuterSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double GrossSurfaceArea { set { addQuantity(new IfcQuantityArea(mDatabase, "NetArea", value)); } }
+		public double GrossVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "GrossVolume", value)); } }
+		public double NetVolume { set { addQuantity(new IfcQuantityVolume(mDatabase, "NetVolume", value)); } }
+		public double GrossWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "GrossWeight", value)); } }
+		public double NetWeight { set { addQuantity(new IfcQuantityWeight(mDatabase, "NetWeight", value)); } }
+		public Qto_PileBaseQuantities(IfcPile instance) : base(instance) { }
+		public Qto_PileBaseQuantities(IfcPileType type) : base(type) { }
+	}
 	public partial class Qto_LinearStratumBaseQuantities : IfcElementQuantity
 	{
 		public double Diameter { set { addQuantity(new IfcQuantityLength(mDatabase, "Diameter", value)); } }
