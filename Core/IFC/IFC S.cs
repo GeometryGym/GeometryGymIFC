@@ -1226,7 +1226,7 @@ namespace GeometryGym.Ifc
 		private void setAttributes(IfcProduct host, string name, IfcObjectPlacement placement, IfcProductDefinitionShape representation)
 		{
 			Name = name;
-			if(placement == null)
+			if (placement == null)
 			{
 				IfcAxis2Placement3D relativePlacement = mDatabase.Factory.XYPlanePlacement;
 				if (host is IfcProduct product && product.ObjectPlacement != null)
@@ -1234,6 +1234,8 @@ namespace GeometryGym.Ifc
 				else
 					ObjectPlacement = new IfcLocalPlacement(relativePlacement);
 			}
+			else
+				ObjectPlacement = placement;
 			Representation = representation;
 		}
 		protected override void initialize()
