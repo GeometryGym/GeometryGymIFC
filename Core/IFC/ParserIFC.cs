@@ -374,6 +374,12 @@ namespace GeometryGym.Ifc
 			}
 			if(str.StartsWith("IFCDURATION("))
 				return IfcDuration.Convert(str.Substring(13, str.Length - 15));
+			if (str.StartsWith("IFCTIMESTAMP("))
+			{
+				string valueString = str.Substring(13, str.Length - 14);
+				if (int.TryParse(valueString, out int ts))
+					return new IfcTimeStamp(ts);
+			}
 			int i = 0;
 			if (int.TryParse(str, out i))
 				return new IfcInteger(i);
