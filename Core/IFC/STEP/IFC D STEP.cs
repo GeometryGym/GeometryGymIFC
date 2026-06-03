@@ -364,7 +364,7 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release) 
 		{ 
-			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mLongName) ? ",$,." : ",'" + ParserSTEP.Encode(mLongName) + "'") + (mPredefinedType == IfcDistributionSystemEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); 
+			return base.BuildStringSTEP(release) + (release < ReleaseVersion.IFC4 ? "" : (string.IsNullOrEmpty(mLongName) ? ",$" : ",'" + ParserSTEP.Encode(mLongName) + "'") + (mPredefinedType == IfcDistributionSystemEnum.NOTDEFINED ? ",$" : ",." + mPredefinedType.ToString() + ".")); 
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
