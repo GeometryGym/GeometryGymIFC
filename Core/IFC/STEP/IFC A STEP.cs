@@ -637,7 +637,7 @@ namespace GeometryGym.Ifc
 			result += IfcDate.STEPAttribute(mApplicableDate) + "," + IfcDate.STEPAttribute(mFixedUntilDate);
 			result += (string.IsNullOrEmpty(mCategory) ? ",$," : ",'" + ParserSTEP.Encode(mCategory) + "',") + (string.IsNullOrEmpty(mCondition) ? "$," : "'" + ParserSTEP.Encode(mCondition) + "',");
 			return result + (mArithmeticOperator == IfcArithmeticOperatorEnum.NONE ? "$," : "." + mArithmeticOperator.ToString() + ".,")
-				+ (mComponents.Count == 0 ? "$" : "(" + string.Join(",", mComponents.Select(x => "#" + x.StepId)) + ")"); ;
+				+ (mComponents.Count == 0 ? "$" : "(" + string.Join(",", mComponents.Select(x => "#" + x.StepId)) + ")");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{

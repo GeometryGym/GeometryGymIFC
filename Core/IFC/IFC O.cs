@@ -321,7 +321,7 @@ namespace GeometryGym.Ifc
 			}
 			if (options.DuplicateDownstream)
 			{
-				DuplicateOptions downstreamOptions = new DuplicateOptions(options) { DuplicateHost = true };
+				DuplicateOptions downstreamOptions = new DuplicateOptions(options) { DuplicateHost = false };
 
 				if(o is IfcSpatialElement spatialElement && !options.mSpatialElementsToDuplicate.Contains(spatialElement))
 				{
@@ -331,9 +331,14 @@ namespace GeometryGym.Ifc
 				}
 				foreach (IfcRelAggregates rag in o.mIsDecomposedBy)
 				{
-					foreach(IfcObjectDefinition obj in rag.RelatedObjects)
-						mDatabase.Factory.Duplicate(obj, downstreamOptions);
+					foreach (IfcObjectDefinition obj in rag.RelatedObjects)
+					{
+						var duplicate = mDatabase.Factory.Duplicate(obj, downstreamOptions) as IfcObjectDefinition;
+						if (duplicate != null)
+							AddAggregated(duplicate);
+					}
 				}
+				downstreamOptions.DuplicateHost = true;
 				foreach (IfcRelNests rn in o.mIsNestedBy)
 					mDatabase.Factory.Duplicate(rn, downstreamOptions);
 			}
@@ -723,36 +728,68 @@ namespace GeometryGym.Ifc
 		{
 			return isDuplicate(e, new OptionsTestDuplicate(tol));
 		}
-		internal class OptionsTestDuplicate
+		internal partial class OptionsTestDuplicate
 		{
+			public bool EnforceSubObjectGlobalIds = true;
 			public bool CheckRelatedObjects = true;
 			public double Tolerance = 1e-5;
 			public bool IgnoreTypeRepresentationMaps = false;
+			public bool RelativePlacementOnly = false;
+			
 			public OptionsTestDuplicate(double tol)
 			{
 				Tolerance = tol;
 			}
 		}
-		internal virtual bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcObjectDefinition objDef = e as IfcObjectDefinition;
 			if (objDef == null)
 				return false;
+			if (mDatabase.id == e.mDatabase.id && StepId == e.StepId)
+				return true;
 			if (base.isDuplicate(e, options.Tolerance))
 			{
+				if (!isDuplicateWorker(e, options))
+					return false;
 				if (options.CheckRelatedObjects)
 				{
 					IEnumerable<IfcObjectDefinition> objDefs = IsDecomposedBy.SelectMany(x => x.RelatedObjects);
-					IEnumerable<IfcObjectDefinition> dupObjDefs = objDef.IsDecomposedBy.SelectMany(x => x.RelatedObjects);
-					Dictionary<string, IfcObjectDefinition> dictObjDefs = dupObjDefs.ToDictionary(x => x.GlobalId, x => x);
-
-					foreach (IfcObjectDefinition od in objDefs)
+					List<IfcObjectDefinition> dupObjDefs = objDef.IsDecomposedBy.SelectMany(x => x.RelatedObjects).ToList();
+					if(objDefs.Count() != dupObjDefs.Count())
 					{
-						if (!dictObjDefs.ContainsKey(od.GlobalId))
-							return false;
-						IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
-						if (!od.isDuplicate(dup, options.Tolerance))
-							return false;
+						return false;
+					}
+					if (options.EnforceSubObjectGlobalIds)
+					{
+						Dictionary<string, IfcObjectDefinition> dictObjDefs = dupObjDefs.ToDictionary(x => x.GlobalId, x => x);
+
+						foreach (IfcObjectDefinition od in objDefs)
+						{
+							if (!dictObjDefs.ContainsKey(od.GlobalId))
+								return false;
+							IfcObjectDefinition dup = dictObjDefs[od.GlobalId];
+							if (!od.isDuplicate(dup, options.Tolerance))
+								return false;
+						}
+					}
+					else
+					{
+						foreach(var od in objDefs)
+						{
+							IfcObjectDefinition duplicate = null;
+							foreach(var dupOd in dupObjDefs)
+							{
+								if(od.isDuplicate(dupOd, options))
+								{
+									duplicate = od;
+									break;
+								}
+							}
+							if (duplicate == null)
+								return false;
+							dupObjDefs.Remove(duplicate);
+						}
 					}
 
 					if (objDef.mIsNestedBy.Count != mIsNestedBy.Count)
@@ -789,6 +826,10 @@ namespace GeometryGym.Ifc
 				return true;
 			}
 			return false;
+		}
+		internal virtual bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
+		{
+			return true;
 		}
 	}
 	[Serializable]
@@ -851,6 +892,31 @@ namespace GeometryGym.Ifc
 			return isXYPlaneWorker(tol);
 		}
 		internal abstract bool isXYPlaneWorker(double tol);
+		internal virtual bool isDuplicate(IfcObjectPlacement p, double tol, bool relativePlacementOnly)
+		{
+			if (p == null)
+				return false;
+			if (!relativePlacementOnly)
+			{
+				IfcObjectPlacement placementRelTo = PlacementRelTo;
+				if (placementRelTo == null)
+				{
+					if (p.PlacementRelTo != null && !p.PlacementRelTo.isXYPlane(tol))
+						return false;
+				}
+				else
+				{
+					if (p.PlacementRelTo == null)
+					{
+						if (!placementRelTo.isXYPlane(tol))
+							return false;
+					}
+					else if (!placementRelTo.isDuplicate(p.PlacementRelTo, tol))
+						return false;
+				}
+			}
+			return true;
+		}
 	}
 	[Serializable]
 	public partial class IfcObjective : IfcConstraint

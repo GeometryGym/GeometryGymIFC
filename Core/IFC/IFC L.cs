@@ -453,7 +453,7 @@ namespace GeometryGym.Ifc
 		}
 		public IfcLinearPositioningElement(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape) { }
 
-		internal override bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal override bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcLinearPositioningElement linearPositioningElement = e as IfcLinearPositioningElement;
 			if (linearPositioningElement == null)
@@ -466,7 +466,7 @@ namespace GeometryGym.Ifc
 			}
 			else if (linearPositioningElement.mAxis != null)
 				return false;
-			return base.isDuplicate(e, options);
+			return base.isDuplicateWorker(e, options);
 		}
 	}
 	[Serializable]

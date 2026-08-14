@@ -800,6 +800,16 @@ namespace GeometryGym.Ifc
 			obj["Angle"] = mAngle;
 		}
 	}
+	public partial class IfcRigidOperation
+	{
+		protected override void setJSON(JsonObject obj, BaseClassIfc host, SetJsonOptions options)
+		{
+			base.setJSON(obj, host, options);
+			obj["FirstCoordinate"] = mFirstCoordinate.getJson(host, options);
+			obj["SecondCoordinate"] = mSecondCoordinate.getJson(host, options);
+			obj["Height"] = mHeight;
+		}
+	}
 	public partial class IfcRoot
 	{
 		internal override void parseJsonObject(JsonObject obj)

@@ -1450,7 +1450,7 @@ namespace GeometryGym.Ifc
 	public partial class IfcRelConnectsWithRealizingElements : IfcRelConnectsElements
 	{
 		internal SET<IfcElement> mRealizingElements = new SET<IfcElement>();// :	SET [1:?] OF IfcElement;
-		internal string mConnectionType = "";// : :	OPTIONAL IfcLabel; 
+		internal string mConnectionType = "";// :	OPTIONAL IfcLabel; 
 
 		public SET<IfcElement> RealizingElements { get { return mRealizingElements; } }
 
@@ -1953,8 +1953,26 @@ namespace GeometryGym.Ifc
 		private IfcOpeningElement mRelatingOpeningElement;// : IfcOpeningElement;
 		private IfcElement mRelatedBuildingElement;// :OPTIONAL IfcElement; 
 
-		public IfcOpeningElement RelatingOpeningElement { get { return mRelatingOpeningElement; } set { mRelatingOpeningElement = value; value.mHasFillings.Add(this); } }
-		public IfcElement RelatedBuildingElement { get { return mRelatedBuildingElement; } set { mRelatedBuildingElement = value; value.mFillsVoids = this; } }
+		public IfcOpeningElement RelatingOpeningElement 
+		{
+			get { return mRelatingOpeningElement; }
+			set 
+			{
+				mRelatingOpeningElement = value;
+				if(value != null)
+					value.mHasFillings.Add(this); 
+			}
+		}
+		public IfcElement RelatedBuildingElement
+		{
+			get { return mRelatedBuildingElement; } 
+			set 
+			{
+				mRelatedBuildingElement = value; 
+				if(value != null)
+					value.mFillsVoids = this;
+			}
+		}
 
 		internal IfcRelFillsElement() : base() { }
 		internal IfcRelFillsElement(DatabaseIfc db, IfcRelFillsElement r, DuplicateOptions options) : base(db, r, options) { RelatingOpeningElement = db.Factory.Duplicate(r.RelatingOpeningElement, options); RelatedBuildingElement = db.Factory.Duplicate(r.RelatedBuildingElement, options); }
@@ -2133,7 +2151,7 @@ namespace GeometryGym.Ifc
 			if (e.NewItems != null)
 			{
 				foreach (IfcProduct product in e.NewItems)
-					product.PositionedRelativeTo.Add(this); ;
+					product.PositionedRelativeTo.Add(this);
 			}
 			if (e.OldItems != null)
 			{
@@ -2347,8 +2365,26 @@ namespace GeometryGym.Ifc
 		private IfcElement mRelatingBuildingElement;// : IfcElement;
 		private IfcFeatureElementSubtraction mRelatedOpeningElement;// : IfcFeatureElementSubtraction; 
 
-		public IfcElement RelatingBuildingElement { get { return mRelatingBuildingElement; } set { mRelatingBuildingElement = value; if(!value.mHasOpenings.Contains(this)) value.mHasOpenings.Add(this); } }
-		public IfcFeatureElementSubtraction RelatedOpeningElement { get { return mRelatedOpeningElement; } set { mRelatedOpeningElement = value; if(value != null) value.mVoidsElement = this; } }
+		public IfcElement RelatingBuildingElement 
+		{
+			get { return mRelatingBuildingElement; }
+			set 
+			{ 
+				mRelatingBuildingElement = value; 
+				if(!value.mHasOpenings.Contains(this)) 
+					value.mHasOpenings.Add(this); 
+			}
+		}
+		public IfcFeatureElementSubtraction RelatedOpeningElement
+		{
+			get { return mRelatedOpeningElement; } 
+			set 
+			{
+				mRelatedOpeningElement = value; 
+				if(value != null)
+					value.mVoidsElement = this; 
+			}
+		}
 
 		internal IfcRelVoidsElement() : base() { }
 		internal IfcRelVoidsElement(DatabaseIfc db, IfcRelVoidsElement v, DuplicateOptions options) : base(db, v, options)

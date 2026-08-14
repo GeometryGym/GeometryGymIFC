@@ -290,7 +290,7 @@ namespace GeometryGym.Ifc
 		public IfcAlignment(IfcSite host, IfcObjectPlacement placement, IfcAlignmentHorizontal horizontal, IfcAlignmentVertical vertical, IfcAlignmentCant cant, IfcCurve axis)
 			: this(placement, horizontal, vertical, cant, host, axis) { }
 
-		internal override bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal override bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcAlignment alignment = e as IfcAlignment;
 			if (alignment == null)
@@ -926,7 +926,7 @@ namespace GeometryGym.Ifc
 		{
 			return isDuplicate(horizontal, tol);
 		}
-		internal override bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal override bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcAlignmentHorizontal horizontal = e as IfcAlignmentHorizontal;
 			if (horizontal == null)
@@ -1279,7 +1279,7 @@ namespace GeometryGym.Ifc
 			DesignParameters = design; 
 		}
 
-		internal override bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal override bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcAlignmentSegment segment = e as IfcAlignmentSegment;
 			if (segment == null)

@@ -1407,17 +1407,17 @@ namespace GeometryGym.Ifc
 			}
 			return null;
 		}
-		internal override bool isDuplicate(BaseClassIfc e, OptionsTestDuplicate options)
+		internal override bool isDuplicateWorker(BaseClassIfc e, OptionsTestDuplicate options)
 		{
 			IfcProduct product = e as IfcProduct;
 			if (e == null)
 				return false;
-			if (base.isDuplicate(e, options))
+			if (base.isDuplicateWorker(e, options))
 			{
 				IfcObjectPlacement placement = ObjectPlacement, placement2 = product.ObjectPlacement;
 				if (placement != null)
 				{
-					if (!placement.isDuplicate(placement2, options.Tolerance))
+					if (!placement.isDuplicate(placement2, options.Tolerance, options.RelativePlacementOnly))
 						return false;
 				}
 				else if (placement2 != null)

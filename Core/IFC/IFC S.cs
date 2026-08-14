@@ -570,12 +570,18 @@ namespace GeometryGym.Ifc
 				RepresentationType = isTwoD ? ShapeRepresentationType.Curve2D.ToString() : ShapeRepresentationType.Curve3D.ToString();
 		}
 
-		//should remove above as in 3d?? hierarchy test
 		public IfcShapeRepresentation(IfcFacetedBrep brep) : base(brep) { RepresentationType = ShapeRepresentationType.Brep.ToString(); }
 		public IfcShapeRepresentation(IfcFaceBasedSurfaceModel surface) : base(surface) { RepresentationType = ShapeRepresentationType.SurfaceModel.ToString(); }
 		public IfcShapeRepresentation(IfcGeometricSet set) : base(set) { RepresentationType = ShapeRepresentationType.GeometricSet.ToString(); }
 		public IfcShapeRepresentation(IfcMappedItem item) : base(item) { RepresentationType = ShapeRepresentationType.MappedRepresentation.ToString(); }
-		public IfcShapeRepresentation(IfcPoint point) : base(point) { RepresentationType = ShapeRepresentationType.Point.ToString(); }
+		public IfcShapeRepresentation(IfcPoint point) : base(point)
+		{
+			if(mDatabase != null && mDatabase.Release < ReleaseVersion.IFC4)
+				RepresentationType = ShapeRepresentationType.GeometricSet.ToString(); 
+			else
+				RepresentationType = ShapeRepresentationType.Point.ToString(); 
+		}
+
 		//internal IfcShapeRepresentation(IfcRepresentationMap rm) : base(new IfcMappedItem(rm), "Model", "MappedRepresentation") { }
 		public IfcShapeRepresentation(IfcSectionedSpine spine) : base(spine)
 		{
@@ -593,7 +599,7 @@ namespace GeometryGym.Ifc
 		public IfcShapeRepresentation(IfcExtrudedAreaSolid extrudedAreaSolid) : base(extrudedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }
 		public IfcShapeRepresentation(IfcRevolvedAreaSolid revolvedAreaSolid) : base(revolvedAreaSolid) { RepresentationType = ShapeRepresentationType.SweptSolid.ToString(); }
 		public IfcShapeRepresentation(IfcExtrudedAreaSolidTapered extrudedAreaSolidTapered) : base(extrudedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); }
-		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); ; }
+		public IfcShapeRepresentation(IfcRevolvedAreaSolidTapered revolvedAreaSolidTapered) : base(revolvedAreaSolidTapered) { RepresentationType = ShapeRepresentationType.AdvancedSweptSolid.ToString(); }
 		public IfcShapeRepresentation(IfcSweptAreaSolid sweep) : base(sweep) 
 		{
 			if(mDatabase.Release < ReleaseVersion.IFC4 && (sweep is IfcExtrudedAreaSolid || sweep is IfcRevolvedAreaSolid))
@@ -1160,10 +1166,24 @@ namespace GeometryGym.Ifc
 			mLongName = e.mLongName;
 			if (options.DuplicateDownstream)
 			{
+				var downStreamOptions = new DuplicateOptions(options) { DuplicateHost = false };
 				foreach (IfcRelContainedInSpatialStructure css in e.ContainsElements)
 				{
-					foreach(IfcProduct obj in css.RelatedElements)
-						db.Factory.Duplicate(obj, options);
+					foreach (IfcProduct obj in css.RelatedElements)
+					{
+						var duplicate = db.Factory.Duplicate(obj, downStreamOptions) as IfcProduct;
+						if(duplicate != null)
+						{
+							if(mContainsElements.Count == 0)
+							{
+								new IfcRelContainedInSpatialStructure(duplicate, this);
+							}
+							else
+							{
+								mContainsElements.First().RelatedElements.Add(duplicate);
+							}
+						}
+					}
 				}
 				DuplicateOptions optionsNoHost = new DuplicateOptions(options) { DuplicateHost = false };
 				foreach(IfcSystem system in e.ServicedBySystems.Select(x=>x.RelatingSystem))

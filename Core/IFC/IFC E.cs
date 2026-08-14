@@ -433,13 +433,13 @@ namespace GeometryGym.Ifc
 				int relatingIndex = db.Factory.mDuplicateMapping.FindExisting(relating), relatedIndex = db.Factory.mDuplicateMapping.FindExisting(related);
 				if (relating != e && relatingIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false });
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false, DuplicateHost = false });
 					rce.RelatedElement = this;
 					rce.RelatingElement = db[relatingIndex] as IfcElement;
 				}
 				else if (related != e && relatedIndex > 0)
 				{
-					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false });
+					IfcRelConnectsElements rce = db.Factory.Duplicate(ce, new DuplicateOptions(options) { DuplicateDownstream = false, DuplicateHost = false });
 					rce.RelatingElement = this;
 					rce.RelatedElement = db[relatedIndex] as IfcElement;
 				}
@@ -650,6 +650,7 @@ namespace GeometryGym.Ifc
 
 		internal IfcElementAssembly() : base() { }
 		internal IfcElementAssembly(DatabaseIfc db, IfcElementAssembly a, DuplicateOptions options) : base(db, a, options) { PredefinedType = a.PredefinedType; }
+		public IfcElementAssembly(IfcObjectDefinition host, IfcObjectPlacement placement) : base(host, placement, null) { }
 		public IfcElementAssembly(IfcObjectDefinition host, IfcObjectPlacement placement, IfcProductDefinitionShape shape) : base(host, placement, shape) { }
 		public IfcElementAssembly(IfcObjectDefinition host, IfcAssemblyPlaceEnum placement, IfcElementAssemblyTypeEnum type) : base(host, null, null) { AssemblyPlace = placement; PredefinedType = type; }
 	}

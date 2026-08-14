@@ -861,7 +861,7 @@ namespace GeometryGym.Ifc
 				{
 					IfcValue value = SpecularHighlight as IfcValue;
 					if (value != null)
-						obj["SpecularHighlight"] = DatabaseIfc.extract(value); ;
+						obj["SpecularHighlight"] = DatabaseIfc.extract(value);
 						
 				}
 			}

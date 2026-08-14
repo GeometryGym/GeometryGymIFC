@@ -947,7 +947,8 @@ namespace GeometryGym.Ifc
 				(mDefinedValues.Count > 0 ? "(" + string.Join(",", mDefinedValues.Select(x=>x.ToString())) + ")," : "$,") +
 				(string.IsNullOrEmpty(mExpression) ? "$," : "'" + ParserSTEP.Encode(mExpression) + "',") + 
 				(mDefiningUnit == null ? "$" : "#" + mDefiningUnit.StepId) + 
-				(mDefinedUnit == null ? ",$,." : ",#,." + mDefinedUnit.StepId) + mCurveInterpolation.ToString() + ".";
+				(mDefinedUnit == null ? ",$" : ",#" + mDefinedUnit.StepId) +
+				(mCurveInterpolation == IfcCurveInterpolationEnum.NOTDEFINED ? ",$" : ",." + mCurveInterpolation.ToString() + ".");
 		}
 	}
 	public partial class IfcPropertyTableValue
@@ -958,7 +959,8 @@ namespace GeometryGym.Ifc
 				(mDefinedValues.Count > 0 ? "(" + string.Join(",", mDefinedValues.Select(x => x.ToString())) + ")," : "$,") +
 				(string.IsNullOrEmpty(mExpression) ? "$," : "'" + ParserSTEP.Encode(mExpression) + "',") +
 				(mDefiningUnit == null ? "$" : "#" + mDefiningUnit.StepId) +
-				(mDefinedUnit == null ? ",$,." : ",#,." + mDefinedUnit.StepId) + mCurveInterpolation.ToString() + ".";
+				(mDefinedUnit == null ? ",$" : ",#" + mDefinedUnit.StepId) +
+				(mCurveInterpolation == IfcCurveInterpolationEnum.NOTDEFINED ? ",$" : ",." + mCurveInterpolation.ToString() + ".");
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
 		{
