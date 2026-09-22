@@ -143,11 +143,13 @@ namespace GeometryGym.Ifc
 	{
 		protected override string BuildStringSTEP(ReleaseVersion release)
 		{
-			string id = Identification;
-			if (string.IsNullOrEmpty(mIdentification) && string.IsNullOrEmpty(mGivenName) && string.IsNullOrEmpty(mFamilyName))
+			string id = Identification, familyName = mFamilyName;
+			if (release < ReleaseVersion.IFC4 && string.IsNullOrEmpty(mGivenName) && string.IsNullOrEmpty(mFamilyName))
+				familyName = "Unknown";
+			else if (string.IsNullOrEmpty(mIdentification) && string.IsNullOrEmpty(mGivenName) && string.IsNullOrEmpty(mFamilyName))
 				id = "Unknown";
 			return (string.IsNullOrEmpty(id) ? "$," : "'" + ParserSTEP.Encode(id) + "',") + 
-				(string.IsNullOrEmpty(mFamilyName) ? "$," : "'" + ParserSTEP.Encode(mFamilyName) + "',") + 
+				(string.IsNullOrEmpty(familyName) ? "$," : "'" + ParserSTEP.Encode(familyName) + "',") + 
 				(string.IsNullOrEmpty(mGivenName) ? "$," : "'" + ParserSTEP.Encode(mGivenName) + "',") +
 				(mMiddleNames.Count == 0 ? "$," : "(" + string.Join(",", mMiddleNames.Select(x=> "'" + ParserSTEP.Encode(x) + "'")) + "),") +
 				(mPrefixTitles.Count == 0 ? "$," : "(" + string.Join(",", mPrefixTitles.Select(x=>"'" + ParserSTEP.Encode(x) + "'")) + "),") +

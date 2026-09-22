@@ -248,7 +248,17 @@ namespace GeometryGym.Ifc
 				str += "$";
 			else
 				str += "." + mState.ToString() + ".";
-			return str + ",." + (release < ReleaseVersion.IFC4 && mChangeAction == IfcChangeActionEnum.NOTDEFINED ? IfcChangeActionEnum.NOCHANGE : mChangeAction).ToString() + ".," + ParserSTEP.IntOptionalToString(mLastModifiedDate) + ","
+			string changeAction = release < ReleaseVersion.IFC4 ? ",.NOCHANGE.," : ",$,";
+			if (mChangeAction != IfcChangeActionEnum.NOTDEFINED)
+			{
+				if (mChangeAction == IfcChangeActionEnum.MODIFIEDADDED)
+					changeAction = ",.ADDED.,";
+				else if (mChangeAction == IfcChangeActionEnum.MODIFIEDDELETED)
+					changeAction = ",.DELETED.,";
+				else
+					changeAction = ",." + mChangeAction.ToString() + ".,";
+			}
+			return str + changeAction + ParserSTEP.IntOptionalToString(mLastModifiedDate) + ","
 				+ ParserSTEP.ObjToLinkString(mLastModifyingUser) + "," + ParserSTEP.ObjToLinkString(mLastModifyingApplication) + "," + mCreationDate;
 		}
 		internal override void parse(string str, ref int pos, ReleaseVersion release, int len, ConcurrentDictionary<int,BaseClassIfc> dictionary)
@@ -259,12 +269,13 @@ namespace GeometryGym.Ifc
 			if (s.StartsWith("."))
 				Enum.TryParse<IfcStateEnum>(s.Substring(1, s.Length - 2), true, out mState);
 			s = ParserSTEP.StripField(str, ref pos, len).Replace(".", "");
-			if (s.EndsWith("ADDED"))
-				mChangeAction = IfcChangeActionEnum.ADDED;
-			if (s.EndsWith("DELETED"))
-				mChangeAction = IfcChangeActionEnum.DELETED;
-			else
-				Enum.TryParse<IfcChangeActionEnum>(s.Substring(1, s.Length - 2), true, out mChangeAction);
+			if(!Enum.TryParse<IfcChangeActionEnum>(s.Substring(1, s.Length - 2), true, out mChangeAction))
+			{
+				if (s.EndsWith("ADDED"))
+					mChangeAction = IfcChangeActionEnum.ADDED;
+				else if (s.EndsWith("DELETED"))
+					mChangeAction = IfcChangeActionEnum.DELETED;
+			}
 			mLastModifiedDate = ParserSTEP.StripInt(str, ref pos, len);
 			LastModifyingUser = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcPersonAndOrganization;
 			LastModifyingApplication = dictionary[ParserSTEP.StripLink(str, ref pos, len)] as IfcApplication;
