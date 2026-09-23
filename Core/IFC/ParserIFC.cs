@@ -296,6 +296,12 @@ namespace GeometryGym.Ifc
 			{
 				if (string.Compare(type.Name,"IfcDescriptiveMeasure",true) == 0)
 					return new IfcDescriptiveMeasure(value);
+				if(string.Compare(type.Name, "IfcCountMeasure", true) == 0)
+				{
+					int dotIndex = value.IndexOf('.');
+					if(dotIndex < 0 && int.TryParse(value, out int i))
+						return new IfcCountMeasure(i);
+				}
 				double val = 0;
 				if(double.TryParse(value, System.Globalization.NumberStyles.Any, ParserSTEP.NumberFormat, out val))
 				{
