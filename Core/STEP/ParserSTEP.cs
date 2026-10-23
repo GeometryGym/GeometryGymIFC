@@ -1071,7 +1071,17 @@ namespace GeometryGym.STEP
 				throw new Exception("Unrecognized format!");
 			while (char.IsWhiteSpace(s[icounter]))
 				icounter++;
-			if (s[icounter] == ')')
+			char c = s[icounter];
+			if(c == '$')
+			{
+				c = s[++icounter];
+				while (c != ')')
+					c = s[++icounter];
+				pos = icounter+1;
+				progressToNext(s, ref pos, len);
+				return new List<int>();
+			}
+			if (c == ')')
 			{
 				pos = icounter + 1;
 				progressToNext(s, ref pos, len);

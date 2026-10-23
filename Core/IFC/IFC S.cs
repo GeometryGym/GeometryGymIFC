@@ -2854,7 +2854,7 @@ namespace GeometryGym.Ifc
 		private IfcProfileDef mSweptArea;// : IfcProfileDef;
 		private IfcAxis2Placement3D mPosition;// : IfcAxis2Placement3D; 	 :	OPTIONAL IFC4
 
-		public IfcProfileDef SweptArea { get { return mSweptArea; } set { mSweptArea = value; } }
+		public IfcProfileDef SweptArea { get { return mSweptArea; } set { mSweptArea = value; if (value != null) mSweptArea.mSweptSolids.Add(this); } }
 		public IfcAxis2Placement3D Position { get { return mPosition; } set { mPosition = value; } }
 
 		protected IfcSweptAreaSolid() : base() { }

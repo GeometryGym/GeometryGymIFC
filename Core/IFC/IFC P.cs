@@ -1552,6 +1552,7 @@ namespace GeometryGym.Ifc
 		private SET<IfcExternalReferenceRelationship> mHasExternalReference = new SET<IfcExternalReferenceRelationship>(); //IFC4 SET [0:?] OF IfcExternalReferenceRelationship FOR RelatedResourceObjects;
 		internal SET<IfcProfileProperties> mHasProperties = new SET<IfcProfileProperties>();
 		internal SET<IfcResourceConstraintRelationship> mHasConstraintRelationships = new SET<IfcResourceConstraintRelationship>(); //gg
+		internal SET<IfcSweptAreaSolid> mSweptSolids = new SET<IfcSweptAreaSolid>(); 
 		internal SET<IfcResourceConstraintRelationship> HasConstraintRelationships { get { return mHasConstraintRelationships; } }
 
 		public IfcProfileTypeEnum ProfileType { get { return mProfileType; } set { mProfileType = value; } }

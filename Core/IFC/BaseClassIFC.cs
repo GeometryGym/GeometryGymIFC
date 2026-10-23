@@ -52,6 +52,10 @@ namespace GeometryGym.Ifc
 			else
 				mGlobalId = globalId;
 		}
+		internal void resetGlobalId()
+		{
+			mGlobalId = "";
+		}
 		
 		[NonSerialized] internal DatabaseIfc mDatabase = null;
 
